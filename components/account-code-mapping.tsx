@@ -23,7 +23,7 @@ export function AccountCodeMapping() {
   ]
 
   return (
-    <div className="container mx-auto p-4 bg-background">
+    <div className=" mx-auto p-6 bg-background">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Account Code Mapping</h1>
         <div className="flex space-x-2">

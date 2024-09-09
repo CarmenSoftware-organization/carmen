@@ -105,7 +105,7 @@ export function UserDashboard() {
   )
 
   return (
-    <div className="container mx-auto p-6">
+    <div className=" mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">User Dashboard</h1>
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
         <div className="w-full md:w-1/3 relative">

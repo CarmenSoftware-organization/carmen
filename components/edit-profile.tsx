@@ -32,8 +32,8 @@ export function EditProfile() {
   }
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
+    <Card className="p-6 mx-auto bg-background">
+      <CardHeader >
         <CardTitle className="text-3xl font-bold">Edit Profile</CardTitle>
       </CardHeader>
       <CardContent>

@@ -46,7 +46,7 @@ export function DepartmentList() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 mx-auto  bg-background">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Department List</h1>
         <Dialog open={isAddDepartmentOpen} onOpenChange={setIsAddDepartmentOpen}>

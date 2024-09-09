@@ -4,7 +4,7 @@ import { EditProfile } from "@/components/edit-profile";
 
 export default function EditProfilePage() {
   return (
-    <div className="container mx-auto p-6">
+    <div className=" mx-auto p-6">
       <EditProfile />
     </div>
   );

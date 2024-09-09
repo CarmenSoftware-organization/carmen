@@ -39,7 +39,7 @@ export function CurrencyManagement() {
   }, [])
 
   return (
-    <div className="container mx-auto p-4 bg-white rounded-lg shadow">
+    <div className="mx-auto p-6 bg-background">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Currency Management</h1>
         <div className="flex items-center space-x-2">

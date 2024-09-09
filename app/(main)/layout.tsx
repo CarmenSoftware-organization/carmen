@@ -14,10 +14,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div>
       <Header onSidebarToggle={handleSidebarToggle} />
-      <Sidebar isOpen={isSidebarOpen} />
-      <main className="pt-16 md:pl-64">
+      <div className="flex justify-between">
+        <Sidebar isOpen={isSidebarOpen} />
+      <main className="pt-16 w-full">
         {children}
       </main>
+      </div>
     </div>
   );
 }

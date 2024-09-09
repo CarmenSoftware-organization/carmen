@@ -26,7 +26,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <nav className={`bg-gray-800 text-white fixed left-0 top-16 bottom-0 z-40 overflow-y-auto transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-0 -translate-x-full'} md:translate-x-0`}>
+    <nav className={`md:mt-16 bg-gray-800 text-white left-0 top-16 bottom-0 z-40 overflow-y-auto transition-all duration-300 ease-in-out ${isOpen ? 'w-80 h-[100vh]' : 'w-0 -translate-x-full'} md:translate-x-0`}>
       <div className="p-4 min-h-full">
         <ul className="space-y-2 mt-8">
           {menuItems.map((item) => (

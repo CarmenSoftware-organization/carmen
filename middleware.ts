@@ -20,11 +20,11 @@ export function middleware(request: Request) {
   const cookieStore = cookies();
   const isLoggedIn = cookieStore.get('isLoggedIn')?.value === 'true';
   
-  if (!publicRoutes.includes(url.pathname) && !mainRoutes.some(route => url.pathname.startsWith(route))) {
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-  }
+  // if (!publicRoutes.includes(url.pathname) && !mainRoutes.some(route => url.pathname.startsWith(route))) {
+  //   if (!isLoggedIn) {
+  //     return NextResponse.redirect(new URL('/login', request.url));
+  //   }
+  // }
 
   return NextResponse.next();
 }
