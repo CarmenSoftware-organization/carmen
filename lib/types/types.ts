@@ -2,13 +2,21 @@
 
 // Common Types and Enums
 
+// export const DocumentStatus = () => {
+//   return{
+//     DRAFT : {value : 1, label : 'DRAFT'},
+//     IN_PROGRESS : {value : 2, label : 'IN PROGRESS'},
+//     COMPLETED : {value : 3, label : 'COMPLETED'},
+//     VOID :  {value : 4, label : 'VOID'},
+//   }
+// }
+
 export enum DocumentStatus {
-    DRAFT = 'DRAFT',
-    SUBMITTED = 'SUBMITTED',
-    IN_PROGRESS = 'IN_PROGRESS',
-    COMPLETED = 'COMPLETED',
-    REJECTED = 'REJECTED'
-  }
+  DRAFT = 'DRAFT',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  VOID = 'VOID'
+}
   
   export type Money = {
     amount: number;
@@ -237,7 +245,10 @@ export enum DocumentStatus {
   export enum WorkflowStatus {
     PENDING = 'PENDING',
     APPROVED = 'APPROVED',
-    REJECTED = 'REJECTED'
+    REJECTED = 'REJECTED',
+    DRAFT = 'DRAFT',
+    SUBMITTED = 'SUBMITTED',
+    REVISION = 'REVISION',
   }
   
   export enum WorkflowStage {

@@ -113,7 +113,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto px-2 py-4">
+    <div className=" mx-auto p-6">
       <h1 className="text-2xl md:text-3xl font-bold mb-4 text-center">Hotel Supply Chain Dashboard</h1>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="dashboard">
