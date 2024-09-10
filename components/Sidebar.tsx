@@ -143,7 +143,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   return (
     <nav
-      className={`md:mt-16 bg-white text-primary dark:bg-gray-800 dark:text-white left-0 top-16 bottom-0 z-40 overflow-y-auto transition-all duration-300 ease-in-out ${
+      className={`mt-0 md:mt-12 drop-shadow-xl md:drop-shadow-none bg-white text-primary fixed md:sticky md:block dark:bg-gray-800 dark:text-white left-0 top-16 bottom-0 z-40 overflow-y-auto transition-all duration-300 ease-in-out ${
         isOpen ? "w-80 h-[100vh]" : "w-0 -translate-x-full"
       } md:translate-x-0`}
     >
@@ -154,7 +154,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
               <Link
                 href={item.path}
                 className={`flex items-center text-left hover:text-blue-400 ${
-                  pathname.startsWith(item.path) ? "text-blue-400" : ""
+                  pathname?.startsWith(item.path) ? "text-blue-400" : ""
                 }`}
               >
                 <svg

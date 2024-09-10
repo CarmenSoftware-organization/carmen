@@ -22,7 +22,7 @@ interface HeaderProps {
 }
 
 export default function Header({ onSidebarToggle }: HeaderProps) {
-  const [businessUnit, setBusinessUnit] = useState("All");
+  const [businessUnit, setBusinessUnit] = useState("BU1");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
@@ -38,7 +38,7 @@ export default function Header({ onSidebarToggle }: HeaderProps) {
   };
 
   return (
-    <header className="bg-background shadow-sm fixed top-0 left-0 right-0 z-50">
+    <header className="bg-background backdrop-blur-md shadow-sm fixed top-0 left-0 right-0 z-50">
       <div className="px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -51,8 +51,8 @@ export default function Header({ onSidebarToggle }: HeaderProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </Button>
-            <Link href="/dashboard" className="text-2xl md:text-3xl font-bold text-blue-600">
-              Carmen
+            <Link href="/dashboard" className="text-2xl md:text-3xl font-bold text-blue-900">
+              CARMEN
             </Link>
           </div>
           
@@ -62,19 +62,18 @@ export default function Header({ onSidebarToggle }: HeaderProps) {
                 <SelectValue placeholder="Business Unit" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All Business Units</SelectItem>
                 <SelectItem value="BU1">Business Unit 1</SelectItem>
                 <SelectItem value="BU2">Business Unit 2</SelectItem>
               </SelectContent>
             </Select>
-            <div className="relative hidden md:block">
+            {/* <div className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <Input
                 type="search"
                 placeholder="Search..."
                 className="pl-10 pr-4 py-2 w-48 lg:w-64 rounded-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-600"
               />
-            </div>
+            </div> */}
             <Button variant="ghost" size="icon" className="hidden md:inline-flex">
               <Bell size={20} />
             </Button>

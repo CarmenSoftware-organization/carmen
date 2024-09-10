@@ -17,6 +17,7 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2, ArrowUpDown } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const sampleData = [
   { id: 'PR-001', type: 'General Purchase', description: 'Office Supplies', requestor: 'John Doe', department: 'Administration', date: '2023-06-15', status: 'Submitted', amount: 500, currentStage: 'Initial Review' },
@@ -32,6 +33,7 @@ const sampleData = [
 ]
 
 export function PurchaseRequestList() {
+  const router = useRouter()
   const [currentPage, setCurrentPage] = React.useState(1)
   const [searchTerm, setSearchTerm] = React.useState('')
   const [selectedType, setSelectedType] = React.useState('All Types')
@@ -97,13 +99,25 @@ export function PurchaseRequestList() {
     }
   }
 
+  const handleCreateNewPR = () => {
+    router.push('/procurement/purchase-requests/new?mode=add')
+  }
+
+  const handleViewPR = (id: string) => {
+    router.push(`/procurement/purchase-requests/${id}?mode=view`)
+  }
+
+  const handleEditPR = (id: string) => {
+    router.push(`/procurement/purchase-requests/${id}?mode=edit`)
+  }
+
   return (
     <div className=" mx-auto p-2 md:p-4 lg:p-6">
       <Card className=" p-0">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 pt-4">
           <CardTitle className="text-xl lg:text-2xl font-bold">Purchase Requests</CardTitle>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm"><Plus className="mr-2 h-4 w-4" /> New PR</Button>
+            <Button size="sm" onClick={handleCreateNewPR}><Plus className="mr-2 h-4 w-4" /> New PR</Button>
             <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" /> Export</Button>
             <Button variant="outline" size="sm"><Printer className="mr-2 h-4 w-4" /> Print</Button>
           </div>
@@ -195,7 +209,7 @@ export function PurchaseRequestList() {
                     <div className="flex items-center space-x-2">
                       <Badge className=''
                         variant={
-                          pr.status === 'Approved' ? 'secondary' :
+                          pr.status === 'Approved' ? 'success' :
                           pr.status === 'Rejected' ? 'destructive' :
                           pr.status === 'Draft' ? 'outline' : 'default'
                         }
@@ -206,10 +220,10 @@ export function PurchaseRequestList() {
                       <span className="text-xs text-muted-foreground">({pr.id})</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button variant="ghost" size="icon" aria-label="View purchase request">
+                      <Button variant="ghost" size="icon" aria-label="View purchase request" onClick={() => handleViewPR(pr.id)}>
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" aria-label="Edit purchase request">
+                      <Button variant="ghost" size="icon" aria-label="Edit purchase request" onClick={() => handleEditPR(pr.id)}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" aria-label="Delete purchase request">
@@ -230,7 +244,7 @@ export function PurchaseRequestList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="p-0 h-auto font-medium text-muted-foreground uppercase text-[0.6rem]"
+                          className="p-0 h-auto font-medium text-muted-foreground uppercase text-xxs"
                           onClick={() => handleSort(field as keyof typeof sampleData[0])}
                         >
                           {label}
