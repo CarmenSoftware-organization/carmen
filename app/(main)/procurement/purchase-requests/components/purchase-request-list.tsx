@@ -38,7 +38,7 @@ export function PurchaseRequestList() {
   const [selectedStatus, setSelectedStatus] = React.useState('All Statuses')
   const [sortField, setSortField] = useState<keyof typeof sampleData[0] | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  const itemsPerPage = 5
+  const itemsPerPage = 10
 
   const filteredData = React.useMemo(() => {
     return sampleData.filter(pr => {
@@ -98,10 +98,10 @@ export function PurchaseRequestList() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <Card>
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">Purchase Requests</CardTitle>
+    <div className=" mx-auto p-2 md:p-4 lg:p-6">
+      <Card className=" p-0">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 pt-4">
+          <CardTitle className="text-xl lg:text-2xl font-bold">Purchase Requests</CardTitle>
           <div className="flex flex-wrap gap-2">
             <Button size="sm"><Plus className="mr-2 h-4 w-4" /> New PR</Button>
             <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" /> Export</Button>
@@ -189,24 +189,35 @@ export function PurchaseRequestList() {
           
           <div className="space-y-2">
             {getCurrentPageData().map((pr) => (
-              <Card key={pr.id} className="overflow-hidden">
-                <div className="p-4">
-                  <div className="flex justify-between items-center mb-2">
+              <Card key={pr.id} className="overflow-hidden p-0 hover:bg-secondary">
+                <div className="py-2 px-4">
+                  <div className="flex justify-between items-center mb-0">
                     <div className="flex items-center space-x-2">
-                      <h3 className="text-base font-semibold">{pr.description}</h3>
+                      <Badge className=''
+                        variant={
+                          pr.status === 'Approved' ? 'secondary' :
+                          pr.status === 'Rejected' ? 'destructive' :
+                          pr.status === 'Draft' ? 'outline' : 'default'
+                        }
+                      >
+                        {pr.status}
+                      </Badge>
+                      <h3 className="text-sm md:text-base font-semibold">{pr.description}</h3>
                       <span className="text-xs text-muted-foreground">({pr.id})</span>
                     </div>
-                    <Badge
-                      variant={
-                        pr.status === 'Approved' ? 'secondary' :
-                        pr.status === 'Rejected' ? 'destructive' :
-                        pr.status === 'Draft' ? 'outline' : 'default'
-                      }
-                    >
-                      {pr.status}
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="ghost" size="icon" aria-label="View purchase request">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" aria-label="Edit purchase request">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" aria-label="Delete purchase request">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
                     {[
                       { label: 'Type', field: 'type' },
                       { label: 'Requestor', field: 'requestor' },
@@ -219,7 +230,7 @@ export function PurchaseRequestList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="p-0 h-auto font-medium text-muted-foreground uppercase"
+                          className="p-0 h-auto font-medium text-muted-foreground uppercase text-[0.6rem]"
                           onClick={() => handleSort(field as keyof typeof sampleData[0])}
                         >
                           {label}
@@ -229,17 +240,6 @@ export function PurchaseRequestList() {
                       </div>
                     ))}
                   </div>
-                </div>
-                <div className="px-4 py-2 bg-muted/5 border-t flex justify-end space-x-2">
-                  <Button variant="ghost" size="icon" aria-label="View purchase request">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" aria-label="Edit purchase request">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" aria-label="Delete purchase request">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </Card>
             ))}
