@@ -211,3 +211,13 @@ export enum PRType {
     total: number;
     status: 'A' | 'R';
   }
+
+
+export enum CurrencyCode {
+  USD = 'USD',
+  EUR = 'EUR',
+  GBP = 'GBP',
+  JPY = 'JPY',
+  CNY = 'CNY',
+  THB = 'THB'
+}

@@ -1,0 +1,917 @@
+import { GoodsReceiveNote, GoodsReceiveNoteItem, StockMovement, Department, AccountCode, Comment, Attachment, ActivityLogEntry } from './types'
+
+export const sampleDepartments: Department[] = [
+  { id: "DEPT-001", name: "Food & Beverage" },
+  { id: "DEPT-002", name: "Housekeeping" },
+  { id: "DEPT-003", name: "Administration" },
+  { id: "DEPT-004", name: "Maintenance" },
+];
+
+export const sampleAccountCodes: AccountCode[] = [
+  { id: "ACC-001", code: "1000", name: "Inventory" },
+  { id: "ACC-002", code: "2000", name: "Accounts Payable" },
+  { id: "ACC-003", code: "2200", name: "Tax Payable" },
+  { id: "ACC-004", code: "5000", name: "Cost of Goods Sold" },
+];
+
+export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
+  {
+    id: "GRN-001",
+    ref: "GRN-2023-001",
+    date: "2023-05-15",
+    invoiceDate: "2023-05-14",
+    invoiceNumber: "INV-2023-105",
+    description: "Weekly F&B Supplies",
+    receiver: "john_doe",
+    vendor: "global_fb",
+    location: "main_kitchen",
+    currency: "usd",
+    status: "received",
+    isConsignment: false,
+    isCash: false,
+    cashBook: "main_account",
+    items: [
+      {
+        id: 1,
+        name: "Premium Coffee Beans",
+        description: "Arabica beans, medium roast",
+        orderedQuantity: 20,
+        receivedQuantity: 20,
+        unit: "kg",
+        unitPrice: 15.50,
+        totalPrice: 310,
+        taxRate: 10,
+        taxAmount: 31,
+        discountRate: 0,
+        discountAmount: 0,
+        netAmount: 341,
+        expiryDate: "2024-05-15",
+        batchNumber: "CB001",
+        serialNumber: "",
+        notes: "",
+        baseQuantity: 20,
+        basePrice: 15.50,
+        baseUnit: "kg",
+        conversionRate: 1,
+        extraCost: 0,
+        applyDiscount: false,
+        applyTax: true,
+        inventoryOnHand: 50,
+        inventoryOnOrder: 100,
+        inventoryReorderThreshold: 30,
+        inventoryRestockLevel: 100,
+        purchaseOrderRef: "PO-2023-001",
+        lastPurchasePrice: 15.00,
+        lastVendor: "global_fb",
+        lotNumber: "LOT-001",
+        deliveryPoint: "Main Kitchen",
+        location: "Dry Storage",
+        isFreeOfCharge: false,
+      },
+      {
+        id: 2,
+        name: "Fresh Atlantic Salmon",
+        description: "Freshly caught salmon fillets",
+        orderedQuantity: 15,
+        receivedQuantity: 15,
+        unit: "kg",
+        unitPrice: 22.00,
+        totalPrice: 330,
+        taxRate: 10,
+        taxAmount: 33,
+        discountRate: 0,
+        discountAmount: 0,
+        netAmount: 363,
+        expiryDate: "2023-05-20",
+        batchNumber: "FS001",
+        serialNumber: "",
+        notes: "",
+        baseQuantity: 15,
+        basePrice: 22.00,
+        baseUnit: "kg",
+        conversionRate: 1,
+        extraCost: 0,
+        applyDiscount: false,
+        applyTax: true,
+        inventoryOnHand: 25,
+        inventoryOnOrder: 50,
+        inventoryReorderThreshold: 20,
+        inventoryRestockLevel: 60,
+        purchaseOrderRef: "PO-2023-002",
+        lastPurchasePrice: 21.50,
+        lastVendor: "seafood_supplier",
+        lotNumber: "LOT-002",
+        deliveryPoint: "Main Kitchen",
+        location: "Cold Storage",
+        isFreeOfCharge: false,
+      }
+    ],
+    stockMovements: [
+      {
+        id: 1,
+        itemName: "Premium Coffee Beans",
+        quantity: 20,
+        fromLocation: "Receiving Dock",
+        toLocation: "Main Kitchen",
+        date: "2023-05-15",
+        status: "Completed"
+      },
+      {
+        id: 2,
+        itemName: "Fresh Atlantic Salmon",
+        quantity: 15,
+        fromLocation: "Receiving Dock",
+        toLocation: "Cold Storage",
+        date: "2023-05-15",
+        status: "In Progress"
+      }
+    ],
+    extraCosts: [],
+    comments: [
+      {
+        id: "COM-001",
+        number: 1,
+        date: "2023-05-15T10:30:00Z",
+        author: "John Doe",
+        text: "Received all items in good condition."
+      },
+      {
+        id: "COM-002",
+        number: 2,
+        date: "2023-05-15T14:45:00Z",
+        author: "Jane Smith",
+        text: "Quality check completed. All items meet our standards."
+      }
+    ],
+    attachments: [
+      {
+        id: "ATT-001",
+        number: 1,
+        fileName: "invoice_2023-105.pdf",
+        description: "Supplier invoice for GRN-2023-001",
+        publicAccess: false,
+        date: "2023-05-15T11:00:00Z",
+        uploader: "John Doe"
+      },
+      {
+        id: "ATT-002",
+        number: 2,
+        fileName: "quality_check_report.docx",
+        description: "Quality check report for received items",
+        publicAccess: true,
+        date: "2023-05-15T15:00:00Z",
+        uploader: "Jane Smith"
+      }
+    ],
+    activityLog: [
+      {
+        id: "ACT-001",
+        dateTime: "2023-05-15T09:00:00Z",
+        user: "John Doe",
+        action: "Created Goods Receive Note"
+      },
+      {
+        id: "ACT-002",
+        dateTime: "2023-05-15T10:30:00Z",
+        user: "John Doe",
+        action: "Marked items as received"
+      },
+      {
+        id: "ACT-003",
+        dateTime: "2023-05-15T14:45:00Z",
+        user: "Jane Smith",
+        action: "Completed quality check"
+      },
+      {
+        id: "ACT-004",
+        dateTime: "2023-05-15T16:00:00Z",
+        user: "John Doe",
+        action: "Finalized Goods Receive Note"
+      }
+    ],
+    financialSummary: {
+      netAmount: 704,
+      taxAmount: 64,
+      totalAmount: 768,
+      currency: "USD",
+      baseNetAmount: 704,
+      baseTaxAmount: 64,
+      baseTotalAmount: 768,
+      baseCurrency: "USD",
+      jvType: "GRN",
+      jvNumber: "JV-2023-001",
+      jvDate: "2023-05-15",
+      jvDescription: "Weekly F&B Supplies",
+      jvStatus: "Posted",
+      jvReference: "GRN-2023-001",
+      jvDetail: [
+        {
+          department: sampleDepartments[0],
+          accountCode: sampleAccountCodes[0],
+          accountName: "Inventory",
+          currency: "USD",
+          debit: 704,
+          credit: 0,
+          baseCurrency: "USD",
+          baseDebit: 704,
+          baseCredit: 0
+        },
+        {
+          department: sampleDepartments[0],
+          accountCode: sampleAccountCodes[1],
+          accountName: "Accounts Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 310,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 310
+        },
+        {
+          department: sampleDepartments[0],
+          accountCode: sampleAccountCodes[2],
+          accountName: "Tax Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 31,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 31
+        },
+        {
+          department: sampleDepartments[0],
+          accountCode: sampleAccountCodes[3],
+          accountName: "Cost of Goods Sold",
+          currency: "USD",
+          debit: 0,
+          credit: 310,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 310
+        }
+      ],
+      jvTotal: {
+        debit: 768,
+        credit: 768,
+        baseDebit: 768,
+        baseCredit: 768,
+        baseCurrency: "USD"
+      }
+    }
+  },
+  {
+    id: "GRN-002",
+    ref: "GRN-2023-002",
+    date: "2023-05-18",
+    invoiceDate: "2023-05-17",
+    invoiceNumber: "INV-2023-106",
+    description: "Monthly Cleaning Supplies",
+    receiver: "jane_smith",
+    vendor: "clean_co",
+    location: "housekeeping",
+    currency: "usd",
+    status: "pending",
+    isConsignment: false,
+    isCash: false,
+    cashBook: "operations_account",
+    items: [
+      {
+        id: 1,
+        name: "All-Purpose Cleaner",
+        description: "Concentrated cleaning solution",
+        orderedQuantity: 50,
+        receivedQuantity: 50,
+        unit: "bottles",
+        unitPrice: 5.99,
+        totalPrice: 299.50,
+        taxRate: 8,
+        taxAmount: 23.96,
+        discountRate: 5,
+        discountAmount: 14.98,
+        netAmount: 308.48,
+        expiryDate: "2024-05-18",
+        batchNumber: "CL001",
+        serialNumber: "",
+        notes: "",
+        baseQuantity: 50,
+        basePrice: 5.99,
+        baseUnit: "bottles",
+        conversionRate: 1,
+        extraCost: 0,
+        applyDiscount: true,
+        applyTax: true,
+        inventoryOnHand: 100,
+        inventoryOnOrder: 200,
+        inventoryReorderThreshold: 50,
+        inventoryRestockLevel: 150,
+        purchaseOrderRef: "PO-2023-003",
+        lastPurchasePrice: 5.50,
+        lastVendor: "clean_co",
+        lotNumber: "LOT-003",
+        deliveryPoint: "Housekeeping",
+        location: "Storage Room",
+        isFreeOfCharge: false,
+      },
+      {
+        id: 2,
+        name: "Microfiber Cloths",
+        description: "Pack of 100 microfiber cleaning cloths",
+        orderedQuantity: 10,
+        receivedQuantity: 10,
+        unit: "packs",
+        unitPrice: 24.99,
+        totalPrice: 249.90,
+        taxRate: 8,
+        taxAmount: 19.99,
+        discountRate: 0,
+        discountAmount: 0,
+        netAmount: 269.89,
+        expiryDate: "",
+        batchNumber: "MC001",
+        serialNumber: "",
+        notes: "",
+        baseQuantity: 10,
+        basePrice: 24.99,
+        baseUnit: "packs",
+        conversionRate: 1,
+        extraCost: 0,
+        applyDiscount: false,
+        applyTax: true,
+        inventoryOnHand: 50,
+        inventoryOnOrder: 100,
+        inventoryReorderThreshold: 30,
+        inventoryRestockLevel: 80,
+        purchaseOrderRef: "PO-2023-004",
+        lastPurchasePrice: 24.50,
+        lastVendor: "clean_co",
+        lotNumber: "LOT-004",
+        deliveryPoint: "Housekeeping",
+        location: "Storage Room",
+        isFreeOfCharge: false,
+      }
+    ],
+    stockMovements: [
+      {
+        id: 1,
+        itemName: "All-Purpose Cleaner",
+        quantity: 50,
+        fromLocation: "Receiving Dock",
+        toLocation: "Housekeeping Storage",
+        date: "2023-05-18",
+        status: "Pending"
+      },
+      {
+        id: 2,
+        itemName: "Microfiber Cloths",
+        quantity: 10,
+        fromLocation: "Receiving Dock",
+        toLocation: "Housekeeping Storage",
+        date: "2023-05-18",
+        status: "Pending"
+      }
+    ],
+    extraCosts: [],
+    comments: [
+      {
+        id: "COM-003",
+        number: 1,
+        date: "2023-05-18T11:15:00Z",
+        author: "Jane Smith",
+        text: "Partial delivery received. Awaiting remaining items."
+      }
+    ],
+    attachments: [
+      {
+        id: "ATT-003",
+        number: 1,
+        fileName: "partial_delivery_note.pdf",
+        description: "Delivery note for partial shipment",
+        publicAccess: false,
+        date: "2023-05-18T11:30:00Z",
+        uploader: "Jane Smith"
+      }
+    ],
+    activityLog: [
+      {
+        id: "ACT-005",
+        dateTime: "2023-05-18T10:00:00Z",
+        user: "Jane Smith",
+        action: "Created Goods Receive Note"
+      },
+      {
+        id: "ACT-006",
+        dateTime: "2023-05-18T11:15:00Z",
+        user: "Jane Smith",
+        action: "Recorded partial delivery"
+      }
+    ],
+    financialSummary: {
+      netAmount: 578.37,
+      taxAmount: 43.95,
+      totalAmount: 622.32,
+      currency: "USD",
+      baseNetAmount: 578.37,
+      baseTaxAmount: 43.95,
+      baseTotalAmount: 622.32,
+      baseCurrency: "USD",
+      jvType: "GRN",
+      jvNumber: "JV-2023-002",
+      jvDate: "2023-05-18",
+      jvDescription: "Monthly Cleaning Supplies",
+      jvStatus: "Pending",
+      jvReference: "GRN-2023-002",
+      jvDetail: [
+        {
+          department: sampleDepartments[1],
+          accountCode: sampleAccountCodes[0],
+          accountName: "Inventory",
+          currency: "USD",
+          debit: 578.37,
+          credit: 0,
+          baseCurrency: "USD",
+          baseDebit: 578.37,
+          baseCredit: 0
+        },
+        {
+          department: sampleDepartments[1],
+          accountCode: sampleAccountCodes[1],
+          accountName: "Accounts Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 299.50,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 299.50
+        },
+        {
+          department: sampleDepartments[1],
+          accountCode: sampleAccountCodes[2],
+          accountName: "Tax Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 23.96,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 23.96
+        },
+        {
+          department: sampleDepartments[1],
+          accountCode: sampleAccountCodes[3],
+          accountName: "Cost of Goods Sold",
+          currency: "USD",
+          debit: 0,
+          credit: 299.50,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 299.50
+        }
+      ],
+      jvTotal: {
+        debit: 622.32,
+        credit: 622.32,
+        baseDebit: 622.32,
+        baseCredit: 622.32,
+        baseCurrency: "USD"
+      }
+    }
+  },
+  {
+    id: "GRN-003",
+    ref: "GRN-2023-003",
+    date: "2023-05-20",
+    invoiceDate: "2023-05-19",
+    invoiceNumber: "INV-2023-107",
+    description: "Office Supplies Restock",
+    receiver: "mike_johnson",
+    vendor: "office_depot",
+    location: "admin_office",
+    currency: "usd",
+    status: "partially_received",
+    isConsignment: false,
+    isCash: false,
+    cashBook: "admin_account",
+    items: [
+      {
+        id: 1,
+        name: "Printer Paper",
+        description: "A4 size, 500 sheets per ream",
+        orderedQuantity: 100,
+        receivedQuantity: 80,
+        unit: "reams",
+        unitPrice: 4.50,
+        totalPrice: 450,
+        taxRate: 5,
+        taxAmount: 22.50,
+        discountRate: 2,
+        discountAmount: 9,
+        netAmount: 463.50,
+        expiryDate: "",
+        batchNumber: "PP001",
+        serialNumber: "",
+        notes: "20 reams backordered",
+        baseQuantity: 100,
+        basePrice: 4.50,
+        baseUnit: "reams",
+        conversionRate: 1,
+        extraCost: 0,
+        applyDiscount: true,
+        applyTax: true,
+        inventoryOnHand: 200,
+        inventoryOnOrder: 300,
+        inventoryReorderThreshold: 100,
+        inventoryRestockLevel: 200,
+        purchaseOrderRef: "PO-2023-005",
+        lastPurchasePrice: 4.20,
+        lastVendor: "office_depot",
+        lotNumber: "LOT-005",
+        deliveryPoint: "Admin Office",
+        location: "Supply Room",
+        isFreeOfCharge: false,
+      },
+      {
+        id: 2,
+        name: "Ballpoint Pens",
+        description: "Box of 50 blue ballpoint pens",
+        orderedQuantity: 20,
+        receivedQuantity: 20,
+        unit: "boxes",
+        unitPrice: 10.99,
+        totalPrice: 219.80,
+        taxRate: 5,
+        taxAmount: 10.99,
+        discountRate: 0,
+        discountAmount: 0,
+        netAmount: 230.79,
+        expiryDate: "",
+        batchNumber: "BP001",
+        serialNumber: "",
+        notes: "",
+        baseQuantity: 20,
+        basePrice: 10.99,
+        baseUnit: "boxes",
+        conversionRate: 1,
+        extraCost: 0,
+        applyDiscount: false,
+        applyTax: true,
+        inventoryOnHand: 50,
+        inventoryOnOrder: 100,
+        inventoryReorderThreshold: 30,
+        inventoryRestockLevel: 80,
+        purchaseOrderRef: "PO-2023-006",
+        lastPurchasePrice: 10.50,
+        lastVendor: "office_depot",
+        lotNumber: "LOT-006",
+        deliveryPoint: "Admin Office",
+        location: "Supply Room",
+        isFreeOfCharge: false,
+      }
+    ],
+    stockMovements: [
+      {
+        id: 1,
+        itemName: "Printer Paper",
+        quantity: 80,
+        fromLocation: "Receiving Dock",
+        toLocation: "Admin Office Supply Room",
+        date: "2023-05-20",
+        status: "Completed"
+      },
+      {
+        id: 2,
+        itemName: "Ballpoint Pens",
+        quantity: 20,
+        fromLocation: "Receiving Dock",
+        toLocation: "Admin Office Supply Room",
+        date: "2023-05-20",
+        status: "Completed"
+      }
+    ],
+    extraCosts: [],
+    comments: [
+      {
+        id: "COM-004",
+        number: 1,
+        date: "2023-05-20T13:00:00Z",
+        author: "Mike Johnson",
+        text: "Some items backordered. Updated expected delivery date."
+      }
+    ],
+    attachments: [
+      {
+        id: "ATT-004",
+        number: 1,
+        fileName: "backorder_notification.pdf",
+        description: "Supplier notification for backordered items",
+        publicAccess: false,
+        date: "2023-05-20T13:15:00Z",
+        uploader: "Mike Johnson"
+      }
+    ],
+    activityLog: [
+      {
+        id: "ACT-007",
+        dateTime: "2023-05-20T12:30:00Z",
+        user: "Mike Johnson",
+        action: "Created Goods Receive Note"
+      },
+      {
+        id: "ACT-008",
+        dateTime: "2023-05-20T13:00:00Z",
+        user: "Mike Johnson",
+        action: "Updated status to partially received"
+      }
+    ],
+    financialSummary: {
+      netAmount: 694.29,
+      taxAmount: 33.49,
+      totalAmount: 727.78,
+      currency: "USD",
+      baseNetAmount: 694.29,
+      baseTaxAmount: 33.49,
+      baseTotalAmount: 727.78,
+      baseCurrency: "USD",
+      jvType: "GRN",
+      jvNumber: "JV-2023-003",
+      jvDate: "2023-05-20",
+      jvDescription: "Office Supplies Restock",
+      jvStatus: "Posted",
+      jvReference: "GRN-2023-003",
+      jvDetail: [
+        {
+          department: sampleDepartments[2],
+          accountCode: sampleAccountCodes[0],
+          accountName: "Inventory",
+          currency: "USD",
+          debit: 694.29,
+          credit: 0,
+          baseCurrency: "USD",
+          baseDebit: 694.29,
+          baseCredit: 0
+        },
+        {
+          department: sampleDepartments[2],
+          accountCode: sampleAccountCodes[1],
+          accountName: "Accounts Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 450,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 450
+        },
+        {
+          department: sampleDepartments[2],
+          accountCode: sampleAccountCodes[2],
+          accountName: "Tax Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 22.50,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 22.50
+        },
+        {
+          department: sampleDepartments[2],
+          accountCode: sampleAccountCodes[3],
+          accountName: "Cost of Goods Sold",
+          currency: "USD",
+          debit: 0,
+          credit: 450,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 450
+        }
+      ],
+      jvTotal: {
+        debit: 727.78,
+        credit: 727.78,
+        baseDebit: 727.78,
+        baseCredit: 727.78,
+        baseCurrency: "USD"
+      }
+    }
+  },
+  {
+    id: "GRN-004",
+    ref: "GRN-2023-004",
+    date: "2023-05-22",
+    invoiceDate: "2023-05-21",
+    invoiceNumber: "INV-2023-108",
+    description: "Bar Restocking",
+    receiver: "emily_brown",
+    vendor: "beverage_world",
+    location: "main_bar",
+    currency: "usd",
+    status: "received",
+    isConsignment: false,
+    isCash: false,
+    cashBook: "fb_account",
+    items: [
+      {
+        id: 1,
+        name: "Premium Vodka",
+        description: "1L bottles of premium vodka",
+        orderedQuantity: 24,
+        receivedQuantity: 24,
+        unit: "bottles",
+        unitPrice: 29.99,
+        totalPrice: 719.76,
+        taxRate: 10,
+        taxAmount: 71.98,
+        discountRate: 5,
+        discountAmount: 35.99,
+        netAmount: 755.75,
+        expiryDate: "2025-05-22",
+        batchNumber: "PV001",
+        serialNumber: "",
+        notes: "",
+        baseQuantity: 24,
+        basePrice: 29.99,
+        baseUnit: "bottles",
+        conversionRate: 1,
+        extraCost: 0,
+        applyDiscount: true,
+        applyTax: true,
+        inventoryOnHand: 100,
+        inventoryOnOrder: 200,
+        inventoryReorderThreshold: 50,
+        inventoryRestockLevel: 150,
+        purchaseOrderRef: "PO-2023-007",
+        lastPurchasePrice: 28.99,
+        lastVendor: "beverage_world",
+        lotNumber: "LOT-007",
+        deliveryPoint: "Main Bar",
+        location: "Bar Storage",
+        isFreeOfCharge: false,
+      },
+      {
+        id: 2,
+        name: "Craft Beer Assortment",
+        description: "Mixed case of 24 craft beers",
+        orderedQuantity: 10,
+        receivedQuantity: 10,
+        unit: "cases",
+        unitPrice: 59.99,
+        totalPrice: 599.90,
+        taxRate: 10,
+        taxAmount: 59.99,
+        discountRate: 0,
+        discountAmount: 0,
+        netAmount: 659.89,
+        expiryDate: "2023-11-22",
+        batchNumber: "CB001",
+        serialNumber: "",
+        notes: "Keep refrigerated",
+        baseQuantity: 240,
+        basePrice: 2.50,
+        baseUnit: "bottles",
+        conversionRate: 24,
+        extraCost: 0,
+        applyDiscount: false,
+        applyTax: true,
+        inventoryOnHand: 50,
+        inventoryOnOrder: 100,
+        inventoryReorderThreshold: 30,
+        inventoryRestockLevel: 80,
+        purchaseOrderRef: "PO-2023-008",
+        lastPurchasePrice: 58.99,
+        lastVendor: "beverage_world",
+        lotNumber: "LOT-008",
+        deliveryPoint: "Main Bar",
+        location: "Bar Refrigerator",
+        isFreeOfCharge: false,
+      }
+    ],
+    stockMovements: [
+      {
+        id: 1,
+        itemName: "Premium Vodka",
+        quantity: 24,
+        fromLocation: "Receiving Dock",
+        toLocation: "Main Bar Storage",
+        date: "2023-05-22",
+        status: "Completed"
+      },
+      {
+        id: 2,
+        itemName: "Craft Beer Assortment",
+        quantity: 10,
+        fromLocation: "Receiving Dock",
+        toLocation: "Main Bar Refrigerator",
+        date: "2023-05-22",
+        status: "Completed"
+      }
+    ],
+    extraCosts: [],
+    comments: [
+      {
+        id: "COM-005",
+        number: 1,
+        date: "2023-05-22T16:30:00Z",
+        author: "Emily Brown",
+        text: "All items received and stored in the bar area."
+      }
+    ],
+    attachments: [
+      {
+        id: "ATT-005",
+        number: 1,
+        fileName: "bar_inventory_update.xlsx",
+        description: "Updated bar inventory after receiving new stock",
+        publicAccess: false,
+        date: "2023-05-22T17:00:00Z",
+        uploader: "Emily Brown"
+      }
+    ],
+    activityLog: [
+      {
+        id: "ACT-009",
+        dateTime: "2023-05-22T15:00:00Z",
+        user: "Emily Brown",
+        action: "Created Goods Receive Note"
+      },
+      {
+        id: "ACT-010",
+        dateTime: "2023-05-22T16:30:00Z",
+        user: "Emily Brown",
+        action: "Marked all items as received"
+      },
+      {
+        id: "ACT-011",
+        dateTime: "2023-05-22T17:00:00Z",
+        user: "Emily Brown",
+        action: "Updated bar inventory"
+      }
+    ],
+    financialSummary: {
+      netAmount: 1315.64,
+      taxAmount: 111.97,
+      totalAmount: 1427.61,
+      currency: "USD",
+      baseNetAmount: 1315.64,
+      baseTaxAmount: 111.97,
+      baseTotalAmount: 1427.61,
+      baseCurrency: "USD",
+      jvType: "GRN",
+      jvNumber: "JV-2023-004",
+      jvDate: "2023-05-22",
+      jvDescription: "Bar Restocking",
+      jvStatus: "Posted",
+      jvReference: "GRN-2023-004",
+      jvDetail: [
+        {
+          department: sampleDepartments[3],
+          accountCode: sampleAccountCodes[0],
+          accountName: "Inventory",
+          currency: "USD",
+          debit: 1315.64,
+          credit: 0,
+          baseCurrency: "USD",
+          baseDebit: 1315.64,
+          baseCredit: 0
+        },
+        {
+          department: sampleDepartments[3],
+          accountCode: sampleAccountCodes[1],
+          accountName: "Accounts Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 1315.64,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 1315.64
+        },
+        {
+          department: sampleDepartments[3],
+          accountCode: sampleAccountCodes[2],
+          accountName: "Tax Payable",
+          currency: "USD",
+          debit: 0,
+          credit: 111.97,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 111.97
+        },
+        {
+          department: sampleDepartments[3],
+          accountCode: sampleAccountCodes[3],
+          accountName: "Cost of Goods Sold",
+          currency: "USD",
+          debit: 0,
+          credit: 1315.64,
+          baseCurrency: "USD",
+          baseDebit: 0,
+          baseCredit: 1315.64
+        }
+      ],
+      jvTotal: {
+        debit: 1427.61,
+        credit: 1427.61,
+        baseDebit: 1427.61,
+        baseCredit: 1427.61,
+        baseCurrency: "USD"
+      }
+    }
+  }
+];
+
