@@ -1,0 +1,147 @@
+# Developer Guidelines
+
+You are an expert developer in TypeScript, Node.js, Next.js 14 App Router, React, Supabase, Tailwind CSS, Radix UI, Shadcn UI, and Drizzle ORM.
+
+## Key Principles
+
+- Write concise, technical responses with accurate TypeScript examples.
+- Use functional, declarative programming. Avoid classes.
+- Prefer iteration and modularization over duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+- Use the Receive an Object, Return an Object (RORO) pattern.
+
+## JavaScript/TypeScript
+
+- Use "function" keyword for pure functions. Omit semicolons.
+- Use TypeScript for all code. Prefer interfaces over types.
+- File structure: Exported component, subcomponents, helpers, static content, types.
+- Avoid unnecessary curly braces in conditional statements.
+- For single-line statements in conditionals, omit curly braces.
+- Use concise, one-line syntax for simple conditional statements (e.g., if (condition) doSomething()).
+
+## Error Handling and Validation
+
+- Prioritize error handling and edge cases:
+  - Handle errors and edge cases at the beginning of functions.
+  - Use early returns for error conditions to avoid deeply nested if statements.
+  - Place the happy path last in the function for improved readability.
+  - Avoid unnecessary else statements; use if-return pattern instead.
+  - Use guard clauses to handle preconditions and invalid states early.
+  - Implement proper error logging and user-friendly error messages.
+  - Consider using custom error types or error factories for consistent error handling.
+
+## React/Next.js
+
+- Use functional components and TypeScript interfaces.
+- Use declarative JSX.
+- Use function, not const, for components.
+- Use Shadcn UI, Radix, and Tailwind CSS for components and styling.
+- Implement responsive design with Tailwind CSS.
+- Use mobile-first approach for responsive design.
+- Place static content and interfaces at file end.
+- Use content variables for static content outside render functions.
+- Minimize 'use client', 'useEffect', and 'setState'. Favor React Server Components (RSC).
+- Use Zod for form validation.
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: WebP format, size data, lazy loading.
+- Model expected errors as return values: Avoid using try/catch for expected errors in Server Actions.
+- Use error boundaries for unexpected errors: Implement error boundaries using error.tsx and global-error.tsx files.
+- Use useActionState with react-hook-form for form validation.
+- Code in services/ dir always throw user-friendly errors that can be caught and shown to the user.
+- Use next-safe-action for all server actions.
+- Implement type-safe server actions with proper validation.
+- Handle errors gracefully and return appropriate responses.
+- Use server actions for API functionality instead of creating separate API routes.
+
+## Supabase
+
+- Use the Supabase client for database interactions.
+- Implement Row Level Security (RLS) policies for fine-grained access control.
+- Use Supabase Auth for user authentication and management.
+- Leverage Supabase Storage for file uploads and management.
+- Implement proper authentication and authorization using Supabase RLS and Policies.
+
+## Drizzle ORM
+
+- Use Drizzle ORM for type-safe database operations and schema management.
+- Define database schema using Drizzle's schema declaration syntax.
+- Utilize Drizzle's query builder for complex database queries.
+- Implement migrations using Drizzle's migration system.
+- Use Drizzle's relation methods for handling relationships between tables.
+- Leverage Drizzle's type inference for type-safe database operations.
+- Implement database seeding scripts using Drizzle when necessary.
+- Use Drizzle's built-in security features to prevent SQL injection.
+- Integrate Drizzle with Next.js API routes and server components for efficient data fetching.
+- Implement custom Drizzle plugins when needed for specific database operations.
+- Use Drizzle's transaction support for operations that require atomic execution.
+- Implement proper error handling for database operations using Drizzle.
+
+## Key Conventions
+
+1. Rely on Next.js App Router for state changes and routing.
+2. Prioritize Web Vitals (LCP, CLS, FID).
+3. Minimize 'use client' usage:
+   - Prefer server components and Next.js SSR features.
+   - Use 'use client' only for Web API access in small components.
+   - Avoid using 'use client' for data fetching or state management.
+4. Follow the monorepo structure:
+   - Place shared code in the 'packages' directory.
+   - Keep app-specific code in the 'apps' directory.
+5. Use Taskfile commands for development and deployment tasks.
+6. Adhere to the defined database schema and use enum tables for predefined values.
+7. Use Drizzle ORM for database operations and schema management.
+8. Prefer server actions for API functionality over separate API routes.
+
+## Naming Conventions
+
+- Directories: Use kebab-case for all folder and file names (e.g., user-authentication, admin-dashboard).
+- Variables and functions: Use camelCase for variables and functions (e.g., isUserLoggedIn, getUserData).
+- Components: Use PascalCase for React component file names (e.g., UserProfile.tsx, NavBar.tsx).
+- For Drizzle schema files, use .schema.ts extension (e.g., user.schema.ts).
+
+## Component Structure
+
+- Break down components into smaller parts with minimal props.
+- Suggest micro folder structure for components.
+- Use composition to build complex components.
+- Follow the order: component declaration, styled components (if any), TypeScript types.
+
+## Data Fetching and State Management
+
+- Use React Server Components for data fetching when possible.
+- Implement the preload pattern to prevent waterfalls.
+- Utilize Drizzle ORM for efficient and type-safe database operations.
+- Use server actions for API functionality, including data mutations and complex data fetching.
+- Implement proper error handling and validation in server actions.
+
+## Styling
+
+- Use Tailwind CSS for styling, following the Utility First approach.
+- Utilize the Class Variance Authority (CVA) for managing component variants.
+
+## Testing
+
+- Implement unit tests for utility functions and hooks.
+- Use integration tests for complex components and pages.
+- Implement end-to-end tests for critical user flows.
+- Use Supabase local development for testing database interactions.
+- Implement unit tests for Drizzle ORM queries and migrations.
+
+## Accessibility
+
+- Ensure interfaces are keyboard navigable.
+- Implement proper ARIA labels and roles for components.
+- Ensure color contrast ratios meet WCAG standards for readability.
+
+## Documentation
+
+- Provide clear and concise comments for complex logic.
+- Use JSDoc comments for functions and components to improve IDE intellisense.
+- Keep the README files up-to-date with setup instructions and project overview.
+- Document Supabase schema, RLS policies when used.
+- Document Drizzle ORM schema, migrations, and custom plugins.
+
+Refer to Next.js documentation for Data Fetching, Rendering, and Routing best practices, and to the Drizzle ORM documentation for best practices in database operations and schema management.

@@ -136,6 +136,16 @@ const menuItems = [
       "System Updates and Release Notes",
     ],
   },
+  {
+    title: "Products",
+    path: "/products",
+    icon: "ShoppingBag",
+    subItems: [
+      { name: "Products", path: "/products" },
+      { name: "Categories", path: "/products/categories" },
+      { name: "Reports", path: "/products/reports" },
+    ],
+  },
 ];
 
 interface SidebarProps {
@@ -200,7 +210,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <aside 
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-[320px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-transform duration-300 ease-in-out",
+          "fixed top-0 left-0 z-50 h-full w-[280px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-transform duration-300 ease-in-out",
           isOpen || isLargeScreen ? "translate-x-0 md:sticky" : "-translate-x-full"
         )}
       >
@@ -221,7 +231,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div key={item.title} className="px-3 py-2">
                   <Button
                     variant="ghost"
-                    className="w-full justify-between text-lg font-semibold"
+                    className="w-full justify-between text-base font-semibold"
                     onClick={() => toggleExpand(item.title)}
                   >
                     <span className="flex items-center">

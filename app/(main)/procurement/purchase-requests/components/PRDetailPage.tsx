@@ -78,13 +78,16 @@ export default function PRDetailPage() {
             onDocumentAction={handleDocumentAction}
           />
           <div className="bg-muted p-4 rounded-lg">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-start">
               {['currentWorkflowStage', 'workflowStatus', 'status'].map(key => (
-                <div key={key} className="space-y-1">
-                  <label className="text-sm font-medium">
+                <div key={key} className="space-y-2 text-center">
+                  <label className="text-sm font-medium block">
                     {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                   </label>
-                  <Badge variant={getBadgeVariant(String(formData[key as keyof PurchaseRequest]))} className="text-sm">
+                  <Badge 
+                    variant={getBadgeVariant(String(formData[key as keyof PurchaseRequest]))}
+                    className={`badge-${String(formData[key as keyof PurchaseRequest]).toLowerCase()} mt-1`}
+                  >
                     {String(formData[key as keyof PurchaseRequest])}
                   </Badge>
                 </div>
@@ -122,9 +125,21 @@ export default function PRDetailPage() {
             {[
               { action: 'approve', icon: CheckCircleIcon, color: 'green' },
               { action: 'reject', icon: XCircleIcon, color: 'red' },
-              { action: 'sendBack', icon: RotateCcwIcon, color: 'yellow' }
+              { action: 'sendBack', icon: RotateCcwIcon, color: 'orange' }
             ].map(({ action, icon: Icon, color }) => (
-              <Button key={action} onClick={() => handleWorkflowAction(action as WorkflowAction)} variant="outline" size="sm" className={`bg-${color}-500 text-white hover:bg-${color}-600`}>
+              <Button 
+                key={action} 
+                onClick={() => handleWorkflowAction(action as WorkflowAction)} 
+                variant={color === 'green' ? 'default' : 'outline'}
+                size="sm" 
+                className={`${
+                  color === 'red' 
+                    ? 'bg-red-500 hover:bg-red-600 text-white' 
+                    : color === 'orange'
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                    : ''
+                }`}
+              >
                 <Icon className="mr-2 h-4 w-4" />
                 {action.charAt(0).toUpperCase() + action.slice(1)}
               </Button>

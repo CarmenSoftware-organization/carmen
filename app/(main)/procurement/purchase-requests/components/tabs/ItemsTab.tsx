@@ -8,6 +8,44 @@ import { Edit2Icon, Trash2Icon, InfoIcon, ImageIcon, MessageSquareIcon } from 'l
 import { ItemDetail } from '@/types/types'
 import { Separator } from '@/components/ui/separator'
 
+import { Eye, Edit, Plus, X } from 'lucide-react'
+import { ItemDetailsEditForm } from '../item-details-edit-form'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+interface Item {
+  // id: string
+  // name: string
+  // quantity: number
+  // unit: string
+  // price: number
+  // total: number
+
+  
+    id: string,
+    location: string,
+    product: string,
+    comment: string,
+    unit: string,
+    request: {
+      quantity: number,
+      ordering: number
+    },
+    approve: {
+      quantity: number,
+      onHand: number
+    },
+    currency: string,
+    price: {
+      current: number,
+      last: number
+    },
+    total: number,
+    status: string
+  
+
+}
+
+
 const itemDetails: ItemDetail[] = [
   // ... (item details data as before)
   {
@@ -75,7 +113,44 @@ export const ItemsTab: React.FC = () => {
     )
   }
 
+  const [items, setItems] = useState<Item[]>(itemDetails)
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false)
+  const [formMode, setFormMode] = useState<'view' | 'edit' | 'add'>('view')
+
+  const openItemForm = (item: Item | null, mode: 'view' | 'edit' | 'add') => {
+    setSelectedItem(item)
+    setFormMode(mode)
+    setIsEditFormOpen(true)
+  }
+
+  const closeItemForm = () => {
+    setSelectedItem(null)
+    setIsEditFormOpen(false)
+    setFormMode('view')
+  }
+
+  const handleSave = (formData: FormData) => {
+    // Handle saving the form data
+    console.log('Saving item:', formData)
+    closeItemForm()
+    // You would typically update the items state here with the new/updated item
+  }
+
+  const handleModeChange = (newMode: 'view' | 'edit' | 'add') => {
+    setFormMode(newMode)
+  }
+
   return (
+ <>
+    <div>
+
+  <Button onClick={() => openItemForm(null, 'add')}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Item
+      </Button>
+      </div>
+
     <Table>
       {/* <TableHeader >
         <TableRow >
@@ -152,21 +227,24 @@ export const ItemsTab: React.FC = () => {
               </TableCell>
               <TableCell className="text-right align-top">{item.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
               <TableCell>
-                <Badge variant={item.status === 'A' ? 'success' : 'destructive'}>
+                <Badge variant={item.status === 'A' ? 'secondary' : 'destructive'}>
                   {item.status}
                 </Badge>
               </TableCell>
               <TableCell>
                 <div className="flex justify-end space-x-2">
-                  <Button variant="outline" size="icon">
+
+            
+                  <Button variant="outline" size="icon" onClick={() => openItemForm(item, 'edit')}>
                     <Edit2Icon className="h-4 w-4" />
                   </Button>
                   <Button variant="outline" size="icon">
                     <Trash2Icon className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="icon">
-                    <InfoIcon className="h-4 w-4" />
-                  </Button>
+
+                <Button variant="outline" size="icon" onClick={() => openItemForm(item, 'view')}>
+                  <Eye className="h-4 w-4" />
+                </Button>
                   <Button variant="outline" size="icon">
                     <ImageIcon className="h-4 w-4" />
                   </Button>
@@ -185,5 +263,32 @@ export const ItemsTab: React.FC = () => {
         ))}
       </TableBody>
     </Table>
+
+    <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
+        <DialogContent className="sm:max-w-[80vw] max-w-[80vw]">
+          <DialogHeader>
+            <DialogTitle>
+              {formMode === 'add' ? 'Add New Item' : formMode === 'edit' ? 'Edit Item' : 'View Item'}
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-4 top-4"
+              onClick={closeItemForm}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
+          <ItemDetailsEditForm
+            onSave={handleSave}
+            onCancel={closeItemForm}
+            initialData={selectedItem}
+            mode={formMode}
+            onModeChange={handleModeChange}
+          />
+        </DialogContent>
+      </Dialog>
+
+    </>
   )
 }
