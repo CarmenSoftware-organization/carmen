@@ -265,20 +265,21 @@ export const ItemsTab: React.FC = () => {
     </Table>
 
     <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
-        <DialogContent className="sm:max-w-[80vw] max-w-[80vw]">
-          <DialogHeader>
-            <DialogTitle>
-              {formMode === 'add' ? 'Add New Item' : formMode === 'edit' ? 'Edit Item' : 'View Item'}
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-4 top-4"
-              onClick={closeItemForm}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogHeader>
+      <DialogContent className="sm:max-w-[80vw] max-w-[80vw] p-0 border-none bg-transparent">
+        <DialogHeader className="bg-background rounded-t-lg">
+          <DialogTitle className="p-6">
+            {formMode === 'add' ? 'Add New Item' : formMode === 'edit' ? 'Edit Item' : 'View Item'}
+          </DialogTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-4 top-4"
+            onClick={closeItemForm}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </DialogHeader>
+        <div className="bg-background rounded-b-lg">
           <ItemDetailsEditForm
             onSave={handleSave}
             onCancel={closeItemForm}
@@ -286,8 +287,9 @@ export const ItemsTab: React.FC = () => {
             mode={formMode}
             onModeChange={handleModeChange}
           />
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     </>
   )

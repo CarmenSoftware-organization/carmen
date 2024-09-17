@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileIcon, PrinterIcon, DownloadIcon, ShareIcon, PencilIcon, CheckCircleIcon, XCircleIcon, RotateCcwIcon } from 'lucide-react'
+import { FileIcon, PrinterIcon, DownloadIcon,HashIcon,BuildingIcon,MapPinIcon, UserIcon, ShareIcon, PencilIcon, CheckCircleIcon, XCircleIcon, RotateCcwIcon } from 'lucide-react'
 import { PRHeader } from './PRHeader'
 import { PRForm } from './PRForm'
 import { ItemsTab } from './tabs/ItemsTab'
@@ -17,9 +17,13 @@ import { BudgetsTab } from './tabs/BudgetsTab'
 import { WorkflowTab } from './tabs/WorkflowTab'
 import { AttachmentsTab } from './tabs/AttachmentsTab'
 import { ActivityTab } from './tabs/ActivityTab'
-import { PurchaseRequest, WorkflowAction, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/types/types'
+import { PurchaseRequest, WorkflowAction, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, Requestor } from '@/types/types'
 import { getBadgeVariant, handleDocumentAction, getNextWorkflowStage, getPreviousWorkflowStage } from './utils'
 import { samplePRData } from './sampleData'
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 
 export default function PRDetailPage() {
   const router = useRouter()
@@ -67,6 +71,17 @@ export default function PRDetailPage() {
     }))
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+      requestor: name.startsWith('requestor.') 
+        ? { ...prev.requestor, [name.split('.')[1]]: value }
+        : prev.requestor
+    }))
+  }
+
   return (
     <div className="container mx-auto py-10">
       <Card className="mb-6">
@@ -77,36 +92,129 @@ export default function PRDetailPage() {
             onModeChange={handleModeChange}
             onDocumentAction={handleDocumentAction}
           />
-          <div className="bg-muted p-4 rounded-lg">
-            <div className="flex justify-between items-start">
-              {['currentWorkflowStage', 'workflowStatus', 'status'].map(key => (
-                <div key={key} className="space-y-2 text-center">
-                  <label className="text-sm font-medium block">
-                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                  </label>
-                  <Badge 
-                    variant={getBadgeVariant(String(formData[key as keyof PurchaseRequest]))}
-                    className={`badge-${String(formData[key as keyof PurchaseRequest]).toLowerCase()} mt-1`}
-                  >
-                    {String(formData[key as keyof PurchaseRequest])}
-                  </Badge>
+          <Card>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                  <Label htmlFor="refNumber">Reference Number</Label>
+                  <Input
+                    id="refNumber"
+                    value={formData.refNumber}
+                    onChange={(e) => setFormData({...formData, refNumber: e.target.value})}
+                    disabled={mode === 'view'}
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-          <PRForm formData={formData} setFormData={setFormData} isDisabled={mode === 'view'} />
+                <div>
+                  <Label htmlFor="date">Date</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    disabled={mode === 'view'}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="type">PR Type</Label>
+                  <Select
+                    value={formData.type}
+                    onValueChange={(value) => setFormData({...formData, type: value as PRType})}
+                    disabled={mode === 'view'}
+                  >
+                    <SelectTrigger id="type">
+                      <SelectValue placeholder="Select PR Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(PRType).map((type) => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="estimatedTotal">Estimated Cost</Label>
+                  <Input
+                    id="estimatedTotal"
+                    type="number"
+                    value={formData.estimatedTotal}
+                    onChange={(e) => setFormData({...formData, estimatedTotal: parseFloat(e.target.value)})}
+                    disabled={mode === 'view'}
+                  />
+                </div>
+                <div className="col-span-2 md:col-span-5">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    disabled={mode === 'view'}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-8 gap-4">
+               
+                <div className="col-span-5">
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { id: 'requestor.name', label: 'Requestor', icon: UserIcon },
+                      { id: 'department', label: 'Department', icon: BuildingIcon },
+                      { id: 'location', label: 'Location', icon: MapPinIcon },
+                      { id: 'jobCode', label: 'Job Code', icon: HashIcon },
+                    ].map(({ id, label, icon: Icon }) => (
+                      <div key={id} className="space-y-1">
+                        <Label htmlFor={id} className="text-[0.7rem] text-gray-500 flex items-center gap-2">
+                          <Icon className="h-3 w-3" /> {label}
+                        </Label>
+                        <Input
+                          id={id}
+                          name={id}
+                          value={typeof formData[id as keyof PurchaseRequest] === 'object' 
+                            ? (formData[id as keyof PurchaseRequest] as Requestor)[id.split('.')[1] as keyof Requestor] 
+                            : String(formData[id as keyof PurchaseRequest])}
+                          onChange={handleInputChange}
+                          disabled={mode === 'view'}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="col-span-3 bg-muted p-4 rounded-lg">
+                  <div className="flex justify-between items-start">
+                    {['currentWorkflowStage', 'workflowStatus', 'status'].map(key => (
+                      <div key={key} className="space-y-2 text-center">
+                        <label className="text-sm font-medium block">
+                          {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        </label>
+                        <Badge 
+                          variant={getBadgeVariant(String(formData[key as keyof PurchaseRequest]))}
+                          className={`badge-${String(formData[key as keyof PurchaseRequest]).toLowerCase()} mt-1`}
+                        >
+                          {String(formData[key as keyof PurchaseRequest])}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* <PRForm formData={formData} setFormData={setFormData} isDisabled={mode === 'view'} /> */}
         </CardHeader>
         <CardContent className="pt-0">
           <Tabs defaultValue="items" className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
-              {['items', 'details', 'budgets', 'workflow', 'attachments', 'activity'].map(tab => (
+            <TabsList className="grid w-full grid-cols-5">
+              {['items', 'budgets', 'workflow', 'attachments', 'activity'].map(tab => (
                 <TabsTrigger key={tab} value={tab}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</TabsTrigger>
               ))}
             </TabsList>
             <form onSubmit={handleSubmit}>
               <ScrollArea className="h-[400px] w-full rounded-md border">
                 <TabsContent value="items"><ItemsTab /></TabsContent>
-                <TabsContent value="details"><DetailsTab formData={formData} setFormData={setFormData} isDisabled={mode === 'view'} /></TabsContent>
                 <TabsContent value="budgets"><BudgetsTab /></TabsContent>
                 <TabsContent value="workflow"><WorkflowTab /></TabsContent>
                 <TabsContent value="attachments"><AttachmentsTab /></TabsContent>

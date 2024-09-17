@@ -23,7 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ChevronDown, Eye, Trash2, X, CheckSquare, FileDown, Mail, Printer } from "lucide-react"
+import { ChevronDown, Eye, Trash2, X, CheckSquare, FileDown, Mail, Printer, Edit2Icon, ImageIcon, MessageSquareIcon } from "lucide-react"
 import {
   Tooltip,
   TooltipContent,
@@ -37,6 +37,8 @@ import { PrintOptionsSidepanel } from './PrintOptionsSidepanel'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {Label} from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
+import { Card, CardContent } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 
 // This is a mock data structure. Replace with actual data fetching logic.
 const purchaseOrders = [
@@ -59,7 +61,7 @@ const purchaseRequests = [
   { id: 3, refNumber: 'PR-003', date: '2023-08-03', description: 'Furniture', deliveryDate: '2023-08-25', status: 'Approved' },
 ]
 
-export default function PurchaseOrderList() {
+const PurchaseOrderList: React.FC = () => {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -260,104 +262,114 @@ export default function PurchaseOrderList() {
         isOpen={isPrintOpen}
         onClose={() => setIsPrintOpen(false)}
       />
-      <Table>
-        <TableHeader className="bg-gray-100">
-          <TableRow>
-            <TableHead className="w-[50px]">
-              <Checkbox
-                checked={currentItems.length > 0 && selectedPOs.length === currentItems.length}
-                onCheckedChange={handleSelectAll}
-              />
-            </TableHead>
-            <TableHead>PO Number</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Vendor</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentItems.map((po) => (
-            <TableRow key={po.id}>
-              <TableCell>
-                <Checkbox
-                  checked={selectedPOs.includes(po.id)}
-                  onCheckedChange={(checked) => handleSelectPO(po.id, checked as boolean)}
-                />
-              </TableCell>
-              <TableCell>{po.number}</TableCell>
-              <TableCell>{po.date}</TableCell>
-              <TableCell>{po.vendor}</TableCell>
-              <TableCell>${po.total.toFixed(2)}</TableCell>
-              <TableCell>
-                <Badge 
-                  variant={
-                    po.status === 'Open' ? 'default' :
-                    po.status === 'Send' ? 'secondary' :
-                    po.status === 'Partial Received' ? 'secondary' :
-                    po.status === 'Closed' ? 'outline' :
-                    'destructive'
-                  }
-                >
-                  {po.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/procurement/purchase-orders/${po.id}`}>
-                          <Eye className="h-4 w-4" />
-                        </Link>
+      <div className="space-y-2">
+        {currentItems.map((po) => (
+          <Card key={po.id}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Checkbox
+                    checked={selectedPOs.includes(po.id)}
+                    onCheckedChange={(checked) => handleSelectPO(po.id, checked as boolean)}
+                  />
+                  <Badge 
+                    variant={
+                      po.status === 'Open' ? 'default' :
+                      po.status === 'Send' ? 'secondary' :
+                      po.status === 'Partial Received' ? 'secondary' :
+                      po.status === 'Closed' ? 'outline' :
+                      'destructive'
+                    }
+                  >
+                    {po.status}
+                  </Badge>
+                  <div>
+                    <h3 className="font-semibold">{po.number}</h3>
+                    <p className="text-sm text-muted-foreground">{po.vendor}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/procurement/purchase-orders/${po.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View purchase order details</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        ...
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View purchase order details</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      ...
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {po.status === 'Open' && (
-                      <DropdownMenuItem onSelect={() => handleBulkAction('delete', [po.id])}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {po.status === 'Open' && (
+                        <DropdownMenuItem onSelect={() => handleBulkAction('delete', [po.id])}>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      )}
+                      {['Send', 'Partial Received'].includes(po.status) && (
+                        <DropdownMenuItem onSelect={() => handleBulkAction('void', [po.id])}>
+                          <X className="mr-2 h-4 w-4" />
+                          Void
+                        </DropdownMenuItem>
+                      )}
+                      {['Open', 'Send', 'Partial Received'].includes(po.status) && (
+                        <DropdownMenuItem onSelect={() => handleBulkAction('close', [po.id])}>
+                          <CheckSquare className="mr-2 h-4 w-4" />
+                          Close
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onSelect={() => handlePrintPO(po.id)}>
+                        <Printer className="mr-2 h-4 w-4" />
+                        Print
                       </DropdownMenuItem>
-                    )}
-                    {['Send', 'Partial Received'].includes(po.status) && (
-                      <DropdownMenuItem onSelect={() => handleBulkAction('void', [po.id])}>
-                        <X className="mr-2 h-4 w-4" />
-                        Void
+                      <DropdownMenuItem onSelect={() => handleSendEmail(po.id)}>
+                        <Mail className="mr-2 h-4 w-4"  />
+                        Send Email
                       </DropdownMenuItem>
-                    )}
-                    {['Open', 'Send', 'Partial Received'].includes(po.status) && (
-                      <DropdownMenuItem onSelect={() => handleBulkAction('close', [po.id])}>
-                        <CheckSquare className="mr-2 h-4 w-4" />
-                        Close
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onSelect={() => handlePrintPO(po.id)}>
-                      <Printer className="mr-2 h-4 w-4" />
-                      Print
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => handleSendEmail(po.id)}>
-                      <Mail className="mr-2 h-4 w-4"  />
-                      Send Email
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-4 gap-4 text-sm">
+                <div>
+                  <Label>Date</Label>
+                  <p>{po.date}</p>
+                </div>
+                <div>
+                  <Label>Total</Label>
+                  <p>${po.total.toFixed(2)}</p>
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <p>{po.email}</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" onClick={() => handlePrintPO(po.id)}>
+                    <Printer className="mr-2 h-4 w-4" />
+                    Print
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleSendEmail(po.id)}>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Send Email
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Pagination */}
       <div className="flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, i) => (
           <Button
@@ -549,3 +561,8 @@ export default function PurchaseOrderList() {
     </div>
   )
 }
+
+export default PurchaseOrderList;
+
+
+

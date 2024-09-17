@@ -6,8 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useRouter } from "next/navigation"
 
 export function DashboardApproval() {
+
+  const router = useRouter();
+  const goto_purchase_request = (id: number) =>  {
+    router.push(`/procurement/purchase-requests/${id}?mode=edit`)
+  }
+
   return (
     <div className="container mx-auto p-6 bg-gray-50">
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Department Approval</h1>
@@ -51,7 +58,7 @@ export function DashboardApproval() {
                             {request.department}
                           </Badge>
                           <div className="space-x-2">
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" onClick={() => goto_purchase_request(request.id)}>
                               <Eye className="w-4 h-4 mr-2" />
                               Details
                             </Button>

@@ -1,14 +1,15 @@
 "use client";
 
 import { Menu, X } from "lucide-react";
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { ChevronDown, ChevronRight } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import { useRouter } from 'next/navigation';
 
 const menuItems = [
   {
@@ -22,12 +23,22 @@ const menuItems = [
     path: "/procurement",
     icon: "ShoppingCart",
     subItems: [
-      {name :"My Approvals", path : "/procurement/my-approvals"},
+      { name: "My Approvals", path: "/procurement/my-approvals" },
       "Purchase Requests",
       "Purchase Orders",
       "Goods Received Note",
       { name: "Credit Notes", path: "/procurement/credit-note" },
       "Purchase Request Templates",
+    ],
+  },
+  {
+    title: "Product Management",
+    path: "/product-management",
+    icon: "Package",
+    subItems: [
+      { name: "Products", path: "/product-management/products" },
+      { name: "Categories", path: "/product-management/categories" },
+      { name: "Reports", path: "/product-management/reports" },
     ],
   },
   {
@@ -158,116 +169,139 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
 
+const router = useRouter();
+
   useEffect(() => {
     const handleResize = () => {
       setIsLargeScreen(window.innerWidth >= 1024);
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
-
 
   const handleIsOpen = () => {
     isOpen = !isOpen;
-  }
+  };
 
-  const toggleExpand = (title: string) => {
-    setExpandedItems(prev => 
-      prev.includes(title) ? prev.filter(item => item !== title) : [...prev, title]
-    );
+
+  const toggleExpand = (title: string, path?: string) => {
+    const menuItem = menuItems.find(item => item.title === title);
+    if (!menuItem?.subItems || menuItem.subItems.length === 0) {
+      // If there are no subitems, navigate to the path
+      router.push(path || '/');
+    } else {
+      // If there are subitems, toggle the expansion
+      setExpandedItems((prev) =>
+        prev.includes(title)
+          ? prev.filter((item) => item !== title)
+          : [...prev, title]
+      );
+    }
   };
 
   return (
     <>
-    <div className="z-50 flex-col gap-4 relative">
-     {/* <div className="bg-green-300 md:sticky absolute">
-            <Button variant="ghost" size="icon" onClick={handleIsOpen}>
-              {isOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </Button>
-            
-            <Link
-              href="/dashboard"
-              className="text-2xl md:text-3xl font-bold text-blue-900"
-            >
-              CARMEN
-            </Link>
-
-     </div> */}
-
-      {isOpen && !isLargeScreen && (
-        <div 
-          className="fixed md:sticky inset-0 bg-black/40 z-40" 
-          onClick={onClose}
-        />
-      )}
-
-      <aside 
-        className={cn(
-          "fixed top-0 left-0 z-50 h-full w-[280px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-transform duration-300 ease-in-out",
-          isOpen || isLargeScreen ? "translate-x-0 md:sticky" : "-translate-x-full"
+      <div className="z-50 flex-col gap-4 relative">
+        {isOpen && !isLargeScreen && (
+          <div
+            className="fixed md:sticky inset-0 bg-black/40 z-40"
+            onClick={onClose}
+          />
         )}
-      >
-        <div className="px-8 pt-6 w-fit">
-         <Link
+
+        <aside
+          className={cn(
+            "fixed top-0 left-0 z-50 h-full w-[280px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-transform duration-300 ease-in-out",
+            isOpen || isLargeScreen
+              ? "translate-x-0 md:sticky"
+              : "-translate-x-full"
+          )}
+        >
+          <div className="px-8 pt-6 w-fit">
+            <Link
               href="/"
               className="text-2xl text-center font-bold text-blue-900"
             >
               CARMEN
             </Link>
-            </div>
-
-        <ScrollArea className="h-full">
-          <div className="space-y-1 py-4">
-            {menuItems.map((item) => {
-              const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
-              return (
-                <div key={item.title} className="px-3 py-2">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between text-base font-semibold"
-                    onClick={() => toggleExpand(item.title)}
-                  >
-                    <span className="flex items-center">
-                      <IconComponent className="mr-2 h-5 w-5" />
-                      {item.title}
-                    </span>
-                    {item.subItems && item.subItems.length > 0 && (
-                      expandedItems.includes(item.title) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
-                    )}
-                  </Button>
-                  {item.subItems && item.subItems.length > 0 && expandedItems.includes(item.title) && (
-                    <div className="ml-4 mt-2 space-y-1">
-                      {item.subItems.map((subItem, index) => (
-                        <Button
-                          key={typeof subItem === 'string' ? subItem : subItem.name}
-                          variant="ghost"
-                          asChild
-                          className={cn(
-                            "w-full justify-start text-sm",
-                            pathname === (typeof subItem === 'string' ? `${item.path}/${subItem.toLowerCase().replace(/\s+/g, '-')}` : subItem.path) ? "bg-muted hover:bg-muted" : "hover:bg-transparent hover:underline"
-                          )}
-                          onClick={() => !isLargeScreen && onClose()}
-                        >
-                          <Link href={typeof subItem === 'string' ? `${item.path}/${subItem.toLowerCase().replace(/\s+/g, '-')}` : subItem.path}>
-                            {typeof subItem === 'string' ? subItem : subItem.name}
-                          </Link>
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
           </div>
-        </ScrollArea>
-      </aside>
+
+          <ScrollArea className="h-full">
+            <div className="space-y-1 py-4">
+              {menuItems.map((item) => {
+                const IconComponent =
+                  (LucideIcons as any)[item.icon] || LucideIcons.Circle;
+                return (
+                  <div key={item.title} className="px-3 py-2">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between text-base font-semibold"
+                      onClick={() => toggleExpand(item.title, item.path)}
+                    >
+                      <span className="flex items-center">
+                        <IconComponent className="mr-2 h-5 w-5" />
+                        {item.title}
+                      </span>
+                      {item.subItems &&
+                        item.subItems.length > 0 &&
+                        (expandedItems.includes(item.title) ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        ))}
+                    </Button>
+                    {item.subItems &&
+                      item.subItems.length > 0 &&
+                      expandedItems.includes(item.title) && (
+                        <div className="ml-4 mt-2 space-y-1">
+                          {item.subItems.map((subItem, index) => (
+                            <Button
+                              key={
+                                typeof subItem === "string"
+                                  ? subItem
+                                  : subItem.name
+                              }
+                              variant="ghost"
+                              asChild
+                              className={cn(
+                                "w-full justify-start text-sm",
+                                pathname ===
+                                  (typeof subItem === "string"
+                                    ? `${item.path}/${subItem
+                                        .toLowerCase()
+                                        .replace(/\s+/g, "-")}`
+                                    : subItem.path)
+                                  ? "bg-muted hover:bg-muted"
+                                  : "hover:bg-transparent hover:underline"
+                              )}
+                              onClick={() => !isLargeScreen && onClose()}
+                            >
+                              <Link
+                                href={
+                                  typeof subItem === "string"
+                                    ? `${item.path}/${subItem
+                                        .toLowerCase()
+                                        .replace(/\s+/g, "-")}`
+                                    : subItem.path
+                                }
+                              >
+                                {typeof subItem === "string"
+                                  ? subItem
+                                  : subItem.name}
+                              </Link>
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </aside>
       </div>
     </>
   );
