@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2, ArrowUpDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import ListPageTemplate from '@/components/templates/ListPageTemplate'
 
 const sampleData = [
   { id: 'PR-001', type: 'General Purchase', description: 'Office Supplies', requestor: 'John Doe', department: 'Administration', date: '2023-06-15', status: 'Submitted', amount: 500, currentStage: 'Initial Review' },
@@ -112,7 +113,201 @@ export function PurchaseRequestList() {
     router.push(`/procurement/purchase-requests/${id}?mode=edit`)
   }
 
+   const filters =(
+    <>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div className="w-full sm:w-1/2 flex space-x-2">
+              <Input 
+                placeholder="Search PRs..." 
+                className="w-full" 
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+              <Button variant="secondary" size="icon"><Search className="h-4 w-4" /></Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    {selectedType}
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => handleTypeChange('All Types')}>All Types</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleTypeChange('General Purchase')}>General Purchase</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleTypeChange('Market List')}>Market List</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleTypeChange('Asset Purchase')}>Asset Purchase</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    {selectedStatus}
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => handleStatusChange('All Statuses')}>All Statuses</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleStatusChange('Draft')}>
+                    <Badge variant="outline" className="mr-2">Draft</Badge> Draft
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleStatusChange('Submitted')}>
+                    <Badge className="mr-2">Submitted</Badge> Submitted
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleStatusChange('Approved')}>
+                    <Badge variant="secondary" className="mr-2">Approved</Badge> Approved
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleStatusChange('Rejected')}>
+                    <Badge variant="destructive" className="mr-2">Rejected</Badge> Rejected
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Filter className="mr-2 h-4 w-4" /> More Filters
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>Filter Options</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem>
+                    Date Range
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem>
+                    Department
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem>
+                    Requestor
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem>
+                    Amount Range
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    Clear Filters
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+    </>);
+  
+  const actionButtons = (
+    <>
+    <div className="flex flex-wrap gap-2">
+            <Button size="sm" onClick={handleCreateNewPR}><Plus className="mr-2 h-4 w-4" /> New PR</Button>
+            <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" /> Export</Button>
+            <Button variant="outline" size="sm"><Printer className="mr-2 h-4 w-4" /> Print</Button>
+          </div>
+    </>
+  );
+
+  const content = (
+      <>
+
+<div className="space-y-2">
+            {getCurrentPageData().map((pr) => (
+              <Card key={pr.id} className="overflow-hidden p-0 hover:bg-secondary">
+                <div className="py-2 px-4">
+                  <div className="flex justify-between items-center mb-0">
+                    <div className="flex items-center space-x-2">
+                      <Badge className=''
+                        variant={
+                          pr.status === 'Approved' ? 'success' :
+                          pr.status === 'Rejected' ? 'destructive' :
+                          pr.status === 'Draft' ? 'outline' : 'default'
+                        }
+                      >
+                        {pr.status}
+                      </Badge>
+                      <h3 className="text-sm md:text-base font-semibold">{pr.description}</h3>
+                      <span className="text-xs text-muted-foreground">({pr.id})</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="ghost" size="icon" aria-label="View purchase request" onClick={() => handleViewPR(pr.id)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" aria-label="Edit purchase request" onClick={() => handleEditPR(pr.id)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" aria-label="Delete purchase request">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
+                    {[
+                      { label: 'Type', field: 'type' },
+                      { label: 'Requestor', field: 'requestor' },
+                      { label: 'Department', field: 'department' },
+                      { label: 'Date', field: 'date' },
+                      { label: 'Amount', field: 'amount' },
+                      { label: 'Current Stage', field: 'currentStage' },
+                    ].map(({ label, field }) => (
+                      <div key={field}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="p-0 h-auto font-medium text-muted-foreground uppercase text-xxs"
+                          onClick={() => handleSort(field as keyof typeof sampleData[0])}
+                        >
+                          {label}
+                          <ArrowUpDown className="ml-1 h-3 w-3" />
+                        </Button>
+                        <p className="text-sm">{pr[field as keyof typeof pr]}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+          
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, sortedAndFilteredData.length)} of {sortedAndFilteredData.length} results
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="sr-only">Previous page</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                <span className="sr-only">Next page</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+      </>
+    );
+  
+
+  
+
   return (
+
+    <ListPageTemplate
+    title="Purchase Requests"
+    actionButtons={actionButtons}
+    filters={filters}
+    content={content}
+  />
+
+
+
+  /*
     <div className=" mx-auto p-2 md:p-4 lg:p-6">
       <Card className=" p-0">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 pt-4">
@@ -288,5 +483,6 @@ export function PurchaseRequestList() {
         </CardContent>
       </Card>
     </div>
+    */
   )
 }

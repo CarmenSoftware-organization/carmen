@@ -15,6 +15,7 @@ import CommentsAttachmentsTab from '@/components/purchase-orders/CommentsAttachm
 import ActivityLogTab from '@/components/purchase-orders/ActivityLogTab'
 import GoodsReceiveNoteTab from '@/components/purchase-orders/GoodsReceiveNoteTab'
 import { useToast } from "@/components/ui/use-toast"
+import DetailPageTemplate from '@/components/templates/DetailPageTemplate'
 
 interface Item {
   id: string;
@@ -156,7 +157,121 @@ export default function PurchaseOrderDetail({ params }: { params: { id: string }
     return <div>Loading...</div>
   }
 
+  const title = (<>
+  Purchase Order Details {params.id}
+  </>)
+  
+  const actionButtons = (<>
+  <div className="space-x-2">
+              <Button onClick={handleEdit}>Edit</Button>
+              <Button onClick={handleVoid} disabled={poData.status !== 'Partial'}>Void</Button>
+              <Button onClick={handleClose}>Close PO</Button>
+              <Button onClick={handlePrint}>Print</Button>
+              <Button onClick={handleEmail}>Email</Button>
+            </div></>);
+  const backLink = (<>
+              <Button onClick={() => router.back()} variant="outline">Back</Button></>);
+  const content = (<>
+  
+  <Card className="mb-6">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-2xl">Purchase Order: {poData.id}</CardTitle>
+              <p className="text-muted-foreground">Vendor: {poData.vendor}</p>
+            </div>
+            <Badge variant={poData.status === 'Partial' ? 'default' : 'secondary'}>
+              {poData.status}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <p><span className="font-semibold">Date:</span> {poData.date}</p>
+              <p><span className="font-semibold">Total:</span> {poData.currency} {poData.total.toFixed(2)}</p>
+            </div>
+            
+          </div>
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-full grid-cols-8">
+          <TabsTrigger value="items">Items</TabsTrigger>
+          <TabsTrigger value="general">General Info</TabsTrigger>
+          <TabsTrigger value="financial">Financial Details</TabsTrigger>
+          <TabsTrigger value="related">Related Documents</TabsTrigger>
+          <TabsTrigger value="inventory">Inventory Status</TabsTrigger>
+          <TabsTrigger value="comments">Comments & Attachments</TabsTrigger>
+          <TabsTrigger value="activity">Activity Log</TabsTrigger>
+          <TabsTrigger value="grn">Goods Receive Note</TabsTrigger>
+        </TabsList>
+        <TabsContent value="items">
+         <ItemsTab
+           items={poData?.items || []}
+           onUpdateItem={(updatedItem) => {
+             setPOData((prevData) => {
+               if (!prevData) return null;
+               return {
+                 ...prevData,
+                 items: prevData.items.map(item => 
+                   item.id === updatedItem.id ? updatedItem : item
+                 )
+               };
+             });
+           }}
+           onDeleteItem={(itemId) => {
+             setPOData((prevData) => {
+               if (!prevData) return null;
+               return {
+                 ...prevData,
+                 items: prevData.items.filter(item => item.id !== itemId)
+               };
+             });
+           }}
+           onAddItem={(newItem) => {
+             setPOData((prevData) => {
+               if (!prevData) return null;
+               return {
+                 ...prevData,
+                 items: [...prevData.items, newItem]
+               };
+             });
+           }}
+           poData={poData}
+         />
+        </TabsContent>
+        <TabsContent value="general">
+          <GeneralInfoTab poData={poData} />
+        </TabsContent>
+        <TabsContent value="financial">
+          <FinancialDetailsTab poData={poData} />
+        </TabsContent>
+        <TabsContent value="related">
+          <RelatedDocumentsTab poData={poData} />
+        </TabsContent>
+        <TabsContent value="inventory">
+          <InventoryStatusTab poData={poData} />
+        </TabsContent>
+        <TabsContent value="comments">
+          <CommentsAttachmentsTab poData={poData} />
+        </TabsContent>
+        <TabsContent value="activity">
+          <ActivityLogTab poData={poData} />
+        </TabsContent>
+        <TabsContent value="grn">
+          <GoodsReceiveNoteTab poData={poData} />
+        </TabsContent>
+      </Tabs>
+
+  </>);
+
   return (
+
+    <DetailPageTemplate title={title} actionButtons={actionButtons} content={content} backLink={backLink} />
+
+    /*
     <div className="container mx-auto px-4 py-8">
       <Card className="mb-6">
         <CardHeader>
@@ -257,5 +372,6 @@ export default function PurchaseOrderDetail({ params }: { params: { id: string }
         </TabsContent>
       </Tabs>
     </div>
+    */
   )
 }

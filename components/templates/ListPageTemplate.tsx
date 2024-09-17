@@ -5,6 +5,7 @@ interface ListPageTemplateProps {
   actionButtons?: ReactNode;
   filters?: ReactNode;
   content: ReactNode;
+  bulkActions? : ReactNode;
 }
 
 const ListPageTemplate: React.FC<ListPageTemplateProps> = ({
@@ -12,6 +13,7 @@ const ListPageTemplate: React.FC<ListPageTemplateProps> = ({
   actionButtons,
   filters,
   content,
+  bulkActions,
 }) => {
   return (
     <div className="container mx-auto p-4">
@@ -20,6 +22,7 @@ const ListPageTemplate: React.FC<ListPageTemplateProps> = ({
         {actionButtons && <div className="space-x-2">{actionButtons}</div>}
       </div>
       {filters && <div className="mb-4">{filters}</div>}
+      {bulkActions && <div className="mb-4">{bulkActions}</div>}
       <div className="bg-background rounded-lg shadow">
         {content}
       </div>
