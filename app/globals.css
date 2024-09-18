@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #ffffffc4;
   --foreground: #171717;
 }
 
@@ -58,7 +58,7 @@ body {
   }
   .dark {
     --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --foreground: 0 0% 8%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
@@ -88,12 +88,18 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border text-black; 
   }
   body {
-    @apply bg-background text-foreground;
+    /* @apply bg-background text-foreground; */
   }
 }
+
+.bg-background {
+  @apply bg-white;
+}
+
+.text
 
 .form-field-label {
   @apply pb-4;

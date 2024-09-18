@@ -66,6 +66,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CreatePOFromPR from "./createpofrompr";
 
 // This is a mock data structure. Replace with actual data fetching logic.
 const purchaseOrders = [
@@ -158,90 +159,6 @@ const purchaseOrders = [
     total: 3500.0,
     status: "Partial Received",
     email: "sales@premiumhotelfurnishings.com",
-  },
-];
-
-// Mock data for Purchase Requests
-const purchaseRequests = [
-  {
-    id: 1,
-    refNumber: "PR-001",
-    date: "2023-08-01",
-    description: "Bed Linens",
-    deliveryDate: "2023-08-15",
-    status: "Approved",
-  },
-  {
-    id: 2,
-    refNumber: "PR-002",
-    date: "2023-08-02",
-    description: "Toiletries",
-    deliveryDate: "2023-08-20",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    refNumber: "PR-003",
-    date: "2023-08-03",
-    description: "Room Furniture",
-    deliveryDate: "2023-08-25",
-    status: "Approved",
-  },
-  {
-    id: 4,
-    refNumber: "PR-004",
-    date: "2023-08-04",
-    description: "Cleaning Supplies",
-    deliveryDate: "2023-08-18",
-    status: "Approved",
-  },
-  {
-    id: 5,
-    refNumber: "PR-005",
-    date: "2023-08-05",
-    description: "Restaurant Equipment",
-    deliveryDate: "2023-08-30",
-    status: "Pending",
-  },
-  {
-    id: 6,
-    refNumber: "PR-006",
-    date: "2023-08-06",
-    description: "Pool Maintenance Supplies",
-    deliveryDate: "2023-08-22",
-    status: "Approved",
-  },
-  {
-    id: 7,
-    refNumber: "PR-007",
-    date: "2023-08-07",
-    description: "In-room Electronics",
-    deliveryDate: "2023-09-01",
-    status: "Pending",
-  },
-  {
-    id: 8,
-    refNumber: "PR-008",
-    date: "2023-08-08",
-    description: "Spa Products",
-    deliveryDate: "2023-08-28",
-    status: "Approved",
-  },
-  {
-    id: 9,
-    refNumber: "PR-009",
-    date: "2023-08-09",
-    description: "Gym Equipment",
-    deliveryDate: "2023-09-05",
-    status: "Pending",
-  },
-  {
-    id: 10,
-    refNumber: "PR-010",
-    date: "2023-08-10",
-    description: "Conference Room Supplies",
-    deliveryDate: "2023-08-24",
-    status: "Approved",
   },
 ];
 
@@ -583,60 +500,7 @@ const PurchaseOrderList: React.FC = () => {
           <Card>
 
           <CardContent className="py-4">
-
-            <Select
-              value={selectedCurrency}
-              onValueChange={(value) =>
-                setSelectedCurrency(value as CurrencyCode)
-              }
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(CurrencyCode).map((currency) => (
-                  <SelectItem key={currency} value={currency}>
-                    {currency}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Table className="mt-4">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">Select</TableHead>
-                  <TableHead>Ref#</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Delivery Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {purchaseRequests.map((pr) => (
-                  <TableRow key={pr.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedPRs.includes(pr.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedPRs([...selectedPRs, pr.id]);
-                          } else {
-                            setSelectedPRs(
-                              selectedPRs.filter((id) => id !== pr.id)
-                            );
-                          }
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>{pr.refNumber}</TableCell>
-                    <TableCell>{pr.date}</TableCell>
-                    <TableCell>{pr.description}</TableCell>
-                    <TableCell>{pr.deliveryDate}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
+            <CreatePOFromPR />
           </CardContent>
 
           </Card>
