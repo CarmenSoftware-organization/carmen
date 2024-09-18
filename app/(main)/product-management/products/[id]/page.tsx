@@ -151,7 +151,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         // }
         // const data = await response.json();
         const data = productList[0];
-        setProduct(data);
+        setProduct(data as Product);
       } catch (error) {
         setError('Error fetching product');
         console.error('Error fetching product:', error);
@@ -209,6 +209,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   };
 
   const handleAddConversion = async (unitType: 'INVENTORY' | 'ORDER' | 'RECIPE' | 'COUNTING') => {
+    if (!product) return; // Add this line to handle the case when product is null
     try {
       const response = await fetch('/api/product-units', {
         method: 'POST',
@@ -463,147 +464,6 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
             <Button onClick={() => handleAddConversion('RECIPE')}>Add Recipe Unit</Button>
             <Button onClick={() => handleAddConversion('COUNTING')}>Add Counting Unit</Button>
           </div>
-        </TabsContent>
-        <TabsContent value="orderConversions">
-          <h2 className="text-xl font-semibold mb-2">Order Unit Conversions</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>From Unit</TableHead>
-                <TableHead>To Unit</TableHead>
-                <TableHead>Conversion Factor</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {product.unitConversions.filter(conv => conv.type === 'ORDER').map((conversion) => (
-                <TableRow key={conversion.id}>
-                  <TableCell>
-                    <Input 
-                      value={conversion.fromUnit} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'fromUnit', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input 
-                      value={conversion.toUnit} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'toUnit', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input 
-                      type="number"
-                      value={conversion.conversionFactor} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'conversionFactor', parseFloat(e.target.value))}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteConversion(conversion.id)}>
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <Button className="mt-2" onClick={() => handleAddConversion('ORDER')}>
-            <PlusIcon className="h-4 w-4 mr-2" />
-            Add Order Conversion
-          </Button>
-        </TabsContent>
-        <TabsContent value="recipeConversions">
-          <h2 className="text-xl font-semibold mb-2">Recipe Unit Conversions</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>From Unit</TableHead>
-                <TableHead>To Unit</TableHead>
-                <TableHead>Conversion Factor</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {product.unitConversions.filter(conv => conv.type === 'RECIPE').map((conversion) => (
-                <TableRow key={conversion.id}>
-                  <TableCell>
-                    <Input 
-                      value={conversion.fromUnit} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'fromUnit', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input 
-                      value={conversion.toUnit} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'toUnit', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input 
-                      type="number"
-                      value={conversion.conversionFactor} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'conversionFactor', parseFloat(e.target.value))}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteConversion(conversion.id)}>
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <Button className="mt-2" onClick={() => handleAddConversion('RECIPE')}>
-            <PlusIcon className="h-4 w-4 mr-2" />
-            Add Recipe Conversion
-          </Button>
-        </TabsContent>
-        <TabsContent value="countingConversions">
-          <h2 className="text-xl font-semibold mb-2">Counting Unit Conversions</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>From Unit</TableHead>
-                <TableHead>To Unit</TableHead>
-                <TableHead>Conversion Factor</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {product.unitConversions.filter(conv => conv.type === 'COUNTING').map((conversion) => (
-                <TableRow key={conversion.id}>
-                  <TableCell>
-                    <Input 
-                      value={conversion.fromUnit} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'fromUnit', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input 
-                      value={conversion.toUnit} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'toUnit', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input 
-                      type="number"
-                      value={conversion.conversionFactor} 
-                      onChange={(e) => handleEditConversion(conversion.id, 'conversionFactor', parseFloat(e.target.value))}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteConversion(conversion.id)}>
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <Button className="mt-2" onClick={() => handleAddConversion('COUNTING')}>
-            <PlusIcon className="h-4 w-4 mr-2" />
-            Add Counting Conversion
-          </Button>
         </TabsContent>
         <TabsContent value="orderConversions">
           <h2 className="text-xl font-semibold mb-2">Order Unit Conversions</h2>

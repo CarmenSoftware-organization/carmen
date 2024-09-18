@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import PurchaseOrderList from '@/components/purchase-orders/PurchaseOrderList'
+import PurchaseOrderList from './components/PurchaseOrderList'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 import {

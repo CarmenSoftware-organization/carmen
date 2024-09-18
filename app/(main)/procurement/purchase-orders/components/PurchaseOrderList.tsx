@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CurrencyCode } from "@/types/types";
@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronDown,
-  ChevronRight,
   Eye,
   Trash2,
   X,
@@ -65,7 +64,7 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import ListPageTemplate from "../templates/ListPageTemplate";
+import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 // This is a mock data structure. Replace with actual data fetching logic.
@@ -272,8 +271,6 @@ const PurchaseOrderList: React.FC = () => {
     email: "",
   });
   const itemsPerPage = 6;
-  const [groupByDeliveryDate, setGroupByDeliveryDate] = useState(false);
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
 
   const handleCreateManually = () => {
     router.push("/procurement/purchase-orders/${0}");
@@ -380,29 +377,6 @@ const PurchaseOrderList: React.FC = () => {
   const handleSendEmail = (poId: number) => {
     console.log(`Sending email for PO: ${poId}`);
     // Implement email sending logic here
-  };
-
-  const groupedPurchaseRequests = useMemo(() => {
-    if (!groupByDeliveryDate) return purchaseRequests;
-
-    const grouped = purchaseRequests.reduce((acc, pr) => {
-      const key = `${pr.deliveryDate}-${pr.vendor || 'Unknown Vendor'}`;
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(pr);
-      return acc;
-    }, {} as Record<string, typeof purchaseRequests>);
-
-    return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
-  }, [purchaseRequests, groupByDeliveryDate]);
-
-  const toggleGroup = (groupKey: string) => {
-    setExpandedGroups(prev =>
-      prev.includes(groupKey)
-        ? prev.filter(key => key !== groupKey)
-        : [...prev, groupKey]
-    );
   };
 
   const filters = (
@@ -600,136 +574,74 @@ const PurchaseOrderList: React.FC = () => {
 
       {/* Create from PR Dialog */}
       <Dialog open={isCreateFromPROpen} onOpenChange={setIsCreateFromPROpen}>
-        <DialogContent className="sm:max-w-[800px]">
+        <DialogContent className="sm:max-w-[800px] bg-white p-6">
           <DialogHeader>
             <DialogTitle>Create PO from Purchase Request</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <div className="flex justify-between items-center mb-4">
-              <Select
-                value={selectedCurrency}
-                onValueChange={(value) =>
-                  setSelectedCurrency(value as CurrencyCode)
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(CurrencyCode).map((currency) => (
-                    <SelectItem key={currency} value={currency}>
-                      {currency}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="groupByDeliveryDate"
-                  checked={groupByDeliveryDate}
-                  onCheckedChange={(checked) => setGroupByDeliveryDate(checked as boolean)}
-                />
-                <Label htmlFor="groupByDeliveryDate">Group by Delivery Date & Vendor</Label>
-              </div>
-            </div>
-            <ScrollArea className="h-[400px]">
-              {groupByDeliveryDate ? (
-                groupedPurchaseRequests.map(([groupKey, prs]) => {
-                  const [deliveryDate, vendor] = groupKey.split('-');
-                  const isExpanded = expandedGroups.includes(groupKey);
-                  return (
-                    <div key={groupKey} className="mb-4">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start"
-                        onClick={() => toggleGroup(groupKey)}
-                      >
-                        {isExpanded ? <ChevronDown className="mr-2 h-4 w-4" /> : <ChevronRight className="mr-2 h-4 w-4" />}
-                        {deliveryDate} - {vendor} ({prs.length})
-                      </Button>
-                      {isExpanded && (
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-[50px]">Select</TableHead>
-                              <TableHead>Ref#</TableHead>
-                              <TableHead>Date</TableHead>
-                              <TableHead>Description</TableHead>
-                              <TableHead>Status</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {prs.map((pr) => (
-                              <TableRow key={pr.id}>
-                                <TableCell>
-                                  <Checkbox
-                                    checked={selectedPRs.includes(pr.id)}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        setSelectedPRs([...selectedPRs, pr.id]);
-                                      } else {
-                                        setSelectedPRs(
-                                          selectedPRs.filter((id) => id !== pr.id)
-                                        );
-                                      }
-                                    }}
-                                  />
-                                </TableCell>
-                                <TableCell>{pr.refNumber}</TableCell>
-                                <TableCell>{pr.date}</TableCell>
-                                <TableCell>{pr.description}</TableCell>
-                                <TableCell>{pr.status}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">Select</TableHead>
-                      <TableHead>Ref#</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Delivery Date</TableHead>
-                      <TableHead>Vendor</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {purchaseRequests.map((pr) => (
-                      <TableRow key={pr.id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedPRs.includes(pr.id)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setSelectedPRs([...selectedPRs, pr.id]);
-                              } else {
-                                setSelectedPRs(
-                                  selectedPRs.filter((id) => id !== pr.id)
-                                );
-                              }
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>{pr.refNumber}</TableCell>
-                        <TableCell>{pr.date}</TableCell>
-                        <TableCell>{pr.description}</TableCell>
-                        <TableCell>{pr.deliveryDate}</TableCell>
-                        <TableCell>{pr.vendor || 'N/A'}</TableCell>
-                        <TableCell>{pr.status}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </ScrollArea>
-          </div>
+
+          <ScrollArea className="max-h-[60vh]">
+          <Card>
+
+          <CardContent className="py-4">
+
+            <Select
+              value={selectedCurrency}
+              onValueChange={(value) =>
+                setSelectedCurrency(value as CurrencyCode)
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(CurrencyCode).map((currency) => (
+                  <SelectItem key={currency} value={currency}>
+                    {currency}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Table className="mt-4">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">Select</TableHead>
+                  <TableHead>Ref#</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Delivery Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {purchaseRequests.map((pr) => (
+                  <TableRow key={pr.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedPRs.includes(pr.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedPRs([...selectedPRs, pr.id]);
+                          } else {
+                            setSelectedPRs(
+                              selectedPRs.filter((id) => id !== pr.id)
+                            );
+                          }
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>{pr.refNumber}</TableCell>
+                    <TableCell>{pr.date}</TableCell>
+                    <TableCell>{pr.description}</TableCell>
+                    <TableCell>{pr.deliveryDate}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+          </CardContent>
+
+          </Card>
+          </ScrollArea>
+
           <DialogFooter>
             <Button
               onClick={handleGeneratePOs}
