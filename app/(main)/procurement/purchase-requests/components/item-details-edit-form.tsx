@@ -60,6 +60,7 @@ import {
 } from "@/components/ui/dialog";
 import InventoryBreakdown from "./inventory-breakdown";
 import VendorComparison from "./vendor-comparison";
+import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 
 type ItemDetailsFormProps = {
   onSave: (formData: FormData) => void;
@@ -136,6 +137,7 @@ export function ItemDetailsEditForm({
   const [isInventoryBreakdownOpen, setIsInventoryBreakdownOpen] =
     useState(false);
   const [isVendorComparisonOpen, setIsVendorComparisonOpen] = useState(false);
+  const [isOnOrderOpen, setIsOnOrderOpen] = useState(false);
 
   useEffect(() => {
     setFormData(initialData || emptyItemData);
@@ -815,14 +817,49 @@ export function ItemDetailsEditForm({
                     </Card>
                   </DialogContent>
                 </Dialog>
-                <Button
+
+                <Dialog
+                  open={isOnOrderOpen}
+                  onOpenChange={setIsOnOrderOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline">
+                      <TruckIcon className="mr-2 h-4 w-4" />
+                      On Order
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[60vw]">
+                    <Card className="">
+                      <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle className="text-xl sm:text-2xl font-bold">
+                          Pending Purchase Order
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsOnOrderOpen(false)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </CardHeader>
+
+                      <CardContent>
+                        {/* <div className="bg-red-300 h-48"></div> */}
+                        <PendingPurchaseOrdersComponent />
+                        {/* <InventoryBreakdown /> */}
+                      </CardContent>
+                    </Card>
+                  </DialogContent>
+                </Dialog>
+
+                {/* <Button
                   type="button"
                   variant="outline"
                   disabled={mode === "view"}
                 >
                   <TruckIcon className="mr-2 h-4 w-4" />
                   On Order
-                </Button>
+                </Button> */}
 
                 {/* <Button type="button" variant="outline" onClick={handleVendorComparison}>
                 <Users className="mr-2 h-4 w-4" />
