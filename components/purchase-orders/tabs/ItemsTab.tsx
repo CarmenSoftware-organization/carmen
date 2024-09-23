@@ -12,6 +12,7 @@ import { Gift, ChevronDown, ChevronRight, MoreHorizontal, Plus } from 'lucide-re
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
+import { PurchaseOrderItemFormComponent } from './purchase-order-item-form';
                                                                                                                         
 // Sample mock data
 const mockItems: Item[] = [
@@ -109,17 +110,8 @@ interface ItemsTabProps {
 export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem, poData }: ItemsTabProps) {                     
   const [selectedItems, setSelectedItems] = useState<string[]>([]);                                                     
   const [expandedItems, setExpandedItems] = useState<string[]>([]);                                                     
-  const [newItem, setNewItem] = useState<Partial<Item>>({
-    code: '',
-    description: '',
-    orderedQuantity: 0,
-    orderUnit: '',
-    baseQuantity: 0,
-    baseUnit: '',
-    baseReceivingQty: 0,
-    unitPrice: 0,
-    isFOC: false,
-  });
+  const [isAddItemFormOpen, setIsAddItemFormOpen] = useState(false);
+  const [viewItemDetails, setViewItemDetails] = useState<Item | null>(null);
 
   const handleExport = () => {
     // Implement export logic here
@@ -191,12 +183,15 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
     setSelectedItems([]);
   };
                                                                                                                         
-  const handleViewDetails = (item: Item) => {                                                                           
-    // Implement view details logic                                                                                     
-    console.log('View details for item:', item);                                                                        
-  };                                                                                                                    
-                                                                                                                        
-  const handleEditItem = (item: Item) => {                                                                              
+  const handleViewDetails = (item: Item) => {
+    setViewItemDetails(item);
+  };
+
+  const handleCloseItemDetails = () => {
+    setViewItemDetails(null);
+  };
+
+  const handleEditItem = (item: Item) => {
     // Implement edit item logic                                                                                        
     console.log('Edit item:', item);                                                                                    
   };                                                                                                                    
@@ -224,34 +219,9 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
     }
   };
                                                                                                                         
-  const [isAddItemSheetOpen, setIsAddItemSheetOpen] = useState(false);
-
-  const handleAddNewItem = () => {
-    if (newItem.code && newItem.description && newItem.orderedQuantity && newItem.orderUnit) {
-      const itemToAdd: Item = {
-        id: Date.now().toString(), // Generate a temporary ID
-        ...newItem as Item,
-        baseQuantity: newItem.baseQuantity || newItem.orderedQuantity,
-        baseUnit: newItem.baseUnit || newItem.orderUnit,
-        receivedQuantity: 0,
-        remainingQuantity: newItem.orderedQuantity as number,
-        totalPrice: (newItem.orderedQuantity as number) * (newItem.unitPrice as number),
-        status: 'Not Received',
-      };
-      onAddItem(itemToAdd);
-      setNewItem({
-        code: '',
-        description: '',
-        orderedQuantity: 0,
-        orderUnit: '',
-        baseQuantity: 0,
-        baseUnit: '',
-        baseReceivingQty: 0,
-        unitPrice: 0,
-        isFOC: false,
-      });
-      setIsAddItemSheetOpen(false);
-    }
+  const handleAddNewItem = (newItemData: Item) => {
+    onAddItem(newItemData);
+    setIsAddItemFormOpen(false);
   };
 
   return (
@@ -491,8 +461,7 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
                       <DropdownMenuItem onSelect={() => handleViewDetails(item)}>View Details</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleEditItem(item)}>Edit Item</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleAddNote(item)}>Add Note</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => handleSplitLine(item)}>Split Line</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => handleCancelItem(item)}>Cancel Item</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => handleCancelItem(item)}>Delete Item</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <div className="text-sm text-gray-500 mt-1">Actions</div>
@@ -504,125 +473,25 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
       ) : (
         <p>No items available.</p>
       )}                                                                                                          
-        <Sheet open={isAddItemSheetOpen} onOpenChange={setIsAddItemSheetOpen}>
-          <SheetTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Item
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[400px] sm:w-[540px]">
-            <SheetHeader>
-              <SheetTitle>Add New Item</SheetTitle>
-              <SheetDescription>Fill in the details to add a new item to the purchase order.</SheetDescription>
-            </SheetHeader>
-            <ScrollArea className="h-[calc(100vh-200px)] pr-4">
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newItemCode" className="text-right">
-                    Item Code
-                  </Label>
-                  <Input
-                    id="newItemCode"
-                    value={newItem.code}
-                    onChange={(e) => setNewItem({ ...newItem, code: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newItemDescription" className="text-right">
-                    Description
-                  </Label>
-                  <Input
-                    id="newItemDescription"
-                    value={newItem.description}
-                    onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newItemOrderedQuantity" className="text-right">
-                    Ordered Quantity
-                  </Label>
-                  <Input
-                    id="newItemOrderedQuantity"
-                    type="number"
-                    value={newItem.orderedQuantity}
-                    onChange={(e) => setNewItem({ ...newItem, orderedQuantity: Number(e.target.value) })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newItemOrderUnit" className="text-right">
-                    Order Unit
-                  </Label>
-                  <Select
-                    value={newItem.orderUnit}
-                    onValueChange={(value) => setNewItem({ ...newItem, orderUnit: value })}
-                  >
-                    <SelectTrigger id="newItemOrderUnit" className="col-span-3">
-                      <SelectValue placeholder="Select Order Unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pcs">Piece (pcs)</SelectItem>
-                      <SelectItem value="kg">Kilogram (kg)</SelectItem>
-                      <SelectItem value="ltr">Liter (ltr)</SelectItem>
-                      <SelectItem value="box">Box</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newItemBaseUnit" className="text-right">
-                    Base Unit
-                  </Label>
-                  <Select
-                    value={newItem.baseUnit}
-                    onValueChange={(value) => setNewItem({ ...newItem, baseUnit: value })}
-                  >
-                    <SelectTrigger id="newItemBaseUnit" className="col-span-3">
-                      <SelectValue placeholder="Select Base Unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pcs">Piece (pcs)</SelectItem>
-                      <SelectItem value="kg">Kilogram (kg)</SelectItem>
-                      <SelectItem value="ltr">Liter (ltr)</SelectItem>
-                      <SelectItem value="box">Box</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newItemUnitPrice" className="text-right">
-                    Unit Price
-                  </Label>
-                  <Input
-                    id="newItemUnitPrice"
-                    type="number"
-                    value={newItem.unitPrice}
-                    onChange={(e) => setNewItem({ ...newItem, unitPrice: Number(e.target.value) })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newItemIsFOC" className="text-right">
-                    Free of Charge
-                  </Label>
-                  <div className="col-span-3 flex items-center space-x-2">
-                    <Checkbox
-                      id="newItemIsFOC"
-                      checked={newItem.isFOC}
-                      onCheckedChange={(checked) => setNewItem({ ...newItem, isFOC: checked as boolean })}
-                    />
-                    <Label htmlFor="newItemIsFOC">Free of Charge (FOC)</Label>
-                  </div>
-                </div>
-              </div>
-            </ScrollArea>
-            <SheetFooter>
-              <SheetClose asChild>
-                <Button type="submit" onClick={handleAddNewItem}>Add Item</Button>
-              </SheetClose>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
+        <Button onClick={() => setIsAddItemFormOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Item
+        </Button>
+
+        {isAddItemFormOpen && (
+          <PurchaseOrderItemFormComponent
+            initialMode="add"
+            onClose={() => setIsAddItemFormOpen(false)}
+            onSubmit={handleAddNewItem}
+          />
+        )}
+
+        {viewItemDetails && (
+          <PurchaseOrderItemFormComponent
+            initialMode="view"
+            onClose={handleCloseItemDetails}
+            initialData={viewItemDetails}
+          />
+        )}
       </div>                                                                                                              
     </TooltipProvider>
   );                                                                                                                    

@@ -7,7 +7,7 @@ import { Eye, Edit, Trash } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
 import { sampleGoodsReceiveNotes } from '@/lib/sample-data'
-import { GoodsReceiveNote } from '@/lib/types'
+import { GoodsReceiveNote } from '@/lib/types/types'
 import { Button } from '@/components/ui/button'
 
 // Make sure these components are properly imported or implemented

@@ -10,6 +10,8 @@ import { Gift, ChevronDown, ChevronRight, MoreHorizontal, Plus, Eye, Edit, Messa
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
+import { PurchaseOrderItemFormComponent } from './purchase-order-item-form'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 
 // Sample mock data
 
@@ -118,6 +120,8 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     unitPrice: 0,
     isFOC: false,
   });
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
+  const [viewingItem, setViewingItem] = useState<Item | null>(null);
   
   const handleExport = () => {
     // Implement export logic here
@@ -181,15 +185,13 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     setSelectedItems([]);
   };
                                                                                                                         
-  const handleViewDetails = (item: Item) => {                                                                           
-    // Implement view details logic                                                                                     
-    console.log('View details for item:', item);                                                                        
-  };                                                                                                                    
+  const handleViewDetails = (item: Item) => {
+    setViewingItem(item);
+  };
                                                                                                                         
-  const handleEditItem = (item: Item) => {                                                                              
-    // Implement edit item logic                                                                                        
-    console.log('Edit item:', item);                                                                                    
-  };                                                                                                                    
+  const handleEditItem = (item: Item) => {
+    setEditingItem(item);
+  };
                                                                                                                         
   const handleAddNote = (item: Item) => {                                                                               
     // Implement add note logic                                                                                         
@@ -214,160 +216,54 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     }
   };
                                                                                                                         
-  const [isAddItemSheetOpen, setIsAddItemSheetOpen] = useState(false);
+  const [isAddItemFormOpen, setIsAddItemFormOpen] = useState(false)
 
-  const handleAddNewItem = () => {
-    if (newItem.code && newItem.description && newItem.orderedQuantity && newItem.orderUnit) {
-      const itemToAdd: Item = {
-        ...newItem as Item,
-        id: Date.now().toString(), // Generate a temporary ID
-        baseQuantity: newItem.baseQuantity || newItem.orderedQuantity,
-        baseUnit: newItem.baseUnit || newItem.orderUnit,
-        receivedQuantity: 0,
-        remainingQuantity: newItem.orderedQuantity as number,
-        totalPrice: (newItem.orderedQuantity as number) * (newItem.unitPrice as number),
-        status: 'Not Received',
-      };
-      onAddItem(itemToAdd);
-      setNewItem({
-        code: '',
-        description: '',
-        orderedQuantity: 0,
-        orderUnit: '',
-        baseQuantity: 0,
-        baseUnit: '',
-        baseReceivingQty: 0,
-        unitPrice: 0,
-        isFOC: false,
-      });
-      setIsAddItemSheetOpen(false);
-    }
+  const handleAddNewItem = (newItem: Item) => {
+    onAddItem(newItem)
+    setIsAddItemFormOpen(false)
+  }
+
+  const handleItemUpdate = (updatedItem: Item) => {
+    onUpdateItem(updatedItem);
+    setEditingItem(null);
   };
 
   return (
     <TooltipProvider>
       <div className="space-y-4 w-full">
         <div className="flex justify-between items-center w-full">
-          <Sheet open={isAddItemSheetOpen} onOpenChange={setIsAddItemSheetOpen}>
-            <SheetTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Add Item
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[400px] sm:w-[540px]">
-              <SheetHeader>
-                <SheetTitle>Add New Item</SheetTitle>
-                <SheetDescription>Fill in the details to add a new item to the purchase order.</SheetDescription>
-              </SheetHeader>
-              <ScrollArea className="h-[calc(100vh-200px)] pr-4">
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="newItemCode" className="text-right">
-                      Item Code
-                    </Label>
-                    <Input
-                      id="newItemCode"
-                      value={newItem.code}
-                      onChange={(e) => setNewItem({ ...newItem, code: e.target.value })}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="newItemDescription" className="text-right">
-                      Description
-                    </Label>
-                    <Input
-                      id="newItemDescription"
-                      value={newItem.description}
-                      onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="newItemOrderedQuantity" className="text-right">
-                      Ordered Quantity
-                    </Label>
-                    <Input
-                      id="newItemOrderedQuantity"
-                      type="number"
-                      value={newItem.orderedQuantity}
-                      onChange={(e) => setNewItem({ ...newItem, orderedQuantity: Number(e.target.value) })}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="newItemOrderUnit" className="text-right">
-                      Order Unit
-                    </Label>
-                    <Select
-                      value={newItem.orderUnit}
-                      onValueChange={(value) => setNewItem({ ...newItem, orderUnit: value })}
-                    >
-                      <SelectTrigger id="newItemOrderUnit" className="col-span-3">
-                        <SelectValue placeholder="Select Order Unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pcs">Piece (pcs)</SelectItem>
-                        <SelectItem value="kg">Kilogram (kg)</SelectItem>
-                        <SelectItem value="ltr">Liter (ltr)</SelectItem>
-                        <SelectItem value="box">Box</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="newItemBaseUnit" className="text-right">
-                      Base Unit
-                    </Label>
-                    <Select
-                      value={newItem.baseUnit}
-                      onValueChange={(value) => setNewItem({ ...newItem, baseUnit: value })}
-                    >
-                      <SelectTrigger id="newItemBaseUnit" className="col-span-3">
-                        <SelectValue placeholder="Select Base Unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pcs">Piece (pcs)</SelectItem>
-                        <SelectItem value="kg">Kilogram (kg)</SelectItem>
-                        <SelectItem value="ltr">Liter (ltr)</SelectItem>
-                        <SelectItem value="box">Box</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="newItemUnitPrice" className="text-right">
-                      Unit Price
-                    </Label>
-                    <Input
-                      id="newItemUnitPrice"
-                      type="number"
-                      value={newItem.unitPrice}
-                      onChange={(e) => setNewItem({ ...newItem, unitPrice: Number(e.target.value) })}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="newItemIsFOC" className="text-right">
-                      Free of Charge
-                    </Label>
-                    <div className="col-span-3 flex items-center space-x-2">
-                      <Checkbox
-                        id="newItemIsFOC"
-                        checked={newItem.isFOC}
-                        onCheckedChange={(checked) => setNewItem({ ...newItem, isFOC: checked as boolean })}
-                      />
-                      <Label htmlFor="newItemIsFOC">Free of Charge (FOC)</Label>
-                    </div>
-                  </div>
-                </div>
-              </ScrollArea>
-              <SheetFooter>
-                <SheetClose asChild>
-                  <Button type="submit" onClick={handleAddNewItem}>Add Item</Button>
-                </SheetClose>
-              </SheetFooter>
-            </SheetContent>
-          </Sheet>
+          <Button onClick={() => setIsAddItemFormOpen(true)}>
+            <Plus className="mr-2 s h-4 w-4" /> Add Item
+          </Button>
         </div>
+
+        {isAddItemFormOpen && (     
+              <PurchaseOrderItemFormComponent
+                initialMode="add"
+                onClose={() => setIsAddItemFormOpen(false)}
+                onSubmit={handleAddNewItem}
+                isOpen={isAddItemFormOpen}
+              />
+        )}
+
+        {editingItem && (
+          <PurchaseOrderItemFormComponent
+            initialMode="edit"
+            onClose={() => setEditingItem(null)}
+            onSubmit={handleItemUpdate}
+            isOpen={!!editingItem}
+            initialData={editingItem}
+          />
+        )}
+
+        {viewingItem && (
+          <PurchaseOrderItemFormComponent
+            initialMode="view"
+            onClose={() => setViewingItem(null)}
+            isOpen={!!viewingItem}
+            initialData={viewingItem}
+          />
+        )}
 
         {selectedItems.length > 0 && (
           <div className="flex space-x-2 mb-4">
@@ -380,7 +276,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
           {poData.items.length > 0 ? (
             <Table className="w-full">
               <TableHeader>
-                <TableRow>
+                <TableRow className="h-8">
                   <TableHead className="w-[50px]">
                     <Checkbox
                       checked={selectedItems.length === poData.items.length}
@@ -401,76 +297,73 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
               </TableHeader>
               <TableBody>
                 {poData.items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
+                  <TableRow key={item.id} className="h-10">
+                    <TableCell className="py-1">
                       <Checkbox
                         checked={selectedItems.includes(item.id)}
                         onCheckedChange={() => toggleItemSelection(item.id)}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-1">
                       <div>{item.code}</div>
                       {item.isFOC && (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Gift className="inline-block mt-1 text-blue-500" size={16} />
+                            <Gift className="inline-block mt-0.5 text-blue-500" size={14} />
                           </TooltipTrigger>
                           <TooltipContent>Free of Charge</TooltipContent>
                         </Tooltip>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{item.description}</div>
+                    <TableCell className="py-1">
+                      <div className="text-xs">{item.description}</div>
                     </TableCell>
-                    <TableCell>
-                      <div>{item.orderedQuantity} {item.orderUnit}</div>
+                    <TableCell className="py-1">
+                      <div className="text-sm">{item.orderedQuantity} {item.orderUnit}</div>
                       <div className="text-xs text-gray-500">{item.baseQuantity} {item.baseUnit}</div>
                     </TableCell>
-                    <TableCell>
-                      <div>{item.receivedQuantity} {item.orderUnit}</div>
+                    <TableCell className="py-1">
+                      <div className="text-sm">{item.receivedQuantity} {item.orderUnit}</div>
                       <div className="text-xs text-gray-500">{item.baseReceivingQty} {item.baseUnit}</div>
                     </TableCell>
-                    <TableCell>
-                      <div>{item.remainingQuantity} {item.orderUnit}</div>
+                    <TableCell className="py-1">
+                      <div className="text-sm">{item.remainingQuantity} {item.orderUnit}</div>
                       <div className="text-xs text-gray-500">
                         {(item.remainingQuantity * (item.baseQuantity / item.orderedQuantity)).toFixed(2)} {item.baseUnit}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div>{item.orderUnit}</div>
+                    <TableCell className="py-1">
+                      <div className="text-sm">{item.orderUnit}</div>
                       <div className="text-xs text-gray-500">{item.baseUnit}</div>
                     </TableCell>
-                    <TableCell>
-                      <div>${item.unitPrice.toFixed(2)}</div>
+                    <TableCell className="py-1">
+                      <div className="text-sm">${item.unitPrice.toFixed(2)}</div>
                       <div className="text-xs text-gray-500">
                         ${(item.unitPrice * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div>${item.totalPrice.toFixed(2)}</div>
+                    <TableCell className="py-1">
+                      <div className="text-sm">${item.totalPrice.toFixed(2)}</div>
                       <div className="text-xs text-gray-500">
                         ${(item.totalPrice * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge className={`${getStatusColor(item.status)} text-xs px-2 py-0.5`}>{item.status}</Badge>
+                    <TableCell className="py-1">
+                      <Badge className={`${getStatusColor(item.status)} text-xs px-1 py-0.5`}>{item.status}</Badge>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleViewDetails(item)}>
-                          <Eye className="h-4 w-4" />
+                    <TableCell className="py-1">
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewDetails(item)}>
+                          <Eye className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleEditItem(item)}>
-                          <Edit className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={() => handleEditItem(item)}>
+                          <Edit className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleAddNote(item)}>
-                          <MessageSquare className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={() => handleAddNote(item)}>
+                          <MessageSquare className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleSplitLine(item)}>
-                          <Split className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleCancelItem(item)}>
-                          <X className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={() => handleCancelItem(item)}>
+                          <X className="h-3 w-3" />
                         </Button>
                       </div>
                     </TableCell>

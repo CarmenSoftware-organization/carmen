@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { CurrencyCode } from "@/types/types";
+import { PurchaseRequest } from "@/types/types"; // Add this import
 import {
   Table,
   TableBody,
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ArrowUpDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -21,211 +22,154 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 
 // Updated mock data for Purchase Requests
-const purchaseRequests = [
-  {
-    id: 1,
-    refNumber: "PR-001",
-    date: "2023-08-01",
-    description: "Bed Linens",
-    deliveryDate: "2023-08-15",
-    status: "Approved",
-    items: [
-      { id: 1, name: "King Sheet Set", quantity: 50, price: 89.99, vendor: "Vendor A" },
-      { id: 2, name: "Queen Duvet Cover", quantity: 30, price: 79.99, vendor: "Vendor B" },
-    ],
-  },
-  {
-    id: 2,
-    refNumber: "PR-002",
-    date: "2023-08-02",
-    description: "Toiletries",
-    deliveryDate: "2023-08-20",
-    status: "Approved",
-    items: [
-      { id: 3, name: "Shampoo Bottles", quantity: 500, price: 2.50, vendor: "Vendor C" },
-      { id: 4, name: "Bath Soap Bars", quantity: 1000, price: 1.25, vendor: "Vendor D" },
-    ],
-  },
-  {
-    id: 3,
-    refNumber: "PR-003",
-    date: "2023-08-03",
-    description: "Room Furniture",
-    deliveryDate: "2023-08-25",
-    status: "Approved",
-    items: [
-      { id: 5, name: "Bedside Table", quantity: 100, price: 129.99, vendor: "Vendor E" },
-      { id: 6, name: "Desk Chair", quantity: 50, price: 199.99, vendor: "Vendor F" },
-    ],
-  },
-  {
-    id: 4,
-    refNumber: "PR-004",
-    date: "2023-08-04",
-    description: "Cleaning Supplies",
-    deliveryDate: "2023-08-18",
-    status: "Approved",
-    items: [
-      { id: 7, name: "All-Purpose Cleaner", quantity: 200, price: 5.99, vendor: "Vendor G" },
-      { id: 8, name: "Microfiber Cloths", quantity: 500, price: 1.99, vendor: "Vendor H" },
-    ],
-  },
-  {
-    id: 5,
-    refNumber: "PR-005",
-    date: "2023-08-05",
-    description: "Restaurant Equipment",
-    deliveryDate: "2023-08-30",
-    status: "Approved",
-    items: [
-      { id: 9, name: "Commercial Blender", quantity: 5, price: 299.99, vendor: "Vendor I" },
-      { id: 10, name: "Stainless Steel Pots", quantity: 20, price: 89.99, vendor: "Vendor J" },
-    ],
-  },
+const purchaseRequests: PurchaseRequest[] = [
+  { id: "1", refNumber: 'PR001', date: '2023-07-01', description: 'Office Supplies', deliveryDate: '2023-07-15', vendor: 'OfficeMax' },
+  { id: "2", refNumber: 'PR002', date: '2023-07-02', description: 'IT Equipment', deliveryDate: '2023-07-20', vendor: 'Dell' },
+  { id: "3", refNumber: 'PR003', date: '2023-07-03', description: 'Furniture', deliveryDate: '2023-07-15', vendor: 'IKEA' },
+  { id: "4", refNumber: 'PR004', date: '2023-07-04', description: 'Marketing Materials', deliveryDate: '2023-07-18', vendor: 'PrintCo' },
+  { id: "5", refNumber: 'PR005', date: '2023-07-05', description: 'Cleaning Supplies', deliveryDate: '2023-07-12', vendor: 'CleanAll' },
+  { id: "6", refNumber: 'PR006', date: '2023-07-06', description: 'Software Licenses', deliveryDate: '2023-07-20', vendor: 'Microsoft' },
+  { id: "7", refNumber: 'PR007', date: '2023-07-07', description: 'Office Snacks', deliveryDate: '2023-07-14', vendor: 'Costco' },
+  { id: "8", refNumber: 'PR008', date: '2023-07-08', description: 'Training Materials', deliveryDate: '2023-07-22', vendor: 'LearnCo' },
+  { id: "9", refNumber: 'PR009', date: '2023-07-09', description: 'Safety Equipment', deliveryDate: '2023-07-16', vendor: 'SafetyFirst' },
+  { id: "10", refNumber: 'PR010', date: '2023-07-10', description: 'Vehicle Maintenance', deliveryDate: '2023-07-28', vendor: 'AutoShop' },
+  { id: "11", refNumber: 'PR011', date: '2023-07-11', description: 'Office Furniture', deliveryDate: '2023-07-15', vendor: 'IKEA' },
+  { id: "12", refNumber: 'PR012', date: '2023-07-12', description: 'Networking Equipment', deliveryDate: '2023-07-29', vendor: 'Cisco' },
+  { id: "13", refNumber: 'PR013', date: '2023-07-13', description: 'Employee Uniforms', deliveryDate: '2023-07-23', vendor: 'UniformCo' },
+  { id: "14", refNumber: 'PR014', date: '2023-07-14', description: 'Lab Supplies', deliveryDate: '2023-07-21', vendor: 'LabEquip' },
+  { id: "15", refNumber: 'PR015', date: '2023-07-15', description: 'Office Plants', deliveryDate: '2023-07-19', vendor: 'GreenThumb' },
+  { id: "16", refNumber: 'PR016', date: '2023-07-16', description: 'Catering Services', deliveryDate: '2023-07-20', vendor: 'FoodForAll' },
+  { id: "17", refNumber: 'PR017', date: '2023-07-17', description: 'Security Cameras', deliveryDate: '2023-07-27', vendor: 'SecureTech' },
+  { id: "18", refNumber: 'PR018', date: '2023-07-18', description: 'First Aid Kits', deliveryDate: '2023-07-24', vendor: 'MedSupplies' },
+  { id: "19", refNumber: 'PR019', date: '2023-07-19', description: 'Printer Ink', deliveryDate: '2023-07-13', vendor: 'IKEA' },
+  { id: "20", refNumber: 'PR020', date: '2023-07-20', description: 'Employee Awards', deliveryDate: '2023-07-17', vendor: 'TrophyShop' }
 ];
 
-export default function CreatePOFromPR() {
-  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>(CurrencyCode.USD);
-  const [selectedPRs, setSelectedPRs] = useState<number[]>([]);
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
+type SortConfig = {
+  key: keyof PurchaseRequest;
+  direction: 'asc' | 'desc';
+};
 
-  const groupedPurchaseRequests = useMemo(() => {
-    const grouped = purchaseRequests.reduce((acc, pr) => {
-      pr.items.forEach(item => {
-        const deliveryDateKey = pr.deliveryDate;
-        const vendorKey = item.vendor;
-        const currencyKey = selectedCurrency;
+interface CreatePOFromPRProps {
+  onSelectPRs: (selectedPRs: PurchaseRequest[]) => void;
+}
 
-        if (!acc[deliveryDateKey]) acc[deliveryDateKey] = {};
-        if (!acc[deliveryDateKey][vendorKey]) acc[deliveryDateKey][vendorKey] = {};
-        if (!acc[deliveryDateKey][vendorKey][currencyKey]) acc[deliveryDateKey][vendorKey][currencyKey] = [];
+export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
+  const [selectedPRIds, setSelectedPRIds] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'date', direction: 'asc' });
 
-        if (!acc[deliveryDateKey][vendorKey][currencyKey].includes(pr)) {
-          acc[deliveryDateKey][vendorKey][currencyKey].push(pr);
-        }
+  const filteredAndSortedPurchaseRequests = useMemo(() => {
+    return purchaseRequests
+      .filter(pr =>
+        pr.refNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pr.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pr.vendor.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
       });
-      return acc;
-    }, {} as Record<string, Record<string, Record<string, typeof purchaseRequests>>>);
+  }, [purchaseRequests, searchTerm, sortConfig]);
 
-    return grouped;
-  }, [purchaseRequests, selectedCurrency]);
-
-  const toggleGroup = (groupKey: string) => {
-    setExpandedGroups(prev =>
-      prev.includes(groupKey)
-        ? prev.filter(key => key !== groupKey)
-        : [...prev, groupKey]
-    );
-  };
-
-  const handleSelectPR = (id: number, checked: boolean) => {
+  const handleSelectPR = (id: string, checked: boolean) => {
     if (checked) {
-      setSelectedPRs([...selectedPRs, id]);
+      setSelectedPRIds([...selectedPRIds, id]);
     } else {
-      setSelectedPRs(selectedPRs.filter(prId => prId !== id));
+      setSelectedPRIds(selectedPRIds.filter(prId => prId !== id));
     }
+    updateSelectedPRs([...selectedPRIds, id]);
   };
 
-  const handleSelectAllInGroup = (prs: typeof purchaseRequests, checked: boolean) => {
+  const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const newSelectedPRs = [...new Set([...selectedPRs, ...prs.map(pr => pr.id)])];
-      setSelectedPRs(newSelectedPRs);
+      setSelectedPRIds(filteredAndSortedPurchaseRequests.map(pr => pr.id));
     } else {
-      const prIdsInGroup = prs.map(pr => pr.id);
-      setSelectedPRs(selectedPRs.filter(id => !prIdsInGroup.includes(id)));
+      setSelectedPRIds([]);
     }
+    updateSelectedPRs(checked ? filteredAndSortedPurchaseRequests.map(pr => pr.id) : []);
   };
 
-  const renderGroup = (group: any, level: number = 0, path: string[] = []) => {
-    if (Array.isArray(group)) {
-      const allSelected = group.every(pr => selectedPRs.includes(pr.id));
-      const someSelected = group.some(pr => selectedPRs.includes(pr.id));
-
-      return (
-        <div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">Select</TableHead>
-                <TableHead>Ref#</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Delivery Date</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {group.map((pr) => (
-                <TableRow key={pr.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedPRs.includes(pr.id)}
-                      onCheckedChange={(checked) => handleSelectPR(pr.id, checked as boolean)}
-                    />
-                  </TableCell>
-                  <TableCell>{pr.refNumber}</TableCell>
-                  <TableCell>{pr.date}</TableCell>
-                  <TableCell>{pr.description}</TableCell>
-                  <TableCell>{pr.deliveryDate}</TableCell>
-                  <TableCell>{pr.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      );
-    }
-
-    return Object.entries(group).map(([key, value]) => {
-      const currentPath = [...path, key];
-      const groupKey = currentPath.join('-');
-      const isExpanded = expandedGroups.includes(groupKey);
-
-      const allPRs = getAllPRs(value);
-      const allSelected = allPRs.every(pr => selectedPRs.includes(pr.id));
-      const someSelected = allPRs.some(pr => selectedPRs.includes(pr.id));
-
-      return (
-        <div key={groupKey} className="mb-4" style={{ marginLeft: `${level * 20}px` }}>
-          <div className="flex items-center space-x-2">
-            
-          <Checkbox
-              checked={allSelected}
-              onCheckedChange={(checked) => handleSelectAllInGroup(allPRs, checked as boolean)}
-            />
-            
-            <Button
-              variant="outline"
-              className="flex-grow justify-start"
-              onClick={() => toggleGroup(groupKey)}
-            >
-              {isExpanded ? <ChevronDown className="mr-2 h-4 w-4" /> : <ChevronRight className="mr-2 h-4 w-4" />}
-              {level === 0 ? 'Delivery Date: ' : level === 1 ? 'Vendor: ' : 'Currency: '}{key}
-            </Button>
-          </div>
-          {isExpanded && (
-            <div className="mt-2">
-              {renderGroup(value, level + 1, currentPath)}
-            </div>
-          )}
-        </div>
-      );
-    });
+  const updateSelectedPRs = (selectedIds: string[]) => {
+    const selectedPRs = purchaseRequests.filter(pr => selectedIds.includes(pr.id));
+    onSelectPRs(selectedPRs);
   };
 
-  const getAllPRs = (group: any): typeof purchaseRequests => {
-    if (Array.isArray(group)) {
-      return group;
-    }
-    return Object.values(group).flatMap(getAllPRs);
+  const handleSort = (key: keyof PurchaseRequest) => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
+    }));
   };
 
   return (
     <>
+      <div className="mb-4">
+        <Input
+          placeholder="Search PRs..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       <ScrollArea className="h-[400px]">
-        {renderGroup(groupedPurchaseRequests)}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectedPRIds.length === filteredAndSortedPurchaseRequests.length}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('refNumber')}>
+                  Ref# <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('date')}>
+                  Date <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('vendor')}>
+                  Vendor <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('description')}>
+                  Description <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('deliveryDate')}>
+                  Delivery Date <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAndSortedPurchaseRequests.map((pr) => (
+              <TableRow key={pr.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedPRIds.includes(pr.id)}
+                    onCheckedChange={(checked) => handleSelectPR(pr.id, checked as boolean)}
+                  />
+                </TableCell>
+                <TableCell>{pr.refNumber}</TableCell>
+                <TableCell>{pr.date}</TableCell>
+                <TableCell>{pr.vendor}</TableCell>
+                <TableCell>{pr.description}</TableCell>
+                <TableCell>{pr.deliveryDate}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </ScrollArea>
     </>
   );

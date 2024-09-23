@@ -135,7 +135,7 @@ export function PODetailPage({ params }: { params: { id: string } }) {
           <TabsTrigger value="GoodsReceiveNoteTab">Goods Receive</TabsTrigger>
           <TabsTrigger value="RelatedDocumentsTab">Documents</TabsTrigger>
           <TabsTrigger value="CommentsAttachmentsTab">Comments & Attachments</TabsTrigger>
-          <TabsTrigger value="ActivityLogsTab">Activity Log</TabsTrigger>
+          <TabsTrigger value="ActivityLogsTab">Activity Logs</TabsTrigger>
         </TabsList>
         <TabsContent value="items">
           <ItemsTab 
