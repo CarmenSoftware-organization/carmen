@@ -13,7 +13,6 @@ export default function HomePage() {
           Go to Menu
         </Link>
     abc
-        <TEST />
       </div>
     </div>
   );
