@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { CurrencyCode, Item, PurchaseOrder, PurchaseOrderItem, PurchaseRequestItem } from '@/lib/types';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Gift, ChevronDown, ChevronRight, MoreHorizontal, Plus, Eye, Edit, MessageSquare, Split, X } from 'lucide-react';
@@ -12,105 +13,128 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
 import { PurchaseOrderItemFormComponent } from './purchase-order-item-form'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-
 // Sample mock data
 
-interface Item {
-  id: string;
-  code: string;
-  description: string;
-  orderedQuantity: number;
-  orderUnit: string;
-  baseQuantity: number;
-  baseUnit: string;
-  baseReceivingQty: number;
-  receivedQuantity: number;
-  remainingQuantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  status: 'Not Received' | 'Partially Received' | 'Fully Received';
-  isFOC: boolean;
-}
+// interface Item {
+//   id: string;
+//   code: string;
+//   description: string;
+//   orderedQuantity: number;
+//   orderUnit: string;
+//   baseQuantity: number;
+//   baseUnit: string;
+//   baseReceivingQty: number;
+//   receivedQuantity: number;
+//   remainingQuantity: number;
+//   unitPrice: number;
+//   totalPrice: number;
+//   status: 'Not Received' | 'Partially Received' | 'Fully Received';
+//   isFOC: boolean;
+// }
 
-const mockItems: Item[] = [
-  {
-    id: '1',
-    code: 'ITEM001',
-    description: 'Office Chair',
-    orderedQuantity: 10,
-    orderUnit: 'pcs',
-    baseQuantity: 10,
-    baseUnit: 'pcs',
-    baseReceivingQty: 5,
-    receivedQuantity: 5,
-    remainingQuantity: 5,
-    unitPrice: 150.00,
-    totalPrice: 1500.00,
-    status: 'Partially Received',
-    isFOC: false,
-  },
-  {
-    id: '2',
-    code: 'ITEM002',
-    description: 'Desk Lamp',
-    orderedQuantity: 20,
-    orderUnit: 'pcs',
-    baseQuantity: 20,
-    baseUnit: 'pcs',
-    baseReceivingQty: 20,
-    receivedQuantity: 20,
-    remainingQuantity: 0,
-    unitPrice: 30.00,
-    totalPrice: 600.00,
-    status: 'Fully Received',
-    isFOC: false,
-  },
-  {
-    id: '3',
-    code: 'ITEM003',
-    description: 'Notebook',
-    orderedQuantity: 100,
-    orderUnit: 'pcs',
-    baseQuantity: 100,
-    baseUnit: 'pcs',
-    baseReceivingQty: 0,
-    receivedQuantity: 0,
-    remainingQuantity: 100,
-    unitPrice: 5.00,
-    totalPrice: 500.00,
-    status: 'Not Received',
-    isFOC: true,
-  },
-  {
-    id: '4',
-    code: 'ITEM004',
-    description: 'Whiteboard',
-    orderedQuantity: 5,
-    orderUnit: 'pcs',
-    baseQuantity: 5,
-    baseUnit: 'pcs',
-    baseReceivingQty: 3,
-    receivedQuantity: 3,
-    remainingQuantity: 2,
-    unitPrice: 80.00,
-    totalPrice: 400.00,
-    status: 'Partially Received',
-    isFOC: false,
-  },
-];
+// const mockItems: PurchaseOrderItem[] = [
+//   {
+//     id: '1',
+//     code: 'ITEM001',
+//     description: 'Office Chair',
+//     orderedQuantity: 10,
+//     orderUnit: 'pcs',
+//     baseQuantity: 10,
+//     baseUnit: 'pcs',
+//     baseReceivingQty: 5,
+//     receivedQuantity: 5,
+//     remainingQuantity: 5,
+//     status: 'Partially Received',
+//     isFOC: false,
+//     taxRate: 0.07,
+//     taxAmount: 0.00,
+//     discountRate: 0.00,
+//     discountAmount: 0.00,
+//     totalPrice: {
+//       amount: 0.00,
+//       currency: CurrencyCode.USD,
+//     },
+//   },
+//   {
+//     id: '2',
+//     code: 'ITEM002',
+//     description: 'Desk Lamp',
+//     orderedQuantity: 20,
+//     orderUnit: 'pcs',
+//     baseQuantity: 20,
+//     baseUnit: 'pcs',
+//     baseReceivingQty: 20,
+//     receivedQuantity: 20,
+//     remainingQuantity: 0,
+//     status: 'Fully Received',
+//     isFOC: false,
+//     taxRate: 0.07,
+//     taxAmount: 0.00,
+//     discountRate: 0.00,
+//     discountAmount: 0.00,
+//     totalPrice: {
+//       amount: 0.00,
+//       currency: CurrencyCode.USD,
+//     },
+//   },
+//   {
+//     id: '3',
+//     code: 'ITEM003',
+//     description: 'Notebook',
+//     orderedQuantity: 100,
+//     orderUnit: 'pcs',
+//     baseQuantity: 100,
+//     baseUnit: 'pcs',
+//     baseReceivingQty: 0,
+//     receivedQuantity: 0,
+//     remainingQuantity: 100,
+//     status: 'Not Received',
+//     isFOC: true,
+//     taxRate: 0.07,
+//     taxAmount: 0.00,
+//     discountRate: 0.00,
+//     discountAmount: 0.00,
+//     totalPrice: {
+//       amount: 0.00,
+//       currency: CurrencyCode.USD,
+//     },
+//   },
+//   {
+//     id: '4',
+//     code: 'ITEM004',
+//     description: 'Whiteboard',
+//     orderedQuantity: 5,
+//     orderUnit: 'pcs',
+//     baseQuantity: 5,
+//     baseUnit: 'pcs',
+//     baseReceivingQty: 3,
+//     receivedQuantity: 3,
+//     remainingQuantity: 2,
+//     status: 'Partially Received',
+//     isFOC: false,
+//     taxRate: 0.07,
+//     taxAmount: 0.00,
+//     discountRate: 0.00,
+//     discountAmount: 0.00,
+//     totalPrice: {
+//       amount: 0.00,
+//       currency: CurrencyCode.USD,
+//     },
+//   },
+// ];
 
 interface ItemsTabProps {
-  onUpdateItem: (updatedItem: Item) => void;
-  onDeleteItem: (itemId: string) => void;
-  onAddItem: (newItem: Item) => void;
+   onUpdateItem: (updatedItem: PurchaseOrderItem) => void;
+   onDeleteItem: (itemId: string) => void;
+   onAddItem: (newItem: PurchaseOrderItem) => void;
   poData: PurchaseOrder;
 }
 
-export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData }: ItemsTabProps) {
+export default function ItemsTab({ poData  }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [newItem, setNewItem] = useState<Partial<Item>>({
-    code: '',
+  const [newItem, setNewItem] = useState<Partial<PurchaseOrderItem>>({
+    name: '',
     description: '',
     orderedQuantity: 0,
     orderUnit: '',
@@ -119,79 +143,84 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     baseReceivingQty: 0,
     unitPrice: 0,
     isFOC: false,
+    taxRate: 0.07,
+    taxAmount: 0.00,
+    discountRate: 0.00,
+    discountAmount: 0.00,
   });
-  const [editingItem, setEditingItem] = useState<Item | null>(null);
-  const [viewingItem, setViewingItem] = useState<Item | null>(null);
+
+  const [editingItem, setEditingItem] = useState<PurchaseOrderItem | null>(null);
+  const [viewingItem, setViewingItem] = useState<PurchaseOrderItem | null>(null);
   
   const handleExport = () => {
-    // Implement export logic here
-    console.log('Exporting PO data:', poData);
-  };
+    // if (!poData) {
+    //   console.error('No purchase order data available for export.');
+    //   return
+    // }
+    // console.log('Exporting PO data:', poData);
+  }
                                                                                                                         
-  const selectedItemsCount = useMemo(() => selectedItems.length, [selectedItems]);                                      
-                                                                                                                        
+  const selectedItemsCount = useMemo(() => selectedItems.length, [selectedItems])
   const toggleItemSelection = (itemId: string) => {                                                                     
     setSelectedItems(prev =>                                                                                            
       prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]                                      
     );                                                                                                                  
   };                                                                                                                    
                                                                                                                         
-  const toggleAllSelection = () => {                                                                                    
-    if (selectedItems.length === poData.items.length) {                                                                        
-      setSelectedItems([]);                                                                                             
-    } else {                                                                                                            
-      setSelectedItems(poData.items.map(item => item.id));                                                                     
-    }                                                                                                                   
-  };                                                                                                                    
+  // const toggleAllSelection = () => {                                                                                    
+  //   if (selectedItems.length === poData.items.length) setSelectedItems([])                                                                                             
+  //   else setSelectedItems(poData.items.map((item: PurchaseOrderItem) => item.id))                                                                     
+  // }
+  // };                                                                                                                    
                                                                                                                         
-  const toggleItemExpansion = (itemId: string) => {                                                                     
-    setExpandedItems(prev =>                                                                                            
-      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]                                      
-    );                                                                                                                  
-  };                                                                                                                    
+  // const toggleItemExpansion = (itemId: string) => {                                                                     
+  //   setExpandedItems(prev =>                                                                                            
+  //     prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]                                      
+  //   );                                                                                                                  
+                                                                                                                     
                                                                                                                         
-  const getStatusColor = (status: Item['status']) => {                                                                  
-    switch (status) {                                                                                                   
-      case 'Not Received': return 'bg-red-500';                                                                         
-      case 'Partially Received': return 'bg-yellow-500';                                                                
-      case 'Fully Received': return 'bg-green-500';                                                                     
-    }                                                                                                                   
-  };                                                                                                                    
+  // const getStatusColor = (status: Item['status']) => {                                                                  
+  //   switch (status) {                                                                                                   
+  //     case 'Not Received': return 'bg-red-500';                                                                         
+  //     case 'Partially Received': return 'bg-yellow-500';                                                                
+  //     case 'Fully Received': return 'bg-green-500';                                                                     
+  //   }                                                                                                                   
+  // };                                                                                                                    
                                                                                                                         
   const handleBulkAction = (action: string) => {
     switch (action) {
       case 'setFullyReceived':
-        updateItemsStatus('Fully Received');
+        // updateItemsStatus('Fully Received');
         break;
       case 'cancel':
-        console.log('Bulk cancel items:', selectedItems);
+        // console.log('Bulk cancel items:', selectedItems);
         break;
       default:
         console.log(`Unknown bulk action: ${action}`);
     }
   };
 
-  const updateItemsStatus = (newStatus: Item['status']) => {
-    const updatedItems = poData.items.map(item => 
-      selectedItems.includes(item.id) 
-        ? { ...item, status: newStatus } 
-        : item
-    );
-    updatedItems.forEach(item => {
-      if (selectedItems.includes(item.id)) {
-        onUpdateItem(item);
-      }
-    });
-    setSelectedItems([]);
-  };
+  // const updateItemsStatus = (newStatus: PurchaseOrderItem['status']) => {
+  //   const updatedItems = poData.items.map(item => 
+  //     selectedItems.includes(item.id) 
+  //       ? { ...item, status: newStatus } 
+  //       : item
+  //   );
+  //   updatedItems.forEach(item => {
+  //     if (selectedItems.includes(item.id)) {
+  //       onUpdateItem(item);
+  //     }
+  //   });
+  //   setSelectedItems([]);
+  // };
                                                                                                                         
-  const handleViewDetails = (item: Item) => {
-    setViewingItem(item);
-  };
+  // const handleViewDetails = (item: Item) => {
+  //   setViewingItem(item);
+  // };
                                                                                                                         
-  const handleEditItem = (item: Item) => {
-    setEditingItem(item);
-  };
+  // const handleEditItem = (item: Item) => {
+  //   setEditingItem(item);
+  // };
                                                                                                                         
   const handleAddNote = (item: Item) => {                                                                               
     // Implement add note logic                                                                                         
@@ -208,13 +237,23 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     console.log('Cancel item:', item);
   };
 
-  const handleUnitChange = (itemId: string, newUnit: string) => {
-    const updatedItem = poData.items.find(item => item.id === itemId);
-    if (updatedItem) {
-      updatedItem.orderUnit = newUnit;
-      onUpdateItem(updatedItem);
-    }
-  };
+  // interface PurchaseOrderItem {
+  //   poId: string
+  //   orderUnit: string
+  // }
+
+  interface Props {
+    poData: { items: PurchaseOrderItem[] }
+    onUpdateItem: (item: PurchaseOrderItem) => void
+  }
+
+  function handleUnitChange({ poData, onUpdateItem }: Props, itemId: string, newUnit: string) {
+    const updatedItem = poData.items.find(item => item.id === itemId)
+    if (!updatedItem) return
+
+    updatedItem.orderUnit = newUnit
+    onUpdateItem(updatedItem)
+  }
                                                                                                                         
   const [isAddItemFormOpen, setIsAddItemFormOpen] = useState(false)
 
@@ -222,11 +261,10 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     onAddItem(newItem)
     setIsAddItemFormOpen(false)
   }
-
-  const handleItemUpdate = (updatedItem: Item) => {
-    onUpdateItem(updatedItem);
-    setEditingItem(null);
-  };
+  function handleItemUpdate(updatedItem: Item) {
+    // onUpdateItem(updatedItem)
+    setEditingItem(null)
+  }
 
   return (
     <TooltipProvider>
@@ -241,7 +279,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
               <PurchaseOrderItemFormComponent
                 initialMode="add"
                 onClose={() => setIsAddItemFormOpen(false)}
-                onSubmit={handleAddNewItem}
+                // onSubmit={handleAddNewItem}
                 isOpen={isAddItemFormOpen}
               />
         )}
@@ -250,9 +288,9 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
           <PurchaseOrderItemFormComponent
             initialMode="edit"
             onClose={() => setEditingItem(null)}
-            onSubmit={handleItemUpdate}
+            // onSubmit={handleItemUpdate}
             isOpen={!!editingItem}
-            initialData={editingItem}
+            // initialData={editingItem}
           />
         )}
 
@@ -261,7 +299,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
             initialMode="view"
             onClose={() => setViewingItem(null)}
             isOpen={!!viewingItem}
-            initialData={viewingItem}
+            // initialData={viewingItem}
           />
         )}
 
@@ -280,7 +318,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
                   <TableHead className="w-[50px]">
                     <Checkbox
                       checked={selectedItems.length === poData.items.length}
-                      onCheckedChange={toggleAllSelection}
+                      // onCheckedChange={toggleAllSelection}
                     />
                   </TableHead>
                   <TableHead className="min-w-[120px]">Item</TableHead>
@@ -305,7 +343,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
                       />
                     </TableCell>
                     <TableCell className="py-1">
-                      <div>{item.code}</div>
+                      <div>{item.name}</div>
                       {item.isFOC && (
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -348,7 +386,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
                         ${(item.totalPrice * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
                       </div>
                     </TableCell>
-                    <TableCell className="py-1">
+                    {/* <TableCell className="py-1">
                       <Badge className={`${getStatusColor(item.status)} text-xs px-1 py-0.5`}>{item.status}</Badge>
                     </TableCell>
                     <TableCell className="py-1">
@@ -366,7 +404,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
                           <X className="h-3 w-3" />
                         </Button>
                       </div>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
               </TableBody>
@@ -378,4 +416,14 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
       </div>
     </TooltipProvider>
   );
+}; 
+
+
+function onAddItem(newItem: Item) {
+  throw new Error('Function not implemented.');
 }
+
+function setEditingItem(arg0: null) {
+  throw new Error('Function not implemented.');
+}
+

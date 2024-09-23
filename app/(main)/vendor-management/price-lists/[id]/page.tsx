@@ -192,7 +192,7 @@ export default function PricelistDetail({ params }: { params: { id: string } }) 
         }
 
         // Refresh the pricelist data
-        fetchPricelist();
+        // fetchPricelist();
       } catch (error) {
         console.error('Error deleting item:', error);
       }
@@ -229,7 +229,7 @@ export default function PricelistDetail({ params }: { params: { id: string } }) 
               <p><strong>Name:</strong> {pricelist.name}</p>
               <p><strong>Description:</strong> {pricelist.description}</p>
               <p><strong>Start Date:</strong> {new Date(pricelist.startDate).toLocaleDateString()} <strong>End Date:</strong> {new Date(pricelist.endDate).toLocaleDateString()}</p>
-              <p><strong>Status:</strong> <Badge variant={pricelist.isActive ? "success" : "destructive"}>{pricelist.isActive ? 'Active' : 'Inactive'}</Badge></p>
+              <p><strong>Status:</strong> <Badge variant={pricelist.isActive ? "default" : "destructive"}>{pricelist.isActive ? 'Active' : 'Inactive'}</Badge></p>
             </div>
           </div>
         </TabsContent>
@@ -289,7 +289,7 @@ export default function PricelistDetail({ params }: { params: { id: string } }) 
                 <p><strong>Price:</strong> {selectedItem?.price.toFixed(2)} / {selectedItem?.unit}</p>
                 <p><strong>Discount:</strong> {selectedItem?.discountPercentage.toFixed(2)}% / {selectedItem?.discountAmount.toFixed(2)}</p>
                 <p><strong>Minimum Quantity:</strong> {selectedItem?.minQuantity.toFixed(2)}</p>
-                <p><strong>Gross:</strong> {selectedItem?.gross.toFixed(2)}</p>
+                <p><strong>Total:</strong> {selectedItem?.total.toFixed(2)}</p>
                 <p><strong>Last Received Price:</strong> {selectedItem?.lastReceivedPrice.toFixed(2)}</p>
               </div>
             </DialogContent>
@@ -309,6 +309,7 @@ export default function PricelistDetail({ params }: { params: { id: string } }) 
       title={`Pricelist: ${pricelist.name}`}
       actionButtons={actionButtons}
       content={content}
+      backLink="/vendor-management/price-lists"
     />
   );
 }

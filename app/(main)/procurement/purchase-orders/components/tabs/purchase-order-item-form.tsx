@@ -150,10 +150,10 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
         <div className="mb-1">
           <Label className="text-sm font-medium">{label}</Label>
           <div className="mt-0.5 flex items-center">
-            <span className="text-sm">{formattedValue}{suffix}</span>
+            {/* <span className="text-sm">{formattedValue}{suffix}</span> */}
             {baseValue && (
               <span className="text-xs text-gray-500 ml-1">
-                ({formattedBaseValue}
+                {/* ({formattedBaseValue} */}
                 {convRate && ` Conv: ${(formData.baseQuantity / formData.orderedQuantity).toFixed(2)}`})
               </span>
             )}
@@ -189,7 +189,7 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
         </div>
         {baseValue && (
           <div className="text-xs text-gray-500 mt-0.5">
-            {formattedBaseValue}
+            {/* {formattedBaseValue} */}
             {convRate && ` (Conv: ${(formData.baseQuantity / formData.orderedQuantity).toFixed(2)})`}
           </div>
         )}

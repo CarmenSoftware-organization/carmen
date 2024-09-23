@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface DetailPageTemplateProps {
-  title: string;
+  title: ReactNode;
   actionButtons?: ReactNode;
   content: ReactNode;
   backLink : ReactNode;

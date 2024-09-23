@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CurrencyCode } from "@/types/types";
+import { CurrencyCode, DocumentStatus, PRType, PurchaseRequest, WorkflowStage, WorkflowStatus } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -163,87 +163,53 @@ const purchaseOrders = [
 ];
 
 // Mock data for Purchase Requests
-const purchaseRequests = [
-  {
-    id: 1,
+const purchaseRequests : PurchaseRequest[] = [
+   {
+    id: "1",
     refNumber: "PR-001",
-    date: "2023-08-01",
-    description: "Bed Linens",
-    deliveryDate: "2023-08-15",
-    status: "Approved",
-  },
-  {
-    id: 2,
+    date: new Date("2023-08-01"),
+    vendor: "Luxury Linens Co.",
+    vendorId: 1,
+    type: PRType.MarketList,
+    deliveryDate: new Date("2023-08-01"),
+    description: "Request for new linens",
+    requestorId: "1",   
+    requestor: {
+      id: "1",
+      name: "John Doe",
+      department: "Sales"
+    },
+    status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.pending,
+    currentWorkflowStage: WorkflowStage.requester,
+    location: "Warehouse",
+    department: "Sales",
+    jobCode: "12345",
+    estimatedTotal: 1000,
+   },
+   {
+    id: "2",
     refNumber: "PR-002",
-    date: "2023-08-02",
-    description: "Toiletries",
-    deliveryDate: "2023-08-20",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    refNumber: "PR-003",
-    date: "2023-08-03",
-    description: "Room Furniture",
-    deliveryDate: "2023-08-25",
-    status: "Approved",
-  },
-  {
-    id: 4,
-    refNumber: "PR-004",
-    date: "2023-08-04",
-    description: "Cleaning Supplies",
-    deliveryDate: "2023-08-18",
-    status: "Approved",
-  },
-  {
-    id: 5,
-    refNumber: "PR-005",
-    date: "2023-08-05",
-    description: "Restaurant Equipment",
-    deliveryDate: "2023-08-30",
-    status: "Pending",
-  },
-  {
-    id: 6,
-    refNumber: "PR-006",
-    date: "2023-08-06",
-    description: "Pool Maintenance Supplies",
-    deliveryDate: "2023-08-22",
-    status: "Approved",
-  },
-  {
-    id: 7,
-    refNumber: "PR-007",
-    date: "2023-08-07",
-    description: "In-room Electronics",
-    deliveryDate: "2023-09-01",
-    status: "Pending",
-  },
-  {
-    id: 8,
-    refNumber: "PR-008",
-    date: "2023-08-08",
-    description: "Spa Products",
-    deliveryDate: "2023-08-28",
-    status: "Approved",
-  },
-  {
-    id: 9,
-    refNumber: "PR-009",
-    date: "2023-08-09",
-    description: "Gym Equipment",
-    deliveryDate: "2023-09-05",
-    status: "Pending",
-  },
-  {
-    id: 10,
-    refNumber: "PR-010",
-    date: "2023-08-10",
-    description: "Conference Room Supplies",
-    deliveryDate: "2023-08-24",
-    status: "Approved",
-  },
+    date: new Date("2023-08-02"),
+    vendor: "Gourmet Kitchen Supplies",
+    vendorId: 2,
+    type: PRType.MarketList,
+    deliveryDate: new Date("2023-08-02"),
+    description: "Request for new kitchen supplies",
+    requestorId: "2",
+    requestor: {
+      id: "2",
+      name: "Jane Doe",
+      department: "Purchasing"
+    },
+    status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.pending,
+    currentWorkflowStage: WorkflowStage.requester,
+    location: "Warehouse",
+    department: "Purchasing",
+    jobCode: "12345",
+    estimatedTotal: 1000,
+   }
 ];
 
 const PurchaseOrderList: React.FC = () => {
@@ -260,7 +226,7 @@ const PurchaseOrderList: React.FC = () => {
   );
   const [isCreateFromPROpen, setIsCreateFromPROpen] = useState(false);
   const [isCreateManuallyOpen, setIsCreateManuallyOpen] = useState(false);
-  const [selectedPRs, setSelectedPRs] = useState<number[]>([]);
+  const [selectedPRs, setSelectedPRs] = useState<string[]>([]);
   const [generatedPOs, setGeneratedPOs] = useState<typeof purchaseOrders>([]);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [newManualPO, setNewManualPO] = useState({
@@ -634,7 +600,7 @@ const PurchaseOrderList: React.FC = () => {
             </div>
             <ScrollArea className="h-[400px]">
               {groupByDeliveryDate ? (
-                groupedPurchaseRequests.map(([groupKey, prs]) => {
+                groupedPurchaseRequests.map(([groupKey, prs] : any) => {
                   const [deliveryDate, vendor] = groupKey.split('-');
                   const isExpanded = expandedGroups.includes(groupKey);
                   return (
@@ -659,7 +625,7 @@ const PurchaseOrderList: React.FC = () => {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {prs.map((pr) => (
+                            {prs.map((pr: PurchaseRequest) => (
                               <TableRow key={pr.id}>
                                 <TableCell>
                                   <Checkbox
@@ -676,7 +642,7 @@ const PurchaseOrderList: React.FC = () => {
                                   />
                                 </TableCell>
                                 <TableCell>{pr.refNumber}</TableCell>
-                                <TableCell>{pr.date}</TableCell>
+                                <TableCell>{pr.date.toLocaleDateString()}</TableCell>
                                 <TableCell>{pr.description}</TableCell>
                                 <TableCell>{pr.status}</TableCell>
                               </TableRow>
@@ -718,9 +684,9 @@ const PurchaseOrderList: React.FC = () => {
                           />
                         </TableCell>
                         <TableCell>{pr.refNumber}</TableCell>
-                        <TableCell>{pr.date}</TableCell>
+                        <TableCell>{pr.date.toLocaleDateString()}</TableCell>
                         <TableCell>{pr.description}</TableCell>
-                        <TableCell>{pr.deliveryDate}</TableCell>
+                        <TableCell>{pr.deliveryDate.toLocaleDateString()}</TableCell>
                         <TableCell>{pr.vendor || 'N/A'}</TableCell>
                         <TableCell>{pr.status}</TableCell>
                       </TableRow>

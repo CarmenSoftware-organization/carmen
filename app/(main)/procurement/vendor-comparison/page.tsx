@@ -1,4 +1,4 @@
-import { VendorComparisonComponent } from '@/app/(main)/procurement/purchase-requests/components/vendor-comparison';
+import  VendorComparisonComponent  from '@/app/(main)/procurement/purchase-requests/components/vendor-comparison';
 
 export default function VendorComparisonPage() {
   return (

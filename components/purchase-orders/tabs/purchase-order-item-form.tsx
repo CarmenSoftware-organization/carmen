@@ -8,13 +8,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, Upload } from "lucide-react"
+import { PurchaseOrderItem } from '@/lib/types'
 
 type FormMode = 'view' | 'edit' | 'add'
 
 interface ItemFormProps {
   initialMode: FormMode
   onClose: () => void
-  initialData?: Item
+  initialData?: PurchaseOrderItem
 }
 
 export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, initialData }: ItemFormProps) {
@@ -24,7 +25,7 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
     description: 'High-performance laptop with 16GB RAM, 512GB SSD, and 15" display',
     itemOrderUnit: 'Unit',
     baseUnit: 'Piece',
-    convRate: 1,
+    convRate: 1.2,
     approvedQty: 10.000,
     baseApprovedQty: 10.000,
     receivedQty: 8.000,
@@ -35,21 +36,19 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
     baseCancelQty: 1.000,
     pricePerUnit: 1200.00,
     basePricePerUnit: 1200.00,
-    total: 12000.00,
-    baseTotal: 12000.00,
+    totalAmount: 12000.00,
+    baseTotalAmount: 12000.00,
     netAmount: 11400.00,
     baseNetAmount: 11400.00,
     baseQty: 10.000,
-    discPercentage: 5,
-    discAmount: 600.00,
+    discountRate: 5,
+    discountAmount: 600.00,
     baseDiscAmount: 600.00,
     taxRate: 7,
     taxAmount: 798.00,
     baseTaxAmount: 798.00,
-    totalAmount: 12198.00,
-    baseTotalAmount: 12198.00,
     comment: '',
-    attachedFile: null as File | null
+    attachedFile: null
   })
 
   const [adjustments, setAdjustments] = useState({
@@ -77,11 +76,11 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null
-    setFormData(prev => ({ ...prev, attachedFile: file }))
+    const file = e.target.files?.[0] ?? undefined
+    // setFormData(prev => ({ ...prev, attachedFile: file }))
   }
 
-  const triggerFileUpload = () => {
+  function triggerFileUpload() {
     fileInputRef.current?.click()
   }
 
@@ -100,10 +99,10 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
       return (
         <div className="mb-2">
           <Label className="text-sm font-medium">{label}</Label>
-          <div className="mt-0.5">{formattedValue}{suffix}</div>
+          {/* <div className="mt-0.5">{formattedValue}{suffix}</div> */}
           {baseValue && (
             <div className="text-xs text-gray-500">
-              {formattedBaseValue}
+              {/* {formattedBaseValue} */}
               {convRateValue && ` (Conv: ${convRateValue})`}
             </div>
           )}
@@ -136,7 +135,7 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
         </div>
         {baseValue && (
           <div className="text-xs text-gray-500 mt-0.5">
-            {formattedBaseValue}
+            {/* {formattedBaseValue} */}
             {convRateValue && ` (Conv: ${convRateValue})`}
           </div>
         )}
@@ -172,12 +171,13 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
         <div className="col-span-5">
           {renderField('Description', 'description', 'textarea')}
         </div>
-        <div className="col-span-1">{renderField('Order Unit', 'itemOrderUnit', 'text', 'baseUnit', true)}</div>
+
+        {/* <div className="col-span-1">{renderField('Order Unit', 'itemOrderUnit', 'text', 'baseUnit', true)}</div>
         <div className="col-span-1">{renderField('Approved Qty', 'approvedQty', 'number', 'baseApprovedQty', false, '', 3)}</div>
         <div className="col-span-1">{renderField('Received Qty', 'receivedQty', 'number', 'baseReceivedQty', false, '', 3)}</div>
         <div className="col-span-1">{renderField('FOC', 'foc', 'number', 'baseFocQty', false, '', 3)}</div>
         <div className="col-span-1">{renderField('Cancel Qty', 'cancelQty', 'number', 'baseCancelQty', false, '', 3)}</div>
-        <div className="col-span-1">{renderField('Price per Unit', 'pricePerUnit', 'number', 'basePricePerUnit', false, '', 2)}</div>
+        <div className="col-span-1">{renderField('Price per Unit', 'pricePerUnit', 'number', 'basePricePerUnit', false, '', 2)}</div> */}
 
         <div className="col-span-3">
           <h4 className="text-lg font-medium mt-3 mb-1">Comment</h4>
@@ -207,8 +207,8 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
                 <label htmlFor="adjDiscount" className="ml-2 text-sm">Discount</label>
               </div>
             </div>
-            <div className="col-span-1">{renderField('', 'discPercentage', 'number', undefined, undefined, '%')}</div>
-            <div className="col-span-1 text-right">{renderField('', 'discAmount', 'number', 'baseDiscAmount', false, '', 2)}</div>
+            <div className="col-span-1">{renderField('', 'discountRate', 'number', undefined, undefined, '%')}</div>
+            <div className="col-span-1 text-right">{renderField('', 'discountAmount', 'number', 'baseDiscAmount', false, '', 2)}</div>
             
             <div className="col-span-1">
               <div className="flex items-center">
@@ -235,7 +235,7 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
               <Upload className="mr-2 h-4 w-4" /> Upload File
             </Button>
             <span className="text-sm text-gray-500">
-              {formData.attachedFile ? formData.attachedFile.name : 'No file chosen'}
+              {/* {formData.attachedFile ? formData.attachedFile.name : 'No file chosen'} */}
             </span>
           </div>
           <input

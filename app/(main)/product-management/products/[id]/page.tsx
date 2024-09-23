@@ -8,49 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PencilIcon, TrashIcon, PlusIcon } from 'lucide-react'
+import { PencilIcon, TrashIcon, PlusIcon, XIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input';
+import { toast } from '@/components/ui/use-toast';
 
-interface Product {
-  id: string;
-  productCode: string;
-  name: string;
-  description: string;
-  localDescription: string;
-  categoryId: string;
-  subCategoryId: string;
-  itemGroupId: string;
-  primaryInventoryUnitId: string;
-  size: string;
-  color: string;
-  barcode: string;
-  isActive: boolean;
-  basePrice: number;
-  currency: string;
-  taxType: string;
-  taxRate: number;
-  standardCost: number;
-  lastCost: number;
-  priceDeviationLimit: number;
-  quantityDeviationLimit: number;
-  minStockLevel: number;
-  maxStockLevel: number;
-  isForSale: boolean;
-  isIngredient: boolean;
-  weight: number;
-  dimensions: { length: number; width: number; height: number };
-  shelfLife: number;
-  storageInstructions: string;
-  unitConversions: UnitConversion[];
-}
-
-interface UnitConversion {
-  id: string;
-  unitId: string;
-  unitName: string;
-  conversionFactor: number;
-  unitType: 'INVENTORY' | 'ORDER' | 'RECIPE' | 'COUNTING';
-}
+import { Product, UnitConversion } from '@/lib/types';
 
 const productList = [
   {
@@ -216,15 +178,22 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId: product.id, unitType }),
       });
-      if (!response.ok) throw new Error('Failed to add conversion');
-      const newConversion = await response.json();
-      setProduct(prev => ({
-        ...prev,
-        unitConversions: [...prev.unitConversions, newConversion],
-      }));
+      if (!response.ok) {
+        console.error('Failed to add conversion')
+        toast({ title: "Error", description: "Failed to add conversion", variant: "destructive" })
+        return
+      }
+      const newConversion = await response.json()
+      setProduct(prev => {
+        if (!prev) return null
+        return {
+          ...prev,
+          unitConversions: [...prev.unitConversions, newConversion],
+        }
+      })
     } catch (error) {
-      console.error('Error adding conversion:', error);
-      toast({ title: "Error", description: "Failed to add conversion", variant: "destructive" });
+      console.error('Error adding conversion:', error)
+      toast({ title: "Error", description: "Failed to add conversion", variant: "destructive" })
     }
   };
 
@@ -236,12 +205,15 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         body: JSON.stringify({ [field]: value }),
       });
       if (!response.ok) throw new Error('Failed to update conversion');
-      setProduct(prev => ({
-        ...prev,
-        unitConversions: prev.unitConversions.map(conv =>
-          conv.id === conversionId ? { ...conv, [field]: value } : conv
-        ),
-      }));
+      setProduct(prev => {
+        if (!prev) return null
+        return {
+          ...prev,
+          unitConversions: prev.unitConversions.map(conv =>
+            conv.id === conversionId ? { ...conv, [field]: value } : conv
+          ),
+        }
+      });
     } catch (error) {
       console.error('Error updating conversion:', error);
       toast({ title: "Error", description: "Failed to update conversion", variant: "destructive" });
@@ -254,10 +226,13 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete conversion');
-      setProduct(prev => ({
-        ...prev,
-        unitConversions: prev.unitConversions.filter(conv => conv.id !== conversionId),
-      }));
+      setProduct(prev => {
+        if (!prev) return null
+        return {
+          ...prev,
+          unitConversions: prev.unitConversions.filter(conv => conv.id !== conversionId),
+        }
+      });
     } catch (error) {
       console.error('Error deleting conversion:', error);
       toast({ title: "Error", description: "Failed to delete conversion", variant: "destructive" });
@@ -265,21 +240,46 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   };
 
   const saveConversions = async () => {
+    if (!product) {
+      console.error('Product is null')
+      toast({ title: "Error", description: "Product not found", variant: "destructive" })
+      return
+    }
+
     try {
       const response = await fetch(`/api/products/${product.id}/conversions`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(product.unitConversions),
-      });
+      })
 
-      if (!response.ok) throw new Error('Failed to save conversions');
+      if (!response.ok) throw new Error('Failed to save conversions')
 
-      toast({ title: "Conversions saved successfully" });
+      toast({ title: "Conversions saved successfully" })
     } catch (error) {
-      console.error('Error saving conversions:', error);
-      toast({ title: "Error", description: "Failed to save conversions", variant: "destructive" });
+      console.error('Error saving conversions:', error)
+      toast({ title: "Error", description: "Failed to save conversions", variant: "destructive" })
     }
-  };
+  }
+
+  //       const response = await fetch(`/api/products/${product?.id}/conversions`, {
+  //         method: 'PUT',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify(product?.unitConversions),
+  //       });
+
+  //       if (!response.ok) throw new Error('Failed to save conversions');
+  //     if (!response.ok) {
+  //       console.error('Failed to save conversions')
+  //       toast({ title: "Error", description: "Failed to save conversions", variant: "destructive" })
+  //       return
+  //     }
+  //     if (response.ok) toast({ title: "Conversions saved successfully" })
+  //   } catch (error) {
+  //     console.error('Error saving conversions:', error)
+  //     toast({ title: "Error", description: "Failed to save conversions", variant: "destructive" })
+  //   }
+  // }
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -318,7 +318,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               <p><strong>Barcode:</strong>
                 {product.barcode}
               </p>
-              <p><strong>Status:</strong> <Badge variant={product.isActive ? "success" : "destructive"}>{product.isActive ? 'Active' : 'Inactive'}</Badge></p>
+              <p><strong>Status:</strong> <Badge variant={product.isActive ? "default" : "destructive"}>{product.isActive ? 'Active' : 'Inactive'}</Badge></p>
             </div>
             <div>
               <div className="relative">
@@ -330,9 +330,9 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                       variant="ghost"
                       size="icon"
                       className="absolute top-2 right-2"
-                      onClick={() => handleImageDelete()}
+                      onClick={handleDelete}
                     >
-                      <X className="h-4 w-4" />
+                      <XIcon className="h-4 w-4" />
                     </Button>
                   </>
                 ) : (
@@ -391,7 +391,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <TableCell>{conversion.toUnit}</TableCell>
                   <TableCell>{conversion.conversionFactor}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleEditConversion(conversion.id)}>
+                    <Button variant="ghost" size="icon" onClick={() => handleEditConversion(conversion.id, 'conversionFactor', conversion.conversionFactor)}>
                       <PencilIcon className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDeleteConversion(conversion.id)}>
@@ -402,7 +402,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               ))}
             </TableBody>
           </Table>
-          <Button className="mt-2" onClick={handleAddConversion}>
+          <Button className="mt-2" onClick={() => handleAddConversion('INVENTORY')}>
             <PlusIcon className="h-4 w-4 mr-2" />
             Add Conversion
           </Button>
@@ -477,7 +477,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {product.unitConversions.filter(conv => conv.type === 'ORDER').map((conversion) => (
+              {product.unitConversions.filter(conv => conv.unitType === 'ORDER').map((conversion) => (
                 <TableRow key={conversion.id}>
                   <TableCell>
                     <Input 
@@ -524,7 +524,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {product.unitConversions.filter(conv => conv.type === 'RECIPE').map((conversion) => (
+              {product.unitConversions.filter(conv => conv.unitType === 'RECIPE').map((conversion) => (
                 <TableRow key={conversion.id}>
                   <TableCell>
                     <Input 
@@ -571,7 +571,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {product.unitConversions.filter(conv => conv.type === 'COUNTING').map((conversion) => (
+              {product.unitConversions.filter(conv => conv.unitType === 'COUNTING').map((conversion) => (
                 <TableRow key={conversion.id}>
                   <TableCell>
                     <Input 
@@ -621,6 +621,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       title={`Product: ${product.name}`}
       actionButtons={actionButtons}
       content={content}
+      backLink="/products"
     />
   );
 }

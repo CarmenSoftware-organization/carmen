@@ -20,7 +20,7 @@ export const WorkflowTab: React.FC = () => {
           <TableCell>Department Head Approval</TableCell>
           <TableCell>Jane Smith</TableCell>
           <TableCell>
-            <Badge variant="success">Approved</Badge>
+            <Badge variant="default">Approved</Badge>
           </TableCell>
           <TableCell>2023-07-16</TableCell>
           <TableCell>Approved as per department policy</TableCell>

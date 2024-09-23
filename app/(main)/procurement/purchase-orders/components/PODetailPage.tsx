@@ -19,6 +19,7 @@ import GoodsReceiveNoteTab from './tabs/GoodsReceiveNoteTab'
 import RelatedDocumentsTab from './tabs/RelatedDocumentsTab'
 import CommentsAttachmentsTab from './tabs/CommentsAttachmentsTab'
 import ActivityLogTab from './tabs/ActivityLogTab'
+import { PurchaseOrderItem, PurchaseOrderStatus } from '@/lib/types'
 
 interface Item {
   id: string;
@@ -56,14 +57,14 @@ interface PurchaseOrder {
   creditTerms: string;
   description:string;
   remarks: string;
-  items: Item[];
+  items: PurchaseOrderItem[];
 }
 
 // Sample data for items
-const sampleItems: Item[] = [
+const sampleItems: PurchaseOrderItem[] = [
   {
     id: '1',
-    code: 'ITEM001',
+    name: 'Office Chair',
     description: 'Office Chair',
     orderedQuantity: 10,
     orderUnit: 'pcs',
@@ -75,11 +76,18 @@ const sampleItems: Item[] = [
     unitPrice: 150.00,
     totalPrice: 1500.00,
     status: 'Partially Received',
-    isFOC: false,
+    isFOC: false, 
+    taxRate: 0.07,
+    taxAmount: 105.00,
+    discountRate: 0.1,
+    discountAmount: 150.00,
+    attachments: [],
+    convRate: 1,
+    baseTaxAmount: 105.00,
   },
   {
     id: '2',
-    code: 'ITEM002',
+    name: 'Desk Lamp',
     description: 'Desk Lamp',
     orderedQuantity: 20,
     orderUnit: 'pcs',
@@ -92,10 +100,17 @@ const sampleItems: Item[] = [
     totalPrice: 600.00,
     status: 'Fully Received',
     isFOC: false,
+    taxRate: 0.07,
+    taxAmount: 105.00,
+    discountRate: 0.1,
+    discountAmount: 150.00,
+    attachments: [],
+    convRate: 1,
+    baseTaxAmount: 105.00,
   },
   {
     id: '3',
-    code: 'ITEM003',
+    name: 'Notebook',
     description: 'Notebook',
     orderedQuantity: 100,
     orderUnit: 'pcs',
@@ -106,8 +121,15 @@ const sampleItems: Item[] = [
     remainingQuantity: 100,
     unitPrice: 5.00,
     totalPrice: 500.00,
-    status: 'Not Received',
+    status: "Not Received",
     isFOC: true,
+    taxRate: 0.07,
+    taxAmount: 105.00,
+    discountRate: 0.1,
+    discountAmount: 150.00,
+    attachments: [],
+    convRate: 1,
+    baseTaxAmount: 105.00,
   },
 ];
 
@@ -138,6 +160,7 @@ export function PODetailPage({ params }: { params: { id: string } }) {
       description: "Office supplies order",
       creditTerms:"30",
       remarks: "Please deliver to the main office",
+      
       items: sampleItems, // Assign the sample items here
     })
   }, [params.id])
@@ -175,7 +198,7 @@ export function PODetailPage({ params }: { params: { id: string } }) {
       const updatedItems = poData.items.map(item =>
         item.id === updatedItem.id ? updatedItem : item
       );
-      setPOData({ ...poData, items: updatedItems });
+      setPOData({ ...poData, items: updatedItems as PurchaseOrderItem[] });
     }
   };
 
@@ -188,7 +211,7 @@ export function PODetailPage({ params }: { params: { id: string } }) {
 
   const handleAddItem = (newItem: Item) => {
     if (poData) {
-      setPOData({ ...poData, items: [...poData.items, newItem] });
+      setPOData({ ...poData, items: [...poData.items, newItem as unknown as PurchaseOrderItem] });
     }
   };
 
@@ -352,12 +375,12 @@ export function PODetailPage({ params }: { params: { id: string } }) {
           <TabsTrigger value="ActivityLogsTab">Activity Log</TabsTrigger>
         </TabsList>
         <TabsContent value="items" className="bg-white p-4 rounded-md shadow">
-          <ItemsTab 
-            onUpdateItem={handleUpdateItem}
-            onDeleteItem={handleDeleteItem}
-            onAddItem={handleAddItem}
-            poData={poData}
-          />
+          {/* <ItemsTab 
+            // onUpdateItem={handleUpdateItem}
+            // onDeleteItem={handleDeleteItem}
+            // onAddItem={handleAddItem}
+            // poData={poData as PurchaseOrder}
+          /> */}
         </TabsContent>
         <TabsContent value="FinancialDetailsTab" className="bg-white p-4 rounded-md shadow">
           <FinancialDetailsTab poData={poData} />
@@ -378,11 +401,20 @@ export function PODetailPage({ params }: { params: { id: string } }) {
     </>
   )
 
+  const backLink = (
+    <Button variant="ghost" size="icon" asChild className="mr-1">
+      <Link href="/procurement/purchase-orders">
+        <ArrowLeft className="h-4 w-4" />
+      </Link>
+    </Button>
+  )
+
   return (
     <DetailPageTemplate
       title={title}
       actionButtons={actionButtons}
       content={content}
+      backLink={backLink}
     />
   )
 }

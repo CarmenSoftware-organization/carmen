@@ -17,7 +17,7 @@ import { BudgetsTab } from './tabs/BudgetsTab'
 import { WorkflowTab } from './tabs/WorkflowTab'
 import { AttachmentsTab } from './tabs/AttachmentsTab'
 import { ActivityTab } from './tabs/ActivityTab'
-import { PurchaseRequest, WorkflowAction, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, Requestor } from '@/types/types'
+import { PurchaseRequest, WorkflowAction, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, Requestor } from '@/lib/types'
 import { getBadgeVariant, handleDocumentAction, getNextWorkflowStage, getPreviousWorkflowStage } from './utils'
 import { samplePRData } from './sampleData'
 import { Label } from "@/components/ui/label"
@@ -109,8 +109,8 @@ export default function PRDetailPage() {
                   <Input
                     id="date"
                     type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    value={formData.date.toISOString().split('T')[0]}
+                    onChange={(e) => setFormData({...formData, date: new Date(e.target.value)})}
                     disabled={mode === 'view'}
                   />
                 </div>
@@ -189,12 +189,12 @@ export default function PRDetailPage() {
                         <label className="text-sm font-medium block">
                           {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                         </label>
-                        <Badge 
+                        {/* <Badge 
                           variant={getBadgeVariant(String(formData[key as keyof PurchaseRequest]))}
                           className={`badge-${String(formData[key as keyof PurchaseRequest]).toLowerCase()} mt-1`}
                         >
                           {String(formData[key as keyof PurchaseRequest])}
-                        </Badge>
+                        </Badge> */}
                       </div>
                     ))}
                   </div>
@@ -263,7 +263,7 @@ function getEmptyPurchaseRequest(): PurchaseRequest {
   return {
     id: '',
     refNumber: '',
-    date: new Date().toISOString().split('T')[0],
+    date: new Date(),
     type: PRType.GeneralPurchase,
     description: '',
     requestorId: '',
@@ -279,14 +279,9 @@ function getEmptyPurchaseRequest(): PurchaseRequest {
     department: '',
     jobCode: '',
     estimatedTotal: 0,
-    items: [],
-    attachments: [],
-    comments: [],
-    budget: {
-      totalBudget: 0,
-      availableBudget: 0,
-      allocatedBudget: 0
-    },
-    approvalHistory: []
+    vendor: '',
+    vendorId: 0,
+    deliveryDate: new Date(),
+    
   }
 }

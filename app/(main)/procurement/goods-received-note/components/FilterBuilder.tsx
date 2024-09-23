@@ -1,8 +1,8 @@
 'use client'
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Button } from '../../../../../components/ui/button';
+import { Input } from '../../../../../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/select';
 
 const operators = [
   { value: '=', label: 'Equals' },
@@ -16,10 +16,24 @@ const operators = [
   { value: 'endsWith', label: 'Ends With' },
 ];
 
-export function FilterBuilder({ fields, onFilterChange }) {
-  const [filters, setFilters] = useState([{ field: '', operator: '=', value: '', conjunction: 'AND' }]);
+import { Dispatch, SetStateAction } from 'react'
 
-  const handleFilterChange = (index, key, value) => {
+interface Filter {
+  field: string
+  operator: string
+  value: string
+  conjunction: string
+}
+
+interface FilterBuilderProps {
+  fields: { value: string, label: string }[]
+  onFilterChange: (filters: Filter[]) => void
+}
+
+export function FilterBuilder({ fields, onFilterChange }: FilterBuilderProps) {
+  const [filters, setFilters]: [Filter[], Dispatch<SetStateAction<Filter[]>>] = useState([{ field: '', operator: '=', value: '', conjunction: 'AND' }])
+
+  const handleFilterChange = (index: number, key: keyof Filter, value: string) => {
     const newFilters = filters.map((filter, i) => 
       i === index ? { ...filter, [key]: value } : filter
     );
@@ -31,11 +45,11 @@ export function FilterBuilder({ fields, onFilterChange }) {
     setFilters([...filters, { field: '', operator: '=', value: '', conjunction: 'AND' }]);
   };
 
-  const removeFilter = (index) => {
-    const newFilters = filters.filter((_, i) => i !== index);
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
+  const removeFilter = (index: number) => {
+    const newFilters = filters.filter((_, i) => i !== index)
+    setFilters(newFilters)
+    onFilterChange(newFilters)
+  }
 
   return (
     <div className="space-y-4">
@@ -83,6 +97,9 @@ export function FilterBuilder({ fields, onFilterChange }) {
         </div>
       ))}
       <Button onClick={addFilter}>Add Filter</Button>
+
     </div>
+
+
   );
 }

@@ -18,22 +18,11 @@ import FinancialDetailsTab from './tabs/FinancialDetailsTab'
 import RelatedDocumentsTab from './tabs/RelatedDocumentsTab'
 import CommentsAttachmentsTab from './tabs/CommentsAttachmentsTab'
 import ActivityLogTab from './tabs/ActivityLogTab'
+import { PurchaseOrder, PurchaseOrderStatus } from '@/lib/types'
 
 // Import other necessary components and types
 
-interface PurchaseOrder {
-  id: string;
-  number: string;
-  date: string;
-  vendor: string;
-  total: number;
-  status: string;
-  email: string;
-  items?: any[]; // Add this line to include items in the interface
-  // Add other fields as necessary
-}
-
-export function PODetailPage({ params }: { params: { id: string } }) {
+export function PODetailPage({ params }: { params: { id: number } }) {
   const router = useRouter()
   const [poData, setPOData] = useState<PurchaseOrder | null>(null)
 
@@ -41,15 +30,18 @@ export function PODetailPage({ params }: { params: { id: string } }) {
     // Fetch PO data here
     // For now, we'll use mock data
     setPOData({
-      id: params.id,
-      number: `PO-${params.id}`,
-      date: '2023-08-15',
-      vendor: 'Acme Supplies',
-      total: 10000.00,
-      status: 'Open',
+      poId: params.id,
+      number: 'PO12345',
+      vendorName: 'Acme Supplies',
+      totalAmount: 10000.00,
+      status: PurchaseOrderStatus.OPEN,
+      orderDate: new Date(),
+      items: [],
+      vendorId: 1,
+      currencyCode: 'USD',
+      exchangeRate: 1,
+      createdBy: 1,
       email: 'vendor@acme.com',
-      items: [ ], // Add an empty array for items
-      // Add other mock data as necessary
     })
   }, [params.id])
 
@@ -110,9 +102,9 @@ export function PODetailPage({ params }: { params: { id: string } }) {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-2xl">Purchase Order: {poData.number}</CardTitle>
-              <p className="text-muted-foreground">Vendor: {poData.vendor}</p>
+              <p className="text-muted-foreground">Vendor: {poData.vendorName}</p>
             </div>
-            <Badge variant={poData.status === 'Open' ? 'default' : 'secondary'}>
+            <Badge variant={poData.status === PurchaseOrderStatus.OPEN ? 'default' : 'secondary'}>
               {poData.status}
             </Badge>
           </div>
@@ -120,8 +112,8 @@ export function PODetailPage({ params }: { params: { id: string } }) {
         <CardContent>
           <div className="flex justify-between items-center">
             <div className="space-y-1">
-              <p><span className="font-semibold">Date:</span> {poData.date}</p>
-              <p><span className="font-semibold">Total:</span> ${poData.total.toFixed(2)}</p>
+              <p><span className="font-semibold">Date:</span> {poData.orderDate.toLocaleDateString()}</p>
+              <p><span className="font-semibold">Total:</span> ${poData.totalAmount?.toFixed(2)}</p>
             </div>
           </div>
         </CardContent>
@@ -143,7 +135,7 @@ export function PODetailPage({ params }: { params: { id: string } }) {
             onUpdateItem={handleUpdateItem}
             onDeleteItem={handleDeleteItem}
             onAddItem={handleAddItem}
-            poData={poData}
+            poData={poData as unknown as PurchaseOrder}
           />
         </TabsContent>
         <TabsContent value="GeneralInfoTab">

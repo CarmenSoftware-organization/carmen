@@ -133,14 +133,20 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         number: 1,
         date: "2023-05-15T10:30:00Z",
         author: "John Doe",
-        text: "Received all items in good condition."
+        text: "Received all items in good condition.",
+        content: "Received all items in good condition.",
+        timestamp: new Date(),
+        user: "John Doe"
       },
       {
         id: "COM-002",
         number: 2,
         date: "2023-05-15T14:45:00Z",
         author: "Jane Smith",
-        text: "Quality check completed. All items meet our standards."
+        text: "Quality check completed. All items meet our standards.",
+        content: "Quality check completed. All items meet our standards.",
+        timestamp: new Date(),
+        user: "Jane Smith"
       }
     ],
     attachments: [
@@ -151,7 +157,12 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         description: "Supplier invoice for GRN-2023-001",
         publicAccess: false,
         date: "2023-05-15T11:00:00Z",
-        uploader: "John Doe"
+        uploader: "John Doe",
+        fileType: "pdf",
+        fileSize: 1024,
+        fileUrl: "https://example.com/invoice_2023-105.pdf",
+        uploadDate: new Date(),
+        uploaderId: "1"
       },
       {
         id: "ATT-002",
@@ -160,7 +171,12 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         description: "Quality check report for received items",
         publicAccess: true,
         date: "2023-05-15T15:00:00Z",
-        uploader: "Jane Smith"
+        uploader: "Jane Smith",
+        fileType: "pdf",
+        fileSize: 1024,
+        fileUrl: "https://example.com/invoice_2023-105.pdf",
+        uploadDate: new Date(),
+        uploaderId: "2"
       }
     ],
     activityLog: [
@@ -168,25 +184,41 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         id: "ACT-001",
         dateTime: "2023-05-15T09:00:00Z",
         user: "John Doe",
-        action: "Created Goods Receive Note"
+        action: "Created Goods Receive Note",
+        userId: "1",
+        activityType: "GRN_CREATED",
+        description: "Goods Receive Note created",
+        timestamp: new Date()
       },
       {
         id: "ACT-002",
         dateTime: "2023-05-15T10:30:00Z",
         user: "John Doe",
-        action: "Marked items as received"
+        action: "Marked items as received",
+        userId: "1",
+        activityType: "GRN_ITEMS_RECEIVED",
+        description: "Items marked as received",
+        timestamp: new Date()
       },
       {
         id: "ACT-003",
         dateTime: "2023-05-15T14:45:00Z",
         user: "Jane Smith",
-        action: "Completed quality check"
+        action: "Completed quality check",
+        userId: "2",
+        activityType: "GRN_QUALITY_CHECK_COMPLETED",
+        description: "Quality check completed",
+        timestamp: new Date()
       },
       {
         id: "ACT-004",
         dateTime: "2023-05-15T16:00:00Z",
         user: "John Doe",
-        action: "Finalized Goods Receive Note"
+        action: "Finalized Goods Receive Note",
+        userId: "1",
+        activityType: "GRN_FINALIZED",
+        description: "Goods Receive Note finalized",
+        timestamp: new Date()
       }
     ],
     financialSummary: {
@@ -377,7 +409,10 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         number: 1,
         date: "2023-05-18T11:15:00Z",
         author: "Jane Smith",
-        text: "Partial delivery received. Awaiting remaining items."
+        text: "Partial delivery received. Awaiting remaining items.",
+        content: "Partial delivery received. Awaiting remaining items.",
+        timestamp: new Date(),
+        user: "Jane Smith"
       }
     ],
     attachments: [
@@ -388,7 +423,12 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         description: "Delivery note for partial shipment",
         publicAccess: false,
         date: "2023-05-18T11:30:00Z",
-        uploader: "Jane Smith"
+        uploader: "Jane Smith",
+        fileType: "pdf",
+        fileSize: 1024,
+        fileUrl: "https://example.com/invoice_2023-105.pdf",
+        uploadDate: new Date(),
+        uploaderId: "2"
       }
     ],
     activityLog: [
@@ -396,13 +436,21 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         id: "ACT-005",
         dateTime: "2023-05-18T10:00:00Z",
         user: "Jane Smith",
-        action: "Created Goods Receive Note"
+        action: "Created Goods Receive Note",
+        userId: "2",
+        activityType: "GRN_CREATED",
+        description: "Goods Receive Note created",
+        timestamp: new Date()
       },
       {
         id: "ACT-006",
         dateTime: "2023-05-18T11:15:00Z",
         user: "Jane Smith",
-        action: "Recorded partial delivery"
+        action: "Recorded partial delivery",
+        userId: "2",
+        activityType: "GRN_PARTIAL_DELIVERY_RECORDED",
+        description: "Partial delivery recorded",
+        timestamp: new Date()
       }
     ],
     financialSummary: {
@@ -593,7 +641,10 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         number: 1,
         date: "2023-05-20T13:00:00Z",
         author: "Mike Johnson",
-        text: "Some items backordered. Updated expected delivery date."
+        text: "Some items backordered. Updated expected delivery date.",
+        content: "Some items backordered. Updated expected delivery date.",
+        timestamp: new Date(),
+        user: "Mike Johnson"
       }
     ],
     attachments: [
@@ -604,7 +655,12 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         description: "Supplier notification for backordered items",
         publicAccess: false,
         date: "2023-05-20T13:15:00Z",
-        uploader: "Mike Johnson"
+        uploader: "Mike Johnson",
+        fileType: "pdf",
+        fileSize: 1024,
+        fileUrl: "https://example.com/invoice_2023-105.pdf",
+        uploadDate: new Date(),
+        uploaderId: "2"
       }
     ],
     activityLog: [
@@ -612,13 +668,21 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         id: "ACT-007",
         dateTime: "2023-05-20T12:30:00Z",
         user: "Mike Johnson",
-        action: "Created Goods Receive Note"
+        action: "Created Goods Receive Note",
+        userId: "2",
+        activityType: "GRN_CREATED",
+        description: "Goods Receive Note created",
+        timestamp: new Date()
       },
       {
         id: "ACT-008",
         dateTime: "2023-05-20T13:00:00Z",
         user: "Mike Johnson",
-        action: "Updated status to partially received"
+        action: "Updated status to partially received",
+        userId: "2",
+        activityType: "GRN_STATUS_UPDATED",
+        description: "Status updated to partially received",
+        timestamp: new Date()
       }
     ],
     financialSummary: {
@@ -809,7 +873,10 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         number: 1,
         date: "2023-05-22T16:30:00Z",
         author: "Emily Brown",
-        text: "All items received and stored in the bar area."
+        text: "All items received and stored in the bar area.",
+        content: "All items received and stored in the bar area.",
+        timestamp: new Date(),
+        user: "Emily Brown"
       }
     ],
     attachments: [
@@ -820,7 +887,12 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         description: "Updated bar inventory after receiving new stock",
         publicAccess: false,
         date: "2023-05-22T17:00:00Z",
-        uploader: "Emily Brown"
+        uploader: "Emily Brown",
+        fileType: "xlsx",
+        fileSize: 1024,
+        fileUrl: "https://example.com/bar_inventory_update.xlsx",
+        uploadDate: new Date(),
+        uploaderId: "3"
       }
     ],
     activityLog: [
@@ -828,19 +900,31 @@ export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
         id: "ACT-009",
         dateTime: "2023-05-22T15:00:00Z",
         user: "Emily Brown",
-        action: "Created Goods Receive Note"
+        action: "Created Goods Receive Note",
+        userId: "3",
+        activityType: "GRN_CREATED",
+        description: "Goods Receive Note created",
+        timestamp: new Date()
       },
       {
         id: "ACT-010",
         dateTime: "2023-05-22T16:30:00Z",
         user: "Emily Brown",
-        action: "Marked all items as received"
+        action: "Marked all items as received",
+        userId: "3",
+        activityType: "GRN_STATUS_UPDATED",
+        description: "Status updated to received",
+        timestamp: new Date()
       },
       {
         id: "ACT-011",
         dateTime: "2023-05-22T17:00:00Z",
         user: "Emily Brown",
-        action: "Updated bar inventory"
+        action: "Updated bar inventory",
+        userId: "3",
+        activityType: "GRN_INVENTORY_UPDATED",
+        description: "Inventory updated",
+        timestamp: new Date()
       }
     ],
     financialSummary: {

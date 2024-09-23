@@ -13,39 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "@/components/ui/use-toast"
 
-interface Vendor {
-  id: string;
-  companyName: string;
-  businessRegistrationNumber: string;
-  taxId: string;
-  establishmentDate: string;
-  businessTypeId: string;
-  isActive: boolean;
-  addresses: Address[];
-  contacts: Contact[];
-  rating: number;
-}
-
-interface Address {
-  id: string;
-  addressType: 'MAIN' | 'BILLING' | 'SHIPPING';
-  addressLine: string;
-  subDistrictId: string;
-  districtId: string;
-  provinceId: string;
-  postalCode: string;
-  isPrimary: boolean;
-}
-
-interface Contact {
-  id: string;
-  name: string;
-  position: string;
-  phone: string;
-  email: string;
-  department: string;
-  isPrimary: boolean;
-}
+import { Vendor, Address, Contact } from '@/lib/types';
 
 const VendorData : Vendor = {
   id: "1",
@@ -141,7 +109,7 @@ export default function VendorDetail({ params }: { params: { id: string } }) {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/vendors/${vendor.id}`, {
+      const response = await fetch(`/api/vendors/${vendor?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(vendor),
@@ -160,7 +128,7 @@ export default function VendorDetail({ params }: { params: { id: string } }) {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this vendor?')) {
       try {
-        const response = await fetch(`/api/vendors/${vendor.id}`, {
+        const response = await fetch(`/api/vendors/${vendor?.id}`, {
           method: 'DELETE',
         });
 
@@ -176,17 +144,26 @@ export default function VendorDetail({ params }: { params: { id: string } }) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setVendor(prev => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setVendor(prev => {
+      if (!prev) return prev
+      return { ...prev, [name]: value }
+    })
+  }
 
   const handleSwitchChange = () => {
-    setVendor(prev => ({ ...prev, isActive: !prev.isActive }));
+    setVendor(prev => {
+      if (!prev) return prev
+      return { ...prev, isActive: !prev.isActive }
+    })
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setVendor(prev => ({ ...prev, [name]: value }));
-  };
+    setVendor(prev => {
+      if (!prev) return prev
+      return { ...prev, [name]: value }
+    })
+  }
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -359,6 +336,7 @@ export default function VendorDetail({ params }: { params: { id: string } }) {
       title={`Vendor: ${vendor.companyName}`}
       actionButtons={actionButtons}
       content={content}
+      backLink="/vendor-management/manage-vendors"
     />
   );
 }

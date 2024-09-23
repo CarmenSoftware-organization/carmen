@@ -99,10 +99,10 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose }
       return (
         <div className="mb-2">
           <Label className="text-sm font-medium">{label}</Label>
-          <div className="mt-0.5">{formattedValue}{suffix}</div>
+          {/* <div className="mt-0.5">{formattedValue}{suffix}</div> */}
           {baseValue && (
             <div className="text-xs text-gray-500">
-              {formattedBaseValue}
+              {/* {formattedBaseValue} */}
               {convRateValue && ` (Conv: ${convRateValue})`}
             </div>
           )}
@@ -135,7 +135,7 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose }
         </div>
         {baseValue && (
           <div className="text-xs text-gray-500 mt-0.5">
-            {formattedBaseValue}
+            {/* {formattedBaseValue} */}
             {convRateValue && ` (Conv: ${convRateValue})`}
           </div>
         )}

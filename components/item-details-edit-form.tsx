@@ -100,7 +100,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target
-    setFormData(prevData => ({ ...prevData, [name]: value }))
+    setFormData((prevData: typeof initialData) => ({ ...prevData, [name]: value }))
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -280,7 +280,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                           selected={deliveryDate}
                           onSelect={(date) => {
                             setDeliveryDate(date)
-                            setFormData(prevData => ({ ...prevData, deliveryDate: date ? format(date, 'yyyy-MM-dd') : '' }))
+                            setFormData((prevData: typeof initialData) => ({ ...prevData, deliveryDate: date ? format(date, 'yyyy-MM-dd') : '' }))
                           }}
                           initialFocus
                         />
@@ -354,7 +354,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                   <Select 
                     name="currency" 
                     value={formData.currency}
-                    onValueChange={(value) => setFormData(prevData => ({ ...prevData, currency: value }))}
+                    onValueChange={(value) => setFormData((prevData: typeof initialData) => ({ ...prevData, currency: value }))}
                     disabled={mode === 'view'}
                   >
                     <SelectTrigger>
@@ -422,7 +422,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                       id="adjustment" 
                       name="adjustment" 
                       checked={formData.adjustment}
-                      onCheckedChange={(checked) => setFormData(prevData => ({ ...prevData, adjustment: checked }))}
+                      onCheckedChange={(checked) => setFormData((prevData: typeof initialData) => ({ ...prevData, adjustment: checked }))}
                       disabled={mode === 'view'} 
                     />
                     <Label htmlFor="adjustment">Price Adjustment</Label>
@@ -594,7 +594,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
             }}>
               Cancel
             </Button>
-            <Button type="submit" onClick={handleSubmit}>Save</Button>
+            <Button type="submit">Save</Button>
           </>
         )}
       </CardFooter>

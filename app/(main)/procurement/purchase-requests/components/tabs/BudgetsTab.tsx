@@ -2,7 +2,7 @@
 // File: tabs/BudgetsTab.tsx
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { BudgetData } from '@/types/types'
+import { BudgetData } from '@/lib/types'
 
 const budgetData: BudgetData[] = [
     {

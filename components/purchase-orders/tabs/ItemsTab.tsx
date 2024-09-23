@@ -13,12 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
 import { PurchaseOrderItemFormComponent } from './purchase-order-item-form';
+import { PurchaseOrder, PurchaseOrderItem } from '@/lib/types';
                                                                                                                         
 // Sample mock data
-const mockItems: Item[] = [
+const mockItems: PurchaseOrderItem[] = [
   {
     id: '1',
-    code: 'ITEM001',
+    name: 'Office Chair',
     description: 'Office Chair',
     orderedQuantity: 10,
     orderUnit: 'pcs',
@@ -31,10 +32,17 @@ const mockItems: Item[] = [
     totalPrice: 1500.00,
     status: 'Partially Received',
     isFOC: false,
+    taxRate: 0.1,
+    taxAmount: 150.00,
+    discountRate: 0.05,
+    discountAmount: 75.00,
+    convRate: 1,
+    baseTaxAmount: 150.00,
+    baseDiscAmount: 75.00,
   },
   {
     id: '2',
-    code: 'ITEM002',
+    name: 'Desk Lamp',
     description: 'Desk Lamp',
     orderedQuantity: 20,
     orderUnit: 'pcs',
@@ -47,10 +55,17 @@ const mockItems: Item[] = [
     totalPrice: 600.00,
     status: 'Fully Received',
     isFOC: false,
+    taxRate: 0.1,
+    taxAmount: 60.00,
+    discountRate: 0.05,
+    discountAmount: 30.00,
+    convRate: 1,
+    baseTaxAmount: 60.00,
+    baseDiscAmount: 30.00,
   },
   {
     id: '3',
-    code: 'ITEM003',
+    name: 'Notebook',
     description: 'Notebook',
     orderedQuantity: 100,
     orderUnit: 'pcs',
@@ -63,10 +78,17 @@ const mockItems: Item[] = [
     totalPrice: 500.00,
     status: 'Not Received',
     isFOC: true,
+    taxRate: 0.1,
+    taxAmount: 50.00,
+    discountRate: 0.05,
+    discountAmount: 25.00,
+    convRate: 1,
+    baseTaxAmount: 50.00,
+    baseDiscAmount: 25.00,
   },
   {
     id: '4',
-    code: 'ITEM004',
+    name: 'Whiteboard',
     description: 'Whiteboard',
     orderedQuantity: 5,
     orderUnit: 'pcs',
@@ -79,39 +101,46 @@ const mockItems: Item[] = [
     totalPrice: 400.00,
     status: 'Partially Received',
     isFOC: false,
+    taxRate: 0.1,
+    taxAmount: 40.00,
+    discountRate: 0.05,
+    discountAmount: 20.00,
+    convRate: 1,
+    baseTaxAmount: 40.00,
+    baseDiscAmount: 20.00,
   },
 ];
 
-interface Item {
-  id: string;
-  code: string;
-  description: string;
-  orderedQuantity: number;
-  orderUnit: string;
-  baseQuantity: number;
-  baseUnit: string;
-  baseReceivingQty: number;
-  receivedQuantity: number;
-  remainingQuantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  status: 'Not Received' | 'Partially Received' | 'Fully Received';
-  isFOC: boolean;
-}
+// interface Item {
+//   id: string;
+//   code: string;
+//   description: string;
+//   orderedQuantity: number;
+//   orderUnit: string;
+//   baseQuantity: number;
+//   baseUnit: string;
+//   baseReceivingQty: number;
+//   receivedQuantity: number;
+//   remainingQuantity: number;
+//   unitPrice: number;
+//   totalPrice: number;
+//   status: 'Not Received' | 'Partially Received' | 'Fully Received';
+//   isFOC: boolean;
+// }
                                                                                                                         
 interface ItemsTabProps {                                                                                               
-  items: Item[];                                                                                                        
-  onUpdateItem: (updatedItem: Item) => void;                                                                            
+  items: PurchaseOrderItem[];                                                                                                        
+  onUpdateItem: (updatedItem: PurchaseOrderItem) => void;                                                                            
   onDeleteItem: (itemId: string) => void;                                                                               
-  onAddItem: (newItem: Item) => void;  
-  poData: any;                                                                                 
+  onAddItem: (newItem: PurchaseOrderItem) => void;  
+  poData: PurchaseOrder;                                                                                 
 }                                                                                                                       
                                                                                                                         
 export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem, poData }: ItemsTabProps) {                     
   const [selectedItems, setSelectedItems] = useState<string[]>([]);                                                     
   const [expandedItems, setExpandedItems] = useState<string[]>([]);                                                     
   const [isAddItemFormOpen, setIsAddItemFormOpen] = useState(false);
-  const [viewItemDetails, setViewItemDetails] = useState<Item | null>(null);
+  const [viewItemDetails, setViewItemDetails] = useState<PurchaseOrderItem | null>(null);
 
   const handleExport = () => {
     // Implement export logic here
@@ -140,7 +169,7 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
     );                                                                                                                  
   };                                                                                                                    
                                                                                                                         
-  const getStatusColor = (status: Item['status']) => {                                                                  
+  const getStatusColor = (status: PurchaseOrderItem['status']) => {                                                                  
     switch (status) {                                                                                                   
       case 'Not Received': return 'bg-red-500';                                                                         
       case 'Partially Received': return 'bg-yellow-500';                                                                
@@ -172,7 +201,7 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
   const updateItemsStatus = (newStatus: string) => {
     const updatedItems = items.map(item => 
       selectedItems.includes(item.id) 
-        ? { ...item, status: newStatus as Item['status'] } 
+        ? { ...item, status: newStatus as PurchaseOrderItem['status'] } 
         : item
     );
     updatedItems.forEach(item => {
@@ -183,7 +212,7 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
     setSelectedItems([]);
   };
                                                                                                                         
-  const handleViewDetails = (item: Item) => {
+  const handleViewDetails = (item: PurchaseOrderItem) => {
     setViewItemDetails(item);
   };
 
@@ -191,22 +220,22 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
     setViewItemDetails(null);
   };
 
-  const handleEditItem = (item: Item) => {
+  const handleEditItem = (item: PurchaseOrderItem) => {
     // Implement edit item logic                                                                                        
     console.log('Edit item:', item);                                                                                    
   };                                                                                                                    
                                                                                                                         
-  const handleAddNote = (item: Item) => {                                                                               
+  const handleAddNote = (item: PurchaseOrderItem) => {                                                                               
     // Implement add note logic                                                                                         
     console.log('Add note to item:', item);                                                                             
   };                                                                                                                    
                                                                                                                         
-  const handleSplitLine = (item: Item) => {                                                                             
+  const handleSplitLine = (item: PurchaseOrderItem) => {                                                                             
     // Implement split line logic                                                                                       
     console.log('Split line for item:', item);                                                                          
   };                                                                                                                    
                                                                                                                         
-  const handleCancelItem = (item: Item) => {
+  const handleCancelItem = (item: PurchaseOrderItem) => {
     // Implement cancel item logic
     console.log('Cancel item:', item);
   };
@@ -219,7 +248,7 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
     }
   };
                                                                                                                         
-  const handleAddNewItem = (newItemData: Item) => {
+  const handleAddNewItem = (newItemData: PurchaseOrderItem) => {
     onAddItem(newItemData);
     setIsAddItemFormOpen(false);
   };
@@ -414,7 +443,7 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
                   />
                 </TableCell>
                 <TableCell>
-                  <div>{item.code}</div>
+                  <div>{item.name}</div>
                   <div className="text-sm text-gray-500">{item.description}</div>
                   {item.isFOC && (
                     <Tooltip>
@@ -481,15 +510,18 @@ export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem,
           <PurchaseOrderItemFormComponent
             initialMode="add"
             onClose={() => setIsAddItemFormOpen(false)}
-            onSubmit={handleAddNewItem}
+            initialData={undefined}
+            // onSubmit={handleAddNewItem}
           />
         )}
 
         {viewItemDetails && (
           <PurchaseOrderItemFormComponent
+
             initialMode="view"
             onClose={handleCloseItemDetails}
             initialData={viewItemDetails}
+            // onSubmit={handleEditItem}
           />
         )}
       </div>                                                                                                              

@@ -1,9 +1,9 @@
-import React from 'react'
-import { Button } from '@/components/ui/button'
+import React from 'react';
+import { Button } from '@/components/ui/button';
 
 interface BulkActionsProps {
-  selectedItems: string[]
-  onAction: (action: string) => void
+  selectedItems: string[];
+  onAction: (action: string) => void;
 }
 
 export function BulkActions({ selectedItems, onAction }: BulkActionsProps) {
@@ -17,5 +17,5 @@ export function BulkActions({ selectedItems, onAction }: BulkActionsProps) {
       </Button>
       {/* Add more bulk actions as needed */}
     </div>
-  )
+  );
 }

@@ -23,7 +23,9 @@ export function CommentTab({ mode, comments, onAddComment, onEditComment, onDele
     if (newComment.trim()) {
       // onAddComment({
       //   author: 'Current User', // Replace with actual user name
-      //   text: newComment
+      //   text: newComment,
+      //   content: '',
+      //   timestamp: new Date()
       // })
       setNewComment('')
     }

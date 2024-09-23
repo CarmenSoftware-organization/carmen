@@ -4,7 +4,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, FileDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { GoodsReceiveNoteList } from '@/components/goods-receive/GoodsReceiveNoteList'
+import { GoodsReceiveNoteList } from './components/GoodsReceiveNoteList'
 
 export default function GoodsReceiveNotePage() {
   const router = useRouter()
