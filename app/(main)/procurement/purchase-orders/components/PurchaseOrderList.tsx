@@ -71,6 +71,7 @@ import CreatePOFromPR from "./createpofrompr";
 // This is a mock data structure. Replace with actual data fetching logic.
 import { Mock_purchaseOrders } from "@/lib/mock/purchaseOrder";  
 import StatusBadge from "@/components/ui/custom-status-badge";
+import { randomUUID } from "crypto";
 
 const PurchaseOrderList: React.FC = () => {
   const router = useRouter();
@@ -78,7 +79,7 @@ const PurchaseOrderList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [filteredPOs, setFilteredPOs] = useState(Mock_purchaseOrders);
-  const [selectedPOs, setSelectedPOs] = useState<number[]>([]);
+  const [selectedPOs, setSelectedPOs] = useState<string[]>([]);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isPrintOpen, setIsPrintOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>(
@@ -124,7 +125,7 @@ const PurchaseOrderList: React.FC = () => {
 
   const handleBulkAction = (
     action: "delete" | "void" | "close",
-    poIds: number[] = selectedPOs
+    poIds: string[] = selectedPOs
   ) => {
     // Implement the bulk action logic here
     console.log(`Action: ${action} for POs:`, poIds);
@@ -154,7 +155,7 @@ const PurchaseOrderList: React.FC = () => {
     }
   }
 
-  const handleSelectPO = (id: number, checked: boolean) => {
+  const handleSelectPO = (id: string, checked: boolean) => {
     if (checked) {
       setSelectedPOs([...selectedPOs, id]);
     } else {
@@ -173,7 +174,7 @@ const PurchaseOrderList: React.FC = () => {
   const handleGeneratePOs = () => {
     const newPOs = selectedPRs.map((pr) => {
       return {
-        poId: Math.max(...Mock_purchaseOrders.map((po) => po.poId)) + 1,
+        poId: randomUUID(), //  (...Mock_purchaseOrders.map((po) => po.poId)),
         number: `PO-${String(Math.random()).slice(2, 6)}`,
         orderDate: new Date(),
         DeliveryDate: pr.deliveryDate,
@@ -196,12 +197,12 @@ const PurchaseOrderList: React.FC = () => {
     setIsConfirmationOpen(false);
   };
 
-  const handlePrintPO = (poId: number) => {
+  const handlePrintPO = (poId: string) => {
     console.log(`Printing PO: ${poId}`);
     // Implement print logic here
   };
 
-  const handleSendEmail = (poId: number) => {
+  const handleSendEmail = (poId: string) => {
     console.log(`Sending email for PO: ${poId}`);
     // Implement email sending logic here
   };
@@ -566,7 +567,7 @@ const PurchaseOrderList: React.FC = () => {
             <Button
               onClick={() => {
                 const newPO = {
-                  poId: Math.max(...Mock_purchaseOrders.map((po) => po.poId)) + 1,
+                  poId: randomUUID(), // Math.max(...Mock_purchaseOrders.map((po) => po.poId)) + 1,
                   ...newManualPO,
                 };
                 setFilteredPOs([...filteredPOs, newPO as unknown as PurchaseOrder]);

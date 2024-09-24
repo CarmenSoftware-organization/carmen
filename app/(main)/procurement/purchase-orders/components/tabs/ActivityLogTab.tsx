@@ -133,10 +133,7 @@ export default function ActivityLogTab({ poData }: ActivityLogTabProps) {
                       : log.action === "Sent"
                       ? "outline"
                       : "default"
-                  }
-                >
-                  {log.action}
-                </StatusBadge>
+                  } />
               </TableCell>
               <TableCell>{log.details}</TableCell>
               <TableCell className="text-right">{log.timestamp}</TableCell>

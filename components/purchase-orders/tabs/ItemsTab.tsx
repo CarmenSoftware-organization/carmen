@@ -49,7 +49,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((item) => (
+          {poData.items.map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.description}</TableCell>
