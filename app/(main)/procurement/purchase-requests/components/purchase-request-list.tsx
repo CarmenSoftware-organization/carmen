@@ -20,6 +20,7 @@ import {
 import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2, ArrowUpDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import ListPageTemplate from '@/components/templates/ListPageTemplate'
+import StatusBadge from '@/components/ui/custom-status-badge'
 
 const sampleData = [
   { id: 'PR-001', type: 'General Purchase', description: 'Office Supplies', requestor: 'John Doe', department: 'Administration', date: '2023-06-15', status: 'Submitted', amount: 500, currentStage: 'Initial Review' },
@@ -227,104 +228,95 @@ export function PurchaseRequestList() {
     </>
   );
 
-  const content = (
-    <>
-      <div className="space-y-2">
-        {getCurrentPageData().map((pr) => (
-          <Card key={pr.id} className="overflow-hidden p-0 hover:bg-secondary">
-            <div className="py-2 px-4">
-              <div className="flex justify-between items-center mb-0">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={selectedPRs.includes(pr.id)}
-                    onCheckedChange={() => handleSelectPR(pr.id)}
-                  />
-                  <Badge className=''
-                    variant={
-                      pr.status === 'Approved' ? 'outline' :
-                      pr.status === 'Rejected' ? 'destructive' :
-                      pr.status === 'Draft' ? 'outline' : 'default'
-                    }
-                  >
-                    {pr.status}
-                  </Badge>
-                  <h3 className="text-sm md:text-base font-semibold">{pr.description}</h3>
-                  <span className="text-xs text-muted-foreground">({pr.id})</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="icon" aria-label="View purchase request" onClick={() => handleViewPR(pr.id)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" aria-label="Edit purchase request" onClick={() => handleEditPR(pr.id)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" aria-label="Delete purchase request">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
-                {[
-                  { label: 'Type', field: 'type' },
-                  { label: 'Requestor', field: 'requestor' },
-                  { label: 'Department', field: 'department' },
-                  { label: 'Date', field: 'date' },
-                  { label: 'Amount', field: 'amount' },
-                  { label: 'Current Stage', field: 'currentStage' },
-                ].map(({ label, field }) => (
-                  <div key={field}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-0 h-auto font-medium text-muted-foreground uppercase text-xxs"
-                      onClick={() => handleSort(field as keyof typeof sampleData[0])}
-                    >
-                      {label}
-                      <ArrowUpDown className="ml-1 h-3 w-3" />
-                    </Button>
-                    <p className="text-sm">{pr[field as keyof typeof pr]}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-      
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, sortedAndFilteredData.length)} of {sortedAndFilteredData.length} results
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Previous page</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            <span className="sr-only">Next page</span>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </>
-  );
-
   return (
     <ListPageTemplate
       title="Purchase Requests"
       actionButtons={actionButtons}
       filters={filters}
-      content={content}
+      content={
+        <>
+          <div className="space-y-2">
+            {getCurrentPageData().map((pr) => (
+              <Card key={pr.id} className="overflow-hidden p-0 hover:bg-secondary">
+                <div className="py-2 px-4">
+                  <div className="flex justify-between items-center mb-0">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={selectedPRs.includes(pr.id)}
+                        onCheckedChange={() => handleSelectPR(pr.id)}
+                      />
+                      {/* Replace the existing Badge with the new StatusBadge component */}
+                      <StatusBadge status={pr.status} />
+                      <h3 className="text-sm md:text-base font-semibold">{pr.description}</h3>
+                      <span className="text-xs text-muted-foreground">({pr.id})</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="ghost" size="icon" aria-label="View purchase request" onClick={() => handleViewPR(pr.id)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" aria-label="Edit purchase request" onClick={() => handleEditPR(pr.id)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" aria-label="Delete purchase request">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
+                    {[
+                      { label: 'Type', field: 'type' },
+                      { label: 'Requestor', field: 'requestor' },
+                      { label: 'Department', field: 'department' },
+                      { label: 'Date', field: 'date' },
+                      { label: 'Amount', field: 'amount' },
+                      { label: 'Current Stage', field: 'currentStage' },
+                    ].map(({ label, field }) => (
+                      <div key={field}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="p-0 h-auto font-medium text-muted-foreground uppercase text-xxs"
+                          onClick={() => handleSort(field as keyof typeof sampleData[0])}
+                        >
+                          {label}
+                          <ArrowUpDown className="ml-1 h-3 w-3" />
+                        </Button>
+                        <p className="text-sm">{pr[field as keyof typeof pr]}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+          
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, sortedAndFilteredData.length)} of {sortedAndFilteredData.length} results
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="sr-only">Previous page</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                <span className="sr-only">Next page</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </>
+      }
       bulkActions={bulkActions}
     />
   )

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import StatusBadge from "@/components/ui/custom-status-badge";
 
 interface ActivityLog {
   id: string;
@@ -97,24 +98,6 @@ const mockActivityLogs: ActivityLog[] = [
     timestamp: "2023-08-20 09:15 AM",
   },
 ];
-
-export function StatusBadge({ status, children }: { status: string, children: React.ReactNode }) {
-  return (
-    <Badge
-      className={
-        status === "Open"
-          ? "bg-green-500 text-white"
-          : status === "Send"
-          ? "bg-blue-400 text-white"
-          : status === "Partial Received"
-          ? "bg-yellow-400 text-white"
-          : "bg-gray-400 text-white"
-      }
-    >
-      {children}
-    </Badge>
-  );
-}
 
 export default function ActivityLogTab({ poData }: ActivityLogTabProps) {
   return (

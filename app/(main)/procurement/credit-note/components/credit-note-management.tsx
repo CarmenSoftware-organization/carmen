@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2, ArrowUpDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import StatusBadge from '@/components/ui/custom-status-badge'
 
 // Mock data for demonstration
 const mockCreditNotes = Array(50).fill(null).map((_, index) => ({
@@ -30,20 +31,6 @@ const mockCreditNotes = Array(50).fill(null).map((_, index) => ({
   amount: Math.round(Math.random() * 1000 * 100) / 100,
   status: ['Committed', 'Saved', 'Voided'][index % 3],
 }))
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const colorMap: { [key: string]: string } = {
-    Committed: 'bg-green-100 text-green-800',
-    Saved: 'bg-blue-100 text-blue-800',
-    Voided: 'bg-red-100 text-red-800',
-  }
-
-  return (
-    <Badge className={`${colorMap[status]} font-semibold`}>
-      {status}
-    </Badge>
-  )
-}
 
 export function CreditNoteManagement() {
   const router = useRouter()

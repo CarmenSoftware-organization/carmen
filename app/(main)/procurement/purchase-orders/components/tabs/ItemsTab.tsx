@@ -237,11 +237,6 @@ export default function ItemsTab({ poData  }: ItemsTabProps) {
     console.log('Cancel item:', item);
   };
 
-  // interface PurchaseOrderItem {
-  //   poId: string
-  //   orderUnit: string
-  // }
-
   interface Props {
     poData: { items: PurchaseOrderItem[] }
     onUpdateItem: (item: PurchaseOrderItem) => void

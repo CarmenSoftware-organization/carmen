@@ -221,15 +221,19 @@
 - REJECTED
 
 ### PurchaseOrderStatus
-- DRAFT
-- SENT
-- PARTIALLY_RECEIVED
-- FULLY_RECEIVED
-- CANCELLED
+- Open = "Open",
+- Voided = "Voided",
+- Closed = "Closed",
+- Draft = "Draft",
+- Sent = "Sent",
+- PartiallyReceived = "PartiallyReceived",
+- FullyReceived = "FullyReceived",
+- Cancelled = "Cancelled",
+- Deleted = "Deleted",
 
 ### POLineStatus
-- OPEN
-- CLOSED
+- Open
+- Closed
 
 ### PRType
 - GENERAL_PURCHASE

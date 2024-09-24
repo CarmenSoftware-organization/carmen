@@ -146,7 +146,7 @@ export enum GRNItemStatus {
 // Purchase Order (PO) Types
 
 export interface PurchaseOrder {
-  poId: number;
+  poId: string;
   number: string;
   vendorId: number;
   vendorName: string;
@@ -161,6 +161,10 @@ export interface PurchaseOrder {
   approvedBy?: number;
   approvalDate?: Date;
   email: string;
+  buyer: string;
+  creditTerms: string;
+  description: string;
+  remarks: string;
   items: PurchaseOrderItem[];
 }
 
@@ -201,18 +205,19 @@ export interface PurchaseOrderItem {
   totalAmount?: number; 
   baseTotalAmount?: number;
   attachedFile?: File | null;
+  received? : GRNItem[];
 }
 
 export enum PurchaseOrderStatus {
-  OPEN = "OPEN",
-  VOIDED = "VOIDED",
-  CLOSED = "CLOSED",
-  DRAFT = "DRAFT",
-  SENT = "SENT",
-  PARTIALLY_RECEIVED = "PARTIALLY_RECEIVED",
-  FULLY_RECEIVED = "FULLY_RECEIVED",
-  CANCELLED = "CANCELLED",
-  DELETED = "DELETED",
+  Open = "Open",
+  Voided = "Voided",
+  Closed = "Closed",
+  Draft = "Draft",
+  Sent = "Sent",
+  Partial = "Partial",
+  FullyReceived = "FullyReceived",
+  Cancelled = "Cancelled",
+  Deleted = "Deleted",
 }
 
 export interface PurchaseOrderLine {

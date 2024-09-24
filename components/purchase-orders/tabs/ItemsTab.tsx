@@ -1,530 +1,71 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Gift, ChevronDown, ChevronRight, MoreHorizontal, Plus } from 'lucide-react';
-import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
-import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
-import { PurchaseOrderItemFormComponent } from './purchase-order-item-form';
-import { PurchaseOrder, PurchaseOrderItem } from '@/lib/types';
-                                                                                                                        
-// Sample mock data
-const mockItems: PurchaseOrderItem[] = [
-  {
-    id: '1',
-    name: 'Office Chair',
-    description: 'Office Chair',
-    orderedQuantity: 10,
-    orderUnit: 'pcs',
-    baseQuantity: 10,
-    baseUnit: 'pcs',
-    baseReceivingQty: 5,
-    receivedQuantity: 5,
-    remainingQuantity: 5,
-    unitPrice: 150.00,
-    totalPrice: 1500.00,
-    status: 'Partially Received',
-    isFOC: false,
-    taxRate: 0.1,
-    taxAmount: 150.00,
-    discountRate: 0.05,
-    discountAmount: 75.00,
-    convRate: 1,
-    baseTaxAmount: 150.00,
-    baseDiscAmount: 75.00,
-  },
-  {
-    id: '2',
-    name: 'Desk Lamp',
-    description: 'Desk Lamp',
-    orderedQuantity: 20,
-    orderUnit: 'pcs',
-    baseQuantity: 20,
-    baseUnit: 'pcs',
-    baseReceivingQty: 20,
-    receivedQuantity: 20,
-    remainingQuantity: 0,
-    unitPrice: 30.00,
-    totalPrice: 600.00,
-    status: 'Fully Received',
-    isFOC: false,
-    taxRate: 0.1,
-    taxAmount: 60.00,
-    discountRate: 0.05,
-    discountAmount: 30.00,
-    convRate: 1,
-    baseTaxAmount: 60.00,
-    baseDiscAmount: 30.00,
-  },
-  {
-    id: '3',
-    name: 'Notebook',
-    description: 'Notebook',
-    orderedQuantity: 100,
-    orderUnit: 'pcs',
-    baseQuantity: 100,
-    baseUnit: 'pcs',
-    baseReceivingQty: 0,
-    receivedQuantity: 0,
-    remainingQuantity: 100,
-    unitPrice: 5.00,
-    totalPrice: 500.00,
-    status: 'Not Received',
-    isFOC: true,
-    taxRate: 0.1,
-    taxAmount: 50.00,
-    discountRate: 0.05,
-    discountAmount: 25.00,
-    convRate: 1,
-    baseTaxAmount: 50.00,
-    baseDiscAmount: 25.00,
-  },
-  {
-    id: '4',
-    name: 'Whiteboard',
-    description: 'Whiteboard',
-    orderedQuantity: 5,
-    orderUnit: 'pcs',
-    baseQuantity: 5,
-    baseUnit: 'pcs',
-    baseReceivingQty: 3,
-    receivedQuantity: 3,
-    remainingQuantity: 2,
-    unitPrice: 80.00,
-    totalPrice: 400.00,
-    status: 'Partially Received',
-    isFOC: false,
-    taxRate: 0.1,
-    taxAmount: 40.00,
-    discountRate: 0.05,
-    discountAmount: 20.00,
-    convRate: 1,
-    baseTaxAmount: 40.00,
-    baseDiscAmount: 20.00,
-  },
-];
+import { Button } from "@/components/ui/button";
+import { PurchaseOrderItem, PurchaseOrder } from '@/lib/types';
 
-// interface Item {
-//   id: string;
-//   code: string;
-//   description: string;
-//   orderedQuantity: number;
-//   orderUnit: string;
-//   baseQuantity: number;
-//   baseUnit: string;
-//   baseReceivingQty: number;
-//   receivedQuantity: number;
-//   remainingQuantity: number;
-//   unitPrice: number;
-//   totalPrice: number;
-//   status: 'Not Received' | 'Partially Received' | 'Fully Received';
-//   isFOC: boolean;
-// }
-                                                                                                                        
-interface ItemsTabProps {                                                                                               
-  items: PurchaseOrderItem[];                                                                                                        
-  onUpdateItem: (updatedItem: PurchaseOrderItem) => void;                                                                            
-  onDeleteItem: (itemId: string) => void;                                                                               
-  onAddItem: (newItem: PurchaseOrderItem) => void;  
-  poData: PurchaseOrder;                                                                                 
-}                                                                                                                       
-                                                                                                                        
-export default function ItemsTab({ items, onUpdateItem, onDeleteItem, onAddItem, poData }: ItemsTabProps) {                     
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);                                                     
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);                                                     
-  const [isAddItemFormOpen, setIsAddItemFormOpen] = useState(false);
-  const [viewItemDetails, setViewItemDetails] = useState<PurchaseOrderItem | null>(null);
+interface ItemsTabProps {
+  onUpdateItem: (updatedItem: PurchaseOrderItem) => void;
+  onDeleteItem: (itemId: string) => void;
+  onAddItem: (newItem: PurchaseOrderItem) => void;
+  poData: PurchaseOrder;
+}
 
-  const handleExport = () => {
-    // Implement export logic here
-    console.log('Exporting PO data:', poData);
-  };
-                                                                                                                        
-  const selectedItemsCount = useMemo(() => selectedItems.length, [selectedItems]);                                      
-                                                                                                                        
-  const toggleItemSelection = (itemId: string) => {                                                                     
-    setSelectedItems(prev =>                                                                                            
-      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]                                      
-    );                                                                                                                  
-  };                                                                                                                    
-                                                                                                                        
-  const toggleAllSelection = () => {                                                                                    
-    if (selectedItems.length === items.length) {                                                                        
-      setSelectedItems([]);                                                                                             
-    } else {                                                                                                            
-      setSelectedItems(items.map(item => item.id));                                                                     
-    }                                                                                                                   
-  };                                                                                                                    
-                                                                                                                        
-  const toggleItemExpansion = (itemId: string) => {                                                                     
-    setExpandedItems(prev =>                                                                                            
-      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]                                      
-    );                                                                                                                  
-  };                                                                                                                    
-                                                                                                                        
-  const getStatusColor = (status: PurchaseOrderItem['status']) => {                                                                  
-    switch (status) {                                                                                                   
-      case 'Not Received': return 'bg-red-500';                                                                         
-      case 'Partially Received': return 'bg-yellow-500';                                                                
-      case 'Fully Received': return 'bg-green-500';                                                                     
-    }                                                                                                                   
-  };                                                                                                                    
-                                                                                                                        
-  const handleBulkAction = (action: string) => {
-    switch (action) {
-      case 'setNotReceived':
-      case 'setPartiallyReceived':
-      case 'setFullyReceived':
-        updateItemsStatus(action.replace('set', ''));
-        break;
-      case 'edit':
-        console.log('Bulk edit items:', selectedItems);
-        break;
-      case 'cancel':
-        console.log('Bulk cancel items:', selectedItems);
-        break;
-      case 'addNote':
-        console.log('Bulk add note to items:', selectedItems);
-        break;
-      default:
-        console.log(`Unknown bulk action: ${action}`);
+export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData }: ItemsTabProps) {
+   console.log("Items received in ItemsTab:", poData.items);
+
+  if (!poData.items || poData.items.length === 0) {
+    return <p>No items found for this purchase order.</p>
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Not Received': return 'bg-red-100 text-red-800';
+      case 'Partially Received': return 'bg-yellow-100 text-yellow-800';
+      case 'Fully Received': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
-  };
-
-  const updateItemsStatus = (newStatus: string) => {
-    const updatedItems = items.map(item => 
-      selectedItems.includes(item.id) 
-        ? { ...item, status: newStatus as PurchaseOrderItem['status'] } 
-        : item
-    );
-    updatedItems.forEach(item => {
-      if (selectedItems.includes(item.id)) {
-        onUpdateItem(item);
-      }
-    });
-    setSelectedItems([]);
-  };
-                                                                                                                        
-  const handleViewDetails = (item: PurchaseOrderItem) => {
-    setViewItemDetails(item);
-  };
-
-  const handleCloseItemDetails = () => {
-    setViewItemDetails(null);
-  };
-
-  const handleEditItem = (item: PurchaseOrderItem) => {
-    // Implement edit item logic                                                                                        
-    console.log('Edit item:', item);                                                                                    
-  };                                                                                                                    
-                                                                                                                        
-  const handleAddNote = (item: PurchaseOrderItem) => {                                                                               
-    // Implement add note logic                                                                                         
-    console.log('Add note to item:', item);                                                                             
-  };                                                                                                                    
-                                                                                                                        
-  const handleSplitLine = (item: PurchaseOrderItem) => {                                                                             
-    // Implement split line logic                                                                                       
-    console.log('Split line for item:', item);                                                                          
-  };                                                                                                                    
-                                                                                                                        
-  const handleCancelItem = (item: PurchaseOrderItem) => {
-    // Implement cancel item logic
-    console.log('Cancel item:', item);
-  };
-
-  const handleUnitChange = (itemId: string, newUnit: string) => {
-    const updatedItem = items.find(item => item.id === itemId);
-    if (updatedItem) {
-      updatedItem.orderUnit = newUnit;
-      onUpdateItem(updatedItem);
-    }
-  };
-                                                                                                                        
-  const handleAddNewItem = (newItemData: PurchaseOrderItem) => {
-    onAddItem(newItemData);
-    setIsAddItemFormOpen(false);
   };
 
   return (
-    <TooltipProvider>                                                                                                              
-      <div className="space-y-4">                                                                                         
-        <div className="flex justify-between items-center">                                                               
-          <h2 className="text-2xl font-bold">Purchase Order Items</h2>                                                    
-          <div className="flex space-x-2">
-            <DropdownMenu>                                                                                                  
-              <DropdownMenuTrigger asChild>                                                                                 
-                <Button variant="outline">
-                  <MoreHorizontal className="h-4 w-4 mr-2" />
-                  Actions
-                </Button>                                                             
-              </DropdownMenuTrigger>                                                                                        
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => handleBulkAction('setNotReceived')}>Set Not Received</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleBulkAction('setPartiallyReceived')}>Set Partially Received</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleBulkAction('setFullyReceived')}>Set Fully Received</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleBulkAction('edit')}>Edit Selected Items</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleBulkAction('cancel')}>Cancel Selected Items</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleBulkAction('addNote')}>Add Note to Selected Items</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline">Export</Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[400px] sm:w-[600px]">
-                <SheetHeader>
-                  <SheetTitle>Export Purchase Order</SheetTitle>
-                  <SheetDescription>Choose your export options below.</SheetDescription>
-                </SheetHeader>
-                <ScrollArea className="flex-grow">
-                  <div className="space-y-4 p-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="exportFormat" className="text-right">
-                        Format
-                      </Label>
-                      <Select defaultValue="pdf">
-                        <SelectTrigger id="exportFormat" className="col-span-3">
-                          <SelectValue placeholder="Select format" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pdf">PDF</SelectItem>
-                          <SelectItem value="excel">Excel</SelectItem>
-                          <SelectItem value="csv">CSV</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="dateType" className="text-right">
-                        Date Type
-                      </Label>
-                      <Select defaultValue="poDate">
-                        <SelectTrigger id="dateType" className="col-span-3">
-                          <SelectValue placeholder="Select date type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="poDate">PO Date</SelectItem>
-                          <SelectItem value="deliveryDate">Delivery Date</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">Date</Label>
-                      <div className="col-span-3 grid grid-cols-2 gap-2">
-                        <Input id="dateFrom" type="date" placeholder="From" />
-                        <Input id="dateTo" type="date" placeholder="To" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">Location</Label>
-                      <div className="col-span-3 grid grid-cols-2 gap-2">
-                        <Input id="locationFrom" placeholder="From" />
-                        <Input id="locationTo" placeholder="To" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">Category</Label>
-                      <div className="col-span-3 grid grid-cols-2 gap-2">
-                        <Input id="categoryFrom" placeholder="From" />
-                        <Input id="categoryTo" placeholder="To" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">Sub-category</Label>
-                      <div className="col-span-3 grid grid-cols-2 gap-2">
-                        <Input id="subCategoryFrom" placeholder="From" />
-                        <Input id="subCategoryTo" placeholder="To" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">Item Group</Label>
-                      <div className="col-span-3 grid grid-cols-2 gap-2">
-                        <Input id="itemGroupFrom" placeholder="From" />
-                        <Input id="itemGroupTo" placeholder="To" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">Product</Label>
-                      <div className="col-span-3 grid grid-cols-2 gap-2">
-                        <Input id="productFrom" placeholder="From" />
-                        <Input id="productTo" placeholder="To" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="poStatus" className="text-right">
-                        PO Status
-                      </Label>
-                      <Select defaultValue="all">
-                        <SelectTrigger id="poStatus" className="col-span-3">
-                          <SelectValue placeholder="Select PO status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All</SelectItem>
-                          <SelectItem value="open">Open</SelectItem>
-                          <SelectItem value="closed">Closed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="orderBy" className="text-right">
-                        Order By
-                      </Label>
-                      <Select defaultValue="poDatePoNo">
-                        <SelectTrigger id="orderBy" className="col-span-3">
-                          <SelectValue placeholder="Select order by" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="poDatePoNo">PO Date, PO No.</SelectItem>
-                          <SelectItem value="poNo">PO No.</SelectItem>
-                          <SelectItem value="vendor">Vendor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="includeDetails" className="text-right">
-                        Include Details
-                      </Label>
-                      <div className="col-span-3">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="includeComments" />
-                          <Label htmlFor="includeComments">Comments</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="includeAttachments" />
-                          <Label htmlFor="includeAttachments">Attachments</Label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </ScrollArea>
-                <SheetFooter>
-                  <Button type="submit" onClick={handleExport}>Export</Button>
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
-          </div>                                                                                                 
-        </div>    
-                                                                                                              
-      {items.length > 0 ? (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={selectedItems.length === items.length}
-                  onCheckedChange={toggleAllSelection}
-                />
-              </TableHead>
-              <TableHead>Item Code/Description</TableHead>
-              <TableHead>Ordered Qty / Base Qty</TableHead>
-              <TableHead>Received Qty / Base Receiving Qty</TableHead>
-              <TableHead>Remaining Qty</TableHead>
-              <TableHead>Unit Price</TableHead>
-              <TableHead>Total Price</TableHead>
-              <TableHead>Receiving Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell className="align-top">
-                  <Checkbox
-                    checked={selectedItems.includes(item.id)}
-                    onCheckedChange={() => toggleItemSelection(item.id)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <div>{item.name}</div>
-                  <div className="text-sm text-gray-500">{item.description}</div>
-                  {item.isFOC && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Gift className="inline-block mt-1 text-blue-500" size={16} />
-                      </TooltipTrigger>
-                      <TooltipContent>Free of Charge</TooltipContent>
-                    </Tooltip>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div>{item.orderedQuantity} {item.orderUnit} / {item.baseQuantity} {item.baseUnit}</div>
-                  <div className="text-sm text-gray-500">Ordered Qty / Base Qty</div>
-                </TableCell>
-                <TableCell>
-                  <div>{item.receivedQuantity} {item.orderUnit} / {item.baseReceivingQty} {item.baseUnit}</div>
-                  <div className="text-sm text-gray-500">Received Qty / Base Receiving Qty</div>
-                </TableCell>
-                <TableCell>
-                  <div>{item.remainingQuantity} {item.orderUnit}</div>
-                  <div className="text-sm text-gray-500">Remaining Qty</div>
-                </TableCell>
-                <TableCell>
-                  <div>${item.unitPrice.toFixed(2)}</div>
-                  <div className="text-sm text-gray-500">Unit Price</div>
-                </TableCell>
-                <TableCell>
-                  <div>${item.totalPrice.toFixed(2)}</div>
-                  <div className="text-sm text-gray-500">Total Price</div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-2">
-                    <Progress value={(item.receivedQuantity / item.orderedQuantity) * 100} className="w-[60px]" />
-                    <Badge className={`${getStatusColor(item.status)} text-xs px-2 py-0.5`}>{item.status}</Badge>
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">Receiving Status</div>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm"><MoreHorizontal size={16} /></Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onSelect={() => handleViewDetails(item)}>View Details</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => handleEditItem(item)}>Edit Item</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => handleAddNote(item)}>Add Note</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => handleCancelItem(item)}>Delete Item</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <div className="text-sm text-gray-500 mt-1">Actions</div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ) : (
-        <p>No items available.</p>
-      )}                                                                                                          
-        <Button onClick={() => setIsAddItemFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Item
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Purchase Order Items</h2>
+        <Button onClick={() => onAddItem({ id: 'new', name: 'New Item' } as PurchaseOrderItem)}>
+          Add Item
         </Button>
+      </div>
 
-        {isAddItemFormOpen && (
-          <PurchaseOrderItemFormComponent
-            initialMode="add"
-            onClose={() => setIsAddItemFormOpen(false)}
-            initialData={undefined}
-            // onSubmit={handleAddNewItem}
-          />
-        )}
-
-        {viewItemDetails && (
-          <PurchaseOrderItemFormComponent
-
-            initialMode="view"
-            onClose={handleCloseItemDetails}
-            initialData={viewItemDetails}
-            // onSubmit={handleEditItem}
-          />
-        )}
-      </div>                                                                                                              
-    </TooltipProvider>
-  );                                                                                                                    
-}                     
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Item Name</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Ordered Qty</TableHead>
+            <TableHead>Received Qty</TableHead>
+            <TableHead>Unit Price</TableHead>
+            <TableHead>Total Price</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {items.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>{item.name}</TableCell>
+              <TableCell>{item.description}</TableCell>
+              <TableCell>{item.orderedQuantity} {item.orderUnit}</TableCell>
+              <TableCell>{item.receivedQuantity} {item.orderUnit}</TableCell>
+              <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
+              <TableCell>${item.totalPrice.toFixed(2)}</TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(item.status)}>
+                  {item.status}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}

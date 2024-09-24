@@ -69,165 +69,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CreatePOFromPR from "./createpofrompr";
 
 // This is a mock data structure. Replace with actual data fetching logic.
-const purchaseOrders : PurchaseOrder[] = [
-  {
-    poId: 1,
-    number: "PO-001",
-    orderDate: new Date("2023-08-01"),
-    DeliveryDate: new Date("2023-08-15"),
-    vendorId: 1,
-    totalAmount: 1000.0,
-    status: PurchaseOrderStatus.OPEN,
-    email: "orders@luxurylinens.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 1,
-    vendorName: "Luxury Linens",
-    items: [],
-  },
-  {
-    poId: 2,
-    number: "PO-002",
-    orderDate: new Date("2023-08-02"),
-    DeliveryDate: new Date("2023-08-20"),
-    vendorId: 2,
-    totalAmount: 1500.5,
-    status: PurchaseOrderStatus.SENT,
-    email: "sales@gourmetkitchen.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 2,
-    vendorName: "Gourmet Kitchen",
-    items: [],
-  },
-  {
-    poId: 3,
-    number: "PO-003",
-    orderDate: new Date("2023-08-03"),
-    DeliveryDate: new Date("2023-08-25"),
-    vendorId: 3,
-    totalAmount: 2500.75,
-    status: PurchaseOrderStatus.FULLY_RECEIVED,
-    email: "info@elegantfurniture.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 3,
-    vendorName: "Elegant Furniture",
-    items: [],
-  },
-  {
-    poId: 4,
-    number: "PO-004",
-    orderDate: new Date("2023-08-04"),
-    DeliveryDate: new Date("2023-08-30"),
-    vendorId: 4,
-    totalAmount: 750.25,
-    status: PurchaseOrderStatus.OPEN,
-    email: "orders@ecoclean.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 4,
-    vendorName: "Eco Clean",
-    items: [],
-  },
-  {
-    poId: 5,
-    number: "PO-005",
-    orderDate: new Date("2023-08-05"),
-    DeliveryDate: new Date("2023-09-05"),
-    vendorId: 5,
-    totalAmount : 3000.0,
-    status: PurchaseOrderStatus.SENT,
-    email: "sales@smartroom.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 5,
-    vendorName: "Smart Room",
-    items: [],
-  },
-  {
-    poId: 6,
-    number: "PO-006",
-    orderDate: new Date("2023-08-06"),
-    DeliveryDate: new Date("2023-08-10"),
-    vendorId: 6,
-    totalAmount: 500.5,
-    status: PurchaseOrderStatus.PARTIALLY_RECEIVED,
-    email: "orders@hospitalityessentials.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 6,
-    vendorName: "Hospitality Essentials",
-    items: [],
-  },
-  {
-    poId: 7,
-    number: "PO-007",
-    orderDate: new Date("2023-08-07"),
-    DeliveryDate: new Date("2023-08-15"),
-    vendorId: 7,
-    totalAmount: 4500.0,
-    status: PurchaseOrderStatus.OPEN,
-    email: "sales@luxebedding.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 7,
-    vendorName: "Luxury Bedding",
-    items: [],
-  },
-  {
-    poId: 8,
-    number: "PO-008",
-    orderDate: new Date("2023-08-08"),
-    DeliveryDate: new Date("2023-08-18"),
-    vendorId: 8,
-    totalAmount: 2000.25,
-    status: PurchaseOrderStatus.SENT,
-    email: "orders@hotelmaintenance.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 8,
-    vendorName: "Hotel Maintenance",
-    items: [],
-  },
-  {
-    poId: 9,
-    number: "PO-009",
-    orderDate: new Date("2023-08-09"),
-    DeliveryDate: new Date("2023-08-20"),
-    vendorId: 9,
-    totalAmount: 1750.75,
-    status: PurchaseOrderStatus.CANCELLED,
-    email: "info@guestamenities.com",
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 9,
-    vendorName: "Guest Amenities",
-    items: [],
-  },
-  {
-    poId: 10,
-    number: "PO-010",
-    orderDate: new Date("2023-08-10"),
-    DeliveryDate: new Date("2023-08-22"),
-    vendorId: 10,
-    totalAmount: 3500.0,
-    status: PurchaseOrderStatus.PARTIALLY_RECEIVED,
-    email: "sales@premiumhotelfurnishings.com", 
-    currencyCode: "USD",
-    exchangeRate: 1.0,
-    createdBy: 10,
-    vendorName: "Premium Hotel Furnishings",
-    items: [],
-  },
-];
+import { Mock_purchaseOrders } from "@/lib/mock/purchaseOrder";  
+import StatusBadge from "@/components/ui/custom-status-badge";
 
 const PurchaseOrderList: React.FC = () => {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [filteredPOs, setFilteredPOs] = useState(purchaseOrders);
+  const [filteredPOs, setFilteredPOs] = useState(Mock_purchaseOrders);
   const [selectedPOs, setSelectedPOs] = useState<number[]>([]);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isPrintOpen, setIsPrintOpen] = useState(false);
@@ -237,7 +87,7 @@ const PurchaseOrderList: React.FC = () => {
   const [isCreateFromPROpen, setIsCreateFromPROpen] = useState(false);
   const [isCreateManuallyOpen, setIsCreateManuallyOpen] = useState(false);
   const [selectedPRs, setSelectedPRs] = useState<PurchaseRequest[]>([]);
-  const [generatedPOs, setGeneratedPOs] = useState<typeof purchaseOrders>([]);
+  const [generatedPOs, setGeneratedPOs] = useState<typeof Mock_purchaseOrders>([]);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [newManualPO, setNewManualPO] = useState({
     number: "",
@@ -254,7 +104,7 @@ const PurchaseOrderList: React.FC = () => {
   };
 
   useEffect(() => {
-    const filtered = purchaseOrders.filter(
+    const filtered = Mock_purchaseOrders.filter(
       (po) =>
         (po.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
           po.vendorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -292,10 +142,10 @@ const PurchaseOrderList: React.FC = () => {
               ...po,
               status:
                 action === "delete"
-                  ? PurchaseOrderStatus.DELETED
+                  ? PurchaseOrderStatus.Deleted
                   : action === "void"
-                  ? PurchaseOrderStatus.VOIDED
-                  : PurchaseOrderStatus.CLOSED,
+                  ? PurchaseOrderStatus.Voided
+                  : PurchaseOrderStatus.Closed,
             }
           }
           return po
@@ -323,14 +173,14 @@ const PurchaseOrderList: React.FC = () => {
   const handleGeneratePOs = () => {
     const newPOs = selectedPRs.map((pr) => {
       return {
-        poId: Math.max(...purchaseOrders.map((po) => po.poId)) + 1,
+        poId: Math.max(...Mock_purchaseOrders.map((po) => po.poId)) + 1,
         number: `PO-${String(Math.random()).slice(2, 6)}`,
         orderDate: new Date(),
         DeliveryDate: pr.deliveryDate,
         vendorId: pr.vendorId,
         vendorName: "",
         totalAmount: 0 , // pr.totalAmount,
-        status: PurchaseOrderStatus.OPEN,
+        status: PurchaseOrderStatus.Open,
         email: "autogenerated@vendor.com",
       };
     });
@@ -407,33 +257,19 @@ const PurchaseOrderList: React.FC = () => {
         />
         <Label htmlFor="select-all">Select All</Label>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-4">
         {currentItems.map((po) => (
           <Card key={po.poId}>
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                 <div className="flex items-center space-x-4">
                   <Checkbox
                     checked={selectedPOs.includes(po.poId)}
                     onCheckedChange={(checked) => handleSelectPO(po.poId, checked as boolean)}
                   />
-                  <div className="flex items-center space-x-2">
-                    <Badge
-                      variant={
-                        po.status === PurchaseOrderStatus.OPEN
-                          ? "default"
-                          : po.status === PurchaseOrderStatus.SENT
-                          ? "secondary"
-                          : po.status === PurchaseOrderStatus.PARTIALLY_RECEIVED
-                          ? "secondary"
-                          : po.status === PurchaseOrderStatus.CLOSED
-                          ? "outline"
-                          : "destructive"
-                      }
-                    >
-                      {po.status}
-                    </Badge>
-                    <h3 className="text-lg font-semibold">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
+                    <StatusBadge status={po.status} />
+                    <h3 className="text-lg font-semibold mt-2 sm:mt-0">
                       {po.vendorName} <span className="text-sm font-normal text-muted-foreground">({po.number})</span>
                     </h3>
                   </div>
@@ -452,6 +288,38 @@ const PurchaseOrderList: React.FC = () => {
                         <p>View purchase order details</p>
                       </TooltipContent>
                     </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={() => handlePrintPO(po.poId)}>
+                          <Printer className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Print purchase order</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={() => handleSendEmail(po.poId)}>
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Send email</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/procurement/purchase-orders/${po.poId}/edit`}>
+                            <Edit2Icon className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit purchase order</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </TooltipProvider>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -460,7 +328,7 @@ const PurchaseOrderList: React.FC = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      {po.status === PurchaseOrderStatus.OPEN && (
+                      {po.status === PurchaseOrderStatus.Open && (
                         <DropdownMenuItem
                           onSelect={() => handleBulkAction("delete", [po.poId])}
                         >
@@ -468,7 +336,7 @@ const PurchaseOrderList: React.FC = () => {
                           Delete
                         </DropdownMenuItem>
                       )}
-                      {["Send", "Partial Received"].includes(po.status) && (
+                      {["Send", "PartialReceived"].includes(po.status) && (
                         <DropdownMenuItem
                           onSelect={() => handleBulkAction("void", [po.poId])}
                         >
@@ -476,9 +344,7 @@ const PurchaseOrderList: React.FC = () => {
                           Void
                         </DropdownMenuItem>
                       )}
-                      {["Open", "Send", "Partial Received"].includes(
-                        po.status
-                      ) && (
+                      {["Open", "Send", "PartialReceived"].includes(po.status) && (
                         <DropdownMenuItem
                           onSelect={() => handleBulkAction("close", [po.poId])}
                         >
@@ -486,19 +352,19 @@ const PurchaseOrderList: React.FC = () => {
                           Close
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem onSelect={() => handlePrintPO(po.poId)}>
-                        <Printer className="mr-2 h-4 w-4" />
-                        Print
+                      <DropdownMenuItem>
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        Attachments
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => handleSendEmail(po.poId)}>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Send Email
+                      <DropdownMenuItem>
+                        <MessageSquareIcon className="mr-2 h-4 w-4" />
+                        Comments
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </div>
-              <div className="mt-2 grid grid-cols-5 gap-4 text-sm">
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <Label className="text-xs text-muted-foreground">Date</Label>
                   <p>{po.orderDate.toLocaleDateString()}</p>
@@ -513,25 +379,7 @@ const PurchaseOrderList: React.FC = () => {
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Email</Label>
-                  <p>{po.email}</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePrintPO(po.poId)}
-                  >
-                    <Printer className="mr-2 h-4 w-4" />
-                    Print
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleSendEmail(po.poId)}
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Email
-                  </Button>
+                  <p className="truncate">{po.email}</p>
                 </div>
               </div>
             </CardContent>
@@ -718,7 +566,7 @@ const PurchaseOrderList: React.FC = () => {
             <Button
               onClick={() => {
                 const newPO = {
-                  poId: Math.max(...purchaseOrders.map((po) => po.poId)) + 1,
+                  poId: Math.max(...Mock_purchaseOrders.map((po) => po.poId)) + 1,
                   ...newManualPO,
                 };
                 setFilteredPOs([...filteredPOs, newPO as unknown as PurchaseOrder]);
@@ -746,21 +594,21 @@ const PurchaseOrderList: React.FC = () => {
       <Button
         variant="outline"
         onClick={() => handleBulkAction("delete")}
-        disabled={!selectedPOs.some(id => currentItems.find(po => po.poId === id)?.status === PurchaseOrderStatus.OPEN)}
+        disabled={!selectedPOs.some(id => currentItems.find(po => po.poId === id)?.status === PurchaseOrderStatus.Open)}
       >
         Delete Selected
       </Button>
       <Button
         variant="outline"
         onClick={() => handleBulkAction("void")}
-        disabled={!selectedPOs.some(id => ["Send", "Partial Received"].includes(currentItems.find(po => po.poId === id)?.status || ""))}
+        disabled={!selectedPOs.some(id => ["Send", "PartialReceived"].includes(currentItems.find(po => po.poId === id)?.status || ""))}
       >
         Void Selected
       </Button>
       <Button
         variant="outline"
         onClick={() => handleBulkAction("close")}
-        disabled={!selectedPOs.some(id => ["Open", "Send", "Partial Received"].includes(currentItems.find(po => po.poId === id)?.status || ""))}
+        disabled={!selectedPOs.some(id => ["Open", "Send", "PartialReceived"].includes(currentItems.find(po => po.poId === id)?.status || ""))}
       >
         Close Selected
       </Button>
@@ -768,7 +616,16 @@ const PurchaseOrderList: React.FC = () => {
   ) : null;
 
   const actionButtons = (
-    <div className="flex space-x-2">
+    <div className="flex space-x-2 items-center">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="default">New Purchase Order</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onSelect={() => setIsCreateFromPROpen(true)}>Select Purchase Request</DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleCreateManually}>Manually</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Button variant="outline" onClick={() => setIsExportOpen(true)}>
         <FileDown className="mr-2 h-4 w-4" />
         Export
@@ -777,18 +634,9 @@ const PurchaseOrderList: React.FC = () => {
         <Printer className="mr-2 h-4 w-4" />
         Print
       </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Create PO</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onSelect={() => setIsCreateFromPROpen(true)}>Create from PR</DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleCreateManually}>Create Manually</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
-
+  
   return (
     <ListPageTemplate
       title="Purchase Orders"
