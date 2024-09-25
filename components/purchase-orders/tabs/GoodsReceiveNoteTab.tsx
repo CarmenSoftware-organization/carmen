@@ -2,40 +2,66 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-interface GRNItem {
-  id: string;
-  grnNumber: string;
-  receiveDate: string;
-  status: 'Pending' | 'Received' | 'Partially Received';
-  receivedQuantity: number;
-  remarks: string;
-}
+import { GoodsReceiveNote, GoodsReceiveNoteStatus } from '@/lib/types';
+import StatusBadge from '@/components/ui/custom-status-badge';
 
 interface GoodsReceiveNoteTabProps {
-  poData: any; // You might want to type this more specifically
+  poData: {
+    id: string;
+    ref: string;
+    date: Date;
+    status: GoodsReceiveNoteStatus;
+    orderedQuantity: number;
+    receivedQuantity: number;
+    remarks: string;
+    unit: string;
+  }
 }
 
-const GoodsReceiveNoteTab: React.FC<GoodsReceiveNoteTabProps> = ({ poData }) => {
-  // Mock GRN data - in a real application, this would come from your backend
-  const grnItems: GRNItem[] = [
-    {
-      id: '1',
-      grnNumber: 'GRN-001',
-      receiveDate: '2023-08-20',
-      status: 'Received',
-      receivedQuantity: 5,
-      remarks: 'All items received in good condition',
-    },
-    {
-      id: '2',
-      grnNumber: 'GRN-002',
-      receiveDate: '2023-08-25',
-      status: 'Partially Received',
-      receivedQuantity: 3,
-      remarks: 'Partial delivery, remaining items expected next week',
-    },
-  ];
+interface GoodsReceiveNoteItem {
+  id: string;
+  ref: string;
+  date: Date;
+  status: GoodsReceiveNoteStatus;
+  receivedQuantity: number;
+  remarks: string;
+  unit: string;
+}
+
+// Mock items received
+const mockItemsReceived: GoodsReceiveNoteItem[] = [
+  { 
+    id: "GRN001", 
+    ref: "GRN-2023-001",
+    date: new Date("2023-05-15"), 
+    status: "Received", 
+    receivedQuantity: 50, 
+    remarks: "All items in good condition",
+    unit: "unit"
+  },
+  { 
+    id: "GRN002", 
+    ref: "GRN-2023-002",
+    date: new Date("2023-05-20"), 
+    status: "Partial", 
+    receivedQuantity: 30, 
+    remarks: "Some items backordered",
+    unit: "unit"
+  },
+  { 
+    id: "GRN003", 
+    ref: "GRN-2023-003",
+    date: new Date("2023-05-25"), 
+    status: "Pending", 
+    receivedQuantity: 0, 
+    remarks: "Awaiting delivery",
+    unit: "unit"
+  },
+];
+
+function GoodsReceiveNoteTab({ poData }: GoodsReceiveNoteTabProps) {
+  // Use the mock data
+  const grnItems: GoodsReceiveNoteItem[] = mockItemsReceived;
 
   return (
     <div className="space-y-4">
@@ -57,12 +83,10 @@ const GoodsReceiveNoteTab: React.FC<GoodsReceiveNoteTabProps> = ({ poData }) => 
         <TableBody>
           {grnItems.map((item) => (
             <TableRow key={item.id}>
-              <TableCell>{item.grnNumber}</TableCell>
-              <TableCell>{item.receiveDate}</TableCell>
+              <TableCell>{item.ref}</TableCell>
+              <TableCell>{item.date.toLocaleDateString()}</TableCell>
               <TableCell>
-                <Badge variant={item.status === 'Received' ? 'default' : 'secondary'}>
-                  {item.status}
-                </Badge>
+                <StatusBadge status={item.status} />
               </TableCell>
               <TableCell>{item.receivedQuantity}</TableCell>
               <TableCell>{item.remarks}</TableCell>
@@ -75,6 +99,6 @@ const GoodsReceiveNoteTab: React.FC<GoodsReceiveNoteTabProps> = ({ poData }) => 
       </Table>
     </div>
   );
-};
+}
 
 export default GoodsReceiveNoteTab;

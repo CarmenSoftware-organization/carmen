@@ -36,26 +36,26 @@ export interface ExchangeRate {
 
 // Inventory Types
 
-export interface Item {
-  itemId: number;
-  itemCode: string;
-  itemName: string;
-  description?: string;
-  categoryId: number;
-  baseUnitId: number;
-  costingMethod: CostingMethod;
-  isActive: boolean;
-  isSerialized: boolean;
-  minimumQuantity?: number;
-  maximumQuantity?: number;
-  reorderPoint?: number;
-  reorderQuantity?: number;
-  leadTime?: number;
-  lastPurchaseDate?: Date;
-  lastPurchasePrice?: number;
-  lastSaleDate?: Date;
-  lastSalePrice?: number;
-}
+// export interface Item {
+//   itemId: number;
+//   itemCode: string;
+//   itemName: string;
+//   description?: string;
+//   categoryId: number;
+//   baseUnitId: number;
+//   costingMethod: CostingMethod;
+//   isActive: boolean;
+//   isSerialized: boolean;
+//   minimumQuantity?: number;
+//   maximumQuantity?: number;
+//   reorderPoint?: number;
+//   reorderQuantity?: number;
+//   leadTime?: number;
+//   lastPurchaseDate?: Date;
+//   lastPurchasePrice?: number;
+//   lastSaleDate?: Date;
+//   lastSalePrice?: number;
+// }
 
 export enum CostingMethod {
   FIFO = "FIFO",
@@ -201,7 +201,7 @@ export interface Attachment {
   description?: string;
   publicAccess: boolean;
   userId: string;
-  UserName: string;
+  userName: string;
   fileName: string;
   fileType: string;
   fileSize: number;
@@ -336,6 +336,7 @@ export interface GoodsReceiveNote {
   isCash: boolean;
   cashBook?: string;
   items: GoodsReceiveNoteItem[];
+  selectedItems: string[];
   stockMovements: StockMovement[];
   extraCosts: ExtraCost[];
   comments: Comment[];
@@ -399,11 +400,11 @@ export interface StockMovement {
 export type GoodsReceiveNoteMode = "view" | "edit" | "create";
 
 export type GoodsReceiveNoteStatus =
-  | "pending"
-  | "received"
-  | "partial"
-  | "cancelled"
-  | "void";
+  | "Pending"
+  | "Received"
+  | "Partial"
+  | "Cancelled"
+  | "Voided";
 
 export type CostType = "shipping" | "handling" | "insurance" | "other";
 

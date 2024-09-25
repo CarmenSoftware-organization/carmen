@@ -5,6 +5,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     id: "GRN001",
     ref: "GRN-2023-001",
     date: new Date("2023-07-15"),
+    selectedItems: [],
     invoiceDate: new Date("2023-07-14"),
     invoiceNumber: "INV-20230714-001",
     taxInvoiceDate: "2023-07-14",
@@ -14,7 +15,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     vendor: "Hotel Supplies Co.",
     location: "Main Warehouse",
     currency: "USD",
-    status: "received",
+    status: "Received",
     isConsignment: false,
     isCash: false,
     items: [
@@ -137,7 +138,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
         id: "ATT001",
         publicAccess: true,
         userId: "101",
-        UserName: "John Smith",
+        userName: "John Smith",
         fileName: "Luxury Towels.pdf",
         fileType: "application/pdf",
         fileSize: 1024,
@@ -197,6 +198,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
   {
     id: "GRN002",
     ref: "GRN-2023-002",
+    selectedItems: [],
     date: new Date("2023-07-20"),
     invoiceDate: new Date("2023-07-19"),
     invoiceNumber: "INV-20230719-002",
@@ -207,7 +209,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     vendor: "Luxury Amenities Inc.",
     location: "Central Storage",
     currency: "USD",
-    status: "received",
+    status: "Received",
     isConsignment: false,
     isCash: false,
     items: [
@@ -304,6 +306,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
   {
     id: "GRN003",
     ref: "GRN-2023-003",
+    selectedItems: [],
     date: new Date("2023-07-25"),
     invoiceDate: new Date("2023-07-24"),
     invoiceNumber: "INV-20230724-003",
@@ -314,7 +317,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     vendor: "Comfort Bedding Co.",
     location: "Linen Storage",
     currency: "USD",
-    status: "received",
+    status: "Received",
     isConsignment: false,
     isCash: false,
     items: [
@@ -411,6 +414,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
   {
     id: "GRN004",
     ref: "GRN-2023-004",
+    selectedItems: [],
     date: new Date("2023-07-30"),
     invoiceDate: new Date("2023-07-29"),
     invoiceNumber: "INV-20230729-004",
@@ -421,7 +425,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     vendor: "Elegant Bathroom Supplies",
     location: "Main Warehouse",
     currency: "USD",
-    status: "received",
+    status: "Pending",
     isConsignment: false,
     isCash: false,
     items: [
@@ -518,6 +522,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
   {
     id: "GRN005",
     ref: "GRN-2023-005",
+    selectedItems: [],
     date: new Date("2023-08-05"),
     invoiceDate: new Date("2023-08-04"),
     invoiceNumber: "INV-20230804-005",
@@ -528,7 +533,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     vendor: "Hotel Equipment Specialists",
     location: "Equipment Storage",
     currency: "USD",
-    status: "received",
+    status: "Partial",
     isConsignment: false,
     isCash: false,
     items: [

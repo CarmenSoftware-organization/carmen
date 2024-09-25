@@ -1,20 +1,20 @@
 import { GoodsReceiveNote, GoodsReceiveNoteItem, StockMovement, Department, AccountCode, Comment, Attachment, ActivityLogEntry } from './types'
 
-export const sampleDepartments: Department[] = [
+ const sampleDepartments: Department[] = [
   { id: "DEPT-001", name: "Food & Beverage" },
   { id: "DEPT-002", name: "Housekeeping" },
   { id: "DEPT-003", name: "Administration" },
   { id: "DEPT-004", name: "Maintenance" },
 ];
 
-export const sampleAccountCodes: AccountCode[] = [
+ const sampleAccountCodes: AccountCode[] = [
   { id: "ACC-001", code: "1000", name: "Inventory" },
   { id: "ACC-002", code: "2000", name: "Accounts Payable" },
   { id: "ACC-003", code: "2200", name: "Tax Payable" },
   { id: "ACC-004", code: "5000", name: "Cost of Goods Sold" },
 ];
 
-export const sampleGoodsReceiveNotes: GoodsReceiveNote[] = [
+ const sampleGoodsReceiveNotes = [
   {
     id: "GRN-001",
     ref: "GRN-2023-001",

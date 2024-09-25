@@ -2,7 +2,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 
 interface GoodsReceiveNoteItemsBulkActionsProps {
-  selectedItems: number[]
+  selectedItems: string[]
   onBulkAction: (action: string) => void
 }
 

@@ -13,8 +13,8 @@ export function ActivityLogTab({ activityLog }: ActivityLogTabProps) {
   const filteredActivityLog = useMemo(() => {
     return activityLog.filter(entry =>
       entry.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.dateTime.toLowerCase().includes(searchTerm.toLowerCase())
+      entry.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.timestamp.toISOString().toLowerCase().includes(searchTerm.toLowerCase())
     )
   }, [activityLog, searchTerm])
 
@@ -38,8 +38,8 @@ export function ActivityLogTab({ activityLog }: ActivityLogTabProps) {
         <TableBody>
           {filteredActivityLog.map((entry) => (
             <TableRow key={entry.id}>
-              <TableCell>{entry.dateTime}</TableCell>
-              <TableCell>{entry.user}</TableCell>
+              <TableCell>{entry.timestamp.toISOString()}</TableCell>
+              <TableCell>{entry.userName}</TableCell>
               <TableCell>{entry.action}</TableCell>
             </TableRow>
           ))}

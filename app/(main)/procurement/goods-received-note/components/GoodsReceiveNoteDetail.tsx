@@ -32,6 +32,7 @@ interface GoodsReceiveNoteDetailProps {
 const emptyGoodsReceiveNote: GoodsReceiveNote = {
   id: '',
   ref: '',
+  selectedItems: [],
   date: new Date(),
   invoiceDate: new Date(),
   invoiceNumber: '',
@@ -40,7 +41,7 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   vendor: '',
   location: '',
   currency: '',
-  status: 'pending',
+  status: 'Pending',
   cashBook: '',
   items: [],
   stockMovements: [],

@@ -23,6 +23,7 @@ export enum Status {
   SendBack = "SendBack",
   Review = "Review",
   Deleted = "Deleted",
+  Received = "Received",
 }
 
 export interface IBadgeColors {
@@ -52,6 +53,7 @@ export const StatusList: IBadgeColors[] = [
   { key: Status.SendBack, Color: "bg-red-500 text-white" },
   { key: Status.Review, Color: "bg-yellow-500 text-black" },
   { key: Status.Deleted, Color: "bg-red-500 text-white" },
+  { key: Status.Received, Color: "bg-green-500 text-white" },
 ];
 
 export default function StatusBadge({ status }: { status: string }) {

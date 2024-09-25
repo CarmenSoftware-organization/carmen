@@ -33,7 +33,8 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
         fileSize: 0,
         fileUrl: '',
         uploadDate: new Date(),
-        uploaderId: ''
+        userId: '',
+        userName: ''
       })
       setNewFileName('')
       setNewDescription('')
@@ -43,7 +44,7 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
 
   const handleEditClick = (attachment: Attachment) => {
     setEditingAttachmentId(attachment.id)
-    setEditedDescription(attachment.description)
+    setEditedDescription(attachment.description || '')
     setEditedPublicAccess(attachment.publicAccess)
   }
 
@@ -71,7 +72,7 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
         <TableBody>
           {attachments.map((attachment) => (
             <TableRow key={attachment.id}>
-              <TableCell>{attachment.number}</TableCell>
+              <TableCell>{attachment.id}</TableCell>
               <TableCell>{attachment.fileName}</TableCell>
               <TableCell>
                 {editingAttachmentId === attachment.id ? (
@@ -93,8 +94,8 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
                   attachment.publicAccess ? 'Yes' : 'No'
                 )}
               </TableCell>
-              <TableCell>{attachment.date}</TableCell>
-              <TableCell>{attachment.uploader}</TableCell>
+              <TableCell>{attachment.uploadDate.toISOString()}</TableCell>
+              <TableCell>{attachment.userName}</TableCell>
               {mode !== 'view' && (
                 <TableCell>
                   {editingAttachmentId === attachment.id ? (

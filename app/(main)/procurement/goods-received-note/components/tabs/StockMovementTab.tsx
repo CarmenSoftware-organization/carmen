@@ -33,7 +33,7 @@ export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps
               <TableCell>{movement.quantity}</TableCell>
               <TableCell>{movement.fromLocation}</TableCell>
               <TableCell>{movement.toLocation}</TableCell>
-              <TableCell>{movement.date}</TableCell>
+              <TableCell>{movement.date.toISOString().split('T')[0]}</TableCell>
               <TableCell>{movement.status}</TableCell>
             </TableRow>
           ))}

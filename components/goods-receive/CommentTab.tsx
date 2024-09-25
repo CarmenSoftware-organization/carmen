@@ -57,9 +57,9 @@ export function CommentTab({ mode, comments, onAddComment, onEditComment, onDele
         <TableBody>
           {comments.map((comment) => (
             <TableRow key={comment.id}>
-              <TableCell>{comment.number}</TableCell>
-              <TableCell>{comment.date}</TableCell>
-              <TableCell>{comment.author}</TableCell>
+              <TableCell>{comment.id}</TableCell>
+              <TableCell>{comment.timestamp.toISOString().split('T')[0]}</TableCell>
+              <TableCell>{comment.userName}</TableCell>
               <TableCell>
                 {editingCommentId === comment.id ? (
                   <Textarea

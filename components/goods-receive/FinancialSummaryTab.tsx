@@ -90,7 +90,7 @@ export function FinancialSummaryTab({ mode, summary }: FinancialSummaryTabProps)
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">JV Date</label>
-            <Input type="date" value={summary.jvDate} readOnly />
+            <Input type="date" value={summary.jvDate.toISOString().split('T')[0]} readOnly />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">JV Status</label>

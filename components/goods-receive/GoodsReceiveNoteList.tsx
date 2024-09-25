@@ -6,11 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, Edit, Trash } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
-import { sampleGoodsReceiveNotes } from '@/lib/sample-data'
 import { GoodsReceiveNote } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-
-// Make sure these components are properly imported or implemented
+import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 import { FilterBuilder } from '@/app/(main)/procurement/goods-received-note/components/FilterBuilder'
 import { BulkActions } from '@/app/(main)/procurement/goods-received-note/components/BulkActions'
 
@@ -20,8 +18,9 @@ export function GoodsReceiveNoteList() {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [filters, setFilters] = useState<Array<{ field: string; value: string }>>([])
 
-  // Implement search and filter logic here
-  const filteredGRNs = sampleGoodsReceiveNotes.filter((grn: GoodsReceiveNote) => {
+  // Implement search and filter logic her
+
+  const filteredGRNs = mockGoodsReceiveNotes.filter((grn: GoodsReceiveNote) => {
     const matchesSearch = 
       grn.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
       grn.vendor.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,22 +88,14 @@ export function GoodsReceiveNoteList() {
               <Checkbox
                 checked={selectedItems.length === filteredGRNs.length}
                 onCheckedChange={(checked) => {
-                  if (checked) {
-                    setSelectedItems(filteredGRNs.map(grn => grn.id))
-                  } else {
-                    setSelectedItems([])
-                  }
+                  setSelectedItems(checked ? filteredGRNs.map(grn => grn.id) : [])
                 }}
               />
             </TableHead>
             <TableHead>Date</TableHead>
-            <TableHead>Description</TableHead>
             <TableHead>Ref.#</TableHead>
             <TableHead>Vendor</TableHead>
-            <TableHead>Invoice#</TableHead>
-            <TableHead>Invoice Date</TableHead>
             <TableHead>Total Amount</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -114,17 +105,13 @@ export function GoodsReceiveNoteList() {
               <TableCell>
                 <Checkbox
                   checked={selectedItems.includes(grn.id)}
-                  onCheckedChange={(checked) => toggleItemSelection(grn.id)}
+                  onCheckedChange={() => toggleItemSelection(grn.id)}
                 />
               </TableCell>
-              <TableCell>{grn.date}</TableCell>
-              <TableCell>{grn.description}</TableCell>
+              <TableCell>{grn.date.toLocaleDateString()}</TableCell>
               <TableCell>{grn.ref}</TableCell>
               <TableCell>{grn.vendor}</TableCell>
-              <TableCell>{grn.invoiceNumber}</TableCell>
-              <TableCell>{grn.invoiceDate}</TableCell>
               <TableCell>{calculateTotalAmount(grn).toFixed(2)}</TableCell>
-              <TableCell>{grn.status}</TableCell>
               <TableCell>
                 <TooltipProvider>
                   <div className="flex space-x-2">
