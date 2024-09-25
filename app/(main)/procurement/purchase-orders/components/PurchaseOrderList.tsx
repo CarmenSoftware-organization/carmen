@@ -130,11 +130,11 @@ const PurchaseOrderList: React.FC = () => {
   );
 
   const content = (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {filteredPOs.map((po) => (
         <Card key={po.poId} className="hover:bg-accent">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-4">
                 <Checkbox
                   checked={selectedPOs.includes(po.poId)}
@@ -180,7 +180,7 @@ const PurchaseOrderList: React.FC = () => {
                 </TooltipProvider>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div>
                 <Label className="text-xs text-muted-foreground">Date</Label>
                 <p>{po.orderDate.toLocaleDateString()}</p>

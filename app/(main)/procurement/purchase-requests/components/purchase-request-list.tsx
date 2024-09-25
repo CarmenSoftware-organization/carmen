@@ -131,9 +131,9 @@ export function PurchaseRequestList() {
 
   const bulkActions = selectedPRs.length > 0 ? (
     <div className="flex flex-wrap gap-2">
-      <Button variant="outline" size="sm">Delete Selected</Button>
-      <Button variant="outline" size="sm">Approve Selected</Button>
-      <Button variant="outline" size="sm">Reject Selected</Button>
+      <Button variant="outline">Delete Selected</Button>
+      <Button variant="outline">Approve Selected</Button>
+      <Button variant="outline">Reject Selected</Button>
     </div>
   ) : null;
 
@@ -152,7 +152,7 @@ export function PurchaseRequestList() {
             <div className="flex flex-wrap gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" >
                     {selectedType}
                     <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
@@ -166,7 +166,7 @@ export function PurchaseRequestList() {
               </DropdownMenu>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" >
                     {selectedStatus}
                     <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
@@ -189,7 +189,7 @@ export function PurchaseRequestList() {
               </DropdownMenu>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" >
                     <Filter className="mr-2 h-4 w-4" /> More Filters
                   </Button>
                 </DropdownMenuTrigger>
@@ -221,20 +221,15 @@ export function PurchaseRequestList() {
   const actionButtons = (
     <>
     <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={handleCreateNewPR}><Plus className="mr-2 h-4 w-4" /> New PR</Button>
-            <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" /> Export</Button>
-            <Button variant="outline" size="sm"><Printer className="mr-2 h-4 w-4" /> Print</Button>
+            <Button onClick={handleCreateNewPR}><Plus className="mr-2 h-4 w-4" /> New PR</Button>
+            <Button variant="outline" ><Download className="mr-2 h-4 w-4" /> Export</Button>
+            <Button variant="outline" ><Printer className="mr-2 h-4 w-4" /> Print</Button>
           </div>
     </>
   );
 
-  return (
-    <ListPageTemplate
-      title="Purchase Requests"
-      actionButtons={actionButtons}
-      filters={filters}
-      content={
-        <>
+  const content = (
+    <>
           <div className="space-y-2">
             {getCurrentPageData().map((pr) => (
               <Card key={pr.id} className="overflow-hidden p-0 hover:bg-secondary">
@@ -316,7 +311,14 @@ export function PurchaseRequestList() {
             </div>
           </div>
         </>
-      }
+        );
+
+  return (
+    <ListPageTemplate
+      title="Purchase Requests"
+      actionButtons={actionButtons}
+      filters={filters}
+      content={content}
       bulkActions={bulkActions}
     />
   )
