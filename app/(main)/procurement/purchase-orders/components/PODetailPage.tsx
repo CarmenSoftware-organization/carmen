@@ -38,7 +38,7 @@ import {
   PurchaseOrderStatus,
   PurchaseOrder,
 } from "@/lib/types";
-import { Mock_purchaseOrders } from "@/lib/mock/purchaseOrder";
+import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
 
 export function PODetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();

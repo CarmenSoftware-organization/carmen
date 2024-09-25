@@ -1,16 +1,6 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { GoodsReceiveNoteMode } from '@/lib/types'
-
-interface StockMovement {
-  id: number
-  itemName: string
-  quantity: number
-  fromLocation: string
-  toLocation: string
-  date: string
-  status: string
-}
+import { GoodsReceiveNoteMode, StockMovement } from '@/lib/types'
 
 interface StockMovementTabProps {
   mode: GoodsReceiveNoteMode

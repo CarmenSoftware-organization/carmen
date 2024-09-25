@@ -1,37 +1,34 @@
 'use client'
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, Edit, Trash } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
-import { sampleGoodsReceiveNotes } from '@/lib/sample-data'
 import { GoodsReceiveNote } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-
-// Make sure these components are properly imported or implemented
-import { FilterBuilder } from '@/app/(main)/procurement/goods-received-note/components/FilterBuilder'
 import { BulkActions } from '@/app/(main)/procurement/goods-received-note/components/BulkActions'
+import StatusBadge from '@/components/ui/custom-status-badge'
+import { Card, CardContent } from '@/components/ui/card'
+import ListPageTemplate from '@/components/templates/ListPageTemplate'
+import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [filters, setFilters] = useState<Array<{ field: string; value: string }>>([])
+  const [statusFilter, setStatusFilter] = useState('all')
 
   // Implement search and filter logic here
-  const filteredGRNs = sampleGoodsReceiveNotes.filter((grn: GoodsReceiveNote) => {
+  const filteredGRNs = mockGoodsReceiveNotes.filter((grn: GoodsReceiveNote) => {
     const matchesSearch = 
       grn.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
       grn.vendor.toLowerCase().includes(searchTerm.toLowerCase()) ||
       grn.description.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const matchesFilters = filters.every(filter => 
-      String(grn[filter.field as keyof GoodsReceiveNote]).toLowerCase().includes(filter.value.toLowerCase())
-    )
+    const matchesStatus = statusFilter === 'all' || grn.status === statusFilter
 
-    return matchesSearch && matchesFilters
+    return matchesSearch && matchesStatus
   })
 
   const handleBulkAction = (action: string) => {
@@ -45,8 +42,12 @@ export function GoodsReceiveNoteList() {
     );
   };
 
-  const handleFilterChange = (newFilters: Array<{ field: string; value: string }>) => {
-    setFilters(newFilters);
+  const toggleSelectAll = () => {
+    if (selectedItems.length === filteredGRNs.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(filteredGRNs.map(grn => grn.id));
+    }
   };
 
   // Function to calculate total amount
@@ -54,9 +55,41 @@ export function GoodsReceiveNoteList() {
     return grn.items.reduce((total, item) => total + item.netAmount, 0);
   };
 
-  return (
-    <div>
-      <div className="flex items-center space-x-4 mb-4">
+  const title = 'Goods Receive Notes';
+  const actionButtons = (
+    <>
+     <div className="flex space-x-2">
+          <Button>New Goods Receive Note</Button>
+          <Button variant="outline">Export</Button>
+          <Button variant="outline">Print</Button>
+        </div>
+    </>
+  );
+
+  const bulkActions = (
+    <>
+    {selectedItems.length > 0 && (
+        <div className="mb-4">
+          <BulkActions
+            selectedItems={selectedItems}
+            onAction={handleBulkAction}
+          />
+        </div>
+      )}
+
+      <div className="mb-4 flex items-center">
+        <Checkbox
+          checked={selectedItems.length === filteredGRNs.length && filteredGRNs.length > 0}
+          onCheckedChange={toggleSelectAll}
+        />
+        <span className="ml-2">Select All</span>
+      </div>
+    </>
+  )
+
+  const filter = (
+    <>
+     <div className="flex items-center space-x-4 mb-4">
         <div className="flex-grow">
           <Input
             placeholder="Search goods receive notes..."
@@ -64,68 +97,40 @@ export function GoodsReceiveNoteList() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <FilterBuilder
-          fields={[
-            { label: 'Reference Number', value: 'ref' },
-            { label: 'Date', value: 'date' },
-            { label: 'Vendor', value: 'vendor' },
-            { label: 'Status', value: 'status' },
-          ]}
-          onFilterChange={handleFilterChange}
-        />
+        <select 
+          className="border rounded p-2"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">All Statuses</option>
+          <option value="draft">Draft</option>
+          <option value="submitted">Submitted</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <Button variant="outline">More Filters</Button>
       </div>
+    </>
+  )
 
-      <div className="mb-4">
-        <BulkActions
-          selectedItems={selectedItems}
-          onAction={handleBulkAction}
-        />
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">
-              <Checkbox
-                checked={selectedItems.length === filteredGRNs.length}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setSelectedItems(filteredGRNs.map(grn => grn.id))
-                  } else {
-                    setSelectedItems([])
-                  }
-                }}
-              />
-            </TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Ref.#</TableHead>
-            <TableHead>Vendor</TableHead>
-            <TableHead>Invoice#</TableHead>
-            <TableHead>Invoice Date</TableHead>
-            <TableHead>Total Amount</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredGRNs.map((grn) => (
-            <TableRow key={grn.id}>
-              <TableCell>
-                <Checkbox
-                  checked={selectedItems.includes(grn.id)}
-                  onCheckedChange={(checked) => toggleItemSelection(grn.id)}
-                />
-              </TableCell>
-              <TableCell>{grn.date}</TableCell>
-              <TableCell>{grn.description}</TableCell>
-              <TableCell>{grn.ref}</TableCell>
-              <TableCell>{grn.vendor}</TableCell>
-              <TableCell>{grn.invoiceNumber}</TableCell>
-              <TableCell>{grn.invoiceDate}</TableCell>
-              <TableCell>{calculateTotalAmount(grn).toFixed(2)}</TableCell>
-              <TableCell>{grn.status}</TableCell>
-              <TableCell>
+  const content = (
+    <>
+    <div className="space-y-4">
+        {filteredGRNs.map((grn) => (
+          <Card key={grn.id}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-4">
+                  <Checkbox
+                    checked={selectedItems.includes(grn.id)}
+                    onCheckedChange={(checked) => toggleItemSelection(grn.id)}
+                  />
+                  <StatusBadge status={grn.status} />
+                  <div>
+                    <h3 className="font-semibold">{grn.ref}</h3>
+                    <p className="text-sm text-gray-500">{grn.description}</p>
+                  </div>
+                </div>
                 <TooltipProvider>
                   <div className="flex space-x-2">
                     <Tooltip>
@@ -154,11 +159,46 @@ export function GoodsReceiveNoteList() {
                     </Tooltip>
                   </div>
                 </TooltipProvider>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Date</p>
+                  <p>{grn.date.toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Vendor</p>
+                  <p>{grn.vendor}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Invoice #</p>
+                  <p>{grn.invoiceNumber}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Invoice Date</p>
+                  <p>{grn.invoiceDate.toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Total Amount</p>
+                  <p className="font-semibold">${calculateTotalAmount(grn).toFixed(2)}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </>
+  )
+
+  return (
+
+    <ListPageTemplate
+    title={title}
+    actionButtons={actionButtons}
+    filters={filter}
+    content={content}
+    bulkActions={bulkActions}
+    />
+
+
   )
 }

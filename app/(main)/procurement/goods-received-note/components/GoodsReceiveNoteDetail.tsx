@@ -32,8 +32,8 @@ interface GoodsReceiveNoteDetailProps {
 const emptyGoodsReceiveNote: GoodsReceiveNote = {
   id: '',
   ref: '',
-  date: '',
-  invoiceDate: '',
+  date: new Date(),
+  invoiceDate: new Date(),
   invoiceNumber: '',
   description: '',
   receiver: '',
@@ -50,37 +50,14 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   comments: [],
   attachments: [],
   activityLog: [],
-  financialSummary: {
-    netAmount: 0,
-    taxAmount: 0,
-    totalAmount: 0,
-    currency: '',
-    baseNetAmount: 0,
-    baseTaxAmount: 0,
-    baseTotalAmount: 0,
-    baseCurrency: '',
-    jvType: '',
-    jvNumber: '',
-    jvDate: '',
-    jvDescription: '',
-    jvStatus: '',
-    jvReference: '',
-    jvDetail: [],
-    jvTotal: {
-      debit: 0,
-      credit: 0,
-      baseDebit: 0,
-      baseCredit: 0,
-      baseCurrency: ''
-    }
-  }
+  financialSummary: []
 };
 
 export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initialData }: GoodsReceiveNoteDetailProps) {
   const router = useRouter()
   const [formData, setFormData] = useState<GoodsReceiveNote>(initialData || emptyGoodsReceiveNote);
   const [extraCosts, setExtraCosts] = useState<ExtraCost[]>([])
-  const [selectedItems, setSelectedItems] = useState<number[]>([])
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
 
   const handleEditClick = () => {
     if (onModeChange) {
@@ -92,8 +69,8 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
     setExtraCosts(costs);
   };
 
-  const handleItemSelection = (itemId: number, isSelected: boolean) => {
-    if (itemId === -1) { // -1 indicates select all/deselect all
+  const handleItemSelection = (itemId: string, isSelected: boolean) => {
+    if (itemId === "") { // -1 indicates select all/deselect all
       if (isSelected) {
         setSelectedItems(formData.items.map(item => item.id))
       } else {
@@ -149,6 +126,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
     const exchangeRate = 1.2; // Example: 1 USD = 1.2 Base Currency
 
     return {
+      id: '1',  
       netAmount,
       taxAmount,
       totalAmount,
@@ -281,11 +259,11 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             </div>
             <div className="space-y-2 col-span-2">
               <Label htmlFor="date">Date</Label>
-              <Input id="date" type="date" readOnly={mode === 'view'} value={formData.date} />
+              <Input id="date" type="date" readOnly={mode === 'view'} value={formData.date.toISOString()} />
             </div>
             <div className="space-y-2 col-span-2">
               <Label htmlFor="invoiceDate">Invoice Date</Label>
-              <Input id="invoiceDate" type="date" readOnly={mode === 'view'} value={formData.invoiceDate} />
+              <Input id="invoiceDate" type="date" readOnly={mode === 'view'} value={formData.invoiceDate.toISOString()  } />
             </div>
             <div className="space-y-2 col-span-2">
               <Label htmlFor="invoiceNumber">Invoice#</Label>

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNoteDetail } from '@/components/goods-receive/GoodsReceiveNoteDetail'
 import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
-import { sampleGoodsReceiveNotes } from '@/lib/sample-data'
+import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 
 export default function EditGoodsReceiveNote({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -14,7 +14,7 @@ export default function EditGoodsReceiveNote({ params }: { params: { id: string 
   useEffect(() => {
     // In a real application, you would fetch the GRN data from an API
     // For this example, we'll use the sample data
-    const grn = sampleGoodsReceiveNotes.find(grn => grn.id === params.id)
+    const grn = mockGoodsReceiveNotes.find(grn => grn.id === params.id)
     if (grn) {
       setGrnData(grn)
     } else {

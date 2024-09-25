@@ -85,27 +85,6 @@ export enum TransactionType {
   ADJUST = "ADJUST",
 }
 
-// Goods Receive Note (GRN) Types
-
-// export interface GoodsReceiveNote {
-//   grnRefNo: string;
-//   date: Date;
-//   invoiceDate?: Date;
-//   invoiceNo?: string;
-//   taxInvoiceDate?: Date;
-//   taxInvoiceNo?: string;
-//   description?: string;
-//   receiverId: number;
-//   vendorId: number;
-//   locationId: number;
-//   currencyCode: string;
-//   exchangeRate: number;
-//   status: GRNStatus;
-//   isConsignment: boolean;
-//   isCash: boolean;
-//   cashBookId?: number;
-// }
-
 export enum GRNStatus {
   RECEIVED = "RECEIVED",
   COMMITTED = "COMMITTED",
@@ -136,6 +115,15 @@ export interface GRNItem {
   lotNumber?: string;
   expiryDate?: Date;
   comment?: string;
+}
+
+export interface Comment {
+  id: string;
+  userId: string;
+  userName: string;
+  text: string;
+  content: string;
+  timestamp: Date;
 }
 
 export enum GRNItemStatus {
@@ -185,11 +173,11 @@ export interface PurchaseOrderItem {
   totalPrice: number;
   status: string;
   isFOC: boolean;
-  taxRate : number;
-  taxAmount : number;
-  baseTaxAmount : number;
-  discountRate : number;
-  discountAmount : number;
+  taxRate: number;
+  taxAmount: number;
+  baseTaxAmount: number;
+  discountRate: number;
+  discountAmount: number;
   attachments?: Attachment[];
   comment?: string;
   netAmount?: number;
@@ -202,10 +190,23 @@ export interface PurchaseOrderItem {
   lastPrice?: number;
   lastVendorId?: number;
   baseDiscAmount?: number;
-  totalAmount?: number; 
+  totalAmount?: number;
   baseTotalAmount?: number;
   attachedFile?: File | null;
-  received? : GRNItem[];
+  received?: GRNItem[];
+}
+
+export interface Attachment {
+  id: string;
+  description?: string;
+  publicAccess: boolean;
+  userId: string;
+  UserName: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileUrl: string;
+  uploadDate: Date;
 }
 
 export enum PurchaseOrderStatus {
@@ -307,22 +308,6 @@ export interface PurchaseRequestItem {
   totalPrice: Money;
 }
 
-export interface Attachment {
-  id: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
-  fileUrl: string;
-  uploadDate: Date;
-  uploaderId: string;
-}
-
-export interface Comment {
-  id: string;
-  author: string;
-  content: string;
-  timestamp: Date;
-}
 
 export interface WorkflowStep {
   stage: WorkflowStage;
@@ -330,18 +315,14 @@ export interface WorkflowStep {
 }
 
 export interface ActivityLogEntry {
-  id: string;
-  userId: string;
-  activityType: string;
-  description: string;
-  timestamp: Date;
+ 
 }
 
 export interface GoodsReceiveNote {
   id: string;
   ref: string;
-  date: string;
-  invoiceDate: string;
+  date: Date;
+  invoiceDate: Date;
   invoiceNumber: string;
   taxInvoiceDate?: string;
   taxInvoiceNumber?: string;
@@ -360,11 +341,11 @@ export interface GoodsReceiveNote {
   comments: Comment[];
   attachments: Attachment[];
   activityLog: ActivityLogEntry[];
-  financialSummary: FinancialSummary;
+  financialSummary: FinancialSummary[];
 }
 
 export interface GoodsReceiveNoteItem {
-  id: number;
+  id: string;
   name: string;
   description: string;
   orderedQuantity: number;
@@ -377,13 +358,17 @@ export interface GoodsReceiveNoteItem {
   discountRate: number;
   discountAmount: number;
   netAmount: number;
-  expiryDate?: string;
-  batchNumber?: string;
+  expiryDate?: Date;
   serialNumber?: string;
   notes?: string;
   baseQuantity: number;
   basePrice: number;
   baseUnit: string;
+  baseTotalPrice: number;
+  baseTaxRate: number;
+  baseTaxAmount: number;
+  baseDiscountRate: number;
+  baseDiscountAmount: number;
   conversionRate: number;
   extraCost: number;
   applyDiscount: boolean;
@@ -407,7 +392,7 @@ export interface StockMovement {
   quantity: number;
   fromLocation: string;
   toLocation: string;
-  date: string;
+  date: Date;
   status: string;
 }
 
@@ -416,7 +401,7 @@ export type GoodsReceiveNoteMode = "view" | "edit" | "create";
 export type GoodsReceiveNoteStatus =
   | "pending"
   | "received"
-  | "partially_received"
+  | "partial"
   | "cancelled"
   | "void";
 
@@ -429,6 +414,7 @@ export interface ExtraCost {
 }
 
 export interface FinancialSummary {
+  id: string;
   netAmount: number;
   taxAmount: number;
   totalAmount: number;
@@ -439,11 +425,11 @@ export interface FinancialSummary {
   baseCurrency: string;
   jvType: string;
   jvNumber: string;
-  jvDate: string;
+  jvDate: Date;
   jvDescription: string;
   jvStatus: string;
   jvReference: string;
-  jvDetail: JournalEntryDetail[];
+  jvDetail?: JournalEntryDetail[];
   jvTotal: JournalEntryTotal;
 }
 
@@ -467,29 +453,16 @@ export interface JournalEntryTotal {
   baseCurrency: string;
 }
 
-export interface Comment {
-  id: string;
-  number: number;
-  date: string;
-  author: string;
-  text: string;
-}
 
-export interface Attachment {
-  id: string;
-  number: number;
-  fileName: string;
-  description: string;
-  publicAccess: boolean;
-  date: string;
-  uploader: string;
-}
 
 export interface ActivityLogEntry {
   id: string;
-  dateTime: string;
-  user: string;
   action: string;
+  userId: string;
+  userName: string;
+  activityType: string;
+  description: string;
+  timestamp: Date;
 }
 
 export interface Department {
@@ -642,18 +615,6 @@ export interface PurchaseRequestItem {
   totalPrice: Money;
 }
 
-export interface Attachment {
-  id: string;
-  fileName: string;
-  uploadDate: Date;
-}
-
-export interface Comment {
-  id: string;
-  user: string;
-  date: string;
-  text: string;
-}
 
 export interface Budget {
   totalBudget: number;
@@ -664,7 +625,7 @@ export interface Budget {
 export interface ApprovalHistoryItem {
   stage: WorkflowStage;
   approver: string;
-  date: string;
+  date: Date;
   status: string;
 }
 
@@ -737,9 +698,6 @@ export enum CurrencyCode {
   THB = "THB",
 }
 
-
-
-
 export interface Product {
   [x: string]: any;
   id: string;
@@ -773,7 +731,6 @@ export interface Product {
   storageInstructions: string;
   unitConversions: UnitConversion[];
   imagesUrl: string;
-
 }
 
 export interface UnitConversion {
@@ -784,9 +741,8 @@ export interface UnitConversion {
   unitName: string;
 
   conversionFactor: number;
-  unitType: 'INVENTORY' | 'ORDER' | 'RECIPE' | 'COUNTING';
+  unitType: "INVENTORY" | "ORDER" | "RECIPE" | "COUNTING";
 }
-
 
 export interface Vendor {
   id: string;
@@ -803,7 +759,7 @@ export interface Vendor {
 
 export interface Address {
   id: string;
-  addressType: 'MAIN' | 'BILLING' | 'SHIPPING';
+  addressType: "MAIN" | "BILLING" | "SHIPPING";
   addressLine: string;
   subDistrictId: string;
   districtId: string;

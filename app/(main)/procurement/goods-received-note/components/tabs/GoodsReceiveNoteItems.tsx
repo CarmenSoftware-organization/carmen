@@ -13,20 +13,20 @@ interface GoodsReceiveNoteItemsProps {
   mode: GoodsReceiveNoteMode
   items: GoodsReceiveNoteItem[]
   onItemsChange: (items: GoodsReceiveNoteItem[]) => void
-  selectedItems: number[]
-  onItemSelect: (itemId: number, isSelected: boolean) => void
+  selectedItems: string[]
+  onItemSelect: (itemId: string, isSelected: boolean) => void
 }
 
 export function GoodsReceiveNoteItems({ mode, items = [], onItemsChange, selectedItems, onItemSelect }: GoodsReceiveNoteItemsProps) {
-  const [expandedItems, setExpandedItems] = useState<number[]>([])
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
 
-  const toggleExpand = (id: number) => {
+  const toggleExpand = (id: string) => {
     setExpandedItems(prev =>
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     )
   }
 
-  const handleItemChange = (id: number, field: keyof GoodsReceiveNoteItem, value: string | number | boolean) => {
+  const handleItemChange = (id: string, field: keyof GoodsReceiveNoteItem, value: string | number | boolean) => {
     const updatedItems = items.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     )
@@ -35,9 +35,9 @@ export function GoodsReceiveNoteItems({ mode, items = [], onItemsChange, selecte
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      onItemSelect(-1, true) // Use -1 to indicate "select all"
+      onItemSelect("", true) // Use -1 to indicate "select all"
     } else {
-      onItemSelect(-1, false) // Use -1 to indicate "deselect all"
+      onItemSelect("", false) // Use -1 to indicate "deselect all"
     }
   }
 
