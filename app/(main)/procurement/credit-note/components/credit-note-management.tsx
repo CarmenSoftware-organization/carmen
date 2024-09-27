@@ -144,9 +144,9 @@ export function CreditNoteManagement() {
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 pt-4">
           <CardTitle className="text-xl lg:text-2xl font-bold">Credit Notes</CardTitle>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={handleCreateCreditNote}><Plus className="mr-2 h-4 w-4" /> New Credit Note</Button>
-            <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" /> Export</Button>
-            <Button variant="outline" size="sm"><Printer className="mr-2 h-4 w-4" /> Print</Button>
+            <Button variant="default" onClick={handleCreateCreditNote}><Plus className="mr-2 h-4 w-4" /> New Credit Note</Button>
+            <Button variant="outline" ><Download className="mr-2 h-4 w-4" /> Export</Button>
+            <Button variant="outline" ><Printer className="mr-2 h-4 w-4" /> Print</Button>
           </div>
         </CardHeader>
         <CardContent>

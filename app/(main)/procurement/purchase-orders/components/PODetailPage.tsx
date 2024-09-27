@@ -119,52 +119,52 @@ export function PODetailPage({ params }: { params: { id: string } }) {
 
   const title = (
     <div className="flex items-center space-x-2">
-      <h1 className="text-2xl font-bold">Purchase Order</h1>
+      <h1 className="text-xl md:text-2xl font-bold">Purchase Order</h1>
     </div>
   );
 
   const actionButtons = (
-    <>
+    <div className="flex flex-wrap gap-2">
       {isEditing ? (
         <>
-          <Button onClick={handleSave}>
+          <Button onClick={handleSave} size="sm">
             <Edit className="mr-2 h-4 w-4" />
             Save
           </Button>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} size="sm">
             <X className="mr-2 h-4 w-4" />
             Cancel
           </Button>
         </>
       ) : (
         <>
-          <Button onClick={handleEdit}>
+          <Button onClick={handleEdit} size="sm">
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleDelete} size="sm">
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </Button>
-          <Button variant="outline" onClick={handlePrint}>
+          <Button variant="outline" onClick={handlePrint} size="sm">
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>
-          <Button variant="outline" onClick={handleEmail}>
+          <Button variant="outline" onClick={handleEmail} size="sm">
             <Mail className="mr-2 h-4 w-4" />
             Email
           </Button>
         </>
       )}
-    </>
+    </div>
   );
 
   const content = (
     <>
       <Card className="mb-6">
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <Label className="text-xs text-muted-foreground">
                   PO Number
@@ -218,11 +218,13 @@ export function PODetailPage({ params }: { params: { id: string } }) {
                 )}
               </div>
             </div>
-            <Badge
-              variant={poData?.status === "Open" ? "default" : "secondary"}
-            >
-              {poData?.status || ""}
-            </Badge>
+            <div className="flex justify-end">
+              <Badge
+                variant={poData?.status === "Open" ? "default" : "secondary"}
+              >
+                {poData?.status || ""}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ChevronLeft, Edit, Printer, XCircle } from 'lucide-react'
+import { ChevronLeft, Edit, Plus, Printer, XCircle } from 'lucide-react'
 
 export function CreditNoteDetail() {
   const [isEditing, setIsEditing] = useState(false)
@@ -32,7 +32,10 @@ export function CreditNoteDetail() {
                 </>
               ) : (
                 <>
-                  <Button onClick={handleEdit}>Edit</Button>
+                  <Button variant="default" color='primary' onClick={handleEdit}>
+                    <Plus className="mr-2 h-4 w-4 text-current" />
+                    Edit
+                  </Button>
                   <Button variant="destructive">
                     <XCircle className="mr-2 h-4 w-4" />
                     Void

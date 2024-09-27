@@ -262,7 +262,7 @@ export const ItemsTab: React.FC = () => {
 
       <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
         <DialogContent className="sm:max-w-[80vw] max-w-[80vw] p-0 border-none bg-transparent">
-          <DialogHeader className="bg-background rounded-t-lg">
+          {/* <DialogHeader className="bg-background rounded-t-lg">
             <DialogTitle className="p-6">
               {formMode === 'add' ? 'Add New Item' : formMode === 'edit' ? 'Edit Item' : 'View Item'}
             </DialogTitle>
@@ -274,7 +274,7 @@ export const ItemsTab: React.FC = () => {
             >
               <X className="h-4 w-4" />
             </Button>
-          </DialogHeader>
+          </DialogHeader> */}
           <div className="bg-background rounded-b-lg">
             <ItemDetailsEditForm
               onSave={handleSave}

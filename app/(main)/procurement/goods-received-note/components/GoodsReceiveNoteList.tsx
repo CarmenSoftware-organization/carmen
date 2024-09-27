@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote } from '@/lib/types'
@@ -12,6 +12,12 @@ import StatusBadge from '@/components/ui/custom-status-badge'
 import { Card, CardContent } from '@/components/ui/card'
 import ListPageTemplate from '@/components/templates/ListPageTemplate'
 import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
@@ -62,10 +68,10 @@ export function GoodsReceiveNoteList() {
 
   const title = 'Goods Receive Notes'
   const actionButtons = (
-    <div className="flex space-x-2">
-      <Button>New Goods Receive Note</Button>
-      <Button variant="outline">Export</Button>
-      <Button variant="outline">Print</Button>
+    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+      <Button className="w-full sm:w-auto">New Goods Receive Note</Button>
+      <Button variant="outline" className="w-full sm:w-auto">Export</Button>
+      <Button variant="outline" className="w-full sm:w-auto">Print</Button>
     </div>
   )
 
@@ -90,8 +96,8 @@ export function GoodsReceiveNoteList() {
   )
 
   const filter = (
-    <div className="flex items-center space-x-4 mb-4">
-      <div className="flex-grow">
+    <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
+      <div className="w-full sm:w-auto flex-grow">
         <Input
           placeholder="Search goods receive notes..."
           value={searchTerm}
@@ -99,7 +105,7 @@ export function GoodsReceiveNoteList() {
         />
       </div>
       <select 
-        className="border rounded p-2"
+        className="w-full sm:w-auto border rounded p-2"
         value={statusFilter}
         onChange={(e) => setStatusFilter(e.target.value)}
       >
@@ -109,7 +115,7 @@ export function GoodsReceiveNoteList() {
         <option value="approved">Approved</option>
         <option value="rejected">Rejected</option>
       </select>
-      <Button variant="outline">More Filters</Button>
+      <Button variant="outline" className="w-full sm:w-auto">More Filters</Button>
     </div>
   )
 
@@ -118,8 +124,8 @@ export function GoodsReceiveNoteList() {
       {paginatedGRNs.map((grn) => (
         <Card key={grn.id}>
           <CardContent className="p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+              <div className="flex items-center space-x-3 mb-2 sm:mb-0">
                 <Checkbox
                   checked={selectedItems.includes(grn.id)}
                   onCheckedChange={(checked) => toggleItemSelection(grn.id)}
@@ -156,10 +162,22 @@ export function GoodsReceiveNoteList() {
                     </TooltipTrigger>
                     <TooltipContent>Delete</TooltipContent>
                   </Tooltip>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>Print</DropdownMenuItem>
+                      <DropdownMenuItem>Export</DropdownMenuItem>
+                      <DropdownMenuItem>Share</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TooltipProvider>
             </div>
-            <div className="grid grid-cols-6 gap-2 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-sm">
               <div>
                 <p className="text-gray-500">Date</p>
                 <p>{grn.date.toLocaleDateString()}</p>
@@ -176,7 +194,7 @@ export function GoodsReceiveNoteList() {
                 <p className="text-gray-500">Invoice Date</p>
                 <p>{grn.invoiceDate.toLocaleDateString()}</p>
               </div>
-              <div>
+              <div className="col-span-2 sm:col-span-1">
                 <p className="text-gray-500">Total Amount</p>
                 <p className="font-semibold">${calculateTotalAmount(grn).toFixed(2)}</p>
               </div>
@@ -201,8 +219,11 @@ export function GoodsReceiveNoteList() {
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span>
+        <span className="hidden sm:inline">
           Page {currentPage} of {totalPages}
+        </span>
+        <span className="sm:hidden">
+          {currentPage}/{totalPages}
         </span>
         <Button
           variant="outline"

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { X } from "lucide-react"
-
+import { useEffect } from "react"
 // Mock data for demonstration
 const poData = [
   {
@@ -37,6 +37,10 @@ const poData = [
 export function PendingPurchaseOrdersComponent() {
   const totalOnOrder = poData.reduce((total, po) => total + po.qtyToReceive, 0)
 
+  useEffect(() => {
+    console.log("poData", poData);
+  }, [poData]);
+
   const handleClose = () => {
     // Implement close functionality here
     console.log("Close button clicked")
@@ -44,7 +48,7 @@ export function PendingPurchaseOrdersComponent() {
 
   return (
     <>
-    {/* <Card className="w-full mx-auto relative"> */}
+    <Card className="w-full mx-auto relative">
       {/* <CardHeader className="pb-4">
         <CardTitle className="text-2xl font-bold">Pending Purchase Orders</CardTitle>
         <Button
@@ -57,9 +61,9 @@ export function PendingPurchaseOrdersComponent() {
           <span className="sr-only">Close</span>
         </Button>
       </CardHeader> */}
-      {/* <CardContent> */}
-        <ScrollArea className="max-h-[calc(100vh-48rem)] w-full">
-          <Table>
+      <CardContent >
+        <ScrollArea className="max-h-[50vh] w-full">
+          <Table >
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[100px]">PO #</TableHead>
@@ -88,8 +92,8 @@ export function PendingPurchaseOrdersComponent() {
           <span className="font-semibold text-sm text-muted-foreground">Total on Order:</span>
           <span className="font-bold text-lg">{totalOnOrder}</span>
         </div>
-      {/* </CardContent> */}
-    {/* </Card> */}
+      </CardContent>
+    </Card>
     </>
   )
 }

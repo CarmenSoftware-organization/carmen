@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { GoodsReceiveNoteDetail } from '@/components/goods-receive/GoodsReceiveNoteDetail'
+import { GoodsReceiveNoteDetail } from '@/app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail'
 import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
 import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 

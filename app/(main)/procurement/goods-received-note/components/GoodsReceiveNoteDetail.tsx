@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,6 +59,10 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
   const [formData, setFormData] = useState<GoodsReceiveNote>(initialData || emptyGoodsReceiveNote);
   const [extraCosts, setExtraCosts] = useState<ExtraCost[]>([])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
+
+  // useEffect(() => {
+  //   console.log('formData', initialData)
+  // }, [initialData]);
 
   const handleEditClick = () => {
     if (onModeChange) {
@@ -213,7 +217,6 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
         <div className="flex items-center space-x-4">
           <Button variant="ghost" onClick={handleBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
           </Button>
           <h1 className="text-2xl font-bold">
             {mode === 'create' ? 'Create Goods Receive Note' : `Goods Receive Note: ${id}`}
@@ -253,36 +256,36 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
 
       <Card>
         <CardContent className="p-6">
-          <div className="grid grid-cols-8 gap-6">
-            <div className="space-y-2 col-span-2">
+          <div className="grid grid-cols-6 gap-6">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="ref">Ref#</Label>
               <Input id="ref" readOnly={mode === 'view'} value={formData.ref} />
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="date">Date</Label>
-              <Input id="date" type="date" readOnly={mode === 'view'} value={formData.date.toISOString()} />
+              <Input id="date" type="date" readOnly={mode === 'view'} value={formData.date.toISOString().split('T')[0]} />
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="invoiceDate">Invoice Date</Label>
-              <Input id="invoiceDate" type="date" readOnly={mode === 'view'} value={formData.invoiceDate.toISOString()  } />
+              <Input id="invoiceDate" type="date" readOnly={mode === 'view'} value={formData.invoiceDate.toISOString().split('T')[0]} />
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="invoiceNumber">Invoice#</Label>
               <Input id="invoiceNumber" readOnly={mode === 'view'} value={formData.invoiceNumber} />
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="taxInvoiceDate">Tax Invoice Date</Label>
               <Input id="taxInvoiceDate" type="date" readOnly={mode === 'view'} />
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="taxInvoiceNumber">Tax Invoice#</Label>
               <Input id="taxInvoiceNumber" readOnly={mode === 'view'} />
             </div>
-            <div className="space-y-2 col-span-8">
+            <div className="space-y-2 col-span-3">
               <Label htmlFor="description">Description</Label>
               <Textarea id="description" readOnly={mode === 'view'} value={formData.description} />
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="receiver">Receiver</Label>
               <Select disabled={mode === 'view'} value={formData.receiver} onValueChange={(value) => setFormData(prev => ({ ...prev, receiver: value }))}>
                 <SelectTrigger id="receiver">
@@ -296,7 +299,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="vendor">Vendor</Label>
               <Select disabled={mode === 'view'} value={formData.vendor} onValueChange={(value) => setFormData(prev => ({ ...prev, vendor: value }))}>
                 <SelectTrigger id="vendor">
@@ -310,7 +313,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="location">Location</Label>
               <Select disabled={mode === 'view'} value={formData.location} onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}>
                 <SelectTrigger id="location">
@@ -324,7 +327,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="currency">Currency</Label>
               <Select disabled={mode === 'view'} value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
                 <SelectTrigger id="currency">
@@ -338,7 +341,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="status">Status</Label>
               <Select 
                 disabled={mode === 'view'} 
@@ -357,15 +360,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center space-x-2 col-span-2">
-              <Checkbox id="consignment" disabled={mode === 'view'} />
-              <Label htmlFor="consignment">Consignment</Label>
-            </div>
-            <div className="flex items-center space-x-2 col-span-2">
-              <Checkbox id="cash" disabled={mode === 'view'} />
-              <Label htmlFor="cash">Cash</Label>
-            </div>
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <Label htmlFor="cashBook">Cash Book</Label>
               <Select disabled={mode === 'view'} value={formData.cashBook} onValueChange={(value) => setFormData(prev => ({ ...prev, cashBook: value }))}>
                 <SelectTrigger id="cashBook">
@@ -378,6 +373,14 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
                   <SelectItem value="operations">Operations Account</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center space-x-2 col-span-1">
+              <Checkbox id="consignment" disabled={mode === 'view'} />
+              <Label htmlFor="consignment">Consignment</Label>
+            </div>
+            <div className="flex items-center space-x-2 col-span-1">
+              <Checkbox id="cash" disabled={mode === 'view'} />
+              <Label htmlFor="cash">Cash</Label>
             </div>
           </div>
         </CardContent>

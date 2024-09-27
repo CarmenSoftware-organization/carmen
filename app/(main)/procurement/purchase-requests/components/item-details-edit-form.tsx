@@ -426,6 +426,39 @@ export function ItemDetailsEditForm({
                   />
                 </FormField>
               </div>
+                 {/* Inventory Information Section */}
+            <div>
+              <div className="bg-muted p-3 rounded-md">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <div>
+                    <p className="font-medium">On Hand</p>
+                    <p className="text-muted-foreground">
+                      {formData.inventoryInfo?.onHand} Kg
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">On Ordered</p>
+                    <p className="text-muted-foreground">
+                      {formData.inventoryInfo?.onOrdered} Kg
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Reorder Level</p>
+                    <p className="text-muted-foreground">
+                      {formData.inventoryInfo?.reorderLevel} Kg
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Restock Level</p>
+                    <p className="text-muted-foreground">
+                      {formData.inventoryInfo?.restockLevel} Kg
+                    </p>
+                  </div>
+                 
+                </div>
+              </div>
+            </div>
+
             </Card>
 
             {/* Pricing Section */}
@@ -636,6 +669,32 @@ export function ItemDetailsEditForm({
                   </FormField>
                 </div>
               </div>
+                      {/* Inventory Information Section */}
+            <div>
+              <div className="bg-muted p-3 rounded-md">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <div>
+                    <p className="font-medium">Last Price</p>
+                    <p className="text-muted-foreground">
+                      ${formData.inventoryInfo?.lastPrice} per Kg
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Last Order Date</p>
+                    <p className="text-muted-foreground">
+                      {formData.inventoryInfo?.lastOrderDate}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Last Vendor</p>
+                    <p className="text-muted-foreground">
+                      {formData.inventoryInfo?.lastVendor}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             </Card>
 
             {/* Vendor and Additional Information Section */}
@@ -724,65 +783,7 @@ export function ItemDetailsEditForm({
               </div>
             </Card>
 
-            {/* Inventory Information Section */}
-            <div>
-              <h3 className="text-lg font-semibold mb-2">
-                Inventory Information
-              </h3>
-              <div className="bg-muted p-3 rounded-md">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div>
-                    <p className="font-medium">On Hand</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.onHand} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">On Ordered</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.onOrdered} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Reorder Level</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.reorderLevel} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Restock Level</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.restockLevel} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Avg Monthly Usage</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.averageMonthlyUsage} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Last Price</p>
-                    <p className="text-muted-foreground">
-                      ${formData.inventoryInfo?.lastPrice} per Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Last Order Date</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.lastOrderDate}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Last Vendor</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.lastVendor}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+         
             {/* Action Buttons */}
             <div>
               <div className="flex flex-wrap justify-end gap-2">
@@ -800,7 +801,7 @@ export function ItemDetailsEditForm({
                     <Card className="">
                       <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-xl sm:text-2xl font-bold">
-                          Inventory Breakdown
+                          On Hand by Location
                         </CardTitle>
                         <Button
                           variant="ghost"
@@ -818,10 +819,7 @@ export function ItemDetailsEditForm({
                   </DialogContent>
                 </Dialog>
 
-                <Dialog
-                  open={isOnOrderOpen}
-                  onOpenChange={setIsOnOrderOpen}
-                >
+                <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
                   <DialogTrigger asChild>
                     <Button type="button" variant="outline">
                       <TruckIcon className="mr-2 h-4 w-4" />
@@ -876,24 +874,8 @@ export function ItemDetailsEditForm({
                       Vendor Comparison
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[80vw]">
-                    <Card className="">
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="text-xl sm:text-2xl font-bold">
-                          Vendor Comaprison
-                        </CardTitle>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setIsVendorComparisonOpen(false)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </CardHeader>
-                      <CardContent>
-                        <VendorComparison />
-                      </CardContent>
-                    </Card>
+                  <DialogContent className="sm:max-w-[80vw] bg-white p-6" >
+                    <VendorComparison />
                   </DialogContent>
                 </Dialog>
               </div>

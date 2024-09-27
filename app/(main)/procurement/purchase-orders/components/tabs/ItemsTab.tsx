@@ -267,152 +267,147 @@ export default function ItemsTab({ poData }: ItemsTabProps) {
 
         <div className="w-full overflow-auto">
           {poData.items.length > 0 ? (
-            <Table className="w-full">
-              <TableHeader>
-                <TableRow className="h-8">
-                  <TableHead className="w-[50px]">
-                    <Checkbox
-                      checked={selectedItems.length === poData.items.length}
-                      // onCheckedChange={toggleAllSelection}
-                    />
-                  </TableHead>
-                  <TableHead className="min-w-[120px]">Item</TableHead>
-                  <TableHead className="min-w-[200px]">Description</TableHead>
-                  <TableHead className="min-w-[120px]">Approved Qty</TableHead>
-                  <TableHead className="min-w-[120px]">Received Qty</TableHead>
-                  <TableHead className="min-w-[120px]">Remaining Qty</TableHead>
-                  <TableHead className="min-w-[80px]">Unit</TableHead>
-                  <TableHead className="min-w-[100px]">Price</TableHead>
-                  <TableHead className="min-w-[120px]">Total Amount</TableHead>
-                  <TableHead className="min-w-[150px]">
-                    Receiving Status
-                  </TableHead>
-                  <TableHead className="min-w-[120px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {poData.items.map((item) => (
-                  <TableRow key={item.id} className="h-10">
-                    <TableCell className="py-1">
+            <div className="overflow-x-auto">
+              <Table className="w-full min-w-[1200px]">
+                <TableHeader>
+                  <TableRow className="h-8">
+                    <TableHead className="w-[50px]">
                       <Checkbox
-                        checked={selectedItems.includes(item.id)}
-                        onCheckedChange={() => toggleItemSelection(item.id)}
+                        checked={selectedItems.length === poData.items.length}
+                        // onCheckedChange={toggleAllSelection}
                       />
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div>{item.name}</div>
-                      {item.isFOC && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Gift
-                              className="inline-block mt-0.5 text-blue-500"
-                              size={14}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent>Free of Charge</TooltipContent>
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="text-xs">{item.description}</div>
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="text-sm">
-                        {item.orderedQuantity} {item.orderUnit}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {item.baseQuantity} {item.baseUnit}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="text-sm">
-                        {item.receivedQuantity} {item.orderUnit}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {item.baseReceivingQty} {item.baseUnit}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="text-sm">
-                        {item.remainingQuantity} {item.orderUnit}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {(
-                          item.remainingQuantity *
-                          (item.baseQuantity / item.orderedQuantity)
-                        ).toFixed(2)}{" "}
-                        {item.baseUnit}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="text-sm">{item.orderUnit}</div>
-                      <div className="text-xs text-gray-500">
-                        {item.baseUnit}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="text-sm">
-                        ${item.unitPrice.toFixed(2)}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        $
-                        {(
-                          item.unitPrice *
-                          (item.baseQuantity / item.orderedQuantity)
-                        ).toFixed(2)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="text-sm">
-                        ${item.totalPrice.toFixed(2)}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        $
-                        {(
-                          item.totalPrice *
-                          (item.baseQuantity / item.orderedQuantity)
-                        ).toFixed(2)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <StatusBadge status={item.status} />
-                    </TableCell>
-                    <TableCell className="py-1">
-                      <div className="flex space-x-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewDetails(item)}
-                        >
-                          <Eye className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditItem(item)}
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        {/* <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleAddNote(item)}
-                        >
-                          <MessageSquare className="h-3 w-3" />
-                        </Button> */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCancelItem(item)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    </TableHead>
+                    <TableHead className="min-w-[120px]">Item</TableHead>
+                    <TableHead className="min-w-[200px]">Description</TableHead>
+                    <TableHead className="min-w-[120px]">Approved Qty</TableHead>
+                    <TableHead className="min-w-[120px]">Received Qty</TableHead>
+                    <TableHead className="min-w-[120px]">Remaining Qty</TableHead>
+                    <TableHead className="min-w-[80px]">Unit</TableHead>
+                    <TableHead className="min-w-[100px]">Price</TableHead>
+                    <TableHead className="min-w-[120px]">Total Amount</TableHead>
+                    <TableHead className="min-w-[150px]">
+                      Receiving Status
+                    </TableHead>
+                    <TableHead className="sticky right-0 bg-background min-w-[120px]">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {poData.items.map((item) => (
+                    <TableRow key={item.id} className="h-10">
+                      <TableCell className="py-1">
+                        <Checkbox
+                          checked={selectedItems.includes(item.id)}
+                          onCheckedChange={() => toggleItemSelection(item.id)}
+                        />
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div>{item.name}</div>
+                        {item.isFOC && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Gift
+                                className="inline-block mt-0.5 text-blue-500"
+                                size={14}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>Free of Charge</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div className="text-xs">{item.description}</div>
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div className="text-sm">
+                          {item.orderedQuantity} {item.orderUnit}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {item.baseQuantity} {item.baseUnit}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div className="text-sm">
+                          {item.receivedQuantity} {item.orderUnit}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {item.baseReceivingQty} {item.baseUnit}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div className="text-sm">
+                          {item.remainingQuantity} {item.orderUnit}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {(
+                            item.remainingQuantity *
+                            (item.baseQuantity / item.orderedQuantity)
+                          ).toFixed(2)}{" "}
+                          {item.baseUnit}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div className="text-sm">{item.orderUnit}</div>
+                        <div className="text-xs text-gray-500">
+                          {item.baseUnit}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div className="text-sm">
+                          ${item.unitPrice.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          $
+                          {(
+                            item.unitPrice *
+                            (item.baseQuantity / item.orderedQuantity)
+                          ).toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <div className="text-sm">
+                          ${item.totalPrice.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          $
+                          {(
+                            item.totalPrice *
+                            (item.baseQuantity / item.orderedQuantity)
+                          ).toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1">
+                        <StatusBadge status={item.status} />
+                      </TableCell>
+                      <TableCell className="sticky right-0 bg-background py-1">
+                        <div className="flex space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewDetails(item)}
+                          >
+                            <Eye className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditItem(item)}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCancelItem(item)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <p>No items available.</p>
           )}

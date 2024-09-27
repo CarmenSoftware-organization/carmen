@@ -1,4 +1,4 @@
-import { GoodsReceiveNoteDetail } from '@/components/goods-receive/GoodsReceiveNoteDetail'
+import { GoodsReceiveNoteDetail } from '@/app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail'
 import React from 'react'
 export default function GoodsReceiveNoteDetailPage({ params }: { params: { id: string } }) {
   return (

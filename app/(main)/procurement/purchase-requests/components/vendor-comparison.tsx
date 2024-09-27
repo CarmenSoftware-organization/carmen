@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DialogFooter } from "@/components/ui/dialog"
 
 // Mock data for vendors including preferred status, price lists, and ratings
 const initialVendors = [
@@ -18,8 +19,8 @@ const initialVendors = [
     isPreferred: true,
     rating: 4.5,
     priceLists: [
-      { id: 1, name: "Standard", unitPrice: 10, minQuantity: 100, orderUnit: "pcs", bulkPrice: 9.5, isPreferred: true },
-      { id: 2, name: "Premium", unitPrice: 12, minQuantity: 50, orderUnit: "pcs", bulkPrice: 11, isPreferred: false }
+      { id: 1, name: "Standard", unitPrice: 10, minQuantity: 100, orderUnit: "pcs", isPreferred: true },
+      { id: 2, name: "Premium", unitPrice: 12, minQuantity: 50, orderUnit: "pcs", isPreferred: false }
     ]
   },
   { 
@@ -28,8 +29,8 @@ const initialVendors = [
     isPreferred: false,
     rating: 3.8,
     priceLists: [
-      { id: 3, name: "Basic", unitPrice: 11, minQuantity: 50, orderUnit: "pcs", bulkPrice: 10, isPreferred: false },
-      { id: 4, name: "Bulk", unitPrice: 9, minQuantity: 200, orderUnit: "pcs", bulkPrice: 8.5, isPreferred: true }
+      { id: 3, name: "Basic", unitPrice: 11, minQuantity: 50, orderUnit: "pcs", isPreferred: false },
+      { id: 4, name: "Bulk", unitPrice: 9, minQuantity: 200, orderUnit: "pcs",  isPreferred: true }
     ]
   },
   { 
@@ -38,7 +39,7 @@ const initialVendors = [
     isPreferred: false,
     rating: 4.2,
     priceLists: [
-      { id: 5, name: "Standard", unitPrice: 9.5, minQuantity: 200, orderUnit: "pcs", bulkPrice: 9, isPreferred: true }
+      { id: 5, name: "Standard", unitPrice: 9.5, minQuantity: 200, orderUnit: "pcs",  isPreferred: true }
     ]
   },
 ]
@@ -51,7 +52,6 @@ export default function VendorComparison() {
     priceName: "",
     unitPrice: "",
     minQuantity: "",
-    bulkPrice: "",
     orderUnit: "pcs",
   })
   const [selectedVendor, setSelectedVendor] = useState<number | null>(null)
@@ -75,7 +75,7 @@ export default function VendorComparison() {
   }
 
   const handleAddNewVendor = () => {
-    if (newVendor.name && newVendor.rating && newVendor.priceName && newVendor.unitPrice && newVendor.minQuantity && newVendor.bulkPrice) {
+    if (newVendor.name && newVendor.rating && newVendor.priceName && newVendor.unitPrice && newVendor.minQuantity ) {
       const newVendorObj = {
         id: vendors.length + 1,
         name: newVendor.name,
@@ -87,7 +87,6 @@ export default function VendorComparison() {
             name: newVendor.priceName,
             unitPrice: parseFloat(newVendor.unitPrice),
             minQuantity: parseInt(newVendor.minQuantity),
-            bulkPrice: parseFloat(newVendor.bulkPrice),
             orderUnit: newVendor.orderUnit,
             isPreferred: true
           }
@@ -100,7 +99,6 @@ export default function VendorComparison() {
         priceName: "",
         unitPrice: "",
         minQuantity: "",
-        bulkPrice: "",
         orderUnit: "pcs",
       })
     }
@@ -123,20 +121,8 @@ export default function VendorComparison() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle>Vendor Comparison</CardTitle>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleCancelSelection} disabled={selectedVendor === null}>
-              Cancel
-            </Button>
-            <Button onClick={handleSelectVendor} disabled={selectedVendor === null}>
-              Select
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
+    <>
+    
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -145,11 +131,10 @@ export default function VendorComparison() {
                   <TableHead>Vendor</TableHead>
                   <TableHead>Preferred Vendor</TableHead>
                   <TableHead>Rating</TableHead>
-                  <TableHead>Price List</TableHead>
-                  <TableHead>Preferred Price List</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Pref. List</TableHead>
                   <TableHead>Unit Price</TableHead>
                   <TableHead>Min. Quantity</TableHead>
-                  <TableHead>Bulk Price</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -183,18 +168,18 @@ export default function VendorComparison() {
                       </TableCell>
                       <TableCell>${priceList.unitPrice.toFixed(2)} / {priceList.orderUnit}</TableCell>
                       <TableCell>{priceList.minQuantity} {priceList.orderUnit}</TableCell>
-                      <TableCell>${priceList.bulkPrice.toFixed(2)} / {priceList.orderUnit}</TableCell>
                     </TableRow>
                   ))
                 )}
               </TableBody>
             </Table>
           </div>
-
+          
+{/* 
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-4">Add New Vendor</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="lg:col-span-4">
+              <div className="lg:col-span-2">
                 <Label htmlFor="vendorName">Vendor Name</Label>
                 <Input
                   id="vendorName"
@@ -203,28 +188,7 @@ export default function VendorComparison() {
                   placeholder="Enter vendor name"
                 />
               </div>
-              <div className="lg:col-span-4">
-                <Label htmlFor="priceName">Price List Name</Label>
-                <Input
-                  id="priceName"
-                  value={newVendor.priceName}
-                  onChange={(e) => setNewVendor({ ...newVendor, priceName: e.target.value })}
-                  placeholder="Enter price list name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="vendorRating">Rating</Label>
-                <Input
-                  id="vendorRating"
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  value={newVendor.rating}
-                  onChange={(e) => setNewVendor({ ...newVendor, rating: e.target.value })}
-                  placeholder="Enter vendor rating (0-5)"
-                />
-              </div>
+             
               <div>
                 <Label htmlFor="unitPrice">Unit Price</Label>
                 <Input
@@ -253,24 +217,22 @@ export default function VendorComparison() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="bulkPrice">Bulk Price</Label>
+              <div className="lg:col-span-1">
+                <Label htmlFor="requestQty">Request Qty</Label>
                 <Input
-                  id="bulkPrice"
-                  type="number"
-                  value={newVendor.bulkPrice}
-                  onChange={(e) => setNewVendor({ ...newVendor, bulkPrice: e.target.value })}
-                  placeholder="Enter bulk price"
+                  id="requestQty"
+                  // value={newVendor.requestQty}
+                  // onChange={(e) => setNewVendor({ ...newVendor, requestQty: e.target.value })
+                  placeholder="Enter request quantity"
                 />
               </div>
-              <div>
-                <Label htmlFor="minQuantity">Min. Quantity</Label>
+              <div className="lg:col-span-1">
+                <Label htmlFor="approvedQty">Approved Qty</Label>
                 <Input
-                  id="minQuantity"
-                  type="number"
-                  value={newVendor.minQuantity}
-                  onChange={(e) => setNewVendor({ ...newVendor, minQuantity: e.target.value })}
-                  placeholder="Enter min quantity"
+                  id="approvedQty"
+                //  value={newVendor.name}
+                //  onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })}
+                  placeholder="Enter order quantity"
                 />
               </div>
             </div>
@@ -278,9 +240,20 @@ export default function VendorComparison() {
               <Plus className="w-4 h-4 mr-2" />
               Add New Vendor
             </Button>
+          </div> */}
+        {/* </CardContent>
+
+      </Card> */}
+      <DialogFooter>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleCancelSelection} disabled={selectedVendor === null}>
+              Cancel
+            </Button>
+            <Button onClick={handleSelectVendor} disabled={selectedVendor === null}>
+              Select
+            </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+       </DialogFooter>
+    </>
   )
 }
