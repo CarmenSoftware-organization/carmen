@@ -132,3 +132,4 @@ dist
 # env sensitive data  
 .env.local
 
+.aider*
