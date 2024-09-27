@@ -61,6 +61,7 @@ import {
 import InventoryBreakdown from "./inventory-breakdown";
 import VendorComparison from "./vendor-comparison";
 import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type ItemDetailsFormProps = {
   onSave: (formData: FormData) => void;
@@ -92,9 +93,8 @@ const emptyItemData = {
   taxAmount: 0,
   totalAmount: 0,
   vendor: "",
-  vendorItemCode: "",
+  pricelistNumber: "",
   comment: "",
-  image: null,
   createdBy: "",
   createdDate: "",
   lastModifiedBy: "",
@@ -115,6 +115,49 @@ const emptyItemData = {
 
 type FormDataType = typeof emptyItemData;
 
+// Add this mock data near the top of the file, after the imports and before the component definition
+
+const mockItemData: FormDataType = {
+  location: "Main Warehouse",
+  name: "Organic Quinoa",
+  description: "Premium organic white quinoa grains",
+  unit: "Kg",
+  quantityRequested: 500,
+  quantityApproved: 450,
+  deliveryDate: "2023-07-15",
+  deliveryPoint: "Kitchen Storage",
+  currency: "USD",
+  currencyRate: 1,
+  price: 3.99,
+  foc: 10,
+  netAmount: 1795.5,
+  adjustment: false,
+  discountRate: 5,
+  discountAmount: 89.78,
+  taxRate: 7,
+  taxAmount: 119.4,
+  totalAmount: 1825.12,
+  vendor: "Healthy Grains Co.",
+  pricelistNumber: "PL-2023-056",
+  comment: "Bulk order for summer menu",
+  createdBy: "John Doe",
+  createdDate: "2023-06-01",
+  lastModifiedBy: "Jane Smith",
+  lastModifiedDate: "2023-06-05",
+  itemCategory: "Grains",
+  itemSubcategory: "Quinoa",
+  inventoryInfo: {
+    onHand: 100,
+    onOrdered: 200,
+    reorderLevel: 50,
+    restockLevel: 300,
+    averageMonthlyUsage: 400,
+    lastPrice: 3.85,
+    lastOrderDate: "2023-05-15",
+    lastVendor: "Organic Supplies Inc.",
+  },
+};
+
 export function ItemDetailsEditForm({
   onSave,
   onCancel,
@@ -125,47 +168,15 @@ export function ItemDetailsEditForm({
 }: ItemDetailsFormProps) {
   const router = useRouter();
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(
-    initialData?.deliveryDate
-      ? parse(initialData.deliveryDate, "yyyy-MM-dd", new Date())
+    mockItemData.deliveryDate
+      ? parse(mockItemData.deliveryDate, "yyyy-MM-dd", new Date())
       : undefined
   );
-  const [image, setImage] = useState<string | null>(initialData?.image || null);
-  const [formData, setFormData] = useState<FormDataType>(
-    initialData || emptyItemData
-  );
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [formData, setFormData] = useState<FormDataType>(mockItemData);
   const [isInventoryBreakdownOpen, setIsInventoryBreakdownOpen] =
     useState(false);
   const [isVendorComparisonOpen, setIsVendorComparisonOpen] = useState(false);
   const [isOnOrderOpen, setIsOnOrderOpen] = useState(false);
-
-  useEffect(() => {
-    setFormData(initialData || emptyItemData);
-    setDeliveryDate(
-      initialData?.deliveryDate
-        ? parse(initialData.deliveryDate, "yyyy-MM-dd", new Date())
-        : undefined
-    );
-    setImage(initialData?.image || null);
-  }, [initialData]);
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   const handleInputChange = (
     event: React.ChangeEvent<
@@ -194,7 +205,6 @@ export function ItemDetailsEditForm({
     id,
     label,
     required = false,
-    tooltip,
     children,
     smallText,
     baseValue,
@@ -209,16 +219,6 @@ export function ItemDetailsEditForm({
         >
           {label}
         </Label>
-        {tooltip && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <HelpCircle className="h-4 w-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>{tooltip}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
       </div>
       {mode === "view" ? (
         <div className="mt-1 text-sm">
@@ -249,63 +249,59 @@ export function ItemDetailsEditForm({
         <CardTitle className="text-xl sm:text-2xl font-bold">
           {mode === "add" ? "Add New Item" : "Item Details"}
         </CardTitle>
-        <Button variant="ghost" size="icon" onClick={onCancel}>
-          <X className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {mode === "view" && (
+            <Button variant="outline" onClick={() => onModeChange("edit")}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" onClick={onCancel}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
-        <ScrollArea className="h-[70vh] px-4">
+        <ScrollArea className="h-auto px-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Item Details Section */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              <FormField
-                id="location"
-                label="Location"
-                required
-                tooltip="The location where this item is stored"
-              >
-                <Input
-                  id="location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  required
-                  disabled={mode === "view"}
-                />
-              </FormField>
-              <FormField
-                id="name"
-                label="Name"
-                required
-                tooltip="Name of the item"
-              >
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  disabled={mode === "view"}
-                />
-              </FormField>
-              <div className="sm:col-span-2">
-                <FormField
-                  id="description"
-                  label="Description"
-                  required
-                  tooltip="Brief description of the item"
-                >
+            {/* Basic Item Information */}
+            <Card className="px-4 py-2">
+              <h3 className="text-lg font-semibold mb-2">Basic Information</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <FormField id="location" label="Location" required>
                   <Input
-                    id="description"
-                    name="description"
-                    value={formData.description}
+                    id="location"
+                    name="location"
+                    value={formData.location}
                     onChange={handleInputChange}
                     required
                     disabled={mode === "view"}
                   />
                 </FormField>
+                <FormField id="name" label="Name" required>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    disabled={mode === "view"}
+                  />
+                </FormField>
+                <div className="sm:col-span-2">
+                  <FormField id="description" label="Description" required>
+                    <Input
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      required
+                      disabled={mode === "view"}
+                    />
+                  </FormField>
+                </div>
               </div>
-            </div>
+            </Card>
 
             {/* Quantity and Delivery Section */}
             <Card className="px-4 py-2">
@@ -317,7 +313,6 @@ export function ItemDetailsEditForm({
                   id="unit"
                   label="Unit"
                   required
-                  tooltip="Unit of measurement for this item"
                   smallText="Base: Kg | 1 Bag = 0.5 Kg"
                 >
                   <Input
@@ -333,7 +328,6 @@ export function ItemDetailsEditForm({
                   id="quantityRequested"
                   label="Quantity Requested"
                   required
-                  tooltip="Amount of items requested"
                   smallText="5 Kg"
                 >
                   <Input
@@ -351,7 +345,6 @@ export function ItemDetailsEditForm({
                 <FormField
                   id="quantityApproved"
                   label="Quantity Approved"
-                  tooltip="Amount of items approved (if different from requested)"
                   smallText="4.5 Kg"
                 >
                   <Input
@@ -365,12 +358,7 @@ export function ItemDetailsEditForm({
                     disabled={mode === "view"}
                   />
                 </FormField>
-                <FormField
-                  id="deliveryDate"
-                  label="Delivery Date"
-                  required
-                  tooltip="Expected date of delivery"
-                >
+                <FormField id="deliveryDate" label="Delivery Date" required>
                   {mode === "view" ? (
                     <div>
                       {deliveryDate ? format(deliveryDate, "PPP") : "Not set"}
@@ -412,11 +400,7 @@ export function ItemDetailsEditForm({
                     </Popover>
                   )}
                 </FormField>
-                <FormField
-                  id="deliveryPoint"
-                  label="Delivery Point"
-                  tooltip="Specific location for delivery"
-                >
+                <FormField id="deliveryPoint" label="Delivery Point">
                   <Input
                     id="deliveryPoint"
                     name="deliveryPoint"
@@ -426,39 +410,37 @@ export function ItemDetailsEditForm({
                   />
                 </FormField>
               </div>
-                 {/* Inventory Information Section */}
-            <div>
-              <div className="bg-muted p-3 rounded-md">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div>
-                    <p className="font-medium">On Hand</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.onHand} Kg
-                    </p>
+              {/* Inventory Information Section */}
+              <div>
+                <div className="bg-muted p-3 rounded-md">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div>
+                      <p className="font-medium">On Hand</p>
+                      <p className="text-muted-foreground">
+                        {formData.inventoryInfo?.onHand} Kg
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">On Ordered</p>
+                      <p className="text-muted-foreground">
+                        {formData.inventoryInfo?.onOrdered} Kg
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Reorder Level</p>
+                      <p className="text-muted-foreground">
+                        {formData.inventoryInfo?.reorderLevel} Kg
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Restock Level</p>
+                      <p className="text-muted-foreground">
+                        {formData.inventoryInfo?.restockLevel} Kg
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">On Ordered</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.onOrdered} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Reorder Level</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.reorderLevel} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Restock Level</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.restockLevel} Kg
-                    </p>
-                  </div>
-                 
                 </div>
               </div>
-            </div>
-
             </Card>
 
             {/* Pricing Section */}
@@ -469,7 +451,6 @@ export function ItemDetailsEditForm({
                   id="currency"
                   label="Currency"
                   required
-                  tooltip="Currency for pricing"
                   baseValue="USD"
                 >
                   <Select
@@ -493,12 +474,7 @@ export function ItemDetailsEditForm({
                     </SelectContent>
                   </Select>
                 </FormField>
-                <FormField
-                  id="currencyRate"
-                  label="Rate"
-                  tooltip="Exchange rate if applicable"
-                  baseValue="1.000000"
-                >
+                <FormField id="currencyRate" label="Rate" baseValue="1.000000">
                   <Input
                     id="currencyRate"
                     name="currencyRate"
@@ -509,13 +485,7 @@ export function ItemDetailsEditForm({
                     disabled={mode === "view"}
                   />
                 </FormField>
-                <FormField
-                  id="price"
-                  label="Price"
-                  required
-                  tooltip="Price per unit"
-                  baseValue="$5.99"
-                >
+                <FormField id="price" label="Price" required baseValue="$5.99">
                   <Input
                     id="price"
                     name="price"
@@ -528,12 +498,7 @@ export function ItemDetailsEditForm({
                     disabled={mode === "view"}
                   />
                 </FormField>
-                <FormField
-                  id="foc"
-                  label="FOC Qty"
-                  tooltip="Free of Charge quantity"
-                  baseValue="0"
-                >
+                <FormField id="foc" label="FOC Qty" baseValue="0">
                   <Input
                     id="foc"
                     name="foc"
@@ -549,7 +514,6 @@ export function ItemDetailsEditForm({
                   <FormField
                     id="netAmount"
                     label="Net Amount"
-                    tooltip="Net amount before discounts and taxes"
                     baseValue="$59.90"
                   >
                     <Input
@@ -600,7 +564,6 @@ export function ItemDetailsEditForm({
                 <FormField
                   id="discountAmount"
                   label="Discount Amount"
-                  tooltip="Total discount amount"
                   baseValue="$0.00"
                 >
                   <Input
@@ -614,11 +577,7 @@ export function ItemDetailsEditForm({
                     disabled={mode === "view"}
                   />
                 </FormField>
-                <FormField
-                  id="taxRate"
-                  label="Tax Rate"
-                  tooltip="Tax rate as a percentage"
-                >
+                <FormField id="taxRate" label="Tax Rate">
                   <Input
                     id="taxRate"
                     name="taxRate"
@@ -631,12 +590,7 @@ export function ItemDetailsEditForm({
                     disabled={mode === "view"}
                   />
                 </FormField>
-                <FormField
-                  id="taxAmount"
-                  label="Tax Amount"
-                  tooltip="Total tax amount"
-                  baseValue="$4.19"
-                >
+                <FormField id="taxAmount" label="Tax Amount" baseValue="$4.19">
                   <Input
                     id="taxAmount"
                     name="taxAmount"
@@ -652,7 +606,6 @@ export function ItemDetailsEditForm({
                   <FormField
                     id="totalAmount"
                     label="Total Amount"
-                    tooltip="Final total amount"
                     baseValue="$64.09"
                   >
                     <Input
@@ -669,32 +622,31 @@ export function ItemDetailsEditForm({
                   </FormField>
                 </div>
               </div>
-                      {/* Inventory Information Section */}
-            <div>
-              <div className="bg-muted p-3 rounded-md">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div>
-                    <p className="font-medium">Last Price</p>
-                    <p className="text-muted-foreground">
-                      ${formData.inventoryInfo?.lastPrice} per Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Last Order Date</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.lastOrderDate}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Last Vendor</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.lastVendor}
-                    </p>
+              {/* Inventory Information Section */}
+              <div>
+                <div className="bg-muted p-3 rounded-md">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div>
+                      <p className="font-medium">Last Price</p>
+                      <p className="text-muted-foreground">
+                        ${formData.inventoryInfo?.lastPrice} per Kg
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Last Order Date</p>
+                      <p className="text-muted-foreground">
+                        {formData.inventoryInfo?.lastOrderDate}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Last Vendor</p>
+                      <p className="text-muted-foreground">
+                        {formData.inventoryInfo?.lastVendor}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-
             </Card>
 
             {/* Vendor and Additional Information Section */}
@@ -703,87 +655,44 @@ export function ItemDetailsEditForm({
                 Vendor and Additional Information
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <FormField
-                  id="vendor"
-                  label="Vendor"
-                  tooltip="Current vendor for this item"
-                >
+                <FormField id="vendor" label="Vendor">
                   <Input
                     id="vendor"
                     name="vendor"
                     value={formData.vendor}
                     onChange={handleInputChange}
+                    placeholder="Vendor name"
                     disabled={mode === "view"}
                   />
                 </FormField>
-                <FormField
-                  id="comment"
-                  label="Comment"
-                  tooltip="Any additional notes or comments"
-                >
-                  <Textarea
-                    id="comment"
-                    name="comment"
-                    placeholder="Add any additional notes here"
-                    value={formData.comment}
+                <FormField id="pricelistNumber" label="Pricelist Number">
+                  <Input
+                    id="pricelistNumber"
+                    name="pricelistNumber"
+                    value={formData.pricelistNumber}
                     onChange={handleInputChange}
+                    placeholder="Pricelist #"
                     disabled={mode === "view"}
                   />
                 </FormField>
                 <div className="sm:col-span-2">
-                  <FormField
-                    id="image"
-                    label="Image Attachment"
-                    tooltip="Upload an image of the item"
-                  >
+                  <FormField id="comment" label="Comment">
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">
-                        {image ? (
-                          <img
-                            src={image}
-                            alt="Item"
-                            className="max-w-full max-h-40 rounded-md"
-                          />
-                        ) : (
-                          "No image uploaded"
-                        )}
-                      </div>
+                      <div className="mt-1 text-sm">{formData.comment}</div>
                     ) : (
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="file"
-                          id="image"
-                          name="image"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          ref={fileInputRef}
-                          className="hidden"
-                        />
-                        <label htmlFor="image" className="cursor-pointer">
-                          <Button variant="outline" asChild>
-                            <div>
-                              <Upload className="mr-2 h-4 w-4" />
-                              Upload Image
-                            </div>
-                          </Button>
-                        </label>
-                        {image && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleRemoveImage}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      <Textarea
+                        id="comment"
+                        name="comment"
+                        value={formData.comment}
+                        onChange={handleInputChange}
+                        placeholder="Add any additional notes here"
+                      />
                     )}
                   </FormField>
                 </div>
               </div>
             </Card>
 
-         
             {/* Action Buttons */}
             <div>
               <div className="flex flex-wrap justify-end gap-2">
@@ -849,21 +758,6 @@ export function ItemDetailsEditForm({
                     </Card>
                   </DialogContent>
                 </Dialog>
-
-                {/* <Button
-                  type="button"
-                  variant="outline"
-                  disabled={mode === "view"}
-                >
-                  <TruckIcon className="mr-2 h-4 w-4" />
-                  On Order
-                </Button> */}
-
-                {/* <Button type="button" variant="outline" onClick={handleVendorComparison}>
-                <Users className="mr-2 h-4 w-4" />
-                Vendor Comparison
-              </Button> */}
-
                 <Dialog
                   open={isVendorComparisonOpen}
                   onOpenChange={setIsVendorComparisonOpen}
@@ -874,7 +768,7 @@ export function ItemDetailsEditForm({
                       Vendor Comparison
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[80vw] bg-white p-6" >
+                  <DialogContent className="sm:max-w-[80vw] bg-white p-6">
                     <VendorComparison />
                   </DialogContent>
                 </Dialog>
@@ -886,10 +780,6 @@ export function ItemDetailsEditForm({
       <CardFooter className="flex flex-wrap justify-end gap-2 p-4 sm:p-6">
         {mode === "view" ? (
           <>
-            <Button variant="outline" onClick={() => onModeChange("edit")}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
             <Button variant="outline" onClick={onCancel}>
               Close
             </Button>
