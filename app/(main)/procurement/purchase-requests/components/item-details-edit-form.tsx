@@ -303,8 +303,17 @@ export function ItemDetailsEditForm({
               </div>
             </Card>
 
-            {/* Quantity and Delivery Section */}
-            <Card className="px-4 py-2">
+            {/* Tab Section */}
+            <Tabs defaultValue="details" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                <TabsTrigger value="inventory">Inventory</TabsTrigger>
+                <TabsTrigger value="history">History</TabsTrigger>
+              </TabsList>
+              <TabsContent value="details">
+                {/* Quantity and Delivery Section */}
+                <Card className="px-4 py-2">
               <h3 className="text-lg font-semibold mb-2">
                 Quantity and Delivery
               </h3>
