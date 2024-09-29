@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DialogFooter } from "@/components/ui/dialog"
+import StatusBadge from "@/components/ui/custom-status-badge"
 
 // Mock data for vendors including preferred status, price lists, and ratings
 const initialVendors = [
@@ -43,6 +44,16 @@ const initialVendors = [
     ]
   },
 ]
+
+// Sample item data
+const itemData = {
+  name: "Organic Quinoa",
+  description: "Premium organic white quinoa grains",
+  status: "Accepted",
+  requestedQuantity: 500,
+  approvedQuantity: 450,
+  unit: "Kg"
+}
 
 export default function VendorComparison() {
   const [vendors, setVendors] = useState(initialVendors)
@@ -122,138 +133,81 @@ export default function VendorComparison() {
 
   return (
     <>
-    
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">Select</TableHead>
-                  <TableHead>Vendor</TableHead>
-                  <TableHead>Preferred Vendor</TableHead>
-                  <TableHead>Rating</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Pref. List</TableHead>
-                  <TableHead>Unit Price</TableHead>
-                  <TableHead>Min. Quantity</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {vendors.flatMap((vendor) =>
-                  vendor.priceLists.map((priceList, index) => (
-                    <TableRow key={`${vendor.id}-${priceList.id}`}>
-                      {index === 0 && (
-                        <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                          <Checkbox
-                            checked={selectedVendor === vendor.id}
-                            onCheckedChange={() => handleVendorSelection(vendor.id)}
-                          />
-                        </TableCell>
-                      )}
-                      {index === 0 ? (
-                        <>
-                          <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                            {vendor.name}
-                          </TableCell>
-                          <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                            {vendor.isPreferred && <Check className="w-4 h-4 text-green-500" />}
-                          </TableCell>
-                          <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                            {renderRating(vendor.rating)}
-                          </TableCell>
-                        </>
-                      ) : null}
-                      <TableCell>{priceList.name}</TableCell>
-                      <TableCell>
-                        {priceList.isPreferred && <Check className="w-4 h-4 text-green-500" />}
-                      </TableCell>
-                      <TableCell>${priceList.unitPrice.toFixed(2)} / {priceList.orderUnit}</TableCell>
-                      <TableCell>{priceList.minQuantity} {priceList.orderUnit}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          
-{/* 
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold mb-4">Add New Vendor</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="lg:col-span-2">
-                <Label htmlFor="vendorName">Vendor Name</Label>
-                <Input
-                  id="vendorName"
-                  value={newVendor.name}
-                  onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })}
-                  placeholder="Enter vendor name"
-                />
-              </div>
-             
-              <div>
-                <Label htmlFor="unitPrice">Unit Price</Label>
-                <Input
-                  id="unitPrice"
-                  type="number"
-                  value={newVendor.unitPrice}
-                  onChange={(e) => setNewVendor({ ...newVendor, unitPrice: e.target.value })}
-                  placeholder="Enter unit price"
-                />
-              </div>
-              <div>
-                <Label htmlFor="orderUnit">Order Unit</Label>
-                <Select
-                  value={newVendor.orderUnit}
-                  onValueChange={(value) => setNewVendor({ ...newVendor, orderUnit: value })}
-                >
-                  <SelectTrigger id="orderUnit">
-                    <SelectValue placeholder="Select unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pcs">Pieces (pcs)</SelectItem>
-                    <SelectItem value="kg">Kilograms (kg)</SelectItem>
-                    <SelectItem value="lbs">Pounds (lbs)</SelectItem>
-                    <SelectItem value="m">Meters (m)</SelectItem>
-                    <SelectItem value="ft">Feet (ft)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="lg:col-span-1">
-                <Label htmlFor="requestQty">Request Qty</Label>
-                <Input
-                  id="requestQty"
-                  // value={newVendor.requestQty}
-                  // onChange={(e) => setNewVendor({ ...newVendor, requestQty: e.target.value })
-                  placeholder="Enter request quantity"
-                />
-              </div>
-              <div className="lg:col-span-1">
-                <Label htmlFor="approvedQty">Approved Qty</Label>
-                <Input
-                  id="approvedQty"
-                //  value={newVendor.name}
-                //  onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })}
-                  placeholder="Enter order quantity"
-                />
-              </div>
-            </div>
-            <Button onClick={handleAddNewVendor} className="mt-4">
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Vendor
-            </Button>
-          </div> */}
-        {/* </CardContent>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-4">Vendor Comparison</h1>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-bold">{itemData.name}</h2>
+          <StatusBadge status={itemData.status} />
+        </div>
+        <p className="text-gray-600 mb-2">{itemData.description}</p>
+        <div className="flex justify-between text-sm text-gray-500">
+          <span>Requested: {itemData.requestedQuantity} {itemData.unit}</span>
+          <span>Approved: {itemData.approvedQuantity} {itemData.unit}</span>
+        </div>
+      </div>
 
-      </Card> */}
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">Select</TableHead>
+              <TableHead>Vendor</TableHead>
+              <TableHead>Preferred Vendor</TableHead>
+              <TableHead>Rating</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Pref. List</TableHead>
+              <TableHead>Unit Price</TableHead>
+              <TableHead>Min. Quantity</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {vendors.flatMap((vendor) =>
+              vendor.priceLists.map((priceList, index) => (
+                <TableRow key={`${vendor.id}-${priceList.id}`}>
+                  {index === 0 && (
+                    <TableCell rowSpan={vendor.priceLists.length} className="align-top">
+                      <Checkbox
+                        checked={selectedVendor === vendor.id}
+                        onCheckedChange={() => handleVendorSelection(vendor.id)}
+                      />
+                    </TableCell>
+                  )}
+                  {index === 0 ? (
+                    <>
+                      <TableCell rowSpan={vendor.priceLists.length} className="align-top">
+                        {vendor.name}
+                      </TableCell>
+                      <TableCell rowSpan={vendor.priceLists.length} className="align-top">
+                        {vendor.isPreferred && <Check className="w-4 h-4 text-green-500" />}
+                      </TableCell>
+                      <TableCell rowSpan={vendor.priceLists.length} className="align-top">
+                        {renderRating(vendor.rating)}
+                      </TableCell>
+                    </>
+                  ) : null}
+                  <TableCell>{priceList.name}</TableCell>
+                  <TableCell>
+                    {priceList.isPreferred && <Check className="w-4 h-4 text-green-500" />}
+                  </TableCell>
+                  <TableCell>${priceList.unitPrice.toFixed(2)} / {priceList.orderUnit}</TableCell>
+                  <TableCell>{priceList.minQuantity} {priceList.orderUnit}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      
       <DialogFooter>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleCancelSelection} disabled={selectedVendor === null}>
-              Cancel
-            </Button>
-            <Button onClick={handleSelectVendor} disabled={selectedVendor === null}>
-              Select
-            </Button>
-          </div>
-       </DialogFooter>
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={handleCancelSelection} disabled={selectedVendor === null}>
+            Cancel
+          </Button>
+          <Button onClick={handleSelectVendor} disabled={selectedVendor === null}>
+            Select
+          </Button>
+        </div>
+      </DialogFooter>
     </>
   )
 }

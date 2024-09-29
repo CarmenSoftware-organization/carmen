@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, Upload } from "lucide-react"
 
-type FormMode = 'view' | 'edit'
+type FormMode = 'add' | 'view' | 'edit'
 
 interface ItemFormProps {
   initialMode?: FormMode

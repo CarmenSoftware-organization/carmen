@@ -6,7 +6,9 @@
   --background: #ffffffc4;
   --foreground: #171717;
 }
-
+svg {
+  color: inherit;
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

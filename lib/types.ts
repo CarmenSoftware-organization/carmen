@@ -301,11 +301,48 @@ export interface PurchaseRequest_1 {
 // }
 
 export interface PurchaseRequestItem {
-  id: string;
+  id?: string;
+  location: string;
+  name: string;
   description: string;
-  quantity: number;
-  unitPrice: Money;
-  totalPrice: Money;
+  unit: string;
+  quantityRequested: number;
+  quantityApproved: number;
+  deliveryDate: Date;
+  deliveryPoint: string;
+  currency: string;
+  currencyRate: number;
+  price: number;
+  foc: number;
+  netAmount: number;
+  adjustment: boolean;
+  discountRate: number;
+  discountAmount: number;
+  taxRate: number;
+  taxAmount: number;
+  totalAmount: number;
+  vendor: string;
+  pricelistNumber: string;
+  comment: string;
+  createdBy?: string;
+  createdDate?: Date;
+  updatedBy?: string;
+  updatedDate?: Date;
+  itemCategory: string;
+  itemSubcategory: string;
+  status?: 'Accepted' | 'Rejected' | 'Review';
+  inventoryInfo: {
+    onHand: number;
+    onOrdered: number;
+    reorderLevel: number;
+    restockLevel: number;
+    averageMonthlyUsage: number;
+    lastPrice: number;
+    lastOrderDate: Date;
+    lastVendor: string;
+  };
+  accountCode: string;
+  jobCode: string;
 }
 
 
@@ -608,13 +645,13 @@ export interface Requestor {
   department: string;
 }
 
-export interface PurchaseRequestItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: Money;
-  totalPrice: Money;
-}
+// export interface PurchaseRequestItem {
+//   id: string;
+//   description: string;
+//   quantity: number;
+//   unitPrice: Money;
+//   totalPrice: Money;
+// }
 
 
 export interface Budget {

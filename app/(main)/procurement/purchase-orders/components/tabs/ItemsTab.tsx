@@ -54,7 +54,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
-import { PurchaseOrderItemFormComponent } from "./purchase-order-item-form";
+import { ItemDetailsComponent } from "./item-details";
 import {
   Dialog,
   DialogContent,
@@ -74,7 +74,7 @@ interface ItemsTabProps {
   poData: PurchaseOrder;
 }
 
-export default function ItemsTab({ poData }: ItemsTabProps) {
+export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState<Partial<PurchaseOrderItem>>({
@@ -212,10 +212,11 @@ export default function ItemsTab({ poData }: ItemsTabProps) {
     onAddItem(newItem);
     setIsAddItemFormOpen(false);
   };
-  function handleItemUpdate(updatedItem: PurchaseOrderItem) {
-    // onUpdateItem(updatedItem)
+
+  const handleItemUpdate = (updatedItem: PurchaseOrderItem) => {
+    onUpdateItem(updatedItem);
     setEditingItem(null);
-  }
+  };
 
   return (
     <TooltipProvider>
@@ -227,30 +228,30 @@ export default function ItemsTab({ poData }: ItemsTabProps) {
         </div>
 
         {isAddItemFormOpen && (
-          <PurchaseOrderItemFormComponent
+          <ItemDetailsComponent
             initialMode="add"
             onClose={() => setIsAddItemFormOpen(false)}
-            // onSubmit={handleAddNewItem}
+            onSubmit={handleAddNewItem}
             isOpen={isAddItemFormOpen}
           />
         )}
 
         {editingItem && (
-          <PurchaseOrderItemFormComponent
+          <ItemDetailsComponent
             initialMode="edit"
             onClose={() => setEditingItem(null)}
-            // onSubmit={handleItemUpdate}
+            onSubmit={handleItemUpdate}
             isOpen={!!editingItem}
-            // initialData={editingItem}
+            initialData={editingItem}
           />
         )}
 
         {viewingItem && (
-          <PurchaseOrderItemFormComponent
+          <ItemDetailsComponent
             initialMode="view"
             onClose={() => setViewingItem(null)}
             isOpen={!!viewingItem}
-            // initialData={viewingItem}
+            initialData={viewingItem}
           />
         )}
 

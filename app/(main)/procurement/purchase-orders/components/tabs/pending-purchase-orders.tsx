@@ -1,7 +1,7 @@
 'use client'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { X } from "lucide-react"
@@ -61,16 +61,12 @@ export function PendingPurchaseOrdersComponent() {
   return (
     <>
       
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-bold">{itemData.name}</h2>
-          <StatusBadge status={itemData.status} />
-        </div>
-        <p className="text-gray-600 mb-2">{itemData.description}</p>
-        <div className="flex justify-between text-sm text-gray-500">
-          <span>Requested: {itemData.requestedQuantity} {itemData.unit}</span>
-          <span>Approved: {itemData.approvedQuantity} {itemData.unit}</span>
-        </div>
+        
       <Card className="w-full mx-auto relative">
+        <CardHeader className="bg-muted">
+          <CardTitle>{itemData.name}</CardTitle>
+          <CardDescription>{itemData.description}</CardDescription>
+        </CardHeader>
         <CardContent>
           <ScrollArea className="max-h-[50vh] w-full">
             <Table>

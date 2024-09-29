@@ -62,6 +62,8 @@ import InventoryBreakdown from "./inventory-breakdown";
 import VendorComparison from "./vendor-comparison";
 import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PricingFormComponent } from "./pricing-form";
+import StatusBadge from "@/components/ui/custom-status-badge";
 
 type ItemDetailsFormProps = {
   onSave: (formData: FormData) => void;
@@ -73,6 +75,7 @@ type ItemDetailsFormProps = {
 };
 
 const emptyItemData = {
+  status: 'Accepted',
   location: "",
   name: "",
   description: "",
@@ -121,6 +124,7 @@ const mockItemData: FormDataType = {
   location: "Main Warehouse",
   name: "Organic Quinoa",
   description: "Premium organic white quinoa grains",
+  status: 'Accepted',
   unit: "Kg",
   quantityRequested: 500,
   quantityApproved: 450,
@@ -131,7 +135,7 @@ const mockItemData: FormDataType = {
   price: 3.99,
   foc: 10,
   netAmount: 1795.5,
-  adjustment: false,
+  adjustment: true,
   discountRate: 5,
   discountAmount: 89.78,
   taxRate: 7,
@@ -266,7 +270,10 @@ export function ItemDetailsEditForm({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Basic Item Information */}
             <Card className="px-4 py-2">
-              <h3 className="text-lg font-semibold mb-2">Basic Information</h3>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-semibold">Basic Information</h3>
+                  <StatusBadge status={formData.status} />                
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <FormField id="location" label="Location" required>
                   <Input
@@ -307,7 +314,7 @@ export function ItemDetailsEditForm({
               <h3 className="text-lg font-semibold mb-2">
                 Quantity and Delivery
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                 <FormField
                   id="unit"
                   label="Unit"
@@ -353,6 +360,18 @@ export function ItemDetailsEditForm({
                     min="0"
                     step="1"
                     value={formData.quantityApproved}
+                    onChange={handleInputChange}
+                    disabled={mode === "view"}
+                  />
+                </FormField>
+                <FormField id="foc" label="FOC Qty" baseValue="0">
+                  <Input
+                    id="foc"
+                    name="foc"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={formData.foc}
                     onChange={handleInputChange}
                     disabled={mode === "view"}
                   />
@@ -443,211 +462,7 @@ export function ItemDetailsEditForm({
             </Card>
 
             {/* Pricing Section */}
-            <Card className="px-4 py-2">
-              <h3 className="text-lg font-semibold mb-2">Pricing</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <FormField
-                  id="currency"
-                  label="Currency"
-                  required
-                  baseValue="USD"
-                >
-                  <Select
-                    name="currency"
-                    value={formData.currency}
-                    onValueChange={(value) =>
-                      setFormData((prevData: FormDataType) => ({
-                        ...prevData,
-                        currency: value,
-                      }))
-                    }
-                    disabled={mode === "view"}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="THB">THB</SelectItem>
-                      <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <FormField id="currencyRate" label="Rate" baseValue="1.000000">
-                  <Input
-                    id="currencyRate"
-                    name="currencyRate"
-                    type="number"
-                    step="0.000001"
-                    value={formData.currencyRate}
-                    onChange={handleInputChange}
-                    disabled={mode === "view"}
-                  />
-                </FormField>
-                <FormField id="price" label="Price" required baseValue="$5.99">
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    required
-                    disabled={mode === "view"}
-                  />
-                </FormField>
-                <FormField id="foc" label="FOC Qty" baseValue="0">
-                  <Input
-                    id="foc"
-                    name="foc"
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={formData.foc}
-                    onChange={handleInputChange}
-                    disabled={mode === "view"}
-                  />
-                </FormField>
-                <div className="col-span-1">
-                  <FormField
-                    id="netAmount"
-                    label="Net Amount"
-                    baseValue="$59.90"
-                  >
-                    <Input
-                      id="netAmount"
-                      name="netAmount"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.netAmount}
-                      onChange={handleInputChange}
-                      readOnly
-                      disabled={mode === "view"}
-                    />
-                  </FormField>
-                </div>
-                <div className="col-start-1 grid grid-cols-2 gap-3">
-                  <FormField id="adjustment" label="Adjustment">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="adjustment"
-                        name="adjustment"
-                        checked={formData.adjustment}
-                        onCheckedChange={(checked) =>
-                          setFormData((prevData: FormDataType) => ({
-                            ...prevData,
-                            adjustment: checked as boolean,
-                          }))
-                        }
-                        disabled={mode === "view"}
-                      />
-                    </div>
-                  </FormField>
-
-                  <FormField id="discountRate" label="Disc Rate">
-                    <Input
-                      id="discountRate"
-                      name="discountRate"
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                      value={formData.discountRate}
-                      onChange={handleInputChange}
-                      disabled={mode === "view"}
-                    />
-                  </FormField>
-                </div>
-                <FormField
-                  id="discountAmount"
-                  label="Discount Amount"
-                  baseValue="$0.00"
-                >
-                  <Input
-                    id="discountAmount"
-                    name="discountAmount"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.discountAmount}
-                    onChange={handleInputChange}
-                    disabled={mode === "view"}
-                  />
-                </FormField>
-                <FormField id="taxRate" label="Tax Rate">
-                  <Input
-                    id="taxRate"
-                    name="taxRate"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    value={formData.taxRate}
-                    onChange={handleInputChange}
-                    disabled={mode === "view"}
-                  />
-                </FormField>
-                <FormField id="taxAmount" label="Tax Amount" baseValue="$4.19">
-                  <Input
-                    id="taxAmount"
-                    name="taxAmount"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.taxAmount}
-                    onChange={handleInputChange}
-                    disabled={mode === "view"}
-                  />
-                </FormField>
-                <div className="col-span-1">
-                  <FormField
-                    id="totalAmount"
-                    label="Total Amount"
-                    baseValue="$64.09"
-                  >
-                    <Input
-                      id="totalAmount"
-                      name="totalAmount"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.totalAmount}
-                      onChange={handleInputChange}
-                      readOnly
-                      disabled={mode === "view"}
-                    />
-                  </FormField>
-                </div>
-              </div>
-              {/* Inventory Information Section */}
-              <div>
-                <div className="bg-muted p-3 rounded-md">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div>
-                      <p className="font-medium">Last Price</p>
-                      <p className="text-muted-foreground">
-                        ${formData.inventoryInfo?.lastPrice} per Kg
-                      </p>
-                    </div>
-                    <div>
-                      <p className="font-medium">Last Order Date</p>
-                      <p className="text-muted-foreground">
-                        {formData.inventoryInfo?.lastOrderDate}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="font-medium">Last Vendor</p>
-                      <p className="text-muted-foreground">
-                        {formData.inventoryInfo?.lastVendor}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
+              <PricingFormComponent initialMode={mode}  />      
             {/* Vendor and Additional Information Section */}
             <Card className="px-4 py-2">
               <h3 className="text-lg font-semibold mb-2">
@@ -705,7 +520,7 @@ export function ItemDetailsEditForm({
                       On Hand
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[60vw]">
+                  <DialogContent className="sm:max-w-auto">
                     <Card className="">
                       <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-xl sm:text-2xl font-bold">

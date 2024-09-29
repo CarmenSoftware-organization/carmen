@@ -29,9 +29,7 @@ import {
   RotateCcwIcon,
 } from "lucide-react";
 import { PRHeader } from "./PRHeader";
-import { PRForm } from "./PRForm";
 import { ItemsTab } from "./tabs/ItemsTab";
-import { DetailsTab } from "./tabs/DetailsTab";
 import { BudgetsTab } from "./tabs/BudgetsTab";
 import { WorkflowTab } from "./tabs/WorkflowTab";
 import { AttachmentsTab } from "./tabs/AttachmentsTab";

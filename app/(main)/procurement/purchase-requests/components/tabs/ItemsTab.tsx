@@ -10,85 +10,109 @@ import { Separator } from '@/components/ui/separator'
 import { Eye, Edit, X } from 'lucide-react'
 import { ItemDetailsEditForm } from '../item-details-edit-form'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { PurchaseRequestItem } from '@/lib/types'
+import StatusBadge from '@/components/ui/custom-status-badge'
 
-interface Item {
-  id: string,
-  location: string,
-  product: string,
-  comment: string,
-  unit: string,
-  request: {
-    quantity: number,
-    ordering: number
-  },
-  approve: {
-    quantity: number,
-    onHand: number
-  },
-  currency: string,
-  price: {
-    current: number,
-    last: number
-  },
-  total: number,
-  status: string
-}
-
-const itemDetails: Item[] = [
+const itemDetails: PurchaseRequestItem[] = [
   {
     id: '1',
-    location: 'Food Store 1FB01',
-    product: 'Pasta Fettucini brand Best 10100001',
-    comment: 'need to use this with spec with this brand only',
-    unit: 'Kgs',
-    request: {
-      quantity: 50000,
-      ordering: 45000
+    location: 'Warehouse A',
+    name: 'Office Chair',
+    description: 'Ergonomic office chair with lumbar support',
+    unit: 'Piece',
+    quantityRequested: 10,
+    quantityApproved: 8,
+    inventoryInfo: {
+      onHand: 5,
+      onOrdered: 15,
+      lastPrice: 199.99,
+      lastOrderDate: new Date('2023-05-15'),
+      lastVendor: 'Office Supplies Co.',
+      reorderLevel: 10,
+      restockLevel: 20,
+      averageMonthlyUsage: 7
     },
-    approve: {
-      quantity: 100000,
-      onHand: 5000
-    },
-    currency: 'THB',
-    price: {
-      current: 19.80,
-      last: 18.50
-    },
-    total: 990000.00,
-    status: 'A'
+    currency: 'USD',
+    price: 199.99,
+    totalAmount: 1599.92,
+    status: 'Accepted',
+    taxRate: 0.08,
+    taxAmount: 127.99,
+    discountRate: 0.05,
+    discountAmount: 79.99,
+    netAmount: 1647.92,
+    deliveryDate: new Date('2023-07-01'),
+    deliveryPoint: 'Main Office',
+    jobCode: 'OFF-2023',
+    createdDate: new Date('2023-06-01'),
+    updatedDate: new Date('2023-06-10'),
+    createdBy: 'John Doe',
+    updatedBy: 'Jane Smith',
+    itemCategory: 'Furniture',
+    itemSubcategory: 'Seating',
+    vendor: 'Office Supplies Co.',
+    pricelistNumber: 'PL-2023-06',
+    comment: 'Urgent requirement for new hires',
+    adjustment: false,
+    currencyRate: 1,
+    foc: 0,
+    accountCode: 'FURN-1001',
   },
   {
     id: '2',
-    location: 'Food Store 1FB01',
-    product: 'Pasta Fettucini brand Best 10100001',
-    comment: 'need to use this with spec with this brand only',
-    unit: 'Kgs',
-    request: {
-      quantity: 50000,
-      ordering: 48000
+    location: 'Warehouse B',
+    name: 'Laptop',
+    description: 'High-performance laptop for developers',
+    unit: 'Piece',
+    quantityRequested: 5,
+    quantityApproved: 4,
+    inventoryInfo: {
+      onHand: 2,
+      onOrdered: 10,
+      lastPrice: 1299.99,
+      lastOrderDate: new Date('2023-04-20'),
+      lastVendor: 'Tech Solutions Inc.',
+      reorderLevel: 5,
+      restockLevel: 15,
+      averageMonthlyUsage: 3
     },
-    approve: {
-      quantity: 100000,
-      onHand: 2000
-    },
-    currency: 'THB',
-    price: {
-      current: 19.80,
-      last: 18.50
-    },
-    total: 990000.00,
-    status: 'R'
+    currency: 'USD',
+    price: 1299.99,
+    totalAmount: 5199.96,
+    status: 'Review',
+    taxRate: 0.08,
+    taxAmount: 415.99,
+    discountRate: 0.1,
+    discountAmount: 519.99,
+    netAmount: 5095.96,
+    deliveryDate: new Date('2023-07-15'),
+    deliveryPoint: 'IT Department',
+    jobCode: 'IT-2023',
+    createdDate: new Date('2023-06-05'),
+    updatedDate: new Date('2023-06-12'),
+    createdBy: 'Alice Johnson',
+    updatedBy: 'Bob Williams',
+    itemCategory: 'Electronics',
+    itemSubcategory: 'Computers',
+    vendor: 'Tech Solutions Inc.',
+    pricelistNumber: 'PL-2023-06-TECH',
+    comment: 'Needed for new development team',
+    adjustment: true,
+    currencyRate: 1,
+    foc: 0,
+    accountCode: 'TECH-2001',
   }
+  
 ]
 
-export const ItemsTab: React.FC = () => {
+export function ItemsTab() {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [items, setItems] = useState<Item[]>(itemDetails)
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+  const [items, setItems] = useState<PurchaseRequestItem[]>(itemDetails)
+  const [selectedItem, setSelectedItem] = useState<PurchaseRequestItem | null>(null)
   const [isEditFormOpen, setIsEditFormOpen] = useState(false)
   const [formMode, setFormMode] = useState<'view' | 'edit' | 'add'>('view')
 
-  const handleSelectItem = (itemId: string) => {
+  function handleSelectItem(itemId: string) {
     setSelectedItems(prev => 
       prev.includes(itemId) 
         ? prev.filter(id => id !== itemId)
@@ -96,51 +120,49 @@ export const ItemsTab: React.FC = () => {
     )
   }
 
-  const handleSelectAllItems = () => {
+  function handleSelectAllItems() {
     setSelectedItems(prev => 
       prev.length === items.length 
         ? [] 
-        : items.map(item => item.id)
+        : items.map(item => item.id ?? '')
     )
   }
 
-  const openItemForm = (item: Item | null, mode: 'view' | 'edit' | 'add') => {
+  function openItemForm(item: PurchaseRequestItem | null, mode: 'view' | 'edit' | 'add') {
     setSelectedItem(item)
     setFormMode(mode)
     setIsEditFormOpen(true)
   }
 
-  const closeItemForm = () => {
+  function closeItemForm() {
     setSelectedItem(null)
     setIsEditFormOpen(false)
     setFormMode('view')
   }
 
-  const handleSave = (formData: FormData) => {
+  function handleSave(formData: FormData) {
     // Handle saving the form data
     console.log('Saving item:', formData)
     closeItemForm()
     // You would typically update the items state here with the new/updated item
   }
 
-  const handleModeChange = (newMode: 'view' | 'edit' | 'add') => {
+  function handleModeChange(newMode: 'view' | 'edit' | 'add') {
     setFormMode(newMode)
   }
 
-  const handleBulkAction = (action: 'accept' | 'reject' | 'review') => {
-    // Implement bulk action logic here
+  function handleBulkAction(action: 'Accepted' | 'Rejected' | 'Review') {
     console.log(`Bulk ${action} for items:`, selectedItems)
-    // Update the items' status based on the action
     const updatedItems = items.map(item => 
-      selectedItems.includes(item.id) 
-        ? { ...item, status: action === 'accept' ? 'Approved' : action === 'reject' ? 'Rejected' : 'Under Review' }
+      selectedItems.includes(item.id ?? '') 
+        ? { ...item, status: action }
         : item
     )
     setItems(updatedItems)
     setSelectedItems([])
   }
 
-  const handleSplitItems = () => {
+  function handleSplitItems() {
     // Implement split items logic here
     console.log('Splitting items:', selectedItems)
     // You would typically open a dialog or form to handle the split operation
@@ -157,15 +179,15 @@ export const ItemsTab: React.FC = () => {
 
       {selectedItems.length > 0 && (
         <div className="flex space-x-2 mt-4">
-          <Button onClick={() => handleBulkAction('accept')}>
+          <Button onClick={() => handleBulkAction('Accepted')}>
             <CheckCircle className="mr-2 h-4 w-4" />
             Accept Selected
           </Button>
-          <Button onClick={() => handleBulkAction('reject')}>
+          <Button onClick={() => handleBulkAction('Rejected')}>
             <XCircle className="mr-2 h-4 w-4" />
             Reject Selected
           </Button>
-          <Button onClick={() => handleBulkAction('review')}>
+          <Button onClick={() => handleBulkAction('Review')}>
             <RotateCcw className="mr-2 h-4 w-4" />
             Review Selected
           </Button>
@@ -204,31 +226,29 @@ export const ItemsTab: React.FC = () => {
               <TableRow>
                 <TableCell>
                   <Checkbox
-                    checked={selectedItems.includes(item.id)}
-                    onCheckedChange={() => handleSelectItem(item.id)}
+                    checked={selectedItems.includes(item.id ?? '')}
+                    onCheckedChange={() => handleSelectItem(item.id ?? '')}
                   />
                 </TableCell>
                 <TableCell>{item.location}</TableCell>
-                <TableCell>{item.product}</TableCell>
+                <TableCell>{item.name}</TableCell>
                 <TableCell className='align-top'>{item.unit}</TableCell>
                 <TableCell className="text-right align-top">
-                  <div>{item.request.quantity.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">{item.request.ordering.toLocaleString()}</div>
+                  <div>{item.quantityRequested.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">{item.inventoryInfo.onOrdered.toLocaleString()}</div>
                 </TableCell>
                 <TableCell className="text-right align-top">
-                  <div>{item.approve.quantity.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">{item.approve.onHand.toLocaleString()}</div>
+                  <div>{item.quantityApproved.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">{item.inventoryInfo.onHand.toLocaleString()}</div>
                 </TableCell>
                 <TableCell className='align-top'>{item.currency}</TableCell>
                 <TableCell className="text-right align-top">
-                  <div>{item.price.current.toFixed(2)}</div>
-                  <div className="text-xs text-muted-foreground">{item.price.last.toFixed(2)}</div>
+                  <div>{item.price.toFixed(2)}</div>
+                  <div className="text-xs text-muted-foreground">{item.inventoryInfo.lastPrice.toFixed(2)}</div>
                 </TableCell>
-                <TableCell className="text-right align-top">{item.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                <TableCell className="text-right align-top">{item.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                 <TableCell>
-                  <Badge variant={item.status === 'A' ? 'secondary' : 'destructive'}>
-                    {item.status}
-                  </Badge>
+                  <StatusBadge status={item.status ?? '' } />
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end space-x-2">
@@ -251,7 +271,7 @@ export const ItemsTab: React.FC = () => {
                 <TableCell colSpan={11} className="py-2">
                   <div className="flex items-center space-x-2">
                     <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">{item.comment}</span>
+                    <span className="text-sm text-muted-foreground">{item.description}</span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -262,19 +282,6 @@ export const ItemsTab: React.FC = () => {
 
       <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
         <DialogContent className="sm:max-w-[80vw] max-w-[80vw] p-0 border-none bg-transparent">
-          {/* <DialogHeader className="bg-background rounded-t-lg">
-            <DialogTitle className="p-6">
-              {formMode === 'add' ? 'Add New Item' : formMode === 'edit' ? 'Edit Item' : 'View Item'}
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-4 top-4"
-              onClick={closeItemForm}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogHeader> */}
           <div className="bg-background rounded-b-lg">
             <ItemDetailsEditForm
               onSave={handleSave}

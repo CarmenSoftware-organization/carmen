@@ -1,4 +1,4 @@
- "use client"
+"use client"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import StatusBadge from "@/components/ui/custom-status-badge"
 
 // Sample data for inventory locations
 const inventoryData = [
@@ -49,36 +50,49 @@ const inventoryData = [
   },
 ]
 
-export default function InventoryBreakdown() {
+// Sample item data
+const itemData = {
+  name: "Organic Quinoa",
+  description: "Premium organic white quinoa grains",
+  status: "Accepted",
+}
 
+export default function InventoryBreakdown() {
   return (
     <>
-          <Table className="w-full mx-auto">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[180px]">Location</TableHead>
-                <TableHead>Quantity On Hand</TableHead>
-                <TableHead>Units</TableHead>
-                <TableHead>Par</TableHead>
-                <TableHead>Reorder Point</TableHead>
-                <TableHead>Min Stock</TableHead>
-                <TableHead>Max Stock</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {inventoryData.map((item) => (
-                <TableRow key={item.location}>
-                  <TableCell className="font-medium">{item.location}</TableCell>
-                  <TableCell>{item.quantityOnHand}</TableCell>
-                  <TableCell>{item.units}</TableCell>
-                  <TableCell>{item.par}</TableCell>
-                  <TableCell>{item.reorderPoint}</TableCell>
-                  <TableCell>{item.minStock}</TableCell>
-                  <TableCell>{item.maxStock}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-bold">{itemData.name}</h2>
+          <StatusBadge status={itemData.status} />
+        </div>
+        <p className="text-gray-600">{itemData.description}</p>
+      </div>
+      <Table className="w-full mx-auto">
+        <TableHeader>
+          <TableRow className="text-nowrap">
+            <TableHead className="w-[180px]">Location</TableHead>
+            <TableHead >Quantity On Hand</TableHead>
+            <TableHead>Units</TableHead>
+            <TableHead >Par</TableHead>
+            <TableHead >Reorder Point</TableHead>
+            <TableHead >Min Stock</TableHead>
+            <TableHead >Max Stock</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {inventoryData.map((item) => (
+            <TableRow className="text-nowrap" key={item.location}>
+              <TableCell className="font-medium">{item.location}</TableCell>
+              <TableCell>{item.quantityOnHand}</TableCell>
+              <TableCell>{item.units}</TableCell>
+              <TableCell>{item.par}</TableCell>
+              <TableCell>{item.reorderPoint}</TableCell>
+              <TableCell>{item.minStock}</TableCell>
+              <TableCell>{item.maxStock}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </>
   )
 }

@@ -26,6 +26,7 @@ type ItemDetailsFormProps = {
 type FormMode = 'add' | 'edit' | 'view'
 
 const sampleItemData = {
+  status: 'Accepted',
   location: "FB: Food & Beverage",
   name: "Premium Coffee Beans",
   description: "Organic, fair-trade coffee beans (1kg bag)",
