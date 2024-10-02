@@ -12,7 +12,6 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   FileIcon,
@@ -61,6 +60,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import StatusBadge from "@/components/ui/custom-status-badge";
+import SummaryTotal from "./SummaryTotal";
 
 export default function PRDetailPage() {
   const router = useRouter();
@@ -289,7 +289,7 @@ export default function PRDetailPage() {
         <CardContent className="pt-0">
           <Tabs defaultValue="items" className="w-full">
             <TabsList className="grid w-full grid-cols-5">
-              {["items", "budgets", "workflow", "attachments", "activity"].map(
+              {["items", "budgets", "workflow", "attachments", "activity", "summary"].map(
                 (tab) => (
                   <TabsTrigger key={tab} value={tab}>
                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -314,6 +314,9 @@ export default function PRDetailPage() {
                 <TabsContent value="activity">
                   <ActivityTab />
                 </TabsContent>
+                <TabsContent value="summary">
+                  <SummaryTotal prData={formData} />
+                </TabsContent>
               </ScrollArea>
               {(mode === "edit" || mode === "add") && (
                 <Button type="submit" className="mt-6">
@@ -322,6 +325,17 @@ export default function PRDetailPage() {
               )}
             </form>
           </Tabs>
+          
+            {/* Add SummaryTotal component here */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Purchase Request Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SummaryTotal prData={formData} />
+            </CardContent>
+          </Card>
+
         </CardContent>
         {mode !== "add" && (
           <CardFooter className="flex justify-end space-x-2">
@@ -374,8 +388,19 @@ function getEmptyPurchaseRequest(): PurchaseRequest {
     department: "",
     jobCode: "",
     estimatedTotal: 0,
+    currency:"THB",
     vendor: "",
     vendorId: 0,
     deliveryDate: new Date(),
+    baseSubTotalPrice : 0,
+    subTotalPrice: 0,
+    baseNetAmount: 0,
+    netAmount: 0,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 0,
+    taxAmount: 0,
+    baseTotalAmount: 0,
+    totalAmount: 0,
   };
 }

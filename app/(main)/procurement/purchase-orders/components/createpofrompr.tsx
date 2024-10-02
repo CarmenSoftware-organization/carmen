@@ -4,12 +4,11 @@ import React, { useState, useMemo } from "react";
 import {
   CurrencyCode,
   DocumentStatus,
-  PurchaseRequest_3,
+  PurchaseRequest,
   WorkflowStage,
   WorkflowStatus,
 } from "@/lib/types";
 import { PRType } from "@/lib/types";
-import { PurchaseRequest } from "@/lib/types"; // Add this import
 import {
   Table,
   TableBody,
@@ -32,39 +31,75 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
 // Updated mock data for Purchase Requests
-const purchaseRequests: PurchaseRequest_3[] = [
+// Mock data for Purchase Requests
+const purchaseRequests: PurchaseRequest[] = [
   {
     id: "1",
     refNumber: "PR001",
-    date: new Date("2023-01-01"),
-    type: PRType.MarketList,
-    vendor: "Vendor A",
+    date: new Date("2023-06-15"),
+    type: PRType.GeneralPurchase,
+    vendor: "Office Supplies Co.",
     vendorId: 1,
-    deliveryDate: new Date("2023-01-10"),
-    description: "Market list for fresh produce",
+    deliveryDate: new Date("2023-06-30"),
+    description: "Office supplies for Q3",
     requestorId: "user1",
     requestor: {
-      name: "John Doe",
+      name: "Jane Smith",
       id: "user1",
-      department: "IT",
+      department: "Administration",
+    },
+    status: DocumentStatus.InProgress,
+    workflowStatus: WorkflowStatus.approved,
+    currentWorkflowStage: WorkflowStage.completed,
+    location: "Head Office",
+    department: "Administration",
+    jobCode: "ADM2023Q3",
+    estimatedTotal: 1500,
+    currency: CurrencyCode.USD,
+    baseSubTotalPrice: 550,
+    subTotalPrice: 550,
+    baseNetAmount: 550,
+    netAmount: 550,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 55,
+    taxAmount: 55,
+    baseTotalAmount: 605,
+    totalAmount: 605,
+  },
+  {
+    id: "2",
+    refNumber: "PR002",
+    date: new Date("2023-06-20"),
+    type: PRType.MarketList,
+    vendor: "Fresh Foods Inc.",
+    vendorId: 2,
+    deliveryDate: new Date("2023-06-25"),
+    description: "Weekly fresh produce order",
+    requestorId: "user2",
+    requestor: {
+      name: "Bob Brown",
+      id: "user2",
+      department: "Cafeteria",
     },
     status: DocumentStatus.Submitted,
-    workflowStatus: WorkflowStatus.approved,
+    workflowStatus: WorkflowStatus.pending,
     currentWorkflowStage: WorkflowStage.departmentHeadApproval,
-    location: "Warehouse 1",
-    department: "IT",
-    jobCode: "JOB001",
-    estimatedTotal: 1000,
+    location: "Main Cafeteria",
+    department: "Food Services",
+    jobCode: "CAF2023W25",
+    estimatedTotal: 800,
     currency: CurrencyCode.USD,
-    items: [],
-    attachments: [],
-    comments: [],
-    budget: {
-      totalBudget: 100,
-      availableBudget: 100,
-      allocatedBudget: 100,
-    },
-    approvalHistory: [],
+    baseSubTotalPrice: 100,
+    subTotalPrice: 100,
+    baseNetAmount: 100,
+    netAmount: 100,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 0,
+    taxAmount: 0,
+    baseTotalAmount: 100,
+    totalAmount: 100,
   },
 ];
 
@@ -74,7 +109,7 @@ type SortConfig = {
 };
 
 interface CreatePOFromPRProps {
-  onSelectPRs: (selectedPRs: PurchaseRequest_3[]) => void;
+  onSelectPRs: (selectedPRs: PurchaseRequest[]) => void;
 }
 
 export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {

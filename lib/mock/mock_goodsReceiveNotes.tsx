@@ -8,7 +8,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     selectedItems: [],
     invoiceDate: new Date("2023-07-14"),
     invoiceNumber: "INV-20230714-001",
-    taxInvoiceDate: "2023-07-14",
+    taxInvoiceDate: new Date("2023-07-14"),
     taxInvoiceNumber: "TAX-20230714-001",
     description: "Hotel Supplies Delivery",
     receiver: "John Smith",
@@ -18,6 +18,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     status: "Received",
     isConsignment: false,
     isCash: false,
+    cashBook: "General Cash Book",
     items: [
       {
         id: "ITEM001",
@@ -202,7 +203,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     date: new Date("2023-07-20"),
     invoiceDate: new Date("2023-07-19"),
     invoiceNumber: "INV-20230719-002",
-    taxInvoiceDate: "2023-07-19",
+    taxInvoiceDate: new Date("2023-07-19"),
     taxInvoiceNumber: "TAX-20230719-002",
     description: "Room Amenities Delivery",
     receiver: "Emma Johnson",
@@ -212,6 +213,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     status: "Received",
     isConsignment: false,
     isCash: false,
+    cashBook: "General Cash Book",
     items: [
       {
         id: "ITEM002",
@@ -310,7 +312,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     date: new Date("2023-07-25"),
     invoiceDate: new Date("2023-07-24"),
     invoiceNumber: "INV-20230724-003",
-    taxInvoiceDate: "2023-07-24",
+    taxInvoiceDate: new Date("2023-07-24"),
     taxInvoiceNumber: "TAX-20230724-003",
     description: "Bedding Supplies Delivery",
     receiver: "Michael Brown",
@@ -320,6 +322,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     status: "Received",
     isConsignment: false,
     isCash: false,
+    cashBook: "General Cash Book",
     items: [
       {
         id: "ITEM004",
@@ -418,7 +421,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     date: new Date("2023-07-30"),
     invoiceDate: new Date("2023-07-29"),
     invoiceNumber: "INV-20230729-004",
-    taxInvoiceDate: "2023-07-29",
+    taxInvoiceDate: new Date("2023-07-29"),
     taxInvoiceNumber: "TAX-20230729-004",
     description: "Bathroom Accessories Delivery",
     receiver: "Sarah Davis",
@@ -428,6 +431,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     status: "Pending",
     isConsignment: false,
     isCash: false,
+    cashBook: "General Cash Book",
     items: [
       {
         id: "ITEM006",
@@ -526,7 +530,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     date: new Date("2023-08-05"),
     invoiceDate: new Date("2023-08-04"),
     invoiceNumber: "INV-20230804-005",
-    taxInvoiceDate: "2023-08-04",
+    taxInvoiceDate: new Date("2023-08-04"),
     taxInvoiceNumber: "TAX-20230804-005",
     description: "Room Service Equipment Delivery",
     receiver: "Robert Wilson",
@@ -536,6 +540,7 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     status: "Partial",
     isConsignment: false,
     isCash: false,
+    cashBook: "General Cash Book",
     items: [
       {
         id: "ITEM008",

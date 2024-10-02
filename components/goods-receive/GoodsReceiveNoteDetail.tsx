@@ -280,7 +280,7 @@ export function GoodsReceiveNoteDetail({
             Back
           </Button>
           <h1 className="text-2xl font-bold">
-            {mode === "create"
+            {mode === "add"
               ? "Create Goods Receive Note"
               : `Goods Receive Note: ${id}`}
           </h1>

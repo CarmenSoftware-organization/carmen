@@ -141,7 +141,6 @@ export interface PurchaseOrder {
   orderDate: Date;
   DeliveryDate?: Date | null;
   status: PurchaseOrderStatus;
-  totalAmount: number;
   currencyCode: string;
   exchangeRate: number;
   notes?: string;
@@ -154,6 +153,16 @@ export interface PurchaseOrder {
   description: string;
   remarks: string;
   items: PurchaseOrderItem[];
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
 }
 
 export interface PurchaseOrderItem {
@@ -170,18 +179,23 @@ export interface PurchaseOrderItem {
   receivedQuantity: number;
   remainingQuantity: number;
   unitPrice: number;
-  totalPrice: number;
-  status: string;
+  status: PurchaseRequestItemStatus;
   isFOC: boolean;
   taxRate: number;
-  taxAmount: number;
-  baseTaxAmount: number;
   discountRate: number;
-  discountAmount: number;
   attachments?: Attachment[];
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
   comment?: string;
-  netAmount?: number;
-  baseNetAmount?: number;
+  taxIncluded: boolean;
   adjustments?: {
     discount: boolean;
     tax: boolean;
@@ -189,10 +203,17 @@ export interface PurchaseOrderItem {
   lastReceiveDate?: Date;
   lastPrice?: number;
   lastVendorId?: number;
-  baseDiscAmount?: number;
-  totalAmount?: number;
-  baseTotalAmount?: number;
   attachedFile?: File | null;
+  inventoryInfo: {
+    onHand: number;
+    onOrdered: number;
+    reorderLevel: number;
+    restockLevel: number;
+    averageMonthlyUsage: number;
+    lastPrice: number;
+    lastOrderDate: Date;
+    lastVendor: string;
+  };
   received?: GRNItem[];
 }
 
@@ -264,7 +285,6 @@ export interface PurchaseRequest_1 {
   attachments: Attachment[];
   subtotal: Money;
   tax: Money;
-  totalAmount: Money;
   jobCode: string;
   department: string;
   budgetCode: string;
@@ -280,6 +300,16 @@ export interface PurchaseRequest_1 {
   deliveryPoint: string;
   activityLog: ActivityLogEntry[];
   additionalCharges: Money;
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
 }
 
 // export enum WorkflowStatus {
@@ -300,6 +330,19 @@ export interface PurchaseRequest_1 {
 //   COMPLETED = "COMPLETED",
 // }
 
+export interface IBaseSummary {
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
+}
+
 export interface PurchaseRequestItem {
   id?: string;
   location: string;
@@ -314,13 +357,13 @@ export interface PurchaseRequestItem {
   currencyRate: number;
   price: number;
   foc: number;
-  netAmount: number;
-  adjustment: boolean;
+  taxIncluded: boolean;// adjustment: boolean;
+  adjustments: {
+    discount?: boolean;
+    tax: boolean; 
+  };
   discountRate: number;
-  discountAmount: number;
   taxRate: number;
-  taxAmount: number;
-  totalAmount: number;
   vendor: string;
   pricelistNumber: string;
   comment: string;
@@ -330,7 +373,7 @@ export interface PurchaseRequestItem {
   updatedDate?: Date;
   itemCategory: string;
   itemSubcategory: string;
-  status?: 'Accepted' | 'Rejected' | 'Review';
+  status: PurchaseRequestItemStatus;
   inventoryInfo: {
     onHand: number;
     onOrdered: number;
@@ -343,16 +386,28 @@ export interface PurchaseRequestItem {
   };
   accountCode: string;
   jobCode: string;
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
 }
+
+export type PurchaseRequestItemStatus =
+ "Pending"|
+ "Accepted"|
+ "Rejected"|
+ "Review";
 
 
 export interface WorkflowStep {
   stage: WorkflowStage;
   status: WorkflowStatus;
-}
-
-export interface ActivityLogEntry {
- 
 }
 
 export interface GoodsReceiveNote {
@@ -361,7 +416,7 @@ export interface GoodsReceiveNote {
   date: Date;
   invoiceDate: Date;
   invoiceNumber: string;
-  taxInvoiceDate?: string;
+  taxInvoiceDate?: Date;
   taxInvoiceNumber?: string;
   description: string;
   receiver: string;
@@ -434,7 +489,7 @@ export interface StockMovement {
   status: string;
 }
 
-export type GoodsReceiveNoteMode = "view" | "edit" | "create";
+export type GoodsReceiveNoteMode = "view" | "edit" | "add";
 
 export type GoodsReceiveNoteStatus =
   | "Pending"
@@ -490,8 +545,6 @@ export interface JournalEntryTotal {
   baseCredit: number;
   baseCurrency: string;
 }
-
-
 
 export interface ActivityLogEntry {
   id: string;
@@ -566,6 +619,17 @@ export interface PurchaseRequest {
   department: string;
   jobCode: string;
   estimatedTotal: number;
+  currency: string;
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
 }
 
 export type WorkflowAction = "approve" | "reject" | "sendBack";
@@ -653,7 +717,6 @@ export interface Requestor {
 //   totalPrice: Money;
 // }
 
-
 export interface Budget {
   totalBudget: number;
   availableBudget: number;
@@ -691,6 +754,16 @@ export interface PurchaseRequest_3 {
   comments: Comment[];
   budget: Budget;
   approvalHistory: ApprovalHistoryItem[];
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
 }
 
 export interface BudgetData {

@@ -20,8 +20,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog"
-import { Edit, Plus, Search, Trash2 } from "lucide-react"
+import { Edit, Plus, Search, Trash2, XIcon } from "lucide-react"
 
 interface Department {
   code: string
@@ -181,9 +182,16 @@ export function DepartmentList() {
       </div>
 
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-white">
+        <DialogContent className="sm:max-w-[425px] bg-white [&>button]:hidden">
           <DialogHeader>
+            <div className="flex justify-between w-full items-center">
             <DialogTitle>{editingDepartment?.code ? 'Edit Department' : 'New Department'}</DialogTitle>
+            <DialogClose asChild>
+                  <Button variant="ghost" size="sm">
+                    <XIcon className="h-4 w-4" />
+                  </Button>
+                </DialogClose>
+          </div>
           </DialogHeader>
           {editingDepartment && (
             <form onSubmit={(e) => {

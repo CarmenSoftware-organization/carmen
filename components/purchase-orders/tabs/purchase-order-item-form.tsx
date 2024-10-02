@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, Upload } from "lucide-react"
 import { PurchaseOrderItem } from '@/lib/types'
+import { GoodsReceiveNoteTable } from '@/app/(main)/procurement/purchase-orders/components/tabs/goods-receive-note-table'
 
 type FormMode = 'view' | 'edit' | 'add'
 
@@ -56,6 +57,8 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
     tax: false
   })
 
+  const [showGRNTable, setShowGRNTable] = useState(false)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -86,6 +89,10 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
 
   const formatNumber = (value: number, decimals: number) => {
     return value.toFixed(decimals)
+  }
+
+  const handleGoodsReceivedClick = () => {
+    setShowGRNTable(true)
   }
 
   const renderField = (label: string, name: keyof typeof formData, type: string = 'text', baseField?: keyof typeof formData, convRate?: boolean, suffix?: string, decimals?: number) => {
@@ -259,9 +266,16 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
             <Button variant="outline" size="sm">On Hand</Button>
             <Button variant="outline" size="sm">On Order</Button>
             <Button variant="outline" size="sm">PR Details</Button>
+            <Button variant="outline" size="sm" onClick={handleGoodsReceivedClick}>Goods Received</Button>
           </div>
         </div>
       </form>
+
+      {showGRNTable && (
+        <div className="mt-8">
+          <GoodsReceiveNoteTable />
+        </div>
+      )}
     </div>
   )
 }

@@ -56,7 +56,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
               <TableCell>{item.orderedQuantity} {item.orderUnit}</TableCell>
               <TableCell>{item.receivedQuantity} {item.orderUnit}</TableCell>
               <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
-              <TableCell>${item.totalPrice.toFixed(2)}</TableCell>
+              <TableCell>${item.subTotalPrice.toFixed(2)}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(item.status)}>
                   {item.status}

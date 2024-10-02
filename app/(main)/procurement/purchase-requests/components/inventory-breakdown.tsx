@@ -60,7 +60,7 @@ const itemData = {
 export default function InventoryBreakdown() {
   return (
     <>
-      <div className="mb-6">
+      <div className="mb-6 bg-muted p-4 rounded-md">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-bold">{itemData.name}</h2>
           <StatusBadge status={itemData.status} />

@@ -219,7 +219,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             <ArrowLeft className="mr-2 h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">
-            {mode === 'create' ? 'Create Goods Receive Note' : `Goods Receive Note: ${id}`}
+            {mode === 'add' ? 'New Goods Receive Note' : `Goods Receive Note`}
           </h1>
         </div>
         <div className="space-x-2">

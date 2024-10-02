@@ -2,10 +2,10 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from 'lucide-react'
+import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
-import { GoodsReceiveNote } from '@/lib/types'
+import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { BulkActions } from '@/app/(main)/procurement/goods-received-note/components/BulkActions'
 import StatusBadge from '@/components/ui/custom-status-badge'
@@ -66,10 +66,20 @@ export function GoodsReceiveNoteList() {
     return grn.items.reduce((total, item) => total + item.netAmount, 0)
   }
 
+  const handleGoodsReceiveNoteAction = (id: string, mode: GoodsReceiveNoteMode) => {
+    router.push(`/procurement/goods-received-note/${id}?mode=${mode}`)
+  }
+
+  const handleAddNewGoodsReceiveNote = () => {
+    router.push('/procurement/goods-received-note/0?mode=create')
+  }
+
   const title = 'Goods Receive Notes'
   const actionButtons = (
     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-      <Button className="w-full sm:w-auto">New Goods Receive Note</Button>
+      <Button className="w-full sm:w-auto" onClick={handleAddNewGoodsReceiveNote}>
+        <Plus className="mr-2 h-4 w-4" /> New Goods Receive Note
+      </Button>
       <Button variant="outline" className="w-full sm:w-auto">Export</Button>
       <Button variant="outline" className="w-full sm:w-auto">Print</Button>
     </div>
@@ -140,7 +150,11 @@ export function GoodsReceiveNoteList() {
                 <div className="flex space-x-1">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={() => router.push(`/procurement/goods-received-note/${grn.id}`)}>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
@@ -148,7 +162,11 @@ export function GoodsReceiveNoteList() {
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={() => router.push(`/procurement/goods-received-note/${grn.id}/edit`)}>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleGoodsReceiveNoteAction(grn.id, 'edit')}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
@@ -202,45 +220,44 @@ export function GoodsReceiveNoteList() {
           </CardContent>
         </Card>
       ))}
-      <div className="flex justify-center items-center space-x-2 mt-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setCurrentPage(1)}
-          disabled={currentPage === 1}
-        >
-          <ChevronsLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="hidden sm:inline">
+      <div className="flex justify-end items-center mt-4 space-x-4">
+        <span className="text-sm text-gray-500">
           Page {currentPage} of {totalPages}
         </span>
-        <span className="sm:hidden">
-          {currentPage}/{totalPages}
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setCurrentPage(totalPages)}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronsRight className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   )

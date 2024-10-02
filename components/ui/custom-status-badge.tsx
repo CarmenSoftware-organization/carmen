@@ -32,28 +32,28 @@ export interface IBadgeColors {
 }
 
 export const StatusList: IBadgeColors[] = [
-  { key: Status.Open, Color: "bg-green-500 text-white" },
-  { key: Status.Closed, Color: "bg-gray-500 text-white" },
-  { key: Status.Draft, Color: "bg-yellow-500 text-black" },
-  { key: Status.Sent, Color: "bg-blue-500 text-white" },
-  { key: Status.Committed, Color: "bg-purple-500 text-white" },
-  { key: Status.Saved, Color: "bg-teal-500 text-white" },
-  { key: Status.Voided, Color: "bg-red-500 text-white" },
-  { key: Status.Approved, Color: "bg-green-700 text-white" },
-  { key: Status.Rejected, Color: "bg-red-700 text-white" },
-  { key: Status.Pending, Color: "bg-yellow-700 text-black" },
-  { key: Status.InProgress, Color: "bg-blue-700 text-white" },
-  { key: Status.Completed, Color: "bg-green-900 text-white" },
-  { key: Status.Cancelled, Color: "bg-red-900 text-white" },
-  { key: Status.OnHold, Color: "bg-orange-500 text-black" },
-  { key: Status.Delayed, Color: "bg-orange-700 text-black" },
-  { key: Status.Partial, Color: "bg-yellow-500 text-white" },
-  { key: Status.Submitted, Color: "bg-teal-700 text-white" },
-  { key: Status.Accepted, Color: "bg-green-500 text-white" },
-  { key: Status.SendBack, Color: "bg-red-500 text-white" },
-  { key: Status.Review, Color: "bg-yellow-500 text-black" },
-  { key: Status.Deleted, Color: "bg-red-500 text-white" },
-  { key: Status.Received, Color: "bg-green-500 text-white" },
+  { key: Status.Open, Color: "bg-emerald-300 text-emerald-800" },
+  { key: Status.Closed, Color: "bg-slate-300 text-slate-800" },
+  { key: Status.Draft, Color: "bg-amber-200 text-amber-800" },
+  { key: Status.Sent, Color: "bg-sky-300 text-sky-800" },
+  { key: Status.Committed, Color: "bg-violet-300 text-violet-800" },
+  { key: Status.Saved, Color: "bg-teal-300 text-teal-800" },
+  { key: Status.Voided, Color: "bg-rose-300 text-rose-800" },
+  { key: Status.Approved, Color: "bg-green-300 text-green-800" },
+  { key: Status.Rejected, Color: "bg-red-300 text-red-800" },
+  { key: Status.Pending, Color: "bg-yellow-200 text-yellow-800" },
+  { key: Status.InProgress, Color: "bg-blue-300 text-blue-800" },
+  { key: Status.Completed, Color: "bg-lime-300 text-lime-800" },
+  { key: Status.Cancelled, Color: "bg-pink-300 text-pink-800" },
+  { key: Status.OnHold, Color: "bg-orange-200 text-orange-800" },
+  { key: Status.Delayed, Color: "bg-amber-300 text-amber-800" },
+  { key: Status.Partial, Color: "bg-yellow-300 text-yellow-800" },
+  { key: Status.Submitted, Color: "bg-cyan-300 text-cyan-800" },
+  { key: Status.Accepted, Color: "bg-emerald-300 text-emerald-800" },
+  { key: Status.SendBack, Color: "bg-rose-300 text-rose-800" },
+  { key: Status.Review, Color: "bg-amber-200 text-amber-800" },
+  { key: Status.Deleted, Color: "bg-rose-300 text-rose-800" },
+  { key: Status.Received, Color: "bg-emerald-300 text-emerald-800" },
 ];
 
 export default function StatusBadge({ status }: { status: string }) {
@@ -74,7 +74,9 @@ function CustomStatusBadge({
   }
   return (
     <Badge
-      className={StatusList.find((color) => color.key === badgeColor)?.Color}
+      className={`${
+        StatusList.find((color) => color.key === badgeColor)?.Color
+      } rounded-full`}
     >
       {children}
     </Badge>

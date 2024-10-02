@@ -87,6 +87,11 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
     baseReceivingQty: 0,
     unitPrice: 0,
     isFOC: false,
+    taxIncluded: false,
+    adjustments: {
+      discount: false,
+      tax: false,
+    },
     taxRate: 0.07,
     taxAmount: 0.0,
     discountRate: 0.0,
@@ -223,7 +228,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
       <div className="space-y-4 w-full">
         <div className="flex justify-between items-center w-full">
           <Button onClick={() => setIsAddItemFormOpen(true)}>
-            <Plus className="mr-2 s h-4 w-4" /> Add Item
+            <Plus className="mr-2 s h-4 w-4 "/> Add Item
           </Button>
         </div>
 
@@ -366,12 +371,12 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
                       </TableCell>
                       <TableCell className="py-1">
                         <div className="text-sm">
-                          ${item.totalPrice.toFixed(2)}
+                          ${item.subTotalPrice.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">
                           $
                           {(
-                            item.totalPrice *
+                            item.subTotalPrice *
                             (item.baseQuantity / item.orderedQuantity)
                           ).toFixed(2)}
                         </div>

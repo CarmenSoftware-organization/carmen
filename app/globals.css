@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
   --background: #ffffffc4;
@@ -90,10 +90,10 @@ body {
 
 @layer base {
   * {
-    @apply border-border text-black; 
+    @apply border-border; 
   }
   body {
-    /* @apply bg-background text-foreground; */
+  @apply bg-background text-foreground;
   }
 }
 
@@ -101,8 +101,10 @@ body {
   @apply bg-white;
 }
 
-.text
-
 .form-field-label {
   @apply pb-4;
 }
+
+/* .lucide{
+  color: white;
+} */

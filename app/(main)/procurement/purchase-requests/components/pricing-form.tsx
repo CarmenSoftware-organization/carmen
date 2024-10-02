@@ -1,175 +1,245 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import SummaryPRTable from "./tabs/Summary-pr-table";
+import { IBaseSummary, PurchaseRequestItem } from "@/lib/types";
 
-interface PricingFormData {
-  currency: string
-  exchangeRate: number
-  price: number
-  enableAdjustment: boolean
-  discountRate: number
-  overrideDiscount: number | null
-  taxRate: number
-  overrideTax: number | null
-}
+type FormMode = "add" | "edit" | "view";
 
-type FormMode = 'add' | 'edit' | 'view'
-type currentMode = FormMode
-
-
-const initialFormData: PricingFormData = {
-  currency: 'USD',
-  exchangeRate: 1,
+const initialFormData: Partial<PurchaseRequestItem> = {
+  currency: "USD",
+  currencyRate: 1,
   price: 3.99,
-  enableAdjustment: false,
+  adjustments: {
+    discount: false,
+    tax: false,
+  },
+  taxIncluded: false,
   discountRate: 5,
-  overrideDiscount: null,
   taxRate: 7,
-  overrideTax: null
-}
+};
 
-export function PricingFormComponent({ data, initialMode }: { data?: PricingFormData; initialMode: FormMode }) {
-  const [formData, setFormData] = useState<PricingFormData>(data || initialFormData)
-  const [mode, setMode] = useState<FormMode>(initialMode)
+export function PricingFormComponent({
+  data,
+  initialMode,
+}: {
+  data?: Partial<PurchaseRequestItem>;
+  initialMode: FormMode;
+}) {
+  const [formData, setFormData] = useState<Partial<PurchaseRequestItem>>(
+    data || initialFormData
+  );
+  const [mode, setMode] = useState<FormMode>(initialMode);
   const [calculatedAmounts, setCalculatedAmounts] = useState({
     baseAmount: 0,
     discountAmount: 0,
     netAmount: 0,
     taxAmount: 0,
-    totalAmount: 0
-  })
+    totalAmount: 0,
+  });
+
+  const [summaryFooter, setSummaryFooter] = useState<IBaseSummary>({
+    baseSubTotalPrice: 0,
+    subTotalPrice: 0,
+    baseNetAmount: 0,
+    netAmount: 0,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 0,
+    taxAmount: 0,
+    baseTotalAmount: 0,
+    totalAmount: 0,
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : parseFloat(value) || value
-    }))
-  }
+      [name]:
+        type === "checkbox"
+          ? (e.target as HTMLInputElement).checked
+          : parseFloat(value) || value,
+    }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleModeChange = (newMode: FormMode) => {
-    setMode(newMode)
-    if (newMode === 'add') {
-      setFormData(initialFormData)
+    setMode(newMode);
+    if (newMode === "add") {
+      setFormData(initialFormData);
     }
+  };
+
+  function calcRate(amt: number, exchangeRate: number) {
+    return amt / exchangeRate;
   }
 
   useEffect(() => {
-    const quantity = 450 // Assuming 450 is the quantity as per the image calculations
-    const baseAmount = formData.price * quantity
-    const discountAmount = (formData.overrideDiscount !== null) 
-      ? formData.overrideDiscount 
-      : baseAmount * (formData.discountRate / 100)
-    const netAmount = baseAmount - discountAmount
-    const taxAmount = (formData.overrideTax !== null)
-      ? formData.overrideTax
-      : netAmount * (formData.taxRate / 100)
-    const totalAmount = netAmount + taxAmount
+    const quantity = 450; // Assuming 450 is the quantity as per the image calculations
+    const baseAmount = (formData.price || 0) * quantity;
+    const discountAmount =
+      formData.discountAmount !== undefined && formData.discountAmount !== null
+        ? formData.discountAmount
+        : baseAmount * ((formData.discountRate || 0) / 100);
+    const netAmount = baseAmount - discountAmount;
+    const taxAmount =
+      formData.taxAmount !== undefined && formData.taxAmount !== null
+        ? formData.taxAmount
+        : netAmount * ((formData.taxRate || 0) / 100);
+    const totalAmount = netAmount + taxAmount;
+
+    const currencyRate = formData.currencyRate || 1;
 
     setCalculatedAmounts({
       baseAmount,
       discountAmount,
       netAmount,
       taxAmount,
-      totalAmount
-    })
-  }, [formData])
+      totalAmount,
+    });
 
-  const isViewMode = mode === initialMode
+    setSummaryFooter({
+      baseSubTotalPrice: baseAmount / currencyRate,
+      subTotalPrice: baseAmount,
+      baseNetAmount: netAmount / currencyRate,
+      netAmount: netAmount,
+      baseDiscAmount: discountAmount / currencyRate,
+      discountAmount: discountAmount,
+      baseTaxAmount: taxAmount / currencyRate,
+      taxAmount: taxAmount,
+      baseTotalAmount: totalAmount / currencyRate,
+      totalAmount: totalAmount,
+    });
+  }, [formData]);
 
-  const formatAmount = (amount: number, currency: string) => {
-    const baseAmount = amount / formData.exchangeRate
-    return (
-      <div className="flex items-center justify-end space-x-2">
-        <span className="text-xs text-gray-500">USD {baseAmount.toFixed(2)}</span>
-        <span>{currency}</span>
-        <span className="tabular-nums">{amount.toFixed(2)}</span>
-      </div>
-    )
-  }
+  const isViewMode = mode === initialMode;
 
   return (
-    // <div className="container mx-auto p-4">
-    <div>
-      {/* <div className="flex justify-end space-x-2 mb-4">
-        <Button onClick={() => handleModeChange('view')} variant={mode === 'view' ? 'default' : 'outline'}>View</Button>
-        <Button onClick={() => handleModeChange('edit')} variant={mode === 'edit' ? 'default' : 'outline'}>Edit</Button>
-        <Button onClick={() => handleModeChange('add')} variant={mode === 'add' ? 'default' : 'outline'}>Add</Button>
-      </div> */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-bold">Pricing</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-end space-x-4">
-                <div className="w-1/4">
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select
-                    value={formData.currency}
-                    onValueChange={(value) => handleSelectChange('currency', value)}
-                    disabled={isViewMode}
-                  >
-                    <SelectTrigger id="currency">
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                      <SelectItem value="GBP">GBP</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="w-1/4">
-                  <Label htmlFor="exchangeRate">Exch. Rate</Label>
-                  <Input
-                    type="number"
-                    id="exchangeRate"
-                    name="exchangeRate"
-                    value={formData.exchangeRate}
-                    onChange={handleInputChange}
-                    disabled={isViewMode}
-                  />
-                </div>
-                <div className="w-2/4">
-                  <Label htmlFor="price">Price</Label>
-                  <Input
-                    type="number"
-                    id="price"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    disabled={isViewMode}
-                  />
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="enableAdjustment"
-                  name="enableAdjustment"
-                  checked={formData.enableAdjustment}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enableAdjustment: checked as boolean }))}
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-0 space-x-0 md:space-x-6">
+        <div className="w-full md:w-1/2 ">
+          <h2 className="text-lg font-semibold mb-4">Pricing</h2>
+          <div className="space-y-4">
+            <div className="flex items-end space-x-4">
+              <div className="w-1/4">
+                <Label
+                  htmlFor="currency"
+                  className="text-xs text-muted-foreground"
+                >
+                  Currency
+                </Label>
+                <Select
+                  value={formData.currency}
+                  onValueChange={(value) =>
+                    handleSelectChange("currency", value)
+                  }
                   disabled={isViewMode}
-                />
-                <Label htmlFor="enableAdjustment">Enable adjustment</Label>
+                >
+                  <SelectTrigger id="currency" className="h-8 text-sm">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="GBP">GBP</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-end space-x-4">
-                <div className="w-1/4">
-                  <Label htmlFor="discountRate">Disc. Rate (%)</Label>
+              <div className="w-1/4">
+                <Label
+                  htmlFor="currencyRate"
+                  className="text-xs text-muted-foreground"
+                >
+                  Exch. Rate
+                </Label>
+                <Input
+                  type="number"
+                  id="currencyRate"
+                  name="currencyRate"
+                  value={formData.currencyRate}
+                  onChange={handleInputChange}
+                  disabled={isViewMode}
+                  className="h-8 text-sm"
+                />
+              </div>
+              <div className="w-2/4">
+                <Label
+                  htmlFor="price"
+                  className="text-xs text-muted-foreground"
+                >
+                  Price
+                </Label>
+                <Input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  disabled={isViewMode}
+                  className="h-8 text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="tax-included"
+                name="tax-included"
+                checked={formData.taxIncluded}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    adjustment: checked as boolean,
+                  }))
+                }
+                disabled={isViewMode}
+                className="h-4 w-4"
+              />
+              <Label
+                htmlFor="tax-included"
+                className="text-xs text-muted-foreground"
+              >
+                Tax Included ?
+              </Label>
+            </div>
+            <div className="grid grid-cols-4 space-x-4">
+
+              <div className="col-span-2 lg:col-span-1 flex gap-2 items-center w-full">
+                <div className="flex flex-col">
+                  <Label
+                    htmlFor="enable-disc-adjustment"
+                    className="space-y-1 text-xs"
+                  >
+                    Adj.
+                  </Label>
+                  <div className="flex items-center h-7 pt-2">
+                    <Checkbox
+                      id="enable-disc-adjustment"
+                      value={formData.adjustments?.discount?.toString()}
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1 w-full">
+                  <Label htmlFor="discountRate" className="text-xs">
+                    Disc. Rate (%)
+                  </Label>
                   <Input
                     type="number"
                     id="discountRate"
@@ -177,24 +247,53 @@ export function PricingFormComponent({ data, initialMode }: { data?: PricingForm
                     value={formData.discountRate}
                     onChange={handleInputChange}
                     disabled={isViewMode}
-                  />
-                </div>
-                <div className="w-3/4">
-                  <Label htmlFor="overrideDiscount">Override Discount</Label>
-                  <Input
-                    type="number"
-                    id="overrideDiscount"
-                    name="overrideDiscount"
-                    value={formData.overrideDiscount ?? ''}
-                    onChange={handleInputChange}
-                    placeholder="Enter to override"
-                    disabled={isViewMode}
+                    className="h-7 text-sm"
                   />
                 </div>
               </div>
-              <div className="flex items-end space-x-4">
-                <div className="w-1/4">
-                  <Label htmlFor="taxRate">Tax Rate (%)</Label>
+
+              <div className="col-span-2 lg:col-span-3">
+                <Label
+                  htmlFor="discountAmount"
+                  className="text-xs text-muted-foreground"
+                >
+                  Override Discount
+                </Label>
+                <Input
+                  type="number"
+                  id="discountAmount"
+                  name="discountAmount"
+                  value={formData.discountAmount ?? ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter to override"
+                  disabled={isViewMode}
+                  className="h-8 text-sm"
+                />
+              </div>
+
+            </div>
+            <div className="grid grid-cols-4 space-x-4">
+            
+              <div className="col-span-2 lg:col-span-1 flex gap-2 items-center w-full">
+                <div className="flex flex-col">
+                  <Label
+                    htmlFor="enable-tax-adjustment"
+                    className="space-y-1 text-xs"
+                  >
+                    Adj.
+                  </Label>
+                  <div className="flex items-center h-7 pt-2">
+                    <Checkbox
+                      id="enable-tax-adjustment"
+                      value={formData.adjustments?.tax.toString()}
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1 w-full">
+                  <Label htmlFor="taxRate" className="text-xs">
+                    Tax Rate (%)
+                  </Label>
                   <Input
                     type="number"
                     id="taxRate"
@@ -202,59 +301,65 @@ export function PricingFormComponent({ data, initialMode }: { data?: PricingForm
                     value={formData.taxRate}
                     onChange={handleInputChange}
                     disabled={isViewMode}
-                  />
-                </div>
-                <div className="w-3/4">
-                  <Label htmlFor="overrideTax">Override Tax</Label>
-                  <Input
-                    type="number"
-                    id="overrideTax"
-                    name="overrideTax"
-                    value={formData.overrideTax ?? ''}
-                    onChange={handleInputChange}
-                    placeholder="Enter to override"
-                    disabled={isViewMode}
+                    className="h-7 text-sm"
                   />
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-bold">Calculated Amounts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Base Amount:</span>
-                {formatAmount(calculatedAmounts.baseAmount, formData.currency)}
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Discount Amount:</span>
-                {formatAmount(calculatedAmounts.discountAmount, formData.currency)}
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Net Amount:</span>
-                {formatAmount(calculatedAmounts.netAmount, formData.currency)}
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Tax Amount:</span>
-                {formatAmount(calculatedAmounts.taxAmount, formData.currency)}
-              </div>
-              <div className="flex justify-between items-center font-medium">
-                <span className="text-sm">Total Amount:</span>
-                {formatAmount(calculatedAmounts.totalAmount, formData.currency)}
+
+              <div className="col-span-2 lg:col-span-3">
+                <Label
+                  htmlFor="taxAmount"
+                  className="text-xs text-muted-foreground"
+                >
+                  Override Tax
+                </Label>
+                <Input
+                  type="number"
+                  id="taxAmount"
+                  name="taxAmount"
+                  value={formData.taxAmount ?? ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter to override"
+                  disabled={isViewMode}
+                  className="h-8 text-sm"
+                />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        <div className="w-full md:w-1/2">
+          <h2 className="text-lg font-semibold mb-4">Calculated Amounts</h2>
+          <SummaryPRTable
+            item={{
+              ...summaryFooter,
+              currency: formData.currency || "USD",
+              currencyRate: formData.currencyRate || 1,
+              discountRate: formData.discountRate || 0,
+              taxRate: formData.taxRate || 0,
+            }}
+            localCurrency="THB"
+            currentCurrency={formData.currency || "USD"}
+          />
+        </div>
+
       </div>
-      <div className="mt-4 bg-gray-100 p-3 rounded-md flex justify-between items-center text-sm text-gray-600">
-        <span>Last Price: $3.85 per Kg</span>
-        <span>Last Order Date: 2023-05-15</span>
-        <span>Last Vendor: Organic Supplies Inc.</span>
+
+      {/* Last Price, Last Order Date, Last Vendor section */}
+      <div className="grid grid-cols-3 gap-4 bg-gray-100 p-3 rounded-md">
+        <div>
+          <p className="text-xs text-muted-foreground">Last Price</p>
+          <p className="text-sm font-medium">$3.85 per Kg</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Last Order Date</p>
+          <p className="text-sm font-medium">2023-05-15</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Last Vendor</p>
+          <p className="text-sm font-medium">Organic Supplies Inc.</p>
+        </div>
       </div>
     </div>
-  )
+  );
 }

@@ -133,8 +133,8 @@ export default function VendorComparison() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4">Vendor Comparison</h1>
+      <div className="mb-6 bg-muted p-4 rounded-md">
+        {/* <h1 className="text-2xl font-bold mb-4">Vendor Comparison</h1> */}
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-bold">{itemData.name}</h2>
           <StatusBadge status={itemData.status} />

@@ -21,5 +21,16 @@ export const samplePRData: PurchaseRequest = {
   estimatedTotal: 1500,
   vendor: 'Office Supplies Co.',
   vendorId: 1,
-  deliveryDate: new Date('2023-01-15')
+  deliveryDate: new Date('2023-01-15'),
+  currency: 'USD',
+  baseSubTotalPrice: 1000,
+  subTotalPrice: 1000,
+  baseNetAmount: 1000,
+  netAmount: 1000,
+  baseDiscAmount: 0,
+  discountAmount: 0,
+  baseTaxAmount: 100,
+  taxAmount: 100,
+  baseTotalAmount: 1100,
+  totalAmount: 1100,
 }

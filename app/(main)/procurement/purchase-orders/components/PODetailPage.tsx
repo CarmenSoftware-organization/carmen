@@ -39,6 +39,8 @@ import {
   PurchaseOrder,
 } from "@/lib/types";
 import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
+import StatusBadge from "@/components/ui/custom-status-badge";
+import SummaryTotal from "./SummaryTotal";
 
 export function PODetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -219,17 +221,15 @@ export function PODetailPage({ params }: { params: { id: string } }) {
               </div>
             </div>
             <div className="flex justify-end">
-              <Badge
-                variant={poData?.status === "Open" ? "default" : "secondary"}
-              >
-                {poData?.status || ""}
-              </Badge>
+              <StatusBadge
+                status={poData?.status === "Open" ? "default" : "secondary"}
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-8 gap-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-1">
               <Label className="text-xs text-muted-foreground">
                 Delivery Date
               </Label>
@@ -245,21 +245,19 @@ export function PODetailPage({ params }: { params: { id: string } }) {
             </div>
             <div className="col-span-1">
               <Label className="text-xs text-muted-foreground">
+                Exch. Rate
+              </Label>
+              <Input value={poData?.exchangeRate || "1"} readOnly />
+            </div>
+            <div className="col-span-1">
+              <Label className="text-xs text-muted-foreground">
                 Credit Terms
               </Label>
               <Input value={poData?.creditTerms || ""} readOnly />
             </div>
-            <div className="col-span-2">
-              <Label className="text-xs text-muted-foreground">Total</Label>
-              <Input
-                value={`$${poData?.totalAmount?.toFixed(2) || ""}`}
-                readOnly
-              />
-            </div>
-            <div className="col-span-2">
-              <Label className="text-xs text-muted-foreground">Buyer</Label>
-              <Input value={poData?.buyer || ""} readOnly />
-            </div>
+
+            
+            
             <div className="col-span-4">
               <Label className="text-xs text-muted-foreground">
                 Description
@@ -322,6 +320,16 @@ export function PODetailPage({ params }: { params: { id: string } }) {
           <ActivityLogTab poData={poData} />
         </TabsContent>
       </Tabs>
+
+      {/* Add SummaryTotal component here */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Purchase Order Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SummaryTotal poData={poData} />
+        </CardContent>
+      </Card>
     </>
   );
 

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -17,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import StatusBadge from "@/components/ui/custom-status-badge"
+import { XIcon } from "lucide-react"
 
 // Sample data for inventory locations
 const inventoryData = [
@@ -69,9 +71,16 @@ interface InventoryBreakdownProps {
 export default function InventoryBreakdown({ isOpen, onClose, itemData }: InventoryBreakdownProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
         <DialogHeader>
+          <div className="flex justify-between w-full items-center">
           <DialogTitle>Inventory Breakdown</DialogTitle>
+          <DialogClose asChild>
+                  <Button variant="ghost" size="sm">
+                    <XIcon className="h-4 w-4" />
+                  </Button>
+                </DialogClose>
+                </div>
         </DialogHeader>
         <div className="mb-6 bg-muted p-4 rounded-lg">
           <div className="flex justify-between items-center mb-2">

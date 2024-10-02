@@ -25,7 +25,9 @@ import {
   Edit2Icon,
   ImageIcon,
   MessageSquareIcon,
-  Filter
+  Filter,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import {
   Tooltip,
@@ -49,6 +51,8 @@ const PurchaseOrderList: React.FC = () => {
   const [sortField, setSortField] = useState<keyof PurchaseOrder | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
 
   useEffect(() => {
     let filtered = Mock_purchaseOrders.filter(
@@ -71,6 +75,7 @@ const PurchaseOrderList: React.FC = () => {
 
     setFilteredPOs(filtered);
     setSelectedPOs([]);
+    setCurrentPage(1);
   }, [searchTerm, statusFilter, sortField, sortOrder]);
 
   const handleSelectPO = (id: string, checked: boolean) => {
@@ -89,6 +94,12 @@ const PurchaseOrderList: React.FC = () => {
       setSortOrder("asc");
     }
   };
+
+  const totalPages = Math.ceil(filteredPOs.length / itemsPerPage);
+  const paginatedPOs = filteredPOs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const filters = (
     <div className="flex items-center justify-between ">
@@ -130,78 +141,126 @@ const PurchaseOrderList: React.FC = () => {
   );
 
   const content = (
-    <div className="space-y-2">
-      {filteredPOs.map((po) => (
-        <Card key={po.poId} className="hover:bg-accent">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-4">
-                <Checkbox
-                  checked={selectedPOs.includes(po.poId)}
-                  onCheckedChange={(checked) => handleSelectPO(po.poId, checked as boolean)}
-                />
-                <StatusBadge status={po.status} />
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    {po.number} <span className="text-sm font-normal text-muted-foreground">({po.vendorName})</span>
-                  </h3>
+    <>
+      <div className="space-y-2">
+        {paginatedPOs.map((po) => (
+          <Card key={po.poId} className="hover:bg-accent">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-4">
+                  <Checkbox
+                    checked={selectedPOs.includes(po.poId)}
+                    onCheckedChange={(checked) => handleSelectPO(po.poId, checked as boolean)}
+                  />
+                  <StatusBadge status={po.status} />
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {po.number} <span className="text-sm font-normal text-muted-foreground">({po.vendorName})</span>
+                    </h3>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/procurement/purchase-orders/${po.poId}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>View</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/procurement/purchase-orders/${po.poId}/edit`}>
+                            <Edit2Icon className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/procurement/purchase-orders/${po.poId}`}>
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>View</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/procurement/purchase-orders/${po.poId}/edit`}>
-                          <Edit2Icon className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Edit</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Delete</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Date</Label>
+                  <p>{po.orderDate.toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Doc #</Label>
+                  <p>{po.number}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Doc Date</Label>
+                  <p>{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Amount</Label>
+                  <p>${po.totalAmount.toFixed(2)}</p>
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-              <div>
-                <Label className="text-xs text-muted-foreground">Date</Label>
-                <p>{po.orderDate.toLocaleDateString()}</p>
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground">Doc #</Label>
-                <p>{po.number}</p>
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground">Doc Date</Label>
-                <p>{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</p>
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground">Amount</Label>
-                <p>${po.totalAmount.toFixed(2)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredPOs.length)} of {filteredPOs.length} results
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+          >
+            <span className="sr-only">First page</span>
+            «
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <span className="sr-only">Previous page</span>
+            ‹
+          </Button>
+          <span className="text-sm font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            <span className="sr-only">Next page</span>
+            ›
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+          >
+            <span className="sr-only">Last page</span>
+            »
+          </Button>
+        </div>
+      </div>
+    </>
   );
 
   const actionButtons = (
@@ -229,5 +288,3 @@ const PurchaseOrderList: React.FC = () => {
 };
 
 export default PurchaseOrderList;
-
-
