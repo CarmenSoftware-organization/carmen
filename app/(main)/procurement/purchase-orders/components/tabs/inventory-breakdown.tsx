@@ -93,7 +93,7 @@ export default function InventoryBreakdown({ isOpen, onClose, itemData }: Invent
             <TableRow className="text-nowrap">
               <TableHead className="w-[180px]">Location</TableHead>
               <TableHead >Quantity On Hand</TableHead>
-              <TableHead>Units</TableHead>
+              <TableHead>Inventory Units</TableHead>
               <TableHead >Par</TableHead>
               <TableHead >Reorder Point</TableHead>
               <TableHead >Min Stock</TableHead>

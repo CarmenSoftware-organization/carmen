@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Providers } from "./providers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,18 +21,11 @@ export const metadata: Metadata = {
   description: "Operational Planning and Management",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode  }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased cn(
-          "min-h-screen bg-background font-sans"`}
-      >
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

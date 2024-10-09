@@ -1,29 +1,10 @@
 "use client";
 
-// import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
-
-// export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) {
-//   return (
-//     <header className="sticky top-0 z-40 w-full border-b bg-background">
-//       <div className="container flex h-16 items-center justify-between px-4">
-//         <Button variant="ghost" size="icon" onClick={onSidebarToggle}>
-//           {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-//         </Button>
-//         <h1 className="text-xl font-semibold">Your App Name</h1>
-//         {/* Add more header content here */}
-//       </div>
-//     </header>
-//   );
-// }
-
-// 'use client';
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -40,100 +21,95 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bell, Search, User, Settings, LogOut, Globe } from "lucide-react";
+import { Bell, User, Settings, LogOut, Globe, Moon, Sun, Menu, X } from "lucide-react";
 
 interface HeaderProps {
   onSidebarToggle: () => void;
   isSidebarOpen: boolean;
 }
-// interface HeaderProps {
-//   onSidebarToggle: (isOpen: boolean) => void;
-// }
 
-export default function Header({
-  onSidebarToggle,
-  isSidebarOpen,
-}: HeaderProps) {
+export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) {
   const [businessUnit, setBusinessUnit] = useState("BU1");
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const toggleSidebar = () => {
-    const newState = !isSidebarOpen;
-    // setIsSidebarOpen(newState);
-    // onSidebarToggle(newState);
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleEditProfile = () => {
     console.log("Navigating to edit profile");
     router.push("/edit-profile");
   };
 
-  return (
-    <header className="bg-background backdrop-blur-md shadow-sm fixed top-0 left-0 right-0 z-40">
-      <div className="px-4 py-2 sm:px-6">
-        <div className="flex justify-between items-center h-10">
-          <div className="flex items-center">
-           
-          {/* move to sidebar */}
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
-         <Button variant="ghost" size="icon" className="block lg:hidden" onClick={onSidebarToggle}>
-           {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-         </Button>
-         <Link
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <header className="backdrop-blur supports-[backdrop-filter]:bg-background dark:supports-[backdrop-filter]:bg-gray-800 shadow-sm fixed top-0 left-0 right-0 z-40 border-b border-gray-200 dark:border-gray-500">
+      <div className="container px-4 py-1 sm:px-6">
+        <div className="flex justify-between items-center h-12">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" className="block lg:hidden mr-2" onClick={onSidebarToggle}>
+              {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            <Link
               href="/dashboard"
-              className="text-2xl md:text-3xl font-bold text-blue-900"
+              className="text-2xl md:text-3xl font-bold text-foreground dark:text-gray-100"
             >
               CARMEN
             </Link>
-                  
-        
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
             <Select value={businessUnit} onValueChange={setBusinessUnit}>
-              <SelectTrigger className="w-[140px] sm:w-[180px]">
+              <SelectTrigger className="w-[140px] sm:w-[180px] h-8 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100">
                 <SelectValue placeholder="Business Unit" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="BU1">Business Unit 1</SelectItem>
-                <SelectItem value="BU2">Business Unit 2</SelectItem>
+              <SelectContent className="bg-background dark:bg-gray-700">
+                <SelectItem value="BU1" className="text-foreground dark:text-gray-100">Business Unit 1</SelectItem>
+                <SelectItem value="BU2" className="text-foreground dark:text-gray-100">Business Unit 2</SelectItem>
               </SelectContent>
             </Select>
-            {/* <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="pl-10 pr-4 py-2 w-48 lg:w-64 rounded-full bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-600"
-              />
-            </div> */}
+            
             <Button
               variant="ghost"
               size="icon"
-              className="hidden md:inline-flex"
+              className="hidden md:inline-flex text-foreground dark:text-gray-100"
             >
-              <Bell size={20} />
+              <Bell className="h-5 w-5" />
             </Button>
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Globe size={20} />
+                <Button variant="ghost" size="icon" className="text-foreground dark:text-gray-100">
+                  <Globe className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>English</DropdownMenuItem>
-                <DropdownMenuItem>Spanish</DropdownMenuItem>
-                <DropdownMenuItem>French</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="bg-background dark:bg-gray-700">
+                <DropdownMenuItem className="text-foreground dark:text-gray-100">English</DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground dark:text-gray-100">Spanish</DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground dark:text-gray-100">French</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-foreground dark:text-gray-100">
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   className="relative h-8 w-8 rounded-full"
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8 text-foreground dark:text-gray-100">
                     <AvatarImage
                       src="/placeholder.svg?height=32&width=32"
                       alt="@johndoe"
@@ -142,26 +118,26 @@ export default function Header({
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuContent className="w-56 bg-background dark:bg-gray-700" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">John Doe</p>
-                    <p className="text-xs leading-none text-muted-foreground">
+                    <p className="text-sm font-medium leading-none text-foreground dark:text-gray-100">John Doe</p>
+                    <p className="text-xs leading-none text-muted-foreground dark:text-gray-400">
                       john@example.com
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={handleEditProfile}>
+                <DropdownMenuItem onSelect={handleEditProfile} className="text-foreground dark:text-gray-100">
                   <User className="mr-2 h-4 w-4" />
                   <span>Edit Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground dark:text-gray-100">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground dark:text-gray-100">
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

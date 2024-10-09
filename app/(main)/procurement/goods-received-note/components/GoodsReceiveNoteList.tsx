@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { BulkActions } from '@/app/(main)/procurement/goods-received-note/components/BulkActions'
+import { BulkActions } from './tabs/BulkActions'
 import StatusBadge from '@/components/ui/custom-status-badge'
 import { Card, CardContent } from '@/components/ui/card'
 import ListPageTemplate from '@/components/templates/ListPageTemplate'
@@ -212,9 +212,9 @@ export function GoodsReceiveNoteList() {
                 <p className="text-gray-500">Invoice Date</p>
                 <p>{grn.invoiceDate.toLocaleDateString()}</p>
               </div>
-              <div className="col-span-2 sm:col-span-1">
+              <div className="col-span-2 sm:col-span-1 text-right">
                 <p className="text-gray-500">Total Amount</p>
-                <p className="font-semibold">${calculateTotalAmount(grn).toFixed(2)}</p>
+                <p className="font-semibold ">{calculateTotalAmount(grn).toFixed(2)}</p>
               </div>
             </div>
           </CardContent>

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { GoodsReceiveNoteDetail } from '@/app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail'
+import { GoodsReceiveNoteComponent} from '../components/goods-receive-note'
 import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
 import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 
@@ -43,10 +43,8 @@ export default function EditGoodsReceiveNote({ params }: { params: { id: string 
   }
 
   return (
-    <GoodsReceiveNoteDetail 
-      id={params.id} 
+    <GoodsReceiveNoteComponent 
       mode={mode} 
-      onModeChange={handleModeChange}
       initialData={grnData}
     />
   )

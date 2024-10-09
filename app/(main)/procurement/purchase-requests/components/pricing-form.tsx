@@ -178,7 +178,7 @@ export function PricingFormComponent({
                   className="h-8 text-sm"
                 />
               </div>
-              <div className="w-2/4">
+              <div className="w-1/4">
                 <Label
                   htmlFor="price"
                   className="text-xs text-muted-foreground"
@@ -195,9 +195,15 @@ export function PricingFormComponent({
                   className="h-8 text-sm"
                 />
               </div>
-            </div>
+              <div className="flex items-center flex-col pb-2">
 
-            <div className="flex items-center space-x-2">
+              <Label
+                htmlFor="tax-included"
+                className="space-y-1 text-xs text-muted-foreground"
+              >
+                Tax Incl.
+              </Label>
+              <div className="flex items-center h-7 pt-2">
               <Checkbox
                 id="tax-included"
                 name="tax-included"
@@ -209,15 +215,13 @@ export function PricingFormComponent({
                   }))
                 }
                 disabled={isViewMode}
-                className="h-4 w-4"
+                className="text-sm"
               />
-              <Label
-                htmlFor="tax-included"
-                className="text-xs text-muted-foreground"
-              >
-                Tax Included ?
-              </Label>
+              </div>
             </div>
+            </div>
+
+
             <div className="grid grid-cols-4 space-x-4">
 
               <div className="col-span-2 lg:col-span-1 flex gap-2 items-center w-full">
@@ -272,6 +276,7 @@ export function PricingFormComponent({
               </div>
 
             </div>
+
             <div className="grid grid-cols-4 space-x-4">
             
               <div className="col-span-2 lg:col-span-1 flex gap-2 items-center w-full">
@@ -325,6 +330,22 @@ export function PricingFormComponent({
                 />
               </div>
             </div>
+
+            {/* Last Price, Last Order Date, Last Vendor section */}
+      <div className="grid grid-cols-3 gap-4 bg-gray-100 p-3 rounded-md">
+        <div>
+          <p className="text-xs ">Last Price</p>
+          <p className="text-xs text-muted-foreground">$3.85 per Kg</p>
+        </div>
+        <div>
+          <p className="text-xs">Last Order Date</p>
+          <p className="text-xs text-muted-foreground">2023-05-15</p>
+        </div>
+        <div>
+          <p className="text-xs">Last Vendor</p>
+          <p className="text-xs">Organic Supplies Inc.</p>
+        </div>
+      </div>
           </div>
         </div>
 
@@ -338,28 +359,14 @@ export function PricingFormComponent({
               discountRate: formData.discountRate || 0,
               taxRate: formData.taxRate || 0,
             }}
-            localCurrency="THB"
-            currentCurrency={formData.currency || "USD"}
+            currencyBase="THB"
+            currencyCurrent={formData.currency || "USD"}
           />
         </div>
 
       </div>
 
-      {/* Last Price, Last Order Date, Last Vendor section */}
-      <div className="grid grid-cols-3 gap-4 bg-gray-100 p-3 rounded-md">
-        <div>
-          <p className="text-xs text-muted-foreground">Last Price</p>
-          <p className="text-sm font-medium">$3.85 per Kg</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Last Order Date</p>
-          <p className="text-sm font-medium">2023-05-15</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Last Vendor</p>
-          <p className="text-sm font-medium">Organic Supplies Inc.</p>
-        </div>
-      </div>
+      
     </div>
   );
 }

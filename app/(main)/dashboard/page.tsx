@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
@@ -42,6 +43,12 @@ const initialItems = [
 
 export default function DashboardPage() {
   const [items, setItems] = useState(initialItems);
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) {
@@ -56,15 +63,19 @@ export default function DashboardPage() {
   };
 
   const renderDashboardItem = (item: any) => {
+    const isDark = theme === 'dark';
+    const textColor = isDark ? '#ffffff' : '#000000';
+    const gridColor = isDark ? '#4a4a4a' : '#cccccc';
+
     switch (item.type) {
       case 'inventoryTurnover':
         return (
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={inventoryTurnoverData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="month" stroke={textColor} />
+              <YAxis stroke={textColor} />
+              <Tooltip contentStyle={{ backgroundColor: isDark ? '#333' : '#fff', color: textColor }} />
               <Legend />
               <Line type="monotone" dataKey="turnover" stroke="#8884d8" />
             </LineChart>
@@ -88,7 +99,7 @@ export default function DashboardPage() {
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip contentStyle={{ backgroundColor: isDark ? '#333' : '#fff', color: textColor }} />
             </PieChart>
           </ResponsiveContainer>
         );
@@ -96,24 +107,26 @@ export default function DashboardPage() {
         return (
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={procurementSpendData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="category" stroke={textColor} />
+              <YAxis stroke={textColor} />
+              <Tooltip contentStyle={{ backgroundColor: isDark ? '#333' : '#fff', color: textColor }} />
               <Legend />
               <Bar dataKey="spend" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
         );
       case 'text':
-        return <p>{item.data}</p>;
+        return <p className="text-foreground">{item.data}</p>;
       default:
         return null;
     }
   };
 
+  if (!mounted) return null;
+
   return (
-    <div className=" mx-auto p-6">
+    <div className="mx-auto p-6 bg-background dark:bg-gray-800 text-foreground dark:text-gray-100">
       <h1 className="text-2xl md:text-3xl font-bold mb-4 text-center">Hotel Supply Chain Dashboard</h1>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="dashboard">
@@ -130,7 +143,7 @@ export default function DashboardPage() {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="p-3 rounded-lg shadow-md bg-white"
+                      className="p-3 rounded-lg shadow-md bg-card text-card-foreground"
                     >
                       <h2 className="text-lg font-semibold mb-3">{item.content}</h2>
                       {renderDashboardItem(item)}

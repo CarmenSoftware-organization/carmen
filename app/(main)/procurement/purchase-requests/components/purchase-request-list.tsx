@@ -365,7 +365,7 @@ export function PurchaseRequestList() {
     <>
       <div className="flex flex-wrap gap-2">
         <Button onClick={handleCreateNewPR} className="group">
-          <Plus className="mr-2 h-4 w-4" /> New PR
+          <Plus className="mr-2 h-4 w-4" /> New Purchase Request
         </Button>
         <Button variant="outline" className="group">
           <Download className="mr-2 h-4 w-4" /> Export
@@ -379,9 +379,9 @@ export function PurchaseRequestList() {
 
   const content = (
     <>
-      <div className="space-y-2">
+      <div className="space-y-2" >
         {getCurrentPageData().map((pr) => (
-          <Card key={pr.id} className="overflow-hidden p-2 hover:bg-secondary">
+          <Card key={pr.id} className="overflow-hidden p-2 hover:bg-secondary dark:hover:bg-gray-700 bg-white dark:bg-gray-800">
             <div className="py-2 px-4">
               <div className="flex justify-between items-center mb-0">
                 <div className="flex items-center space-x-2">
@@ -389,14 +389,13 @@ export function PurchaseRequestList() {
                     checked={selectedPRs.includes(pr.id)}
                     onCheckedChange={() => handleSelectPR(pr.id)}
                   />
-                  {/* Replace the existing Badge with the new StatusBadge component */}
                   <StatusBadge status={pr.status} />
+                  <span className="text-muted-foreground">
+                    {pr.id}
+                  </span>
                   <h3 className="text-sm md:text-base font-semibold">
                     {pr.description}
                   </h3>
-                  <span className="text-xs text-muted-foreground">
-                    ({pr.id})
-                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -426,26 +425,22 @@ export function PurchaseRequestList() {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
                 {[
+                  { label: "Date", field: "date" },
                   { label: "Type", field: "type" },
                   { label: "Requestor", field: "requestor" },
                   { label: "Department", field: "department" },
-                  { label: "Date", field: "date" },
                   { label: "Amount", field: "amount" },
                   { label: "Current Stage", field: "currentStage" },
                 ].map(({ label, field }) => (
                   <div key={field}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-0 h-auto font-medium text-muted-foreground uppercase text-xxs"
-                      onClick={() =>
-                        handleSort(field as keyof (typeof sampleData)[0])
-                      }
-                    >
+                    <p className="font-medium text-muted-foreground  text-sm">
                       {label}
-                      <ArrowUpDown className="ml-1 h-3 w-3" />
-                    </Button>
-                    <p className="text-sm">{pr[field as keyof typeof pr]}</p>
+                    </p>
+                    {field === 'currentStage' ?
+                      <p className="text-sm"><StatusBadge status={pr[field as keyof typeof pr] as string}/></p>
+                    :
+                      <p className="text-sm">{pr[field as keyof typeof pr]}</p>
+                    }
                   </div>
                 ))}
               </div>

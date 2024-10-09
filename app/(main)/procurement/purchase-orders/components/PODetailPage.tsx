@@ -163,9 +163,9 @@ export function PODetailPage({ params }: { params: { id: string } }) {
 
   const content = (
     <>
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center">
+      <Card className="mb-4 bg-white dark:bg-gray-800"> {/* Reduced bottom margin */}
+        <CardHeader className="py-3"> {/* Reduced vertical padding */}
+          <div className="flex flex-col space-y-2 md:flex-row md:justify-between md:items-center">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <Label className="text-xs text-muted-foreground">
@@ -227,7 +227,7 @@ export function PODetailPage({ params }: { params: { id: string } }) {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="py-2 "> {/* Reduced vertical padding */}
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-1">
               <Label className="text-xs text-muted-foreground">
@@ -271,17 +271,16 @@ export function PODetailPage({ params }: { params: { id: string } }) {
           </div>
         </CardContent>
       </Card>
-
-      <Tabs defaultValue="items" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="items">Items</TabsTrigger>
-          <TabsTrigger value="FinancialDetailsTab">Financials</TabsTrigger>
-          <TabsTrigger value="GoodsReceiveNoteTab">Goods Receive</TabsTrigger>
-          <TabsTrigger value="RelatedDocumentsTab">Documents</TabsTrigger>
-          <TabsTrigger value="CommentsAttachmentsTab">Comments</TabsTrigger>
-          <TabsTrigger value="ActivityLogsTab">Activity Log</TabsTrigger>
+      <Card className="mb-4 bg-white dark:bg-gray-800">
+      <Tabs defaultValue="items" className="w-full bg-white dark:bg-gray-800 " >
+        <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-gray-700">
+          <TabsTrigger value="items" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Items</TabsTrigger>
+          <TabsTrigger value="GoodsReceiveNoteTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  " >Goods Receive</TabsTrigger>
+          <TabsTrigger value="RelatedDocumentsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Documents</TabsTrigger>
+          <TabsTrigger value="CommentsAttachmentsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Comments & Attachments</TabsTrigger>
+          <TabsTrigger value="ActivityLogsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Activity Log</TabsTrigger>
         </TabsList>
-        <TabsContent value="items" className="bg-white p-4 rounded-md shadow">
+        <TabsContent value="items" className="bg-white dark:bg-gray-800 p-4 rounded-md shadow">
           <ItemsTab
             onUpdateItem={handleUpdateItem}
             onDeleteItem={handleDeleteItem}
@@ -290,43 +289,37 @@ export function PODetailPage({ params }: { params: { id: string } }) {
           />
         </TabsContent>
         <TabsContent
-          value="FinancialDetailsTab"
-          className="bg-white p-4 rounded-md shadow"
-        >
-          <FinancialDetailsTab poData={poData} />
-        </TabsContent>
-        <TabsContent
           value="GoodsReceiveNoteTab"
-          className="bg-white p-4 rounded-md shadow"
+          className="bg-white dark:bg-gray-800 p-4 rounded-md shadow"
         >
           <GoodsReceiveNoteTab poData={poData} />
         </TabsContent>
         <TabsContent
           value="RelatedDocumentsTab"
-          className="bg-white p-4 rounded-md shadow"
+          className="bg-white dark:bg-gray-800 p-4 rounded-md shadow"
         >
           <RelatedDocumentsTab poData={poData} />
         </TabsContent>
         <TabsContent
           value="CommentsAttachmentsTab"
-          className="bg-white p-4 rounded-md shadow"
+          className="bg-white dark:bg-gray-800 p-4 rounded-md shadow"
         >
           <CommentsAttachmentsTab poData={poData} />
         </TabsContent>
         <TabsContent
           value="ActivityLogsTab"
-          className="bg-white p-4 rounded-md shadow"
+          className="bg-white dark:bg-gray-800 p-4 rounded-md shadow"
         >
           <ActivityLogTab poData={poData} />
         </TabsContent>
-      </Tabs>
-
+        </Tabs>
+      </Card>
       {/* Add SummaryTotal component here */}
-      <Card className="mt-6">
-        <CardHeader>
+      <Card className="mt-4 bg-white dark:bg-gray-800"> {/* Reduced top margin */}
+        <CardHeader className="py-3"> {/* Reduced vertical padding */}
           <CardTitle>Purchase Order Summary</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="py-2"> {/* Reduced vertical padding */}
           <SummaryTotal poData={poData} />
         </CardContent>
       </Card>
@@ -342,13 +335,13 @@ export function PODetailPage({ params }: { params: { id: string } }) {
   );
 
   return (
-    <>
+    <div className="-mt-4 bg-white dark:bg-gray-800"> {/* Add negative top margin to the entire page */}
       <DetailPageTemplate
         title={title}
         actionButtons={actionButtons}
         content={content}
         backLink={backLink}
       />
-    </>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-
+/* 
 :root {
   --background: #ffffffc4;
   --foreground: #171717;
@@ -26,11 +26,11 @@ body {
   .text-balance {
     text-wrap: balance;
   }
-}
+} */
 
 @layer base {
   :root {
-    --background: rgb(131, 135, 142);
+    --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -88,7 +88,7 @@ body {
   }
 }
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border; 
   }
@@ -97,14 +97,14 @@ body {
   }
 }
 
-.bg-background {
+/* .bg-background {
   @apply bg-white;
-}
+} */
 
-.form-field-label {
+/* .form-field-label {
   @apply pb-4;
-}
+} */
 
 /* .lucide{
   color: white;
-} */
+} */ 

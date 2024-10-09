@@ -67,65 +67,68 @@ export function PendingPurchaseOrdersComponent() {
   };
 
   return (
-    <>
-      <div className="flex flex-col bg-muted p-4 rounded-md">
-        <div className="flex justify-between items-center mb-2 ">
-          <h2 className="text-xl font-bold">{itemData.name}</h2>
-          <StatusBadge status={itemData.status} />
-        </div>
-        <p className="text-gray-600 mb-2">{itemData.description}</p>
-        <div className="flex justify-between text-sm text-gray-500">
-          <span>
-            Requested: {itemData.requestedQuantity} {itemData.unit}
-          </span>
-          <span>
-            Approved: {itemData.approvedQuantity} {itemData.unit}
-          </span>
-        </div>
-      </div>
-      {/* <div className="flex justify-between text-sm text-gray-500">
-          <span>Requested: {itemData.requestedQuantity} {itemData.unit}</span>
-          <span>Approved: {itemData.approvedQuantity} {itemData.unit}</span>
-        </div> */}
+    <div className="space-y-4">
+      <Card className="bg-muted">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+            <h2 className="text-xl font-bold mb-2 sm:mb-0">{itemData.name}</h2>
+            <StatusBadge status={itemData.status} />
+          </div>
+          <p className="text-gray-600 mb-2">{itemData.description}</p>
+          <div className="flex flex-col sm:flex-row justify-between text-sm text-gray-500">
+            <span className="mb-1 sm:mb-0">
+              Requested: {itemData.requestedQuantity} {itemData.unit}
+            </span>
+            <span>
+              Approved: {itemData.approvedQuantity} {itemData.unit}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div>
-        <ScrollArea className="max-h-auto w-full">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">PO #</TableHead>
-                <TableHead className="min-w-[150px]">Vendor</TableHead>
-                <TableHead className="min-w-[120px]">Delivery Date</TableHead>
-                <TableHead className="min-w-[120px]">Qty to Receive</TableHead>
-                <TableHead className="min-w-[80px]">Units</TableHead>
-                <TableHead className="min-w-[200px]">
-                  Locations Ordered
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {poData.map((po) => (
-                <TableRow key={po.poNumber}>
-                  <TableCell className="font-medium">{po.poNumber}</TableCell>
-                  <TableCell>{po.vendor}</TableCell>
-                  <TableCell>{po.deliveryDate}</TableCell>
-                  <TableCell>{po.qtyToReceive}</TableCell>
-                  <TableCell>{po.units}</TableCell>
-                  <TableCell>{po.locationsOrdered.join(", ")}</TableCell>
+      <Card>
+        <CardContent className="p-0">
+          <ScrollArea className="w-full overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[80px]">PO #</TableHead>
+                  <TableHead className="min-w-[150px]">Vendor</TableHead>
+                  <TableHead className="min-w-[120px]">Delivery Date</TableHead>
+                  <TableHead className="min-w-[80px]">Remaining Qty</TableHead>
+                  <TableHead className="min-w-[80px]">Inventory Units</TableHead>
+                  <TableHead className="min-w-[120px]">
+                    Location
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </ScrollArea>
-        <DialogFooter>
-          <div className="mt-4 flex items-center space-x-2">
+              </TableHeader>
+              <TableBody>
+                {poData.map((po) => (
+                  <TableRow key={po.poNumber}>
+                    <TableCell className="font-medium">{po.poNumber}</TableCell>
+                    <TableCell>{po.vendor}</TableCell>
+                    <TableCell>{po.deliveryDate}</TableCell>
+                    <TableCell>{po.qtyToReceive}</TableCell>
+                    <TableCell>{po.units}</TableCell>
+                    <TableCell>{po.locationsOrdered.join(", ")}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
             <span className="font-semibold text-sm text-muted-foreground">
               Total on Order:
             </span>
             <span className="font-bold text-lg">{totalOnOrder}</span>
           </div>
-        </DialogFooter>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

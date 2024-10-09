@@ -423,6 +423,8 @@ export interface GoodsReceiveNote {
   vendor: string;
   location: string;
   currency: string;
+  exchangeRate: number;
+  baseCurrency: string;
   status: GoodsReceiveNoteStatus;
   isConsignment: boolean;
   isCash: boolean;
@@ -434,18 +436,30 @@ export interface GoodsReceiveNote {
   comments: Comment[];
   attachments: Attachment[];
   activityLog: ActivityLogEntry[];
-  financialSummary: FinancialSummary[];
+  financialSummary?: FinancialSummary;
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
 }
 
 export interface GoodsReceiveNoteItem {
   id: string;
   name: string;
   description: string;
+  jobCode: string;
   orderedQuantity: number;
   receivedQuantity: number;
   unit: string;
   unitPrice: number;
-  totalPrice: number;
+  subTotalAmount: number;
+  totalAmount: number;
   taxRate: number;
   taxAmount: number;
   discountRate: number;
@@ -454,33 +468,43 @@ export interface GoodsReceiveNoteItem {
   expiryDate?: Date;
   serialNumber?: string;
   notes?: string;
+  baseCurrency: string;
   baseQuantity: number;
-  basePrice: number;
+  baseUnitPrice: number;
   baseUnit: string;
-  baseTotalPrice: number;
+  baseSubTotalAmount: number;
+  baseNetAmount: number;
+  baseTotalAmount: number;
   baseTaxRate: number;
   baseTaxAmount: number;
   baseDiscountRate: number;
   baseDiscountAmount: number;
   conversionRate: number;
+  currency: string;
+  exchangeRate: number;
   extraCost: number;
-  applyDiscount: boolean;
-  applyTax: boolean;
   inventoryOnHand: number;
   inventoryOnOrder: number;
   inventoryReorderThreshold: number;
   inventoryRestockLevel: number;
   purchaseOrderRef: string;
   lastPurchasePrice: number;
+  lastOrderDate: Date;
   lastVendor: string;
   lotNumber: string;
   deliveryPoint: string;
+  deliveryDate: Date;
   location: string;
-  isFreeOfCharge: boolean; // Add this line
+  isFreeOfCharge: boolean;
+  taxIncluded: boolean;
+  adjustments: {
+    discount: boolean;
+    tax: boolean;
+  };
 }
 
 export interface StockMovement {
-  id: number;
+  id: string;
   itemName: string;
   quantity: number;
   fromLocation: string;

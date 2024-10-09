@@ -15,9 +15,9 @@ const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
   backLink,
 }) => {
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-2 bg-white dark:bg-gray-800">
       {/* <Card> */}
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gray-100 dark:bg-gray-800">
           <CardTitle className="text-2xl font-bold flex items-center gap-2"><div>{backLink}</div><div>{title}</div> </CardTitle>
           {actionButtons && <div className="space-x-2">{actionButtons}</div>}
         </CardHeader>

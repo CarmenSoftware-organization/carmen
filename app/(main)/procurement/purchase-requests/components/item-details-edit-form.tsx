@@ -201,6 +201,24 @@ export function ItemDetailsEditForm({
               Edit
             </Button>
           )}
+          <div className="flex flex-wrap justify-end gap-2 mt-4">
+        {mode === "view" ? (
+          <>
+            {/* <Button variant="outline" onClick={onCancel}>
+              Close
+            </Button> */}
+          </>
+        ) : (
+          <>
+            <Button variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" form="itemForm">
+              Save
+            </Button>
+          </>
+        )}
+      </div>
           <Button variant="ghost" size="icon" onClick={onCancel}>
             <X className="h-4 w-4" />
           </Button>
@@ -214,7 +232,7 @@ export function ItemDetailsEditForm({
               <h3 className="text-lg font-semibold">Basic Information</h3>
               <StatusBadge status={formData.status} />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-7 gap-2">
               <FormField id="location" label="Location" required>
                 <Input
                   id="location"
@@ -226,10 +244,11 @@ export function ItemDetailsEditForm({
                   className="h-8 text-sm"
                 />
               </FormField>
-              <FormField id="name" label="Name" required>
+              <div className="sm:col-span-2">
+              <FormField id="name" label="Product name" required>
                 <Input
                   id="name"
-                  name="name"
+                  name="Product name"
                   value={formData.name}
                   onChange={handleInputChange}
                   required
@@ -237,12 +256,25 @@ export function ItemDetailsEditForm({
                   className="h-8 text-sm"
                 />
               </FormField>
-              <div className="sm:col-span-2">
-                <FormField id="description" label="Description" required>
+              </div>
+              <div className="sm:col-span-3">
+                <FormField id="description" label="Description" readOnly>
                   <Input
                     id="description"
                     name="description"
                     value={formData.description}
+                    onChange={handleInputChange}
+                    readOnly={true}
+                    className="h-8 text-sm"
+                  />
+                </FormField>
+              </div>
+              <div className="sm:col-span-1">
+                <FormField id="jobcode" label="Job code">
+                  <Input
+                      id="jobcode"
+                    name="jobcode"
+                    value={formData.jobCode}
                     onChange={handleInputChange}
                     required
                     disabled={mode === "view"}
@@ -251,19 +283,112 @@ export function ItemDetailsEditForm({
                 </FormField>
               </div>
             </div>
+            <div className="w-full">
+                <FormField id="comment" label="Comment">
+                  {mode === "view" ? (
+                    <div className="mt-1 text-sm">{formData.comment}</div>
+                  ) : (
+                    <Textarea
+                      id="comment"
+                      name="comment"
+                      value={formData.comment}
+                      onChange={handleInputChange}
+                      placeholder="Add any additional notes here"
+                      className="text-sm h-8"
+                    />
+                  )}
+                </FormField>
+              </div>
           </div>
 
           <Separator className="my-2" />
 
           {/* Quantity and Delivery Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">
-              Quantity and Delivery
-            </h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold">Quantity and Delivery</h3>
+              <div className="flex gap-2">
+                <Dialog
+                  open={isInventoryBreakdownOpen}
+                  onOpenChange={setIsInventoryBreakdownOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      <Package className="mr-2 h-4 w-4" />
+                      On Hand
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[60vw] w-[80vw] overflow-y-auto [&>button]:hidden">
+                    <DialogHeader>
+                      <div className="flex justify-between w-full items-center">
+                        <DialogTitle>On Hand by Location</DialogTitle>
+                        <DialogClose asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsInventoryBreakdownOpen(false)}
+                          >
+                            <XIcon className="h-4 w-4" />
+                          </Button>
+                        </DialogClose>
+                      </div>
+                    </DialogHeader>
+                    <InventoryBreakdown />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      <TruckIcon className="mr-2 h-4 w-4" />
+                      On Order
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[60vw] overflow-y-auto [&>button]:hidden">
+                    <DialogHeader>
+                      <div className="flex justify-between w-full items-center">
+                        <DialogTitle>Pending Purchase Order</DialogTitle>
+                        <DialogClose asChild>
+                          <Button variant="ghost" size="sm" onClick={() => setIsOnOrderOpen(false)}>
+                            <XIcon className="h-4 w-4" />
+                          </Button>
+                        </DialogClose>
+                      </div>
+                    </DialogHeader>
+                    <PendingPurchaseOrdersComponent />
+                  </DialogContent>
+                </Dialog>
+                
+                <Dialog
+                  open={isVendorComparisonOpen}
+                  onOpenChange={setIsVendorComparisonOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      <Package className="mr-2 h-4 w-4" />
+                      Vendor Comparison
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[60vw] bg-white p-6 overflow-y-auto [&>button]:hidden">
+                    <DialogHeader>
+                      <div className="flex justify-between w-full items-center">
+                        <DialogTitle>Vendor Comparison</DialogTitle>
+                        <DialogClose asChild>
+                          <Button variant="ghost" size="sm">
+                            <XIcon className="h-4 w-4" />
+                          </Button>
+                        </DialogClose>
+                      </div>
+                    </DialogHeader>
+                    <VendorComparison />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
               <FormField
                 id="unit"
-                label="Unit"
+                label="Order Unit"
                 required
                 smallText="Base: Kg | 1 Bag = 0.5 Kg"
               >
@@ -377,6 +502,7 @@ export function ItemDetailsEditForm({
                 />
               </FormField>
             </div>
+
             {/* Inventory Information Section */}
             <div className="mt-2">
               <div className="bg-muted p-2 rounded-md">
@@ -445,126 +571,15 @@ export function ItemDetailsEditForm({
                   className="h-8 text-sm"
                 />
               </FormField>
-              <div className="sm:col-span-2">
-                <FormField id="comment" label="Comment">
-                  {mode === "view" ? (
-                    <div className="mt-1 text-sm">{formData.comment}</div>
-                  ) : (
-                    <Textarea
-                      id="comment"
-                      name="comment"
-                      value={formData.comment}
-                      onChange={handleInputChange}
-                      placeholder="Add any additional notes here"
-                      className="text-sm h-8"
-                    />
-                  )}
-                </FormField>
-              </div>
+              
             </div>
           </div>
 
           <Separator className="my-2" />
 
-          {/* Action Buttons */}
-          <div>
-            <div className="flex flex-wrap justify-end gap-2">
-              <Dialog
-                open={isInventoryBreakdownOpen}
-                onOpenChange={setIsInventoryBreakdownOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button type="button" variant="outline">
-                    <Package className="mr-2 h-4 w-4" />
-                    On Hand
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[50vw] w-[80vw] overflow-y-auto [&>button]:hidden">
-                  <DialogHeader>
-                    <div className="flex justify-between w-full items-center">
-                      <DialogTitle>On Hand by Location</DialogTitle>
-                      <DialogClose asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setIsInventoryBreakdownOpen(false)}
-                        >
-                          <XIcon className="h-4 w-4" />
-                        </Button>
-                      </DialogClose>
-                    </div>
-                  </DialogHeader>
-                  <InventoryBreakdown />
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
-                <DialogTrigger asChild>
-                  <Button type="button" variant="outline">
-                    <TruckIcon className="mr-2 h-4 w-4" />
-                    On Order
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[50vw] overflow-y-auto [&>button]:hidden">
-                  <DialogHeader>
-                    <div className="flex justify-between w-full items-center">
-                      <DialogTitle> Pending Purchase Order</DialogTitle>
-                      <DialogClose asChild>
-                        <Button variant="ghost" size="sm" onClick={() => setIsOnOrderOpen(false)}>
-                          <XIcon className="h-4 w-4" />
-                        </Button>
-                      </DialogClose>
-                    </div>
-                  </DialogHeader>
-                  <PendingPurchaseOrdersComponent />
-                </DialogContent>
-              </Dialog>
-              <Dialog
-                open={isVendorComparisonOpen}
-                onOpenChange={setIsVendorComparisonOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button type="button" variant="outline">
-                    <Package className="mr-2 h-4 w-4" />
-                    Vendor Comparison
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[50vw] bg-white p-6  overflow-y-auto [&>button]:hidden">
-                  <DialogHeader>
-                    <div className="flex justify-between w-full items-center">
-                      <DialogTitle>Vendor Comparison</DialogTitle>
-                      <DialogClose asChild>
-                        <Button variant="ghost" size="sm">
-                          <XIcon className="h-4 w-4" />
-                        </Button>
-                      </DialogClose>
-                    </div>
-                  </DialogHeader>
-                  <VendorComparison />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
         </form>
       </ScrollArea>
-      <div className="flex flex-wrap justify-end gap-2 mt-4">
-        {mode === "view" ? (
-          <>
-            <Button variant="outline" onClick={onCancel}>
-              Close
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" form="itemForm">
-              Save
-            </Button>
-          </>
-        )}
-      </div>
+      
     </div>
   );
 }

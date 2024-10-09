@@ -223,7 +223,7 @@ const router = useRouter();
           <div className="px-8 pt-6 w-fit">
             <Link
               href="/"
-              className="text-2xl text-center font-bold text-blue-900"
+              className="text-2xl text-center font-bold text-blue-900 dark:text-blue-100"
             >
               CARMEN
             </Link>
@@ -238,7 +238,7 @@ const router = useRouter();
                   <div key={item.title} className="px-3 py-2">
                     <Button
                       variant="ghost"
-                      className="w-full justify-between text-base font-semibold"
+                      className="w-full justify-between text-base  text-gray-800 dark:text-gray-200"
                       onClick={() => toggleExpand(item.title, item.path)}
                     >
                       <span className="flex items-center">
@@ -267,7 +267,7 @@ const router = useRouter();
                               variant="ghost"
                               asChild
                               className={cn(
-                                "w-full justify-start text-sm",
+                                "w-full justify-start text-sm text-foreground dark:text-gray-100",
                                 pathname ===
                                   (typeof subItem === "string"
                                     ? `${item.path}/${subItem

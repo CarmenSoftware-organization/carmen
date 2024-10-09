@@ -27,7 +27,7 @@ const mockGRNData = [
     date: "2024-03-16",
     location: "IT Department",
     receiver: "Jane Smith",
-    status: "Pending",
+    status: "Void",
     qty: 30,
     units: "boxes",
   },
@@ -36,7 +36,7 @@ const mockGRNData = [
     date: "2024-03-17",
     location: "Branch Office",
     receiver: "Bob Johnson",
-    status: "Partial",
+    status: "Committed",
     qty: 75,
     units: "kg",
   },
@@ -59,7 +59,7 @@ export function GoodsReceiveNoteTable() {
                   <TableHead>Receiver</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Qty</TableHead>
-                  <TableHead>Units</TableHead>
+                  <TableHead>Inventory Units</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

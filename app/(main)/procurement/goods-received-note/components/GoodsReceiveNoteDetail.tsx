@@ -17,8 +17,6 @@ import { StockMovementTab } from './tabs/StockMovementTab'
 import { ArrowLeft, Edit, Trash, Printer, Send, Save } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FinancialSummaryTab } from './tabs/FinancialSummaryTab'
-import { CommentTab } from './tabs/CommentTab'
-import { AttachmentTab } from './tabs/AttachmentTab'
 import { ActivityLogTab } from './tabs/ActivityLogTab'
 
 interface GoodsReceiveNoteDetailProps {
@@ -51,7 +49,18 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   comments: [],
   attachments: [],
   activityLog: [],
-  financialSummary: []
+  exchangeRate: 0,
+  baseCurrency: '',
+  baseSubTotalPrice: 0,
+  subTotalPrice: 0,
+  baseNetAmount: 0,
+  netAmount: 0,
+  baseDiscAmount: 0,
+  discountAmount: 0,
+  baseTaxAmount: 0,
+  taxAmount: 0,
+  baseTotalAmount: 0,
+  totalAmount: 0,
 };
 
 export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initialData }: GoodsReceiveNoteDetailProps) {
@@ -59,7 +68,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
   const [formData, setFormData] = useState<GoodsReceiveNote>(initialData || emptyGoodsReceiveNote);
   const [extraCosts, setExtraCosts] = useState<ExtraCost[]>([])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-
+const [expandedItems, setExpandedItems] = useState<string[]>([])
   // useEffect(() => {
   //   console.log('formData', initialData)
   // }, [initialData]);
@@ -389,7 +398,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
       <Tabs defaultValue="items">
         <TabsList>
           <TabsTrigger value="items">Items</TabsTrigger>
-          <TabsTrigger value="extra-costs">Extra Costs</TabsTrigger>
+          <TabsTrigger value="extra-costs" className="bg bg-red-500">Extra Costs</TabsTrigger>
           <TabsTrigger value="stock-movement">Stock Movement</TabsTrigger>
           <TabsTrigger value="financial-summary">Financial Summary</TabsTrigger>
           <TabsTrigger value="comments">Comments</TabsTrigger>
@@ -416,8 +425,13 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
         <TabsContent value="extra-costs">
           <ExtraCostsTab 
             mode={mode} 
-            initialCosts={extraCosts} 
-            onCostsChange={handleExtraCostsChange} 
+            initialCosts={formData.extraCosts}
+            onCostsChange={(newCosts) => {
+              setFormData(prev => ({
+                ...prev,
+                extraCosts: newCosts
+              }))
+            }}
           />
         </TabsContent>
         <TabsContent value="stock-movement">
@@ -429,54 +443,16 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
         <TabsContent value="financial-summary">
           <FinancialSummaryTab 
             mode={mode}
-            summary={calculateFinancialSummary()}
+            summary={formData.financialSummary} // {calculateFinancialSummary()}
+            currency={formData.currency}
+            baseCurrency={formData.baseCurrency}
           />
         </TabsContent>
         <TabsContent value="comments">
-          <CommentTab 
-            mode={mode}
-            comments={formData.comments}
-            onAddComment={(comment) => {
-              const newComment = {
-                ...comment,
-                id: Date.now().toString(),
-                number: formData.comments.length + 1,
-                date: new Date().toISOString(),
-                author: 'Current User', // Replace with actual user name
-                content: comment.content,
-                timestamp: new Date().toISOString(),
-                text: comment.text,
-              };
-              // setFormData(prev => ({
-              //   ...prev,
-              //   comments: [...prev.comments, newComment]
-              // }));
-            }}
-            onEditComment={handleEditComment}
-            onDeleteComment={handleDeleteComment}
-          />
+          
         </TabsContent>
         <TabsContent value="attachments">
-          <AttachmentTab 
-            mode={mode}
-            attachments={formData.attachments}
-            onAddAttachment={(attachment) => {
-              const newAttachment = {
-                ...attachment,
-                id: Date.now().toString(),
-                number: formData.attachments.length + 1,
-                date: new Date().toISOString(),
-                uploader: 'Current User', // Replace with actual user name
-              };
-              // setFormData(prev => ({
-              //   ...prev,
-              //   attachments: [...prev.attachments, newAttachment]
-              // }));
-            }}
-            onEditAttachment={handleEditAttachment}
-            onDeleteAttachment={handleDeleteAttachment}
-            onDownloadAttachment={handleDownloadAttachment}
-          />
+        
         </TabsContent>
         <TabsContent value="activity-log">
           <ActivityLogTab activityLog={formData.activityLog} />

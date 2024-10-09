@@ -421,10 +421,9 @@ export function ItemsTab() {
         </TableBody>
       </Table>
 
-      <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
-        <DialogContent className="sm:max-w-[80vw] max-w-[80vw] p-0 border-none bg-transparent overflow-y-auto [&>button]:hidden">
-        
-          <div className="bg-background rounded-b-lg overflow-y-auto">
+      <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen} >
+        <DialogContent className="sm:max-w-[80vw] max-w-[80vw] p-0 border-none overflow-y-auto [&>button]:hidden ">
+          <div className="rounded-lg overflow-y-auto">
             <ItemDetailsEditForm
               onSave={handleSave}
               onCancel={closeItemForm}

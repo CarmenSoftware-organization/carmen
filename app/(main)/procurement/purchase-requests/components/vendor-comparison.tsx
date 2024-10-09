@@ -152,10 +152,10 @@ export default function VendorComparison() {
             <TableRow>
               <TableHead className="w-[50px]">Select</TableHead>
               <TableHead>Vendor</TableHead>
-              <TableHead>Preferred Vendor</TableHead>
+              <TableHead className="w-[50px]">Prefer Vendor</TableHead>
               <TableHead>Rating</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead>Pref. List</TableHead>
+              <TableHead>Used List</TableHead>
               <TableHead>Unit Price</TableHead>
               <TableHead>Min. Quantity</TableHead>
             </TableRow>

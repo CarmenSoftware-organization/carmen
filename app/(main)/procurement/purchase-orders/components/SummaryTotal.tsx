@@ -56,19 +56,19 @@ export default function SummaryTotal({ poData }: ISummaryTotalProps) {
       <TableHeader>
         <TableRow>
           <TableHead className="font-bold whitespace-nowrap">Description</TableHead>
-          <TableHead className="text-right text-gray-500 text-xs whitespace-nowrap hidden md:table-cell">Base Amount</TableHead>
           <TableHead className="text-right font-bold whitespace-nowrap">Total Amount</TableHead>
+          <TableHead className="text-right text-gray-500 text-xs whitespace-nowrap hidden md:table-cell">Base Amount</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data.map((item) => (
           <TableRow key={item.Label}>
             <TableCell className="whitespace-nowrap">{item.Label}</TableCell>
-            <TableCell className="hidden md:table-cell text-right text-xs text-gray-500 whitespace-nowrap">
-              {item.localCurrency} {item.localAmt.toFixed(2)}
-            </TableCell>
             <TableCell className="text-right font-bold whitespace-nowrap">
               {item.currentCurrency} {item.currentAmt.toFixed(2)}
+            </TableCell>
+            <TableCell className="hidden md:table-cell text-right text-xs text-gray-500 whitespace-nowrap">
+              {item.localCurrency} {item.localAmt.toFixed(2)}
             </TableCell>
           </TableRow>
         ))}

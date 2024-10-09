@@ -225,9 +225,9 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
 
   return (
     <TooltipProvider>
-      <div className="space-y-4 w-full">
+      <div className="space-y-4 w-full bg-white dark:bg-gray-800" >
         <div className="flex justify-between items-center w-full">
-          <Button onClick={() => setIsAddItemFormOpen(true)}>
+          <Button onClick={() => setIsAddItemFormOpen(true)} className="bg-primary text-white dark:bg-gray-700 dark:text-gray-100">
             <Plus className="mr-2 s h-4 w-4 "/> Add Item
           </Button>
         </div>
@@ -283,9 +283,9 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
                         // onCheckedChange={toggleAllSelection}
                       />
                     </TableHead>
-                    <TableHead className="min-w-[120px]">Item</TableHead>
+                    <TableHead className="min-w-[120px]">Product Name</TableHead>
                     <TableHead className="min-w-[200px]">Description</TableHead>
-                    <TableHead className="min-w-[120px]">Approved Qty</TableHead>
+                    <TableHead className="min-w-[120px]">Order Qty</TableHead>
                     <TableHead className="min-w-[120px]">Received Qty</TableHead>
                     <TableHead className="min-w-[120px]">Remaining Qty</TableHead>
                     <TableHead className="min-w-[80px]">Unit</TableHead>
@@ -294,7 +294,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
                     <TableHead className="min-w-[150px]">
                       Receiving Status
                     </TableHead>
-                    <TableHead className="sticky right-0 bg-background min-w-[120px]">Actions</TableHead>
+                    <TableHead className="sticky right-0 bg-white dark:bg-gray-800 min-w-[120px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -384,7 +384,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
                       <TableCell className="py-1">
                         <StatusBadge status={item.status} />
                       </TableCell>
-                      <TableCell className="sticky right-0 bg-background py-1">
+                      <TableCell className="sticky right-0 bg-gray-100 dark:bg-gray-800 py-1">
                         <div className="flex space-x-1">
                           <Button
                             variant="ghost"

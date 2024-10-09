@@ -17,6 +17,7 @@ import {
   ChevronDown,
   Eye,
   Trash2,
+  Plus,
   X,
   CheckSquare,
   FileDown,
@@ -109,7 +110,7 @@ const PurchaseOrderList: React.FC = () => {
           placeholder="Search purchase orders..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full"
+          className="w-1/2"
         />
       </div>
       <div className="flex items-center space-x-2 flex-shrink-0">
@@ -155,7 +156,7 @@ const PurchaseOrderList: React.FC = () => {
                   <StatusBadge status={po.status} />
                   <div>
                     <h3 className="text-lg font-semibold">
-                      {po.number} <span className="text-sm font-normal text-muted-foreground">({po.vendorName})</span>
+                    <span className="font-normal text-muted-foreground"> {po.number} </span><span className=""> ({po.vendorName})</span>
                     </h3>
                   </div>
                 </div>
@@ -192,22 +193,30 @@ const PurchaseOrderList: React.FC = () => {
                   </TooltipProvider>
                 </div>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <Label className="text-xs text-muted-foreground">Date</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-7 gap-4 text-sm">
+                <div className="text-left">
+                  <Label className="text-sm text-muted-foreground">Date</Label>
                   <p>{po.orderDate.toLocaleDateString()}</p>
                 </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Doc #</Label>
-                  <p>{po.number}</p>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Doc Date</Label>
+                <div className="text-Left">
+                  <Label className="text-sm text-muted-foreground">Delivery Date</Label>
                   <p>{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</p>
                 </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Amount</Label>
-                  <p>${po.totalAmount.toFixed(2)}</p>
+                <div className="">
+                  <Label className="text-sm text-muted-foreground">Currency</Label>
+                  <p>{po.currencyCode}</p>
+                </div>
+                <div className="text-right">
+                  <Label className="text-sm text-muted-foreground">Net Amount</Label>
+                  <p>{po.netAmount.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <Label className="text-sm text-muted-foreground">Tax Amount</Label>
+                  <p>{po.taxAmount.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <Label className="text-sm text-muted-foreground">Amount</Label>
+                  <p>{po.totalAmount.toFixed(2)}</p>
                 </div>
               </div>
             </CardContent>
@@ -265,8 +274,10 @@ const PurchaseOrderList: React.FC = () => {
 
   const actionButtons = (
     <>
-      <Button>New Purchase Order</Button>
-      <Button variant="outline">
+      <Button className="group">
+        <Plus className="mr-2 h-4 w-4" /> New Purchase Order
+      </Button>
+      <Button variant="outline" className="group">
         <FileDown className="mr-2 h-4 w-4" />
         Export
       </Button>

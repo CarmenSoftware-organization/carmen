@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { PRHeader } from "./PRHeader";
 import { ItemsTab } from "./tabs/ItemsTab";
-import { BudgetsTab } from "./tabs/BudgetsTab";
+import { ResponsiveBudgetScreen } from "./tabs/budget-tab";
 import { WorkflowTab } from "./tabs/WorkflowTab";
 import { AttachmentsTab } from "./tabs/AttachmentsTab";
 import { ActivityTab } from "./tabs/ActivityTab";
@@ -134,9 +134,9 @@ export default function PRDetailPage() {
   };
 
   return (
-    <div className="container mx-auto py-10">
-      <Card className="mb-6">
-        <CardHeader className="flex flex-col space-y-4">
+    <div className="container mx-auto py-0">
+      <Card className="mb-6 bg-white dark:bg-gray-800">
+        <CardHeader className="flex flex-col space-y-4 bg-white dark:bg-gray-800">
           <PRHeader
             title={
               mode === "add"
@@ -147,7 +147,7 @@ export default function PRDetailPage() {
             onModeChange={handleModeChange}
             onDocumentAction={handleDocumentAction}
           />
-          <Card>
+          <Card className="bg-white dark:bg-gray-800">
             <CardContent className="p-4">
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div>
@@ -287,11 +287,11 @@ export default function PRDetailPage() {
           {/* <PRForm formData={formData} setFormData={setFormData} isDisabled={mode === 'view'} /> */}
         </CardHeader>
         <CardContent className="pt-0">
-          <Tabs defaultValue="items" className="w-full">
+          <Tabs defaultValue="items" className="w-full bg-white dark:bg-gray-800">
             <TabsList className="grid w-full grid-cols-5">
-              {["items", "budgets", "workflow", "attachments", "activity", "summary"].map(
+              {["items", "budgets", "workflow", "attachments", "activity"].map(
                 (tab) => (
-                  <TabsTrigger key={tab} value={tab}>
+                  <TabsTrigger key={tab} value={tab} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
                   </TabsTrigger>
                 )
@@ -303,7 +303,7 @@ export default function PRDetailPage() {
                   <ItemsTab />
                 </TabsContent>
                 <TabsContent value="budgets">
-                  <BudgetsTab />
+                  <ResponsiveBudgetScreen />
                 </TabsContent>
                 <TabsContent value="workflow">
                   <WorkflowTab />
@@ -313,9 +313,6 @@ export default function PRDetailPage() {
                 </TabsContent>
                 <TabsContent value="activity">
                   <ActivityTab />
-                </TabsContent>
-                <TabsContent value="summary">
-                  <SummaryTotal prData={formData} />
                 </TabsContent>
               </ScrollArea>
               {(mode === "edit" || mode === "add") && (
@@ -327,7 +324,7 @@ export default function PRDetailPage() {
           </Tabs>
           
             {/* Add SummaryTotal component here */}
-          <Card className="mt-6">
+          <Card className="mt-6 bg-white dark:bg-gray-800">
             <CardHeader>
               <CardTitle>Purchase Request Summary</CardTitle>
             </CardHeader>

@@ -161,16 +161,7 @@ export function ItemDetailsComponent({
           </DialogHeader>
 
           <ScrollArea className="max-h-[60vh] w-full overflow-y-auto">
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="comment">Comment</TabsTrigger>
-              </TabsList>
-              <TabsContent value="details" className="space-y-4 mt-4">
+           <div className="space-y-2">
                 <div>
                   <h3 className="text-md font-semibold mb-2">Basic Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
@@ -198,7 +189,32 @@ export function ItemDetailsComponent({
                 <Separator />
 
                 <div>
+                  <div className="flex flex-col md:flex-row justify-between gap-2">
                   <h3 className="text-md font-semibold mb-2">Quantity and Delivery</h3>
+                  <div className="flex flex-wrap justify-end gap-2 py-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRequestNumberClick}
+              >
+                Request #
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleOnHandClick}>
+                On Hand
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleOnOrderClick}>
+                On Order
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGoodsReceivedClick}
+              >
+                G. Received
+              </Button>
+            </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-2">
                     <div className="lg:col-span-1 space-y-1">
                       <Label htmlFor="unit" className="text-xs">
@@ -316,7 +332,7 @@ export function ItemDetailsComponent({
                             className="h-7 text-sm"
                           />
                         </div>
-                        <div className="space-y-1 sm:col-span-2">
+                        <div className="space-y-1 sm:col-span-1">
                           <Label htmlFor="price" className="text-xs">
                             Price
                           </Label>
@@ -327,19 +343,26 @@ export function ItemDetailsComponent({
                             className="h-7 text-sm"
                           />
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="enable-adjustment"
-                          disabled={isReadOnly}
-                        />
+
+                        <div className="flex flex-col pt-2">
                         <Label
                           htmlFor="enable-adjustment"
                           className="text-xs"
                         >
-                          Include Tax
+                           Tax Incl.
                         </Label>
+                        <div className="flex items-center h-7">
+                        <Checkbox
+                          id="enable-adjustment"
+                          disabled={isReadOnly}
+                          className="text-sm"
+                        />
+                        </div>
+                        
                       </div>
+
+                      </div>
+                      
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div className="flex gap-2 items-center w-full">
                           <div className="flex flex-col">
@@ -451,42 +474,9 @@ export function ItemDetailsComponent({
                     />
                   </div>
                 </div>
-              </TabsContent>
-              <TabsContent value="comment" className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Comment</h3>
-                <Textarea
-                  placeholder="Add your comment here..."
-                  className="text-sm h-[calc(100vh-280px)]"
-                  readOnly={isReadOnly}
-                />
-              </TabsContent>
-            </Tabs>
+                </div>
           </ScrollArea>
 
-          <DialogFooter>
-            <div className="flex flex-wrap justify-end gap-2 py-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRequestNumberClick}
-              >
-                Request #
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleOnHandClick}>
-                On Hand
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleOnOrderClick}>
-                On Order
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleGoodsReceivedClick}
-              >
-                G. Received
-              </Button>
-            </div>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 

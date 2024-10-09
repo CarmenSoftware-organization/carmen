@@ -63,8 +63,8 @@ export function PendingPurchaseOrdersComponent() {
                 <TableHead className="w-[100px]">PO #</TableHead>
                 <TableHead className="min-w-[150px]">Vendor</TableHead>
                 <TableHead className="min-w-[120px]">Delivery Date</TableHead>
-                <TableHead className="min-w-[120px]">Qty to Receive</TableHead>
-                <TableHead className="min-w-[80px]">Units</TableHead>
+                <TableHead className="min-w-[120px]">Remaining Qty</TableHead>
+                <TableHead className="min-w-[80px]">Inventory Units</TableHead>
                 <TableHead className="min-w-[200px]">Locations Ordered</TableHead>
               </TableRow>
             </TableHeader>

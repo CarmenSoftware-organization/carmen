@@ -5,51 +5,51 @@ import {
   TableRow,
   TableHead,
   TableHeader,
-} from "@/components/ui/table"
-import { PurchaseRequest } from "@/lib/types"
+} from "@/components/ui/table";
+import { GoodsReceiveNote } from "@/lib/types";
 
 interface ISummaryTotalProps {
-  prData: PurchaseRequest
+    poData: GoodsReceiveNote;
 }
 
-export default function SummaryTotal({ prData }: ISummaryTotalProps) {
+export default function SummaryTotal({ poData }: ISummaryTotalProps) {
   const data = [
     {
       Label: "Subtotal Amount",
-      localCurrency: "THB", // Assuming THB as base currency, adjust if needed
-      localAmt: prData.baseSubTotalPrice ?? 0,
-      currentCurrency: prData.currency ?? "THB",
-      currentAmt: prData.subTotalPrice ?? 0,
+      localCurrency: poData.currency,
+      localAmt: poData.baseSubTotalPrice ?? 0,
+      currentCurrency: poData.baseCurrency,
+      currentAmt: poData.subTotalPrice ?? 0,
     },
     {
       Label: "Discount Amount",
-      localCurrency: "THB",
-      localAmt: prData.baseDiscAmount ?? 0,
-      currentCurrency: prData.currency ?? "THB",
-      currentAmt: prData.discountAmount ?? 0,
+      localCurrency: poData.baseCurrency,
+      localAmt: poData.baseDiscAmount ?? 0,
+      currentCurrency: poData.currency,
+      currentAmt: poData.discountAmount ?? 0,
     },
     {
       Label: "Net Amount",
-      localCurrency: "THB",
-      localAmt: prData.baseNetAmount ?? 0,
-      currentCurrency: prData.currency ?? "THB",
-      currentAmt: prData.netAmount ?? 0,
+      localCurrency: poData.baseCurrency,
+      localAmt: poData.baseNetAmount ?? 0,
+      currentCurrency: poData.currency,
+      currentAmt: poData.netAmount ?? 0,
     },
     {
       Label: "Tax Amount",
-      localCurrency: "THB",
-      localAmt: prData.baseTaxAmount ?? 0,
-      currentCurrency: prData.currency ?? "THB",
-      currentAmt: prData.taxAmount ?? 0,
+      localCurrency: poData.baseCurrency,
+      localAmt: poData.baseTaxAmount ?? 0,
+      currentCurrency: poData.currency,
+      currentAmt: poData.taxAmount ?? 0,
     },
     {
       Label: "Total Amount",
-      localCurrency: "THB",
-      localAmt: prData.baseTotalAmount ?? 0,
-      currentCurrency: prData.currency ?? "THB",
-      currentAmt: prData.totalAmount ?? 0,
+      localCurrency: poData.baseCurrency,
+      localAmt: poData.baseTotalAmount ?? 0,
+      currentCurrency: poData.currency,
+      currentAmt: poData.totalAmount ?? 0,
     }
-  ]
+  ];
 
   return (
     <Table>
@@ -74,5 +74,5 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }

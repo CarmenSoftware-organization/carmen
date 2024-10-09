@@ -29,26 +29,26 @@ const budgetData: BudgetData[] = [
 
 export const BudgetsTab: React.FC = () => {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[150px]">Location</TableHead>
-          <TableHead className="w-[150px]">Budget Category</TableHead>
-          <TableHead className="text-right">Total Budget</TableHead>
-          <TableHead className="text-right">
+    <Table className="bg-white dark:bg-gray-800">
+      <TableHeader className="bg-white dark:bg-gray-800">
+        <TableRow >
+          <TableHead className="w-[150px] text-white dark:text-gray-800">Location</TableHead>
+          <TableHead className="w-[150px] text-white dark:text-gray-800">Budget Category</TableHead>
+          <TableHead className="text-right text-white dark:text-gray-800">Total Budget</TableHead>
+          <TableHead className="text-right text-white dark:text-gray-800">
             <div>Soft Commitment</div>
-            <div className="font-normal text-xs">Dept. Head Approve PR</div>
+            <div className="font-normal text-xs text-white dark:text-gray-800">Dept. Head Approve PR</div>
           </TableHead>
-          <TableHead className="text-right">
+          <TableHead className="text-right text-white dark:text-gray-800">
             <div>Soft Commitment</div>
-            <div className="font-normal text-xs">PO</div>
+            <div className="font-normal text-xs text-white dark:text-gray-800">PO</div>
           </TableHead>
           <TableHead className="text-right">
             <div>Hard Commitment</div>
-            <div className="font-normal text-xs">Actual GL</div>
+            <div className="font-normal text-xs text-white dark:text-gray-800">Actual GL</div>
           </TableHead>
-          <TableHead className="text-right">Available Budget</TableHead>
-          <TableHead className="text-right">Current PR Amount</TableHead>
+          <TableHead className="text-right text-white dark:text-gray-800">Available Budget</TableHead>
+          <TableHead className="text-right text-white dark:text-gray-800">Current PR Amount</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
