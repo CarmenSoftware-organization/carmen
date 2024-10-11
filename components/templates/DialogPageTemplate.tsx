@@ -4,7 +4,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/custom-dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import React, { ReactNode } from "react";

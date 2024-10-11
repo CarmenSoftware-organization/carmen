@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogClose,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/ui/custom-dialog";
 import {
   CalendarIcon,
   Edit2Icon,

@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog"
+} from "@/components/ui/custom-dialog"
 import { Edit, Plus, Search, Trash2, XIcon } from "lucide-react"
 
 interface Department {

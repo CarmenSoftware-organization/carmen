@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import StatusBadge from "@/components/ui/custom-status-badge";
-import { DialogFooter } from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/custom-dialog";
 
 // Mock data for demonstration
 const poData = [

@@ -37,7 +37,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/custom-dialog";
 import { PurchaseRequestItem } from "@/lib/types";
 import StatusBadge from "@/components/ui/custom-status-badge";
 

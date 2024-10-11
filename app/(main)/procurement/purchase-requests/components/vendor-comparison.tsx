@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DialogFooter } from "@/components/ui/dialog"
+import { DialogFooter } from "@/components/ui/custom-dialog"
 import StatusBadge from "@/components/ui/custom-status-badge"
 
 // Mock data for vendors including preferred status, price lists, and ratings

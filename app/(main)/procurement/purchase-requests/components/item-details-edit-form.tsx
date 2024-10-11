@@ -39,7 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/custom-dialog";
 import InventoryBreakdown from "./inventory-breakdown";
 import VendorComparison from "./vendor-comparison";
 import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";

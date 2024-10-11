@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowLeft, ChevronUp, HelpCircle,ChevronDown, PlusCircle, Plus } from "lucide-react";
+import { ArrowLeft, ChevronUp, HelpCircle,ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save } from "lucide-react";
 import {
   GoodsReceiveNote,
   GoodsReceiveNoteMode,
@@ -55,7 +55,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/custom-dialog";
 
 interface GoodsReceiveNoteComponentProps {
   initialData: GoodsReceiveNote;
@@ -202,31 +202,37 @@ export function GoodsReceiveNoteComponent({
                 <>
                   <Button
                     variant="default"
-                    size="lg"
+                    size="sm"
                     onClick={() => setMode("edit")}
                   >
+                    <Edit className="mr-2 h-4 w-4" />
                     Edit
                   </Button>
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="sm">
+                    <Trash2 className="mr-2 h-4 w-4" />
                     Delete
                   </Button>
                 </>
               )}
               {isEditable && (
                 <>
-                  <Button variant="outline" size="lg" onClick={handleSave}>
+                  <Button variant="outline" size="sm" onClick={handleSave}>
+                    <Save className="mr-2 h-4 w-4" />
                     Save
                   </Button>
-                  <Button variant="outline" size="lg" onClick={handleCancel}>
+                  <Button variant="outline" size="sm" onClick={handleCancel}>
+                    <X className="mr-2 h-4 w-4" />
                     Cancel
                   </Button>
                 </>
               )}
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="sm">
+                <Printer className="mr-2 h-4 w-4" />
                 Print
               </Button>
-              <Button variant="outline" size="lg">
-                Send
+              <Button variant="outline" size="sm">
+                <CheckSquare className="mr-2 h-4 w-4" />
+                Commit
               </Button>
             </div>
           </div>
@@ -235,7 +241,7 @@ export function GoodsReceiveNoteComponent({
           <div className="grid grid-cols-6 gap-4 mb-4">
             <div className="space-y-2">
               <Label htmlFor="ref" className="text-sm font-medium">
-                Ref#
+               GRN #
               </Label>
               <Input
                 id="ref"
@@ -261,84 +267,6 @@ export function GoodsReceiveNoteComponent({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="invoice-date" className="text-sm font-medium">
-                Invoice Date
-              </Label>
-              <Input
-                id="invoice-date"
-                name="invoiceDate"
-                type="date"
-                value={formData.invoiceDate.toISOString().split("T")[0]}
-                onChange={handleInputChange}
-                readOnly={!isEditable}
-                className="h-8 text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="invoice" className="text-sm font-medium">
-                Invoice#
-              </Label>
-              <Input
-                id="invoice"
-                name="invoiceNumber"
-                value={formData.invoiceNumber}
-                onChange={handleInputChange}
-                readOnly={!isEditable}
-                className="h-8 text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tax-invoice-date" className="text-sm font-medium">
-                Tax Invoice Date
-              </Label>
-              <Input
-                id="tax-invoice-date"
-                name="taxInvoiceDate"
-                type="date"
-                value={
-                  formData.taxInvoiceDate instanceof Date
-                    ? formData.taxInvoiceDate.toISOString().split("T")[0]
-                    : ""
-                }
-                onChange={handleInputChange}
-                readOnly={!isEditable}
-                className="h-8 text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tax-invoice" className="text-sm font-medium">
-                Tax Invoice#
-              </Label>
-              <Input
-                id="tax-invoice"
-                name="taxInvoiceNumber"
-                value={formData.taxInvoiceNumber}
-                onChange={handleInputChange}
-                readOnly={!isEditable}
-                className="h-8 text-sm"
-              />
-            </div>
-   
-            <div className="space-y-2">
-              <Label htmlFor="receiver" className="text-sm font-medium">
-                Receiver
-              </Label>
-              <Select
-                value={formData.receiver}
-                onValueChange={(value) => handleSelectChange("receiver", value)}
-                disabled={!isEditable}
-              >
-                <SelectTrigger id="receiver" className="h-8 text-sm">
-                  <SelectValue placeholder="Select receiver" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={formData.receiver}>
-                    {formData.receiver}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="vendor" className="text-sm font-medium">
                 Vendor
               </Label>
@@ -357,25 +285,8 @@ export function GoodsReceiveNoteComponent({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="location" className="text-sm font-medium">
-                Location
-              </Label>
-              <Select
-                value={formData.location}
-                onValueChange={(value) => handleSelectChange("location", value)}
-                disabled={!isEditable}
-              >
-                <SelectTrigger id="location" className="h-8 text-sm">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={formData.location}>
-                    {formData.location}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
+ 
             <div className="space-y-2">
               <Label htmlFor="currency" className="text-sm font-medium">
                 Currency
@@ -395,6 +306,83 @@ export function GoodsReceiveNoteComponent({
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="exchangeRate" className="text-sm font-medium">
+                Exchange Rate
+              </Label>
+              <Input
+                id="exchangeRate"
+                name="exchangeRate"
+                type="number"
+                value={formData.exchangeRate}
+                onChange={handleInputChange}
+                readOnly={!isEditable}
+                className="h-8 text-sm"
+                step="0.0001"
+                min="0"
+              />
+            </div>
+            <div className="space-y-2 col-start-1" >
+              <Label htmlFor="invoice" className="text-sm font-medium">
+                Invoice#
+              </Label>
+              <Input
+                id="invoice"
+                name="invoiceNumber"
+                value={formData.invoiceNumber}
+                onChange={handleInputChange}
+                readOnly={!isEditable}
+                className="h-8 text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="invoice-date" className="text-sm font-medium">
+                Invoice Date
+              </Label>
+              <Input
+                id="invoice-date"
+                name="invoiceDate"
+                type="date"
+                value={formData.invoiceDate.toISOString().split("T")[0]}
+                onChange={handleInputChange}
+                readOnly={!isEditable}
+                className="h-8 text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tax-invoice" className="text-sm font-medium">
+                Tax Invoice#
+              </Label>
+              <Input
+                id="tax-invoice"
+                name="taxInvoiceNumber"
+                value={formData.taxInvoiceNumber}
+                onChange={handleInputChange}
+                readOnly={!isEditable}
+                className="h-8 text-sm"
+              />
+            </div>
+ 
+            <div className="space-y-2">
+              <Label htmlFor="tax-invoice-date" className="text-sm font-medium">
+                Tax Invoice Date
+              </Label>
+              <Input
+                id="tax-invoice-date"
+                name="taxInvoiceDate"
+                type="date"
+                value={
+                  formData.taxInvoiceDate instanceof Date
+                    ? formData.taxInvoiceDate.toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={handleInputChange}
+                readOnly={!isEditable}
+                className="h-8 text-sm"
+              />
+            </div>
+           
+            
             <div className="flex flex-col justify-end space-y-2">
               <TooltipProvider>
                 <Tooltip>
@@ -516,15 +504,10 @@ export function GoodsReceiveNoteComponent({
                         Add Item
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-4xl">
-                      <DialogHeader>
-                        <DialogTitle>Add New Item</DialogTitle>
-                        <DialogDescription>
-                          Fill in the details for the new item.
-                        </DialogDescription>
-                      </DialogHeader>
+                    <DialogContent className="max-w-5xl">
                       <ItemDetailForm
                         mode="add"
+                        item={null}
                         onSave={handleAddItem}
                         onClose={() => setIsAddDialogOpen(false)}
                       />

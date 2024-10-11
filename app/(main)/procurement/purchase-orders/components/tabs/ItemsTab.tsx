@@ -64,7 +64,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
+} from "@/components/ui/custom-dialog";
 import StatusBadge from "@/components/ui/custom-status-badge";
 
 interface ItemsTabProps {

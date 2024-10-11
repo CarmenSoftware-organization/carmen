@@ -322,20 +322,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 col-span-1">
-              <Label htmlFor="location">Location</Label>
-              <Select disabled={mode === 'view'} value={formData.location} onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}>
-                <SelectTrigger id="location">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="main_kitchen">Main Kitchen</SelectItem>
-                  <SelectItem value="bar_storage">Bar Storage</SelectItem>
-                  <SelectItem value="dry_goods">Dry Goods Warehouse</SelectItem>
-                  <SelectItem value="cold_storage">Cold Storage</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            
             <div className="space-y-2 col-span-1">
               <Label htmlFor="currency">Currency</Label>
               <Select disabled={mode === 'view'} value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>

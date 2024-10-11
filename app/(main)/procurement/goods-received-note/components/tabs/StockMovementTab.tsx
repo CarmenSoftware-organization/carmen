@@ -20,7 +20,7 @@ export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps
           <TableRow>
             <TableHead>Item Name</TableHead>
             <TableHead>Quantity</TableHead>
-            <TableHead>From Location</TableHead>
+            {/* <TableHead>From Location</TableHead> */}
             <TableHead>To Location</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
@@ -31,7 +31,7 @@ export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps
             <TableRow key={movement.id}>
               <TableCell>{movement.itemName}</TableCell>
               <TableCell>{movement.quantity}</TableCell>
-              <TableCell>{movement.fromLocation}</TableCell>
+              {/* <TableCell>{movement.fromLocation}</TableCell> */}
               <TableCell>{movement.toLocation}</TableCell>
               <TableCell>{movement.date.toISOString().split('T')[0]}</TableCell>
               <TableCell>{movement.status}</TableCell>
