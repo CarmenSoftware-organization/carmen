@@ -407,6 +407,8 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
             onItemsChange={handleItemsChange}
             selectedItems={selectedItems}
             onItemSelect={handleItemSelection}
+            exchangeRate={formData.exchangeRate}
+            baseCurrency={formData.baseCurrency}
           />
         </TabsContent>
         <TabsContent value="extra-costs">

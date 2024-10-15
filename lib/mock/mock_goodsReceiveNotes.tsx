@@ -128,8 +128,9 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
         quantity: 5,
         fromLocation: "Kitchen Receiving",
         toLocation: "Kitchen Storage",
-        date: new Date("2023-08-10"),
-        status: "completed",
+        netAmount: 1249.95,
+        extraCost: 50,
+        totalAmount: 1299.95
       },
       {
         id: "4",
@@ -137,8 +138,9 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
         quantity: 10,
         fromLocation: "Kitchen Receiving",
         toLocation: "Kitchen Storage",
-        date: new Date("2023-08-10"),
-        status: "completed",
+        netAmount: 2499.90,
+        extraCost: 25,
+        totalAmount: 2524.90
       },
     ],
     extraCosts: [
@@ -353,8 +355,9 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
         quantity: 20,
         fromLocation: "Office Receiving",
         toLocation: "Office Storage",
-        date: new Date("2023-08-15"),
-        status: "pending",
+        netAmount: 3999.80,
+        extraCost: 100,
+        totalAmount: 4099.80
       },
     ],
     extraCosts: [

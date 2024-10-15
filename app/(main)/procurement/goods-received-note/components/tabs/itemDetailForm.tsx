@@ -228,14 +228,12 @@ export default function ItemDetailForm({
                   <Button variant="outline" size="sm">
                     On Order
                   </Button>
-                  <Button variant="outline" size="sm">
-                    Vendor Comparison
-                  </Button>
+                
                 </div>
               </div>
-              <div className="grid grid-cols-6 gap-4">
-                <div>
-                  <Label htmlFor={`baseUnit-${item.id}`}>Order Unit*</Label>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor={`baseUnit-${item.id}`}>Ord. Unit</Label>
                   <Input
                     id={`baseUnit-${item.id}`}
                     value={item.baseUnit}
@@ -244,10 +242,10 @@ export default function ItemDetailForm({
                     className="h-8 text-sm"
                   />
                   <div className="text-sm text-gray-500 mt-1">
-                    Base: Kg | 1 Bag = 0.5 Kg
+                  Kg | 1 Bag = 0.5 Kg
                   </div>
                 </div>
-                <div>
+                <div className="col-span-2">
                   <Label htmlFor={`orderedQuantity-${item.id}`}>
                     Order Quantity
                   </Label>
@@ -269,7 +267,7 @@ export default function ItemDetailForm({
                     {item.baseUnit}
                   </div>
                 </div>
-                <div>
+                <div className="col-span-2">
                   <Label htmlFor={`receivedQuantity-${item.id}`}>
                     Receiving Quantity
                   </Label>
@@ -291,7 +289,7 @@ export default function ItemDetailForm({
                     {item.baseUnit}
                   </div>
                 </div>
-                <div>
+                <div className="col-span-1">
                   <Label htmlFor={`isFoc-${item.id}`}>FOC</Label>
                   <div className="flex items-center space-x-2 pt-2">
                     <Input
@@ -306,7 +304,17 @@ export default function ItemDetailForm({
                     />
                   </div>
                 </div>
-                <div>
+                <div className="col-span-2">
+                  <Label htmlFor={`lotNumber-${item.id}`}>Lot Number</Label>
+                  <Input
+                    id={`lotNumber-${item.id}`}
+                    value={item.lotNumber}
+                    onChange={(e) => handleChange("lotNumber", e.target.value)}
+                    readOnly={mode === "view"}
+                    className="h-8 text-sm"
+                  />
+                </div>
+                <div className="col-span-2">
                   <Label htmlFor={`deliveryDate-${item.id}`}>
                     Delivery Date*
                   </Label>
@@ -328,7 +336,7 @@ export default function ItemDetailForm({
                     <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   </div>
                 </div>
-                <div>
+                <div className="col-span-2">
                   <Label htmlFor={`deliveryPoint-${item.id}`}>
                     Delivery Point
                   </Label>

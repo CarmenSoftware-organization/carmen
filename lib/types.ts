@@ -131,6 +131,11 @@ export enum GRNItemStatus {
   REJECTED = "REJECTED",
 }
 
+export enum CostDistributionMethod {
+  NET_AMOUNT = "net-amount",
+  QUANTITY_RATIO = "quantity-ratio",
+}
+
 // Purchase Order (PO) Types
 
 export interface PurchaseOrder {
@@ -447,6 +452,8 @@ export interface GoodsReceiveNote {
   taxAmount: number;
   baseTotalAmount: number;
   totalAmount: number;
+  creditTerms?: string;
+  dueDate?: Date;
 }
 
 export interface GoodsReceiveNoteItem {
@@ -509,8 +516,9 @@ export interface StockMovement {
   quantity: number;
   fromLocation: string;
   toLocation: string;
-  date: Date;
-  status: string;
+  netAmount: number;
+  extraCost: number;
+  totalAmount: number;
 }
 
 export type GoodsReceiveNoteMode = "view" | "edit" | "add";

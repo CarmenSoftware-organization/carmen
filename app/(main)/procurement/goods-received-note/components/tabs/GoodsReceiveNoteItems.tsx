@@ -11,11 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, Eye } from "lucide-react";
+import { Eye, Edit, Trash2 } from "lucide-react";
 import { GoodsReceiveNoteMode, GoodsReceiveNoteItem } from "@/lib/types";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/custom-dialog";
+import { Dialog, DialogContent } from "@/components/ui/custom-dialog";
 import ItemDetailForm from "./itemDetailForm";
 
 interface GoodsReceiveNoteItemsProps {
@@ -24,6 +22,8 @@ interface GoodsReceiveNoteItemsProps {
   onItemsChange: (items: GoodsReceiveNoteItem[]) => void;
   selectedItems: string[];
   onItemSelect: (itemId: string, isSelected: boolean) => void;
+  exchangeRate: number;
+  baseCurrency: string;
 }
 
 export function GoodsReceiveNoteItems({
@@ -32,7 +32,12 @@ export function GoodsReceiveNoteItems({
   onItemsChange,
   selectedItems,
   onItemSelect,
+  exchangeRate,
+  baseCurrency,
 }: GoodsReceiveNoteItemsProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<GoodsReceiveNoteItem | null>(null);
+
   const handleOpenItemDetail = (item: GoodsReceiveNoteItem) => {
     setSelectedItem(item);
     setIsDialogOpen(true);
@@ -53,15 +58,6 @@ export function GoodsReceiveNoteItems({
     onItemSelect("", checked);
   };
 
-  const allSelected = items.length > 0 && selectedItems.length === items.length;
-
-  if (items.length === 0) {
-    return <div>No items available.</div>;
-  }
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<GoodsReceiveNoteItem | null>(null);
-
   const handleCloseItemDetail = () => {
     setIsDialogOpen(false);
   };
@@ -69,6 +65,26 @@ export function GoodsReceiveNoteItems({
   const handleSaveItemDetail = () => {
     setIsDialogOpen(false);
   };
+
+  const handleEditItem = (item: GoodsReceiveNoteItem) => {
+    setSelectedItem(item);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteItem = (itemId: string) => {
+    const updatedItems = items.filter(item => item.id !== itemId);
+    onItemsChange(updatedItems);
+  };
+
+  const allSelected = items.length > 0 && selectedItems.length === items.length;
+
+  const formatBaseAmount = (amount: number) => {
+    return (amount * exchangeRate).toFixed(2);
+  };
+
+  if (items.length === 0) {
+    return <div>No items available.</div>;
+  }
 
   return (
     <>
@@ -91,7 +107,6 @@ export function GoodsReceiveNoteItems({
             <TableHead>Net Price</TableHead>
             <TableHead>Tax</TableHead>
             <TableHead>Total Price</TableHead>
-           
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -109,7 +124,12 @@ export function GoodsReceiveNoteItems({
               </TableCell>
               <TableCell>{item.location || "N/A"}</TableCell>
               <TableCell>{item.name}</TableCell>
-              <TableCell>{item.orderedQuantity}</TableCell>
+              <TableCell>
+                {item.orderedQuantity}
+                <div className="text-xs text-muted-foreground">
+                  {item.baseQuantity} {item.baseUnit}
+                </div>
+              </TableCell>
               <TableCell>
                 <Input
                   type="number"
@@ -123,17 +143,62 @@ export function GoodsReceiveNoteItems({
                   }
                   readOnly={mode === "view"}
                 />
+                <div className="text-xs text-muted-foreground">
+                  {(item.receivedQuantity * item.conversionRate).toFixed(2)} {item.baseUnit}
+                </div>
               </TableCell>
-              <TableCell>{item.unit}</TableCell>
-              <TableCell>{item.unitPrice.toFixed(2)}</TableCell>
-              <TableCell>{(item.unitPrice * item.receivedQuantity).toFixed(2)}</TableCell>
-              <TableCell>{(item.subTotalAmount - (item.unitPrice * item.receivedQuantity)).toFixed(2)}</TableCell>
-              <TableCell>{item.subTotalAmount.toFixed(2)}</TableCell>
-             
               <TableCell>
-                <Button variant="ghost" onClick={() => handleOpenItemDetail(item)}>
-                  <Eye className="h-4 w-4" />
-                </Button>
+                {item.unit}
+                <div className="text-xs text-muted-foreground">
+                  1 {item.unit} = {item.conversionRate} {item.baseUnit}
+                </div>
+              </TableCell>
+              <TableCell>
+                {item.unitPrice.toFixed(2)}
+                <div className="text-xs text-muted-foreground">
+                  {baseCurrency} {formatBaseAmount(item.unitPrice)}
+                </div>
+              </TableCell>
+              <TableCell>
+                {(item.unitPrice * item.receivedQuantity).toFixed(2)}
+                <div className="text-xs text-muted-foreground">
+                  {baseCurrency} {formatBaseAmount(item.unitPrice * item.receivedQuantity)}
+                </div>
+              </TableCell>
+              <TableCell>
+                {(item.subTotalAmount - (item.unitPrice * item.receivedQuantity)).toFixed(2)}
+                <div className="text-xs text-muted-foreground">
+                  {baseCurrency} {formatBaseAmount(item.subTotalAmount - (item.unitPrice * item.receivedQuantity))}
+                </div>
+              </TableCell>
+              <TableCell>
+                {item.subTotalAmount.toFixed(2)}
+                <div className="text-xs text-muted-foreground">
+                  {baseCurrency} {formatBaseAmount(item.subTotalAmount)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex space-x-2">
+                  <Button variant="ghost" size="sm" onClick={() => handleOpenItemDetail(item)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleEditItem(item)}
+                    disabled={mode === "view"}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleDeleteItem(item.id)}
+                    disabled={mode === "view"}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -146,32 +211,15 @@ export function GoodsReceiveNoteItems({
           setSelectedItem(null);
         }
       }}>
-                    <DialogContent className="max-w-5xl">
-                      <ItemDetailForm
-                        item={selectedItem} 
-                        mode="view"
-                        onSave={handleSaveItemDetail}
-                        onClose={() => handleCloseItemDetail}
-                        handleItemChange={handleItemChange}
-                      />
-                    </DialogContent>
-
-
-
-
-        {/* <DialogContent className="sm:max-w-[80vw] max-w-[100vw] p-0 border-none overflow-y-auto [&>button]:hidden ">
-          <div className="rounded-lg overflow-y-auto">
-            {selectedItem && (
-              <ItemDetailForm
-                item={selectedItem}
-                mode={mode}
-                handleItemChange={handleItemChange}
-                onClose={handleCloseItemDetail}
-                onSave={handleSaveItemDetail}
-              />
-            )}
-          </div>
-        </DialogContent>  */}
+        <DialogContent className="max-w-5xl">
+          <ItemDetailForm
+            item={selectedItem} 
+            mode={mode === "view" ? "view" : "edit"}
+            onSave={handleSaveItemDetail}
+            onClose={handleCloseItemDetail}
+            handleItemChange={handleItemChange}
+          />
+        </DialogContent>
       </Dialog>
     </>
   );
