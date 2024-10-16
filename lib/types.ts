@@ -426,6 +426,7 @@ export interface GoodsReceiveNote {
   taxInvoiceNumber?: string;
   description: string;
   receiver: string;
+  vendorId: string;
   vendor: string;
   location: string;
   currency: string;
@@ -442,7 +443,7 @@ export interface GoodsReceiveNote {
   comments: Comment[];
   attachments: Attachment[];
   activityLog: ActivityLogEntry[];
-  financialSummary?: FinancialSummary;
+  financialSummary?: FinancialSummary | null;
   baseSubTotalPrice: number;
   subTotalPrice: number;
   baseNetAmount: number;
@@ -509,6 +510,10 @@ export interface GoodsReceiveNoteItem {
     discount: boolean;
     tax: boolean;
   };
+  availableLots?: {
+    lotNumber: string;
+    expiryDate: Date;
+  }[];
 }
 
 export interface StockMovement {

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/navigation';
 import { Search, ArrowUpDown, ChevronDown, ChevronUp, X, AlertCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -8,7 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { GRNItem, GoodsReceiveNote, Vendor } from '@/lib/types'
+import { GRNItem, GRNItemStatus, GRNStatus, GoodsReceiveNote, Vendor } from '@/lib/types'
+import type { GoodsReceiveNoteItem, GoodsReceiveNoteStatus } from '@/lib/types'
 import {
   Card,
   CardContent,
@@ -64,9 +66,11 @@ type ExpandedRows = {
 
 type CreditNoteType = 'item-based' | 'amount-only' | null
 
-type SelectedItem = GRNItem & {
+type SelectedItem = GoodsReceiveNoteItem & {
   creditQuantity: number
-  creditPrice: number
+  creditPrice: number,
+  lotNumber: string
+  creditLotNumber: string
 }
 
 type Errors = {
@@ -76,28 +80,277 @@ type Errors = {
   [key: string]: string | undefined
 }
 
+// id: string;
+// companyName: string;
+// businessRegistrationNumber: string;
+// taxId: string;
+// establishmentDate: string;
+// businessTypeId: string;
+// isActive: boolean;
+// addresses: Address[];
+// contacts: Contact[];
+// rating: number;
 // Update mock data to use the correct types
 const mockVendors: Vendor[] = [
-  { id: '1', companyName: 'Supplier A', contactPerson: 'John Doe', email: 'supplierA@example.com', phone: '123-456-7890', address: '123 Main St, City A', country: 'Country A' },
-  { id: '2', companyName: 'Vendor B', contactPerson: 'Jane Smith', email: 'vendorB@example.com', phone: '234-567-8901', address: '456 Oak St, City B', country: 'Country B' },
-  { id: '3', companyName: 'Company C', contactPerson: 'Bob Johnson', email: 'companyC@example.com', phone: '345-678-9012', address: '789 Pine St, City C', country: 'Country C' },
-  { id: '4', companyName: 'Distributor D', contactPerson: 'Alice Brown', email: 'distributorD@example.com', phone: '456-789-0123', address: '101 Elm St, City D', country: 'Country D' },
-  { id: '5', companyName: 'Wholesaler E', contactPerson: 'Charlie Wilson', email: 'wholesalerE@example.com', phone: '567-890-1234', address: '202 Maple St, City E', country: 'Country E' },
+
+  { id: '1', companyName: 'Supplier A',businessRegistrationNumber : '1234567890', taxId: '1234567890', establishmentDate: '2024-01-01', businessTypeId: '1234567890', isActive: true, rating: 4.5,
+    contacts : 
+    [ { id: '1', name: 'John Doe', position: 'Manager', phone: '123-456-7890', email: 'john.doe@example.com', department: 'Sales', isPrimary: true } ], 
+    addresses: [
+      { id: '1', addressType: 'MAIN', addressLine: '123 Main St', subDistrictId: '1', districtId: '1', provinceId: '1', postalCode: '10100', isPrimary: true },
+    ],
+  },
+  { id: '2', companyName: 'Vendor B', businessRegistrationNumber : '1234567890', taxId: '1234567890', establishmentDate: '2024-01-01', businessTypeId: '1234567890', isActive: true, rating: 4.5,
+    contacts : 
+    [ { id: '2', name: 'Jane Smith', position: 'Sales Manager', phone: '234-567-8901', email: 'jane.smith@example.com', department: 'Sales', isPrimary: true } ], 
+    addresses: [
+      { id: '2', addressType: 'BILLING', addressLine: '456 Oak St', subDistrictId: '2', districtId: '2', provinceId: '2', postalCode: '20200', isPrimary: false },
+    ],
+  },
+  { id: '3', companyName: 'Company C', businessRegistrationNumber : '1234567890', taxId: '1234567890', establishmentDate: '2024-01-01', businessTypeId: '1234567890', isActive: true, rating: 4.5,
+    contacts : 
+    [ { id: '3', name: 'Bob Johnson', position: 'Sales Manager', phone: '345-678-9012', email: 'bob.johnson@example.com', department: 'Sales', isPrimary: true } ], 
+    addresses: [
+      { id: '3', addressType: 'SHIPPING', addressLine: '789 Pine St', subDistrictId: '3', districtId: '3', provinceId: '3', postalCode: '30300', isPrimary: false },
+    ],
+  },
 ]
 
-const mockGRNItems: GRNItem[] = [
-  { id: '1', name: 'Item A', quantity: 10, price: 50, total: 500, lotNumber: 'LOT001', expirationDate: new Date('2024-12-31') },
-  { id: '2', name: 'Item B', quantity: 5, price: 100, total: 500, lotNumber: 'LOT002', expirationDate: new Date('2024-11-30') },
-  { id: '3', name: 'Item C', quantity: 20, price: 25, total: 500, lotNumber: 'LOT003', expirationDate: new Date('2024-10-31') },
-  { id: '4', name: 'Item D', quantity: 2, price: 250, total: 500, lotNumber: 'LOT004', expirationDate: new Date('2024-09-30') },
+// grnItemId: number;
+// grnRefNo: string;
+// poLineId: number;
+// itemId: number;
+// storeLocationId: number;
+// receivedQuantity: number;
+// receivedUnitId: number;
+// isFOC: boolean;
+// price: number;
+// taxAmount: number;
+// totalAmount: number;
+// status: GRNItemStatus;
+// deliveryPoint?: string;
+// basePrice: number;
+// baseQuantity: number;
+// extraCost: number;
+// totalCost: number;
+// discountAdjustment: boolean;
+// discountAmount?: number;
+// taxAdjustment: boolean;
+// lotNumber?: string;
+// expiryDate?: Date;
+// comment?: string;
+
+const mockGRNItems: GoodsReceiveNoteItem[] = [
+  // { id: '1', name: 'Item A', quantity: 10, price: 50, total: 500, lotNumber: 'LOT001', expirationDate: new Date('2024-12-31') },
+  // { id: '2', name: 'Item B', quantity: 5, price: 100, total: 500, lotNumber: 'LOT002', expirationDate: new Date('2024-11-30') },
+  // { id: '3', name: 'Item C', quantity: 20, price: 25, total: 500, lotNumber: 'LOT003', expirationDate: new Date('2024-10-31') },
+  // { id: '4', name: 'Item D', quantity: 2, price: 250, total: 500, lotNumber: 'LOT004', expirationDate: new Date('2024-09-30') },
+
+  {
+    id: '1',
+    name: 'Item A',
+    description: 'Item A',
+    jobCode: 'Item A',
+    orderedQuantity: 100,
+    receivedQuantity: 100,
+    unit: 'EA',
+    unitPrice: 50,
+    subTotalAmount: 5000,
+    totalAmount: 5035,
+    taxRate: 7,
+    taxAmount: 35,
+    discountRate: 0,
+    discountAmount: 0,
+    netAmount: 5035,
+    expiryDate: new Date('2024-12-31'),
+    serialNumber: '1234567890',
+    notes: 'First item received',
+    baseCurrency: 'THB',
+    baseQuantity: 100,
+    extraCost: 0,
+    baseUnitPrice: 50,
+    baseUnit: 'EA',
+    baseSubTotalAmount: 5000,
+    baseNetAmount: 5035,
+    baseTotalAmount: 5035,
+    baseTaxAmount: 35,
+    baseDiscountAmount: 0,
+    baseDiscountRate: 0,
+    baseTaxRate: 7,
+    conversionRate: 1,
+    currency: 'THB',
+    exchangeRate: 1,
+    inventoryOnHand: 100,
+    inventoryOnOrder: 0,
+    inventoryReorderThreshold: 10,
+    inventoryRestockLevel: 10,
+    purchaseOrderRef: 'PO001',
+    lastPurchasePrice: 50,
+    lastOrderDate: new Date('2024-12-31'),
+    lastVendor: 'Vendor A',
+    lotNumber: 'LOT001',
+    deliveryPoint: 'Warehouse A',
+    deliveryDate: new Date('2024-12-31'),
+    location: 'Warehouse A',
+    isFreeOfCharge: false,
+    taxIncluded: true,
+    adjustments: {
+      discount: false,
+      tax: false,
+    }
+  },
+    {
+      id: '2',
+      name: 'Item B',
+      description: 'Item B',
+      jobCode: 'Item B',
+      orderedQuantity: 100,
+      receivedQuantity: 100,
+      unit: 'EA',
+      unitPrice: 100,
+      subTotalAmount: 10000,
+      totalAmount: 10700,
+      taxRate: 7,
+      taxAmount: 700,
+      discountRate: 0,
+      discountAmount: 0,
+      netAmount: 10700,
+      expiryDate: new Date('2024-12-31'),
+      serialNumber: '1234567890',
+      notes: 'Second item received',
+      baseCurrency: 'THB',
+      baseQuantity: 100,
+      extraCost: 0,
+      baseUnitPrice: 100,
+      baseUnit: 'EA',
+      baseSubTotalAmount: 10000,
+      baseNetAmount: 10700,
+      baseTotalAmount: 10700,
+      baseTaxAmount: 700,
+      baseDiscountAmount: 0,
+      baseDiscountRate: 0,
+      baseTaxRate: 7,
+      conversionRate: 1,
+      currency: 'THB',
+      exchangeRate: 1,
+      inventoryOnHand: 100,
+      inventoryOnOrder: 0,
+      inventoryReorderThreshold: 10,
+      inventoryRestockLevel: 10,
+      purchaseOrderRef: 'PO002',
+      lastPurchasePrice: 100,
+      lastOrderDate: new Date('2024-12-31'),
+      lastVendor: 'Vendor B',
+      lotNumber: 'LOT002',
+      deliveryPoint: 'Warehouse B',
+      deliveryDate: new Date('2024-12-31'),
+      location: 'Warehouse B',
+      isFreeOfCharge: false,
+      taxIncluded: true,
+      adjustments: {
+        discount: false,
+        tax: false,
+      },
+    }
 ]
 
 const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
-  { id: '1', vendorId: '1', items: mockGRNItems, totalAmount: 2000, date: new Date('2023-10-15'), status: 'completed', invoiceNumber: 'INV-001' },
-  { id: '2', vendorId: '2', items: mockGRNItems.slice(0, 2), totalAmount: 1000, date: new Date('2023-10-10'), status: 'completed', invoiceNumber: 'INV-002' },
-  { id: '3', vendorId: '3', items: mockGRNItems.slice(1, 3), totalAmount: 1500, date: new Date('2023-10-20'), status: 'completed', invoiceNumber: 'INV-003' },
-  { id: '4', vendorId: '4', items: mockGRNItems.slice(2, 4), totalAmount: 1750, date: new Date('2023-10-05'), status: 'completed', invoiceNumber: 'INV-004' },
-  { id: '5', vendorId: '5', items: mockGRNItems, totalAmount: 2000, date: new Date('2023-10-18'), status: 'completed', invoiceNumber: 'INV-005' },
+  // { id: '1', vendorId: '1', items: mockGRNItems, totalAmount: 2000, date: new Date('2023-10-15'), status: 'completed', invoiceNumber: 'INV-001' },
+  // { id: '2', vendorId: '2', items: mockGRNItems.slice(0, 2), totalAmount: 1000, date: new Date('2023-10-10'), status: 'completed', invoiceNumber: 'INV-002' },
+  // { id: '3', vendorId: '3', items: mockGRNItems.slice(1, 3), totalAmount: 1500, date: new Date('2023-10-20'), status: 'completed', invoiceNumber: 'INV-003' },
+  // { id: '4', vendorId: '4', items: mockGRNItems.slice(2, 4), totalAmount: 1750, date: new Date('2023-10-05'), status: 'completed', invoiceNumber: 'INV-004' },
+  // { id: '5', vendorId: '5', items: mockGRNItems, totalAmount: 2000, date: new Date('2023-10-18'), status: 'completed', invoiceNumber: 'INV-005' },
+
+  { 
+    id: '1', 
+    vendorId: mockVendors[0].id, 
+    items: mockGRNItems.map(item => ({
+      ...item,
+      id: item.id.toString(),
+      name: item.name.toString(),
+      description: item.description.toString(),
+      jobCode: item.jobCode.toString(),
+      // Add other required properties
+    })), 
+    totalAmount: 15675, 
+    date: new Date('2023-10-15'), 
+    status: "Received",
+    invoiceNumber: 'INV-001',
+    ref: 'REF-001',
+    invoiceDate: new Date('2023-10-15'),
+    description: 'Invoice for Item A',
+    receiver: 'Receiver A',
+    location: 'Warehouse A',
+    currency: 'THB',
+    exchangeRate: 1,
+    baseCurrency: 'THB',
+    baseSubTotalPrice: 15675,
+    subTotalPrice: 15675,
+    baseNetAmount: 15675,
+    netAmount: 15675,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 1075,
+    taxAmount: 1075,
+    extraCosts: [],
+    stockMovements: [],
+    comments: [],
+    attachments: [],
+    activityLog: [],
+    financialSummary: null,
+    baseTotalAmount: 15675,
+    creditTerms: 'Due on receipt',
+    dueDate: new Date('2023-10-15'),
+    selectedItems: [],
+    vendor: mockVendors[0].companyName,
+    isConsignment: false,
+    isCash: false,
+  },
+  {
+    id: '2',
+    vendorId: mockVendors[1].id,
+    items: mockGRNItems.map(item => ({
+      ...item,
+      id: item.id.toString(),
+      name: item.name.toString(),
+      description: item.description.toString(),
+      jobCode: item.jobCode.toString(),
+      // Add other required properties
+    })), 
+    totalAmount: 15675, 
+    date: new Date('2023-10-15'), 
+    status: "Received",
+    invoiceNumber: 'INV-001',
+    ref: 'REF-001',
+    invoiceDate: new Date('2023-10-15'),  
+    description: 'Invoice for Item B',
+    receiver: 'Receiver B',
+    location: 'Warehouse B',
+    currency: 'THB',
+    exchangeRate: 1,
+    baseCurrency: 'THB',
+    baseSubTotalPrice: 15675,
+    subTotalPrice: 15675,
+    baseNetAmount: 15675, 
+    netAmount: 15675,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 1075,
+    taxAmount: 1075,
+    extraCosts: [],
+    stockMovements: [],
+    comments: [],
+    attachments: [],
+    activityLog: [],
+    financialSummary: null,
+    baseTotalAmount: 15675,
+    creditTerms: 'Due on receipt',
+    dueDate: new Date('2023-10-15'),
+    selectedItems: [],
+    vendor: mockVendors[1].companyName,
+    isConsignment: false,
+    isCash: false,  
+  }
 ]
 
 export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNoteCreate?: (creditNote: any) => void }) {
@@ -114,23 +367,25 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
   const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(true)
 
+  const router = useRouter();
+
   useEffect(() => {
     setIsTypeDialogOpen(true)
   }, [])
 
   const sortedGRNs = useMemo(() => {
     let sortableGRNs = [...mockGoodsReceiveNotes]
-    if (sortConfig.key) {
-      sortableGRNs.sort((a: GoodsReceiveNote, b: GoodsReceiveNote) => {
-        if (a[sortConfig.key!] < b[sortConfig.key!]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1
-        }
-        if (a[sortConfig.key!] > b[sortConfig.key!]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1
-        }
-        return 0
-      })
-    }
+    // if (sortConfig.key) {
+    //   sortableGRNs.sort((a: GoodsReceiveNote, b: GoodsReceiveNote) => {
+    //     if (a[sortConfig.key!] < b[sortConfig.key!]) {
+    //       return sortConfig.direction === 'ascending' ? -1 : 1
+    //     }
+    //     if (a[sortConfig.key!] > b[sortConfig.key!]) {
+    //       return sortConfig.direction === 'ascending' ? 1 : -1
+    //     }
+    //     return 0
+    //   })
+    // }
     return sortableGRNs
   }, [sortConfig])
 
@@ -149,6 +404,8 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
     }
     setSortConfig({ key, direction })
   }
+
+
 
   const toggleRowExpansion = (id: string) => {
     setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }))
@@ -171,15 +428,20 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
     setCurrentStep(creditNoteType === 'item-based' ? 'chooseItems' : 'enterAmount')
   }
 
-  const handleItemSelect = (item: GRNItem) => {
+  const handleItemSelect = (item: GoodsReceiveNoteItem) => {
     setSelectedItems(prev => {
-      const isSelected = prev.find(i => i.id === item.id)
+      const isSelected = prev.find(i => i.id === item.id && i.lotNumber === item.lotNumber && i.creditLotNumber === item.lotNumber)
       if (isSelected) {
-        return prev.filter(i => i.id !== item.id)
+        return prev.filter(i => i.id !== item.id || i.lotNumber !== item.lotNumber || i.creditLotNumber !== item.lotNumber)
       } else {
-        return [...prev, { ...item, creditQuantity: item.quantity, creditPrice: item.price }]
+        return [...prev, { ...item, creditQuantity: item.receivedQuantity, creditPrice: item.unitPrice, creditLotNumber: item.lotNumber }]
       }
     })
+  }
+
+  const handleCreditNoteCancel = () => {
+    setIsConfirmDialogOpen(false)
+    router.push(`/procurement/credit-note`);
   }
 
   const handleQuantityChange = (id: string, value: string) => {
@@ -202,8 +464,18 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
     )
   }
 
+  const handleLotNumberChange = (id: string, value: string) => {
+    setSelectedItems(prev => 
+      prev.map(item => 
+        item.id === id 
+          ? { ...item, creditLotNumber: value } 
+          : item
+      )
+    )
+  }
+
   const calculateGainLoss = (item: SelectedItem) => {
-    const originalValue = item.quantity * item.price
+    const originalValue = item.receivedQuantity * item.unitPrice
     const creditValue = item.creditQuantity * item.creditPrice
     return creditValue - originalValue
   }
@@ -260,7 +532,8 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
         reason: amountOnlyReason
       })
     }
-    resetForm()
+    router.push(`/procurement/credit-note/1`);
+    // resetForm()
   }
 
   const resetForm = () => {
@@ -292,7 +565,7 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
               </DialogHeader>
               <RadioGroup
                 onValueChange={(value) => {
-                  setCreditNoteType(value)
+                  setCreditNoteType(value as CreditNoteType)
                   setCurrentStep('selectGRN')
                   setIsTypeDialogOpen(false)
                 }}
@@ -385,8 +658,8 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
                   </div>
                   <div className="mt-4">
                     <p className="font-semibold">GRN Details:</p>
-                    <p>Last GRN: {selectedGRN?.lastGRN}</p>
-                    <p>Last Delivery Date: {selectedGRN?.lastDeliveryDate}</p>
+                    <p>Last GRN: {selectedGRN?.ref}</p>
+                    <p>Last Delivery Date: {selectedGRN?.date.toLocaleDateString()}</p>
                   </div>
                 </DialogDescription>
               </DialogHeader>
@@ -418,7 +691,7 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
                             />
                           </TableCell>
                           <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.referenceLotNumber}</TableCell>
+                          <TableCell>{item.lotNumber}</TableCell>
                           <TableCell>
                             {selectedItem && (
                               <Select
@@ -429,8 +702,8 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
                                   <SelectValue placeholder="Select a lot" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {item.availableLots.map((lot) => (
-                                    <SelectItem key={lot} value={lot}>{lot}</SelectItem>
+                                  {item.availableLots?.map((lot) => (
+                                    <SelectItem key={lot.lotNumber} value={lot.lotNumber}>{lot.lotNumber}</SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
@@ -443,11 +716,11 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
                                 value={selectedItem.creditQuantity}
                                 onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                                 min="1"
-                                max={item.quantity}
+                                max={item.receivedQuantity}
                                 className="w-20"
                               />
                             ) : (
-                              item.quantity
+                              item.receivedQuantity
                             )}
                             {errors[`quantity_${item.id}`] && (
                               <p className="text-red-500 text-xs mt-1">{errors[`quantity_${item.id}`]}</p>
@@ -464,7 +737,7 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
                                 className="w-24"
                               />
                             ) : (
-                              `${selectedGRN?.currency} ${item.price.toFixed(2)}`
+                              `${selectedGRN?.currency} ${item.unitPrice.toFixed(2)}`
                             )}
                             {errors[`price_${item.id}`] && (
                               <p className="text-red-500 text-xs mt-1">{errors[`price_${item.id}`]}</p>
@@ -473,12 +746,12 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
                           <TableCell>
                             {selectedItem
                               ? `${selectedGRN?.currency} ${(selectedItem.creditQuantity * selectedItem.creditPrice).toFixed(2)}`
-                              : `${selectedGRN?.currency} ${item.total.toFixed(2)}`
+                              : `${selectedGRN?.currency} ${item.totalAmount.toFixed(2)}`
                             }
                           </TableCell>
                           <TableCell>
                             {selectedItem && (
-                              <Badge variant={gainLoss >= 0 ? "success" : "destructive"}>
+                              <Badge variant={gainLoss >= 0 ? "default" : "destructive"}>
                                 {gainLoss >= 0 ? '+' : '-'}${Math.abs(gainLoss).toFixed(2)}
                               </Badge>
                             )}
@@ -570,13 +843,13 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
                       return (
                         <TableRow key={item.id}>
                           <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.referenceLotNumber}</TableCell>
+                          <TableCell>{item.lotNumber}</TableCell>
                           <TableCell>{item.creditLotNumber}</TableCell>
                           <TableCell>{item.creditQuantity}</TableCell>
                           <TableCell>{selectedGRN?.currency} {item.creditPrice.toFixed(2)}</TableCell>
                           <TableCell>{selectedGRN?.currency} {(item.creditQuantity * item.creditPrice).toFixed(2)}</TableCell>
                           <TableCell>
-                            <Badge variant={gainLoss >= 0 ? "success" : "destructive"}>
+                            <Badge variant={gainLoss >= 0 ? "default" : "destructive"}>
                               {gainLoss >= 0 ? '+' : '-'}${Math.abs(gainLoss).toFixed(2)}
                             </Badge>
                           </TableCell>
@@ -698,7 +971,7 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsConfirmDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => handleCreditNoteCancel()}>Cancel</Button>
             <Button onClick={confirmCreateCreditNote}>Confirm</Button>
           </DialogFooter>
         </DialogContent>

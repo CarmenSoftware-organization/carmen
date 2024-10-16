@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 
 interface FinancialSummaryTabProps {
   mode: GoodsReceiveNoteMode
-  summary?: FinancialSummary,
+  summary: FinancialSummary | null,
   currency: string,
   baseCurrency: string,
 }

@@ -25,6 +25,7 @@ export default function GoodsReceiveNotePage({ params }: { params: { id: string 
       description: '',
       receiver: '',
       vendor: '',
+      vendorId: '',
       location: '',
       currency: '',
       exchangeRate: 1,

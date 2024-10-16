@@ -606,7 +606,7 @@ export function GoodsReceiveNoteComponent({
                 <TabsContent value="transaction-summary">
                   <FinancialSummaryTab
                     mode={mode}
-                    summary={formData.financialSummary}
+                    summary={formData.financialSummary || null}
                     currency={formData.currency}
                     baseCurrency={formData.baseCurrency}
                   />

@@ -37,6 +37,7 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   description: '',
   receiver: '',
   vendor: '',
+  vendorId: '',
   location: '',
   currency: '',
   status: 'Pending',
@@ -49,6 +50,7 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   comments: [],
   attachments: [],
   activityLog: [],
+  financialSummary: null,
   exchangeRate: 0,
   baseCurrency: '',
   baseSubTotalPrice: 0,
@@ -432,7 +434,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
         <TabsContent value="financial-summary">
           <FinancialSummaryTab 
             mode={mode}
-            summary={formData.financialSummary} // {calculateFinancialSummary()}
+            summary={formData.financialSummary || calculateFinancialSummary()}
             currency={formData.currency}
             baseCurrency={formData.baseCurrency}
           />

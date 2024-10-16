@@ -17,6 +17,7 @@ import {
 import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/custom-status-badge'
+import { VendorSelection } from './vendor-selection'
 
 // Update the mock data to include netAmount and taxAmount
 const mockCreditNotes = Array(50).fill(null).map((_, index) => ({
@@ -47,6 +48,7 @@ export function CreditNoteManagement() {
 
   const handleCreateCreditNote = () => {
     console.log('Creating new credit note')
+    router.push('/procurement/credit-note/new')
   }
 
   const handleFilterChange = (value: string) => {
