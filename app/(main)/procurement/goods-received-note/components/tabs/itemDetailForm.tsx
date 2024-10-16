@@ -314,7 +314,7 @@ export default function ItemDetailForm({
                     className="h-8 text-sm"
                   />
                 </div>
-                <div className="col-span-2">
+                {/* <div className="col-span-2">
                   <Label htmlFor={`deliveryDate-${item.id}`}>
                     Delivery Date*
                   </Label>
@@ -335,7 +335,7 @@ export default function ItemDetailForm({
                     />
                     <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   </div>
-                </div>
+                </div> */}
                 <div className="col-span-2">
                   <Label htmlFor={`deliveryPoint-${item.id}`}>
                     Delivery Point

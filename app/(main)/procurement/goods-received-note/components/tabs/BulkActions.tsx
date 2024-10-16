@@ -12,10 +12,10 @@ export function BulkActions({ selectedItems, onAction }: BulkActionsProps) {
       <Button onClick={() => onAction('delete')} disabled={selectedItems.length === 0}>
         Delete Selected
       </Button>
-      <Button onClick={() => onAction('archive')} disabled={selectedItems.length === 0}>
+      {/* <Button onClick={() => onAction('archive')} disabled={selectedItems.length === 0}>
         Archive Selected
       </Button>
-      {/* Add more bulk actions as needed */}
+      Add more bulk actions as needed */}
     </div>
   );
 }

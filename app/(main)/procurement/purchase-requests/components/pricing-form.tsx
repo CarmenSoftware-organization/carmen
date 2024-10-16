@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -13,6 +14,16 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import SummaryPRTable from "./tabs/Summary-pr-table";
 import { IBaseSummary, PurchaseRequestItem } from "@/lib/types";
+import { Package, XIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/custom-dialog";
+import VendorComparison from "./vendor-comparison";
 
 type FormMode = "add" | "edit" | "view";
 
@@ -60,6 +71,8 @@ export function PricingFormComponent({
     baseTotalAmount: 0,
     totalAmount: 0,
   });
+
+  const [isVendorComparisonOpen, setIsVendorComparisonOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -134,7 +147,33 @@ export function PricingFormComponent({
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-6 md:gap-0 space-x-0 md:space-x-6">
         <div className="w-full md:w-1/2 ">
-          <h2 className="text-lg font-semibold mb-4">Pricing</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Pricing</h2>
+            <Dialog
+              open={isVendorComparisonOpen}
+              onOpenChange={setIsVendorComparisonOpen}
+            >
+              <DialogTrigger asChild>
+                <Button type="button" variant="outline" size="sm">
+                  <Package className="mr-2 h-4 w-4" />
+                  Vendor Comparison
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[60vw] bg-white p-6 overflow-y-auto [&>button]:hidden">
+                <DialogHeader>
+                  <div className="flex justify-between w-full items-center">
+                    <DialogTitle>Vendor Comparison</DialogTitle>
+                    <DialogClose asChild>
+                      <Button variant="ghost" size="sm">
+                        <XIcon className="h-4 w-4" />
+                      </Button>
+                    </DialogClose>
+                  </div>
+                </DialogHeader>
+                <VendorComparison />
+              </DialogContent>
+            </Dialog>
+          </div>
           <div className="space-y-4">
             <div className="flex items-end space-x-4">
               <div className="w-1/4">

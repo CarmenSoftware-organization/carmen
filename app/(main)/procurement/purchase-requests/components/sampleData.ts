@@ -23,6 +23,7 @@ export const samplePRData: PurchaseRequest = {
   vendorId: 1,
   deliveryDate: new Date('2023-01-15'),
   currency: 'USD',
+  baseCurrencyCode: 'USD',
   baseSubTotalPrice: 1000,
   subTotalPrice: 1000,
   baseNetAmount: 1000,

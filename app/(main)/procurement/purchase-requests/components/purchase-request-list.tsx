@@ -390,10 +390,10 @@ export function PurchaseRequestList() {
                     onCheckedChange={() => handleSelectPR(pr.id)}
                   />
                   <StatusBadge status={pr.status} />
-                  <span className="text-muted-foreground">
+                  <span className="text-lg text-muted-foreground">
                     {pr.id}
                   </span>
-                  <h3 className="text-sm md:text-base font-semibold">
+                  <h3 className="text-lg md:text-lg font-semibold">
                     {pr.description}
                   </h3>
                 </div>
@@ -430,7 +430,7 @@ export function PurchaseRequestList() {
                   { label: "Requestor", field: "requestor" },
                   { label: "Department", field: "department" },
                   { label: "Amount", field: "amount" },
-                  { label: "Current Stage", field: "currentStage" },
+                  { label: "Workflow Stage", field: "currentStage" },
                 ].map(({ label, field }) => (
                   <div key={field}>
                     <p className="font-medium text-muted-foreground  text-sm">

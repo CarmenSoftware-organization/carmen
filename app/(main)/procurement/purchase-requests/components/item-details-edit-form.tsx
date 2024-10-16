@@ -358,31 +358,6 @@ export function ItemDetailsEditForm({
                     <PendingPurchaseOrdersComponent />
                   </DialogContent>
                 </Dialog>
-                
-                <Dialog
-                  open={isVendorComparisonOpen}
-                  onOpenChange={setIsVendorComparisonOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      <Package className="mr-2 h-4 w-4" />
-                      Vendor Comparison
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[60vw] bg-white p-6 overflow-y-auto [&>button]:hidden">
-                    <DialogHeader>
-                      <div className="flex justify-between w-full items-center">
-                        <DialogTitle>Vendor Comparison</DialogTitle>
-                        <DialogClose asChild>
-                          <Button variant="ghost" size="sm">
-                            <XIcon className="h-4 w-4" />
-                          </Button>
-                        </DialogClose>
-                      </div>
-                    </DialogHeader>
-                    <VendorComparison />
-                  </DialogContent>
-                </Dialog>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
@@ -535,15 +510,6 @@ export function ItemDetailsEditForm({
               </div>
             </div>
           </div>
-
-          <Separator className="my-2" />
-
-          {/* Pricing Section */}
-          <PricingFormComponent initialMode={mode} />
-
-          <Separator className="my-2" />
-
-          {/* Vendor and Additional Information Section */}
           <div>
             <h3 className="text-lg font-semibold mb-2">
               Vendor and Additional Information
@@ -574,6 +540,20 @@ export function ItemDetailsEditForm({
               
             </div>
           </div>
+          <Separator className="my-2" />
+
+          {/* Pricing Section */}
+          <div>
+            <PricingFormComponent 
+              initialMode={mode} 
+              data={formData}
+            />
+          </div>
+
+          <Separator className="my-2" />
+
+          {/* Vendor and Additional Information Section */}
+          
 
           <Separator className="my-2" />
 

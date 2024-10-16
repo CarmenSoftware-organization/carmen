@@ -66,6 +66,7 @@ const purchaseRequests: PurchaseRequest[] = [
     taxAmount: 55,
     baseTotalAmount: 605,
     totalAmount: 605,
+    baseCurrencyCode: "USD",
   },
   {
     id: "2",
@@ -100,6 +101,7 @@ const purchaseRequests: PurchaseRequest[] = [
     taxAmount: 0,
     baseTotalAmount: 100,
     totalAmount: 100,
+    baseCurrencyCode: CurrencyCode.USD,
   },
 ];
 

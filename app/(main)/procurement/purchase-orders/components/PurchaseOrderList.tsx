@@ -156,7 +156,7 @@ const PurchaseOrderList: React.FC = () => {
                   <StatusBadge status={po.status} />
                   <div>
                     <h3 className="text-lg font-semibold">
-                    <span className="font-normal text-muted-foreground"> {po.number} </span><span className=""> ({po.vendorName})</span>
+                    <span className="font-normal text-muted-foreground"> {po.number} </span><span className=""> {po.vendorName}</span>
                     </h3>
                   </div>
                 </div>

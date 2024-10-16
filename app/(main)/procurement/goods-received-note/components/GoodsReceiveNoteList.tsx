@@ -141,10 +141,8 @@ export function GoodsReceiveNoteList() {
                   onCheckedChange={(checked) => toggleItemSelection(grn.id)}
                 />
                 <StatusBadge status={grn.status} />
-                <div>
-                  <h3 className="font-semibold">{grn.ref}</h3>
-                  <p className="text-sm text-gray-500">{grn.description}</p>
-                </div>
+                  <h3 className="text-muted-foreground text-lg">{grn.ref}</h3>
+                  <h3 className="font-semibold text-lg">{grn.description}</h3>
               </div>
               <TooltipProvider>
                 <div className="flex space-x-1">

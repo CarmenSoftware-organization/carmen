@@ -386,6 +386,7 @@ function getEmptyPurchaseRequest(): PurchaseRequest {
     jobCode: "",
     estimatedTotal: 0,
     currency:"THB",
+    baseCurrencyCode: "THB",
     vendor: "",
     vendorId: 0,
     deliveryDate: new Date(),

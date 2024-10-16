@@ -75,8 +75,8 @@ export default function SummaryPRTable({ item, currencyBase, currencyCurrent }: 
         <TableHeader>
           <TableRow>
             <TableHead className="font-bold whitespace-nowrap">Description</TableHead>
-            <TableHead className="text-right font-bold whitespace-nowrap">Total Amount</TableHead>
-            <TableHead className="text-right text-gray-500 text-xs whitespace-nowrap hidden md:flex items-center justify-end w-full">Base Amount</TableHead>
+            <TableHead className="text-right font-bold whitespace-nowrap">Total Amount ({currencyCurrent})</TableHead>
+            <TableHead className="text-right text-gray-500 text-xs whitespace-nowrap hidden md:flex items-center justify-end w-full">Base Amount ({currencyBase})</TableHead>
             
           </TableRow>
         </TableHeader>
@@ -85,8 +85,8 @@ export default function SummaryPRTable({ item, currencyBase, currencyCurrent }: 
           {data.map((item) => (
                 <TableRow key={item.Label}>
                 <TableCell className="whitespace-nowrap">{item.Label}</TableCell>
-                <TableCell className="text-right font-bold whitespace-nowrap">{item.currentCurrency} {item.currentAmt}</TableCell>
-                <TableCell className="hidden md:block text-right text-xs text-gray-500 whitespace-nowrap">{item.localCurrency} {item.localAmt}</TableCell>
+                <TableCell className="text-right font-bold whitespace-nowrap">{item.currentAmt}</TableCell>
+                <TableCell className="hidden md:block text-right text-xs text-gray-500 whitespace-nowrap">{item.localAmt}</TableCell>
                
               </TableRow>
           ))}

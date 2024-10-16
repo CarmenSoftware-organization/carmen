@@ -82,6 +82,8 @@ export function GoodsReceiveNoteItems({
     return (amount * exchangeRate).toFixed(2);
   };
 
+  const numberCellClass = "text-right";
+
   if (items.length === 0) {
     return <div>No items available.</div>;
   }
@@ -100,13 +102,13 @@ export function GoodsReceiveNoteItems({
             </TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Product Name</TableHead>
-            <TableHead>Ordered Qty</TableHead>
-            <TableHead>Received Qty</TableHead>
+            <TableHead className={numberCellClass}>Ordered Qty</TableHead>
+            <TableHead className={numberCellClass}>Received Qty</TableHead>
             <TableHead>Unit</TableHead>
-            <TableHead>Unit Price</TableHead>
-            <TableHead>Net Price</TableHead>
-            <TableHead>Tax</TableHead>
-            <TableHead>Total Price</TableHead>
+            <TableHead className={numberCellClass}>Price</TableHead>
+            <TableHead className={numberCellClass}>Net Amount</TableHead>
+            <TableHead className={numberCellClass}>Tax Amonut</TableHead>
+            <TableHead className={numberCellClass}>Total Amount</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -124,13 +126,13 @@ export function GoodsReceiveNoteItems({
               </TableCell>
               <TableCell>{item.location || "N/A"}</TableCell>
               <TableCell>{item.name}</TableCell>
-              <TableCell>
+              <TableCell className={numberCellClass}>
                 {item.orderedQuantity}
                 <div className="text-xs text-muted-foreground">
-                  {item.baseQuantity} {item.baseUnit}
+                  {item.baseQuantity} 
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className={numberCellClass}>
                 <Input
                   type="number"
                   value={item.receivedQuantity}
@@ -142,39 +144,40 @@ export function GoodsReceiveNoteItems({
                     )
                   }
                   readOnly={mode === "view"}
+                  className="text-right"
                 />
                 <div className="text-xs text-muted-foreground">
-                  {(item.receivedQuantity * item.conversionRate).toFixed(2)} {item.baseUnit}
+                  {(item.receivedQuantity * item.conversionRate).toFixed(2)}
                 </div>
               </TableCell>
               <TableCell>
                 {item.unit}
                 <div className="text-xs text-muted-foreground">
-                  1 {item.unit} = {item.conversionRate} {item.baseUnit}
+                  1 {item.unit} = {item.conversionRate}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className={numberCellClass}>
                 {item.unitPrice.toFixed(2)}
                 <div className="text-xs text-muted-foreground">
-                  {baseCurrency} {formatBaseAmount(item.unitPrice)}
+                 {formatBaseAmount(item.unitPrice)}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className={numberCellClass}>
                 {(item.unitPrice * item.receivedQuantity).toFixed(2)}
                 <div className="text-xs text-muted-foreground">
-                  {baseCurrency} {formatBaseAmount(item.unitPrice * item.receivedQuantity)}
+                  {formatBaseAmount(item.unitPrice * item.receivedQuantity)}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className={numberCellClass}>
                 {(item.subTotalAmount - (item.unitPrice * item.receivedQuantity)).toFixed(2)}
                 <div className="text-xs text-muted-foreground">
-                  {baseCurrency} {formatBaseAmount(item.subTotalAmount - (item.unitPrice * item.receivedQuantity))}
+                 {formatBaseAmount(item.subTotalAmount - (item.unitPrice * item.receivedQuantity))}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className={numberCellClass}>
                 {item.subTotalAmount.toFixed(2)}
                 <div className="text-xs text-muted-foreground">
-                  {baseCurrency} {formatBaseAmount(item.subTotalAmount)}
+                 {formatBaseAmount(item.subTotalAmount)}
                 </div>
               </TableCell>
               <TableCell>

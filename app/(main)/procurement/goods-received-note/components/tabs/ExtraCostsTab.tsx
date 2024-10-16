@@ -51,6 +51,10 @@ export function ExtraCostsTab({
         id: Date.now().toString(),
         type: newCostType,
         amount: parseFloat(newCostAmount),
+        currency: "USD", // Assuming default currency, adjust as needed
+        exchangeRate: 1, // Assuming default exchange rate, adjust as needed
+        baseAmount: parseFloat(newCostAmount), // Assuming base amount is the same as amount
+        baseCurrency: "USD", // Assuming default base currency, adjust as needed
       };
       const updatedCosts = [...costs, newCost];
       setCosts(updatedCosts);

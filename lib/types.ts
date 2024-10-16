@@ -158,6 +158,7 @@ export interface PurchaseOrder {
   description: string;
   remarks: string;
   items: PurchaseOrderItem[];
+  baseCurrencyCode: string;
   baseSubTotalPrice: number;
   subTotalPrice: number;
   baseNetAmount: number;
@@ -513,14 +514,27 @@ export interface GoodsReceiveNoteItem {
 export interface StockMovement {
   id: string;
   itemName: string;
+  unit: string;
   quantity: number;
   fromLocation: string;
   toLocation: string;
   netAmount: number;
   extraCost: number;
   totalAmount: number;
+  cost: number;
+  totalCost: number;
+  currency: string;
 }
 
+export interface ExtraCost {
+  id: string;
+  type: CostType;
+  amount: number;
+  currency: string;
+  exchangeRate: number;
+  baseAmount: number;
+  baseCurrency: string;
+}
 export type GoodsReceiveNoteMode = "view" | "edit" | "add";
 
 export type GoodsReceiveNoteStatus =
@@ -652,6 +666,7 @@ export interface PurchaseRequest {
   jobCode: string;
   estimatedTotal: number;
   currency: string;
+  baseCurrencyCode: string;
   baseSubTotalPrice: number;
   subTotalPrice: number;
   baseNetAmount: number;

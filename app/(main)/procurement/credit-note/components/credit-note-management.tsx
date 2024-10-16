@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"  // Add this import
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,11 +14,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
-import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2, ArrowUpDown } from 'lucide-react'
+import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/custom-status-badge'
 
-// Mock data for demonstration
+// Update the mock data to include netAmount and taxAmount
 const mockCreditNotes = Array(50).fill(null).map((_, index) => ({
   id: index + 1,
   date: `2023-07-${String(index + 1).padStart(2, '0')}`,
@@ -28,8 +27,13 @@ const mockCreditNotes = Array(50).fill(null).map((_, index) => ({
   vendor: `Supplier ${String.fromCharCode(65 + (index % 26))}`,
   docNumber: `INV${index + 123}`,
   docDate: `2023-06-${String(index + 1).padStart(2, '0')}`,
-  amount: Math.round(Math.random() * 1000 * 100) / 100,
+  netAmount: Math.round(Math.random() * 800 * 100) / 100,
+  taxAmount: Math.round(Math.random() * 200 * 100) / 100,
+  amount: 0, // This will be calculated
   status: ['Committed', 'Saved', 'Voided'][index % 3],
+})).map(note => ({
+  ...note,
+  amount: note.netAmount + note.taxAmount // Calculate the total amount
 }))
 
 export function CreditNoteManagement() {
@@ -39,8 +43,6 @@ export function CreditNoteManagement() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedNotes, setSelectedNotes] = useState<number[]>([])
-  const [sortField, setSortField] = useState<keyof typeof mockCreditNotes[0] | null>(null)
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const itemsPerPage = 10
 
   const handleCreateCreditNote = () => {
@@ -101,15 +103,6 @@ export function CreditNoteManagement() {
     setSelectedNotes([])
   }
 
-  const handleSort = (field: keyof typeof mockCreditNotes[0]) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortField(field)
-      setSortDirection('asc')
-    }
-  }
-
   const filteredCreditNotes = creditNotes
     .filter(note => filterStatus === 'All' || note.status === filterStatus)
     .filter(note => 
@@ -118,22 +111,8 @@ export function CreditNoteManagement() {
       note.vendor.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-  const sortedAndFilteredCreditNotes = useMemo(() => {
-    let result = filteredCreditNotes
-
-    if (sortField) {
-      result = [...result].sort((a, b) => {
-        if (a[sortField] < b[sortField]) return sortDirection === 'asc' ? -1 : 1
-        if (a[sortField] > b[sortField]) return sortDirection === 'asc' ? 1 : -1
-        return 0
-      })
-    }
-
-    return result
-  }, [filteredCreditNotes, sortField, sortDirection])
-
-  const totalPages = Math.ceil(sortedAndFilteredCreditNotes.length / itemsPerPage)
-  const paginatedCreditNotes = sortedAndFilteredCreditNotes.slice(
+  const totalPages = Math.ceil(filteredCreditNotes.length / itemsPerPage)
+  const paginatedCreditNotes = filteredCreditNotes.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
@@ -226,8 +205,9 @@ export function CreditNoteManagement() {
                         onCheckedChange={(checked) => handleSelectNote(note.id, checked as boolean)}
                       />
                       <StatusBadge status={note.status} />
-                      <h3 className="text-sm md:text-base font-semibold">{note.description}</h3>
-                      <span className="text-xs text-muted-foreground">({note.refNumber})</span>
+                      <h3 className="text-lg text-muted-foreground">{note.refNumber}</h3>
+                      <h3 className="text-lg md:text-lg font-semibold">{note.description}</h3>
+                      
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button variant="ghost" size="icon" aria-label="View credit note" onClick={() => handleViewDetails(note.id)}>
@@ -241,25 +221,18 @@ export function CreditNoteManagement() {
                       </Button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-0 md:gap-2">
                     {[
                       { label: 'Date', value: note.date },
                       { label: 'Vendor', value: note.vendor },
                       { label: 'Doc.#', value: note.docNumber },
                       { label: 'Doc. Date', value: note.docDate },
-                      { label: 'Amount', value: `$${note.amount.toFixed(2)}` },
-                      { label: 'Status', value: note.status },
+                      { label: 'Net Amount', value: `$${note.netAmount.toFixed(2)}` },
+                      { label: 'Tax Amount', value: `$${note.taxAmount.toFixed(2)}` },
+                      { label: 'Total Amount', value: `$${note.amount.toFixed(2)}` },
                     ].map(({ label, value }) => (
                       <div key={label}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="p-0 h-auto font-medium text-muted-foreground uppercase text-xxs"
-                          onClick={() => handleSort(label.toLowerCase() as keyof typeof note)}
-                        >
-                          {label}
-                          <ArrowUpDown className="ml-1 h-3 w-3" />
-                        </Button>
+                        <p className="text-xs font-medium text-muted-foreground">{label}</p>
                         <p className="text-sm">{value}</p>
                       </div>
                     ))}
@@ -272,7 +245,7 @@ export function CreditNoteManagement() {
           {/* Pagination */}
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, sortedAndFilteredCreditNotes.length)} of {sortedAndFilteredCreditNotes.length} results
+              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredCreditNotes.length)} of {filteredCreditNotes.length} results
             </div>
             <div className="space-x-2">
               <Button

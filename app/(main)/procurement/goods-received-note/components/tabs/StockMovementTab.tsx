@@ -18,23 +18,27 @@ export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Item Name</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>Product Name</TableHead>
+            <TableHead>Unit</TableHead>
             <TableHead>Quantity</TableHead>
-            <TableHead>To Location</TableHead>
+            <TableHead>Cost</TableHead>
+            <TableHead>Total Cost</TableHead>
             <TableHead>Net Amount</TableHead>
             <TableHead>Extra Cost</TableHead>
-            <TableHead>Total Amount</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {movements.map((movement) => (
-            <TableRow key={movement.id}>
-              <TableCell>{movement.itemName}</TableCell>
-              <TableCell>{movement.quantity}</TableCell>
+          {movements.map((movement, index) => (
+            <TableRow key={movement.id || index}>
               <TableCell>{movement.toLocation}</TableCell>
+              <TableCell>{movement.itemName}</TableCell>
+              <TableCell>{movement.unit}</TableCell>
+              <TableCell>{movement.quantity}</TableCell>
+              <TableCell>{movement.cost}</TableCell>
+              <TableCell>{movement.totalCost}</TableCell>
               <TableCell>{movement.netAmount}</TableCell>
               <TableCell>{movement.extraCost}</TableCell>
-              <TableCell>{movement.totalAmount}</TableCell>
             </TableRow>
           ))}
         </TableBody>

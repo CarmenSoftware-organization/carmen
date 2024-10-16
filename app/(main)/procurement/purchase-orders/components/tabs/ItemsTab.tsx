@@ -149,7 +149,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
       case "setFullyReceived":
         // updateItemsStatus('Fully Received');
         break;
-      case "cancel":
+      case "delete":
         // console.log('Bulk cancel items:', selectedItems);
         break;
       default:
@@ -265,8 +265,8 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
             <Button onClick={() => handleBulkAction("setFullyReceived")}>
               Set Fully Received
             </Button>
-            <Button onClick={() => handleBulkAction("cancel")}>
-              Cancel Selected
+            <Button onClick={() => handleBulkAction("delete")}>
+              Delete Selected
             </Button>
           </div>
         )}
@@ -274,7 +274,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
         <div className="w-full overflow-auto">
           {poData.items.length > 0 ? (
             <div className="overflow-x-auto">
-              <Table className="w-full min-w-[1200px]">
+              <Table className="w-full min-w-[1400px]">
                 <TableHeader>
                   <TableRow className="h-8">
                     <TableHead className="w-[50px]">
@@ -283,18 +283,17 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
                         // onCheckedChange={toggleAllSelection}
                       />
                     </TableHead>
-                    <TableHead className="min-w-[120px]">Product Name</TableHead>
-                    <TableHead className="min-w-[200px]">Description</TableHead>
+                    <TableHead className="min-w-[200px]">Product Name</TableHead>
                     <TableHead className="min-w-[120px]">Order Qty</TableHead>
                     <TableHead className="min-w-[120px]">Received Qty</TableHead>
                     <TableHead className="min-w-[120px]">Remaining Qty</TableHead>
                     <TableHead className="min-w-[80px]">Unit</TableHead>
                     <TableHead className="min-w-[100px]">Price</TableHead>
+                    <TableHead className="min-w-[120px]">Net Amount</TableHead>
+                    <TableHead className="min-w-[120px]">Tax Amount</TableHead>
                     <TableHead className="min-w-[120px]">Total Amount</TableHead>
-                    <TableHead className="min-w-[150px]">
-                      Receiving Status
-                    </TableHead>
-                    <TableHead className="sticky right-0 bg-white dark:bg-gray-800 min-w-[120px]">Actions</TableHead>
+                    <TableHead className="min-w-[150px]">Receiving Status</TableHead>
+                    <TableHead className="min-w-[120px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -307,84 +306,88 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
                         />
                       </TableCell>
                       <TableCell className="py-1">
-                        <div>{item.name}</div>
-                        {item.isFOC && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Gift
-                                className="inline-block mt-0.5 text-blue-500"
-                                size={14}
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent>Free of Charge</TooltipContent>
-                          </Tooltip>
-                        )}
+                        <div className="flex items-center">
+                          <div>
+                            <div>{item.name}</div>
+                            <div className="text-xs text-gray-500">{item.description}</div>
+                          </div>
+                          {item.isFOC && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Gift
+                                  className="inline-block ml-2 text-blue-500"
+                                  size={14}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>Free of Charge</TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
                       </TableCell>
-                      <TableCell className="py-1">
-                        <div className="text-xs">{item.description}</div>
-                      </TableCell>
-                      <TableCell className="py-1">
+                      <TableCell className="py-1 text-right">
                         <div className="text-sm">
-                          {item.orderedQuantity} {item.orderUnit}
+                          {item.orderedQuantity.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {item.baseQuantity} {item.baseUnit}
+                          {item.baseQuantity.toFixed(2)}
                         </div>
                       </TableCell>
-                      <TableCell className="py-1">
+                      <TableCell className="py-1 text-right">
                         <div className="text-sm">
-                          {item.receivedQuantity} {item.orderUnit}
+                          {item.receivedQuantity.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {item.baseReceivingQty} {item.baseUnit}
+                          {item.baseReceivingQty.toFixed(2)}
                         </div>
                       </TableCell>
-                      <TableCell className="py-1">
+                      <TableCell className="py-1 text-right">
                         <div className="text-sm">
-                          {item.remainingQuantity} {item.orderUnit}
+                          {item.remainingQuantity.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {(
-                            item.remainingQuantity *
-                            (item.baseQuantity / item.orderedQuantity)
-                          ).toFixed(2)}{" "}
-                          {item.baseUnit}
+                          {(item.remainingQuantity * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
                         </div>
                       </TableCell>
-                      <TableCell className="py-1">
+                      <TableCell className="py-1 text-right">
                         <div className="text-sm">{item.orderUnit}</div>
-                        <div className="text-xs text-gray-500">
-                          {item.baseUnit}
-                        </div>
+                        <div className="text-xs text-gray-500">{item.baseUnit}</div>
                       </TableCell>
-                      <TableCell className="py-1">
+                      <TableCell className="py-1 text-right">
                         <div className="text-sm">
                           ${item.unitPrice.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          $
-                          {(
-                            item.unitPrice *
-                            (item.baseQuantity / item.orderedQuantity)
-                          ).toFixed(2)}
+                          ${(item.unitPrice * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
                         </div>
                       </TableCell>
-                      <TableCell className="py-1">
+                      <TableCell className="py-1 text-right">
+                        <div className="text-sm">
+                          ${(item.subTotalPrice - item.taxAmount).toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          ${((item.subTotalPrice - item.taxAmount) * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1 text-right">
+                        <div className="text-sm">
+                          ${item.taxAmount.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          ${(item.taxAmount * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-1 text-right">
                         <div className="text-sm">
                           ${item.subTotalPrice.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          $
-                          {(
-                            item.subTotalPrice *
-                            (item.baseQuantity / item.orderedQuantity)
-                          ).toFixed(2)}
+                          ${(item.subTotalPrice * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
                         </div>
                       </TableCell>
                       <TableCell className="py-1">
                         <StatusBadge status={item.status} />
                       </TableCell>
-                      <TableCell className="sticky right-0 bg-gray-100 dark:bg-gray-800 py-1">
+                      <TableCell className="py-1">
                         <div className="flex space-x-1">
                           <Button
                             variant="ghost"

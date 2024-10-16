@@ -3,11 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GoodsReceiveNoteMode } from "@/lib/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TaxTabProps {
   mode: GoodsReceiveNoteMode;
   taxInvoiceNumber?: string;
   taxInvoiceDate?: Date | undefined;
+  taxStatus?: string;
+  taxPeriod?: string;
   onTaxInvoiceChange: (field: string, value: string | Date) => void;
   documentTotals: {
     currency: {
@@ -29,6 +32,8 @@ export function TaxTab({
   mode,
   taxInvoiceNumber,
   taxInvoiceDate,
+  taxStatus,
+  taxPeriod,
   onTaxInvoiceChange,
   documentTotals,
   currency,
@@ -58,33 +63,60 @@ export function TaxTab({
             readOnly={!isEditable}
           />
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="tax-status">Tax Status</Label>
+          <Select
+            disabled={!isEditable}
+            value={taxStatus}
+            onValueChange={(value) => onTaxInvoiceChange('taxStatus', value)}
+          >
+            <SelectTrigger id="tax-status">
+              <SelectValue placeholder="Select tax status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="exempt">Exempt</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="tax-period">Tax Period</Label>
+          <Input
+            id="tax-period"
+            value={taxPeriod}
+            onChange={(e) => onTaxInvoiceChange('taxPeriod', e.target.value)}
+            readOnly={!isEditable}
+            placeholder="e.g., Q2 2023"
+          />
+        </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-2">Document Totals</h3>
+        <h3 className="text-lg font-semibold mb-2">Tax Invoice Totals</h3>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Description</TableHead>
-              <TableHead>{currency}</TableHead>
-              <TableHead>{baseCurrency}</TableHead>
+              <TableHead className="text-right">Total Amount ({currency})</TableHead>
+              <TableHead className="text-right text-xs">Base Amount ({baseCurrency})</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
               <TableCell>Net Amount</TableCell>
-              <TableCell>{documentTotals.currency.netAmount.toFixed(2)}</TableCell>
-              <TableCell>{documentTotals.baseCurrency.netAmount.toFixed(2)}</TableCell>
+              <TableCell className="text-right">{documentTotals.currency.netAmount.toFixed(2)}</TableCell>
+              <TableCell className="text-right text-xs">{documentTotals.baseCurrency.netAmount.toFixed(2)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Tax Amount</TableCell>
-              <TableCell>{documentTotals.currency.taxAmount.toFixed(2)}</TableCell>
-              <TableCell>{documentTotals.baseCurrency.taxAmount.toFixed(2)}</TableCell>
+              <TableCell className="text-right">{documentTotals.currency.taxAmount.toFixed(2)}</TableCell>
+              <TableCell className="text-right text-xs">{documentTotals.baseCurrency.taxAmount.toFixed(2)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold">Total Amount</TableCell>
-              <TableCell className="font-semibold">{documentTotals.currency.totalAmount.toFixed(2)}</TableCell>
-              <TableCell className="font-semibold">{documentTotals.baseCurrency.totalAmount.toFixed(2)}</TableCell>
+              <TableCell className="font-semibold text-right">{documentTotals.currency.totalAmount.toFixed(2)}</TableCell>
+              <TableCell className="font-semibold text-right text-xs">{documentTotals.baseCurrency.totalAmount.toFixed(2)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

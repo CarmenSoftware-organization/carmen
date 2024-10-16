@@ -306,7 +306,32 @@ export function GoodsReceiveNoteComponent({
                   />
                 </div>
                
-                <div className="space-y-2" >
+               
+                 <div className="space-y-2 col-span-2">
+                  <Label htmlFor="vendor" className="text-sm font-medium">
+                    Vendor
+                  </Label>
+                  <Select
+                    value={formData.vendor || undefined}
+                    onValueChange={(value) => handleSelectChange("vendor", value)}
+                    disabled={!isEditable}
+                  >
+                    <SelectTrigger id="vendor" className="h-8 text-sm">
+                      <SelectValue placeholder="Select vendor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {formData.vendor ? (
+                        <SelectItem value={formData.vendor}>
+                          {formData.vendor}
+                        </SelectItem>
+                      ) : (
+                        <SelectItem value="no-vendor">No vendor selected</SelectItem>
+                      )}
+                      {/* Add more vendor options here */}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 col-start-1" >
                   <Label htmlFor="invoice" className="text-sm font-medium">
                     Invoice#
                   </Label>
@@ -333,29 +358,20 @@ export function GoodsReceiveNoteComponent({
                     className="h-8 text-sm"
                   />
                 </div>
-                 <div className="space-y-2 col-span-2">
-                  <Label htmlFor="vendor" className="text-sm font-medium">
-                    Vendor
-                  </Label>
-                  <Select
-                    value={formData.vendor || undefined}
-                    onValueChange={(value) => handleSelectChange("vendor", value)}
-                    disabled={!isEditable}
-                  >
-                    <SelectTrigger id="vendor" className="h-8 text-sm">
-                      <SelectValue placeholder="Select vendor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formData.vendor ? (
-                        <SelectItem value={formData.vendor}>
-                          {formData.vendor}
-                        </SelectItem>
-                      ) : (
-                        <SelectItem value="no-vendor">No vendor selected</SelectItem>
-                      )}
-                      {/* Add more vendor options here */}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2 col-span-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description" className="text-sm font-medium">
+                      Description
+                    </Label>
+                  </div>
+                    <Input
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      readOnly={!isEditable}
+                      className="h-8 text-sm w-full mt-2"
+                    />
                 </div>
                 <div className="space-y-2 col-start-1">
                   <Label htmlFor="currency" className="text-sm font-medium">
@@ -502,21 +518,7 @@ export function GoodsReceiveNoteComponent({
                     <CalendarIcon className="absolute right-3 top-2 h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
-                <div className="space-y-2 col-span-6">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="description" className="text-sm font-medium">
-                      Description
-                    </Label>
-                  </div>
-                    <Input
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      readOnly={!isEditable}
-                      className="h-8 text-sm w-full mt-2"
-                    />
-                </div>
+                
 
  
               </div>

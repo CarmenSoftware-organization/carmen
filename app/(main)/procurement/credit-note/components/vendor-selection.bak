@@ -1,0 +1,708 @@
+'use client'
+
+import React, { useState, useMemo, useEffect } from 'react'
+import { Search, ArrowUpDown, ChevronDown, ChevronUp, X, AlertCircle } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { GRNItem, GoodsReceiveNote, Vendor } from '@/lib/types'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+
+// Local types
+type SortConfig = {
+  key: keyof GoodsReceiveNote | null
+  direction: 'ascending' | 'descending'
+}
+
+type ExpandedRows = {
+  [key: string]: boolean
+}
+
+type CreditNoteType = 'item-based' | 'amount-only' | null
+
+type SelectedItem = GRNItem & {
+  creditQuantity: number
+  creditPrice: number
+}
+
+type Errors = {
+  items?: string
+  amount?: string
+  reason?: string
+  [key: string]: string | undefined
+}
+
+// Update mock data to use the correct types
+const mockVendors: Vendor[] = [
+  { id: '1', companyName: 'Supplier A', contactPerson: 'John Doe', email: 'supplierA@example.com', phone: '123-456-7890', address: '123 Main St, City A', country: 'Country A' },
+  { id: '2', companyName: 'Vendor B', contactPerson: 'Jane Smith', email: 'vendorB@example.com', phone: '234-567-8901', address: '456 Oak St, City B', country: 'Country B' },
+  { id: '3', companyName: 'Company C', contactPerson: 'Bob Johnson', email: 'companyC@example.com', phone: '345-678-9012', address: '789 Pine St, City C', country: 'Country C' },
+  { id: '4', companyName: 'Distributor D', contactPerson: 'Alice Brown', email: 'distributorD@example.com', phone: '456-789-0123', address: '101 Elm St, City D', country: 'Country D' },
+  { id: '5', companyName: 'Wholesaler E', contactPerson: 'Charlie Wilson', email: 'wholesalerE@example.com', phone: '567-890-1234', address: '202 Maple St, City E', country: 'Country E' },
+]
+
+const mockGRNItems: GRNItem[] = [
+  { id: '1', name: 'Item A', quantity: 10, price: 50, total: 500, lotNumber: 'LOT001', expirationDate: new Date('2024-12-31') },
+  { id: '2', name: 'Item B', quantity: 5, price: 100, total: 500, lotNumber: 'LOT002', expirationDate: new Date('2024-11-30') },
+  { id: '3', name: 'Item C', quantity: 20, price: 25, total: 500, lotNumber: 'LOT003', expirationDate: new Date('2024-10-31') },
+  { id: '4', name: 'Item D', quantity: 2, price: 250, total: 500, lotNumber: 'LOT004', expirationDate: new Date('2024-09-30') },
+]
+
+const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
+  { id: '1', vendorId: '1', items: mockGRNItems, totalAmount: 2000, date: new Date('2023-10-15'), status: 'completed', invoiceNumber: 'INV-001' },
+  { id: '2', vendorId: '2', items: mockGRNItems.slice(0, 2), totalAmount: 1000, date: new Date('2023-10-10'), status: 'completed', invoiceNumber: 'INV-002' },
+  { id: '3', vendorId: '3', items: mockGRNItems.slice(1, 3), totalAmount: 1500, date: new Date('2023-10-20'), status: 'completed', invoiceNumber: 'INV-003' },
+  { id: '4', vendorId: '4', items: mockGRNItems.slice(2, 4), totalAmount: 1750, date: new Date('2023-10-05'), status: 'completed', invoiceNumber: 'INV-004' },
+  { id: '5', vendorId: '5', items: mockGRNItems, totalAmount: 2000, date: new Date('2023-10-18'), status: 'completed', invoiceNumber: 'INV-005' },
+]
+
+export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNoteCreate?: (creditNote: any) => void }) {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
+  const [expandedRows, setExpandedRows] = useState<ExpandedRows>({})
+  const [selectedGRN, setSelectedGRN] = useState<GoodsReceiveNote | null>(null)
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([])
+  const [creditNoteType, setCreditNoteType] = useState<CreditNoteType>(null)
+  const [amountOnlyValue, setAmountOnlyValue] = useState('')
+  const [amountOnlyReason, setAmountOnlyReason] = useState('')
+  const [currentStep, setCurrentStep] = useState<'selectType' | 'selectGRN' | 'chooseItems' | 'adjustQuantities' | 'reviewItemBased' | 'enterAmount' | 'reviewAmountOnly' | 'summary'>('selectType')
+  const [errors, setErrors] = useState<Errors>({})
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
+  const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(true)
+
+  useEffect(() => {
+    setIsTypeDialogOpen(true)
+  }, [])
+
+  const sortedGRNs = useMemo(() => {
+    let sortableGRNs = [...mockGoodsReceiveNotes]
+    if (sortConfig.key) {
+      sortableGRNs.sort((a: GoodsReceiveNote, b: GoodsReceiveNote) => {
+        if (a[sortConfig.key!] < b[sortConfig.key!]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1
+        }
+        if (a[sortConfig.key!] > b[sortConfig.key!]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1
+        }
+        return 0
+      })
+    }
+    return sortableGRNs
+  }, [sortConfig])
+
+  const filteredGRNs = useMemo(() => {
+    return sortedGRNs.filter(grn => 
+      grn.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      grn.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mockVendors.find(v => v.id === grn.vendorId)?.companyName.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [sortedGRNs, searchTerm])
+
+  const requestSort = (key: keyof GoodsReceiveNote) => {
+    let direction: 'ascending' | 'descending' = 'ascending'
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending'
+    }
+    setSortConfig({ key, direction })
+  }
+
+  const toggleRowExpansion = (id: string) => {
+    setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  const SortableHeader = ({ label, sortKey }: { label: string, sortKey: keyof GoodsReceiveNote }) => (
+    <Button
+      variant="ghost"
+      onClick={() => requestSort(sortKey)}
+      className="flex items-center justify-between p-1 h-auto w-full text-left hover:bg-transparent"
+    >
+      <span className="font-medium">{label}</span>
+      <ArrowUpDown className={`h-4 w-4 ${sortConfig.key === sortKey ? 'text-primary' : 'text-muted-foreground'}`} />
+    </Button>
+  )
+
+  const handleGRNSelect = (grn: GoodsReceiveNote) => {
+    setSelectedGRN(grn)
+    setSelectedItems([])
+    setCurrentStep(creditNoteType === 'item-based' ? 'chooseItems' : 'enterAmount')
+  }
+
+  const handleItemSelect = (item: GRNItem) => {
+    setSelectedItems(prev => {
+      const isSelected = prev.find(i => i.id === item.id)
+      if (isSelected) {
+        return prev.filter(i => i.id !== item.id)
+      } else {
+        return [...prev, { ...item, creditQuantity: item.quantity, creditPrice: item.price }]
+      }
+    })
+  }
+
+  const handleQuantityChange = (id: string, value: string) => {
+    setSelectedItems(prev => 
+      prev.map(item => 
+        item.id === id 
+          ? { ...item, creditQuantity: parseInt(value) || 0, total: (parseInt(value) || 0) * item.creditPrice } 
+          : item
+      )
+    )
+  }
+
+  const handlePriceChange = (id: string, value: string) => {
+    setSelectedItems(prev => 
+      prev.map(item => 
+        item.id === id 
+          ? { ...item, creditPrice: parseFloat(value) || 0, total: item.creditQuantity * (parseFloat(value) || 0) } 
+          : item
+      )
+    )
+  }
+
+  const calculateGainLoss = (item: SelectedItem) => {
+    const originalValue = item.quantity * item.price
+    const creditValue = item.creditQuantity * item.creditPrice
+    return creditValue - originalValue
+  }
+
+  const validateForm = () => {
+    const newErrors: Errors = {}
+
+    if (creditNoteType === 'item-based') {
+      if (selectedItems.length === 0) {
+        newErrors.items = 'Please select at least one item'
+      }
+      selectedItems.forEach(item => {
+        if (item.creditQuantity <= 0) {
+          newErrors[`quantity_${item.id}`] = 'Quantity must be greater than 0'
+        }
+        if (item.creditPrice <= 0) {
+          newErrors[`price_${item.id}`] = 'Price must be greater than 0'
+        }
+      })
+    } else {
+      if (!amountOnlyValue || parseFloat(amountOnlyValue) <= 0) {
+        newErrors.amount = 'Please enter a valid amount'
+      }
+      if (!amountOnlyReason.trim()) {
+        newErrors.reason = 'Please provide a reason for the credit note'
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleCreateCreditNote = () => {
+    if (validateForm()) {
+      setIsConfirmDialogOpen(true)
+    }
+  }
+
+  const confirmCreateCreditNote = () => {
+    if (creditNoteType === 'item-based') {
+      onCreditNoteCreate({ 
+        type: 'item-based',
+        vendor: selectedGRN?.vendorId, 
+        items: selectedItems.map(item => ({
+          ...item,
+          gainLoss: calculateGainLoss(item)
+        }))
+      })
+    } else {
+      onCreditNoteCreate({
+        type: 'amount-only',
+        vendor: selectedGRN?.vendorId,
+        amount: parseFloat(amountOnlyValue),
+        reason: amountOnlyReason
+      })
+    }
+    resetForm()
+  }
+
+  const resetForm = () => {
+    setSelectedGRN(null)
+    setSelectedItems([])
+    setCreditNoteType(null)
+    setAmountOnlyValue('')
+    setAmountOnlyReason('')
+    setCurrentStep('selectType')
+    setErrors({})
+    setIsConfirmDialogOpen(false)
+    setIsTypeDialogOpen(true)
+  }
+
+  const getProgressPercentage = () => {
+    const steps = ['selectType', 'selectGRN', 'chooseItems', 'adjustQuantities', 'reviewItemBased', 'enterAmount', 'reviewAmountOnly', 'summary']
+    return ((steps.indexOf(currentStep) + 1) / steps.length) * 100
+  }
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 'selectType':
+        return (
+          <Dialog open={isTypeDialogOpen} onOpenChange={setIsTypeDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Select Credit Note Type</DialogTitle>
+                <DialogDescription>Choose the type of credit note you want to create</DialogDescription>
+              </DialogHeader>
+              <RadioGroup
+                onValueChange={(value) => {
+                  setCreditNoteType(value)
+                  setCurrentStep('selectGRN')
+                  setIsTypeDialogOpen(false)
+                }}
+              >
+                <div className="flex items-center space-x-2 mb-4">
+                  <RadioGroupItem value="item-based" id="item-based" />
+                  <Label htmlFor="item-based">Item-based</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="amount-only" id="amount-only" />
+                  <Label htmlFor="amount-only">Amount-only</Label>
+                </div>
+              </RadioGroup>
+            </DialogContent>
+          </Dialog>
+        )
+      case 'selectGRN':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Select Goods Receive Note</CardTitle>
+              <CardDescription>Choose a GRN for the credit note</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search GRN, invoice number, or vendor..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead><SortableHeader label="GRN ID" sortKey="id" /></TableHead>
+                      <TableHead><SortableHeader label="Vendor" sortKey="vendorId" /></TableHead>
+                      <TableHead><SortableHeader label="Invoice Number" sortKey="invoiceNumber" /></TableHead>
+                      <TableHead><SortableHeader label="Date" sortKey="date" /></TableHead>
+                      <TableHead className="text-right"><SortableHeader label="Total Amount" sortKey="totalAmount" /></TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredGRNs.map((grn) => (
+                      <TableRow key={grn.id}>
+                        <TableCell>{grn.id}</TableCell>
+                        <TableCell>{mockVendors.find(v => v.id === grn.vendorId)?.companyName}</TableCell>
+                        <TableCell>{grn.invoiceNumber}</TableCell>
+                        <TableCell>{grn.date.toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">{grn.totalAmount.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Button onClick={() => handleGRNSelect(grn)} size="sm">
+                            Select
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      case 'chooseItems':
+      case 'adjustQuantities':
+        return (
+          <Dialog open={selectedGRN !== null} onOpenChange={() => setSelectedGRN(null)}>
+            <DialogContent className="sm:max-w-[800px]">
+              <DialogHeader>
+                <DialogTitle>{currentStep === 'chooseItems' ? 'Select Items for Credit Note' : 'Adjust Quantities, Prices, and Lot Numbers'}</DialogTitle>
+                <DialogDescription>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <p className="font-semibold">Vendor Details:</p>
+                      <p>Name: {mockVendors.find(v => v.id === selectedGRN?.vendorId)?.companyName}</p>
+                      <p>Invoice Number: {selectedGRN?.invoiceNumber}</p>
+                      <p>Invoice Date: {selectedGRN?.date.toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold">Financial Details:</p>
+                      <p>Currency: {selectedGRN?.currency}</p>
+                      <p>Net Amount: {selectedGRN?.netAmount.toFixed(2)}</p>
+                      <p>Tax Amount: {selectedGRN?.taxAmount.toFixed(2)}</p>
+                      <p>Total Amount: {selectedGRN?.totalAmount.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <p className="font-semibold">GRN Details:</p>
+                    <p>Last GRN: {selectedGRN?.lastGRN}</p>
+                    <p>Last Delivery Date: {selectedGRN?.lastDeliveryDate}</p>
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="h-[400px] mt-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">Select</TableHead>
+                      <TableHead>Item Name</TableHead>
+                      <TableHead>Reference Lot</TableHead>
+                      <TableHead>Credit Lot</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Gain/Loss</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mockGRNItems.map((item) => {
+                      const selectedItem = selectedItems.find(i => i.id === item.id)
+                      const gainLoss = selectedItem ? calculateGainLoss(selectedItem) : 0
+                      return (
+                        <TableRow key={item.id}>
+                          <TableCell>
+                            <Checkbox
+                              id={`item-${item.id}`}
+                              checked={selectedItem !== undefined}
+                              onCheckedChange={() => handleItemSelect(item)}
+                            />
+                          </TableCell>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.referenceLotNumber}</TableCell>
+                          <TableCell>
+                            {selectedItem && (
+                              <Select
+                                value={selectedItem.creditLotNumber}
+                                onValueChange={(value) => handleLotNumberChange(item.id, value)}
+                              >
+                                <SelectTrigger className="w-[180px]">
+                                  <SelectValue placeholder="Select a lot" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {item.availableLots.map((lot) => (
+                                    <SelectItem key={lot} value={lot}>{lot}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {selectedItem ? (
+                              <Input
+                                type="number"
+                                value={selectedItem.creditQuantity}
+                                onChange={(e) => handleQuantityChange(item.id, e.target.value)}
+                                min="1"
+                                max={item.quantity}
+                                className="w-20"
+                              />
+                            ) : (
+                              item.quantity
+                            )}
+                            {errors[`quantity_${item.id}`] && (
+                              <p className="text-red-500 text-xs mt-1">{errors[`quantity_${item.id}`]}</p>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {selectedItem ? (
+                              <Input
+                                type="number"
+                                value={selectedItem.creditPrice}
+                                onChange={(e) => handlePriceChange(item.id, e.target.value)}
+                                min="0"
+                                step="0.01"
+                                className="w-24"
+                              />
+                            ) : (
+                              `${selectedGRN?.currency} ${item.price.toFixed(2)}`
+                            )}
+                            {errors[`price_${item.id}`] && (
+                              <p className="text-red-500 text-xs mt-1">{errors[`price_${item.id}`]}</p>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {selectedItem
+                              ? `${selectedGRN?.currency} ${(selectedItem.creditQuantity * selectedItem.creditPrice).toFixed(2)}`
+                              : `${selectedGRN?.currency} ${item.total.toFixed(2)}`
+                            }
+                          </TableCell>
+                          <TableCell>
+                            {selectedItem && (
+                              <Badge variant={gainLoss >= 0 ? "success" : "destructive"}>
+                                {gainLoss >= 0 ? '+' : '-'}${Math.abs(gainLoss).toFixed(2)}
+                              </Badge>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+              {errors.items && (
+                <Alert variant="destructive" className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{errors.items}</AlertDescription>
+                </Alert>
+              )}
+              <DialogFooter>
+                <Button onClick={() => setCurrentStep('reviewItemBased')} className="w-full mt-4" disabled={selectedItems.length === 0}>
+                  {currentStep === 'chooseItems' ? 'Proceed to Review' : 'Review Credit Note'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )
+      case 'enterAmount':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Enter Credit Note Amount</CardTitle>
+              <CardDescription>Vendor: {mockVendors.find(v => v.id === selectedGRN?.vendorId)?.companyName}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount</Label>
+                  <Input
+                    id="amount"
+                    placeholder="Enter amount"
+                    type="number"
+                    value={amountOnlyValue}
+                    onChange={(e) => setAmountOnlyValue(e.target.value)}
+                  />
+                  {errors.amount && <p className="text-red-500 text-xs">{errors.amount}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reason">Reason</Label>
+                  <Textarea
+                    id="reason"
+                    placeholder="Enter reason for credit note"
+                    value={amountOnlyReason}
+                    onChange={(e) => setAmountOnlyReason(e.target.value)}
+                  />
+                  {errors.reason && <p className="text-red-500 text-xs">{errors.reason}</p>}
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={() => setCurrentStep('reviewAmountOnly')} className="w-full" disabled={!amountOnlyValue || !amountOnlyReason}>
+                Review Credit Note
+              </Button>
+            </CardFooter>
+          </Card>
+        )
+      case 'reviewItemBased':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Review Item-based Credit Note</CardTitle>
+              <CardDescription>Vendor: {mockVendors.find(v => v.id === selectedGRN?.vendorId)?.companyName}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[300px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Item Name</TableHead>
+                      <TableHead>Reference Lot</TableHead>
+                      <TableHead>Credit Lot</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Gain/Loss</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedItems.map((item) => {
+                      const gainLoss = calculateGainLoss(item)
+                      return (
+                        <TableRow key={item.id}>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.referenceLotNumber}</TableCell>
+                          <TableCell>{item.creditLotNumber}</TableCell>
+                          <TableCell>{item.creditQuantity}</TableCell>
+                          <TableCell>{selectedGRN?.currency} {item.creditPrice.toFixed(2)}</TableCell>
+                          <TableCell>{selectedGRN?.currency} {(item.creditQuantity * item.creditPrice).toFixed(2)}</TableCell>
+                          <TableCell>
+                            <Badge variant={gainLoss >= 0 ? "success" : "destructive"}>
+                              {gainLoss >= 0 ? '+' : '-'}${Math.abs(gainLoss).toFixed(2)}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+              <div className="mt-4 text-right">
+                <p className="font-semibold">Total Credit Amount: {selectedGRN?.currency} {selectedItems.reduce((sum, item) => sum + item.creditQuantity * item.creditPrice, 0).toFixed(2)}</p>
+                <p className="font-semibold">Total Gain/Loss: {selectedGRN?.currency} {selectedItems.reduce((sum, item) => sum + calculateGainLoss(item), 0).toFixed(2)}</p>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => setCurrentStep('adjustQuantities')}>
+                Back to Adjust
+              </Button>
+              <Button onClick={() => setCurrentStep('summary')}>
+                Proceed to Summary
+              </Button>
+            </CardFooter>
+          </Card>
+        )
+      case 'reviewAmountOnly':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Review Amount-only Credit Note</CardTitle>
+              <CardDescription>Vendor: {mockVendors.find(v => v.id === selectedGRN?.vendorId)?.companyName}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <p className="font-semibold">Amount:</p>
+                  <p>{selectedGRN?.currency} {parseFloat(amountOnlyValue).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="font-semibold">Reason:</p>
+                  <p>{amountOnlyReason}</p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => setCurrentStep('enterAmount')}>
+                Back to Edit
+              </Button>
+              <Button onClick={() => setCurrentStep('summary')}>
+                Proceed to Summary
+              </Button>
+            </CardFooter>
+          </Card>
+        )
+      case 'summary':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Credit Note Summary</CardTitle>
+              <CardDescription>Review the details before creating the credit note</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <p className="font-semibold">Vendor:</p>
+                  <p>{mockVendors.find(v => v.id === selectedGRN?.vendorId)?.companyName}</p>
+                </div>
+                <div>
+                  <p className="font-semibold">Credit Note Type:</p>
+                  <p>{creditNoteType === 'item-based' ? 'Item-based' : 'Amount-only'}</p>
+                </div>
+                {creditNoteType === 'item-based' ? (
+                  <div>
+                    <p className="font-semibold">Items:</p>
+                    <ul className="list-disc list-inside">
+                      {selectedItems.map(item => (
+                        <li key={item.id}>
+                          {item.name} - Quantity: {item.creditQuantity}, Price: {selectedGRN?.currency} {item.creditPrice.toFixed(2)}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="font-semibold mt-2">Total Credit Amount: {selectedGRN?.currency} {selectedItems.reduce((sum, item) => sum + item.creditQuantity * item.creditPrice, 0).toFixed(2)}</p>
+                    <p className="font-semibold">Total Gain/Loss: {selectedGRN?.currency} {selectedItems.reduce((sum, item) => sum + calculateGainLoss(item), 0).toFixed(2)}</p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="font-semibold">Amount:</p>
+                    <p>{selectedGRN?.currency} {parseFloat(amountOnlyValue).toFixed(2)}</p>
+                    <p className="font-semibold mt-2">Reason:</p>
+                    <p>{amountOnlyReason}</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => setCurrentStep(creditNoteType === 'item-based' ? 'reviewItemBased' : 'reviewAmountOnly')}>
+                Back to Review
+              </Button>
+              <Button onClick={handleCreateCreditNote}>
+                Create Credit Note
+              </Button>
+            </CardFooter>
+          </Card>
+        )
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <Progress value={getProgressPercentage()} className="w-full" />
+      {renderStep()}
+      <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Credit Note Creation</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to create this credit note? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConfirmDialogOpen(false)}>Cancel</Button>
+            <Button onClick={confirmCreateCreditNote}>Confirm</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
