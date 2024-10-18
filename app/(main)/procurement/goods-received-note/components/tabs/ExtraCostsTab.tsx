@@ -137,29 +137,32 @@ export function ExtraCostsTab({
           )}
         </TableBody>
       </Table>
-
-      <div className="mt-6">
+      <div className="flex gap-6 w-full">
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2">
+            Cost Distribution Method
+          </h3>
+          <RadioGroup
+            value={distributionMethod}
+            onValueChange={(value: CostDistributionMethod) =>
+              setDistributionMethod(value)
+            }
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="net-amount" id="net-amount" />
+              <Label htmlFor="net-amount">Net Amount</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="quantity-ratio" id="quantity-ratio" />
+              <Label htmlFor="quantity-ratio">Quantity Ratio</Label>
+            </div>
+          </RadioGroup>
+        </div>
         <div className="mt-4">
           <h3 className="font-semibold">
-            Total Extra Cost: {totalExtraCost.toFixed(2)}
+            Total Extra Cost<br/> {totalExtraCost.toFixed(2)}
           </h3>
         </div>
-        <h3 className="text-lg font-semibold mb-2">Cost Distribution Method</h3>
-        <RadioGroup
-          value={distributionMethod}
-          onValueChange={(value: CostDistributionMethod) =>
-            setDistributionMethod(value)
-          }
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="net-amount" id="net-amount" />
-            <Label htmlFor="net-amount">Net Amount</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="quantity-ratio" id="quantity-ratio" />
-            <Label htmlFor="quantity-ratio">Quantity Ratio</Label>
-          </div>
-        </RadioGroup>
       </div>
     </div>
   );

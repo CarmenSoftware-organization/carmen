@@ -169,7 +169,7 @@ export function ItemDetailsComponent({
                       <Label htmlFor="name" className="text-xs">Name</Label>
                       <Input
                         id="name"
-                        defaultValue="Organic Quinoa"
+                        defaultValue="Organic Quinoa zzz"
                         readOnly={isReadOnly}
                         className="h-7 text-sm"
                       />

@@ -43,7 +43,7 @@ export function TaxTab({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label htmlFor="tax-invoice">Tax Invoice#</Label>
           <Input
@@ -93,29 +93,21 @@ export function TaxTab({
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-2">Tax Invoice Totals</h3>
+        {/* <h3 className="text-lg font-semibold mb-2">Tax Invoice Totals</h3> */}
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Description</TableHead>
-              <TableHead className="text-right">Total Amount ({currency})</TableHead>
-              <TableHead className="text-right text-xs">Base Amount ({baseCurrency})</TableHead>
+              <TableHead className="text-right">Net Amount</TableHead>
+              <TableHead className="text-right">Tax Amount</TableHead>
+              <TableHead className="text-right">Total Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell>Net Amount</TableCell>
-              <TableCell className="text-right">{documentTotals.currency.netAmount.toFixed(2)}</TableCell>
+              <TableCell>Base Amount ({baseCurrency})</TableCell>
               <TableCell className="text-right text-xs">{documentTotals.baseCurrency.netAmount.toFixed(2)}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Tax Amount</TableCell>
-              <TableCell className="text-right">{documentTotals.currency.taxAmount.toFixed(2)}</TableCell>
               <TableCell className="text-right text-xs">{documentTotals.baseCurrency.taxAmount.toFixed(2)}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-semibold">Total Amount</TableCell>
-              <TableCell className="font-semibold text-right">{documentTotals.currency.totalAmount.toFixed(2)}</TableCell>
               <TableCell className="font-semibold text-right text-xs">{documentTotals.baseCurrency.totalAmount.toFixed(2)}</TableCell>
             </TableRow>
           </TableBody>

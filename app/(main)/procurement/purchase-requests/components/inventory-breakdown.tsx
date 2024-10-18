@@ -52,7 +52,7 @@ const inventoryData = [
 
 // Sample item data
 const itemData = {
-  name: "Organic Quinoa",
+  name: "Organic Quinoa ccc",
   description: "Premium organic white quinoa grains",
   status: "Accepted",
 }

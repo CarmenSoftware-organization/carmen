@@ -46,7 +46,7 @@ const poData = [
 
 // Sample item data
 const itemData = {
-  name: "Organic Quinoa",
+  name: "Organic Quinoa vv",
   description: "Premium organic white quinoa grains",
   status: "Accepted",
   requestedQuantity: 500,

@@ -201,13 +201,27 @@ export default function ItemDetailForm({
                 </div>
 
                 <div className="col-span-1">
-                  <Label htmlFor={`purchaseOrderRef-${item.id}`}>
-                    Job code
+                  <Label htmlFor={`poReference-${item.id}`}>
+                    PO Reference
                   </Label>
                   <Input
-                    id={`purchaseOrderRef-${item.id}`}
+                    id={`poReference-${item.id}`}
                     value={item.purchaseOrderRef}
-                    readOnly
+                    onChange={(e) => handleChange("purchaseOrderRef", e.target.value)}
+                    readOnly={mode === "view"}
+                    className="h-8 text-sm"
+                  />
+                </div>
+
+                <div className="col-span-1">
+                  <Label htmlFor={`jobCode-${item.id}`}>
+                    Job Code
+                  </Label>
+                  <Input
+                    id={`jobCode-${item.id}`}
+                    value={item.jobCode}
+                    onChange={(e) => handleChange("jobCode", e.target.value)}
+                    readOnly={mode === "view"}
                     className="h-8 text-sm"
                   />
                 </div>

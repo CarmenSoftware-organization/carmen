@@ -20,8 +20,8 @@ const initialVendors = [
     isPreferred: true,
     rating: 4.5,
     priceLists: [
-      { id: 1, name: "Standard", unitPrice: 10, minQuantity: 100, orderUnit: "pcs", isPreferred: true },
-      { id: 2, name: "Premium", unitPrice: 12, minQuantity: 50, orderUnit: "pcs", isPreferred: false }
+      { id: 1, name: "Standard", unitPrice: 10, minQuantity: 100, orderUnit: "pcs", isPreferred: true, priceListNumber: "PL001" },
+      { id: 2, name: "Premium", unitPrice: 12, minQuantity: 50, orderUnit: "pcs", isPreferred: false, priceListNumber: "PL002" }
     ]
   },
   { 
@@ -30,8 +30,8 @@ const initialVendors = [
     isPreferred: false,
     rating: 3.8,
     priceLists: [
-      { id: 3, name: "Basic", unitPrice: 11, minQuantity: 50, orderUnit: "pcs", isPreferred: false },
-      { id: 4, name: "Bulk", unitPrice: 9, minQuantity: 200, orderUnit: "pcs",  isPreferred: true }
+      { id: 3, name: "Basic", unitPrice: 11, minQuantity: 50, orderUnit: "pcs", isPreferred: false, priceListNumber: "PL003" },
+      { id: 4, name: "Bulk", unitPrice: 9, minQuantity: 200, orderUnit: "pcs",  isPreferred: true, priceListNumber: "PL004" }
     ]
   },
   { 
@@ -40,7 +40,7 @@ const initialVendors = [
     isPreferred: false,
     rating: 4.2,
     priceLists: [
-      { id: 5, name: "Standard", unitPrice: 9.5, minQuantity: 200, orderUnit: "pcs",  isPreferred: true }
+      { id: 5, name: "Standard", unitPrice: 9.5, minQuantity: 200, orderUnit: "pcs",  isPreferred: true, priceListNumber: "PL005" }
     ]
   },
 ]
@@ -64,6 +64,7 @@ export default function VendorComparison() {
     unitPrice: "",
     minQuantity: "",
     orderUnit: "pcs",
+    priceListNumber: "",
   })
   const [selectedVendor, setSelectedVendor] = useState<number | null>(null)
 
@@ -86,7 +87,7 @@ export default function VendorComparison() {
   }
 
   const handleAddNewVendor = () => {
-    if (newVendor.name && newVendor.rating && newVendor.priceName && newVendor.unitPrice && newVendor.minQuantity ) {
+    if (newVendor.name && newVendor.rating && newVendor.priceName && newVendor.unitPrice && newVendor.minQuantity && newVendor.priceListNumber) {
       const newVendorObj = {
         id: vendors.length + 1,
         name: newVendor.name,
@@ -99,7 +100,8 @@ export default function VendorComparison() {
             unitPrice: parseFloat(newVendor.unitPrice),
             minQuantity: parseInt(newVendor.minQuantity),
             orderUnit: newVendor.orderUnit,
-            isPreferred: true
+            isPreferred: true,
+            priceListNumber: newVendor.priceListNumber
           }
         ]
       }
@@ -111,6 +113,7 @@ export default function VendorComparison() {
         unitPrice: "",
         minQuantity: "",
         orderUnit: "pcs",
+        priceListNumber: "",
       })
     }
   }
@@ -134,7 +137,6 @@ export default function VendorComparison() {
   return (
     <>
       <div className="mb-6 bg-muted p-4 rounded-md">
-        {/* <h1 className="text-2xl font-bold mb-4">Vendor Comparison</h1> */}
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-bold">{itemData.name}</h2>
           <StatusBadge status={itemData.status} />
@@ -156,6 +158,7 @@ export default function VendorComparison() {
               <TableHead>Rating</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Used List</TableHead>
+              <TableHead>Price List Number</TableHead>
               <TableHead>Unit Price</TableHead>
               <TableHead>Min. Quantity</TableHead>
             </TableRow>
@@ -181,7 +184,7 @@ export default function VendorComparison() {
                         {vendor.isPreferred && <Check className="w-4 h-4 text-green-500" />}
                       </TableCell>
                       <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                        {renderRating(vendor.rating)}
+                        {vendor.rating}
                       </TableCell>
                     </>
                   ) : null}
@@ -189,6 +192,7 @@ export default function VendorComparison() {
                   <TableCell>
                     {priceList.isPreferred && <Check className="w-4 h-4 text-green-500" />}
                   </TableCell>
+                  <TableCell>{priceList.priceListNumber}</TableCell>
                   <TableCell>${priceList.unitPrice.toFixed(2)} / {priceList.orderUnit}</TableCell>
                   <TableCell>{priceList.minQuantity} {priceList.orderUnit}</TableCell>
                 </TableRow>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus } from 'lucide-react'
+import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus, Filter, ArrowUpDown } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
@@ -18,6 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { FilterBuilder } from './FilterBuilder'
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
@@ -26,6 +28,8 @@ export function GoodsReceiveNoteList() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+  const [sortField, setSortField] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
   const filteredGRNs = mockGoodsReceiveNotes.filter((grn: GoodsReceiveNote) => {
     const matchesSearch = 
@@ -38,8 +42,21 @@ export function GoodsReceiveNoteList() {
     return matchesSearch && matchesStatus
   })
 
-  const totalPages = Math.ceil(filteredGRNs.length / itemsPerPage)
-  const paginatedGRNs = filteredGRNs.slice(
+  const sortedAndFilteredGRNs = filteredGRNs.sort((a, b) => {
+    const aValue = a[sortField as keyof GoodsReceiveNote]
+    const bValue = b[sortField as keyof GoodsReceiveNote]
+
+    if (aValue == null && bValue == null) return 0
+    if (aValue == null) return sortDirection === 'asc' ? -1 : 1
+    if (bValue == null) return sortDirection === 'asc' ? 1 : -1
+
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+    return 0
+  })
+
+  const totalPages = Math.ceil(sortedAndFilteredGRNs.length / itemsPerPage)
+  const paginatedGRNs = sortedAndFilteredGRNs.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
@@ -76,7 +93,7 @@ export function GoodsReceiveNoteList() {
 
   const title = 'Goods Receive Notes'
   const actionButtons = (
-    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+    <div className="flex flex-col sm:flex-row space-y-2 sm:space-x-2">
       <Button className="w-full sm:w-auto" onClick={handleAddNewGoodsReceiveNote}>
         <Plus className="mr-2 h-4 w-4" /> New Goods Receive Note
       </Button>
@@ -125,7 +142,59 @@ export function GoodsReceiveNoteList() {
         <option value="approved">Approved</option>
         <option value="rejected">Rejected</option>
       </select>
-      <Button variant="outline" className="w-full sm:w-auto">More Filters</Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline">
+            <Filter className="mr-2 h-4 w-4" />
+            More Filters
+          </Button>
+        </DialogTrigger>
+        <DialogContent className='sm:w-[70vw] max-w-[60vw]'>
+          <FilterBuilder 
+            fields={[
+              { value: 'ref', label: 'Reference' },
+              { value: 'vendor', label: 'Vendor' },
+              { value: 'date', label: 'Date' },
+              { value: 'invoiceNumber', label: 'Invoice Number' },
+              { value: 'invoiceDate', label: 'Invoice Date' },
+              { value: 'status', label: 'Status' },
+            ]}
+            onFilterChange={(filters) => {
+              // Handle filter changes
+              console.log(filters)
+              // You'll need to implement the actual filtering logic
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">
+            <ArrowUpDown className="mr-2 h-4 w-4" />
+            Sort
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => {
+            setSortField('date')
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+          }}>
+            Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => {
+            setSortField('vendor')
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+          }}>
+            Vendor {sortField === 'vendor' && (sortDirection === 'asc' ? '↑' : '↓')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => {
+            setSortField('status')
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+          }}>
+            Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 
