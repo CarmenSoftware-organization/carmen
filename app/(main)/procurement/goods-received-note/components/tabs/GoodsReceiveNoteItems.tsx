@@ -79,7 +79,7 @@ export function GoodsReceiveNoteItems({
   const allSelected = items.length > 0 && selectedItems.length === items.length;
 
   const formatBaseAmount = (amount: number) => {
-    return (amount * exchangeRate).toFixed(2);
+    return `${baseCurrency} ${(amount * exchangeRate).toFixed(2)}`;
   };
 
   const numberCellClass = "text-right";
@@ -102,12 +102,13 @@ export function GoodsReceiveNoteItems({
             </TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Product Name</TableHead>
+            <TableHead>Lot Number</TableHead>
             <TableHead className={numberCellClass}>Ordered Qty</TableHead>
             <TableHead className={numberCellClass}>Received Qty</TableHead>
             <TableHead>Unit</TableHead>
             <TableHead className={numberCellClass}>Price</TableHead>
             <TableHead className={numberCellClass}>Net Amount</TableHead>
-            <TableHead className={numberCellClass}>Tax Amonut</TableHead>
+            <TableHead className={numberCellClass}>Tax Amount</TableHead>
             <TableHead className={numberCellClass}>Total Amount</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -125,7 +126,28 @@ export function GoodsReceiveNoteItems({
                 />
               </TableCell>
               <TableCell>{item.location || "N/A"}</TableCell>
-              <TableCell>{item.name}</TableCell>
+              <TableCell>
+                {item.name}
+                <div className="text-xs text-muted-foreground">
+                  {item.description || "No description available"}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Input
+                  type="text"
+                  value={item.lotNumber || ""}
+                  onChange={(e) =>
+                    handleItemChange(
+                      item.id,
+                      "lotNumber",
+                      e.target.value
+                    )
+                  }
+                  readOnly={mode === "view"}
+                  className="w-full"
+                  placeholder="Enter lot number"
+                />
+              </TableCell>
               <TableCell className={numberCellClass}>
                 {item.orderedQuantity}
                 <div className="text-xs text-muted-foreground">
@@ -159,7 +181,7 @@ export function GoodsReceiveNoteItems({
               <TableCell className={numberCellClass}>
                 {item.unitPrice.toFixed(2)}
                 <div className="text-xs text-muted-foreground">
-                 {formatBaseAmount(item.unitPrice)}
+                  {formatBaseAmount(item.unitPrice)}
                 </div>
               </TableCell>
               <TableCell className={numberCellClass}>
@@ -171,13 +193,13 @@ export function GoodsReceiveNoteItems({
               <TableCell className={numberCellClass}>
                 {(item.subTotalAmount - (item.unitPrice * item.receivedQuantity)).toFixed(2)}
                 <div className="text-xs text-muted-foreground">
-                 {formatBaseAmount(item.subTotalAmount - (item.unitPrice * item.receivedQuantity))}
+                  {formatBaseAmount(item.subTotalAmount - (item.unitPrice * item.receivedQuantity))}
                 </div>
               </TableCell>
               <TableCell className={numberCellClass}>
                 {item.subTotalAmount.toFixed(2)}
                 <div className="text-xs text-muted-foreground">
-                 {formatBaseAmount(item.subTotalAmount)}
+                  {formatBaseAmount(item.subTotalAmount)}
                 </div>
               </TableCell>
               <TableCell>

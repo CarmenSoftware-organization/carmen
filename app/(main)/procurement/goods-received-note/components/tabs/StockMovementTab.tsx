@@ -20,7 +20,8 @@ export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps
           <TableRow>
             <TableHead>Location</TableHead>
             <TableHead>Product Name</TableHead>
-            <TableHead>Unit</TableHead>
+            <TableHead>Lot Number</TableHead>
+            <TableHead>Inventory Unit</TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>Cost</TableHead>
             <TableHead>Total Cost</TableHead>
@@ -32,7 +33,11 @@ export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps
           {movements.map((movement, index) => (
             <TableRow key={movement.id || index}>
               <TableCell>{movement.toLocation}</TableCell>
-              <TableCell>{movement.itemName}</TableCell>
+              <TableCell>
+                <div>{movement.itemName}</div>
+                <div className="text-sm text-gray-500">{movement.itemDescription}</div>
+              </TableCell>
+              <TableCell>{movement.lotNumber}</TableCell>
               <TableCell>{movement.unit}</TableCell>
               <TableCell>{movement.quantity}</TableCell>
               <TableCell>{movement.cost}</TableCell>

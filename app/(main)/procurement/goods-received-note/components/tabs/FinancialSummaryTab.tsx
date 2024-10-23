@@ -64,37 +64,41 @@ export function FinancialSummaryTab({ mode, summary, currency, baseCurrency }: F
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Financial Summary</CardTitle>
+        <CardTitle>Transaction Summary</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-6 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">JV Type</label>
+            <label className="block text-sm font-medium text-gray-700 col-span-1">JV Type</label>
             <Input value={summary.jvType} readOnly />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">JV Number</label>
+            <label className="block text-sm font-medium text-gray-700 col-span-1">JV Number</label>
             <Input value={summary.jvNumber} readOnly />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">JV Date</label>
+            <label className="block text-sm font-medium text-gray-700 col-span-1">Date</label>
             <Input type="date" value={summary.jvDate.toISOString().split('T')[0]} readOnly />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">JV Status</label>
+            <label className="block text-sm font-medium text-gray-700 col-span-1">Status</label>
             <Input value={summary.jvStatus} readOnly />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">JV Reference</label>
+            <label className="block text-sm font-medium text-gray-700 col-span-1">Reference</label>
             <Input value={summary.jvReference} readOnly />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Currency</label>
+          {/* <div>
+            <label className="block text-sm font-medium text-gray-700 col-span-1">Currency</label>
             <Input value={currency} readOnly />
+          </div> */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 col-span-1" >Source</label>
+            <Input value={summary.sourceOfTransaction || 'Goods Received Note'} readOnly />
           </div>
           <div className="col-span-6">
-            <label className="block text-sm font-medium text-gray-700">JV Description</label>
-            <Textarea value={summary.jvDescription} readOnly />
+            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <Input value={summary.jvDescription} readOnly />
           </div>
         </div>
 
@@ -106,10 +110,10 @@ export function FinancialSummaryTab({ mode, summary, currency, baseCurrency }: F
                 <TableHead>Department</TableHead>
                 <TableHead>Account Code</TableHead>
                 <TableHead>Account Name</TableHead>
-                <TableHead>Currency</TableHead>
-                <TableHead className="text-right">Debit</TableHead>
-                <TableHead className="text-right">Credit</TableHead>
-                <TableHead>Base Currency</TableHead>
+                {/* <TableHead>Currency</TableHead> */}
+                {/* <TableHead className="text-right">Debit</TableHead> */}
+                {/* <TableHead className="text-right">Credit</TableHead> */}
+                {/* <TableHead>Base Currency</TableHead> */}
                 <TableHead className="text-right">Base Debit</TableHead>
                 <TableHead className="text-right">Base Credit</TableHead>
               </TableRow>
@@ -120,10 +124,10 @@ export function FinancialSummaryTab({ mode, summary, currency, baseCurrency }: F
                   <TableCell>{entry.department?.name}</TableCell>
                   <TableCell>{entry.accountCode?.code}</TableCell>
                   <TableCell>{entry.accountName}</TableCell>
-                  <TableCell>{entry.currency}</TableCell>
-                  <TableCell className="text-right">{entry.debit.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">{entry.credit.toFixed(2)}</TableCell>
-                  <TableCell>{entry.baseCurrency}</TableCell>
+                  {/* <TableCell>{entry.currency}</TableCell> */}
+                  {/* <TableCell className="text-right">{entry.debit.toFixed(2)}</TableCell> */}
+                  {/* <TableCell className="text-right">{entry.credit.toFixed(2)}</TableCell> */}
+                  {/* <TableCell>{entry.baseCurrency}</TableCell> */}
                   <TableCell className="text-right">{entry.baseDebit.toFixed(2)}</TableCell>
                   <TableCell className="text-right">{entry.baseCredit.toFixed(2)}</TableCell>
                 </TableRow>
@@ -131,10 +135,10 @@ export function FinancialSummaryTab({ mode, summary, currency, baseCurrency }: F
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={4} className="font-medium">Total</TableCell>
-                <TableCell className="text-right font-medium">{jvDetailTotals.debit.toFixed(2)}</TableCell>
-                <TableCell className="text-right font-medium">{jvDetailTotals.credit.toFixed(2)}</TableCell>
-                <TableCell>{jvDetailTotals.currency}</TableCell>
+                <TableCell colSpan={3} className="font-medium">Total</TableCell>
+                {/* <TableCell className="text-right font-medium">{jvDetailTotals.debit.toFixed(2)}</TableCell> */}
+                {/* <TableCell className="text-right font-medium">{jvDetailTotals.credit.toFixed(2)}</TableCell> */}
+                {/* <TableCell>{jvDetailTotals.currency}</TableCell> */}
                 <TableCell className="text-right font-medium">{jvDetailTotals.baseDebit.toFixed(2)}</TableCell>
                 <TableCell className="text-right font-medium">{jvDetailTotals.baseCredit.toFixed(2)}</TableCell>
               </TableRow>

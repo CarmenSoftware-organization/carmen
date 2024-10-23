@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,29 +17,12 @@ import {
 import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/custom-status-badge'
-import { VendorSelection } from './vendor-selection'
-
-// Update the mock data to include netAmount and taxAmount
-const mockCreditNotes = Array(50).fill(null).map((_, index) => ({
-  id: index + 1,
-  date: `2023-07-${String(index + 1).padStart(2, '0')}`,
-  description: `Credit Note ${index + 1}`,
-  refNumber: `CN${String(index + 1).padStart(3, '0')}`,
-  vendor: `Supplier ${String.fromCharCode(65 + (index % 26))}`,
-  docNumber: `INV${index + 123}`,
-  docDate: `2023-06-${String(index + 1).padStart(2, '0')}`,
-  netAmount: Math.round(Math.random() * 800 * 100) / 100,
-  taxAmount: Math.round(Math.random() * 200 * 100) / 100,
-  amount: 0, // This will be calculated
-  status: ['Committed', 'Saved', 'Voided'][index % 3],
-})).map(note => ({
-  ...note,
-  amount: note.netAmount + note.taxAmount // Calculate the total amount
-}))
+import { CreditNote } from '@/lib/types/credit-note'
+import { staticCreditNotes } from '@/lib/mock/static-credit-notes'
 
 export function CreditNoteManagement() {
   const router = useRouter()
-  const [creditNotes, setCreditNotes] = useState(mockCreditNotes)
+  const [creditNotes, setCreditNotes] = useState<CreditNote[]>(staticCreditNotes)
   const [filterStatus, setFilterStatus] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
@@ -63,7 +46,7 @@ export function CreditNoteManagement() {
 
   const handleViewDetails = (id: number) => {
     console.log(`Viewing details of credit note ${id}`)
-    router.push(`/procurement/credit-note/${id}`);
+    router.push(`/procurement/credit-note/${id}`)
   }
 
   const handleEdit = (id: number) => {
@@ -91,17 +74,15 @@ export function CreditNoteManagement() {
     }
   }
 
-  const handleBulkCommit = () => {
-    console.log(`Committing credit notes: ${selectedNotes.join(', ')}`)
-    setCreditNotes(creditNotes.map(note => 
-      selectedNotes.includes(note.id) ? { ...note, status: 'Committed' } : note
-    ))
-    setSelectedNotes([])
-  }
-
-  const handleBulkDelete = () => {
-    console.log(`Deleting credit notes: ${selectedNotes.join(', ')}`)
-    setCreditNotes(creditNotes.filter(note => !selectedNotes.includes(note.id)))
+  const handleBulkAction = (action: 'approve' | 'reject' | 'delete') => {
+    console.log(`Performing bulk ${action} on credit notes: ${selectedNotes.join(', ')}`)
+    if (action === 'delete') {
+      setCreditNotes(creditNotes.filter(note => !selectedNotes.includes(note.id)))
+    } else {
+      setCreditNotes(creditNotes.map(note => 
+        selectedNotes.includes(note.id) ? { ...note, status: action === 'approve' ? 'Approved' : 'Rejected' } : note
+      ))
+    }
     setSelectedNotes([])
   }
 
@@ -110,7 +91,7 @@ export function CreditNoteManagement() {
     .filter(note => 
       note.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       note.refNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      note.vendor.toLowerCase().includes(searchTerm.toLowerCase())
+      note.vendorName.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
   const totalPages = Math.ceil(filteredCreditNotes.length / itemsPerPage)
@@ -151,8 +132,10 @@ export function CreditNoteManagement() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem onSelect={() => handleFilterChange('All')}>All</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('Committed')}>Committed</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('Saved')}>Saved</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleFilterChange('Draft')}>Draft</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleFilterChange('Submitted')}>Submitted</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleFilterChange('Approved')}>Approved</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => handleFilterChange('Rejected')}>Rejected</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => handleFilterChange('Voided')}>Voided</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -186,10 +169,13 @@ export function CreditNoteManagement() {
           {/* Bulk actions */}
           {selectedNotes.length > 0 && (
             <div className="flex justify-start mb-4 space-x-2">
-              <Button onClick={handleBulkCommit}>
-                Commit Selected ({selectedNotes.length})
+              <Button onClick={() => handleBulkAction('approve')}>
+                Approve Selected ({selectedNotes.length})
               </Button>
-              <Button onClick={handleBulkDelete} variant="destructive">
+              <Button onClick={() => handleBulkAction('reject')} variant="secondary">
+                Reject Selected ({selectedNotes.length})
+              </Button>
+              <Button onClick={() => handleBulkAction('delete')} variant="destructive">
                 Delete Selected ({selectedNotes.length})
               </Button>
             </div>
@@ -209,7 +195,6 @@ export function CreditNoteManagement() {
                       <StatusBadge status={note.status} />
                       <h3 className="text-lg text-muted-foreground">{note.refNumber}</h3>
                       <h3 className="text-lg md:text-lg font-semibold">{note.description}</h3>
-                      
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button variant="ghost" size="icon" aria-label="View credit note" onClick={() => handleViewDetails(note.id)}>
@@ -225,13 +210,13 @@ export function CreditNoteManagement() {
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-0 md:gap-2">
                     {[
-                      { label: 'Date', value: note.date },
-                      { label: 'Vendor', value: note.vendor },
+                      { label: 'Date', value: new Date(note.createdDate).toLocaleDateString() },
+                      { label: 'Vendor', value: note.vendorName },
                       { label: 'Doc.#', value: note.docNumber },
-                      { label: 'Doc. Date', value: note.docDate },
+                      { label: 'Doc. Date', value: new Date(note.docDate).toLocaleDateString() },
                       { label: 'Net Amount', value: `$${note.netAmount.toFixed(2)}` },
                       { label: 'Tax Amount', value: `$${note.taxAmount.toFixed(2)}` },
-                      { label: 'Total Amount', value: `$${note.amount.toFixed(2)}` },
+                      { label: 'Total Amount', value: `$${note.totalAmount.toFixed(2)}` },
                     ].map(({ label, value }) => (
                       <div key={label}>
                         <p className="text-xs font-medium text-muted-foreground">{label}</p>

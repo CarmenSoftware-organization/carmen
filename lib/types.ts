@@ -519,10 +519,12 @@ export interface GoodsReceiveNoteItem {
 export interface StockMovement {
   id: string;
   itemName: string;
+  itemDescription: string;
   unit: string;
   quantity: number;
   fromLocation: string;
-  toLocation: string;
+  toLocation: string; 
+  lotNumber: string;
   netAmount: number;
   extraCost: number;
   totalAmount: number;
@@ -575,6 +577,7 @@ export interface FinancialSummary {
   jvReference: string;
   jvDetail?: JournalEntryDetail[];
   jvTotal: JournalEntryTotal;
+  sourceOfTransaction?: string;
 }
 
 export interface JournalEntryDetail {

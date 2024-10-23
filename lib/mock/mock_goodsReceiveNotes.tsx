@@ -126,6 +126,8 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
       {
         id: "3",
         itemName: "Commercial Blender",
+        itemDescription: "High-power, 3HP motor",
+        lotNumber: "LOT-2023-011",
         quantity: 5,
         unit: "piece",
         fromLocation: "Kitchen Receiving",
@@ -140,6 +142,8 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
       {
         id: "4",
         itemName: "Chef's Knives Set",
+        itemDescription: "Professional 8-piece set",
+        lotNumber: "LOT-2023-012",
         quantity: 10,
         unit: "set",
         fromLocation: "Kitchen Receiving",
@@ -366,6 +370,8 @@ export const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
       {
         id: "5",
         itemName: "Ergonomic Office Chair",
+        itemDescription: "Adjustable height and lumbar support",
+        lotNumber: "LOT-2023-013",
         unit: "piece",
         quantity: 20,
         fromLocation: "Office Receiving",

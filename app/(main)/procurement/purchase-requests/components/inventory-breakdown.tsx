@@ -72,7 +72,7 @@ export default function InventoryBreakdown() {
           <TableRow className="text-nowrap">
             <TableHead className="w-[180px]">Location</TableHead>
             <TableHead >Quantity On Hand</TableHead>
-            <TableHead>Units</TableHead>
+            <TableHead >Inv. Units</TableHead>
             <TableHead >Par</TableHead>
             <TableHead >Reorder Point</TableHead>
             <TableHead >Min Stock</TableHead>
