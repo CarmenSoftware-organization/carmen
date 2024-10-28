@@ -1,12 +1,14 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Edit, Info, Plus, Printer, Send, Trash2 } from "lucide-react"
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/custom-dialog"
+import { Edit, Info, Plus, Printer, Send, Trash2, XIcon } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { Button } from "@/components/ui/button"
+import { CnLotApplication } from "./cn-lot-application"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -251,6 +253,12 @@ export function CreditNoteComponent() {
     setHeaderData(prev => ({ ...prev, [field]: value }))
   }
 
+  const [openInfo, setOpenInfo] = useState(Boolean);
+
+  const handleOpeninfo = () => {
+    setOpenInfo(!openInfo);
+  }
+
   return (
     <div className="space-y-4">
       <CreditNoteHeader {...headerData} onHeaderChange={handleHeaderChange} />
@@ -313,7 +321,7 @@ export function CreditNoteComponent() {
                       <div className="text-sm text-muted-foreground">55,000.00</div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleOpeninfo()}>
                         <Info className="h-4 w-4" />
                         <span className="sr-only">View</span>
                       </Button>
@@ -450,6 +458,25 @@ export function CreditNoteComponent() {
               </div>
             </CardContent>
           </Card>
+    
+
+<Dialog open={openInfo} onOpenChange={setOpenInfo}>
+        <DialogContent className="sm:max-w-[80vw] bg-white [&>button]:hidden">
+          <DialogHeader>
+            <div className="flex justify-between w-full items-center">
+           <DialogTitle>Infomation</DialogTitle>
+            <DialogClose asChild>
+                  <Button variant="ghost" size="sm">
+                    <XIcon className="h-4 w-4" />
+                  </Button>
+                </DialogClose>
+          </div>
+          </DialogHeader>
+          
+          <CnLotApplication />
+        </DialogContent>
+      </Dialog>
+    
     </div>
   )
 }
