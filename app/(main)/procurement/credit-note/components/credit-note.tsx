@@ -1,15 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import { Edit, Info, Plus, Printer, Send, Trash2 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { Button } from "@/components/ui/button"
-import { Edit, Trash2, Printer, Send, Info, Plus } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { useState } from 'react'
 
 type CreditNoteType = 'PRICE_DIFFERENCE' | 'QUANTITY_RETURN' | 'AGREED_DISCOUNT' | 'AMOUNT_DISCOUNT'
 type CreditNoteStatus = 'DRAFT' | 'POSTED' | 'VOID'
@@ -274,10 +275,10 @@ export function CreditNoteComponent() {
                     <TableHead className="w-[200px]">Product</TableHead>
                     <TableHead>Unit</TableHead>
                     <TableHead>Quantity</TableHead>
-                    <TableHead>Unit Price</TableHead>
-                    <TableHead>Subtotal</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Net Amount</TableHead>
                     <TableHead>Tax Amount</TableHead>
-                    <TableHead>Total</TableHead>
+                    <TableHead>Total Amount</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
