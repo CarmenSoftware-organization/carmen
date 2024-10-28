@@ -166,9 +166,9 @@ export function CnLotApplication({ grnDetails = {} }) {
                   />
                 </TableHead>
                 <TableHead>Lot Number</TableHead>
-                <TableHead>Available Qty</TableHead>
-                <TableHead>Apply Qty</TableHead>
-                <TableHead>New Qty</TableHead>
+                <TableHead className="text-right">Available Qty</TableHead>
+                <TableHead className="text-right">Apply Qty</TableHead>
+                <TableHead className="text-right">New Qty</TableHead>
                 <TableHead className="text-right">Original Value</TableHead>
                 <TableHead className="text-right">New Value</TableHead>
                 <TableHead className="text-right">Difference</TableHead>
@@ -191,9 +191,9 @@ export function CnLotApplication({ grnDetails = {} }) {
                   <div className="text-sm text-gray-500">{getOrdinalValue(1)} Receipt</div>
                   <div className="text-sm text-gray-500">Warehouse A - Rack 3</div>
                 </TableCell>
-                <TableCell>500</TableCell>
-                <TableCell>10</TableCell>
-                <TableCell>490</TableCell>
+                <TableCell className="text-right font-medium">500</TableCell>
+                <TableCell className="text-right font-medium">10</TableCell>
+                <TableCell className="text-right font-medium">490</TableCell>
                 <TableCell className="text-right">$25,000.00</TableCell>
                 <TableCell className="text-right">$22,500.00</TableCell>
                 <TableCell className="text-right text-red-600">-$2,500.00</TableCell>
@@ -215,19 +215,22 @@ export function CnLotApplication({ grnDetails = {} }) {
                   <div className="text-sm text-gray-500">{getOrdinalValue(2)} Receipt</div>
                   <div className="text-sm text-gray-500">Warehouse B - Rack 1</div>
                 </TableCell>
-                <TableCell>300</TableCell>
-                <TableCell>20</TableCell>
-                <TableCell>280</TableCell>
+                <TableCell className="text-right font-medium">300</TableCell>
+                <TableCell className="text-right font-medium">20</TableCell>
+                <TableCell className="text-right font-medium">280</TableCell>
                 <TableCell className="text-right">$15,000.00</TableCell>
                 <TableCell className="text-right">$13,500.00</TableCell>
                 <TableCell className="text-right text-red-600">-$1,500.00</TableCell>
               </TableRow>
             </TableBody>
             <tfoot>
-              <TableRow>
-                <TableCell colSpan={3} className="font-medium">
+              <TableRow className='bg-gray-50'>
+                <TableCell colSpan={2} className="font-medium">
                   Total Impact
                 </TableCell>
+                <TableCell className="text-right font-medium">800</TableCell>
+                <TableCell className="text-right font-medium">30</TableCell>
+                <TableCell className="text-right font-medium">770</TableCell>
                 <TableCell className="text-right font-medium">$40,000.00</TableCell>
                 <TableCell className="text-right font-medium">$36,000.00</TableCell>
                 <TableCell className="text-right font-medium text-red-600">-$4,000.00</TableCell>
@@ -236,7 +239,7 @@ export function CnLotApplication({ grnDetails = {} }) {
           </Table>
 
           {/* Summary Calculations */}
-          <div className="mt-6 bg-gray-50 rounded-lg p-4">
+          {/* <div className="mt-6 bg-gray-50 rounded-lg p-4">
             <h4 className="text-sm font-medium text-gray-900 mb-3">Application Summary</h4>
             <div className="grid grid-cols-4 gap-6">
               <div>
@@ -258,7 +261,7 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <div className="mt-1 text-sm font-medium text-red-600">-$4,720.00</div>
               </div>
             </div>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>
