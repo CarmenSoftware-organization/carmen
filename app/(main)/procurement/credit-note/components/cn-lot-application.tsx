@@ -23,16 +23,16 @@ export function CnLotApplication({ grnDetails = {} }) {
     <div className="space-y-6">
       {/* Product Information Section */}
       <div className="bg-white shadow-sm rounded-lg">
-        <div className="p-4 border-b flex justify-between items-center">
+        {/* <div className="p-4 border-b flex justify-between items-center">
           <div className="flex items-center">
             <Package className="w-5 h-5 text-gray-500 mr-2" />
             <h2 className="text-lg font-medium text-gray-900">Product Information</h2>
           </div>
-        </div>
+        </div> */}
 
         <div className="p-4">
           {/* Basic Product Details */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-4 gap-6 mb-8">
             <div>
               <label className="block text-sm font-medium text-gray-500">Product Name</label>
               <div className="mt-1">
@@ -47,6 +47,17 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <div className="text-xs text-gray-500 mt-1">Base UOM: Each | Pack: 1</div>
               </div>
             </div>
+
+            <div>
+            <label className="block text-sm font-medium text-gray-500">GRN Number</label>
+            <div className="mt-1 text-sm">{grnDetails.number}</div>
+            </div>
+
+            <div>
+            <label className="block text-sm font-medium text-gray-500">GRN Date</label>
+            <div className="mt-1 text-sm">{grnDetails.date}</div>
+            </div>
+            
           </div>
 
           {/* Cost Information */}
@@ -72,7 +83,7 @@ export function CnLotApplication({ grnDetails = {} }) {
           </div>
 
           {/* GRN Details */}
-          <div className="mt-6 p-4 border-t">
+          {/* <div className="mt-6 p-4 border-t">
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-500">GRN Number</label>
@@ -83,7 +94,7 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <div className="mt-1 text-sm">{grnDetails.date}</div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/custom-dialog"
-import { Edit, Info, Plus, Printer, Send, Trash2, XIcon } from "lucide-react"
+import { Edit, Info, Package, Plus, Printer, Send, Trash2, XIcon } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -463,8 +463,11 @@ export function CreditNoteComponent() {
 <Dialog open={openInfo} onOpenChange={setOpenInfo}>
         <DialogContent className="sm:max-w-[80vw] bg-white [&>button]:hidden">
           <DialogHeader>
-            <div className="flex justify-between w-full items-center">
-           <DialogTitle>Infomation</DialogTitle>
+            <div className="flex justify-between w-full items-center border-b pb-4">
+           <DialogTitle> <div className="flex items-center">
+            <Package className="w-5 h-5 text-gray-500 mr-2" />
+            <h2 className="text-lg font-medium text-gray-900">Product Information</h2>
+          </div></DialogTitle>
             <DialogClose asChild>
                   <Button variant="ghost" size="sm">
                     <XIcon className="h-4 w-4" />
