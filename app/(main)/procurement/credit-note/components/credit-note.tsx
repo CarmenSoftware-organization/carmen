@@ -42,9 +42,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 
-type CreditNoteType =
-  | "QUANTITY_RETURN"
-  | "AMOUNT_DISCOUNT";
+type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
 type CreditNoteReason =
   | "PRICING_ERROR"
@@ -330,10 +328,10 @@ export function CreditNoteComponent() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                  <TableHead className="w-[200px]">Location</TableHead>
+                    <TableHead className="w-[200px]">Location</TableHead>
                     <TableHead className="w-[200px]">Product</TableHead>
-                    <TableHead>Unit</TableHead>
                     <TableHead>Quantity</TableHead>
+                    <TableHead>Unit</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Net Amount</TableHead>
                     <TableHead>Tax Amount</TableHead>
@@ -343,8 +341,7 @@ export function CreditNoteComponent() {
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-
-                  <TableCell>
+                    <TableCell>
                       <div>Location 1</div>
                     </TableCell>
 
@@ -355,12 +352,12 @@ export function CreditNoteComponent() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>Box</div>
-                      <div className="text-sm text-muted-foreground">Piece</div>
-                    </TableCell>
-                    <TableCell>
                       <div>10</div>
                       <div className="text-sm text-muted-foreground">100</div>
+                    </TableCell>
+                    <TableCell>
+                      <div>Box</div>
+                      <div className="text-sm text-muted-foreground">Piece</div>
                     </TableCell>
                     <TableCell>
                       <div>100.00</div>
@@ -406,11 +403,10 @@ export function CreditNoteComponent() {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-
-                  <TableCell>
+                    <TableCell>
                       <div>Location 1</div>
                     </TableCell>
-                    
+
                     <TableCell className="font-medium">
                       <div>Another Product</div>
                       <div className="text-sm text-muted-foreground">
@@ -418,12 +414,12 @@ export function CreditNoteComponent() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>Case</div>
-                      <div className="text-sm text-muted-foreground">Unit</div>
-                    </TableCell>
-                    <TableCell>
                       <div>5</div>
                       <div className="text-sm text-muted-foreground">50</div>
+                    </TableCell>
+                    <TableCell>
+                      <div>Case</div>
+                      <div className="text-sm text-muted-foreground">Unit</div>
                     </TableCell>
                     <TableCell>
                       <div>200.00</div>
