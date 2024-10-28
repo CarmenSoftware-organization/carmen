@@ -1,20 +1,41 @@
-'use client'
+"use client";
 
-import { Box, Calculator, ChevronDown, Clock, CreditCard, Package, RefreshCcw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import React, { useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Box,
+  Calculator,
+  ChevronDown,
+  Clock,
+  CreditCard,
+  Package,
+  RefreshCcw,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function CnLotApplication({ grnDetails = {} }) {
-  const [selectedLots, setSelectedLots] = useState(['LOT001']);
+  const [selectedLots, setSelectedLots] = useState(["LOT001"]);
 
-  const getOrdinalValue = (number : any) => {
-    const suffixes = ['th', 'st', 'nd', 'rd'];
+  const getOrdinalValue = (number: any) => {
+    const suffixes = ["th", "st", "nd", "rd"];
     const v = number % 100;
     return number + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
   };
@@ -34,35 +55,50 @@ export function CnLotApplication({ grnDetails = {} }) {
           {/* Basic Product Details */}
           <div className="grid grid-cols-5 gap-6 mb-8">
             <div>
-              <label className="block text-sm font-medium text-gray-500">Product Name</label>
+              <label className="block text-sm font-medium text-gray-500">
+                Product Name
+              </label>
               <div className="mt-1">
-                <div className="text-sm font-medium">Product A - Standard Grade</div>
-                <div className="text-xs text-gray-500 mt-1">Product Description: Standard Grade Raw Material</div>
+                <div className="text-sm font-medium">
+                  Product A - Standard Grade
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Product Description: Standard Grade Raw Material
+                </div>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-500">Unit of Measure</label>
+              <label className="block text-sm font-medium text-gray-500">
+                Unit of Measure
+              </label>
               <div className="mt-1">
                 <div className="text-sm">Each</div>
-                <div className="text-xs text-gray-500 mt-1">Base UOM: Each | Pack: 1</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Base UOM: Each | Pack: 1
+                </div>
               </div>
             </div>
 
             <div>
-            <label className="block text-sm font-medium text-gray-500">GRN Number</label>
-            <div className="mt-1 text-sm">{grnDetails.number}</div>
+              <label className="block text-sm font-medium text-gray-500">
+                GRN Number
+              </label>
+              <div className="mt-1 text-sm">{grnDetails.number}</div>
             </div>
 
             <div>
-            <label className="block text-sm font-medium text-gray-500">GRN Date</label>
-            <div className="mt-1 text-sm">{grnDetails.date}</div>
+              <label className="block text-sm font-medium text-gray-500">
+                GRN Date
+              </label>
+              <div className="mt-1 text-sm">{grnDetails.date}</div>
             </div>
 
             <div>
-            <label className="block text-sm font-medium text-gray-500">Tax Rate</label>
-            <div className="mt-1 text-sm">18%</div>
+              <label className="block text-sm font-medium text-gray-500">
+                Tax Rate
+              </label>
+              <div className="mt-1 text-sm">18%</div>
             </div>
-            
           </div>
 
           {/* Cost Information */}
@@ -73,20 +109,25 @@ export function CnLotApplication({ grnDetails = {} }) {
             </h3>
             <div className="grid grid-cols-3 gap-6">
               <div>
-                <label className="block text-xs text-blue-700">Last Purchase Price</label>
+                <label className="block text-xs text-blue-700">
+                  Last Purchase Price
+                </label>
                 <div className="mt-1 text-sm font-medium">$50.00</div>
               </div>
               <div>
-                <label className="block text-xs text-blue-700">Standard Cost</label>
+                <label className="block text-xs text-blue-700">
+                  Standard Cost
+                </label>
                 <div className="mt-1 text-sm font-medium">$48.50</div>
               </div>
               <div>
-                <label className="block text-xs text-blue-700">Moving Average Cost</label>
+                <label className="block text-xs text-blue-700">
+                  Moving Average Cost
+                </label>
                 <div className="mt-1 text-sm font-medium">$49.25</div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -99,7 +140,7 @@ export function CnLotApplication({ grnDetails = {} }) {
           <Table>
             <TableHeader>
               <TableRow>
-              <TableHead>Location</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Lot Number</TableHead>
                 <TableHead>Receipt Date</TableHead>
                 <TableHead>Original Qty</TableHead>
@@ -109,7 +150,7 @@ export function CnLotApplication({ grnDetails = {} }) {
             </TableHeader>
             <TableBody>
               <TableRow>
-              <TableCell>Warehouse A - Rack 3</TableCell>
+                <TableCell>Warehouse A - Rack 3</TableCell>
                 <TableCell>LOT001</TableCell>
                 <TableCell>23-10-2024 14:30</TableCell>
                 <TableCell>1000</TableCell>
@@ -117,7 +158,7 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <TableCell>$50.00</TableCell>
               </TableRow>
               <TableRow>
-              <TableCell>Warehouse B - Rack 1</TableCell>
+                <TableCell>Warehouse B - Rack 1</TableCell>
                 <TableCell>LOT002</TableCell>
                 <TableCell>23-10-2024 16:45</TableCell>
                 <TableCell>800</TableCell>
@@ -129,7 +170,6 @@ export function CnLotApplication({ grnDetails = {} }) {
         </CardContent>
       </Card>
 
-
       {/* Lot Application */}
       <Card>
         <CardHeader>
@@ -138,14 +178,14 @@ export function CnLotApplication({ grnDetails = {} }) {
         <CardContent>
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-4">
-              <button 
+              <button
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
                 onClick={() => {}}
               >
                 <RefreshCcw className="w-4 h-4 mr-1" />
                 Auto Apply
               </button>
-              <button 
+              <button
                 className="text-sm text-gray-600 hover:text-gray-700 font-medium flex items-center"
                 onClick={() => {}}
               >
@@ -160,8 +200,8 @@ export function CnLotApplication({ grnDetails = {} }) {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                 </TableHead>
@@ -178,62 +218,85 @@ export function CnLotApplication({ grnDetails = {} }) {
               {/* Lot 1 */}
               <TableRow>
                 <TableCell>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    checked={selectedLots.includes('LOT001')}
+                    checked={selectedLots.includes("LOT001")}
                     onChange={() => {}}
                   />
                 </TableCell>
                 <TableCell>
                   <div className="font-medium">LOT001</div>
                   <div className="text-sm text-gray-500">23-10-2024 14:30</div>
-                  <div className="text-sm text-gray-500">{getOrdinalValue(1)} Receipt</div>
-                  <div className="text-sm text-gray-500">Warehouse A - Rack 3</div>
+                  <div className="text-sm text-gray-500">
+                    {getOrdinalValue(1)} Receipt
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Warehouse A - Rack 3
+                  </div>
                 </TableCell>
                 <TableCell className="text-right font-medium">500</TableCell>
                 <TableCell className="text-right font-medium">10</TableCell>
                 <TableCell className="text-right font-medium">490</TableCell>
                 <TableCell className="text-right">$25,000.00</TableCell>
                 <TableCell className="text-right">$22,500.00</TableCell>
-                <TableCell className="text-right text-red-600">-$2,500.00</TableCell>
+                <TableCell className="text-right text-red-600">
+                  -$2,500.00
+                </TableCell>
               </TableRow>
 
               {/* Lot 2 */}
               <TableRow>
                 <TableCell>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    checked={selectedLots.includes('LOT002')}
+                    checked={selectedLots.includes("LOT002")}
                     onChange={() => {}}
                   />
                 </TableCell>
                 <TableCell>
                   <div className="font-medium">LOT002</div>
                   <div className="text-sm text-gray-500">23-10-2024 16:45</div>
-                  <div className="text-sm text-gray-500">{getOrdinalValue(2)} Receipt</div>
-                  <div className="text-sm text-gray-500">Warehouse B - Rack 1</div>
+                  <div className="text-sm text-gray-500">
+                    {getOrdinalValue(2)} Receipt
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Warehouse B - Rack 1
+                  </div>
                 </TableCell>
                 <TableCell className="text-right font-medium">300</TableCell>
                 <TableCell className="text-right font-medium">20</TableCell>
                 <TableCell className="text-right font-medium">280</TableCell>
                 <TableCell className="text-right">$15,000.00</TableCell>
                 <TableCell className="text-right">$13,500.00</TableCell>
-                <TableCell className="text-right text-red-600">-$1,500.00</TableCell>
+                <TableCell className="text-right text-red-600">
+                  -$1,500.00
+                </TableCell>
               </TableRow>
             </TableBody>
             <tfoot>
-              <TableRow className='bg-gray-50'>
+              <TableRow className="bg-gray-50">
                 <TableCell colSpan={2} className="font-medium">
                   Total Impact
+                  <span>
+                    <label className="block text-xs text-gray-500">
+                      Applied To <span className="mt-1 text-sm font-medium">2 Lots</span>
+                    </label>
+                  </span>
                 </TableCell>
                 <TableCell className="text-right font-medium">800</TableCell>
                 <TableCell className="text-right font-medium">30</TableCell>
                 <TableCell className="text-right font-medium">770</TableCell>
-                <TableCell className="text-right font-medium">$40,000.00</TableCell>
-                <TableCell className="text-right font-medium">$36,000.00</TableCell>
-                <TableCell className="text-right font-medium text-red-600">-$4,000.00</TableCell>
+                <TableCell className="text-right font-medium">
+                  $40,000.00
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  $36,000.00
+                </TableCell>
+                <TableCell className="text-right font-medium text-red-600">
+                  -$4,000.00
+                </TableCell>
               </TableRow>
             </tfoot>
           </Table>
