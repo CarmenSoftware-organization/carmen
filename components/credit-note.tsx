@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Edit, Trash2, Printer, Send, Info, Plus } from "lucide-react"
 
@@ -274,10 +274,10 @@ export function CreditNoteComponent() {
                     <TableHead className="w-[200px]">Product</TableHead>
                     <TableHead>Unit</TableHead>
                     <TableHead>Quantity</TableHead>
-                    <TableHead>Unit Price</TableHead>
-                    <TableHead>Subtotal</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Net Amount</TableHead>
                     <TableHead>Tax Amount</TableHead>
-                    <TableHead>Total</TableHead>
+                    <TableHead>Total Amount</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
