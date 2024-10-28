@@ -510,44 +510,6 @@ export function CreditNoteComponent() {
         </TabsContent>
       </Tabs>
       <Card>
-<<<<<<< HEAD
-            <CardHeader>
-              <CardTitle>Transaction Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Description</TableHead>
-                      <TableHead className="text-right">Amount (USD)</TableHead>
-                      <TableHead className="text-right">Base Amount (PHP)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>Net Amount</TableCell>
-                      <TableCell className="text-right">2,000.00</TableCell>
-                      <TableCell className="text-right">100,000.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Tax Amount</TableCell>
-                      <TableCell className="text-right">200.00</TableCell>
-                      <TableCell className="text-right">10,000.00</TableCell>
-                    </TableRow>
-                    
-                    <TableRow className="font-bold">
-                      <TableCell>Total Amount</TableCell>
-                      <TableCell className="text-right">2,200.00</TableCell>
-                      <TableCell className="text-right">110,000.00</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-    
-=======
         <CardHeader>
           <CardTitle>Transaction Summary</CardTitle>
         </CardHeader>
@@ -589,7 +551,6 @@ export function CreditNoteComponent() {
           </div>
         </CardContent>
       </Card>
->>>>>>> 519e033 (update credit note)
 
       <Dialog open={openInfo} onOpenChange={setOpenInfo}>
         <DialogContent className="sm:max-w-[80vw] bg-white [&>button]:hidden">
