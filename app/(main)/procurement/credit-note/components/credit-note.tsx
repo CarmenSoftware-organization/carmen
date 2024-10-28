@@ -1,40 +1,77 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/custom-dialog"
-import { Edit, Info, Package, Plus, Printer, Send, Trash2, XIcon } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/custom-dialog";
+import {
+  Edit,
+  Info,
+  Package,
+  Plus,
+  Printer,
+  Send,
+  Trash2,
+  XIcon,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Button } from "@/components/ui/button"
-import { CnLotApplication } from "./cn-lot-application"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useState } from 'react'
+import { Button } from "@/components/ui/button";
+import { CnLotApplication } from "./cn-lot-application";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 
-type CreditNoteType = 'PRICE_DIFFERENCE' | 'QUANTITY_RETURN' | 'AGREED_DISCOUNT' | 'AMOUNT_DISCOUNT'
-type CreditNoteStatus = 'DRAFT' | 'POSTED' | 'VOID'
-type CreditNoteReason = 'PRICING_ERROR' | 'DAMAGED_GOODS' | 'RETURN' | 'DISCOUNT_AGREEMENT' | 'OTHER'
+type CreditNoteType =
+  | "PRICE_DIFFERENCE"
+  | "QUANTITY_RETURN"
+  | "AGREED_DISCOUNT"
+  | "AMOUNT_DISCOUNT";
+type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
+type CreditNoteReason =
+  | "PRICING_ERROR"
+  | "DAMAGED_GOODS"
+  | "RETURN"
+  | "DISCOUNT_AGREEMENT"
+  | "OTHER";
 
 interface CreditNoteHeaderProps {
-  creditNoteNumber: string
-  date: string
-  type: CreditNoteType
-  status: CreditNoteStatus
-  vendorName: string
-  vendorCode: string
-  currency: string
-  invoiceReference: string
-  invoiceDate: string
-  taxInvoiceReference: string
-  taxDate: string
-  grnReference: string
-  grnDate: string
-  reason: CreditNoteReason
-  description: string
-  onHeaderChange: (field: string, value: string) => void
+  creditNoteNumber: string;
+  date: string;
+  type: CreditNoteType;
+  status: CreditNoteStatus;
+  vendorName: string;
+  vendorCode: string;
+  currency: string;
+  invoiceReference: string;
+  invoiceDate: string;
+  taxInvoiceReference: string;
+  taxDate: string;
+  grnReference: string;
+  grnDate: string;
+  reason: CreditNoteReason;
+  description: string;
+  onHeaderChange: (field: string, value: string) => void;
 }
 
 function CreditNoteHeader({
@@ -53,7 +90,7 @@ function CreditNoteHeader({
   grnDate,
   reason,
   description,
-  onHeaderChange
+  onHeaderChange,
 }: CreditNoteHeaderProps) {
   return (
     <Card className="w-full mb-4">
@@ -85,7 +122,9 @@ function CreditNoteHeader({
             <Input
               id="creditNoteNumber"
               value={creditNoteNumber}
-              onChange={(e) => onHeaderChange('creditNoteNumber', e.target.value)}
+              onChange={(e) =>
+                onHeaderChange("creditNoteNumber", e.target.value)
+              }
             />
           </div>
           <div className="space-y-2">
@@ -94,17 +133,22 @@ function CreditNoteHeader({
               id="date"
               type="date"
               value={date}
-              onChange={(e) => onHeaderChange('date', e.target.value)}
+              onChange={(e) => onHeaderChange("date", e.target.value)}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="type">Type</Label>
-            <Select value={type} onValueChange={(value) => onHeaderChange('type', value)}>
+            <Select
+              value={type}
+              onValueChange={(value) => onHeaderChange("type", value)}
+            >
               <SelectTrigger id="type">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="PRICE_DIFFERENCE">Price Difference</SelectItem>
+                <SelectItem value="PRICE_DIFFERENCE">
+                  Price Difference
+                </SelectItem>
                 <SelectItem value="QUANTITY_RETURN">Quantity Return</SelectItem>
                 <SelectItem value="AGREED_DISCOUNT">Agreed Discount</SelectItem>
                 <SelectItem value="AMOUNT_DISCOUNT">Amount Discount</SelectItem>
@@ -113,7 +157,10 @@ function CreditNoteHeader({
           </div>
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select value={status} onValueChange={(value) => onHeaderChange('status', value)}>
+            <Select
+              value={status}
+              onValueChange={(value) => onHeaderChange("status", value)}
+            >
               <SelectTrigger id="status">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
@@ -126,7 +173,10 @@ function CreditNoteHeader({
           </div>
           <div className="space-y-2">
             <Label htmlFor="reason">Reason</Label>
-            <Select value={reason} onValueChange={(value) => onHeaderChange('reason', value)}>
+            <Select
+              value={reason}
+              onValueChange={(value) => onHeaderChange("reason", value)}
+            >
               <SelectTrigger id="reason">
                 <SelectValue placeholder="Select reason" />
               </SelectTrigger>
@@ -134,7 +184,9 @@ function CreditNoteHeader({
                 <SelectItem value="PRICING_ERROR">Pricing Error</SelectItem>
                 <SelectItem value="DAMAGED_GOODS">Damaged Goods</SelectItem>
                 <SelectItem value="RETURN">Return</SelectItem>
-                <SelectItem value="DISCOUNT_AGREEMENT">Discount Agreement</SelectItem>
+                <SelectItem value="DISCOUNT_AGREEMENT">
+                  Discount Agreement
+                </SelectItem>
                 <SelectItem value="OTHER">Other</SelectItem>
               </SelectContent>
             </Select>
@@ -144,7 +196,7 @@ function CreditNoteHeader({
             <Input
               id="vendorName"
               value={vendorName}
-              onChange={(e) => onHeaderChange('vendorName', e.target.value)}
+              onChange={(e) => onHeaderChange("vendorName", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -152,7 +204,7 @@ function CreditNoteHeader({
             <Input
               id="vendorCode"
               value={vendorCode}
-              onChange={(e) => onHeaderChange('vendorCode', e.target.value)}
+              onChange={(e) => onHeaderChange("vendorCode", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -160,7 +212,7 @@ function CreditNoteHeader({
             <Input
               id="currency"
               value={currency}
-              onChange={(e) => onHeaderChange('currency', e.target.value)}
+              onChange={(e) => onHeaderChange("currency", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -168,7 +220,9 @@ function CreditNoteHeader({
             <Input
               id="invoiceReference"
               value={invoiceReference}
-              onChange={(e) => onHeaderChange('invoiceReference', e.target.value)}
+              onChange={(e) =>
+                onHeaderChange("invoiceReference", e.target.value)
+              }
             />
           </div>
           <div className="space-y-2">
@@ -177,7 +231,7 @@ function CreditNoteHeader({
               id="invoiceDate"
               type="date"
               value={invoiceDate}
-              onChange={(e) => onHeaderChange('invoiceDate', e.target.value)}
+              onChange={(e) => onHeaderChange("invoiceDate", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -185,7 +239,9 @@ function CreditNoteHeader({
             <Input
               id="taxInvoiceReference"
               value={taxInvoiceReference}
-              onChange={(e) => onHeaderChange('taxInvoiceReference', e.target.value)}
+              onChange={(e) =>
+                onHeaderChange("taxInvoiceReference", e.target.value)
+              }
             />
           </div>
           <div className="space-y-2">
@@ -194,7 +250,7 @@ function CreditNoteHeader({
               id="taxDate"
               type="date"
               value={taxDate}
-              onChange={(e) => onHeaderChange('taxDate', e.target.value)}
+              onChange={(e) => onHeaderChange("taxDate", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -202,7 +258,7 @@ function CreditNoteHeader({
             <Input
               id="grnReference"
               value={grnReference}
-              onChange={(e) => onHeaderChange('grnReference', e.target.value)}
+              onChange={(e) => onHeaderChange("grnReference", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -211,7 +267,7 @@ function CreditNoteHeader({
               id="grnDate"
               type="date"
               value={grnDate}
-              onChange={(e) => onHeaderChange('grnDate', e.target.value)}
+              onChange={(e) => onHeaderChange("grnDate", e.target.value)}
             />
           </div>
           <div className="space-y-2 col-span-full">
@@ -219,7 +275,7 @@ function CreditNoteHeader({
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => onHeaderChange('description', e.target.value)}
+              onChange={(e) => onHeaderChange("description", e.target.value)}
               placeholder="Enter a detailed description..."
               className="min-h-[100px]"
             />
@@ -227,37 +283,37 @@ function CreditNoteHeader({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function CreditNoteComponent() {
   const [headerData, setHeaderData] = useState({
-    creditNoteNumber: '',
-    date: '',
-    type: 'PRICE_DIFFERENCE' as CreditNoteType,
-    status: 'DRAFT' as CreditNoteStatus,
-    vendorName: '',
-    vendorCode: '',
-    currency: '',
-    invoiceReference: '',
-    invoiceDate: '',
-    taxInvoiceReference: '',
-    taxDate: '',
-    grnReference: '',
-    grnDate: '',
-    reason: 'PRICING_ERROR' as CreditNoteReason,
-    description: ''
-  })
+    creditNoteNumber: "",
+    date: "",
+    type: "PRICE_DIFFERENCE" as CreditNoteType,
+    status: "DRAFT" as CreditNoteStatus,
+    vendorName: "",
+    vendorCode: "",
+    currency: "",
+    invoiceReference: "",
+    invoiceDate: "",
+    taxInvoiceReference: "",
+    taxDate: "",
+    grnReference: "",
+    grnDate: "",
+    reason: "PRICING_ERROR" as CreditNoteReason,
+    description: "",
+  });
 
   const handleHeaderChange = (field: string, value: string) => {
-    setHeaderData(prev => ({ ...prev, [field]: value }))
-  }
+    setHeaderData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const [openInfo, setOpenInfo] = useState(Boolean);
 
   const handleOpeninfo = () => {
     setOpenInfo(!openInfo);
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -280,6 +336,7 @@ export function CreditNoteComponent() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                  <TableHead className="w-[200px]">Location</TableHead>
                     <TableHead className="w-[200px]">Product</TableHead>
                     <TableHead>Unit</TableHead>
                     <TableHead>Quantity</TableHead>
@@ -292,9 +349,16 @@ export function CreditNoteComponent() {
                 </TableHeader>
                 <TableBody>
                   <TableRow>
+
+                  <TableCell>
+                      <div>Location 1</div>
+                    </TableCell>
+
                     <TableCell className="font-medium">
                       <div>Sample Product</div>
-                      <div className="text-sm text-muted-foreground">High-quality widget</div>
+                      <div className="text-sm text-muted-foreground">
+                        High-quality widget
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>Box</div>
@@ -306,22 +370,34 @@ export function CreditNoteComponent() {
                     </TableCell>
                     <TableCell>
                       <div>100.00</div>
-                      <div className="text-sm text-muted-foreground">5,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        5,000.00
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>1,000.00</div>
-                      <div className="text-sm text-muted-foreground">50,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        50,000.00
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>100.00</div>
-                      <div className="text-sm text-muted-foreground">5,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        5,000.00
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>1,100.00</div>
-                      <div className="text-sm text-muted-foreground">55,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        55,000.00
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleOpeninfo()}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleOpeninfo()}
+                      >
                         <Info className="h-4 w-4" />
                         <span className="sr-only">View</span>
                       </Button>
@@ -336,9 +412,16 @@ export function CreditNoteComponent() {
                     </TableCell>
                   </TableRow>
                   <TableRow>
+
+                  <TableCell>
+                      <div>Location 1</div>
+                    </TableCell>
+                    
                     <TableCell className="font-medium">
                       <div>Another Product</div>
-                      <div className="text-sm text-muted-foreground">Durable gadget</div>
+                      <div className="text-sm text-muted-foreground">
+                        Durable gadget
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>Case</div>
@@ -350,19 +433,27 @@ export function CreditNoteComponent() {
                     </TableCell>
                     <TableCell>
                       <div>200.00</div>
-                      <div className="text-sm text-muted-foreground">10,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        10,000.00
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>1,000.00</div>
-                      <div className="text-sm text-muted-foreground">50,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        50,000.00
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>100.00</div>
-                      <div className="text-sm text-muted-foreground">5,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        5,000.00
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div>1,100.00</div>
-                      <div className="text-sm text-muted-foreground">55,000.00</div>
+                      <div className="text-sm text-muted-foreground">
+                        55,000.00
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon">
@@ -419,6 +510,7 @@ export function CreditNoteComponent() {
         </TabsContent>
       </Tabs>
       <Card>
+<<<<<<< HEAD
             <CardHeader>
               <CardTitle>Transaction Summary</CardTitle>
             </CardHeader>
@@ -455,27 +547,74 @@ export function CreditNoteComponent() {
             </CardContent>
           </Card>
     
+=======
+        <CardHeader>
+          <CardTitle>Transaction Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Description</TableHead>
+                  <TableHead className="text-right">Amount (USD)</TableHead>
+                  <TableHead className="text-right">
+                    Base Amount (PHP)
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Net Amount</TableCell>
+                  <TableCell className="text-right">2,000.00</TableCell>
+                  <TableCell className="text-right">100,000.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Tax</TableCell>
+                  <TableCell className="text-right">200.00</TableCell>
+                  <TableCell className="text-right">10,000.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Adjustments</TableCell>
+                  <TableCell className="text-right">-100.00</TableCell>
+                  <TableCell className="text-right">-5,000.00</TableCell>
+                </TableRow>
+                <TableRow className="font-bold">
+                  <TableCell>Total Amount</TableCell>
+                  <TableCell className="text-right">2,100.00</TableCell>
+                  <TableCell className="text-right">105,000.00</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+>>>>>>> 519e033 (update credit note)
 
-<Dialog open={openInfo} onOpenChange={setOpenInfo}>
+      <Dialog open={openInfo} onOpenChange={setOpenInfo}>
         <DialogContent className="sm:max-w-[80vw] bg-white [&>button]:hidden">
           <DialogHeader>
             <div className="flex justify-between w-full items-center border-b pb-4">
-           <DialogTitle> <div className="flex items-center">
-            <Package className="w-5 h-5 text-gray-500 mr-2" />
-            <h2 className="text-lg font-medium text-gray-900">Product Information</h2>
-          </div></DialogTitle>
-            <DialogClose asChild>
-                  <Button variant="ghost" size="sm">
-                    <XIcon className="h-4 w-4" />
-                  </Button>
-                </DialogClose>
-          </div>
+              <DialogTitle>
+                {" "}
+                <div className="flex items-center">
+                  <Package className="w-5 h-5 text-gray-500 mr-2" />
+                  <h2 className="text-lg font-medium text-gray-900">
+                    Product Information
+                  </h2>
+                </div>
+              </DialogTitle>
+              <DialogClose asChild>
+                <Button variant="ghost" size="sm">
+                  <XIcon className="h-4 w-4" />
+                </Button>
+              </DialogClose>
+            </div>
           </DialogHeader>
-          
+
           <CnLotApplication />
         </DialogContent>
       </Dialog>
-    
     </div>
-  )
+  );
 }

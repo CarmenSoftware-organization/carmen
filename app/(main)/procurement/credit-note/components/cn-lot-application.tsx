@@ -32,7 +32,7 @@ export function CnLotApplication({ grnDetails = {} }) {
 
         <div className="p-4">
           {/* Basic Product Details */}
-          <div className="grid grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-5 gap-6 mb-8">
             <div>
               <label className="block text-sm font-medium text-gray-500">Product Name</label>
               <div className="mt-1">
@@ -56,6 +56,11 @@ export function CnLotApplication({ grnDetails = {} }) {
             <div>
             <label className="block text-sm font-medium text-gray-500">GRN Date</label>
             <div className="mt-1 text-sm">{grnDetails.date}</div>
+            </div>
+
+            <div>
+            <label className="block text-sm font-medium text-gray-500">Tax Rate</label>
+            <div className="mt-1 text-sm">18%</div>
             </div>
             
           </div>
@@ -82,19 +87,6 @@ export function CnLotApplication({ grnDetails = {} }) {
             </div>
           </div>
 
-          {/* GRN Details */}
-          {/* <div className="mt-6 p-4 border-t">
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-500">GRN Number</label>
-                <div className="mt-1 text-sm">{grnDetails.number}</div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-500">GRN Date</label>
-                <div className="mt-1 text-sm">{grnDetails.date}</div>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
 
@@ -113,7 +105,6 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <TableHead>Original Qty</TableHead>
                 <TableHead>Available Qty</TableHead>
                 <TableHead>Unit Cost</TableHead>
-                <TableHead>Tax Rate</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -124,7 +115,6 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <TableCell>1000</TableCell>
                 <TableCell>500</TableCell>
                 <TableCell>$50.00</TableCell>
-                <TableCell>18%</TableCell>
               </TableRow>
               <TableRow>
               <TableCell>Warehouse B - Rack 1</TableCell>
@@ -133,7 +123,6 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <TableCell>800</TableCell>
                 <TableCell>300</TableCell>
                 <TableCell>$50.00</TableCell>
-                <TableCell>18%</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -178,11 +167,9 @@ export function CnLotApplication({ grnDetails = {} }) {
                 </TableHead>
                 <TableHead>Lot Number</TableHead>
                 <TableHead>Available Qty</TableHead>
-                <TableHead>Tax Rate</TableHead>
                 <TableHead className="text-right">Original Value</TableHead>
                 <TableHead className="text-right">New Value</TableHead>
                 <TableHead className="text-right">Difference</TableHead>
-                <TableHead className="text-right">Tax Impact</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -203,11 +190,9 @@ export function CnLotApplication({ grnDetails = {} }) {
                   <div className="text-sm text-gray-500">Warehouse A - Rack 3</div>
                 </TableCell>
                 <TableCell>500</TableCell>
-                <TableCell>18%</TableCell>
                 <TableCell className="text-right">$25,000.00</TableCell>
                 <TableCell className="text-right">$22,500.00</TableCell>
                 <TableCell className="text-right text-red-600">-$2,500.00</TableCell>
-                <TableCell className="text-right text-red-600">-$450.00</TableCell>
               </TableRow>
 
               {/* Lot 2 */}
@@ -227,11 +212,9 @@ export function CnLotApplication({ grnDetails = {} }) {
                   <div className="text-sm text-gray-500">Warehouse B - Rack 1</div>
                 </TableCell>
                 <TableCell>300</TableCell>
-                <TableCell>18%</TableCell>
                 <TableCell className="text-right">$15,000.00</TableCell>
                 <TableCell className="text-right">$13,500.00</TableCell>
                 <TableCell className="text-right text-red-600">-$1,500.00</TableCell>
-                <TableCell className="text-right text-red-600">-$270.00</TableCell>
               </TableRow>
             </TableBody>
             <tfoot>
@@ -242,7 +225,6 @@ export function CnLotApplication({ grnDetails = {} }) {
                 <TableCell className="text-right font-medium">$40,000.00</TableCell>
                 <TableCell className="text-right font-medium">$36,000.00</TableCell>
                 <TableCell className="text-right font-medium text-red-600">-$4,000.00</TableCell>
-                <TableCell className="text-right font-medium text-red-600">-$720.00</TableCell>
               </TableRow>
             </tfoot>
           </Table>
