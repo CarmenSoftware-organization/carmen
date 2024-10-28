@@ -43,9 +43,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 
 type CreditNoteType =
-  | "PRICE_DIFFERENCE"
   | "QUANTITY_RETURN"
-  | "AGREED_DISCOUNT"
   | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
 type CreditNoteReason =
@@ -146,11 +144,7 @@ function CreditNoteHeader({
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="PRICE_DIFFERENCE">
-                  Price Difference
-                </SelectItem>
                 <SelectItem value="QUANTITY_RETURN">Quantity Return</SelectItem>
-                <SelectItem value="AGREED_DISCOUNT">Agreed Discount</SelectItem>
                 <SelectItem value="AMOUNT_DISCOUNT">Amount Discount</SelectItem>
               </SelectContent>
             </Select>
