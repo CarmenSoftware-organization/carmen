@@ -167,6 +167,8 @@ export function CnLotApplication({ grnDetails = {} }) {
                 </TableHead>
                 <TableHead>Lot Number</TableHead>
                 <TableHead>Available Qty</TableHead>
+                <TableHead>Apply Qty</TableHead>
+                <TableHead>New Qty</TableHead>
                 <TableHead className="text-right">Original Value</TableHead>
                 <TableHead className="text-right">New Value</TableHead>
                 <TableHead className="text-right">Difference</TableHead>
@@ -190,6 +192,8 @@ export function CnLotApplication({ grnDetails = {} }) {
                   <div className="text-sm text-gray-500">Warehouse A - Rack 3</div>
                 </TableCell>
                 <TableCell>500</TableCell>
+                <TableCell>10</TableCell>
+                <TableCell>490</TableCell>
                 <TableCell className="text-right">$25,000.00</TableCell>
                 <TableCell className="text-right">$22,500.00</TableCell>
                 <TableCell className="text-right text-red-600">-$2,500.00</TableCell>
@@ -212,6 +216,8 @@ export function CnLotApplication({ grnDetails = {} }) {
                   <div className="text-sm text-gray-500">Warehouse B - Rack 1</div>
                 </TableCell>
                 <TableCell>300</TableCell>
+                <TableCell>20</TableCell>
+                <TableCell>280</TableCell>
                 <TableCell className="text-right">$15,000.00</TableCell>
                 <TableCell className="text-right">$13,500.00</TableCell>
                 <TableCell className="text-right text-red-600">-$1,500.00</TableCell>
