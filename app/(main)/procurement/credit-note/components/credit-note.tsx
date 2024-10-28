@@ -439,19 +439,15 @@ export function CreditNoteComponent() {
                       <TableCell className="text-right">100,000.00</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Tax</TableCell>
+                      <TableCell>Tax Amount</TableCell>
                       <TableCell className="text-right">200.00</TableCell>
                       <TableCell className="text-right">10,000.00</TableCell>
                     </TableRow>
-                    <TableRow>
-                      <TableCell>Adjustments</TableCell>
-                      <TableCell className="text-right">-100.00</TableCell>
-                      <TableCell className="text-right">-5,000.00</TableCell>
-                    </TableRow>
+                    
                     <TableRow className="font-bold">
                       <TableCell>Total Amount</TableCell>
-                      <TableCell className="text-right">2,100.00</TableCell>
-                      <TableCell className="text-right">105,000.00</TableCell>
+                      <TableCell className="text-right">2,200.00</TableCell>
+                      <TableCell className="text-right">110,000.00</TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
