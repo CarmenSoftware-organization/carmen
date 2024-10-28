@@ -107,33 +107,33 @@ export function CnLotApplication({ grnDetails = {} }) {
           <Table>
             <TableHeader>
               <TableRow>
+              <TableHead>Location</TableHead>
                 <TableHead>Lot Number</TableHead>
                 <TableHead>Receipt Date</TableHead>
                 <TableHead>Original Qty</TableHead>
                 <TableHead>Available Qty</TableHead>
                 <TableHead>Unit Cost</TableHead>
                 <TableHead>Tax Rate</TableHead>
-                <TableHead>Location</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow>
+              <TableCell>Warehouse A - Rack 3</TableCell>
                 <TableCell>LOT001</TableCell>
                 <TableCell>23-10-2024 14:30</TableCell>
                 <TableCell>1000</TableCell>
                 <TableCell>500</TableCell>
                 <TableCell>$50.00</TableCell>
                 <TableCell>18%</TableCell>
-                <TableCell>Warehouse A - Rack 3</TableCell>
               </TableRow>
               <TableRow>
+              <TableCell>Warehouse B - Rack 1</TableCell>
                 <TableCell>LOT002</TableCell>
                 <TableCell>23-10-2024 16:45</TableCell>
                 <TableCell>800</TableCell>
                 <TableCell>300</TableCell>
                 <TableCell>$50.00</TableCell>
                 <TableCell>18%</TableCell>
-                <TableCell>Warehouse B - Rack 1</TableCell>
               </TableRow>
             </TableBody>
           </Table>
