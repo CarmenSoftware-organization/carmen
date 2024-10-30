@@ -41,8 +41,14 @@ import {
 import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import SummaryTotal from "./SummaryTotal";
+import { CreditNoteDetail } from "../../credit-note/components/credit-note-detail"
 
-export function PODetailPage({ params }: { params: { id: string } }) {
+interface PODetailPageProps {
+  params: { id: string }
+  backLink?: React.ReactElement | string
+}
+
+export function PODetailPage({ params, backLink: propBackLink }: PODetailPageProps) {
   const router = useRouter();
   const [poData, setPOData] = useState<PurchaseOrder | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -160,6 +166,18 @@ export function PODetailPage({ params }: { params: { id: string } }) {
       )}
     </div>
   );
+
+  // Define the default backLink early
+  const defaultBackLink = (
+    <Button variant="ghost" size="icon" asChild className="mr-1">
+      <Link href="/procurement/purchase-orders">
+        <ArrowLeft className="h-4 w-4" />
+      </Link>
+    </Button>
+  )
+
+  // Use the provided backLink or default
+  const backLink = propBackLink || defaultBackLink
 
   const content = (
     <>
@@ -323,19 +341,12 @@ export function PODetailPage({ params }: { params: { id: string } }) {
           <SummaryTotal poData={poData} />
         </CardContent>
       </Card>
+      <CreditNoteDetail backLink={backLink} />
     </>
   );
 
-  const backLink = (
-    <Button variant="ghost" size="icon" asChild className="mr-1">
-      <Link href="/procurement/purchase-orders">
-        <ArrowLeft className="h-4 w-4" />
-      </Link>
-    </Button>
-  );
-
   return (
-    <div className="-mt-4 bg-white dark:bg-gray-800"> {/* Add negative top margin to the entire page */}
+    <div className="-mt-4 bg-white dark:bg-gray-800">
       <DetailPageTemplate
         title={title}
         actionButtons={actionButtons}

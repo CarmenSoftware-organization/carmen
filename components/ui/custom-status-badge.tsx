@@ -24,6 +24,12 @@ export enum Status {
   Review = "Review",
   Deleted = "Deleted",
   Received = "Received",
+  Active = "Active",
+  Inactive = "Inactive",
+  BelowMin = "below-min",
+  Reorder = "reorder",
+  OverMax = "over-max",
+  Normal = "normal",
 }
 
 export interface IBadgeColors {
@@ -53,7 +59,15 @@ export const StatusList: IBadgeColors[] = [
   { key: Status.SendBack, Color: "bg-rose-300 text-rose-800" },
   { key: Status.Review, Color: "bg-amber-200 text-amber-800" },
   { key: Status.Deleted, Color: "bg-rose-300 text-rose-800" },
-  { key: Status.Received, Color: "bg-emerald-300 text-emerald-800" },
+  { key: Status.Received  , Color: "bg-emerald-300 text-emerald-800" },
+  { key: Status.Active, Color: "bg-emerald-300 text-emerald-800" },
+  { key: Status.Inactive, Color: "bg-slate-300 text-slate-800" },
+  { key: Status.BelowMin, Color: "bg-destructive text-red-800" },
+  { key: Status.Reorder, Color: "bg-yellow-500 text-amber-800" },
+  { key: Status.OverMax, Color: "bg-blue-500 text-default-800" },
+  { key: Status.Normal, Color: "bg-green-500 text-gray-800" }, 
+
+ 
 ];
 
 export default function StatusBadge({ status }: { status: string }) {

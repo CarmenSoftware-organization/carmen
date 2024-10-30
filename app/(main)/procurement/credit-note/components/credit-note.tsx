@@ -41,6 +41,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import Inventory from "./inventory"
+import JournalEntries  from "./journal-entries"
+import TaxEntries  from "./tax-entries"
+import { StockMovementTab } from "./StockMovementTab"
 
 type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
@@ -307,13 +311,87 @@ export function CreditNoteComponent() {
     setOpenInfo(!openInfo);
   };
 
+  const mockStockMovements = [
+    {
+      id: "1",
+      documentNo: "CN-001",
+      documentType: "CREDIT_NOTE",
+      date: "2024-03-20",
+      itemCode: "PROD-001",
+      itemName: "Sample Product",
+      itemDescription: "High-quality widget",
+      location: {
+        id: "LOC-001",
+        code: "WH-001",
+        name: "Main Warehouse",
+        type: "WAREHOUSE"
+      },
+      fromLocation: "Main Warehouse",
+      toLocation: "Main Warehouse",
+      quantity: -10,
+      unit: "Box",
+      lotNumber: "LOT-001",
+      baseQuantity: -100,
+      baseUom: "Piece",
+      inventoryUnit: "Box",
+      cost: 100.00,
+      totalCost: 1000.00,
+      netAmount: 1000.00,
+      totalAmount: 1100.00,
+      currency: "USD",
+      extraCost: 100.00,
+      status: "POSTED",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: "system",
+      updatedBy: "system"
+    },
+    {
+      id: "2",
+      documentNo: "CN-001",
+      documentType: "CREDIT_NOTE",
+      date: "2024-03-20",
+      itemCode: "PROD-002",
+      itemName: "Another Product",
+      itemDescription: "Durable gadget",
+      location: {
+        id: "LOC-001",
+        code: "WH-001",
+        name: "Main Warehouse",
+        type: "WAREHOUSE"
+      },
+      fromLocation: "Main Warehouse",
+      toLocation: "Main Warehouse",
+      quantity: -5,
+      unit: "Case",
+      lotNumber: "LOT-002",
+      baseQuantity: -50,
+      baseUom: "Unit",
+      inventoryUnit: "Case",
+      cost: 200.00,
+      totalCost: 1000.00,
+      netAmount: 1000.00,
+      totalAmount: 1100.00,
+      currency: "USD",
+      extraCost: 100.00,
+      status: "POSTED",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: "system",
+      updatedBy: "system"
+    }
+  ]
+
   return (
     <div className="space-y-4">
       <CreditNoteHeader {...headerData} onHeaderChange={handleHeaderChange} />
       <Tabs defaultValue="itemDetails" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="itemDetails">Item Details</TabsTrigger>
+          <TabsTrigger value="inventory">Inventory</TabsTrigger>
           <TabsTrigger value="stockMovement">Stock Movement</TabsTrigger>
+          <TabsTrigger value="journalEntries">Journal Entries</TabsTrigger>
+          <TabsTrigger value="taxEntries">Tax Entries</TabsTrigger>
         </TabsList>
         <TabsContent value="itemDetails">
           <Card>
@@ -465,38 +543,20 @@ export function CreditNoteComponent() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="inventory">
+          <Inventory />
+        </TabsContent>
         <TabsContent value="stockMovement">
-          <Card>
-            <CardHeader>
-              <CardTitle>Stock Movement</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product Name</TableHead>
-                    <TableHead>Warehouse</TableHead>
-                    <TableHead>Quantity Change</TableHead>
-                    <TableHead>New Stock Level</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>Sample Product</TableCell>
-                    <TableCell>Main Warehouse</TableCell>
-                    <TableCell>-10</TableCell>
-                    <TableCell>90</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Another Product</TableCell>
-                    <TableCell>Main Warehouse</TableCell>
-                    <TableCell>-5</TableCell>
-                    <TableCell>45</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <StockMovementTab 
+            mode="view" 
+            movements={mockStockMovements}
+          />
+        </TabsContent>
+        <TabsContent value="journalEntries">
+          <JournalEntries />
+        </TabsContent>
+        <TabsContent value="taxEntries">
+          <TaxEntries />
         </TabsContent>
       </Tabs>
       <Card>

@@ -31,7 +31,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function CnLotApplication({ grnDetails = {} }) {
+interface GRNDetails {
+  number: string
+  date: string
+}
+
+interface CnLotApplicationProps {
+  grnDetails?: GRNDetails
+}
+
+export function CnLotApplication({ 
+  grnDetails = { number: 'N/A', date: 'N/A' } 
+}: CnLotApplicationProps) {
   const [selectedLots, setSelectedLots] = useState(["LOT001"]);
 
   const getOrdinalValue = (number: any) => {

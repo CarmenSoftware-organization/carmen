@@ -1,6 +1,11 @@
+import React from 'react'
 import { CreditNoteComponent } from "./credit-note";
 
-export function CreditNoteDetail(){
+interface CreditNoteDetailProps {
+  backLink?: React.ReactElement | string
+}
+
+export function CreditNoteDetail({ backLink }: CreditNoteDetailProps) {
     return (
         <>
         <CreditNoteComponent />
