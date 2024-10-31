@@ -38,6 +38,7 @@ const menuItems = [
     subItems: [
       { name: "Products", path: "/product-management/products" },
       { name: "Categories", path: "/product-management/categories" },
+      { name: "Units", path: "/product-management/units" },
       { name: "Reports", path: "/product-management/reports" },
     ],
   },
