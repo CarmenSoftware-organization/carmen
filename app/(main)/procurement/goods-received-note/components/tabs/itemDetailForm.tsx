@@ -4,15 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GoodsReceiveNoteItem, GoodsReceiveNoteMode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, X, XIcon } from "lucide-react";
+import { CalendarIcon, Package, TruckIcon, X, XIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import React from "react";
 import {
+    Dialog,
   DialogClose,
+  DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/custom-dialog";
+import InventoryBreakdown from "./inventory-breakdown";
+import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 
 interface ItemDetailFormProps {
   item: GoodsReceiveNoteItem | null;
@@ -88,6 +93,18 @@ export default function ItemDetailForm({
       // Add other required fields with default values
     }
   );
+  const [isOnOrderOpen, setIsOnOrderOpen] =
+  useState(false);
+
+  const [isOnHandOpen, setIsOnHandOpen] = useState(false);
+
+  const handleOnHandClick = () => {
+    setIsOnHandOpen(true);
+  };
+
+  const handleOnOrderClick = () => {
+    setIsOnOrderOpen(true);
+  };
 
   const handleEdit = () => {
     setMode("edit");
@@ -119,6 +136,8 @@ export default function ItemDetailForm({
       handleItemChange(item.id, field, value);
     }
   };
+
+
 
   return (
     <>
@@ -236,10 +255,10 @@ export default function ItemDetailForm({
                   Quantity and Delivery
                 </h3>
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleOnHandClick()}>
                     On Hand
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleOnOrderClick()}>
                     On Order
                   </Button>
                 
@@ -614,6 +633,58 @@ export default function ItemDetailForm({
                 </div>
               </div>
             </div>
+
+            <Dialog
+                  open={isOnHandOpen}
+                  onOpenChange={setIsOnHandOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      <Package className="mr-2 h-4 w-4" />
+                      On Hand
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[60vw] w-[80vw] overflow-y-auto [&>button]:hidden">
+                    <DialogHeader>
+                      <div className="flex justify-between w-full items-center">
+                        <DialogTitle>On Hand by Location</DialogTitle>
+                        <DialogClose asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsOnHandOpen(false)}
+                          >
+                            <XIcon className="h-4 w-4" />
+                          </Button>
+                        </DialogClose>
+                      </div>
+                    </DialogHeader>
+                    <InventoryBreakdown />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      <TruckIcon className="mr-2 h-4 w-4" />
+                      On Order
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[60vw] overflow-y-auto [&>button]:hidden">
+                    <DialogHeader>
+                      <div className="flex justify-between w-full items-center">
+                        <DialogTitle>Pending Purchase Order</DialogTitle>
+                        <DialogClose asChild>
+                          <Button variant="ghost" size="sm" onClick={() => setIsOnOrderOpen(false)}>
+                            <XIcon className="h-4 w-4" />
+                          </Button>
+                        </DialogClose>
+                      </div>
+                    </DialogHeader>
+                    <PendingPurchaseOrdersComponent />
+                  </DialogContent>
+                </Dialog>
+                
           </div>
         </div>
       </div>
