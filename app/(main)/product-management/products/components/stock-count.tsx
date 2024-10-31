@@ -13,8 +13,7 @@ const productInfo = {
       description: 'Standard Pallet',
       isDefault: true,
       precision: 0,
-      minQty: 1,
-      location: 'BULK'
+      minQty: 1
     },
     {
       countUnit: 'BAG',
@@ -22,8 +21,7 @@ const productInfo = {
       description: 'Single Bag',
       isDefault: false,
       precision: 0,
-      minQty: 1,
-      location: 'PICK'
+      minQty: 1
     },
     {
       countUnit: 'KG',
@@ -31,8 +29,7 @@ const productInfo = {
       description: 'Kilogram',
       isDefault: false,
       precision: 2,
-      minQty: 0.5,
-      location: 'QC'
+      minQty: 0.5
     }
   ]
 };
@@ -45,7 +42,6 @@ interface CountingUnit {
   isDefault: boolean;
   precision: number;
   minQty: number;
-  location: string;
 }
 
 export default function StockCountUnitTab() {
@@ -137,7 +133,6 @@ export default function StockCountUnitTab() {
                 <th className="px-4 py-2 text-left bg-gray-50">Description</th>
                 <th className="px-4 py-2 text-right bg-gray-50">Precision</th>
                 <th className="px-4 py-2 text-right bg-gray-50">Min Qty</th>
-                <th className="px-4 py-2 text-left bg-gray-50">Location</th>
                 <th className="px-4 py-2 text-center bg-gray-50">Count Default</th>
                 <th className="px-4 py-2 text-right bg-gray-50">Actions</th>
               </tr>
@@ -172,9 +167,6 @@ export default function StockCountUnitTab() {
                     <span className="text-sm tabular-nums text-right block">
                       {unit.minQty}
                     </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-gray-500">{unit.location}</span>
                   </td>
                   <td className="px-4 py-3 text-center">
                     <input
