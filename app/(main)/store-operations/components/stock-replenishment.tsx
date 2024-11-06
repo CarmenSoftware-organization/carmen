@@ -1,0 +1,244 @@
+'use client'
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { 
+  AlertTriangle, 
+  ArrowUp,
+  Package,
+  TrendingUp,
+  Search,
+  Filter
+} from 'lucide-react';
+
+const StockReplenishmentDashboard = () => {
+  const stockLevels = [
+    { month: 'Jan', level: 150 },
+    { month: 'Feb', level: 180 },
+    { month: 'Mar', level: 120 },
+    { month: 'Apr', level: 200 },
+    { month: 'May', level: 160 },
+    { month: 'Jun', level: 140 },
+  ];
+
+  const items = [
+    {
+      id: 1,
+      name: 'Thai Milk Tea (12 pack)',
+      sku: 'BEV-001',
+      location: 'Central Kitchen',
+      currentStock: 25,
+      minLevel: 30,
+      maxLevel: 100,
+      parLevel: 80,
+      onOrder: 50,
+      reorderPoint: 40,
+      lastPrice: 45.99,
+      lastVendor: 'Thai Beverage Co.',
+      status: 'low',
+      usage: 'high',
+      orderAmount: 0,
+    },
+    {
+      id: 2,
+      name: 'Coffee Beans (1kg)',
+      sku: 'BEV-002',
+      location: 'Roastery Store',
+      currentStock: 45,
+      minLevel: 20,
+      maxLevel: 80,
+      parLevel: 60,
+      onOrder: 0,
+      reorderPoint: 30,
+      lastPrice: 28.50,
+      lastVendor: 'Global Coffee Suppliers',
+      status: 'normal',
+      usage: 'medium',
+      orderAmount: 0,
+    }
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total SKUs</p>
+                <p className="text-2xl font-bold">1,234</p>
+              </div>
+              <Package className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Low Stock Items</p>
+                <p className="text-2xl font-bold text-red-500">28</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Items on Order</p>
+                <p className="text-2xl font-bold text-orange-500">45</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-orange-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Stock Value</p>
+                <p className="text-2xl font-bold">$45,678</p>
+              </div>
+              <ArrowUp className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Stock Level Trend */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Stock Level Trend</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={stockLevels}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="level" stroke="#2563eb" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Low Stock Alerts */}
+      <Alert className="bg-red-50 border-red-200">
+        <AlertTriangle className="h-4 w-4 text-red-500" />
+        <AlertDescription>
+          8 items are below minimum stock levels and require immediate attention
+        </AlertDescription>
+      </Alert>
+
+      {/* Inventory Table */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Inventory Status</CardTitle>
+            <div className="flex gap-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <Input className="pl-8" placeholder="Search items..." />
+              </div>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Filters
+              </Button>
+              <Button>Create Requisition</Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">PAR Level</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Reorder Point</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">On Order</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Order Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {items.map((item) => {
+                  const suggestedOrder = Math.max(0, item.parLevel - (item.currentStock + item.onOrder));
+                  
+                  return (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.sku}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.location}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <span className={`${item.currentStock < item.reorderPoint ? 'text-red-500 font-medium' : ''}`}>
+                          {item.currentStock}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{item.parLevel}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{item.reorderPoint}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <span className="text-gray-500">{item.onOrder}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <Input 
+                          type="number"
+                          defaultValue={suggestedOrder}
+                          className="w-20 text-right"
+                          onChange={(e) => {
+                            console.log('Updated order amount:', e.target.value);
+                          }}
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          item.status === 'low' 
+                            ? 'bg-red-100 text-red-700' 
+                            : 'bg-green-100 text-green-700'
+                        }`}>
+                          {item.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Button variant="outline" size="sm">
+                          Create Order
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default StockReplenishmentDashboard;

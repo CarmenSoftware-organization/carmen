@@ -53,10 +53,9 @@ const menuItems = [
     path: "/store-operations",
     icon: "Store",
     subItems: [
-      "Store Requisitions",
-      "Issues Management",
-      "Stock Replenishment",
-      "Wastage Reporting",
+      { name: "Store Requisitions", path: "/store-operations/store-requisitions" },
+      { name: "Stock Replenishment", path: "/store-operations/stock-replenishment" },
+      { name: "Wastage Reporting", path: "/store-operations/wastage-reporting" },
     ],
   },
   {
@@ -65,7 +64,7 @@ const menuItems = [
     icon: "Package",
     subItems: [
       "Stock Overview",
-      "Stock In",
+      { name: "Stock In", path: "/inventory-management/stock-in" },
       "Stock Out",
       "Transfer Between Locations",
       "Physical Count",
