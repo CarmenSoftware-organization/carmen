@@ -16,7 +16,7 @@ export interface CreditNote {
   status: string
   notes: string
   createdBy: string
-  updatedDate: string
+  updatedDate: Date
   updatedBy: string
   items: CreditNoteItem[]
   attachments: CreditNoteAttachment[]

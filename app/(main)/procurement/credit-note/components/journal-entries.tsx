@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Building, Calculator, AlertCircle, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button'
 
 // Mock data for journal entries
 const mockEntries = [
@@ -97,20 +98,49 @@ export default function JournalEntries() {
   const totals = calculateTotals();
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="p-4 border-b">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-medium text-gray-900">Journal Entries</h2>
-            <div className="px-2 py-1 text-sm text-blue-600 bg-blue-50 rounded-full">
-              CN-2024-001
-            </div>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <h2 className="text-lg font-medium">Journal Entries</h2>
+          <div className="px-2 py-1 text-sm text-blue-600 bg-blue-50 rounded-full">
+            CN-2024-001
           </div>
-          <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center">
-            <Calculator className="w-4 h-4 mr-1" />
-            Recalculate
-          </button>
+        </div>
+        <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Calculator className="h-4 w-4" />
+          Recalculate
+        </Button>
+      </div>
+
+      {/* Header Details */}
+      <div className="grid grid-cols-3 gap-6 p-4 bg-gray-50 rounded-lg">
+        <div>
+          <div className="text-sm text-gray-500">Document Type</div>
+          <div className="font-medium">Credit Note</div>
+        </div>
+        <div>
+          <div className="text-sm text-gray-500">Transaction Date</div>
+          <div className="font-medium">2024-03-15</div>
+        </div>
+        <div>
+          <div className="text-sm text-gray-500">Journal Status</div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full" />
+            <span className="font-medium">Posted</span>
+          </div>
+        </div>
+        <div>
+          <div className="text-sm text-gray-500">Journal Reference</div>
+          <div className="font-medium">CN-2024-001</div>
+        </div>
+        <div>
+          <div className="text-sm text-gray-500">Source</div>
+          <div className="font-medium">CN</div>
+        </div>
+        <div>
+          <div className="text-sm text-gray-500">Description</div>
+          <div className="font-medium">Credit Note Adjustment</div>
         </div>
       </div>
 
@@ -123,7 +153,7 @@ export default function JournalEntries() {
             value={selectedDepartment}
             onChange={(e) => setSelectedDepartment(e.target.value)}
           >
-            <option value="ALL">All Departments</option>
+            <option value="ALL">All Locations</option>
             <option value="PUR">Purchasing</option>
             <option value="WHS">Warehouse</option>
             <option value="ACC">Accounting</option>
