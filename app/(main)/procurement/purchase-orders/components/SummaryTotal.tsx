@@ -56,7 +56,7 @@ export default function SummaryTotal({ poData }: ISummaryTotalProps) {
       <TableHeader>
         <TableRow>
           <TableHead className="font-bold whitespace-nowrap">Description</TableHead>
-          <TableHead className="text-right font-bold whitespace-nowrap">Total Amount ({poData.currencyCode})</TableHead>
+          <TableHead className="text-right font-bold whitespace-nowrap">Amount ({poData.currencyCode})</TableHead>
           <TableHead className="text-right text-gray-500 text-xs whitespace-nowrap hidden md:table-cell">Base Amount ({poData.baseCurrencyCode})</TableHead>
         </TableRow>
       </TableHeader>

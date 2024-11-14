@@ -1,179 +1,151 @@
 import React from 'react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { GoodsReceiveNoteMode, FinancialSummary } from '@/lib/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 
 interface FinancialSummaryTabProps {
   mode: GoodsReceiveNoteMode
-  summary: FinancialSummary | null,
-  currency: string,
-  baseCurrency: string,
-}
-interface JVDetail {
-  department: {
-    name: string
-  }
-  accountCode: {
-    code: string
-  }
-  accountName: string
-  currency: string
-  debit: number
-  credit: number
-  baseDebit: number
-  baseCredit: number
-}
-interface JVDetailTotals {
-  debit: number
-  credit: number
-  baseDebit: number
-  baseCredit: number
+  summary: FinancialSummary | null
   currency: string
   baseCurrency: string
 }
 
-
 export function FinancialSummaryTab({ mode, summary, currency, baseCurrency }: FinancialSummaryTabProps) {
-  if (!summary) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Financial Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>No financial summary available</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  const jvDetailTotals: JVDetailTotals = summary.jvDetail?.reduce(
-    (acc, entry) => ({
-      debit: acc.debit + entry.debit,
-      credit: acc.credit + entry.credit,
-      baseDebit: acc.baseDebit + entry.baseDebit,
-      baseCredit: acc.baseCredit + entry.baseCredit,
-      currency: entry.currency,
-      baseCurrency: entry.baseCurrency,
-    }),
-    { debit: 0, credit: 0, baseDebit: 0, baseCredit: 0, currency, baseCurrency }
-  ) || { debit: 0, credit: 0, baseDebit: 0, baseCredit: 0, currency, baseCurrency };
+  if (!summary) return null
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Transaction Summary</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-6 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 col-span-1">JV Type</label>
-            <Input value={summary.jvType} readOnly />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 col-span-1">JV Number</label>
-            <Input value={summary.jvNumber} readOnly />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 col-span-1">Date</label>
-            <Input type="date" value={summary.jvDate.toISOString().split('T')[0]} readOnly />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 col-span-1">Status</label>
-            <Input value={summary.jvStatus} readOnly />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 col-span-1">Reference</label>
-            <Input value={summary.jvReference} readOnly />
-          </div>
-          {/* <div>
-            <label className="block text-sm font-medium text-gray-700 col-span-1">Currency</label>
-            <Input value={currency} readOnly />
-          </div> */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 col-span-1" >Source</label>
-            <Input value={summary.sourceOfTransaction || 'Goods Received Note'} readOnly />
-          </div>
-          <div className="col-span-6">
-            <label className="block text-sm font-medium text-gray-700">Description</label>
-            <Input value={summary.jvDescription} readOnly />
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium mb-4">Journal Entries</h3>
+        <div className="text-sm text-muted-foreground mb-2">
+          Source: GRN | Journal Voucher: {summary.jvNumber} | Date: {summary.jvDate.toLocaleDateString()} | Status: {summary.jvStatus}
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Account</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="text-right">Debit ({currency})</TableHead>
+              <TableHead className="text-right">Credit ({currency})</TableHead>
+              <TableHead className="text-right">Base Debit ({baseCurrency})</TableHead>
+              <TableHead className="text-right">Base Credit ({baseCurrency})</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {summary.jvDetail?.map((entry, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <div>{entry.accountName}</div>
+                  <div className="text-sm text-muted-foreground">{entry.accountCode.code}</div>
+                </TableCell>
+                <TableCell>
+                  <div>{entry.department.name}</div>
+                  <div className="text-sm text-muted-foreground">ID: {entry.department.id}</div>
+                </TableCell>
+                <TableCell>{summary.jvDescription}</TableCell>
+                <TableCell className="text-right">
+                  {entry.debit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </TableCell>
+                <TableCell className="text-right">
+                  {entry.credit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </TableCell>
+                <TableCell className="text-right">
+                  {entry.baseDebit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </TableCell>
+                <TableCell className="text-right">
+                  {entry.baseCredit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex justify-between items-center pt-4 border-t">
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-muted-foreground">Total Debit</div>
+          <div className="font-medium">
+            {summary.jvTotal.debit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </div>
         </div>
-
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">JV Detail</h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Department</TableHead>
-                <TableHead>Account Code</TableHead>
-                <TableHead>Account Name</TableHead>
-                {/* <TableHead>Currency</TableHead> */}
-                {/* <TableHead className="text-right">Debit</TableHead> */}
-                {/* <TableHead className="text-right">Credit</TableHead> */}
-                {/* <TableHead>Base Currency</TableHead> */}
-                <TableHead className="text-right">Base Debit</TableHead>
-                <TableHead className="text-right">Base Credit</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {summary.jvDetail?.map((entry, index) => (
-                <TableRow key={index}>
-                  <TableCell>{entry.department?.name}</TableCell>
-                  <TableCell>{entry.accountCode?.code}</TableCell>
-                  <TableCell>{entry.accountName}</TableCell>
-                  {/* <TableCell>{entry.currency}</TableCell> */}
-                  {/* <TableCell className="text-right">{entry.debit.toFixed(2)}</TableCell> */}
-                  {/* <TableCell className="text-right">{entry.credit.toFixed(2)}</TableCell> */}
-                  {/* <TableCell>{entry.baseCurrency}</TableCell> */}
-                  <TableCell className="text-right">{entry.baseDebit.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">{entry.baseCredit.toFixed(2)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell colSpan={3} className="font-medium">Total</TableCell>
-                {/* <TableCell className="text-right font-medium">{jvDetailTotals.debit.toFixed(2)}</TableCell> */}
-                {/* <TableCell className="text-right font-medium">{jvDetailTotals.credit.toFixed(2)}</TableCell> */}
-                {/* <TableCell>{jvDetailTotals.currency}</TableCell> */}
-                <TableCell className="text-right font-medium">{jvDetailTotals.baseDebit.toFixed(2)}</TableCell>
-                <TableCell className="text-right font-medium">{jvDetailTotals.baseCredit.toFixed(2)}</TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-muted-foreground">Total Credit</div>
+          <div className="font-medium">
+            {summary.jvTotal.credit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </div>
         </div>
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-muted-foreground">Difference</div>
+          <div className="font-medium">
+            {(summary.jvTotal.debit - summary.jvTotal.credit).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </div>
+        </div>
+        <div className="text-sm text-green-600 font-medium">
+          {summary.jvTotal.debit === summary.jvTotal.credit ? 'Balanced' : 'Unbalanced'}
+        </div>
+      </div>
 
-        {/* <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">JV Total</h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Description</TableHead>
-                <TableHead>Currency</TableHead>
-                <TableHead className="text-right">Debit</TableHead>
-                <TableHead className="text-right">Credit</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Total</TableCell>
-                <TableCell>{currency}</TableCell>
-                <TableCell className="text-right">{summary.jvTotal.debit.toFixed(2)}</TableCell>
-                <TableCell className="text-right">{summary.jvTotal.credit.toFixed(2)}</TableCell>
-              </TableRow>
-              <TableRow className="text-xs text-muted-foreground">
-                <TableCell className="font-semibold">Base Total</TableCell>
-                <TableCell>{baseCurrency}</TableCell>
-                <TableCell className="text-right">{summary.jvTotal.baseDebit.toFixed(2)}</TableCell>
-                <TableCell className="text-right">{summary.jvTotal.baseCredit.toFixed(2)}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div> */}
-      </CardContent>
-    </Card>
+      {/* <div className="grid grid-cols-2 gap-6 pt-4 border-t">
+        <Card>
+          <CardHeader>
+            <CardTitle>Transaction Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between">
+              <Label>Net Amount:</Label>
+              <span>{summary.netAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} {currency}</span>
+            </div>
+            <div className="flex justify-between">
+              <Label>Tax Amount:</Label>
+              <span>{summary.taxAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} {currency}</span>
+            </div>
+            <Separator />
+            <div className="flex justify-between font-bold">
+              <Label>Total Amount:</Label>
+              <span>{summary.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} {currency}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Base Currency Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between">
+              <Label>Base Net Amount:</Label>
+              <span>{summary.baseNetAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} {baseCurrency}</span>
+            </div>
+            <div className="flex justify-between">
+              <Label>Base Tax Amount:</Label>
+              <span>{summary.baseTaxAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} {baseCurrency}</span>
+            </div>
+            <Separator />
+            <div className="flex justify-between font-bold">
+              <Label>Base Total Amount:</Label>
+              <span>{summary.baseTotalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} {baseCurrency}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div> */}
+
+      {/* <div className="space-y-2 text-sm text-muted-foreground border-t pt-4">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-green-500"></div>
+          <div>Document Type: GRN</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-green-500"></div>
+          <div>Reference: {summary.jvReference}</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-green-500"></div>
+          <div>Transaction Date: {summary.jvDate.toLocaleDateString()}</div>
+        </div>
+      </div> */}
+    </div>
   )
 }

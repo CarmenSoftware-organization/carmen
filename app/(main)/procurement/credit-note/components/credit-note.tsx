@@ -45,6 +45,7 @@ import Inventory from "./inventory"
 import JournalEntries  from "./journal-entries"
 import TaxEntries  from "./tax-entries"
 import { StockMovementTab } from "./StockMovementTab"
+import StockMovementContent from "./stock-movement";
 
 type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
@@ -95,9 +96,9 @@ function CreditNoteHeader({
   return (
     <Card className="w-full mb-4">
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
-        <CardTitle>Credit Note Header</CardTitle>
+        <CardTitle>Credit Note</CardTitle>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="default" size="sm">
             <Edit className="h-4 w-4 mr-2" />
             Edit
           </Button>
@@ -116,7 +117,7 @@ function CreditNoteHeader({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-6">
           <div className="space-y-2">
             <Label htmlFor="creditNoteNumber">Credit Note Number</Label>
             <Input
@@ -282,23 +283,56 @@ function CreditNoteHeader({
   );
 }
 
+interface CreditNoteItem {
+  id: number
+  location: {
+    code: string
+    name: string
+  }
+  product: {
+    code: string
+    name: string
+    description: string
+  }
+  quantity: {
+    primary: number
+    secondary: number
+  }
+  unit: {
+    primary: string
+    secondary: string
+  }
+  price: {
+    unit: number
+    secondary: number
+  }
+  amounts: {
+    net: number
+    tax: number
+    total: number
+    baseNet: number
+    baseTax: number
+    baseTotal: number
+  }
+}
+
 export function CreditNoteComponent() {
   const [headerData, setHeaderData] = useState({
-    creditNoteNumber: "",
-    date: "",
-    type: "PRICE_DIFFERENCE" as CreditNoteType,
+    creditNoteNumber: "CN-2024-001",
+    date: "2024-03-20",
+    type: "QUANTITY_RETURN" as CreditNoteType,
     status: "DRAFT" as CreditNoteStatus,
-    vendorName: "",
-    vendorCode: "",
-    currency: "",
-    invoiceReference: "",
-    invoiceDate: "",
-    taxInvoiceReference: "",
-    taxDate: "",
-    grnReference: "",
-    grnDate: "",
-    reason: "PRICING_ERROR" as CreditNoteReason,
-    description: "",
+    vendorName: "Thai Beverage Co.",
+    vendorCode: "VEN-001",
+    currency: "THB",
+    invoiceReference: "INV-2024-0123",
+    invoiceDate: "2024-03-15",
+    taxInvoiceReference: "TAX-2024-0123",
+    taxDate: "2024-03-15",
+    grnReference: "GRN-2024-0089",
+    grnDate: "2024-03-10",
+    reason: "DAMAGED_GOODS" as CreditNoteReason,
+    description: "Credit note for damaged beverage products received in last shipment. Items show signs of mishandling during transport.",
   });
 
   const handleHeaderChange = (field: string, value: string) => {
@@ -313,72 +347,175 @@ export function CreditNoteComponent() {
 
   const mockStockMovements = [
     {
-      id: "1",
-      documentNo: "CN-001",
-      documentType: "CREDIT_NOTE",
-      date: "2024-03-20",
-      itemCode: "PROD-001",
-      itemName: "Sample Product",
-      itemDescription: "High-quality widget",
-      location: {
-        id: "LOC-001",
-        code: "WH-001",
-        name: "Main Warehouse",
-        type: "WAREHOUSE"
+      id: 1,
+      commitDate: '2024-01-15',
+      postingDate: '2024-01-15',
+      movementType: 'CREDIT_NOTE',
+      sourceDocument: 'CN-2024-001', 
+      store: 'WH-001',
+      status: 'Posted',
+      items: [
+        {
+          id: 1,
+          productName: 'Coffee mate 450 g.',
+          sku: 'BEV-CM450-001',
+          uom: 'Bag',
+          beforeQty: 200,
+          inQty: 0,
+          outQty: 50,
+          afterQty: 150,
+          unitCost: 125.00,
+          totalCost: -6250.00,
+          location: {
+            type: 'INV',
+            code: 'WH-001',
+            name: 'Main Warehouse',
+            displayType: 'Inventory'
+          },
+          lots: [
+            {
+              lotNo: 'L20240115-001',
+              quantity: -30,
+              uom: 'Bag'
+            },
+            {
+              lotNo: 'L20240115-002', 
+              quantity: -20,
+              uom: 'Bag'
+            }
+          ]
+        },
+        {
+          id: 2,
+          productName: 'Heineken Beer 330ml',
+          sku: 'BEV-HB330-002',
+          uom: 'Bottle',
+          beforeQty: 470,
+          inQty: 0,
+          outQty: 120,
+          afterQty: 350,
+          unitCost: 85.00,
+          totalCost: -10200.00,
+          location: {
+            type: 'DIR',
+            code: 'BAR-001',
+            name: 'Main Bar',
+            displayType: 'Direct'
+          },
+          lots: [
+            {
+              lotNo: 'L20240115-003',
+              quantity: -120,
+              uom: 'Bottle'
+            }
+          ]
+        },
+        {
+          id: 3,
+          productName: 'Bath Towel Premium White',
+          sku: 'HK-BT700-001',
+          uom: 'Piece',
+          beforeQty: 250,
+          inQty: 0,
+          outQty: 50,
+          afterQty: 200,
+          unitCost: 450.00,
+          totalCost: -22500.00,
+          location: {
+            type: 'DIR',
+            code: 'HK-001',
+            name: 'Housekeeping Store',
+            displayType: 'Direct'
+          },
+          lots: [
+            {
+              lotNo: 'L20240115-004',
+              quantity: -50,
+              uom: 'Piece'
+            }
+          ]
+        }
+      ],
+      totals: {
+        inQty: 0,
+        outQty: 220,
+        totalCost: -38950.00,
+        lotCount: 4
       },
-      fromLocation: "Main Warehouse",
-      toLocation: "Main Warehouse",
-      quantity: -10,
-      unit: "Box",
-      lotNumber: "LOT-001",
-      baseQuantity: -100,
-      baseUom: "Piece",
-      inventoryUnit: "Box",
-      cost: 100.00,
-      totalCost: 1000.00,
-      netAmount: 1000.00,
-      totalAmount: 1100.00,
-      currency: "USD",
-      extraCost: 100.00,
-      status: "POSTED",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "system",
-      updatedBy: "system"
+      movement: {
+        source: 'Multiple',
+        sourceName: 'Multiple Locations',
+        destination: 'Supplier',
+        destinationName: 'Thai Beverage Co.',
+        type: 'Stock Return'
+      }
+    }
+  ]
+
+  const mockItems: CreditNoteItem[] = [
+    {
+      id: 1,
+      location: {
+        code: 'WH-001',
+        name: 'Main Warehouse'
+      },
+      product: {
+        code: 'BEV-CM450-001',
+        name: 'Coffee mate 450 g.',
+        description: 'Non-dairy coffee creamer'
+      },
+      quantity: {
+        primary: 10,
+        secondary: 100
+      },
+      unit: {
+        primary: 'Box',
+        secondary: 'Bag'
+      },
+      price: {
+        unit: 1250.00,
+        secondary: 125.00
+      },
+      amounts: {
+        net: 12500.00,
+        tax: 875.00,
+        total: 13375.00,
+        baseNet: 437500.00,
+        baseTax: 30625.00,
+        baseTotal: 468125.00
+      }
     },
     {
-      id: "2",
-      documentNo: "CN-001",
-      documentType: "CREDIT_NOTE",
-      date: "2024-03-20",
-      itemCode: "PROD-002",
-      itemName: "Another Product",
-      itemDescription: "Durable gadget",
+      id: 2,
       location: {
-        id: "LOC-001",
-        code: "WH-001",
-        name: "Main Warehouse",
-        type: "WAREHOUSE"
+        code: 'WH-001',
+        name: 'Main Warehouse'
       },
-      fromLocation: "Main Warehouse",
-      toLocation: "Main Warehouse",
-      quantity: -5,
-      unit: "Case",
-      lotNumber: "LOT-002",
-      baseQuantity: -50,
-      baseUom: "Unit",
-      inventoryUnit: "Case",
-      cost: 200.00,
-      totalCost: 1000.00,
-      netAmount: 1000.00,
-      totalAmount: 1100.00,
-      currency: "USD",
-      extraCost: 100.00,
-      status: "POSTED",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "system",
-      updatedBy: "system"
+      product: {
+        code: 'BEV-HB330-002',
+        name: 'Heineken Beer 330ml',
+        description: 'Premium lager beer'
+      },
+      quantity: {
+        primary: 5,
+        secondary: 120
+      },
+      unit: {
+        primary: 'Case',
+        secondary: 'Bottle'
+      },
+      price: {
+        unit: 2040.00,
+        secondary: 85.00
+      },
+      amounts: {
+        net: 10200.00,
+        tax: 714.00,
+        total: 10914.00,
+        baseNet: 357000.00,
+        baseTax: 24990.00,
+        baseTotal: 381990.00
+      }
     }
   ]
 
@@ -388,7 +525,7 @@ export function CreditNoteComponent() {
       <Tabs defaultValue="itemDetails" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="itemDetails">Item Details</TabsTrigger>
-          <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          {/* <TabsTrigger value="inventory">Inventory</TabsTrigger> */}
           <TabsTrigger value="stockMovement">Stock Movement</TabsTrigger>
           <TabsTrigger value="journalEntries">Journal Entries</TabsTrigger>
           <TabsTrigger value="taxEntries">Tax Entries</TabsTrigger>
@@ -418,139 +555,82 @@ export function CreditNoteComponent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <div>Location 1</div>
-                    </TableCell>
-
-                    <TableCell className="font-medium">
-                      <div>Sample Product</div>
-                      <div className="text-sm text-muted-foreground">
-                        High-quality widget
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>10</div>
-                      <div className="text-sm text-muted-foreground">100</div>
-                    </TableCell>
-                    <TableCell>
-                      <div>Box</div>
-                      <div className="text-sm text-muted-foreground">Piece</div>
-                    </TableCell>
-                    <TableCell>
-                      <div>100.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        5,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>1,000.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        50,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>100.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        5,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>1,100.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        55,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleOpeninfo()}
-                      >
-                        <Info className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <div>Location 1</div>
-                    </TableCell>
-
-                    <TableCell className="font-medium">
-                      <div>Another Product</div>
-                      <div className="text-sm text-muted-foreground">
-                        Durable gadget
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>5</div>
-                      <div className="text-sm text-muted-foreground">50</div>
-                    </TableCell>
-                    <TableCell>
-                      <div>Case</div>
-                      <div className="text-sm text-muted-foreground">Unit</div>
-                    </TableCell>
-                    <TableCell>
-                      <div>200.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        10,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>1,000.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        50,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>100.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        5,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>1,100.00</div>
-                      <div className="text-sm text-muted-foreground">
-                        55,000.00
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon">
-                        <Info className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  {mockItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <div>{item.location.name}</div>
+                        <div className="text-sm text-muted-foreground">{item.location.code}</div>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <div>{item.product.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.product.description}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>{item.quantity.primary}</div>
+                        <div className="text-sm text-muted-foreground">{item.quantity.secondary}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div>{item.unit.primary}</div>
+                        <div className="text-sm text-muted-foreground">{item.unit.secondary}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div>{item.price.unit.toFixed(2)}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.price.secondary.toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>{item.amounts.net.toFixed(2)}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.amounts.baseNet.toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>{item.amounts.tax.toFixed(2)}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.amounts.baseTax.toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>{item.amounts.total.toFixed(2)}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.amounts.baseTotal.toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpeninfo()}
+                        >
+                          <Info className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete</span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="inventory">
-          <Inventory />
-        </TabsContent>
+       
         <TabsContent value="stockMovement">
-          <StockMovementTab 
+          {/* <StockMovementTab 
             mode="view" 
             movements={mockStockMovements}
-          />
+          /> */}
+          <StockMovementContent />
         </TabsContent>
         <TabsContent value="journalEntries">
           <JournalEntries />
@@ -577,7 +657,7 @@ export function CreditNoteComponent() {
               </TableHeader>
               <TableBody>
                 <TableRow>
-                  <TableCell>Net Amount</TableCell>
+                  <TableCell>Sub Total Amount</TableCell>
                   <TableCell className="text-right">2,000.00</TableCell>
                   <TableCell className="text-right">100,000.00</TableCell>
                 </TableRow>

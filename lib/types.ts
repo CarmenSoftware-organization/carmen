@@ -389,6 +389,7 @@ export interface PurchaseRequestItem {
     lastPrice: number;
     lastOrderDate: Date;
     lastVendor: string;
+    inventoryUnit: string;
   };
   accountCode: string;
   jobCode: string;
@@ -402,6 +403,7 @@ export interface PurchaseRequestItem {
   taxAmount: number;
   baseTotalAmount: number;
   totalAmount: number;
+  baseCurrency?: string;
 }
 
 export type PurchaseRequestItemStatus =
@@ -516,21 +518,32 @@ export interface GoodsReceiveNoteItem {
   }[];
 }
 
+export interface LocationInfo {
+  type: 'INV' | 'DIR'
+  code: string
+  name: string
+  displayType: 'Inventory' | 'Direct'
+}
+
 export interface StockMovement {
-  id: string;
-  itemName: string;
-  itemDescription: string;
-  unit: string;
-  quantity: number;
-  fromLocation: string;
-  toLocation: string; 
-  lotNumber: string;
-  netAmount: number;
-  extraCost: number;
-  totalAmount: number;
-  cost: number;
-  totalCost: number;
-  currency: string;
+  id?: string | number
+  fromLocation?: string
+  toLocation: string
+  location?: LocationInfo
+  itemName: string
+  itemDescription?: string
+  lotNumber: string
+  unit: string
+  quantity: number
+  cost: number
+  totalCost: number
+  netAmount: number
+  extraCost: number
+  beforeStock: number
+  afterStock: number
+  stockOut: number
+  currency?: string
+  totalAmount?: number
 }
 
 export interface ExtraCost {

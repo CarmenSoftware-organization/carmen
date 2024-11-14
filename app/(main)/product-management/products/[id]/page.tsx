@@ -28,6 +28,7 @@ import StatusBadge from '@/components/ui/custom-status-badge';
 import OrderUnitTab from '@/app/(main)/product-management/products/components/order-unit';
 import IngredientUnitTab from '@/app/(main)/product-management/products/components/ingredients';
 import StockCountUnitTab from '@/app/(main)/product-management/products/components/stock-count';
+import { EnvironmentImpactTab } from './components/tabs/environment-impact'
 
 const productList: Product[] = [
   {
@@ -521,6 +522,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
           <TabsTrigger value="orderUnit">Order Unit</TabsTrigger>
           <TabsTrigger value="ingredientUnit">Ingredient Unit</TabsTrigger>
           <TabsTrigger value="stockCount">Stock Count</TabsTrigger>
+          <TabsTrigger value="environment">Environmental Impact</TabsTrigger>
         </TabsList>
         <TabsContent value="basic">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -817,6 +819,9 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         </TabsContent>
         <TabsContent value="stockCount">
           <StockCountUnitTab />
+        </TabsContent>
+        <TabsContent value="environment">
+          <EnvironmentImpactTab />
         </TabsContent>
       </Tabs>
       <div className="mt-4 space-x-2">

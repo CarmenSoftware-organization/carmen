@@ -1,15 +1,14 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ChevronDown, ChevronRight, Menu, ChevronLeft } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import { useRouter } from 'next/navigation';
 
 const menuItems = [
   {
@@ -168,8 +167,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
-
-const router = useRouter();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -177,133 +175,173 @@ const router = useRouter();
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleIsOpen = () => {
-    isOpen = !isOpen;
+  return (
+    <>
+      <Sheet open={isOpen && !isLargeScreen} onOpenChange={onClose}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            className="lg:hidden"
+            size="icon"
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-[280px] top-[64px]">
+          <SidebarContent menuItems={menuItems} />
+        </SheetContent>
+      </Sheet>
+
+      <aside className={cn(
+        "fixed z-40 h-[calc(100vh-64px)] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300 ease-in-out",
+        "top-[64px]",
+        isOpen ? "translate-x-0" : "-translate-x-full",
+        "lg:translate-x-0",
+        isCollapsed ? "w-[60px]" : "w-[280px]"
+      )}>
+        <div className="flex justify-end p-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden lg:flex"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <ChevronLeft className={cn(
+              "h-4 w-4 transition-transform",
+              isCollapsed ? "rotate-180" : ""
+            )} />
+          </Button>
+        </div>
+        <SidebarContent 
+          menuItems={menuItems} 
+          isCollapsed={isCollapsed}
+        />
+      </aside>
+    </>
+  );
+}
+
+interface SidebarContentProps {
+  menuItems: Array<{
+    title: string;
+    path: string;
+    icon: string;
+    subItems: Array<{ name: string; path: string } | string>;
+  }>;
+  isCollapsed?: boolean;
+}
+
+function SidebarContent({ menuItems, isCollapsed }: SidebarContentProps) {
+  const pathname = usePathname();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const router = useRouter();
+
+  const toggleExpand = (title: string) => {
+    setExpandedItems((prev) =>
+      prev.includes(title)
+        ? prev.filter((item) => item !== title)
+        : [...prev, title]
+    );
   };
 
-
-  const toggleExpand = (title: string, path?: string) => {
-    const menuItem = menuItems.find(item => item.title === title);
-    if (!menuItem?.subItems || menuItem.subItems.length === 0) {
-      // If there are no subitems, navigate to the path
-      router.push(path || '/');
+  const handleItemClick = (item: typeof menuItems[0]) => {
+    if (item.subItems?.length > 0) {
+      toggleExpand(item.title);
     } else {
-      // If there are subitems, toggle the expansion
-      setExpandedItems((prev) =>
-        prev.includes(title)
-          ? prev.filter((item) => item !== title)
-          : [...prev, title]
-      );
+      router.push(item.path);
     }
   };
 
   return (
-    <>
-      <div className="z-50 flex-col gap-4 relative">
-        {isOpen && !isLargeScreen && (
-          <div
-            className="fixed md:sticky inset-0 bg-black/40 z-40"
-            onClick={onClose}
-          />
-        )}
+    <div className="flex flex-col h-full">
+      <ScrollArea className={cn(
+        "flex-1",
+        isCollapsed ? "px-1" : "px-1"
+      )}>
+        <div className="space-y-1">
+          {menuItems.map((item) => {
+            const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
+            const isExpanded = expandedItems.includes(item.title);
+            const isActive = pathname?.startsWith(item.path) ?? false;
 
-        <aside
-          className={cn(
-            "fixed top-0 left-0 z-50 h-full w-[280px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-transform duration-300 ease-in-out",
-            isOpen || isLargeScreen
-              ? "translate-x-0 md:sticky"
-              : "-translate-x-full"
-          )}
-        >
-          <div className="px-8 pt-6 w-fit">
-            <Link
-              href="/"
-              className="text-2xl text-center font-bold text-blue-900 dark:text-blue-100"
-            >
-              CARMEN
-            </Link>
-          </div>
-
-          <ScrollArea className="h-full">
-            <div className="space-y-1 py-4">
-              {menuItems.map((item) => {
-                const IconComponent =
-                  (LucideIcons as any)[item.icon] || LucideIcons.Circle;
-                return (
-                  <div key={item.title} className="px-3 py-2">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between text-base  text-gray-800 dark:text-gray-200"
-                      onClick={() => toggleExpand(item.title, item.path)}
-                    >
+            return (
+              <div key={item.title} className="space-y-1">
+                {item.subItems?.length > 0 ? (
+                  <Button
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn(
+                      "w-full justify-between",
+                      isCollapsed && "px-2"
+                    )}
+                    onClick={() => toggleExpand(item.title)}
+                  >
+                    <span className="flex items-center">
+                      <IconComponent className="h-4 w-4" />
+                      {!isCollapsed && <span className="ml-2">{item.title}</span>}
+                    </span>
+                    {!isCollapsed && item.subItems?.length > 0 && (
+                      isExpanded ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn(
+                      "w-full justify-between",
+                      isCollapsed && "px-2"
+                    )}
+                    asChild
+                  >
+                    <Link href={item.path}>
                       <span className="flex items-center">
-                        <IconComponent className="mr-2 h-5 w-5" />
-                        {item.title}
+                        <IconComponent className="h-4 w-4" />
+                        {!isCollapsed && <span className="ml-2">{item.title}</span>}
                       </span>
-                      {item.subItems &&
-                        item.subItems.length > 0 &&
-                        (expandedItems.includes(item.title) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        ))}
-                    </Button>
-                    {item.subItems &&
-                      item.subItems.length > 0 &&
-                      expandedItems.includes(item.title) && (
-                        <div className="ml-4 mt-2 space-y-1">
-                          {item.subItems.map((subItem, index) => (
-                            <Button
-                              key={
-                                typeof subItem === "string"
-                                  ? subItem
-                                  : subItem.name
-                              }
-                              variant="ghost"
-                              asChild
-                              className={cn(
-                                "w-full justify-start text-sm text-foreground dark:text-gray-100",
-                                pathname ===
-                                  (typeof subItem === "string"
-                                    ? `${item.path}/${subItem
-                                        .toLowerCase()
-                                        .replace(/\s+/g, "-")}`
-                                    : subItem.path)
-                                  ? "bg-muted hover:bg-muted"
-                                  : "hover:bg-transparent hover:underline"
-                              )}
-                              onClick={() => !isLargeScreen && onClose()}
-                            >
-                              <Link
-                                href={
-                                  typeof subItem === "string"
-                                    ? `${item.path}/${subItem
-                                        .toLowerCase()
-                                        .replace(/\s+/g, "-")}`
-                                    : subItem.path
-                                }
-                              >
-                                {typeof subItem === "string"
-                                  ? subItem
-                                  : subItem.name}
-                              </Link>
-                            </Button>
-                          ))}
-                        </div>
-                      )}
+                    </Link>
+                  </Button>
+                )}
+
+                {!isCollapsed && isExpanded && item.subItems?.length > 0 && (
+                  <div className="pl-6 space-y-1">
+                    {item.subItems.map((subItem, index) => {
+                      const subItemPath = typeof subItem === "string"
+                        ? `${item.path}/${subItem.toLowerCase().replace(/\s+/g, "-")}`
+                        : subItem.path;
+                      const subItemName = typeof subItem === "string" ? subItem : subItem.name;
+                      const isSubItemActive = pathname === subItemPath;
+
+                      return (
+                        <Button
+                          key={index}
+                          variant={isSubItemActive ? "secondary" : "ghost"}
+                          className="w-full justify-start"
+                          asChild
+                        >
+                          <Link href={subItemPath}>
+                            {subItemName}
+                          </Link>
+                        </Button>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
-        </aside>
-      </div>
-    </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
 

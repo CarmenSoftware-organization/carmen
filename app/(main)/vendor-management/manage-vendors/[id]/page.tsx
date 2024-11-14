@@ -1,335 +1,238 @@
 'use client'
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import DetailPageTemplate from '@/components/templates/DetailPageTemplate';
-import FormPageTemplate from '@/components/templates/FormPageTemplate';
+
+import { Suspense, useState } from 'react'
+import { notFound } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import DetailPageTemplate from '@/components/templates/DetailPageTemplate'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, 
+         AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, 
+         AlertDialogAction } from "@/components/ui/alert-dialog"
 import { toast } from "@/components/ui/use-toast"
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Vendor } from './types'
+import { MOCK_VENDORS } from '../data/mock'
+import { updateVendor } from '../actions'
+import { BasicInfoSection } from './sections/basic-info-section'
+import { AddressesSection } from './sections/addresses-section'
+import { ContactsSection } from './sections/contacts-section'
+import { EnvironmentalProfile } from './sections/environmental-profile'
+import { CertificationsSection } from './sections/certifications-section'
 
-import { Vendor, Address, Contact } from '@/lib/types';
-
-const VendorData : Vendor = {
-  id: "1",
-  companyName: "Tech Innovations Inc.",
-  businessRegistrationNumber: "BRN123456789",
-  taxId: "TID987654321",
-  establishmentDate: "2010-05-15",
-  businessTypeId: "TECH001",
-  isActive: true,
-  addresses: [
-    {
-      id: "ADDR001",
-      addressType: "MAIN",
-      addressLine: "123 Silicon Valley",
-      subDistrictId: "SD001",
-      districtId: "D001",
-      provinceId: "P001",
-      postalCode: "94025",
-      isPrimary: true
-    },
-    {
-      id: "ADDR002",
-      addressType: "BILLING",
-      addressLine: "456 Finance Street",
-      subDistrictId: "SD002",
-      districtId: "D002",
-      provinceId: "P002",
-      postalCode: "94026",
-      isPrimary: false
-    }
-  ],
-  contacts: [
-    {
-      id: "CONT001",
-      name: "John Doe",
-      position: "CEO",
-      phone: "555-1234",
-      email: "john.doe@techinnovations.com",
-      department: "Executive",
-      isPrimary: true
-    },
-    {
-      id: "CONT002",
-      name: "Jane Smith",
-      position: "CTO",
-      phone: "555-5678",
-      email: "jane.smith@techinnovations.com",
-      department: "Technology",
-      isPrimary: false
-    }
-  ],
-  rating: 4.8
+export default function VendorDetailPage({ params }: { params: { id: string } }) {
+  return (
+    <Suspense fallback={<VendorDetailSkeleton />}>
+      <VendorDetail id={params.id} />
+    </Suspense>
+  )
 }
 
-export default function VendorDetail({ params }: { params: { id: string } }) {
-  const router = useRouter();
-  const [vendor, setVendor] = useState<Vendor | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+function VendorDetail({ id }: { id: string }) {
+  const router = useRouter()
+  const [vendor, setVendor] = useState<Vendor | null>(MOCK_VENDORS[id] || null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  useEffect(() => {
-    async function fetchVendor() {
-      try {
-        
-        // const response = await fetch(`/api/vendors/${params.id}`);
-        // if (!response.ok) {
-        //   throw new Error('Failed to fetch vendor');
-        // }
-        // const data = await response.json();
+  if (!vendor) return notFound()
 
-        const data = VendorData;
-        setVendor(data);
-      } catch (error) {
-        setError('Error fetching vendor xxxx');
-        console.error('Error fetching vendor:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchVendor();
-    
-  }, [params.id]);
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
+  const handleEdit = () => setIsEditing(true)
+  const handleCancel = () => setIsEditing(false)
 
   const handleSave = async () => {
-    try {
-      const response = await fetch(`/api/vendors/${vendor?.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(vendor),
-      });
+    if (!vendor) return
 
-      if (!response.ok) throw new Error('Failed to update vendor');
-
-      toast({ title: "Vendor updated successfully" });
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating vendor:', error);
-      toast({ title: "Error", description: "Failed to update vendor", variant: "destructive" });
+    const result = await updateVendor(vendor)
+    
+    if (result.error) {
+      toast({
+        title: "Error",
+        description: result.error,
+        variant: "destructive"
+      })
+      return
     }
-  };
+
+    toast({
+      title: "Success",
+      description: "Vendor updated successfully"
+    })
+    
+    setIsEditing(false)
+    router.refresh()
+  }
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this vendor?')) {
-      try {
-        const response = await fetch(`/api/vendors/${vendor?.id}`, {
-          method: 'DELETE',
-        });
-
-        if (!response.ok) throw new Error('Failed to delete vendor');
-
-        toast({ title: "Vendor deleted successfully" });
-        router.push('/vendors');
-      } catch (error) {
-        console.error('Error deleting vendor:', error);
-        toast({ title: "Error", description: "Failed to delete vendor", variant: "destructive" });
-      }
+    try {
+      // Mock delete success
+      toast({
+        title: "Success",
+        description: "Vendor deleted successfully"
+      })
+      router.push('/vendor-management/manage-vendors')
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete vendor",
+        variant: "destructive"
+      })
     }
-  };
+  }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleFieldChange = (name: string, value: any) => {
     setVendor(prev => {
       if (!prev) return prev
       return { ...prev, [name]: value }
     })
   }
-
-  const handleSwitchChange = () => {
-    setVendor(prev => {
-      if (!prev) return prev
-      return { ...prev, isActive: !prev.isActive }
-    })
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setVendor(prev => {
-      if (!prev) return prev
-      return { ...prev, [name]: value }
-    })
-  }
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!vendor) return <div>Vendor not found</div>;
 
   const actionButtons = (
     <>
       {isEditing ? (
-        <>
-          <Button onClick={handleSave}>Save</Button>
-          <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
-        </>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleSave}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Save Changes
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
+        </div>
       ) : (
-        <>
-          <Button onClick={handleEdit}>Edit</Button>
-          <Button variant="destructive" onClick={handleDelete}>Delete</Button>
-        </>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleEdit}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Edit Vendor
+          </Button>
+          <Button 
+            variant="destructive" 
+            onClick={() => setIsDeleting(true)}
+          >
+            Delete Vendor
+          </Button>
+        </div>
       )}
     </>
-  );
+  )
 
   const content = (
-    <Tabs defaultValue="basic">
-      <TabsList>
-        <TabsTrigger value="basic">Basic Info</TabsTrigger>
-        <TabsTrigger value="addresses">Addresses</TabsTrigger>
-        <TabsTrigger value="contacts">Contacts</TabsTrigger>
-      </TabsList>
-      <TabsContent value="basic">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="companyName">Company Name</Label>
-            <Input
-              id="companyName"
-              name="companyName"
-              value={vendor.companyName}
-              onChange={handleChange}
-              disabled={!isEditing}
+    <>
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-medium">Basic Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BasicInfoSection
+              vendor={vendor}
+              isEditing={isEditing}
+              onFieldChange={handleFieldChange}
             />
-          </div>
-          <div>
-            <Label htmlFor="businessRegistrationNumber">Business Registration Number</Label>
-            <Input
-              id="businessRegistrationNumber"
-              name="businessRegistrationNumber"
-              value={vendor.businessRegistrationNumber}
-              onChange={handleChange}
-              disabled={!isEditing}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-medium">Environmental Impact</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EnvironmentalProfile 
+              vendorId={id}
+              environmentalData={vendor.environmentalImpact}
             />
-          </div>
-          <div>
-            <Label htmlFor="taxId">Tax ID</Label>
-            <Input
-              id="taxId"
-              name="taxId"
-              value={vendor.taxId}
-              onChange={handleChange}
-              disabled={!isEditing}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-medium">Addresses</CardTitle>
+              {isEditing && (
+                <Button size="sm" variant="outline">
+                  Add Address
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <AddressesSection
+              addresses={vendor.addresses}
+              isEditing={isEditing}
+              onAddressChange={handleFieldChange}
             />
-          </div>
-          <div>
-            <Label htmlFor="establishmentDate">Establishment Date</Label>
-            <Input
-              id="establishmentDate"
-              name="establishmentDate"
-              type="date"
-              value={vendor.establishmentDate}
-              onChange={handleChange}
-              disabled={!isEditing}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-medium">Contacts</CardTitle>
+              {isEditing && (
+                <Button size="sm" variant="outline">
+                  Add Contact
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ContactsSection
+              contacts={vendor.contacts}
+              isEditing={isEditing}
+              onContactChange={handleFieldChange}
             />
-          </div>
-          <div>
-            <Label htmlFor="businessTypeId">Business Type</Label>
-            <Select
-              name="businessTypeId"
-              value={vendor.businessTypeId}
-              onValueChange={(value) => handleSelectChange('businessTypeId', value)}
-              disabled={!isEditing}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-medium">Certifications</CardTitle>
+              {isEditing && (
+                <Button size="sm" variant="outline">
+                  Add Certification
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <CertificationsSection
+              certifications={vendor.certifications}
+              isEditing={isEditing}
+              onCertificationChange={handleFieldChange}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the vendor
+              and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select business type" />
-              </SelectTrigger>
-              <SelectContent>
-                {/* Add business type options here */}
-                <SelectItem value="1">Type 1</SelectItem>
-                <SelectItem value="2">Type 2</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="isActive"
-              checked={vendor.isActive}
-              onCheckedChange={handleSwitchChange}
-              disabled={!isEditing}
-            />
-            <Label htmlFor="isActive">Active</Label>
-          </div>
-        </div>
-      </TabsContent>
-      <TabsContent value="addresses">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Primary</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {vendor.addresses.map((address) => (
-              <TableRow key={address.id}>
-                <TableCell>{address.addressType}</TableCell>
-                <TableCell>{address.addressLine}</TableCell>
-                <TableCell>{address.isPrimary ? 'Yes' : 'No'}</TableCell>
-                <TableCell>
-                  {isEditing && (
-                    <>
-                      <Button variant="ghost">Edit</Button>
-                      <Button variant="ghost">Delete</Button>
-                    </>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {isEditing && <Button className="mt-4">Add Address</Button>}
-      </TabsContent>
-      <TabsContent value="contacts">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Position</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Primary</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {vendor.contacts.map((contact) => (
-              <TableRow key={contact.id}>
-                <TableCell>{contact.name}</TableCell>
-                <TableCell>{contact.position}</TableCell>
-                <TableCell>{contact.phone}</TableCell>
-                <TableCell>{contact.email}</TableCell>
-                <TableCell>{contact.isPrimary ? 'Yes' : 'No'}</TableCell>
-                <TableCell>
-                  {isEditing && (
-                    <>
-                      <Button variant="ghost">Edit</Button>
-                      <Button variant="ghost">Delete</Button>
-                    </>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {isEditing && <Button className="mt-4">Add Contact</Button>}
-      </TabsContent>
-    </Tabs>
-  );
+              Delete Vendor
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
 
   return (
     <DetailPageTemplate
@@ -338,5 +241,29 @@ export default function VendorDetail({ params }: { params: { id: string } }) {
       content={content}
       backLink="/vendor-management/manage-vendors"
     />
-  );
+  )
+}
+
+function VendorDetailSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-8 w-[300px]" />
+      <div className="grid gap-6">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardHeader className="pb-3">
+              <Skeleton className="h-6 w-[140px]" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-3/4" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
 }

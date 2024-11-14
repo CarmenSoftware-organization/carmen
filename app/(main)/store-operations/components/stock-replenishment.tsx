@@ -22,6 +22,29 @@ import {
   Search,
   Filter
 } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+
+interface Item {
+  id: number
+  name: string
+  sku: string
+  description: string
+  location: string
+  locationCode: string
+  currentStock: number
+  minLevel: number
+  maxLevel: number
+  parLevel: number
+  onOrder: number
+  reorderPoint: number
+  lastPrice: number
+  lastVendor: string
+  status: string
+  usage: string
+  orderAmount: number
+  unit: string
+  selected?: boolean
+}
 
 const StockReplenishmentDashboard = () => {
   const stockLevels = [
@@ -33,12 +56,14 @@ const StockReplenishmentDashboard = () => {
     { month: 'Jun', level: 140 },
   ];
 
-  const items = [
+  const [items, setItems] = useState<Item[]>([
     {
       id: 1,
-      name: 'Thai Milk Tea (12 pack)',
+      name: 'Thai Milk Tea',
+      description: 'Premium Thai tea powder with creamer (12 sachets/box)',
       sku: 'BEV-001',
       location: 'Central Kitchen',
+      locationCode: 'CK-001',
       currentStock: 25,
       minLevel: 30,
       maxLevel: 100,
@@ -50,12 +75,15 @@ const StockReplenishmentDashboard = () => {
       status: 'low',
       usage: 'high',
       orderAmount: 0,
+      unit: 'Box'
     },
     {
       id: 2,
-      name: 'Coffee Beans (1kg)',
+      name: 'Coffee Beans',
+      description: 'Premium Arabica whole beans (1kg/bag)',
       sku: 'BEV-002',
       location: 'Roastery Store',
+      locationCode: 'RS-001',
       currentStock: 45,
       minLevel: 20,
       maxLevel: 80,
@@ -67,8 +95,9 @@ const StockReplenishmentDashboard = () => {
       status: 'normal',
       usage: 'medium',
       orderAmount: 0,
+      unit: 'Bag'
     }
-  ];
+  ]);
 
   return (
     <div className="space-y-4">
@@ -154,18 +183,25 @@ const StockReplenishmentDashboard = () => {
       {/* Inventory Table */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Inventory Status</CardTitle>
-            <div className="flex gap-2">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-                <Input className="pl-8" placeholder="Search items..." />
-              </div>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Filters
-              </Button>
+          <div className="flex flex-col gap-4">
+            {/* First Row - Title and Create Button */}
+            <div className="flex justify-between items-center">
+              <CardTitle>Inventory Status</CardTitle>
               <Button>Create Requisition</Button>
+            </div>
+            
+            {/* Second Row - Search and Filters with justify-between */}
+            <div className="flex items-center justify-between">
+              <div className="relative w-1/2">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <Input className="pl-8 w-full" placeholder="Search items..." />
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filters
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -174,16 +210,28 @@ const StockReplenishmentDashboard = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setItems(items.map(item => ({
+                          ...item,
+                          selected: checked
+                        })))
+                      }}
+                    />
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">PAR Level</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Reorder Point</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">On Order</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Order Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Unit</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -192,9 +240,33 @@ const StockReplenishmentDashboard = () => {
                   
                   return (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.sku}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.location}</td>
+                      <td className="px-6 py-4">
+                        <input
+                          type="checkbox"
+                          className="rounded border-gray-300"
+                          checked={item.selected}
+                          onChange={(e) => {
+                            setItems(items.map(i => 
+                              i.id === item.id ? { ...i, selected: e.target.checked } : i
+                            ))
+                          }}
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="space-y-1">
+                          <div className="font-medium text-gray-900">{item.location}</div>
+                          <div className="text-sm text-gray-500">{item.locationCode}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium text-gray-900">{item.name}</div>
+                            <div className="text-sm text-gray-500">({item.sku})</div>
+                          </div>
+                          <div className="text-sm text-gray-500">{item.description}</div>
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                         <span className={`${item.currentStock < item.reorderPoint ? 'text-red-500 font-medium' : ''}`}>
                           {item.currentStock}
@@ -211,9 +283,26 @@ const StockReplenishmentDashboard = () => {
                           defaultValue={suggestedOrder}
                           className="w-20 text-right"
                           onChange={(e) => {
-                            console.log('Updated order amount:', e.target.value);
+                            const newItems = items.map(i => 
+                              i.id === item.id ? { ...i, orderAmount: parseInt(e.target.value) } : i
+                            );
+                            setItems(newItems);
                           }}
                         />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <Select defaultValue={item.unit}>
+                          <SelectTrigger className="w-[100px]">
+                            <SelectValue placeholder="Select unit" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Box">Box</SelectItem>
+                            <SelectItem value="Bag">Bag</SelectItem>
+                            <SelectItem value="Pack">Pack</SelectItem>
+                            <SelectItem value="Piece">Piece</SelectItem>
+                            <SelectItem value="Kg">Kg</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 text-xs rounded-full ${
@@ -223,11 +312,6 @@ const StockReplenishmentDashboard = () => {
                         }`}>
                           {item.status.toUpperCase()}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Button variant="outline" size="sm">
-                          Create Order
-                        </Button>
                       </td>
                     </tr>
                   );

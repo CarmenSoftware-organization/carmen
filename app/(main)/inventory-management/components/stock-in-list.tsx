@@ -832,10 +832,10 @@ export const StockInListing = () => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex flex-col gap-1">
-                                  <span className={`px-2 py-1 text-xs rounded-full ${getTypeBadgeClass(transaction.type)} w-fit`}>
+                                  <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getTypeBadgeClass(transaction.type)} w-fit`}>
                                     {transaction.type}
                                   </span>
-                                  <span className="text-sm text-blue-600">
+                                  <span className="block mt-1 text-sm text-blue-600">
                                     {transaction.relatedDoc}
                                   </span>
                                 </div>
@@ -852,7 +852,7 @@ export const StockInListing = () => {
                                 {transaction.totalQty.toLocaleString()}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeClass(transaction.status)}`}>
+                                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusBadgeClass(transaction.status)}`}>
                                   {transaction.status}
                                 </span>
                               </td>

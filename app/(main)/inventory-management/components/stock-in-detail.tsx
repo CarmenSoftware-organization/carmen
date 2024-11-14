@@ -806,14 +806,15 @@ export function StockInDetail({ mode, onClose, data }: StockInDetailProps) {
                             </td>
                             <td className="px-6 py-4">
                               <div className="text-sm font-medium text-gray-900">
-                                {TRANSACTION_TYPES.DIRECT.PURCHASE_RECEIVE.requiresApproval ? 
-                                  <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
+                                {TRANSACTION_TYPES.DIRECT.PURCHASE_RECEIVE.requiresApproval ? (
+                                  <span className="inline-flex px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
                                     Pending Approval
-                                  </span> :
-                                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
                                     Approved
                                   </span>
-                                }
+                                )}
                               </div>
                             </td>
                           </tr>

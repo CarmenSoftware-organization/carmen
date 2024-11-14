@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus, Filter, ArrowUpDown } from 'lucide-react'
+import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus, Filter, ArrowUpDown, Download, Printer } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
@@ -20,6 +20,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { FilterBuilder } from './FilterBuilder'
+
+type GoodsReceiveNoteStatus = 
+  | "Draft"
+  | "In Process"
+  | "Complete"
+  | "Reject"
+  | "Voided"
+  | "Accept"
+  | "Review"
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
@@ -93,12 +102,16 @@ export function GoodsReceiveNoteList() {
 
   const title = 'Goods Receive Notes'
   const actionButtons = (
-    <div className="flex flex-col sm:flex-row space-y-2 sm:space-x-2">
+    <div className="flex flex-col sm:flex-row ">
       <Button className="w-full sm:w-auto" onClick={handleAddNewGoodsReceiveNote}>
-        <Plus className="mr-2 h-4 w-4" /> New Goods Receive Note
+        <Plus className="mr-2 h-4 w-4" />Goods Receive Note
       </Button>
-      <Button variant="outline" className="w-full sm:w-auto">Export</Button>
-      <Button variant="outline" className="w-full sm:w-auto">Print</Button>
+      <Button variant="outline" className="w-full sm:w-auto">
+        <Download className="mr-2 h-4 w-4" /> Export
+      </Button>
+      <Button variant="outline" className="w-full sm:w-auto">
+        <Printer className="mr-2 h-4 w-4" /> Print
+      </Button>
     </div>
   )
 

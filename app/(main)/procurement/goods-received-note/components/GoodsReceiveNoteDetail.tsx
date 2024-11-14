@@ -18,6 +18,7 @@ import { ArrowLeft, Edit, Trash, Printer, Send, Save } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FinancialSummaryTab } from './tabs/FinancialSummaryTab'
 import { ActivityLogTab } from './tabs/ActivityLogTab'
+import StockMovementContent from './tabs/stock-movement'
 
 interface GoodsReceiveNoteDetailProps {
   id?: string
@@ -426,9 +427,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
           />
         </TabsContent>
         <TabsContent value="stock-movement">
-          <StockMovementTab 
-            mode={mode}
-            movements={formData.stockMovements || []}
+          <StockMovementContent 
           />
         </TabsContent>
         <TabsContent value="financial-summary">

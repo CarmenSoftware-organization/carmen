@@ -1,34 +1,13 @@
-import { NextResponse } from "next/server";
-import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-const publicRoutes = ["/", "/login", "/signup"];
-const mainRoutes = [
-  "/dashboard",
-  "/procurement",
-  "/store-operations",
-  "/inventory-management",
-  "/operational-planning",
-  "/production",
-  "/reporting-analytics",
-  "/finance",
-  "/system-administration",
-  "/help-support"
-];
-
-export function middleware(request: Request) {
-  const url = new URL(request.url);
-  const cookieStore = cookies();
-  const isLoggedIn = cookieStore.get('isLoggedIn')?.value === 'true';
+export function middleware(request: NextRequest) {
+  // Make sure /dashboard is in your public routes if you have authentication
+  const publicRoutes = ['/login', '/register', '/dashboard']
   
-  // if (!publicRoutes.includes(url.pathname) && !mainRoutes.some(route => url.pathname.startsWith(route))) {
-  //   if (!isLoggedIn) {
-  //     return NextResponse.redirect(new URL('/login', request.url));
-  //   }
-  // }
-
-  return NextResponse.next();
+  // Your middleware logic here
 }
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
-};
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}

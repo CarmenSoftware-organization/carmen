@@ -26,6 +26,8 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   RotateCcwIcon,
+  CheckCircle,
+  X,
 } from "lucide-react";
 import { PRHeader } from "./PRHeader";
 import { ItemsTab } from "./tabs/ItemsTab";
@@ -137,16 +139,57 @@ export default function PRDetailPage() {
     <div className="container mx-auto py-0">
       <Card className="mb-6 bg-white dark:bg-gray-800">
         <CardHeader className="flex flex-col space-y-4 bg-white dark:bg-gray-800">
-          <PRHeader
-            title={
-              mode === "add"
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">
+              {mode === "add"
                 ? "Create New Purchase Request"
-                : "Purchase Request Details"
-            }
-            mode={mode}
-            onModeChange={handleModeChange}
-            onDocumentAction={handleDocumentAction}
-          />
+                : "Purchase Request Details"}
+            </h1>
+            <div className="flex items-center gap-2">
+              {/* Edit/Save/Cancel buttons */}
+              {mode === "view" ? (
+                <Button onClick={() => handleModeChange("edit")}>
+                  <PencilIcon className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button variant="default" onClick={handleSubmit}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Save
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setMode("view");
+                      // Reset form data to original if needed
+                      if (!isAddMode) setFormData(samplePRData);
+                    }}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel
+                  </Button>
+                </>
+              )}
+              
+              {/* Separator between edit/save buttons and action buttons */}
+              <div className="w-px h-6 bg-border mx-2" />
+              
+              {/* Action buttons that are always visible */}
+              <Button variant="outline" size="sm">
+                <PrinterIcon className="mr-2 h-4 w-4" />
+                Print
+              </Button>
+              <Button variant="outline" size="sm">
+                <DownloadIcon className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              <Button variant="outline" size="sm">
+                <ShareIcon className="mr-2 h-4 w-4" />
+                Share
+              </Button>
+            </div>
+          </div>
           <Card className="bg-white dark:bg-gray-800">
             <CardContent className="p-4">
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -315,18 +358,18 @@ export default function PRDetailPage() {
                   <ActivityTab />
                 </TabsContent>
               </ScrollArea>
-              {(mode === "edit" || mode === "add") && (
-                <Button type="submit" className="mt-6">
-                  {mode === "add" ? "Create Purchase Request" : "Update"}
-                </Button>
-              )}
+              {/* {(mode === "edit" || mode === "add") && (
+                // <Button type="submit" className="mt-6">
+                //   {mode === "add" ? "Create Purchase Request" : "Update"}
+                // </Button>
+              )} */}
             </form>
           </Tabs>
           
             {/* Add SummaryTotal component here */}
           <Card className="mt-6 bg-white dark:bg-gray-800">
             <CardHeader>
-              <CardTitle>Purchase Request Summary</CardTitle>
+              <CardTitle>Transaction Summary</CardTitle>
             </CardHeader>
             <CardContent>
               <SummaryTotal prData={formData} />
@@ -336,10 +379,10 @@ export default function PRDetailPage() {
         </CardContent>
         {mode !== "add" && (
           <CardFooter className="flex justify-end space-x-2">
-            {[
+            {mode === "view" && [
               { action: "approve", icon: CheckCircleIcon, color: "green" },
-              { action: "reject", icon: XCircleIcon, color: "red" },
-              { action: "sendBack", icon: RotateCcwIcon, color: "orange" },
+              { action: "reject", icon: XCircleIcon, color: "white" },
+              { action: "sendBack", icon: RotateCcwIcon, color: "white" },
             ].map(({ action, icon: Icon, color }) => (
               <Button
                 key={action}
@@ -347,8 +390,8 @@ export default function PRDetailPage() {
                 variant={color === "green" ? "default" : "outline"}
                 size="sm"
                 className={`${
-                  color === "red"
-                    ? "bg-red-500 hover:bg-red-600 text-white"
+                  color === "white"
+                    ? "bg-white hover:bg-gray-200 text-black"
                     : color === "orange"
                     ? "bg-orange-500 hover:bg-orange-600 text-white"
                     : ""

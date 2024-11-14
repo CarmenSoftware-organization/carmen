@@ -1,5 +1,6 @@
 'use client'
 
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -20,13 +21,27 @@ import {
   Paperclip,
   History,
   Plus,
-  Trash2
+  Trash2,
+  Check,
+  AlertCircle,
+  Split,
+  X,
+  Calculator
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
-import { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Box } from 'lucide-react'
+import StatusBadge from '@/components/ui/custom-status-badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from '@/components/ui/input'
+import { ApprovalLogDialog } from './approval-log-dialog'
+import { JournalEntriesTab } from './tabs/journal-entries-tab'
 
 interface StoreRequisitionDetailProps {
   id: string
@@ -36,6 +51,7 @@ interface StoreRequisitionDetailProps {
 const mockRequisition = {
   refNo: 'SR-2024-001',
   date: '2024-01-15',
+  expectedDeliveryDate: '2024-01-20',
   movementType: 'Issue',
   description: 'Monthly supplies request',
   requestedFrom: 'M01 : Main Store',
@@ -61,12 +77,16 @@ const mockRequisition = {
       },
       itemInfo: {
         location: 'Central Kitchen',
+        locationCode: 'CK001',
         itemName: 'Thai Milk Tea',
         category: 'Beverage',
         subCategory: 'Tea',
         itemGroup: 'Packaged Drinks',
-        barCode: '8851234567890'
-      }
+        barCode: '8851234567890',
+        locationType: 'direct'
+      },
+      qtyIssued: 5,
+      approvalStatus: 'Accept'
     },
     {
       id: 2,
@@ -85,12 +105,16 @@ const mockRequisition = {
       },
       itemInfo: {
         location: 'Roastery Store',
+        locationCode: 'RS001',
         itemName: 'Premium Coffee Beans',
         category: 'Beverage',
         subCategory: 'Coffee',
         itemGroup: 'Raw Materials',
-        barCode: '8851234567891'
-      }
+        barCode: '8851234567891',
+        locationType: 'inventory'
+      },
+      qtyIssued: 10,
+      approvalStatus: 'Reject'
     },
     {
       id: 3,
@@ -109,12 +133,16 @@ const mockRequisition = {
       },
       itemInfo: {
         location: 'Main Warehouse',
+        locationCode: 'MW001',
         itemName: 'Paper Cup 16oz',
         category: 'Packaging',
         subCategory: 'Cups',
         itemGroup: 'Disposables',
-        barCode: '8851234567892'
-      }
+        barCode: '8851234567892',
+        locationType: 'direct'
+      },
+      qtyIssued: 15,
+      approvalStatus: 'Accept'
     },
     {
       id: 4,
@@ -133,12 +161,16 @@ const mockRequisition = {
       },
       itemInfo: {
         location: 'Central Kitchen',
+        locationCode: 'CK001',
         itemName: 'Chocolate Syrup',
         category: 'Ingredients',
         subCategory: 'Syrups',
         itemGroup: 'Flavorings',
-        barCode: '8851234567893'
-      }
+        barCode: '8851234567893',
+        locationType: 'direct'
+      },
+      qtyIssued: 4,
+      approvalStatus: 'Review'
     },
     {
       id: 5,
@@ -157,12 +189,16 @@ const mockRequisition = {
       },
       itemInfo: {
         location: 'Main Warehouse',
+        locationCode: 'MW001',
         itemName: 'Plastic Straw',
         category: 'Packaging',
         subCategory: 'Straws',
         itemGroup: 'Disposables',
-        barCode: '8851234567894'
-      }
+        barCode: '8851234567894',
+        locationType: 'direct'
+      },
+      qtyIssued: 20,
+      approvalStatus: 'Accept'
     },
     {
       id: 6,
@@ -181,12 +217,16 @@ const mockRequisition = {
       },
       itemInfo: {
         location: 'Central Kitchen',
+        locationCode: 'CK001',
         itemName: 'Green Tea Powder',
         category: 'Beverage',
         subCategory: 'Tea',
         itemGroup: 'Raw Materials',
-        barCode: '8851234567895'
-      }
+        barCode: '8851234567895',
+        locationType: 'direct'
+      },
+      qtyIssued: 3,
+      approvalStatus: 'Reject'
     }
   ],
   comments: [
@@ -261,9 +301,224 @@ const mockStockMovements = [
   }
 ]
 
+// Add type for approval logs
+interface ApprovalLogEntry {
+  id: number
+  date: string
+  status: 'Accept' | 'Reject' | 'Review'
+  by: string
+  comments: string
+}
+
+interface ApprovalLogs {
+  [key: number]: ApprovalLogEntry[]
+}
+
+// Update the mock data with proper typing
+const mockApprovalLogs: ApprovalLogs = {
+  1: [
+    {
+      id: 1,
+      date: '2024-01-15 14:30',
+      status: 'Accept',
+      by: 'John Doe',
+      comments: 'Quantity approved as requested'
+    },
+    {
+      id: 2,
+      date: '2024-01-15 10:15',
+      status: 'Review',
+      by: 'Jane Smith',
+      comments: 'Please check stock availability'
+    }
+  ],
+  2: [
+    {
+      id: 1,
+      date: '2024-01-15 13:00',
+      status: 'Reject',
+      by: 'Mike Johnson',
+      comments: 'Insufficient stock available'
+    }
+  ],
+  3: [
+    {
+      id: 1,
+      date: '2024-01-15 11:45',
+      status: 'Accept',
+      by: 'Sarah Wilson',
+      comments: 'Approved as per request'
+    }
+  ]
+} as const
+
+// Add the ApprovalBadge component
+function ApprovalBadge({ status }: { status: 'Accept' | 'Reject' | 'Review' }) {
+  const styles = {
+    Accept: 'bg-green-100 text-green-800',
+    Reject: 'bg-red-100 text-red-800',
+    Review: 'bg-yellow-100 text-yellow-800'
+  }
+
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
+      {status}
+    </span>
+  )
+}
+
+// Add interface for movements
+interface StockMovement {
+  id: number
+  movementType: string
+  sourceDocument: string
+  commitDate: string
+  postingDate: string
+  status: string
+  movement: {
+    source: string
+    sourceName: string
+    destination: string
+    destinationName: string
+    type: string
+  }
+  items: {
+    id: number
+    productName: string
+    sku: string
+    uom: string
+    beforeQty: number
+    inQty: number
+    outQty: number
+    afterQty: number
+    unitCost: number
+    totalCost: number
+    location: {
+      type: 'INV' | 'DIR'
+      code: string
+      name: string
+      displayType: string
+    }
+    lots: {
+      lotNo: string
+      quantity: number
+      uom: string
+    }[]
+  }[]
+  totals: {
+    inQty: number
+    outQty: number
+    totalCost: number
+    lotCount: number
+  }
+}
+
+// Update the mock movements data to reflect the requisition items
+const movements: StockMovement[] = [
+  {
+    id: 1,
+    movementType: 'STORE_REQUISITION',
+    sourceDocument: mockRequisition.refNo,
+    commitDate: mockRequisition.date,
+    postingDate: mockRequisition.date,
+    status: 'Posted',
+    items: mockRequisition.items.map(item => ({
+      id: item.id,
+      productName: item.itemInfo.itemName,
+      sku: item.description,
+      uom: item.unit,
+      beforeQty: item.inventory.onHand,
+      inQty: 0,
+      outQty: item.qtyIssued || 0,
+      afterQty: item.inventory.onHand - (item.qtyIssued || 0),
+      unitCost: item.costPerUnit,
+      totalCost: (item.qtyIssued || 0) * item.costPerUnit,
+      location: {
+        type: item.itemInfo.locationType === 'inventory' ? 'INV' : 'DIR',
+        code: item.itemInfo.locationCode,
+        name: item.itemInfo.location,
+        displayType: item.itemInfo.locationType === 'inventory' ? 'Inventory' : 'Direct'
+      },
+      lots: [
+        {
+          lotNo: `LOT-${mockRequisition.date}-${item.id.toString().padStart(3, '0')}`,
+          quantity: -(item.qtyIssued || 0),
+          uom: item.unit
+        }
+      ]
+    })),
+    movement: {
+      source: 'Main Store',
+      sourceName: 'Main Store',
+      destination: mockRequisition.department,
+      destinationName: mockRequisition.department,
+      type: 'Store Requisition'
+    },
+    totals: {
+      inQty: 0,
+      outQty: mockRequisition.items.reduce((sum, item) => sum + (item.qtyIssued || 0), 0),
+      totalCost: mockRequisition.items.reduce((sum, item) => sum + ((item.qtyIssued || 0) * item.costPerUnit), 0),
+      lotCount: mockRequisition.items.length
+    }
+  }
+]
+
 export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailProps) {
   const router = useRouter()
   const [items, setItems] = useState(mockRequisition.items)
+  const [selectedItems, setSelectedItems] = useState<number[]>([])
+  const [isEditMode, setIsEditMode] = useState(false)
+
+  const handleBulkAction = (action: 'Accept' | 'Reject' | 'Review' | 'Delete' | 'Split') => {
+    if (!selectedItems.length) return
+
+    switch (action) {
+      case 'Accept':
+      case 'Reject':
+      case 'Review':
+        setItems(items.map(item => 
+          selectedItems.includes(item.id) 
+            ? { ...item, approvalStatus: action }
+            : item
+        ))
+        break
+      case 'Delete':
+        setItems(items.filter(item => !selectedItems.includes(item.id)))
+        break
+      case 'Split':
+        console.log('Splitting items:', selectedItems)
+        break
+    }
+    setSelectedItems([]) // Clear selection after action
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedItems(items.map(item => item.id))
+    } else {
+      setSelectedItems([])
+    }
+  }
+
+  const handleSelectItem = (itemId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedItems([...selectedItems, itemId])
+    } else {
+      setSelectedItems(selectedItems.filter(id => id !== itemId))
+    }
+  }
+
+  const handleHeaderUpdate = (field: string, value: string) => {
+    console.log('Updating header field:', field, value)
+  }
+
+  const handleQuantityUpdate = (itemId: number, field: 'qtyRequired' | 'qtyApproved' | 'qtyIssued', value: number) => {
+    setItems(items.map(item => 
+      item.id === itemId 
+        ? { ...item, [field]: value }
+        : item
+    ))
+  }
 
   return (
     <Card className="w-full">
@@ -278,38 +533,68 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <CardTitle>Store Requisition Details</CardTitle>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-              {mockRequisition.status}
-            </span>
-            <div className="flex items-center gap-2">
-            <Button 
-                className="flex items-center gap-2"
-                onClick={() => console.log('Edit requisition')}
-              >
-                <Edit2 className="h-4 w-4" />
-                Edit
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-2"
-                onClick={() => console.log('Print requisition')}
-              >
-                <Printer className="h-4 w-4" />
-                Print
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-2 text-red-600 hover:text-red-600"
-                onClick={() => console.log('Void requisition')}
-              >
-                <XCircle className="h-4 w-4" />
-                Void
-              </Button>
-              
+            <div className="flex items-center gap-3">
+              <CardTitle>Store Requisition Details</CardTitle>
+              <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                {mockRequisition.status}
+              </span>
             </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {isEditMode ? (
+              <>
+                <Button 
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  onClick={() => setIsEditMode(false)}
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button 
+                  className="flex items-center gap-2"
+                  onClick={() => {
+                    // Save changes
+                    setIsEditMode(false)
+                  }}
+                >
+                  <Check className="h-4 w-4" />
+                  Save Changes
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  className="flex items-center gap-2"
+                  onClick={() => setIsEditMode(true)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                  Edit
+                </Button>
+                <Button
+                  className="flex items-center gap-2"
+                  onClick={() => console.log('Submit')}
+                >
+                  Submit
+                </Button>
+              </>
+            )}
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => console.log('Print requisition')}
+            >
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 text-red-600 hover:text-red-600"
+              onClick={() => console.log('Void requisition')}
+            >
+              <XCircle className="h-4 w-4" />
+              Void
+            </Button>
           </div>
         </div>
 
@@ -336,21 +621,23 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
           {/* Column 3 */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Tags className="h-4 w-4" />
-              <span>Movement Type</span>
+              <Calendar className="h-4 w-4" />
+              <span>Expected Delivery</span>
             </div>
-            <p className="font-medium">{mockRequisition.movementType}</p>
-          </div>
-
-          {/* Column 4 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Building2 className="h-4 w-4" />
-              <span>Department</span>
-            </div>
-            <p className="font-medium">{mockRequisition.department}</p>
+            {isEditMode ? (
+              <Input
+                type="date"
+                value={mockRequisition.expectedDeliveryDate}
+                onChange={(e) => handleHeaderUpdate('expectedDeliveryDate', e.target.value)}
+                className="h-8"
+              />
+            ) : (
+              <p className="font-medium">{mockRequisition.expectedDeliveryDate}</p>
+            )}
           </div>
           
+          {/* Column 4 */}
+         
           {/* Column 5 */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -368,7 +655,14 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
             </div>
             <p className="font-medium">{mockRequisition.jobCode}</p>
           </div>
-
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Building2 className="h-4 w-4" />
+              <span>Department</span>
+            </div>
+            <p className="font-medium">{mockRequisition.department}</p>
+          </div>
+          
           {/* Description - Spans full width */}
           <div className="xl:col-span-6 space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -377,6 +671,8 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
             </div>
             <p className="font-medium">{mockRequisition.description}</p>
           </div>
+           
+          
         </div>
 
         <Separator className="my-4" />
@@ -387,11 +683,15 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
           <TabsList className="w-full justify-start border-b mb-4">
             <TabsTrigger value="items" className="flex items-center gap-2 px-6">
               <ListTodo className="h-4 w-4" />
-              Item Details
+              Items
             </TabsTrigger>
             <TabsTrigger value="stock-movements" className="flex items-center gap-2 px-6">
               <Box className="h-4 w-4" />
               Stock Movements
+            </TabsTrigger>
+            <TabsTrigger value="journal-entries" className="flex items-center gap-2 px-6">
+              <Calculator className="h-4 w-4" />
+              Journal Entries
             </TabsTrigger>
             <TabsTrigger value="comments" className="flex items-center gap-2 px-6">
               <MessageSquare className="h-4 w-4" />
@@ -408,9 +708,9 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
           </TabsList>
 
           <TabsContent value="items" className="mt-6">
-            <div className="space-y-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Items List</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Items Details</h3>
                 <Button
                   className="flex items-center gap-2"
                   onClick={() => console.log('Add new item')}
@@ -420,18 +720,61 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                 </Button>
               </div>
 
+              {/* Add bulk actions buttons below the title */}
+              {selectedItems.length > 0 && (
+                <div className="flex gap-2">
+                  <Button 
+                    className="bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2"
+                    onClick={() => handleBulkAction('Accept')}
+                  >
+                    <Check className="h-4 w-4" />
+                    Accept Selected ({selectedItems.length})
+                  </Button>
+                  <Button 
+                    className="bg-red-100 text-red-700 hover:bg-red-200 flex items-center gap-2"
+                    onClick={() => handleBulkAction('Reject')}
+                  >
+                    <XCircle className="h-4 w-4" />
+                    Reject Selected ({selectedItems.length})
+                  </Button>
+                  <Button 
+                    className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 flex items-center gap-2"
+                    onClick={() => handleBulkAction('Review')}
+                  >
+                    <AlertCircle className="h-4 w-4" />
+                    Review Selected ({selectedItems.length})
+                  </Button>
+                  <Button 
+                    className="bg-blue-100 text-blue-700 hover:bg-blue-200 flex items-center gap-2"
+                    onClick={() => handleBulkAction('Split')}
+                  >
+                    <Split className="h-4 w-4" />
+                    Split Selected ({selectedItems.length})
+                  </Button>
+                </div>
+              )}
+
               <div className="border rounded-lg">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-gray-50">
+                      <th className="text-left p-4 text-xs font-medium text-gray-500">
+                        <input
+                          type="checkbox"
+                          className="rounded border-gray-300"
+                          checked={selectedItems.length === items.length}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                        />
+                      </th>
                       <th className="text-left p-4 text-xs font-medium text-gray-500">Location</th>
-                      <th className="text-left p-4 text-xs font-medium text-gray-500">Item Name</th>
-                      <th className="text-left p-4 text-xs font-medium text-gray-500">Description</th>
+                      <th className="text-left p-4 text-xs font-medium text-gray-500">Movement Type</th>
+                      <th className="text-left p-4 text-xs font-medium text-gray-500">Product</th>
                       <th className="text-left p-4 text-xs font-medium text-gray-500">Unit</th>
                       <th className="text-right p-4 text-xs font-medium text-gray-500">Required</th>
                       <th className="text-right p-4 text-xs font-medium text-gray-500">Approved</th>
-                      <th className="text-right p-4 text-xs font-medium text-gray-500">Cost/Unit</th>
+                      <th className="text-right p-4 text-xs font-medium text-gray-500">Issued</th>
                       <th className="text-right p-4 text-xs font-medium text-gray-500">Total</th>
+                      <th className="text-center p-4 text-xs font-medium text-gray-500">Status</th>
                       <th className="text-right p-4 text-xs font-medium text-gray-500 w-[100px]">Actions</th>
                     </tr>
                   </thead>
@@ -441,28 +784,90 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                         {/* Primary Information Row */}
                         <tr key={item.id} className="group hover:bg-gray-50">
                           <td className="p-4">
-                            <p className="truncate max-w-[150px]">{item.itemInfo.location}</p>
+                            <input
+                              type="checkbox"
+                              className="rounded border-gray-300"
+                              checked={selectedItems.includes(item.id)}
+                              onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                            />
                           </td>
                           <td className="p-4">
-                            <p className="font-medium text-gray-600">{item.itemInfo.itemName}</p>
+                            <div className="space-y-1">
+                              <p className="font-medium">{item.itemInfo.location}</p>
+                              <div className="flex flex-col gap-0.5">
+                                <p className="text-sm text-gray-500">
+                                  {item.itemInfo.locationCode} • {item.itemInfo.locationType === 'inventory' ? 'Inventory' : 'Direct'}
+                                </p>
+                              </div>
+                            </div>
                           </td>
                           <td className="p-4">
-                            <p className="truncate max-w-[200px]">{item.description}</p>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              item.itemInfo.locationType === 'inventory' 
+                                ? 'bg-blue-100 text-blue-800' 
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {item.itemInfo.locationType === 'inventory' ? 'Transfer' : 'Issue'}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <div className="space-y-1">
+                              <p className="font-medium text-gray-600">{item.itemInfo.itemName}</p>
+                              <p className="text-sm text-gray-500">{item.description}</p>
+                            </div>
                           </td>
                           <td className="p-4">
                             <p>{item.unit}</p>
                           </td>
                           <td className="p-4 text-right">
-                            <p>{item.qtyRequired}</p>
+                            {isEditMode ? (
+                              <Input
+                                type="number"
+                                value={item.qtyRequired}
+                                onChange={(e) => handleQuantityUpdate(item.id, 'qtyRequired', parseInt(e.target.value))}
+                                className="w-20 h-8 text-right"
+                              />
+                            ) : (
+                              <p>{item.qtyRequired}</p>
+                            )}
                           </td>
                           <td className="p-4 text-right">
-                            <p>{item.qtyApproved}</p>
+                            {isEditMode ? (
+                              <Input
+                                type="number"
+                                value={item.qtyApproved}
+                                onChange={(e) => handleQuantityUpdate(item.id, 'qtyApproved', parseInt(e.target.value))}
+                                className="w-20 h-8 text-right"
+                              />
+                            ) : (
+                              <p>{item.qtyApproved}</p>
+                            )}
                           </td>
                           <td className="p-4 text-right">
-                            <p>{item.costPerUnit.toFixed(2)}</p>
+                            {isEditMode ? (
+                              <Input
+                                type="number"
+                                value={item.qtyIssued || 0}
+                                onChange={(e) => handleQuantityUpdate(item.id, 'qtyIssued', parseInt(e.target.value))}
+                                className="w-20 h-8 text-right"
+                              />
+                            ) : (
+                              <p>{item.qtyIssued || 0}</p>
+                            )}
                           </td>
                           <td className="p-4 text-right">
                             <p className="font-medium">{item.total.toFixed(2)}</p>
+                          </td>
+                          <td className="p-4 text-center">
+                            <ApprovalLogDialog 
+                              itemId={item.id}
+                              itemName={item.itemInfo.itemName}
+                              logs={mockApprovalLogs[item.id] || []}
+                            >
+                              <div className="cursor-pointer">
+                                <StatusBadge status={item.approvalStatus as 'Accept' | 'Reject' | 'Review'} />
+                              </div>
+                            </ApprovalLogDialog>
                           </td>
                           <td className="p-4">
                             <div className="flex justify-end gap-2">
@@ -518,47 +923,145 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
           </TabsContent>
 
           <TabsContent value="stock-movements" className="mt-6">
-            <div className="space-y-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Stock Movements</h3>
+            <div className="space-y-4 px-8">
+              {/* Header with Add Item button on the right */}
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <h1 className="text-2xl font-bold">Stock Movements</h1>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm">Filter</Button>
+                    <Button variant="outline" size="sm">Print</Button>
+                  </div>
+                </div>
+                <Button variant="default" size="sm">+ Add Item</Button>
               </div>
 
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Location</TableHead>
-                      <TableHead>Product Name</TableHead>
-                      <TableHead>Lot Number</TableHead>
-                      <TableHead>Inventory Unit</TableHead>
-                      <TableHead className="text-right">Quantity</TableHead>
-                      <TableHead className="text-right">Cost</TableHead>
-                      <TableHead className="text-right">Total Cost</TableHead>
-                      <TableHead className="text-right">Net Amount</TableHead>
-                      <TableHead className="text-right">Extra Cost</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mockStockMovements.map((movement) => (
-                      <TableRow key={movement.id}>
-                        <TableCell>{movement.toLocation}</TableCell>
-                        <TableCell>
-                          <div>{movement.itemName}</div>
-                          <div className="text-sm text-gray-500">{movement.itemDescription}</div>
-                        </TableCell>
-                        <TableCell>{movement.lotNumber}</TableCell>
-                        <TableCell>{movement.unit}</TableCell>
-                        <TableCell className="text-right">{movement.quantity}</TableCell>
-                        <TableCell className="text-right">{movement.cost.toFixed(2)}</TableCell>
-                        <TableCell className="text-right">{movement.totalCost.toFixed(2)}</TableCell>
-                        <TableCell className="text-right">{movement.netAmount.toFixed(2)}</TableCell>
-                        <TableCell className="text-right">{movement.extraCost.toFixed(2)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              {/* Search Bar */}
+              <div className="flex items-center gap-4">
+                <div className="w-1/2">
+                  <Input
+                    placeholder="Search by location, product name, or lot number..."
+                    className="w-full"
+                  />
+                </div>
               </div>
+
+              {/* Movements Table */}
+              <Card>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Movement Type</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lot No.</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">In</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Out</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Cost</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {movements.map(movement => (
+                          <React.Fragment key={movement.id}>
+                            {/* Movement Header */}
+                            <tr className="bg-gray-50">
+                              <td colSpan={9} className="px-6 py-2">
+                                <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{movement.movementType}</span>
+                                    <span className="text-gray-400">|</span>
+                                    <span className="text-blue-600">{movement.sourceDocument}</span>
+                                    <span className="text-gray-400">|</span>
+                                    <span className="text-gray-500">{movement.commitDate}</span>
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {movement.movement.source} → {movement.movement.destination}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                            {/* Movement Items */}
+                            {movement.items.map(item => (
+                              <React.Fragment key={item.id}>
+                                {item.lots.map((lot, lotIndex) => (
+                                  <tr key={`${item.id}-${lot.lotNo}`} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      {lotIndex === 0 ? (
+                                        <div className="flex flex-col gap-1">
+                                          <div className="text-sm font-medium text-gray-900">{item.location.name}</div>
+                                          <div className="flex gap-2 items-center">
+                                            <div className="text-sm text-gray-500">{item.location.code}</div>
+                                            <span className={`px-1.5 py-0.5 text-xs rounded ${
+                                              item.location.type === 'INV' 
+                                                ? 'bg-blue-100 text-blue-700'
+                                                : 'bg-purple-100 text-purple-700'
+                                            }`}>
+                                              {item.location.type === 'INV' ? 'Inventory' : 'Direct'}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      ) : ''}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      {lotIndex === 0 ? (
+                                        <div>
+                                          <div className="text-sm font-medium text-gray-900">{item.productName}</div>
+                                          <div className="text-sm text-gray-500">{item.sku}</div>
+                                        </div>
+                                      ) : ''}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <span className={`px-2 py-1 text-xs rounded-full ${
+                                        item.location.type === 'INV' 
+                                          ? 'bg-blue-100 text-blue-700'
+                                          : 'bg-orange-100 text-orange-700'
+                                      }`}>
+                                        {item.location.type === 'INV' ? 'Transfer' : 'Issue'}
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <div className="text-sm font-medium text-gray-900">{lot.lotNo}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                      {item.uom}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                      {lot.quantity > 0 ? `+${lot.quantity.toLocaleString()}` : '-'}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 text-right">
+                                      {lot.quantity < 0 ? Math.abs(lot.quantity).toLocaleString() : '-'}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                      {item.unitCost.toLocaleString()}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 text-right">
+                                      {(item.unitCost * Math.abs(lot.quantity)).toLocaleString()}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </React.Fragment>
+                            ))}
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="journal-entries" className="mt-6">
+            <JournalEntriesTab 
+              refNo={mockRequisition.refNo}
+              date={mockRequisition.date}
+              department={mockRequisition.department}
+              description={mockRequisition.description}
+            />
           </TabsContent>
 
           <TabsContent value="comments" className="mt-4">
@@ -624,7 +1127,7 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
       <div className="border-t">
         <div className="p-4">
           <h3 className="text-sm font-semibold mb-4">Transaction Summary</h3>
-          <div className="grid grid-cols-4 gap-8">
+          <div className="grid grid-cols-5 gap-8">
             <div>
               <div className="text-sm text-gray-500 mb-1">Total Items</div>
               <div className="text-lg font-medium">{items.length}</div>
@@ -639,6 +1142,12 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
               <div className="text-sm text-gray-500 mb-1">Total Approved</div>
               <div className="text-lg font-medium">
                 {items.reduce((sum, item) => sum + item.qtyApproved, 0)}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-1">Total Issued</div>
+              <div className="text-lg font-medium">
+                {items.reduce((sum, item) => sum + (item.qtyIssued || 0), 0)}
               </div>
             </div>
             <div>
@@ -659,21 +1168,27 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
           </div>
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              onClick={() => console.log('Cancel')}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              onClick={() => console.log('Approve')}
             >
-              Cancel
+              <Check className="h-4 w-4" />
+              Approve
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Save Draft')}
+              className="flex items-center gap-2 text-red-600 hover:bg-red-50"
+              onClick={() => console.log('Reject')}
             >
-              Save Draft
+              <XCircle className="h-4 w-4" />
+              Reject
             </Button>
             <Button
-              onClick={() => console.log('Submit')}
+              variant="outline"
+              className="flex items-center gap-2 text-orange-600 hover:bg-orange-50"
+              onClick={() => console.log('Send Back')}
             >
-              Submit
+              <ArrowLeft className="h-4 w-4" />
+              Send Back
             </Button>
           </div>
         </div>

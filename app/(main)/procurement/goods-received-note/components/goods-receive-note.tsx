@@ -46,16 +46,9 @@ import StatusBadge from "@/components/ui/custom-status-badge";
 import { useState } from "react";
 import SummaryTotal from "./SummaryTotal";
 import ItemDetailForm  from "./tabs/itemDetailForm";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/custom-dialog";
 import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import { TaxTab } from "./tabs/TaxTab";
+import StockMovementContent from "./tabs/stock-movement";
 
 interface GoodsReceiveNoteComponentProps {
   initialData: GoodsReceiveNote;
@@ -79,7 +72,6 @@ export function GoodsReceiveNoteComponent({
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false)
   const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,14 +177,6 @@ export function GoodsReceiveNoteComponent({
     );
   };
 
-  const handleAddItem = (newItem: GoodsReceiveNoteItem) => {
-    setFormData((prev) => ({
-      ...prev,
-      items: [...prev.items, newItem],
-    }));
-    setIsAddDialogOpen(false);
-  };
-
   const handleGoBack = () => {
     router.back();
   };
@@ -226,54 +210,54 @@ export function GoodsReceiveNoteComponent({
       <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
         <div className={`flex-grow space-y-4 ${isSidebarVisible ? 'lg:w-3/4' : 'w-full'}`}>
           <Card>
-            <CardHeader className="flex flex-col space-y-4 pb-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                <div className="flex items-center space-x-2">
+            <CardHeader className="pb-6">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
                   <Button variant="ghost" size="icon" onClick={handleGoBack}>
                     <ArrowLeft className="h-4 w-4" />
                     <span className="sr-only">Go back</span>
                   </Button>
                   <CardTitle className="text-xl font-bold">Goods Receive Note</CardTitle>
+                  <StatusBadge status={formData.status} />
                 </div>
-                <StatusBadge status={formData.status} />
-              </div>
-              <div className="flex flex-wrap gap-2 justify-start sm:justify-end">
-                {mode === "view" && (
-                  <>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => setMode("edit")}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </Button>
-                  </>
-                )}
-                {isEditable && (
-                  <>
-                    <Button variant="outline" size="sm" onClick={handleSave}>
-                      <Save className="mr-2 h-4 w-4" />
-                      Save
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleCancel}>
-                      <X className="mr-2 h-4 w-4" />
-                      Cancel
-                    </Button>
-                  </>
-                )}
-                <Button variant="outline" size="sm">
-                  <Printer className="mr-2 h-4 w-4" />
-                  Print
-                </Button>
-                <Button variant="outline" size="sm">
-                  <CheckSquare className="mr-2 h-4 w-4" />
-                  Commit
-                </Button>
+                <div className="flex gap-2">
+                  {mode === "view" && (
+                    <>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setMode("edit")}
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                  {isEditable && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={handleSave}>
+                        <Save className="mr-2 h-4 w-4" />
+                        Save
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={handleCancel}>
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                    </>
+                  )}
+                  <Button variant="outline" size="sm">
+                    <Printer className="mr-2 h-4 w-4" />
+                    Print
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <CheckSquare className="mr-2 h-4 w-4" />
+                    Commit
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -532,29 +516,11 @@ export function GoodsReceiveNoteComponent({
                   <TabsTrigger value="items" className="flex-1">Items</TabsTrigger>
                   <TabsTrigger value="extra-costs" className="flex-1">Extra Costs</TabsTrigger>
                   <TabsTrigger value="stock-movement" className="flex-1">Stock Movement</TabsTrigger>
-                  <TabsTrigger value="tax" className="flex-1">Tax</TabsTrigger>
-                  <TabsTrigger value="transaction-summary" className="flex-1">Transaction Summary</TabsTrigger>
+                  <TabsTrigger value="journal-entries" className="flex-1">Journal Entries</TabsTrigger>
+                  <TabsTrigger value="tax" className="flex-1">Tax Entries</TabsTrigger>
                 </TabsList>
                 <TabsContent value="items">
                   <div className="mb-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                        <DialogTrigger asChild>
-                          <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Item
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-5xl">
-                          <ItemDetailForm
-                            mode="add"
-                            item={null}
-                            onSave={handleAddItem}
-                            onClose={() => setIsAddDialogOpen(false)}
-                          />
-                        </DialogContent>
-                      </Dialog>
-                    </div>
                     {isEditable && selectedItems.length > 0 && (
                       <BulkActions
                         selectedItems={selectedItems}
@@ -585,9 +551,15 @@ export function GoodsReceiveNoteComponent({
                   />
                 </TabsContent>
                 <TabsContent value="stock-movement">
-                  <StockMovementTab
+                  <StockMovementContent/>
+                </TabsContent>
+                
+                <TabsContent value="journal-entries">
+                  <FinancialSummaryTab
                     mode={mode}
-                    movements={formData.stockMovements || []}
+                    summary={formData.financialSummary || null}
+                    currency={formData.currency}
+                    baseCurrency={formData.baseCurrency}
                   />
                 </TabsContent>
                 <TabsContent value="tax">
@@ -603,21 +575,13 @@ export function GoodsReceiveNoteComponent({
                     baseCurrency={formData.baseCurrency}
                   />
                 </TabsContent>
-                <TabsContent value="transaction-summary">
-                  <FinancialSummaryTab
-                    mode={mode}
-                    summary={formData.financialSummary || null}
-                    currency={formData.currency}
-                    baseCurrency={formData.baseCurrency}
-                  />
-                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Summary Total</CardTitle>
+              <CardTitle>Transaction Summary</CardTitle>
             </CardHeader>
             <CardContent>
               <SummaryTotal poData={formData} />

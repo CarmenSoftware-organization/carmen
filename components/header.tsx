@@ -53,21 +53,26 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
 
   return (
     <header className="backdrop-blur supports-[backdrop-filter]:bg-background dark:supports-[backdrop-filter]:bg-gray-800 shadow-sm fixed top-0 left-0 right-0 z-40 border-b border-gray-200 dark:border-gray-500">
-      <div className="container px-4 py-1 sm:px-6">
-        <div className="flex justify-between items-center h-12">
+      <div className="w-full px-4 py-1 sm:px-6">
+        <div className="flex items-center h-12">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" className="block lg:hidden mr-2" onClick={onSidebarToggle}>
               {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <Link
-              href="/dashboard"
-              className="text-2xl md:text-3xl font-bold text-foreground dark:text-gray-100"
-            >
-              CARMEN
-            </Link>
+            <div className="flex flex-col">
+              <Link
+                href="/dashboard"
+                className="text-xl md:text-2xl font-bold text-foreground dark:text-gray-100"
+              >
+                CARMEN
+              </Link>
+              <span className="text-xs md:text-sm text-muted-foreground">
+                Hospitality Supply Chain
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="ml-auto flex items-center gap-2 sm:gap-4">
             <Select value={businessUnit} onValueChange={setBusinessUnit}>
               <SelectTrigger className="w-[140px] sm:w-[180px] h-8 bg-background dark:bg-gray-700 text-foreground dark:text-gray-100">
                 <SelectValue placeholder="Business Unit" />

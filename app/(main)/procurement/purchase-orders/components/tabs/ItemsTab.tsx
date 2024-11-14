@@ -225,10 +225,14 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
 
   return (
     <TooltipProvider>
-      <div className="space-y-4 w-full bg-white dark:bg-gray-800" >
-        <div className="flex justify-between items-center w-full">
-          <Button onClick={() => setIsAddItemFormOpen(true)} className="bg-primary text-white dark:bg-gray-700 dark:text-gray-100">
-            <Plus className="mr-2 s h-4 w-4 "/> Add Item
+      <div className="space-y-4 w-full bg-white dark:bg-gray-800">
+        <div className="flex justify-between items-center w-full mb-4">
+          <h2 className="text-lg font-semibold">Item Details</h2>
+          <Button 
+            onClick={() => setIsAddItemFormOpen(true)} 
+            className="bg-primary text-white dark:bg-gray-700 dark:text-gray-100"
+          >
+            <Plus className="mr-2 h-4 w-4"/> Add Item
           </Button>
         </div>
 

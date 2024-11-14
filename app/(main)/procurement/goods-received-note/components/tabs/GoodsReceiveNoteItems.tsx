@@ -11,9 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, Plus } from "lucide-react";
 import { GoodsReceiveNoteMode, GoodsReceiveNoteItem } from "@/lib/types";
-import { Dialog, DialogContent } from "@/components/ui/custom-dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/custom-dialog";
 import ItemDetailForm from "./itemDetailForm";
 
 interface GoodsReceiveNoteItemsProps {
@@ -37,6 +37,7 @@ export function GoodsReceiveNoteItems({
 }: GoodsReceiveNoteItemsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<GoodsReceiveNoteItem | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const handleOpenItemDetail = (item: GoodsReceiveNoteItem) => {
     setSelectedItem(item);
@@ -76,6 +77,11 @@ export function GoodsReceiveNoteItems({
     onItemsChange(updatedItems);
   };
 
+  const handleAddItem = (newItem: GoodsReceiveNoteItem) => {
+    onItemsChange([...items, newItem]);
+    setIsAddDialogOpen(false);
+  };
+
   const allSelected = items.length > 0 && selectedItems.length === items.length;
 
   const formatBaseAmount = (amount: number) => {
@@ -89,7 +95,29 @@ export function GoodsReceiveNoteItems({
   }
 
   return (
-    <>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium">Item Details</h3>
+        {mode !== 'view' && (
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl">
+              <ItemDetailForm
+                mode="add"
+                item={null}
+                onSave={handleAddItem}
+                onClose={() => setIsAddDialogOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -246,6 +274,6 @@ export function GoodsReceiveNoteItems({
           />
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

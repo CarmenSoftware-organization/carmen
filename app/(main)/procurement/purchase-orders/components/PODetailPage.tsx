@@ -295,8 +295,8 @@ export function PODetailPage({ params, backLink: propBackLink }: PODetailPagePro
           <TabsTrigger value="items" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Items</TabsTrigger>
           <TabsTrigger value="GoodsReceiveNoteTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  " >Goods Receive</TabsTrigger>
           <TabsTrigger value="RelatedDocumentsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Documents</TabsTrigger>
-          <TabsTrigger value="CommentsAttachmentsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Comments & Attachments</TabsTrigger>
-          <TabsTrigger value="ActivityLogsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Activity Log</TabsTrigger>
+          {/* <TabsTrigger value="CommentsAttachmentsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Comments & Attachments</TabsTrigger> */}
+          {/* <TabsTrigger value="ActivityLogsTab" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground  ">Activity Log</TabsTrigger> */}
         </TabsList>
         <TabsContent value="items" className="bg-white dark:bg-gray-800 p-4 rounded-md shadow">
           <ItemsTab
@@ -318,30 +318,30 @@ export function PODetailPage({ params, backLink: propBackLink }: PODetailPagePro
         >
           <RelatedDocumentsTab poData={poData} />
         </TabsContent>
-        <TabsContent
+        {/* <TabsContent
           value="CommentsAttachmentsTab"
           className="bg-white dark:bg-gray-800 p-4 rounded-md shadow"
         >
           <CommentsAttachmentsTab poData={poData} />
-        </TabsContent>
-        <TabsContent
+        </TabsContent> */}
+        {/* <TabsContent
           value="ActivityLogsTab"
           className="bg-white dark:bg-gray-800 p-4 rounded-md shadow"
         >
           <ActivityLogTab poData={poData} />
-        </TabsContent>
+        </TabsContent> */}
         </Tabs>
       </Card>
       {/* Add SummaryTotal component here */}
       <Card className="mt-4 bg-white dark:bg-gray-800"> {/* Reduced top margin */}
         <CardHeader className="py-3"> {/* Reduced vertical padding */}
-          <CardTitle>Purchase Order Summary</CardTitle>
+          <CardTitle>Transaction Summary</CardTitle>
         </CardHeader>
         <CardContent className="py-2"> {/* Reduced vertical padding */}
           <SummaryTotal poData={poData} />
         </CardContent>
       </Card>
-      <CreditNoteDetail backLink={backLink} />
+    
     </>
   );
 

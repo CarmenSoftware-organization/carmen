@@ -100,6 +100,7 @@ const emptyItemData: PurchaseRequestItem = {
     lastPrice: 0,
     lastOrderDate: new Date(),
     lastVendor: "",
+    inventoryUnit: "",
   },
   accountCode: "",
   jobCode: "",

@@ -59,6 +59,7 @@ const itemDetails: PurchaseRequestItem[] = [
       reorderLevel: 10,
       restockLevel: 20,
       averageMonthlyUsage: 7,
+      inventoryUnit: "Piece",
     },
     currency: "USD",
     price: 199.99,
@@ -113,6 +114,7 @@ const itemDetails: PurchaseRequestItem[] = [
       reorderLevel: 5,
       restockLevel: 15,
       averageMonthlyUsage: 3,
+      inventoryUnit: "Piece",
     },
     currency: "USD",
     price: 1299.99,
@@ -167,6 +169,7 @@ const itemDetails: PurchaseRequestItem[] = [
       reorderLevel: 2,
       restockLevel: 5,
       averageMonthlyUsage: 1,
+      inventoryUnit: "Piece",
     },
     currency: "USD",
     price: 599.99,
@@ -279,9 +282,10 @@ export function ItemsTab() {
 
   return (
     <>
-      <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Item Details</h2>
         <Button onClick={() => openItemForm(null, "add")}>
-          <Plus className="mr-2 h-4 w-4"   />
+          <Plus className="mr-2 h-4 w-4" />
           Add Item
         </Button>
       </div>
@@ -318,17 +322,25 @@ export function ItemsTab() {
             </TableHead>
             <TableHead className="align-center">Location</TableHead>
             <TableHead className="align-center">Product</TableHead>
-            <TableHead className="align-center">Unit</TableHead>
+            <TableHead className="text-xs flex-col gap-2 justify-between items-center">
+              <div className="text-center">Order Unit</div>
+              <Separator />
+              <div className="text-nowrap text-center">Inv. Unit</div>
+            </TableHead>
             <TableHead className="text-xs flex-col gap-2 justify-between items-center">
               <div className="text-center">Request</div>
-              <Separator /> <div className="text-center">Ordering</div>
+              <Separator /> <div className="text-center">On Order</div>
             </TableHead>
             <TableHead className="text-xs flex-col gap-2 justify-between items-center">
               <div className="text-center">Approve</div>
               <Separator />
               <div className="text-nowrap text-center">On Hand</div>
             </TableHead>
-            <TableHead className="align-center">Curr.</TableHead>
+            <TableHead className="text-xs flex-col gap-2 justify-between items-center">
+              <div className="text-center">Curr.</div>
+              <Separator />
+              <div className="text-nowrap text-center">Base</div>
+            </TableHead>
             <TableHead className="text-xs flex-col gap-2 justify-between items-center">
               <div className="text-center">Price</div>
               <Separator />
@@ -342,81 +354,115 @@ export function ItemsTab() {
 
         <TableBody>
           {items.map((item) => (
-            <React.Fragment key={item.id}>
-              <TableRow>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedItems.includes(item.id ?? "")}
-                    onCheckedChange={() => handleSelectItem(item.id ?? "")}
-                  />
-                </TableCell>
-                <TableCell>{item.location}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell className="align-top">{item.unit}</TableCell>
-                <TableCell className="text-right align-top">
-                  <div>{item.quantityRequested.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {item.inventoryInfo.onOrdered.toLocaleString()}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right align-top">
-                  <div>{item.quantityApproved.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {item.inventoryInfo.onHand.toLocaleString()}
-                  </div>
-                </TableCell>
-                <TableCell className="align-top">{item.currency}</TableCell>
-                <TableCell className="text-right align-top">
-                  <div>{item.price.toFixed(2)}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {item.inventoryInfo.lastPrice.toFixed(2)}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right align-top">
+            <TableRow key={item.id}>
+              <TableCell>
+                <Checkbox
+                  checked={selectedItems.includes(item.id ?? "")}
+                  onCheckedChange={() => handleSelectItem(item.id ?? "")}
+                />
+              </TableCell>
+              <TableCell>{item.location}</TableCell>
+              <TableCell>
+                <div>{item.name}</div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {item.description}
+                </div>
+              </TableCell>
+              <TableCell className="text-right align-top">
+                <div>{item.unit}</div>
+                <div className="text-xs text-muted-foreground">
+                  {item.inventoryInfo?.inventoryUnit || item.unit}
+                </div>
+              </TableCell>
+              <TableCell className="text-right align-top">
+                <div>{item.quantityRequested.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">
+                  {item.inventoryInfo.onOrdered.toLocaleString()}
+                </div>
+              </TableCell>
+              <TableCell className="text-right align-top">
+                <div>{item.quantityApproved.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">
+                  {item.inventoryInfo.onHand.toLocaleString()}
+                </div>
+              </TableCell>
+              <TableCell className="text-right align-top">
+                <div>{item.currency}</div>
+                <div className="text-xs text-muted-foreground">
+                  {item.currency || "THB"}
+                </div>
+              </TableCell>
+              <TableCell className="text-right align-top">
+                <div>{item.price.toFixed(2)}</div>
+                <div className="text-xs text-muted-foreground">
+                  {item.inventoryInfo.lastPrice.toFixed(2)}
+                </div>
+              </TableCell>
+              <TableCell className="text-right align-top">
+                <div>
                   {item.totalAmount.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={item.status ?? ""} />
-                </TableCell>
-                <TableCell>
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => openItemForm(item, "edit")}
-                    >
-                      <Edit2Icon className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <Trash2Icon className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => openItemForm(item, "view")}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <ImageIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-              <TableRow key={`${item.id}-comment`} className="bg-muted/50">
-                <TableCell colSpan={11} className="py-2">
-                  <div className="flex items-center space-x-2">
-                    <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      {item.description}
-                    </span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </React.Fragment>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {item.baseTotalAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </div>
+              </TableCell>
+              <TableCell>
+                <StatusBadge status={item.status ?? ""} />
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-end space-x-2">
+                  {formMode === 'edit' && selectedItem?.id === item.id ? (
+                    <>
+                      <Button
+                        variant="default"
+                        size="icon"
+                        onClick={() => {
+                          if (selectedItem) handleSave(selectedItem)
+                        }}
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={closeItemForm}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => openItemForm(item, "edit")}
+                      >
+                        <Edit2Icon className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon">
+                        <Trash2Icon className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => openItemForm(item, "view")}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon">
+                        <ImageIcon className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
