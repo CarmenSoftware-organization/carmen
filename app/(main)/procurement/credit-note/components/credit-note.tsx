@@ -46,6 +46,7 @@ import JournalEntries  from "./journal-entries"
 import TaxEntries  from "./tax-entries"
 import { StockMovementTab } from "./StockMovementTab"
 import StockMovementContent from "./stock-movement";
+import StatusBadge from "@/components/ui/custom-status-badge"
 
 type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
@@ -96,7 +97,10 @@ function CreditNoteHeader({
   return (
     <Card className="w-full mb-4">
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
-        <CardTitle>Credit Note</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle>Credit Note</CardTitle>
+          <StatusBadge status={status} />
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="default" size="sm">
             <Edit className="h-4 w-4 mr-2" />

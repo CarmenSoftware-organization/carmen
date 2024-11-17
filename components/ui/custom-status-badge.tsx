@@ -29,6 +29,7 @@ export enum BadgeStatus {
   Reorder = "reorder",
   OverMax = "over-max",
   Normal = "normal",
+  Posted = "Posted",
 }
 
 export interface IBadgeColors {
@@ -64,9 +65,8 @@ export const StatusList: IBadgeColors[] = [
   { key: BadgeStatus.BelowMin, Color: "bg-destructive text-red-800" },
   { key: BadgeStatus.Reorder, Color: "bg-yellow-500 text-amber-800" },
   { key: BadgeStatus.OverMax, Color: "bg-blue-500 text-default-800" },
-  { key: BadgeStatus.Normal, Color: "bg-green-500 text-gray-800" }, 
-
- 
+  { key: BadgeStatus.Normal, Color: "bg-green-500 text-gray-800" },
+  { key: BadgeStatus.Posted, Color: "bg-emerald-300 text-emerald-800" },
 ];
 
 interface StatusBadgeProps {
@@ -81,7 +81,10 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     Draft: 'bg-gray-100 text-gray-800',
     InProgress: 'bg-blue-100 text-blue-800',
     Complete: 'bg-emerald-100 text-emerald-800',
-    Void: 'bg-slate-100 text-slate-800'
+    Void: 'bg-slate-100 text-slate-800',
+    DRAFT: 'bg-amber-100 text-amber-800',
+    POSTED: 'bg-emerald-100 text-emerald-800',
+    VOID: 'bg-rose-100 text-rose-800',
   }
 
   return (
