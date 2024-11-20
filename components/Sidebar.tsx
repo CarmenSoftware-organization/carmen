@@ -10,7 +10,27 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChevronDown, ChevronRight, Menu, ChevronLeft } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
-const menuItems = [
+interface MenuItem {
+  title: string;
+  path: string;
+  icon: string;
+  subItems: Array<SubMenuItem>;
+}
+
+interface SubMenuItem {
+  name: string;
+  path: string;
+  icon?: string;
+  description?: string;
+  subItems?: Array<{
+    name: string;
+    path: string;
+    icon?: string;
+    description?: string;
+  }>;
+}
+
+const menuItems: MenuItem[] = [
   {
     title: "Dashboard",
     path: "/dashboard",
@@ -23,11 +43,11 @@ const menuItems = [
     icon: "ShoppingCart",
     subItems: [
       { name: "My Approvals", path: "/procurement/my-approvals" },
-      "Purchase Requests",
-      "Purchase Orders",
-      "Goods Received Note",
+      { name: "Purchase Requests", path: "/procurement/purchase-requests" },
+      { name: "Purchase Orders", path: "/procurement/purchase-orders" },
+      { name: "Goods Received Note", path: "/procurement/goods-received-note" },
       { name: "Credit Notes", path: "/procurement/credit-note" },
-      "Purchase Request Templates",
+      { name: "Purchase Request Templates", path: "/procurement/purchase-request-templates" },
     ],
   },
   {
@@ -45,7 +65,11 @@ const menuItems = [
     title: "Vendor Management",
     path: "/vendor-management",
     icon: "Users",
-    subItems: ["Manage Vendors", "Price Lists", "Price Comparisons"],
+    subItems: [
+      { name: "Manage Vendors", path: "/vendor-management/manage-vendors" },
+      { name: "Price Lists", path: "/vendor-management/price-lists" },
+      { name: "Price Comparisons", path: "/vendor-management/price-comparisons" },
+    ],
   },
   {
     title: "Store Operations",
@@ -62,13 +86,56 @@ const menuItems = [
     path: "/inventory-management",
     icon: "Package",
     subItems: [
-      "Stock Overview",
-      { name: "Stock In", path: "/inventory-management/stock-in" },
-      "Stock Out",
-      "Transfer Between Locations",
-      "Physical Count",
-      "Stock Take",
-      "Inventory Valuation",
+      { name: "Stock Overview", path: "/inventory-management/stock-overview" },
+      { name: "Inventory Adjustments", path: "/inventory-management/inventory-adjustments" },
+      {
+        name: "Physical Count",
+        path: "/inventory-management/physical-count",
+        icon: "ClipboardList",
+        subItems: [
+          {
+            name: "New Count",
+            path: "/inventory-management/physical-count",
+            icon: "Plus",
+            description: "Start a new physical count"
+          },
+          {
+            name: "History",
+            path: "/inventory-management/physical-count/history",
+            icon: "History",
+            description: "View past physical counts"
+          }
+        ]
+      },
+      {
+        name: "Spot Check",
+        path: "/inventory-management/spot-check",
+        icon: "ClipboardCheck",
+        subItems: [
+          { 
+            name: "Dashboard", 
+            path: "/inventory-management/spot-check/dashboard",
+            icon: "LayoutDashboard"
+          },
+          { 
+            name: "New Count", 
+            path: "/inventory-management/spot-check/new/zones",
+            icon: "PlusCircle"
+          },
+          { 
+            name: "Active Counts", 
+            path: "/inventory-management/spot-check/active",
+            icon: "Activity"
+          },
+          { 
+            name: "Completed Counts", 
+            path: "/inventory-management/spot-check/completed",
+            icon: "CheckCircle"
+          },
+        ],
+      },
+      { name: "Stock Take", path: "/inventory-management/stock-take" },
+      { name: "Inventory Valuation", path: "/inventory-management/inventory-valuation" },
     ],
   },
   {
@@ -76,10 +143,10 @@ const menuItems = [
     path: "/operational-planning",
     icon: "CalendarClock",
     subItems: [
-      "Recipes Management",
-      "Menu Engineering",
-      "Demand Forecasting",
-      "Inventory Planning",
+      { name: "Recipes Management", path: "/operational-planning/recipes-management" },
+      { name: "Menu Engineering", path: "/operational-planning/menu-engineering" },
+      { name: "Demand Forecasting", path: "/operational-planning/demand-forecasting" },
+      { name: "Inventory Planning", path: "/operational-planning/inventory-planning" },
     ],
   },
   {
@@ -87,10 +154,10 @@ const menuItems = [
     path: "/production",
     icon: "Factory",
     subItems: [
-      "Recipe Execution",
-      "Batch Production",
-      "Wastage Tracking",
-      "Quality Control",
+      { name: "Recipe Execution", path: "/production/recipe-execution" },
+      { name: "Batch Production", path: "/production/batch-production" },
+      { name: "Wastage Tracking", path: "/production/wastage-tracking" },
+      { name: "Quality Control", path: "/production/quality-control" },
     ],
   },
   {
@@ -98,12 +165,12 @@ const menuItems = [
     path: "/reporting-analytics",
     icon: "BarChart2",
     subItems: [
-      "Operational Reports",
-      "Financial Reports",
-      "Inventory Reports",
-      "Vendor Performance",
-      "Cost Analysis",
-      "Sales Analysis",
+      { name: "Operational Reports", path: "/reporting-analytics/operational-reports" },
+      { name: "Financial Reports", path: "/reporting-analytics/financial-reports" },
+      { name: "Inventory Reports", path: "/reporting-analytics/inventory-reports" },
+      { name: "Vendor Performance", path: "/reporting-analytics/vendor-performance" },
+      { name: "Cost Analysis", path: "/reporting-analytics/cost-analysis" },
+      { name: "Sales Analysis", path: "/reporting-analytics/sales-analysis" },
     ],
   },
   {
@@ -115,7 +182,7 @@ const menuItems = [
       { name: "Currency Management", path: "/finance/currency-management" },
       { name: "Exchange Rates", path: "/finance/exchange-rates" },
       { name: "Department and Cost Center", path: "/finance/department-list" },
-      "Budget Planning and Control",
+      { name: "Budget Planning and Control", path: "/finance/budget-planning-and-control" },
     ],
   },
   {
@@ -123,15 +190,15 @@ const menuItems = [
     path: "/system-administration",
     icon: "Settings",
     subItems: [
-      "User Management",
-      "Location Management",
-      "Workflow Management",
-      "General Settings",
-      "Notification Preferences",
-      "License Management",
-      "Security Settings",
-      "Data Backup and Recovery",
-      "System Integrations",
+      { name: "User Management", path: "/system-administration/user-management" },
+      { name: "Location Management", path: "/system-administration/location-management" },
+      { name: "Workflow Management", path: "/system-administration/workflow-management" },
+      { name: "General Settings", path: "/system-administration/general-settings" },
+      { name: "Notification Preferences", path: "/system-administration/notification-preferences" },
+      { name: "License Management", path: "/system-administration/license-management" },
+      { name: "Security Settings", path: "/system-administration/security-settings" },
+      { name: "Data Backup and Recovery", path: "/system-administration/data-backup-and-recovery" },
+      { name: "System Integrations", path: "/system-administration/system-integrations" },
     ],
   },
   {
@@ -139,11 +206,11 @@ const menuItems = [
     path: "/help-support",
     icon: "HelpCircle",
     subItems: [
-      "User Manuals",
-      "Video Tutorials",
-      "FAQs",
-      "Support Ticket System",
-      "System Updates and Release Notes",
+      { name: "User Manuals", path: "/help-support/user-manuals" },
+      { name: "Video Tutorials", path: "/help-support/video-tutorials" },
+      { name: "FAQs", path: "/help-support/faqs" },
+      { name: "Support Ticket System", path: "/help-support/support-ticket-system" },
+      { name: "System Updates and Release Notes", path: "/help-support/system-updates-and-release-notes" },
     ],
   },
   {
@@ -229,19 +296,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 }
 
 interface SidebarContentProps {
-  menuItems: Array<{
-    title: string;
-    path: string;
-    icon: string;
-    subItems: Array<{ name: string; path: string } | string>;
-  }>;
+  menuItems: MenuItem[];
   isCollapsed?: boolean;
 }
 
 function SidebarContent({ menuItems, isCollapsed }: SidebarContentProps) {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const router = useRouter();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [expandedSubItems, setExpandedSubItems] = useState<string[]>([]);
+
+  const isExpanded = (title: string) => expandedItems.includes(title);
+  const isSubExpanded = (name: string) => expandedSubItems.includes(name);
 
   const toggleExpand = (title: string) => {
     setExpandedItems((prev) =>
@@ -251,7 +317,15 @@ function SidebarContent({ menuItems, isCollapsed }: SidebarContentProps) {
     );
   };
 
-  const handleItemClick = (item: typeof menuItems[0]) => {
+  const toggleSubExpand = (name: string) => {
+    setExpandedSubItems((prev) =>
+      prev.includes(name)
+        ? prev.filter((item) => item !== name)
+        : [...prev, name]
+    );
+  };
+
+  const handleItemClick = (item: MenuItem) => {
     if (item.subItems?.length > 0) {
       toggleExpand(item.title);
     } else {
@@ -259,89 +333,125 @@ function SidebarContent({ menuItems, isCollapsed }: SidebarContentProps) {
     }
   };
 
-  return (
-    <div className="flex flex-col h-full">
-      <ScrollArea className={cn(
-        "flex-1",
-        isCollapsed ? "px-1" : "px-1"
-      )}>
-        <div className="space-y-1">
-          {menuItems.map((item) => {
-            const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
-            const isExpanded = expandedItems.includes(item.title);
-            const isActive = pathname?.startsWith(item.path) ?? false;
+  const handleSubItemClick = (subItem: SubMenuItem, event: React.MouseEvent) => {
+    if (subItem.subItems?.length) {
+      event.preventDefault();
+      toggleSubExpand(subItem.name);
+    }
+  };
 
-            return (
-              <div key={item.title} className="space-y-1">
-                {item.subItems?.length > 0 ? (
+  return (
+    <ScrollArea className="h-full">
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <div className="space-y-1">
+            {menuItems.map((item, index) => {
+              const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
+              const isActive = pathname === item.path;
+              const isItemExpanded = isExpanded(item.title);
+
+              return (
+                <div key={index} className="space-y-1">
                   <Button
                     variant={isActive ? "secondary" : "ghost"}
-                    className={cn(
-                      "w-full justify-between",
-                      isCollapsed && "px-2"
-                    )}
-                    onClick={() => toggleExpand(item.title)}
+                    className={cn("w-full justify-between", {
+                      "h-9": !isCollapsed,
+                      "h-9 w-9 p-0": isCollapsed,
+                    })}
+                    onClick={() => handleItemClick(item)}
                   >
                     <span className="flex items-center">
                       <IconComponent className="h-4 w-4" />
                       {!isCollapsed && <span className="ml-2">{item.title}</span>}
                     </span>
                     {!isCollapsed && item.subItems?.length > 0 && (
-                      isExpanded ? (
+                      isItemExpanded ? (
                         <ChevronDown className="h-4 w-4" />
                       ) : (
                         <ChevronRight className="h-4 w-4" />
                       )
                     )}
                   </Button>
-                ) : (
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    className={cn(
-                      "w-full justify-between",
-                      isCollapsed && "px-2"
-                    )}
-                    asChild
-                  >
-                    <Link href={item.path}>
-                      <span className="flex items-center">
-                        <IconComponent className="h-4 w-4" />
-                        {!isCollapsed && <span className="ml-2">{item.title}</span>}
-                      </span>
-                    </Link>
-                  </Button>
-                )}
 
-                {!isCollapsed && isExpanded && item.subItems?.length > 0 && (
-                  <div className="pl-6 space-y-1">
-                    {item.subItems.map((subItem, index) => {
-                      const subItemPath = typeof subItem === "string"
-                        ? `${item.path}/${subItem.toLowerCase().replace(/\s+/g, "-")}`
-                        : subItem.path;
-                      const subItemName = typeof subItem === "string" ? subItem : subItem.name;
-                      const isSubItemActive = pathname === subItemPath;
+                  {!isCollapsed && isItemExpanded && item.subItems?.length > 0 && (
+                    <div className="pl-6 space-y-1">
+                      {item.subItems.map((subItem, subIndex) => {
+                        const SubIconComponent = subItem.icon ? (LucideIcons as any)[subItem.icon] : undefined;
+                        const isSubActive = pathname === subItem.path;
+                        const isSubItemExpanded = isSubExpanded(subItem.name);
 
-                      return (
-                        <Button
-                          key={index}
-                          variant={isSubItemActive ? "secondary" : "ghost"}
-                          className="w-full justify-start"
-                          asChild
-                        >
-                          <Link href={subItemPath}>
-                            {subItemName}
-                          </Link>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                        return (
+                          <div key={subIndex} className="space-y-1">
+                            <Button
+                              variant={isSubActive ? "secondary" : "ghost"}
+                              className="w-full justify-between"
+                              onClick={(e) => handleSubItemClick(subItem, e)}
+                              asChild={!subItem.subItems}
+                            >
+                              {subItem.subItems ? (
+                                <div className="flex items-center justify-between w-full">
+                                  <span className="flex items-center">
+                                    {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
+                                    <div>
+                                      <span>{subItem.name}</span>
+                                      {subItem.description && (
+                                        <p className="text-xs text-muted-foreground">{subItem.description}</p>
+                                      )}
+                                    </div>
+                                  </span>
+                                  {isSubItemExpanded ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </div>
+                              ) : (
+                                <Link href={subItem.path} className="flex items-center w-full">
+                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
+                                  <div>
+                                    <span>{subItem.name}</span>
+                                    {subItem.description && (
+                                      <p className="text-xs text-muted-foreground">{subItem.description}</p>
+                                    )}
+                                  </div>
+                                </Link>
+                              )}
+                            </Button>
+
+                            {subItem.subItems && isSubItemExpanded && (
+                              <div className="pl-6 space-y-1">
+                                {subItem.subItems.map((subSubItem, subSubIndex) => {
+                                  const SubSubIconComponent = subSubItem.icon ? (LucideIcons as any)[subSubItem.icon] : undefined;
+                                  const isSubSubActive = pathname === subSubItem.path;
+
+                                  return (
+                                    <Button
+                                      key={subSubIndex}
+                                      variant={isSubSubActive ? "secondary" : "ghost"}
+                                      className="w-full justify-start"
+                                      asChild
+                                    >
+                                      <Link href={subSubItem.path} className="flex items-center">
+                                        {SubSubIconComponent && <SubSubIconComponent className="h-4 w-4 mr-2" />}
+                                        <span>{subSubItem.name}</span>
+                                      </Link>
+                                    </Button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </ScrollArea>
-    </div>
+      </div>
+    </ScrollArea>
   );
 }
 

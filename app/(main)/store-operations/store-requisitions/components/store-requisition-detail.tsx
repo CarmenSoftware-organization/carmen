@@ -767,7 +767,6 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                         />
                       </th>
                       <th className="text-left p-4 text-xs font-medium text-gray-500">Location</th>
-                      <th className="text-left p-4 text-xs font-medium text-gray-500">Movement Type</th>
                       <th className="text-left p-4 text-xs font-medium text-gray-500">Product</th>
                       <th className="text-left p-4 text-xs font-medium text-gray-500">Unit</th>
                       <th className="text-right p-4 text-xs font-medium text-gray-500">Required</th>
@@ -800,15 +799,6 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                                 </p>
                               </div>
                             </div>
-                          </td>
-                          <td className="p-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              item.itemInfo.locationType === 'inventory' 
-                                ? 'bg-blue-100 text-blue-800' 
-                                : 'bg-green-100 text-green-800'
-                            }`}>
-                              {item.itemInfo.locationType === 'inventory' ? 'Transfer' : 'Issue'}
-                            </span>
                           </td>
                           <td className="p-4">
                             <div className="space-y-1">
@@ -955,73 +945,67 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                         <tr>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Movement Type</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lot No.</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">In</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Out</th>
+                          <th colSpan={2} className="px-6 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div className="flex flex-col items-center gap-1">
+                              <span>STOCK</span>
+                              <div className="flex justify-center gap-8 w-full border-t pt-1">
+                                <div className="w-16 text-right">In</div>
+                                <div className="w-16 text-right">Out</div>
+                              </div>
+                            </div>
+                          </th>
                           <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Cost</th>
                           <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {movements.map(movement => (
-                          <React.Fragment key={movement.id}>
-                            {/* Movement Header */}
-                            <tr className="bg-gray-50">
-                              <td colSpan={9} className="px-6 py-2">
-                                <div className="flex justify-between items-center">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium">{movement.movementType}</span>
-                                    <span className="text-gray-400">|</span>
-                                    <span className="text-blue-600">{movement.sourceDocument}</span>
-                                    <span className="text-gray-400">|</span>
-                                    <span className="text-gray-500">{movement.commitDate}</span>
+                        {movements.map(movement => {
+                          // Filter items to only show inventory transactions
+                          const inventoryItems = movement.items.filter(item => item.location.type === 'INV');
+                          
+                          // Only render movement if it has inventory items
+                          if (inventoryItems.length === 0) return null;
+
+                          return (
+                            <React.Fragment key={movement.id}>
+                              {/* Movement Header */}
+                              <tr className="bg-gray-50">
+                                <td colSpan={8} className="px-6 py-2">
+                                  <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-blue-600">{movement.sourceDocument}</span>
+                                      <span className="text-gray-400">|</span>
+                                      <span className="text-gray-500">{movement.commitDate}</span>
+                                    </div>
+                                    <div className="text-sm text-gray-500">
+                                      {movement.movement.source} → {movement.movement.destination}
+                                    </div>
                                   </div>
-                                  <div className="text-sm text-gray-500">
-                                    {movement.movement.source} → {movement.movement.destination}
-                                  </div>
-                                </div>
-                              </td>
-                            </tr>
-                            {/* Movement Items */}
-                            {movement.items.map(item => (
-                              <React.Fragment key={item.id}>
-                                {item.lots.map((lot, lotIndex) => (
+                                </td>
+                              </tr>
+                              {/* Movement Items */}
+                              {inventoryItems.map(item => 
+                                item.lots.map((lot, lotIndex) => (
                                   <tr key={`${item.id}-${lot.lotNo}`} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       {lotIndex === 0 ? (
                                         <div className="flex flex-col gap-1">
                                           <div className="text-sm font-medium text-gray-900">{item.location.name}</div>
-                                          <div className="flex gap-2 items-center">
-                                            <div className="text-sm text-gray-500">{item.location.code}</div>
-                                            <span className={`px-1.5 py-0.5 text-xs rounded ${
-                                              item.location.type === 'INV' 
-                                                ? 'bg-blue-100 text-blue-700'
-                                                : 'bg-purple-100 text-purple-700'
-                                            }`}>
-                                              {item.location.type === 'INV' ? 'Inventory' : 'Direct'}
-                                            </span>
+                                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                                            <span>{item.location.code}</span>
                                           </div>
                                         </div>
                                       ) : ''}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       {lotIndex === 0 ? (
-                                        <div>
+                                        <div className="flex flex-col gap-1">
                                           <div className="text-sm font-medium text-gray-900">{item.productName}</div>
                                           <div className="text-sm text-gray-500">{item.sku}</div>
                                         </div>
                                       ) : ''}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                      <span className={`px-2 py-1 text-xs rounded-full ${
-                                        item.location.type === 'INV' 
-                                          ? 'bg-blue-100 text-blue-700'
-                                          : 'bg-orange-100 text-orange-700'
-                                      }`}>
-                                        {item.location.type === 'INV' ? 'Transfer' : 'Issue'}
-                                      </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       <div className="text-sm font-medium text-gray-900">{lot.lotNo}</div>
@@ -1029,24 +1013,24 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                       {item.uom}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                                      {lot.quantity > 0 ? `+${lot.quantity.toLocaleString()}` : '-'}
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-800 text-right">
+                                      {lot.quantity > 0 ? lot.quantity.toLocaleString() : ''}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 text-right">
-                                      {lot.quantity < 0 ? Math.abs(lot.quantity).toLocaleString() : '-'}
+                                      {lot.quantity < 0 ? Math.abs(lot.quantity).toLocaleString() : ''}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
                                       {item.unitCost.toLocaleString()}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 text-right">
                                       {(item.unitCost * Math.abs(lot.quantity)).toLocaleString()}
                                     </td>
                                   </tr>
-                                ))}
-                              </React.Fragment>
-                            ))}
-                          </React.Fragment>
-                        ))}
+                                ))
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

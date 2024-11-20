@@ -1,6 +1,11 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
@@ -10,13 +15,19 @@ import {
 } from "@/components/ui/custom-dialog";
 import {
   Edit,
+  Save,
+  Trash2,
+  Send,
+  Printer,
+  PanelRightOpen,
+  PanelRightClose,
+  History,
+  ArrowLeft,
+  XIcon,
+  Paperclip,
+  Plus,
   Info,
   Package,
-  Plus,
-  Printer,
-  Send,
-  Trash2,
-  XIcon,
 } from "lucide-react";
 import {
   Select,
@@ -47,6 +58,7 @@ import TaxEntries  from "./tax-entries"
 import { StockMovementTab } from "./StockMovementTab"
 import StockMovementContent from "./stock-movement";
 import StatusBadge from "@/components/ui/custom-status-badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
@@ -65,15 +77,18 @@ interface CreditNoteHeaderProps {
   vendorName: string;
   vendorCode: string;
   currency: string;
+  exchangeRate: string;
   invoiceReference: string;
   invoiceDate: string;
   taxInvoiceReference: string;
   taxDate: string;
   grnReference: string;
   grnDate: string;
-  reason: CreditNoteReason;
+  reason: string;
   description: string;
   onHeaderChange: (field: string, value: string) => void;
+  showPanel: boolean;
+  setShowPanel: (show: boolean) => void;
 }
 
 function CreditNoteHeader({
@@ -84,6 +99,7 @@ function CreditNoteHeader({
   vendorName,
   vendorCode,
   currency,
+  exchangeRate,
   invoiceReference,
   invoiceDate,
   taxInvoiceReference,
@@ -93,37 +109,70 @@ function CreditNoteHeader({
   reason,
   description,
   onHeaderChange,
+  showPanel,
+  setShowPanel,
 }: CreditNoteHeaderProps) {
   return (
     <Card className="w-full mb-4">
-      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
-        <div className="flex items-center gap-2">
-          <CardTitle>Credit Note</CardTitle>
-          <StatusBadge status={status} />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="default" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button variant="outline" size="sm">
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
-          <Button variant="outline" size="sm">
-            <Printer className="h-4 w-4 mr-2" />
-            Print
-          </Button>
-          <Button variant="outline" size="sm">
-            <Send className="h-4 w-4 mr-2" />
-            Send
-          </Button>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center space-x-2">
+              <h2 className="text-lg font-semibold">Credit Note</h2>
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  status === 'DRAFT'
+                  ? 'bg-gray-100 text-gray-800'
+                  : status === 'POSTED'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+                }`}>
+                {status}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="default" size="sm">
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            <Button variant="destructive" size="sm">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+            <Button variant="default" size="sm">
+              <Save className="h-4 w-4 mr-2" />
+              Commit
+            </Button>
+            <Button variant="outline" size="sm">
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
+            <Button variant="outline" size="sm">
+              <Send className="h-4 w-4 mr-2" />
+              Send
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowPanel(!showPanel)}
+            >
+              {showPanel ? (
+                <PanelRightClose className="h-4 w-4" />
+              ) : (
+                <PanelRightOpen className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-6">
           <div className="space-y-2">
-            <Label htmlFor="creditNoteNumber">Credit Note Number</Label>
+            <Label htmlFor="creditNoteNumber">Credit Note #</Label>
             <Input
               id="creditNoteNumber"
               value={creditNoteNumber}
@@ -156,23 +205,57 @@ function CreditNoteHeader({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={status}
-              onValueChange={(value) => onHeaderChange("status", value)}
-            >
-              <SelectTrigger id="status">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="DRAFT">Draft</SelectItem>
-                <SelectItem value="POSTED">Posted</SelectItem>
-                <SelectItem value="VOID">Void</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="vendorName">Vendor</Label>
+            <Input
+              id="vendorName"
+              value={`${vendorName} (${vendorCode})`}
+              onChange={(e) => {
+                const value = e.target.value;
+                const match = value.match(/(.*?)\s*\((.*?)\)/);
+                if (match) {
+                  onHeaderChange("vendorName", match[1].trim());
+                  onHeaderChange("vendorCode", match[2].trim());
+                } else {
+                  onHeaderChange("vendorName", value);
+                }
+              }}
+            />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="currency">Currency</Label>
+            <Input
+              id="currency"
+              value={`${currency} (${exchangeRate})`}
+              onChange={(e) => {
+                const value = e.target.value;
+                const match = value.match(/(.*?)\s*\((.*?)\)/);
+                if (match) {
+                  onHeaderChange("currency", match[1].trim());
+                  onHeaderChange("exchangeRate", match[2].trim());
+                } else {
+                  onHeaderChange("currency", value);
+                }
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="grnReference">GRN #</Label>
+            <Input
+              id="grnReference"
+              value={grnReference}
+              onChange={(e) => onHeaderChange("grnReference", e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="grnDate">GRN Date</Label>
+            <Input
+              id="grnDate"
+              value={grnDate}
+              onChange={(e) => onHeaderChange("grnDate", e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="reason">Reason</Label>
             <Select
               value={reason}
@@ -182,42 +265,17 @@ function CreditNoteHeader({
                 <SelectValue placeholder="Select reason" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="PRICING_ERROR">Pricing Error</SelectItem>
-                <SelectItem value="DAMAGED_GOODS">Damaged Goods</SelectItem>
-                <SelectItem value="RETURN">Return</SelectItem>
-                <SelectItem value="DISCOUNT_AGREEMENT">
-                  Discount Agreement
-                </SelectItem>
+                <SelectItem value="DAMAGED">Damaged</SelectItem>
+                <SelectItem value="EXPIRED">Expired</SelectItem>
+                <SelectItem value="WRONG_DELIVERY">Wrong Delivery</SelectItem>
+                <SelectItem value="QUALITY_ISSUE">Quality Issue</SelectItem>
+                <SelectItem value="PRICE_ADJUSTMENT">Price Adjustment</SelectItem>
                 <SelectItem value="OTHER">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="vendorName">Vendor Name</Label>
-            <Input
-              id="vendorName"
-              value={vendorName}
-              onChange={(e) => onHeaderChange("vendorName", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="vendorCode">Vendor Code</Label>
-            <Input
-              id="vendorCode"
-              value={vendorCode}
-              onChange={(e) => onHeaderChange("vendorCode", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
-            <Input
-              id="currency"
-              value={currency}
-              onChange={(e) => onHeaderChange("currency", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="invoiceReference">Invoice Reference</Label>
+            <Label htmlFor="invoiceReference">Invoice #</Label>
             <Input
               id="invoiceReference"
               value={invoiceReference}
@@ -236,7 +294,7 @@ function CreditNoteHeader({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="taxInvoiceReference">Tax Invoice Reference</Label>
+            <Label htmlFor="taxInvoiceReference">Tax Invoice #</Label>
             <Input
               id="taxInvoiceReference"
               value={taxInvoiceReference}
@@ -246,29 +304,11 @@ function CreditNoteHeader({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="taxDate">Tax Date</Label>
+            <Label htmlFor="taxDate">Tax Invoice Date</Label>
             <Input
               id="taxDate"
-              type="date"
               value={taxDate}
               onChange={(e) => onHeaderChange("taxDate", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="grnReference">GRN Reference</Label>
-            <Input
-              id="grnReference"
-              value={grnReference}
-              onChange={(e) => onHeaderChange("grnReference", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="grnDate">GRN Date</Label>
-            <Input
-              id="grnDate"
-              type="date"
-              value={grnDate}
-              onChange={(e) => onHeaderChange("grnDate", e.target.value)}
             />
           </div>
           <div className="space-y-2 col-span-full">
@@ -321,6 +361,7 @@ interface CreditNoteItem {
 }
 
 export function CreditNoteComponent() {
+  const [showPanel, setShowPanel] = useState(true);
   const [headerData, setHeaderData] = useState({
     creditNoteNumber: "CN-2024-001",
     date: "2024-03-20",
@@ -329,13 +370,14 @@ export function CreditNoteComponent() {
     vendorName: "Thai Beverage Co.",
     vendorCode: "VEN-001",
     currency: "THB",
+    exchangeRate: "1.0000",
     invoiceReference: "INV-2024-0123",
     invoiceDate: "2024-03-15",
     taxInvoiceReference: "TAX-2024-0123",
     taxDate: "2024-03-15",
     grnReference: "GRN-2024-0089",
     grnDate: "2024-03-10",
-    reason: "DAMAGED_GOODS" as CreditNoteReason,
+    reason: "",
     description: "Credit note for damaged beverage products received in last shipment. Items show signs of mishandling during transport.",
   });
 
@@ -347,6 +389,41 @@ export function CreditNoteComponent() {
 
   const handleOpeninfo = () => {
     setOpenInfo(!openInfo);
+  };
+
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState([
+    {
+      id: '1',
+      user: 'John Doe',
+      avatar: '/avatars/john-doe.png',
+      content: 'Vendor confirmed the return details.',
+      timestamp: '2024-03-20 09:30 AM',
+      attachments: ['return_confirmation.pdf'],
+    },
+    {
+      id: '2',
+      user: 'Jane Smith',
+      avatar: '/avatars/jane-smith.png',
+      content: 'Quality inspection completed on returned items.',
+      timestamp: '2024-03-20 02:15 PM',
+      attachments: ['inspection_report.pdf', 'damage_photos.zip'],
+    },
+  ]);
+
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      const newCommentObj = {
+        id: Date.now().toString(),
+        user: 'Current User',
+        avatar: '/avatars/current-user.png',
+        content: newComment,
+        timestamp: new Date().toLocaleString(),
+        attachments: [], // Initialize with empty attachments array
+      };
+      setComments([...comments, newCommentObj]);
+      setNewComment('');
+    }
   };
 
   const mockStockMovements = [
@@ -523,171 +600,285 @@ export function CreditNoteComponent() {
     }
   ]
 
+  const auditLogs = [
+    {
+      id: '1',
+      user: 'John Doe',
+      action: 'Created',
+      details: 'Credit Note #CN-2024-001',
+      timestamp: '2024-03-20 09:00 AM'
+    },
+    {
+      id: '2',
+      user: 'Jane Smith',
+      action: 'Updated',
+      details: 'Changed amount from $1,000 to $2,000',
+      timestamp: '2024-03-20 09:30 AM'
+    },
+    {
+      id: '3',
+      user: 'Mike Johnson',
+      action: 'Added Item',
+      details: 'Added product XYZ-123',
+      timestamp: '2024-03-20 10:15 AM'
+    }
+  ];
+
   return (
     <div className="space-y-4">
-      <CreditNoteHeader {...headerData} onHeaderChange={handleHeaderChange} />
-      <Tabs defaultValue="itemDetails" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="itemDetails">Item Details</TabsTrigger>
-          {/* <TabsTrigger value="inventory">Inventory</TabsTrigger> */}
-          <TabsTrigger value="stockMovement">Stock Movement</TabsTrigger>
-          <TabsTrigger value="journalEntries">Journal Entries</TabsTrigger>
-          <TabsTrigger value="taxEntries">Tax Entries</TabsTrigger>
-        </TabsList>
-        <TabsContent value="itemDetails">
+      <div className={`flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4`}>
+        <div className={`flex-grow space-y-4 ${showPanel ? 'lg:w-3/4' : 'w-full'}`}>
+          <CreditNoteHeader 
+            {...headerData}
+            onHeaderChange={handleHeaderChange} 
+            showPanel={showPanel} 
+            setShowPanel={setShowPanel} 
+          />
+          <Tabs defaultValue="itemDetails" className="w-full">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="itemDetails">Item Details</TabsTrigger>
+              <TabsTrigger value="stockMovement">Stock Movement</TabsTrigger>
+              <TabsTrigger value="journalEntries">Journal Entries</TabsTrigger>
+              <TabsTrigger value="taxEntries">Tax Entries</TabsTrigger>
+            </TabsList>
+            <TabsContent value="itemDetails">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Item Details</CardTitle>
+                  <Button size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Item
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[200px]">Location</TableHead>
+                        <TableHead className="w-[200px]">Product</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Net Amount</TableHead>
+                        <TableHead>Tax Amount</TableHead>
+                        <TableHead>Total Amount</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {mockItems.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>
+                            <div>{item.location.name}</div>
+                            <div className="text-sm text-muted-foreground">{item.location.code}</div>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            <div>{item.product.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.product.description}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{item.quantity.primary}</div>
+                            <div className="text-sm text-muted-foreground">{item.quantity.secondary}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{item.unit.primary}</div>
+                            <div className="text-sm text-muted-foreground">{item.unit.secondary}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{item.price.unit.toFixed(2)}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.price.secondary.toFixed(2)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{item.amounts.net.toFixed(2)}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.amounts.baseNet.toFixed(2)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{item.amounts.tax.toFixed(2)}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.amounts.baseTax.toFixed(2)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{item.amounts.total.toFixed(2)}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.amounts.baseTotal.toFixed(2)}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleOpeninfo()}
+                            >
+                              <Info className="h-4 w-4" />
+                              <span className="sr-only">View</span>
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="stockMovement">
+              <StockMovementContent />
+            </TabsContent>
+            <TabsContent value="journalEntries">
+              <JournalEntries />
+            </TabsContent>
+            <TabsContent value="taxEntries">
+              <TaxEntries />
+            </TabsContent>
+          </Tabs>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Item Details</CardTitle>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Item
-              </Button>
+            <CardHeader>
+              <CardTitle>Transaction Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Location</TableHead>
-                    <TableHead className="w-[200px]">Product</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Unit</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Net Amount</TableHead>
-                    <TableHead>Tax Amount</TableHead>
-                    <TableHead>Total Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <div>{item.location.name}</div>
-                        <div className="text-sm text-muted-foreground">{item.location.code}</div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <div>{item.product.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.product.description}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>{item.quantity.primary}</div>
-                        <div className="text-sm text-muted-foreground">{item.quantity.secondary}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div>{item.unit.primary}</div>
-                        <div className="text-sm text-muted-foreground">{item.unit.secondary}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div>{item.price.unit.toFixed(2)}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.price.secondary.toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>{item.amounts.net.toFixed(2)}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.amounts.baseNet.toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>{item.amounts.tax.toFixed(2)}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.amounts.baseTax.toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>{item.amounts.total.toFixed(2)}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.amounts.baseTotal.toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleOpeninfo()}
-                        >
-                          <Info className="h-4 w-4" />
-                          <span className="sr-only">View</span>
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </TableCell>
+              <div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="text-right">Amount (USD)</TableHead>
+                      <TableHead className="text-right">Base Amount (PHP)</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Sub Total Amount</TableCell>
+                      <TableCell className="text-right">2,000.00</TableCell>
+                      <TableCell className="text-right">100,000.00</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Tax Amount</TableCell>
+                      <TableCell className="text-right">200.00</TableCell>
+                      <TableCell className="text-right">10,000.00</TableCell>
+                    </TableRow>
+                    <TableRow className="font-bold">
+                      <TableCell>Total Amount</TableCell>
+                      <TableCell className="text-right">2,100.00</TableCell>
+                      <TableCell className="text-right">105,000.00</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
-       
-        <TabsContent value="stockMovement">
-          {/* <StockMovementTab 
-            mode="view" 
-            movements={mockStockMovements}
-          /> */}
-          <StockMovementContent />
-        </TabsContent>
-        <TabsContent value="journalEntries">
-          <JournalEntries />
-        </TabsContent>
-        <TabsContent value="taxEntries">
-          <TaxEntries />
-        </TabsContent>
-      </Tabs>
-      <Card>
-        <CardHeader>
-          <CardTitle>Transaction Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Description</TableHead>
-                  <TableHead className="text-right">Amount (USD)</TableHead>
-                  <TableHead className="text-right">
-                    Base Amount (PHP)
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>Sub Total Amount</TableCell>
-                  <TableCell className="text-right">2,000.00</TableCell>
-                  <TableCell className="text-right">100,000.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Tax Amount</TableCell>
-                  <TableCell className="text-right">200.00</TableCell>
-                  <TableCell className="text-right">10,000.00</TableCell>
-                </TableRow>
+        </div>
+        
+        {showPanel && (
+          <div className="lg:w-1/4 pt-0 space-y-4">
+            <Card className="sticky top-4">
+              <CardHeader>
+                <CardTitle>Comments & Attachments</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4 mb-4">
+                  {comments.map((comment) => (
+                    <Card key={comment.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start space-x-4">
+                          <Avatar>
+                            <AvatarImage src={comment.avatar} alt={comment.user} />
+                            <AvatarFallback>{comment.user.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center">
+                              <h3 className="font-semibold">{comment.user}</h3>
+                              <span className="text-sm text-gray-500">{comment.timestamp}</span>
+                            </div>
+                            <p className="mt-1">{comment.content}</p>
+                            {comment.attachments && comment.attachments.length > 0 && (
+                              <div className="mt-2">
+                                <h4 className="text-sm font-semibold">Attachments:</h4>
+                                <ul className="list-disc list-inside">
+                                  {comment.attachments.map((attachment, index) => (
+                                    <li key={index} className="text-sm text-blue-500 hover:underline">
+                                      <a href="#">{attachment}</a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
                 
-                <TableRow className="font-bold">
-                  <TableCell>Total Amount</TableCell>
-                  <TableCell className="text-right">2,100.00</TableCell>
-                  <TableCell className="text-right">105,000.00</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                <div className="flex items-start space-x-2">
+                  <Textarea
+                    placeholder="Add a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="flex-1"
+                  />
+                  <div className="space-y-2">
+                    <Button variant="outline" size="icon">
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                    <Button onClick={handleAddComment}>
+                      <Send className="h-4 w-4 mr-2" />
+                      Send
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
+            <Card>
+              <CardHeader>
+                <CardTitle>Audit Log</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  {auditLogs.map((log) => (
+                    <div key={log.id} className="flex items-start space-x-4 border-b pb-3 last:border-0">
+                      <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                        <History className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <span className="font-medium">{log.user}</span>
+                            <span className="text-gray-500"> {log.action.toLowerCase()} </span>
+                            <span>{log.details}</span>
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {log.timestamp}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
       <Dialog open={openInfo} onOpenChange={setOpenInfo}>
         <DialogContent className="sm:max-w-[80vw] bg-white [&>button]:hidden">
           <DialogHeader>
             <div className="flex justify-between w-full items-center border-b pb-4">
               <DialogTitle>
-                {" "}
                 <div className="flex items-center">
                   <Package className="w-5 h-5 text-gray-500 mr-2" />
                   <h2 className="text-lg font-medium text-gray-900">

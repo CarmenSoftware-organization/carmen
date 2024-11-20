@@ -21,7 +21,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bell, User, Settings, LogOut, Globe, Moon, Sun, Menu, X } from "lucide-react";
+import {
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  Globe,
+  Moon,
+  Sun,
+  Menu,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -56,8 +68,18 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
       <div className="w-full px-4 py-1 sm:px-6">
         <div className="flex items-center h-12">
           <div className="flex items-center">
-            <Button variant="ghost" size="icon" className="block lg:hidden mr-2" onClick={onSidebarToggle}>
-              {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onSidebarToggle}
+              className="lg:hover:bg-accent lg:hover:text-accent-foreground block lg:hidden mr-2"
+              aria-label={isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            >
+              {isSidebarOpen ? (
+                <ChevronLeft className="h-5 w-5" />
+              ) : (
+                <ChevronRight className="h-5 w-5" />
+              )}
             </Button>
             <div className="flex flex-col">
               <Link

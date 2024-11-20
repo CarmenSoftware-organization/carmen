@@ -3,6 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import { Warehouse, Store } from 'lucide-react';
+
+interface StockMovement {
+  id: number;
+  lotNo: string;
+  location: string;
+  locationCode: string;
+  locationType: string;
+  product: string;
+  productDescription: string;
+  unit: string;
+  quantity: number;
+  subtotal: number;
+}
 
 const StockMovementContent = () => {
   const [selectedMovement, setSelectedMovement] = useState(null);
@@ -38,12 +52,16 @@ const StockMovementContent = () => {
             {
               lotNo: 'L20240115-001',
               quantity: -30, // Negative quantities for returns
-              uom: 'Bag'
+              uom: 'Bag',
+              totalCost: -3750.00,
+              extraCost: 0
             },
             {
               lotNo: 'L20240115-002',
               quantity: -20,
-              uom: 'Bag'  
+              uom: 'Bag',
+              totalCost: -2500.00,
+              extraCost: 0
             }
           ]
         },
@@ -68,7 +86,9 @@ const StockMovementContent = () => {
             {
               lotNo: 'L20240115-003',
               quantity: -120,
-              uom: 'Bottle'
+              uom: 'Bottle',
+              totalCost: -10200.00,
+              extraCost: 0
             }
           ]
         },
@@ -93,7 +113,9 @@ const StockMovementContent = () => {
             {
               lotNo: 'L20240115-004',
               quantity: -50,
-              uom: 'Piece'
+              uom: 'Piece',
+              totalCost: -22500.00,
+              extraCost: 0
             }
           ]
         }
@@ -102,6 +124,7 @@ const StockMovementContent = () => {
         inQty: 0,
         outQty: 220,
         totalCost: -38950.00, // Negative total cost
+        extraCost: 0,
         lotCount: 4
       },
       movement: {
@@ -113,6 +136,14 @@ const StockMovementContent = () => {
       }
     }
   ];
+
+  const getLocationIcon = (type: string) => {
+    return type === 'INV' ? <Warehouse className="h-4 w-4" /> : <Store className="h-4 w-4" />;
+  };
+
+  const getLocationTypeLabel = (type: string) => {
+    return type === 'INV' ? 'Inventory' : 'Consignment';
+  };
 
   return (
     <div className="space-y-4 px-8">
@@ -145,15 +176,37 @@ const StockMovementContent = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Movement Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lot No.</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">In</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Out</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Cost</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</th>
+                  <th scope="col" className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Location
+                  </th>
+                  <th scope="col" className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Product
+                  </th>
+                  <th scope="col" className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Lot No.
+                  </th>
+                  <th scope="col" className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unit
+                  </th>
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-16"></div>
+                        <span>STOCK</span>
+                        <div className="w-16"></div>
+                      </div>
+                      <div className="flex justify-end gap-2 w-full border-t pt-1">
+                        <div className="w-16 text-center">In</div>
+                        <div className="w-16 text-center">Out</div>
+                      </div>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unit Cost
+                  </th>
+                  <th scope="col" className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Cost
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -161,11 +214,9 @@ const StockMovementContent = () => {
                   <React.Fragment key={movement.id}>
                     {/* Movement Header */}
                     <tr className="bg-gray-50">
-                      <td colSpan={8} className="px-6 py-2">
+                      <td colSpan={7} className="px-2 py-2">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">{movement.movementType}</span>
-                            <span className="text-gray-400">|</span>
                             <span className="text-blue-600">{movement.sourceDocument}</span>
                             <span className="text-gray-400">|</span>
                             <span className="text-gray-500">{movement.commitDate}</span>
@@ -177,81 +228,85 @@ const StockMovementContent = () => {
                       </td>
                     </tr>
                     {/* Movement Items */}
-                    {movement.items.map(item => (
+                    {movement.items.filter(item => ['INV', 'CON'].includes(item.location.type)).map(item => (
                       <React.Fragment key={item.id}>
                         {item.lots.map((lot, lotIndex) => (
                           <tr key={`${item.id}-${lot.lotNo}`} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {lotIndex === 0 ? (
-                                <div className="flex flex-col gap-1">
-                                  <div className="text-sm font-medium text-gray-900">{item.location.name}</div>
-                                  <div className="flex gap-2 items-center">
-                                    <div className="text-sm text-gray-500">{item.location.code}</div>
-                                    <span className={`px-1.5 py-0.5 text-xs rounded ${
-                                      item.location.type === 'INV' 
-                                        ? 'bg-blue-100 text-blue-700'
-                                        : 'bg-purple-100 text-purple-700'
-                                    }`}>
-                                      {item.location.type === 'INV' ? 'Inventory' : 'Direct'}
-                                    </span>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              <div className="flex flex-col gap-1">
+                                <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  item.location.type === 'INV' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {item.location.name}
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-gray-500">
+                                  <span>{item.location.code}</span>
+                                  <span className="text-gray-300">|</span>
+                                  <div className="flex items-center gap-0.5">
+                                    {getLocationIcon(item.location.type)}
+                                    <span>{getLocationTypeLabel(item.location.type)}</span>
                                   </div>
                                 </div>
-                              ) : ''}
+                              </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {lotIndex === 0 ? (
-                                <div>
-                                  <div className="text-sm font-medium text-gray-900">{item.productName}</div>
-                                  <div className="text-sm text-gray-500">{item.sku}</div>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              <div className="flex flex-col gap-1">
+                                <div className="text-sm text-gray-900">
+                                  {item.productName}
                                 </div>
-                              ) : ''}
+                                <div className="text-xs text-gray-500">
+                                  {item.sku}
+                                </div>
+                              </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 py-1 text-xs rounded-full ${
-                                item.location.type === 'INV' 
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : 'bg-orange-100 text-orange-700'
-                              }`}>
-                                {item.location.type === 'INV' ? 'Transfer' : 'Issue'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-2 py-4 whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900">{lot.lotNo}</div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
                               {item.uom}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                              {lot.quantity > 0 ? `+${lot.quantity.toLocaleString()}` : '-'}
+                            <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <div className="flex justify-end gap-2">
+                                <div className="w-16 text-center">
+                                  {lot.quantity > 0 ? lot.quantity.toLocaleString() : '-'}
+                                </div>
+                                <div className="w-16 text-center">
+                                  {lot.quantity < 0 ? Math.abs(lot.quantity).toLocaleString() : '-'}
+                                </div>
+                              </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 text-right">
-                              {lot.quantity < 0 ? Math.abs(lot.quantity).toLocaleString() : '-'}
+                            <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                              {((lot.totalCost || 0) / (lot.quantity || 1)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                              {item.unitCost.toLocaleString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 text-right">
-                              {(item.unitCost * Math.abs(lot.quantity)).toLocaleString()}
+                            <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                              {(lot.totalCost || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                           </tr>
                         ))}
                       </React.Fragment>
                     ))}
-                    {/* Movement Total */}
-                    {/* <tr className="bg-gray-100 font-medium">
-                      <td colSpan={5} className="px-6 py-2 text-sm text-right">
-                        Total ({movement.totals.lotCount} Lots)
+                    {/* Totals */}
+                    <tr className="bg-gray-50">
+                      <td colSpan={4} className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">
+                        Total Items: {movements.length}
                       </td>
-                      <td className="px-6 py-2 text-sm text-right text-gray-900">
-                        {movement.totals.inQty > 0 ? `+${movement.totals.inQty.toLocaleString()}` : '-'}
+                      <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <div className="flex justify-end gap-2">
+                          <div className="w-16 text-center">
+                            {movements.reduce((sum, m) => sum + (m.totals.inQty > 0 ? m.totals.inQty : 0), 0).toLocaleString()}
+                          </div>
+                          <div className="w-16 text-center">
+                            {movements.reduce((sum, m) => sum + (m.totals.outQty > 0 ? m.totals.outQty : 0), 0).toLocaleString()}
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-6 py-2 text-sm text-right text-gray-900">
-                        {movement.totals.outQty > 0 ? movement.totals.outQty.toLocaleString() : '-'}
+                      <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {movements.reduce((sum, m) => sum + m.totals.totalCost, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                      <td className="px-6 py-2 text-sm text-right">
-                        ${movement.totals.totalCost.toLocaleString()}
+                      <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {movements.reduce((sum, m) => sum + m.totals.totalCost, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                    </tr> */}
+                    </tr>
                   </React.Fragment>
                 ))}
               </tbody>
