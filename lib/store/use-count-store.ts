@@ -55,14 +55,7 @@ interface CountStore {
   selectedProducts: HotelProduct[];
   
   // Setup Actions
-  initializeSession: (
-    counterName: string,
-    department: string,
-    countDate: Date,
-    startTime: string,
-    reason: string,
-    countType: "full" | "partial" | "spot"
-  ) => void;
+  initializeSession: (data: SessionInit) => void;
   
   // Location Actions
   setSelectedLocations: (locations: string[]) => void;
@@ -85,6 +78,16 @@ interface CountStore {
   addActiveCount: (count: ActiveCount) => void
   updateActiveCount: (id: string, updates: Partial<ActiveCount>) => void
   removeActiveCount: (id: string) => void
+}
+
+interface SessionInit {
+  counterName: string;
+  department: string;
+  date: Date;
+  time: string;
+  notes: string;
+  type: "spot" | "physical";
+  selectedLocations: string[];
 }
 
 const mockActiveCounts: ActiveCount[] = [
@@ -138,34 +141,28 @@ export const useCountStore = create<CountStore>((set) => ({
   selectedProducts: [],
 
   // Initialize a new count session
-  initializeSession: (
-    counterName: string,
-    department: string,
-    countDate: Date,
-    startTime: string,
-    reason: string,
-    countType: "full" | "partial" | "spot"
-  ) => {
-    const session: CountSession = {
-      id: uuidv4(),
-      type: 'spot',
-      status: 'draft',
-      countDate,
-      startTime,
-      reason,
-      department,
-      counter: counterName,
-      locations: [],
-      targetCount: 0,
-      totalItems: 0,
-      discrepancies: 0,
-      notes: '',
-      allocations: [],
-      updatedAt: new Date(),
-      createdAt: new Date(),
-    };
-
-    set({ currentSession: session });
+  initializeSession: (data: SessionInit) => {
+    const sessionId = uuidv4();
+    set({
+      currentSession: {
+        id: sessionId,
+        type: data.type,
+        status: 'draft',
+        countDate: data.date,
+        startTime: data.time,
+        reason: data.notes,
+        department: data.department,
+        counter: data.counterName,
+        locations: data.selectedLocations,
+        targetCount: 0,
+        totalItems: 0,
+        discrepancies: 0,
+        notes: data.notes,
+        allocations: [],
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      }
+    });
   },
 
   // Location management

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, MapPin, Building2, UtensilsCrossed, Wine, Warehouse, Wrench, Check, X } from 'lucide-react';
+import { Search, MapPin, Building2, UtensilsCrossed, Wine, Warehouse, Wrench, Check, ChevronRight, Clock, Package2, X } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { mockLocations, getLocationsByDepartment, getProductsByLocation, Location } from '@/lib/mock/inventory-data';
+import { format } from 'date-fns';
 
 interface LocationSelectionProps {
   formData: {
@@ -39,6 +40,7 @@ const getLocationIcon = (type: string) => {
 export function SpotCheckLocationSelection({ formData, setFormData, onNext, onBack }: LocationSelectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
+  const [selectedArea, setSelectedArea] = useState('all');
 
   const handleLocationSelect = (locationId: string) => {
     setFormData((prev: any) => {
@@ -60,12 +62,18 @@ export function SpotCheckLocationSelection({ formData, setFormData, onNext, onBa
     [formData.department]
   );
 
+  const areas = useMemo(() => {
+    const uniqueAreas = new Set(departmentLocations.map(loc => loc.building || 'Other'));
+    return ['all', ...Array.from(uniqueAreas)];
+  }, [departmentLocations]);
+
   const filteredLocations = departmentLocations.filter((location) => {
     const matchesSearch = 
       location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       location.code.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'all' || location.type === selectedType;
-    return matchesSearch && matchesType;
+    const matchesArea = selectedArea === 'all' || location.building === selectedArea;
+    return matchesSearch && matchesType && matchesArea;
   });
 
   const locationStats = useMemo(() => {
@@ -86,48 +94,57 @@ export function SpotCheckLocationSelection({ formData, setFormData, onNext, onBa
 
   return (
     <div className="space-y-6">
-      {/* Search and Filter Controls */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            type="text"
-            placeholder="Search locations by name or code..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <div className="flex gap-3">
-          <Select
-            value={selectedType}
-            onValueChange={setSelectedType}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Location Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {locationTypes.map((type) => {
-                const Icon = type.icon;
-                return (
-                  <SelectItem key={type.value} value={type.value}>
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4" />
-                      <span>{type.label}</span>
-                    </div>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+      {/* Search Bar */}
+      <div className="w-full relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+        <Input
+          type="text"
+          placeholder="Search locations by name or code..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10 h-12"
+        />
+      </div>
+
+      {/* Filter Controls */}
+      <div className="flex flex-wrap gap-4">
+        <Select value={selectedArea} onValueChange={setSelectedArea}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Area" />
+          </SelectTrigger>
+          <SelectContent>
+            {areas.map((area) => (
+              <SelectItem key={area} value={area}>
+                {area === 'all' ? 'All Areas' : area}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className="flex flex-wrap gap-2">
+          {locationTypes.map((type) => {
+            const Icon = type.icon;
+            const isSelected = selectedType === type.value;
+            return (
+              <Button
+                key={type.value}
+                variant={isSelected ? "default" : "outline"}
+                size="sm"
+                className="h-10"
+                onClick={() => setSelectedType(type.value)}
+              >
+                <Icon className="h-4 w-4 mr-2" />
+                {type.label}
+              </Button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main Content Area */}
       <div className="flex gap-6">
         {/* Location Grid */}
-        <div className="flex-1 overflow-hidden">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-1">
+        <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredLocations.map((location) => {
               const stats = locationStats[location.id];
               const Icon = getLocationIcon(location.type);
@@ -138,46 +155,50 @@ export function SpotCheckLocationSelection({ formData, setFormData, onNext, onBa
                 <Card
                   key={location.id}
                   className={cn(
-                    "relative transition-all hover:shadow-md cursor-pointer",
+                    "relative transition-all hover:shadow-md cursor-pointer group",
                     isSelected ? "border-primary bg-primary/5" : "hover:border-primary/50",
                     isDisabled && "opacity-50 pointer-events-none"
                   )}
                   onClick={() => !isDisabled && handleLocationSelect(location.id)}
                 >
-                  {isSelected && (
-                    <div className="absolute top-3 right-3 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
-                      <Check className="h-4 w-4 text-primary-foreground" />
-                    </div>
-                  )}
-                  
                   <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-start gap-3">
                       <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                         <Icon className="h-5 w-5 text-muted-foreground" />
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <CardTitle className="text-base truncate">{location.name}</CardTitle>
                         <CardDescription className="truncate">{location.code}</CardDescription>
                       </div>
+                      {isSelected ? (
+                        <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                          <Check className="h-4 w-4 text-primary-foreground" />
+                        </div>
+                      ) : (
+                        <div className="h-6 w-6 rounded-full border-2 border-muted-foreground/30 group-hover:border-primary/50" />
+                      )}
                     </div>
                   </CardHeader>
                   
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Items</p>
-                        <p className="text-lg font-medium">{stats.itemCount}</p>
+                      <div className="flex items-center gap-2">
+                        <Package2 className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{stats.itemCount}</p>
+                          <p className="text-xs text-muted-foreground">Items</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Last Count</p>
-                        <p className="text-lg font-medium">
-                          {stats.lastCountDate 
-                            ? new Date(stats.lastCountDate).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric'
-                              })
-                            : 'Never'}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">
+                            {stats.lastCountDate 
+                              ? format(stats.lastCountDate, 'MMM d')
+                              : 'Never'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">Last Count</p>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -199,88 +220,78 @@ export function SpotCheckLocationSelection({ formData, setFormData, onNext, onBa
           )}
         </div>
 
-        {/* Selected Locations Panel */}
-        <div className="hidden lg:block w-80">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                Selected Locations
-                <Badge variant="secondary" className="ml-2">
-                  {formData.selectedLocations.length} / {formData.targetCount}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[600px] -mx-4 px-4">
-                <div className="space-y-3">
+        {/* Selected Location Panel */}
+        {formData.selectedLocations.length > 0 && (
+          <div className="hidden xl:block w-80 border-l pl-6">
+            <div className="sticky top-6">
+              <h3 className="font-semibold mb-4">Selected Locations</h3>
+              <ScrollArea className="h-[calc(100vh-200px)]">
+                <div className="space-y-4">
                   {formData.selectedLocations.map((locationId) => {
                     const location = departmentLocations.find(l => l.id === locationId);
+                    const stats = locationStats[locationId];
                     if (!location) return null;
-                    const stats = locationStats[location.id];
-                    const Icon = getLocationIcon(location.type);
 
                     return (
-                      <div 
-                        key={location.id} 
-                        className="group relative p-4 rounded-lg border hover:border-primary/50"
-                      >
-                        <button
+                      <Card key={locationId} className="relative group">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleLocationSelect(location.id);
+                            handleLocationSelect(locationId);
                           }}
-                          className="absolute top-2 right-2 h-6 w-6 rounded-full bg-muted opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                         >
-                          <X className="h-3 w-3" />
-                        </button>
-
-                        <div className="flex gap-3">
-                          <div className="h-9 w-9 rounded bg-muted flex items-center justify-center flex-shrink-0">
-                            <Icon className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h4 className="font-medium leading-none truncate">{location.name}</h4>
-                            <p className="text-sm text-muted-foreground mt-1 truncate">{location.code}</p>
-                            
-                            <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                              <div>
-                                <p className="text-muted-foreground">Items</p>
-                                <p className="font-medium">{stats.itemCount}</p>
-                              </div>
-                              <div>
-                                <p className="text-muted-foreground">Last Count</p>
-                                <p className="font-medium">
-                                  {stats.lastCountDate 
-                                    ? new Date(stats.lastCountDate).toLocaleDateString(undefined, {
-                                        month: 'short',
-                                        day: 'numeric'
-                                      })
-                                    : 'Never'}
-                                </p>
-                              </div>
+                          <X className="h-4 w-4" />
+                        </Button>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                              {getLocationIcon(location.type)({ className: "h-4 w-4 text-muted-foreground" })}
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">{location.name}</h4>
+                              <p className="text-sm text-muted-foreground">{location.code}</p>
                             </div>
                           </div>
-                        </div>
-                      </div>
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Items</p>
+                              <p className="font-medium">{stats.itemCount}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Low Stock</p>
+                              <p className="font-medium">{stats.lowStockCount}</p>
+                            </div>
+                            <div className="col-span-2">
+                              <p className="text-muted-foreground">Last Count</p>
+                              <p className="font-medium">
+                                {stats.lastCountDate
+                                  ? format(stats.lastCountDate, 'PPP')
+                                  : 'Never counted'}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
                     );
                   })}
-
-                  {formData.selectedLocations.length === 0 && (
-                    <div className="text-center py-8">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
-                        <MapPin className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                      <h3 className="font-medium">No locations selected</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Select locations from the grid to begin
-                      </p>
-                    </div>
-                  )}
                 </div>
               </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="mt-6 space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Selected</span>
+                  <span className="font-medium">{formData.selectedLocations.length} of {formData.targetCount}</span>
+                </div>
+                <Button className="w-full" onClick={onNext} disabled={formData.selectedLocations.length === 0}>
+                  Continue
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

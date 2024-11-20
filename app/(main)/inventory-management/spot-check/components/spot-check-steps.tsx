@@ -43,7 +43,6 @@ import {
   BookOpen,
   type LucideIcon
 } from "lucide-react"
-import  { SpotCheckLocationSelection }  from "./location-selection"
 
 // Sample inventory data - replace with actual data from your API
 const inventoryItems = [
@@ -99,80 +98,43 @@ const steps: Step[] = [
     title: "Planning",
     options: [
       { id: "schedule", label: "Schedule Setup", icon: Calendar },
-      { id: "personnel", label: "Resource Allocation", icon: Users },
+      { id: "personnel", label: "Personnel Assignment", icon: Users2 },
       { id: "tools", label: "Tools & Equipment", icon: Wrench },
-      { id: "zones", label: "Zone Definition", icon: Map },
-    ],
-    details: {
-      schedule: {
-        date: "",
-        startTime: "",
-        endTime: "",
-        type: "spot",
-      },
-      personnel: [],
-      tools: [],
-      zones: [],
-    }
-  },
-  {
-    title: "Pre-Count Setup",
-    options: [
-      { id: "area-prep", label: "Area Preparation", icon: ClipboardList },
-      { id: "team-brief", label: "Team Briefing", icon: Users2 },
-      { id: "equipment", label: "Equipment Check", icon: ScanLine },
-      { id: "safety", label: "Safety Review", icon: ShieldCheck },
-    ],
-    details: {
-      checklist: {
-        areaClean: false,
-        obstaclesRemoved: false,
-        lightingAdequate: false,
-        safetyEquipment: false,
-      },
-      briefingTopics: [],
-      equipment: [],
-    }
-  },
-  {
-    title: "Location Selection",
-    options: [
-      { id: "specific", label: "Choose specific locations", icon: MapPin },
+      { id: "areas", label: "Areas & Zones", icon: MapPin },
     ],
   },
   {
-    title: "Item Selection",
+    title: "Pre-Count",
     options: [
-      { id: "specific", label: "Choose specific SKUs", icon: Package2 },
-      { id: "high-value", label: "High-value items", icon: DollarSign },
-      { id: "flagged", label: "Flagged locations", icon: MapPin },
-      { id: "random-cat", label: "Random from categories", icon: Tags },
+      { id: "checklist", label: "Area Checklist", icon: ClipboardList },
+      { id: "briefing", label: "Team Briefing", icon: Users },
+      { id: "equipment", label: "Equipment Check", icon: Settings2 },
+      { id: "guidelines", label: "Count Guidelines", icon: BookOpen },
     ],
   },
   {
-    title: "Count Execution",
+    title: "Count",
     options: [
-      { id: "initial", label: "Initial Count", icon: ClipboardCheck },
-      { id: "verify", label: "Verification", icon: CheckCircle2 },
-      { id: "recount", label: "Recount if needed", icon: RefreshCcw },
-      { id: "document", label: "Documentation", icon: FileText },
+      { id: "scan", label: "Scan Items", icon: ScanLine },
+      { id: "verify", label: "Verify Counts", icon: ShieldCheck },
+      { id: "document", label: "Document Issues", icon: FileText },
+      { id: "review", label: "Review Progress", icon: Search },
     ],
   },
   {
     title: "Reconciliation",
     options: [
       { id: "compare", label: "System Comparison", icon: GitCompare },
-      { id: "investigate", label: "Investigate Variances", icon: Search },
-      { id: "adjust", label: "Quantity Adjustments", icon: FileEdit },
-      { id: "approve", label: "Get Approvals", icon: CheckSquare },
+      { id: "adjust", label: "Adjustments", icon: FileEdit },
+      { id: "approve", label: "Approvals", icon: CheckSquare },
+      { id: "report", label: "Generate Report", icon: FileBarChart },
     ],
   },
   {
-    title: "Follow-Up",
+    title: "Follow-up",
     options: [
-      { id: "report", label: "Generate Report", icon: FileBarChart },
       { id: "actions", label: "Action Items", icon: ListTodo },
-      { id: "improve", label: "Process Improvements", icon: Settings2 },
+      { id: "improvements", label: "Process Improvements", icon: RefreshCcw },
       { id: "lessons", label: "Lessons Learned", icon: BookOpen },
     ],
   },
@@ -228,7 +190,6 @@ interface SpotCheckData {
       status: 'checked' | 'pending' | 'issue';
     }>;
   };
-  selectedLocations: string[];
   selectedItems: InventoryItem[];
   counts: Record<string, CountDetails>;
   reconciliation: {
@@ -271,8 +232,7 @@ export function SpotCheckSteps() {
     1: [],
     2: [],
     3: [],
-    4: [],
-    5: []
+    4: []
   }))
   const [spotCheckData, setSpotCheckData] = useState<SpotCheckData>({
     id: crypto.randomUUID(),
@@ -304,7 +264,6 @@ export function SpotCheckSteps() {
       briefingTopics: [],
       equipment: [],
     },
-    selectedLocations: [],
     selectedItems: [],
     counts: {},
     reconciliation: {
@@ -439,101 +398,8 @@ export function SpotCheckSteps() {
               })}
             </div>
 
-            {/* Location selection step specific UI */}
-            {currentStep === 2 && (
-              <div className="space-y-4 mt-6">
-                <SpotCheckLocationSelection
-                  formData={{
-                    selectedLocations: spotCheckData.selectedLocations,
-                    department: '',
-                    targetCount: 5
-                  }}
-                  setFormData={(data) => {
-                    setSpotCheckData((prev) => ({
-                      ...prev,
-                      selectedLocations: data.selectedLocations,
-                    }))
-                  }}
-                  onNext={() => handleNext()}
-                  onBack={() => handleBack()}
-                />
-              </div>
-            )}
-            {currentStep === 3 && (
-              <div className="space-y-4 mt-6">
-                <div className="flex items-center gap-2 relative">
-                  <Search className="absolute left-2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by SKU, name, or location..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8"
-                  />
-                </div>
-
-                <Card className="border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-12"></TableHead>
-                        <TableHead>SKU</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Unit</TableHead>
-                        <TableHead>Last Count</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredItems.map((item) => (
-                        <TableRow
-                          key={item.id}
-                          className={selectedItems.some(i => i.id === item.id) ? "bg-primary/5" : ""}
-                        >
-                          <TableCell>
-                            <Checkbox
-                              checked={selectedItems.some(i => i.id === item.id)}
-                              onCheckedChange={() => handleItemToggle(item)}
-                            />
-                          </TableCell>
-                          <TableCell>{item.sku}</TableCell>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.location}</TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell className="capitalize">{item.unit}</TableCell>
-                          <TableCell>{item.lastCount}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </Card>
-
-                {selectedItems.length > 0 && (
-                  <div className="p-4 bg-muted rounded-lg">
-                    <h3 className="font-medium mb-2">Selected Items ({selectedItems.length})</h3>
-                    <ScrollArea className="h-24">
-                      <div className="space-y-2">
-                        {selectedItems.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between">
-                            <span>{item.sku} - {item.name}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleItemToggle(item)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Count execution step specific UI */}
-            {currentStep === 4 && selectedItems.length > 0 && (
+            {currentStep === 2 && selectedItems.length > 0 && (
               <div className="space-y-4 mt-6">
                 <Card className="border p-4">
                   <h3 className="font-medium mb-4">Count Details for Selected Items</h3>
@@ -876,6 +742,80 @@ export function SpotCheckSteps() {
               </div>
             )}
 
+            {/* Item selection step specific UI */}
+            {currentStep === 2 && (
+              <div className="space-y-4 mt-6">
+                <div className="flex items-center gap-2 relative">
+                  <Search className="absolute left-2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by SKU, name, or location..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+
+                <Card className="border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12"></TableHead>
+                        <TableHead>SKU</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Location</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead>Last Count</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredItems.map((item) => (
+                        <TableRow
+                          key={item.id}
+                          className={selectedItems.some(i => i.id === item.id) ? "bg-primary/5" : ""}
+                        >
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedItems.some(i => i.id === item.id)}
+                              onCheckedChange={() => handleItemToggle(item)}
+                            />
+                          </TableCell>
+                          <TableCell>{item.sku}</TableCell>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.location}</TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell className="capitalize">{item.unit}</TableCell>
+                          <TableCell>{item.lastCount}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
+
+                {selectedItems.length > 0 && (
+                  <div className="p-4 bg-muted rounded-lg">
+                    <h3 className="font-medium mb-2">Selected Items ({selectedItems.length})</h3>
+                    <ScrollArea className="h-24">
+                      <div className="space-y-2">
+                        {selectedItems.map((item) => (
+                          <div key={item.id} className="flex items-center justify-between">
+                            <span>{item.sku} - {item.name}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleItemToggle(item)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Notes field */}
             <div>
               <Label>Additional Notes</Label>
@@ -900,7 +840,7 @@ export function SpotCheckSteps() {
                 onClick={handleNext}
                 disabled={
                   !selectedOptions[currentStep]?.length ||
-                  (currentStep === 3 && selectedItems.length === 0) ||
+                  (currentStep === 2 && selectedItems.length === 0) ||
                   currentStep === steps.length - 1
                 }
               >

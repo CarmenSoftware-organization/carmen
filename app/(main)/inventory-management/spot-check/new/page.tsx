@@ -14,18 +14,20 @@ export default function SpotCheckSetupPage() {
     dateTime: new Date(),
     notes: '',
     targetCount: '',
+    selectedLocations: [],
   });
 
   const handleNext = () => {
     // Initialize the session before navigating
-    initializeSession(
-      formData.counterName,
-      formData.department,
-      formData.dateTime,
-      formData.dateTime.toLocaleTimeString(),
-      formData.notes,
-      "spot"
-    );
+    initializeSession({
+      counterName: formData.counterName,
+      department: formData.department,
+      date: formData.dateTime,
+      time: formData.dateTime.toLocaleTimeString(),
+      notes: formData.notes,
+      type: "spot",
+      selectedLocations: formData.selectedLocations,
+    });
     router.push('/inventory-management/spot-check/new/location');
   };
 

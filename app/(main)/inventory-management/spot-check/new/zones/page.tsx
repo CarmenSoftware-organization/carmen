@@ -67,14 +67,15 @@ export default function SetupPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    initializeSession(
-      values.counterName,
-      values.department,
-      values.date,
-      values.time,
-      values.reason,
-      "spot"
-    );
+    initializeSession({
+      counterName: values.counterName,
+      department: values.department,
+      date: values.date,
+      time: values.time,
+      notes: values.notes || '',
+      type: "spot",
+      selectedLocations: [],
+    });
     router.push("/inventory-management/spot-check/new/location");
   }
 
