@@ -94,39 +94,51 @@ export function LocationSelection({ formData, setFormData, onNext, onBack }: Loc
 
         {/* Locations Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredLocations.map((location) => (
-            <div
-              key={location.id}
-              className={cn(
-                "p-4 rounded-lg border cursor-pointer transition-colors",
-                formData.selectedLocations.includes(location.id)
-                  ? "bg-primary/10 border-primary"
-                  : "hover:bg-muted"
-              )}
-              onClick={() => handleLocationSelect(location.id)}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="font-medium">{location.name}</h3>
-                  <p className="text-sm text-muted-foreground">{location.code}</p>
-                </div>
-                <Badge variant={location.status === 'active' ? 'default' : 'secondary'}>
-                  {location.type}
-                </Badge>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                <p>Floor: {location.floor}</p>
-                {location.capacity && <p>Capacity: {location.capacity} units</p>}
-              </div>
+          {filteredLocations.length === 0 ? (
+            <div className="col-span-full text-center py-8 text-muted-foreground">
+              No locations found matching your criteria.
             </div>
-          ))}
+          ) : (
+            filteredLocations.map((location) => (
+              <div
+                key={location.id}
+                className={cn(
+                  "p-4 rounded-lg border cursor-pointer transition-colors",
+                  formData.selectedLocations.includes(location.id)
+                    ? "bg-primary/5 border-primary"
+                    : "hover:bg-muted/50"
+                )}
+                onClick={() => handleLocationSelect(location.id)}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-medium">{location.name}</h3>
+                    <p className="text-sm text-muted-foreground">{location.code}</p>
+                  </div>
+                  <Badge variant="secondary">
+                    {location.type}
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  <p>Floor {location.floor}</p>
+                  <p>{location.building}</p>
+                  {location.capacity && (
+                    <p>Capacity: {location.capacity} items</p>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
-        {filteredLocations.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            No locations found matching your criteria.
+        <div className="mt-6 flex items-center justify-between text-sm text-muted-foreground">
+          <div>
+            Selected {formData.selectedLocations.length} of {filteredLocations.length} locations
           </div>
-        )}
+          <div>
+            {locationTypes.length - 1} types | {departmentLocations.length} total locations
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

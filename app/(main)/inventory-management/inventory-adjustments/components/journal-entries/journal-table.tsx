@@ -1,14 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-
-interface JournalEntry {
-  id: string
-  account: string
-  accountCode: string
-  department: string
-  description: string
-  debit: number
-  credit: number
-}
+import { JournalEntry } from "../types"
 
 interface JournalTableProps {
   entries: JournalEntry[]
@@ -21,7 +12,7 @@ export function JournalTable({ entries }: JournalTableProps) {
         <TableRow className="hover:bg-transparent">
           <TableHead className="w-[250px]">Account</TableHead>
           <TableHead>Department</TableHead>
-          <TableHead>Description</TableHead>
+          <TableHead>Reference</TableHead>
           <TableHead className="text-right">Debit</TableHead>
           <TableHead className="text-right">Credit</TableHead>
         </TableRow>
@@ -31,12 +22,12 @@ export function JournalTable({ entries }: JournalTableProps) {
           <TableRow key={entry.id} className="hover:bg-muted/50">
             <TableCell>
               <div className="flex flex-col gap-1">
-                <div className="text-sm font-medium">{entry.account}</div>
-                <div className="text-xs text-muted-foreground">{entry.accountCode}</div>
+                <div className="text-sm font-medium">{entry.accountName}</div>
+                <div className="text-xs text-muted-foreground">{entry.account}</div>
               </div>
             </TableCell>
             <TableCell>{entry.department}</TableCell>
-            <TableCell>{entry.description}</TableCell>
+            <TableCell>{entry.reference}</TableCell>
             <TableCell className="text-right">
               {entry.debit > 0 ? entry.debit.toLocaleString('en-US', {
                 style: 'currency',

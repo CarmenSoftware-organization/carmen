@@ -30,6 +30,8 @@ export enum BadgeStatus {
   OverMax = "over-max",
   Normal = "normal",
   Posted = "Posted",
+  IN = "IN",
+  OUT = "OUT"
 }
 
 export interface IBadgeColors {
@@ -59,7 +61,7 @@ export const StatusList: IBadgeColors[] = [
   { key: BadgeStatus.SendBack, Color: "bg-rose-300 text-rose-800" },
   { key: BadgeStatus.Review, Color: "bg-amber-200 text-amber-800" },
   { key: BadgeStatus.Deleted, Color: "bg-rose-300 text-rose-800" },
-  { key: BadgeStatus.Received  , Color: "bg-emerald-300 text-emerald-800" },
+  { key: BadgeStatus.Received, Color: "bg-emerald-300 text-emerald-800" },
   { key: BadgeStatus.Active, Color: "bg-emerald-300 text-emerald-800" },
   { key: BadgeStatus.Inactive, Color: "bg-slate-300 text-slate-800" },
   { key: BadgeStatus.BelowMin, Color: "bg-destructive text-red-800" },
@@ -67,14 +69,16 @@ export const StatusList: IBadgeColors[] = [
   { key: BadgeStatus.OverMax, Color: "bg-blue-500 text-default-800" },
   { key: BadgeStatus.Normal, Color: "bg-green-500 text-gray-800" },
   { key: BadgeStatus.Posted, Color: "bg-emerald-300 text-emerald-800" },
+  { key: BadgeStatus.IN, Color: "bg-green-300 text-green-800" },
+  { key: BadgeStatus.OUT, Color: "bg-red-300 text-red-800" }
 ];
 
 interface StatusBadgeProps {
-  status : string;
+  status: string;
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
-  const styles : Record<string, string> = {
+  const styles: Record<string, string> = {
     Accept: 'bg-green-100 text-green-800',
     Reject: 'bg-red-100 text-red-800',
     Review: 'bg-yellow-100 text-yellow-800',
@@ -85,13 +89,13 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     DRAFT: 'bg-amber-100 text-amber-800',
     POSTED: 'bg-emerald-100 text-emerald-800',
     VOID: 'bg-rose-100 text-rose-800',
-  }
+  };
 
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
       {status}
     </span>
-  )
+  );
 }
 
 function CustomStatusBadge({

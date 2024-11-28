@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import {
   Select,
@@ -13,13 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { mockDepartments } from '@/lib/mock/inventory-data';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from '@/lib/context/user-context';
-import { Badge } from '@/components/ui/badge';
-import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { SpotCheckLocationSelection } from './location-selection';
 
 interface SpotCheckSetupProps {
   formData: {
@@ -33,6 +28,7 @@ interface SpotCheckSetupProps {
   setFormData: (data: any) => void;
   onNext: () => void;
   onBack: () => void;
+  onStartCount: () => void;
 }
 
 const targetCounts = [
@@ -43,9 +39,16 @@ const targetCounts = [
   { value: 'custom', label: 'Custom Amount' },
 ];
 
-export function SpotCheckSetup({ formData, setFormData, onNext, onBack }: SpotCheckSetupProps) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { user, isLoading } = useUser();
+const departments = [
+  { value: "Food & Beverage", label: "Food & Beverage" },
+  { value: "Housekeeping", label: "Housekeeping" },
+  { value: "Maintenance", label: "Maintenance" },
+  { value: "Front Office", label: "Front Office" },
+  { value: "Spa & Recreation", label: "Spa & Recreation" },
+];
+
+export function SpotCheckSetup({ formData, setFormData, onNext, onBack, onStartCount }: SpotCheckSetupProps) {
+  const { user } = useUser();
 
   useEffect(() => {
     if (user) {
@@ -62,165 +65,122 @@ export function SpotCheckSetup({ formData, setFormData, onNext, onBack }: SpotCh
       ...prev,
       [field]: value,
     }));
-    // Clear error when field is modified
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.counterName.trim()) {
-      newErrors.counterName = 'Counter name is required';
-    }
-    if (!formData.department) {
-      newErrors.department = 'Department is required';
-    }
-    if (!formData.targetCount) {
-      newErrors.targetCount = 'Target count is required';
-    }
-    if (!formData.selectedLocations || formData.selectedLocations.length === 0) {
-      newErrors.locations = 'At least one location must be selected';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleNext = () => {
-    if (validateForm()) {
-      onNext();
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <Card className="mt-6">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center p-8">
-            <div className="text-muted-foreground">Loading user information...</div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const isValid = formData.department && formData.dateTime && formData.targetCount;
 
   return (
-    <div className="grid gap-6">
-      {/* Basic Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-          <CardDescription>Enter the basic details for this spot check</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="counterName">Counter Name</Label>
-              <Input
-                id="counterName"
-                value={formData.counterName}
-                onChange={(e) => handleInputChange('counterName', e.target.value)}
-                placeholder="Enter counter name"
-                className={errors.counterName ? 'border-destructive' : ''}
-              />
-              {errors.counterName && (
-                <p className="text-sm text-destructive">{errors.counterName}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
-              <Select
-                value={formData.department}
-                onValueChange={(value) => handleInputChange('department', value)}
-              >
-                <SelectTrigger id="department" className={errors.department ? 'border-destructive' : ''}>
-                  <SelectValue placeholder="Select department" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockDepartments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.department && (
-                <p className="text-sm text-destructive">{errors.department}</p>
-              )}
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="targetCount">Target Count</Label>
-            <Select
-              value={formData.targetCount}
-              onValueChange={(value) => handleInputChange('targetCount', value)}
-            >
-              <SelectTrigger id="targetCount" className={errors.targetCount ? 'border-destructive' : ''}>
-                <SelectValue placeholder="Select target count" />
-              </SelectTrigger>
-              <SelectContent>
-                {targetCounts.map((count) => (
-                  <SelectItem key={count.value} value={count.value}>
-                    {count.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.targetCount && (
-              <p className="text-sm text-destructive">{errors.targetCount}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Add any additional notes..."
-              className="min-h-[100px]"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Location Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Select Locations</CardTitle>
-          <CardDescription>Choose the locations to include in this spot check</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SpotCheckLocationSelection
-            formData={{
-              selectedLocations: formData.selectedLocations || [],
-              department: formData.department,
-              targetCount: parseInt(formData.targetCount) || 10
-            }}
-            setFormData={(data) => {
-              setFormData((prev: any) => ({
-                ...prev,
-                selectedLocations: data.selectedLocations,
-              }));
-            }}
-            onNext={handleNext}
-            onBack={onBack}
+    <Card>
+      <CardHeader>
+        <CardTitle>Spot Check Setup</CardTitle>
+        <CardDescription>
+          Enter the basic information needed to start a spot check count.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Counter Name */}
+        <div className="space-y-2">
+          <Label htmlFor="counterName">Counter Name</Label>
+          <Input
+            id="counterName"
+            type="text"
+            value={formData.counterName || user?.name || ''}
+            disabled
           />
-          {errors.locations && (
-            <p className="text-sm text-destructive mt-2">{errors.locations}</p>
-          )}
-        </CardContent>
-      </Card>
+        </div>
 
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button onClick={handleNext}>
-          Next
-        </Button>
-      </div>
-    </div>
+        {/* Department */}
+        <div className="space-y-2">
+          <Label htmlFor="department">
+            Department <span className="text-destructive">*</span>
+          </Label>
+          <Select
+            value={formData.department || user?.department || ''}
+            onValueChange={(value) => handleInputChange('department', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select department" />
+            </SelectTrigger>
+            <SelectContent>
+              {departments.map((dept) => (
+                <SelectItem key={dept.value} value={dept.value}>
+                  {dept.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date/Time */}
+        <div className="space-y-2">
+          <Label htmlFor="dateTime">
+            Date & Time <span className="text-destructive">*</span>
+          </Label>
+          <DateTimePicker
+            value={formData.dateTime}
+            onChange={(value) => handleInputChange('dateTime', value)}
+          />
+        </div>
+
+        {/* Target Count */}
+        <div className="space-y-2">
+          <Label htmlFor="targetCount">
+            Target Count <span className="text-destructive">*</span>
+          </Label>
+          <Select
+            value={formData.targetCount}
+            onValueChange={(value) => handleInputChange('targetCount', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select target count" />
+            </SelectTrigger>
+            <SelectContent>
+              {targetCounts.map((count) => (
+                <SelectItem key={count.value} value={count.value}>
+                  {count.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Notes */}
+        <div className="space-y-2">
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            value={formData.notes}
+            onChange={(e) => handleInputChange('notes', e.target.value)}
+            placeholder="Add any additional notes or instructions..."
+            className="min-h-[100px]"
+          />
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between p-6 pt-0">
+          <Button
+            variant="outline"
+            onClick={onBack}
+          >
+            Back
+          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={onStartCount}
+              disabled={!isValid}
+            >
+              Start Count
+            </Button>
+            <Button
+              onClick={onNext}
+              disabled={!isValid}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

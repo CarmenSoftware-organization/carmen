@@ -28,28 +28,26 @@ export function StockMovementTable({ items }: StockMovementTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map(item => (
+        {items.map((item) => (
           item.lots.map((lot, lotIndex) => (
             <TableRow key={`${item.id}-${lot.lotNo}`} className="hover:bg-muted/50">
               <TableCell>
-                {lotIndex === 0 ? (
+                {lotIndex === 0 && (
                   <div className="flex flex-col gap-1">
                     <div className="text-sm font-medium">{item.location.name}</div>
                     <div className="text-xs text-muted-foreground">{item.location.code}</div>
                   </div>
-                ) : ''}
+                )}
               </TableCell>
               <TableCell>
-                {lotIndex === 0 ? (
+                {lotIndex === 0 && (
                   <div className="flex flex-col gap-1">
                     <div className="text-sm font-medium">{item.productName}</div>
                     <div className="text-xs text-muted-foreground">{item.sku}</div>
                   </div>
-                ) : ''}
+                )}
               </TableCell>
-              <TableCell>
-                <div className="text-sm font-medium">{lot.lotNo}</div>
-              </TableCell>
+              <TableCell>{lot.lotNo}</TableCell>
               <TableCell>{item.uom}</TableCell>
               <TableCell className="text-right text-green-600">
                 {lot.quantity > 0 ? lot.quantity.toLocaleString() : ''}
@@ -58,20 +56,51 @@ export function StockMovementTable({ items }: StockMovementTableProps) {
                 {lot.quantity < 0 ? Math.abs(lot.quantity).toLocaleString() : ''}
               </TableCell>
               <TableCell className="text-right">
-                {item.unitCost.toLocaleString('en-US', {
+                {lotIndex === 0 ? item.unitCost.toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD'
-                })}
+                }) : ''}
               </TableCell>
               <TableCell className="text-right">
-                {item.totalCost.toLocaleString('en-US', {
-                  style: 'currency',
-                  currency: 'USD'
-                })}
+                {lotIndex === 0 ? (
+                  lot.quantity > 0 
+                    ? (lot.quantity * item.unitCost).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD'
+                      })
+                    : (Math.abs(lot.quantity) * item.unitCost).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD'
+                      })
+                ) : ''}
               </TableCell>
             </TableRow>
           ))
         ))}
+        <TableRow className="hover:bg-transparent border-t-2">
+          <TableCell colSpan={4} className="font-medium">Total</TableCell>
+          <TableCell className="text-right font-medium text-green-600">
+            {items.reduce((sum, item) => 
+              sum + item.lots.reduce((lotSum, lot) => 
+                lot.quantity > 0 ? lotSum + lot.quantity : lotSum, 0
+              ), 0
+            ).toLocaleString()}
+          </TableCell>
+          <TableCell className="text-right font-medium text-red-600">
+            {items.reduce((sum, item) => 
+              sum + item.lots.reduce((lotSum, lot) => 
+                lot.quantity < 0 ? lotSum + Math.abs(lot.quantity) : lotSum, 0
+              ), 0
+            ).toLocaleString()}
+          </TableCell>
+          <TableCell className="text-right"></TableCell>
+          <TableCell className="text-right font-medium">
+            {items.reduce((sum, item) => sum + item.totalCost, 0).toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD'
+            })}
+          </TableCell>
+        </TableRow>
       </TableBody>
     </Table>
   )

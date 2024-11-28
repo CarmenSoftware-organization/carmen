@@ -88,54 +88,9 @@ const menuItems: MenuItem[] = [
     subItems: [
       { name: "Stock Overview", path: "/inventory-management/stock-overview" },
       { name: "Inventory Adjustments", path: "/inventory-management/inventory-adjustments" },
-      {
-        name: "Physical Count",
-        path: "/inventory-management/physical-count",
-        icon: "ClipboardList",
-        subItems: [
-          {
-            name: "New Count",
-            path: "/inventory-management/physical-count",
-            icon: "Plus",
-            description: "Start a new physical count"
-          },
-          {
-            name: "History",
-            path: "/inventory-management/physical-count/history",
-            icon: "History",
-            description: "View past physical counts"
-          }
-        ]
-      },
-      {
-        name: "Spot Check",
-        path: "/inventory-management/spot-check",
-        icon: "ClipboardCheck",
-        subItems: [
-          { 
-            name: "Dashboard", 
-            path: "/inventory-management/spot-check/dashboard",
-            icon: "LayoutDashboard"
-          },
-          { 
-            name: "New Count", 
-            path: "/inventory-management/spot-check/new/zones",
-            icon: "PlusCircle"
-          },
-          { 
-            name: "Active Counts", 
-            path: "/inventory-management/spot-check/active",
-            icon: "Activity"
-          },
-          { 
-            name: "Completed Counts", 
-            path: "/inventory-management/spot-check/completed",
-            icon: "CheckCircle"
-          },
-        ],
-      },
-      { name: "Stock Take", path: "/inventory-management/stock-take" },
-      { name: "Inventory Valuation", path: "/inventory-management/inventory-valuation" },
+      { name: "Spot Check", path: "/inventory-management/spot-check" },
+      { name: "Physical Count", path: "/inventory-management/physical-count-management" },
+      { name: "Period End", path: "/inventory-management/period-end" },
     ],
   },
   {

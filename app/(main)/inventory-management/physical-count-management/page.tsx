@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Building, List, Grid, X, Plus } from 'lucide-react'
-import { CountListItem } from "./components/count-list-item"
-import { CountDetailCard } from "./components/count-detail-card"
-import { CountDetailForm } from "./components/count-detail-form"
-import { users, departments, storeLocations } from '@/lib/mockData'
-import { useRouter } from "next/navigation"
+import { Building, Plus, List, Grid, X } from 'lucide-react'
+import { CountListItem } from "@/app/(main)/inventory-management/physical-count-management/components/count-list-item"
+import { CountDetailCard } from "@/app/(main)/inventory-management/physical-count-management/components/count-detail-card"
+import { NewCountForm, NewCountData } from "@/app/(main)/inventory-management/physical-count-management/components/new-count-form"
+import { CountDetailForm } from "@/app/(main)/inventory-management/physical-count-management/components/count-detail-form"
+import { users, departments, storeLocations, itemsToCount } from '@/lib/mockData'
 
-interface SpotCheckData {
+interface CountData {
   storeName: string
   department: string
   userName: string
@@ -25,18 +25,30 @@ interface SpotCheckData {
   completedCount: number
 }
 
-const spotCheckData = [
+const countData = [
   {
     storeName: "Main Kitchen Store",
     department: "F&B",
     userName: "John Doe",
     date: "2024-04-20",
     status: "pending" as const,
-    itemCount: 10, // Smaller count for spot checks
+    itemCount: 150,
     lastCountDate: "2024-03-20",
     variance: 5.2,
-    notes: "Spot check of dry goods section",
-    completedCount: 5
+    notes: "Discrepancies found in dry goods section",
+    completedCount: 75
+  },
+  {
+    storeName: "Dry Store",
+    department: "Housekeeping",
+    userName: "Jane Smith",
+    date: "2024-04-19",
+    status: "completed" as const,
+    itemCount: 75,
+    lastCountDate: "2024-03-19",
+    variance: -2.1,
+    notes: "All items accounted for",
+    completedCount: 75
   },
   {
     storeName: "Cold Room",
@@ -44,62 +56,23 @@ const spotCheckData = [
     userName: "Mike Johnson",
     date: "2024-04-18",
     status: "in-progress" as const,
-    itemCount: 8,
+    itemCount: 200,
     lastCountDate: "2024-03-18",
     variance: 0,
-    notes: "Spot check in progress",
-    completedCount: 3
+    notes: "Counting in progress, no variances reported yet",
+    completedCount: 0
   },
 ]
 
-interface SpotCheckDetails {
-  countId: string
-  counter: string
-  department: string
-  store: string
-  date: string
-  selectedItems: {
-    id: string
-    code: string
-    name: string
-    description: string
-    expectedQuantity: number
-    unit: string
-  }[]
-}
-
-interface CountDetailData {
-  items: {
-    id: string
-    name: string
-    code: string
-    description?: string
-    currentStock: number
-    actualCount: number
-    unit: string
-    status: 'good' | 'damaged' | 'missing' | 'expired'
-    isSubmitted: boolean
-    variance: number
-  }[]
-  notes: string
-}
-
-interface CountDetailCardProps {
-  countDetails?: Partial<SpotCheckDetails>
-  onStartCount: () => void
-  onDelete: () => void
-}
-
-export default function SpotCheck() {
-  const router = useRouter()
+export default function PhysicalCountManagement() {
   const [view, setView] = useState<'list' | 'grid'>('list')
   const [statusFilter, setStatusFilter] = useState('all')
   const [locationFilter, setLocationFilter] = useState('all')
   const [departmentFilter, setDepartmentFilter] = useState('all')
   const [showLocationFilter, setShowLocationFilter] = useState(false)
+  const [showNewCountForm, setShowNewCountForm] = useState(false)
   const [showCountDetailForm, setShowCountDetailForm] = useState(false)
-  const [counts, setCounts] = useState(spotCheckData)
-  const [currentDetails, setCurrentDetails] = useState<SpotCheckDetails | null>(null)
+  const [counts, setCounts] = useState(countData)
 
   const filteredData = counts.filter(item => 
     (statusFilter === 'all' || item.status === statusFilter) &&
@@ -107,46 +80,59 @@ export default function SpotCheck() {
     (departmentFilter === 'all' || item.department === departmentFilter)
   )
 
-  const handleCountDetailSubmit = () => {
-    if (currentDetails) {
-      console.log('Count details submitted:', currentDetails)
+  const handleNewCount = (data: NewCountData) => {
+    const newCount: CountData = {
+      storeName: data.storeName,
+      department: data.department,
+      userName: data.counter,
+      date: data.date,
+      status: 'pending' as const,
+      itemCount: 0,
+      lastCountDate: '-',
+      variance: 0,
+      notes: data.notes || '',
+      completedCount: 0
     }
+    setCounts([newCount, ...counts])
+    setShowNewCountForm(false)
+  }
+
+  const handleCountDetailSubmit = (data: any) => {
+    console.log('Count details submitted:', data)
     setShowCountDetailForm(false)
+    // Here you would typically update the count status and other relevant data
   }
 
   const handleDeleteCount = (index: number) => {
     setCounts(prevCounts => prevCounts.filter((_, i) => i !== index))
   }
 
-  const handleNewSpotCheck = () => {
-    router.push('/inventory-management/spot-check/new')
-  }
-
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto max-w-7xl p-4 sm:p-6">
         <header className="mb-6 sm:mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl sm:text-3xl font-bold">Spot Check</h1>
-            <Button 
-              onClick={handleNewSpotCheck}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              New Spot Check
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Physical Count Management</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-muted-foreground mb-4 sm:mb-0">Manage and track inventory counts across locations</p>
+            <Button onClick={() => setShowNewCountForm(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Count
             </Button>
           </div>
-          <p className="text-muted-foreground">Random inventory spot checks for accuracy verification</p>
         </header>
 
-        {showCountDetailForm && currentDetails && (
+        {showNewCountForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <NewCountForm 
+              onClose={() => setShowNewCountForm(false)}
+              onSubmit={handleNewCount}
+            />
+          </div>
+        )}
+
+        {showCountDetailForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <CountDetailForm 
-              items={[]}
-              locationName={currentDetails.store}
-              userName={currentDetails.counter}
-              date={currentDetails.date}
-              reference={currentDetails.countId}
               onClose={() => setShowCountDetailForm(false)}
               onSubmit={handleCountDetailSubmit}
             />
@@ -156,7 +142,7 @@ export default function SpotCheck() {
         <Card className="mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr,auto,auto,auto] gap-4 items-center p-4">
             <div className="relative w-full sm:w-64">
-              <Input className="pl-3" placeholder="Search spot checks..." />
+              <Input className="pl-3" placeholder="Search counts..." />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full">
@@ -247,30 +233,18 @@ export default function SpotCheck() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredData.map((item, index) => {
-              const details: SpotCheckDetails = {
-                countId: `SC-${index}`,
-                counter: item.userName,
-                department: item.department,
-                store: item.storeName,
-                date: item.date,
-                selectedItems: [] 
-              }
-              return (
-                <CountDetailCard 
-                  key={index}
-                  countDetails={details}
-                  onStartCount={() => {
-                    setCurrentDetails(details)
-                    setShowCountDetailForm(true)
-                  }}
-                  onDelete={() => handleDeleteCount(index)}
-                />
-              )
-            })}
+            {filteredData.map((item, index) => (
+              <CountDetailCard 
+                key={index} 
+                {...item} 
+                onStartCount={() => setShowCountDetailForm(true)}
+                onDelete={() => handleDeleteCount(index)}
+              />
+            ))}
           </div>
         )}
       </div>
     </div>
   )
 }
+

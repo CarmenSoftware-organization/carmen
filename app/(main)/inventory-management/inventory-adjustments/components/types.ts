@@ -1,8 +1,31 @@
+export interface Location {
+  type: string
+  code: string
+  name: string
+}
+
+export interface Lot {
+  lotNo: string
+  quantity: number
+  uom: string
+}
+
+export interface StockMovementItem {
+  id: string
+  productName: string
+  sku: string
+  location: Location
+  lots: Lot[]
+  uom: string
+  unitCost: number
+  totalCost: number
+}
+
 export interface InventoryAdjustment {
   id: string
   date: string
-  type: 'IN' | 'OUT'
-  status: 'Draft' | 'Posted'
+  type: string
+  status: string
   location: string
   locationCode: string
   reason: string
@@ -14,25 +37,6 @@ export interface InventoryAdjustment {
     outQty: number
     totalCost: number
   }
-}
-
-export interface StockMovementItem {
-  id: string
-  location: {
-    type: 'INV'
-    code: string
-    name: string
-  }
-  productName: string
-  sku: string
-  lots: {
-    lotNo: string
-    quantity: number
-    uom: string
-  }[]
-  uom: string
-  unitCost: number
-  totalCost: number
 }
 
 export interface JournalHeader {
@@ -51,9 +55,9 @@ export interface JournalHeader {
 export interface JournalEntry {
   id: string
   account: string
-  accountCode: string
-  department: string
-  description: string
+  accountName: string
   debit: number
   credit: number
+  department: string
+  reference: string
 }

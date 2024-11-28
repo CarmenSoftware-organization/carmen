@@ -59,31 +59,14 @@ export function HeaderInformation({ data, isEditMode, onUpdate }: HeaderInformat
         <p className="font-medium">{getMovementTypeDisplay(data.type)}</p>
       </div>
       
-      {/* Location */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Store className="h-4 w-4" />
-          <span>Location</span>
-        </div>
-        <p className="font-medium">{data.location} ({data.locationCode})</p>
-      </div>
-      
-      {/* Department */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Building2 className="h-4 w-4" />
-          <span>Department</span>
-        </div>
-        <p className="font-medium">{data.department}</p>
-      </div>
       
       {/* Reason */}
-      <div className="space-y-2">
+      <div className="space-y-2 col-span-2 lg:col-span-1 xl:col-span-2">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <FileText className="h-4 w-4" />
           <span>Reason</span>
         </div>
-        <p className="font-medium">{data.reason}</p>
+        <p className="font-medium col-span-2 no-wrap">{data.reason}</p>
       </div>
       
       {/* Description - Spans full width */}

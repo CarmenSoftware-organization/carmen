@@ -1,48 +1,53 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { SpotCheckSetup } from '../components/setup';
-import { useCountStore } from '@/lib/store/use-count-store';
+import { NewSpotCheckForm } from "../components/new-spot-check-form"
+import { useRouter } from "next/navigation"
+import { SpotCheckDetails } from "../types"
 
-export default function SpotCheckSetupPage() {
-  const router = useRouter();
-  const initializeSession = useCountStore(state => state.initializeSession);
-  const [formData, setFormData] = useState({
-    counterName: '',
-    department: '',
-    dateTime: new Date(),
-    notes: '',
-    targetCount: '',
-    selectedLocations: [],
-  });
+export default function NewSpotCheckPage() {
+  const router = useRouter()
 
-  const handleNext = () => {
-    // Initialize the session before navigating
-    initializeSession({
-      counterName: formData.counterName,
-      department: formData.department,
-      date: formData.dateTime,
-      time: formData.dateTime.toLocaleTimeString(),
-      notes: formData.notes,
-      type: "spot",
-      selectedLocations: formData.selectedLocations,
-    });
-    router.push('/inventory-management/spot-check/new/location');
-  };
+  // This would typically come from your API or database
+  const stores = [
+    { id: "1", name: "Store 1" },
+    { id: "2", name: "Store 2" },
+  ]
+  
+  const departments = [
+    { id: "1", name: "Grocery" },
+    { id: "2", name: "Produce" },
+    { id: "3", name: "Meat" },
+  ]
 
-  const handleBack = () => {
-    router.push('/inventory-management/spot-check');
-  };
+  // Add counters data
+  const counters = [
+    { id: "1", name: "John Doe" },
+    { id: "2", name: "Jane Smith" },
+    { id: "3", name: "Mike Johnson" },
+  ]
+
+  async function handleCreateSpotCheck(details: SpotCheckDetails) {
+    try {
+      // Here you would typically:
+      // 1. Save the spot check details to your database
+      // 2. Create the count session
+      console.log("Creating spot check:", details)
+      
+      // Navigate to the active count page
+      router.push(`/inventory-management/spot-check/active/${details.countId}`)
+    } catch (error) {
+      console.error("Failed to create spot check:", error)
+    }
+  }
 
   return (
-    <div className="container max-w-2xl mx-auto">
-      <SpotCheckSetup
-        formData={formData}
-        setFormData={setFormData}
-        onNext={handleNext}
-        onBack={handleBack}
+    <div className="h-[calc(100vh-4rem)] bg-background">
+      <NewSpotCheckForm
+        stores={stores}
+        departments={departments}
+        counters={counters}
+        onSubmit={handleCreateSpotCheck}
       />
     </div>
-  );
+  )
 }

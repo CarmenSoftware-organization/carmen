@@ -1,13 +1,11 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   ListChecks,
-  Building2,
-  Package,
-  FileText,
-  PlayCircle,
+  Plus,
+  History,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,62 +16,46 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 
 interface MenuItem {
   title: string
+  description: string
   icon: any
-  path?: string
-  items?: {
-    title: string
-    description: string
-    icon: any
-    path: string
-  }[]
+  path: string
 }
 
 const menuItems: MenuItem[] = [
   {
+    title: "New Count",
+    description: "Start a new spot check count",
+    icon: Plus,
+    path: "/inventory-management/spot-check/new",
+  },
+  {
     title: "Active Counts",
-    icon: PlayCircle,
+    description: "View and manage ongoing counts",
+    icon: ListChecks,
     path: "/inventory-management/spot-check/active",
   },
   {
-    title: "New Count",
-    icon: ListChecks,
-    items: [
-      {
-        title: "Zone Selection",
-        description: "Select zones for inventory count: Kitchen, Housekeeping, Storage",
-        icon: Building2,
-        path: "/inventory-management/spot-check/new/zones",
-      },
-      {
-        title: "Item Selection",
-        description: "Search and select multiple items for counting",
-        icon: Package,
-        path: "/inventory-management/spot-check/new/items",
-      },
-      {
-        title: "Count Details",
-        description: "Enter counter details and notes",
-        icon: FileText,
-        path: "/inventory-management/spot-check/new/details",
-      },
-    ],
+    title: "Completed",
+    description: "View completed spot checks",
+    icon: History,
+    path: "/inventory-management/spot-check/completed",
+  },
+  {
+    title: "Settings",
+    description: "Configure spot check preferences",
+    icon: Settings,
+    path: "/inventory-management/spot-check/settings",
   },
 ]
 
 export function SpotCheckNav() {
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState<string | null>(null)
 
-  const handleMenuClick = (section: MenuItem) => {
-    if (section.path) {
-      router.push(section.path)
-    } else {
-      setActiveSection(activeSection === section.title ? null : section.title)
-    }
+  const handleNavigation = (path: string) => {
+    router.push(path)
   }
 
   return (
@@ -81,47 +63,29 @@ export function SpotCheckNav() {
       <CardHeader>
         <CardTitle>Spot Check</CardTitle>
         <CardDescription>
-          Inventory spot check management and tracking
+          Quick inventory verification and spot checking
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[600px] pr-4">
-          <div className="space-y-6">
-            {menuItems.map((section) => (
-              <div key={section.title}>
-                <Button
-                  variant={section.path ? "default" : "ghost"}
-                  className="w-full justify-start gap-2 h-auto py-2"
-                  onClick={() => handleMenuClick(section)}
-                >
-                  <section.icon className="h-5 w-5" />
+        <ScrollArea className="h-[400px] pr-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {menuItems.map((item) => (
+              <Button
+                key={item.title}
+                variant="outline"
+                className="h-auto p-4 justify-start"
+                onClick={() => handleNavigation(item.path)}
+              >
+                <div className="flex items-start gap-4">
+                  <item.icon className="h-5 w-5 mt-0.5" />
                   <div className="text-left">
-                    <div className="font-medium">{section.title}</div>
+                    <div className="font-medium">{item.title}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {item.description}
+                    </div>
                   </div>
-                </Button>
-                
-                {activeSection === section.title && section.items && (
-                  <div className="mt-2 ml-7 space-y-2">
-                    {section.items.map((item) => (
-                      <Button
-                        key={item.title}
-                        variant="ghost"
-                        className="w-full justify-start gap-2 h-auto py-2"
-                        onClick={() => router.push(item.path)}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        <div className="text-left">
-                          <div className="font-medium">{item.title}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {item.description}
-                          </div>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                )}
-                <Separator className="my-4" />
-              </div>
+                </div>
+              </Button>
             ))}
           </div>
         </ScrollArea>

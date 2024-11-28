@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MoreHorizontalIcon, SearchIcon } from "lucide-react"
 import { FilterSortOptions } from "./filter-sort-options"
+import StatusBadge  from "@/components/ui/custom-status-badge"
+
 
 // Mock data - replace with actual API call
 const mockAdjustments = [
@@ -28,11 +30,11 @@ const mockAdjustments = [
     id: "ADJ-2024-001",
     date: "2024-01-15",
     type: "IN",
-    status: "Draft",
+    status: "Posted",
     location: "Main Warehouse",
-    reason: "Stock Count Adjustment",
-    items: 5,
-    totalValue: 1500.00
+    reason: "Physical Count Variance",
+    items: 12,
+    totalValue: 2845.50
   },
   {
     id: "ADJ-2024-002",
@@ -40,11 +42,70 @@ const mockAdjustments = [
     type: "OUT",
     status: "Posted",
     location: "Main Warehouse",
-    reason: "Damage",
-    items: 2,
-    totalValue: 300.00
+    reason: "Damaged Goods",
+    items: 3,
+    totalValue: 567.80
   },
-  // Add more mock data as needed
+  {
+    id: "ADJ-2024-003",
+    date: "2024-01-17",
+    type: "IN",
+    status: "Posted",
+    location: "Production Store",
+    reason: "System Reconciliation",
+    items: 8,
+    totalValue: 1234.60
+  },
+  {
+    id: "ADJ-2024-004",
+    date: "2024-01-18",
+    type: "OUT",
+    status: "Draft",
+    location: "Main Warehouse",
+    reason: "Quality Control Rejection",
+    items: 5,
+    totalValue: 890.25
+  },
+  {
+    id: "ADJ-2024-005",
+    date: "2024-01-18",
+    type: "IN",
+    status: "Draft",
+    location: "Production Store",
+    reason: "Spot Check Variance",
+    items: 4,
+    totalValue: 445.75
+  },
+  {
+    id: "ADJ-2024-006",
+    date: "2024-01-19",
+    type: "OUT",
+    status: "Voided",
+    location: "Main Warehouse",
+    reason: "Expired Items",
+    items: 15,
+    totalValue: 3567.90
+  },
+  {
+    id: "ADJ-2024-007",
+    date: "2024-01-19",
+    type: "IN",
+    status: "Posted",
+    location: "Production Store",
+    reason: "Production Yield Variance",
+    items: 6,
+    totalValue: 789.30
+  },
+  {
+    id: "ADJ-2024-008",
+    date: "2024-01-20",
+    type: "OUT",
+    status: "Draft",
+    location: "Main Warehouse",
+    reason: "Theft/Loss",
+    items: 2,
+    totalValue: 234.50
+  }
 ]
 
 export function InventoryAdjustmentList() {
@@ -134,9 +195,7 @@ export function InventoryAdjustmentList() {
                 </TableCell>
                 <TableCell>{adjustment.date}</TableCell>
                 <TableCell>
-                  <Badge variant={adjustment.type === 'IN' ? 'default' : 'destructive'}>
-                    {adjustment.type}
-                  </Badge>
+                  <StatusBadge status= {adjustment.type}/>
                 </TableCell>
                 <TableCell>{adjustment.location}</TableCell>
                 <TableCell>{adjustment.reason}</TableCell>
@@ -148,9 +207,7 @@ export function InventoryAdjustmentList() {
                   })}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={adjustment.status === 'Draft' ? 'secondary' : 'default'}>
-                    {adjustment.status}
-                  </Badge>
+                  <StatusBadge status={adjustment.status} />
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>

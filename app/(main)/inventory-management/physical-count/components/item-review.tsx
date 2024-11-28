@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, ArrowUpDown } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +22,7 @@ interface ItemReviewProps {
   formData: {
     selectedLocations: string[];
     items: any[];
+    department: string;
   };
   setFormData: (data: any) => void;
   onNext: () => void;
@@ -37,7 +38,7 @@ const categories = [
   }))
 ];
 
-export function ItemReview({ formData, onNext }: ItemReviewProps) {
+export function ItemReview({ formData, setFormData }: ItemReviewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortField, setSortField] = useState<string | null>(null);
@@ -90,6 +91,16 @@ export function ItemReview({ formData, onNext }: ItemReviewProps) {
     return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * modifier;
   });
 
+  // Update items in formData when locations change
+  useEffect(() => {
+    if (formData.selectedLocations.length > 0) {
+      setFormData((prev: any) => ({
+        ...prev,
+        items: uniqueProducts
+      }));
+    }
+  }, [formData.selectedLocations, setFormData]);
+
   return (
     <Card>
       <CardHeader>
@@ -134,86 +145,72 @@ export function ItemReview({ formData, onNext }: ItemReviewProps) {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[100px]">
-                  <Button
-                    variant="ghost"
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
                     onClick={() => handleSort('code')}
-                    className="flex items-center gap-1 font-medium"
                   >
                     Code
                     <ArrowUpDown className="h-4 w-4" />
-                  </Button>
+                  </div>
                 </TableHead>
                 <TableHead>
-                  <Button
-                    variant="ghost"
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
                     onClick={() => handleSort('name')}
-                    className="flex items-center gap-1 font-medium"
                   >
-                    Description
+                    Name
                     <ArrowUpDown className="h-4 w-4" />
-                  </Button>
+                  </div>
                 </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSort('currentStock')}
-                    className="flex items-center gap-1 font-medium"
-                  >
-                    Current Qty
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
+                <TableHead>Category</TableHead>
+                <TableHead>UOM</TableHead>
+                <TableHead className="text-right">Current Stock</TableHead>
+                <TableHead className="text-right">
+                  <div
+                    className="flex items-center justify-end gap-1 cursor-pointer"
                     onClick={() => handleSort('lastCountDate')}
-                    className="flex items-center gap-1 font-medium"
                   >
                     Last Count
                     <ArrowUpDown className="h-4 w-4" />
-                  </Button>
+                  </div>
                 </TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.code}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {item.brand} - {item.packSize} {item.uom}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{item.currentStock}</TableCell>
-                  <TableCell>
-                    {item.lastCountDate 
-                      ? new Date(item.lastCountDate).toLocaleDateString()
-                      : 'Never'}
-                  </TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={item.currentStock <= item.reorderPoint ? 'destructive' : 'default'}
-                    >
-                      {item.currentStock <= item.reorderPoint ? 'Low Stock' : 'Normal'}
-                    </Badge>
+              {sortedItems.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    No items found
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                sortedItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.code}</TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.category}</TableCell>
+                    <TableCell>{item.uom}</TableCell>
+                    <TableCell className="text-right">{item.currentStock}</TableCell>
+                    <TableCell className="text-right">
+                      {item.lastCountDate
+                        ? new Date(item.lastCountDate).toLocaleDateString()
+                        : 'Never'}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
 
-        {sortedItems.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            No items found matching your criteria.
+        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+          <div>
+            Showing {sortedItems.length} of {uniqueProducts.length} items
           </div>
-        )}
+          <div>
+            {categories.length - 1} categories | {uniqueProducts.length} total items
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

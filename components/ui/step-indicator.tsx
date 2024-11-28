@@ -13,12 +13,14 @@ interface StepIndicatorProps {
   steps: Step[]
   currentStep: number
   className?: string
+  onStepClick?: (step: number) => void
 }
 
 export function StepIndicator({
   steps,
   currentStep,
   className,
+  onStepClick,
 }: StepIndicatorProps) {
   return (
     <nav aria-label="Progress" className={className}>
@@ -32,8 +34,10 @@ export function StepIndicator({
                   ? "border-primary"
                   : index === currentStep
                   ? "border-primary"
-                  : "border-border"
+                  : "border-border",
+                onStepClick && "cursor-pointer"
               )}
+              onClick={() => onStepClick?.(index)}
             >
               <span className="text-sm font-medium">
                 <span className="flex items-center gap-2">
