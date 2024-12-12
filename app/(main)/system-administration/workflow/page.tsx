@@ -3,11 +3,20 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WorkflowList } from "./workflow-configuration/components/workflow-list"
-import { RoleAssignmentMatrixLayout } from "./role-assignment/components/layout"
+import RoleAssignmentLayout from "./role-assignment/components/layout"
 import { sampleWorkflows } from "./workflow-configuration/data/mockData"
 import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 export default function WorkflowPage() {
+  return (
+    <Suspense>
+      <WorkflowContent />
+    </Suspense>
+  )
+}
+
+function WorkflowContent() {
   const searchParams = useSearchParams()
   const defaultTab = searchParams.get('tab') || 'configuration'
 
@@ -32,7 +41,7 @@ export default function WorkflowPage() {
           <WorkflowList workflows={workflows} />
         </TabsContent>
         <TabsContent value="approvers">
-          <RoleAssignmentMatrixLayout />
+          <RoleAssignmentLayout />
         </TabsContent>
         <TabsContent value="users">
           <div className="rounded-lg border p-8 text-center">

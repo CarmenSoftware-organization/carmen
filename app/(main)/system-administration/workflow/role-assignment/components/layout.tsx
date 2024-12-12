@@ -3,7 +3,7 @@ import { useState } from "react"
 import { RoleList } from "./role-list"
 import { ConfigurationPanel } from "./configuration-panel"
 
-export function RoleAssignmentMatrixLayout() {
+export default function RoleAssignmentLayout() {
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null)
 
   return (

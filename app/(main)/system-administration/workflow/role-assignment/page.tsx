@@ -1,4 +1,4 @@
-import { RoleAssignmentMatrixLayout } from "./components/layout"
+import RoleAssignmentLayout from "./components/layout"
 
 export const metadata = {
   title: "Role Assignment Matrix | System Administration",
@@ -6,5 +6,5 @@ export const metadata = {
 }
 
 export default function RoleAssignmentPage() {
-  return <RoleAssignmentMatrixLayout />
+  return <RoleAssignmentLayout />
 } 
