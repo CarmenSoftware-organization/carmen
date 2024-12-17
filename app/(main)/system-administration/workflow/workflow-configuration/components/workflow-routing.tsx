@@ -1,33 +1,51 @@
-import React, { useState } from "react"
+'use client'
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Pencil } from 'lucide-react'
-import { RoutingRule, RoutingCondition, RoutingAction } from "../types/workflow"
+import { Textarea } from "@/components/ui/textarea"
+import { Pencil, Plus, Save, X, Trash2 } from 'lucide-react'
+import { RoutingRule, OperatorType, ActionType } from "../types/workflow"
 
 interface WorkflowRoutingProps {
   rules: RoutingRule[]
   stages: string[]
+  isEditing: boolean
   onSave: (rules: RoutingRule[]) => void
 }
 
-export function WorkflowRouting({ rules: initialRules, stages, onSave }: WorkflowRoutingProps) {
+export function WorkflowRouting({ 
+  rules: initialRules = [], 
+  stages,
+  isEditing: parentIsEditing,
+  onSave 
+}: WorkflowRoutingProps) {
   const [rules, setRules] = useState<RoutingRule[]>(initialRules)
   const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
+  const [isRuleEditing, setIsRuleEditing] = useState(false)
+
+  useEffect(() => {
+    setRules(initialRules)
+  }, [initialRules])
+
+  useEffect(() => {
+    if (!parentIsEditing) {
+      setIsRuleEditing(false)
+      setSelectedRuleId(null)
+    }
+  }, [parentIsEditing])
 
   const selectedRule = rules.find(rule => rule.id === selectedRuleId)
 
   const handleRuleSelect = (ruleId: number) => {
+    if (isRuleEditing) return
     setSelectedRuleId(ruleId)
-    setIsEditing(true)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!selectedRule) return
+    if (!selectedRule || !isRuleEditing) return
 
     const updatedRules = rules.map(rule => {
       if (rule.id === selectedRule.id) {
@@ -38,14 +56,17 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
     setRules(updatedRules)
   }
 
-  const handleConditionChange = (field: keyof RoutingCondition, value: string) => {
-    if (!selectedRule) return
+  const handleConditionChange = (field: keyof RoutingRule['condition'], value: string) => {
+    if (!selectedRule || !isRuleEditing) return
 
     const updatedRules = rules.map(rule => {
       if (rule.id === selectedRule.id) {
         return {
           ...rule,
-          condition: { ...rule.condition, [field]: value }
+          condition: {
+            ...rule.condition,
+            [field]: field === 'operator' ? value as OperatorType : value
+          }
         }
       }
       return rule
@@ -53,8 +74,8 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
     setRules(updatedRules)
   }
 
-  const handleActionChange = (field: keyof RoutingAction | keyof RoutingAction['parameters'], value: string) => {
-    if (!selectedRule) return
+  const handleActionChange = (field: keyof RoutingRule['action'] | keyof RoutingRule['action']['parameters'], value: string) => {
+    if (!selectedRule || !isRuleEditing) return
 
     const updatedRules = rules.map(rule => {
       if (rule.id === selectedRule.id) {
@@ -62,7 +83,7 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
           return {
             ...rule,
             action: {
-              type: value as RoutingAction['type'],
+              type: value as ActionType,
               parameters: { targetStage: '' }
             }
           }
@@ -83,8 +104,19 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
 
   const handleSaveRule = () => {
     onSave(rules)
-    setSelectedRuleId(null)
-    setIsEditing(false)
+    setIsRuleEditing(false)
+  }
+
+  const handleCancelRule = () => {
+    const updatedRules = rules.map(rule => {
+      if (rule.id === selectedRuleId) {
+        const initialRule = initialRules.find(r => r.id === selectedRuleId)
+        return initialRule || rule
+      }
+      return rule
+    })
+    setRules(updatedRules)
+    setIsRuleEditing(false)
   }
 
   const handleAddRule = () => {
@@ -92,14 +124,22 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
       id: Math.max(0, ...rules.map(r => r.id)) + 1,
       name: "",
       description: "",
-      triggerStage: "",
+      triggerStage: stages[0] || "",
       condition: { field: '', operator: 'eq', value: '' },
       action: { type: 'NEXT_STAGE', parameters: { targetStage: '' } }
     }
     const updatedRules = [...rules, newRule]
     setRules(updatedRules)
     setSelectedRuleId(newRule.id)
-    setIsEditing(true)
+    setIsRuleEditing(true)
+  }
+
+  const handleDeleteRule = () => {
+    if (!selectedRule) return
+    const updatedRules = rules.filter(rule => rule.id !== selectedRule.id)
+    setRules(updatedRules)
+    setSelectedRuleId(null)
+    onSave(updatedRules)
   }
 
   return (
@@ -113,36 +153,52 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
             {rules.map((rule) => (
               <li
                 key={rule.id}
-                className={`flex items-center justify-between p-2 rounded-md cursor-pointer ${
+                className={`p-2 rounded-md cursor-pointer ${
                   selectedRuleId === rule.id 
                     ? 'bg-secondary' 
                     : 'hover:bg-secondary/50'
                 }`}
                 onClick={() => handleRuleSelect(rule.id)}
               >
-                <span className="flex-1">{rule.name || 'Unnamed Rule'}</span>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleRuleSelect(rule.id)
-                  }}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                {rule.name || 'Unnamed Rule'}
               </li>
             ))}
           </ul>
-          <Button className="w-full mt-4" onClick={handleAddRule}>
-            <Plus className="mr-2 h-4 w-4" /> Add Rule
-          </Button>
+          {parentIsEditing && (
+            <Button className="w-full mt-4" onClick={handleAddRule}>
+              <Plus className="mr-2 h-4 w-4" /> Add Rule
+            </Button>
+          )}
         </CardContent>
       </Card>
 
       <Card className="col-span-2">
-        <CardHeader>
-          <CardTitle>{isEditing ? "Edit Rule" : "Add New Rule"}</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Rule Details</CardTitle>
+          {selectedRule && parentIsEditing && !isRuleEditing && (
+            <div className="flex space-x-2">
+              <Button variant="outline" size="sm" onClick={handleDeleteRule}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Rule
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setIsRuleEditing(true)}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit Rule
+              </Button>
+            </div>
+          )}
+          {selectedRule && isRuleEditing && (
+            <div className="flex space-x-2">
+              <Button variant="ghost" size="sm" onClick={handleCancelRule}>
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSaveRule}>
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           {selectedRule ? (
@@ -153,7 +209,8 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                   id="name" 
                   value={selectedRule.name} 
                   onChange={handleInputChange}
-                  placeholder="Enter rule name" 
+                  placeholder="Enter rule name"
+                  disabled={!isRuleEditing}
                 />
               </div>
               <div>
@@ -162,7 +219,8 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                   id="description" 
                   value={selectedRule.description} 
                   onChange={handleInputChange}
-                  placeholder="Enter rule description" 
+                  placeholder="Enter rule description"
+                  disabled={!isRuleEditing}
                 />
               </div>
               <div>
@@ -170,6 +228,7 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                 <Select 
                   value={selectedRule.triggerStage} 
                   onValueChange={(value) => handleInputChange({ target: { id: 'triggerStage', value } } as any)}
+                  disabled={!isRuleEditing}
                 >
                   <SelectTrigger id="triggerStage">
                     <SelectValue placeholder="Select trigger stage" />
@@ -187,6 +246,7 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                   <Select 
                     value={selectedRule.condition.field} 
                     onValueChange={(value) => handleConditionChange('field', value)}
+                    disabled={!isRuleEditing}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select field" />
@@ -199,7 +259,8 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                   </Select>
                   <Select 
                     value={selectedRule.condition.operator} 
-                    onValueChange={(value) => handleConditionChange('operator', value as RoutingCondition['operator'])}
+                    onValueChange={(value) => handleConditionChange('operator', value)}
+                    disabled={!isRuleEditing}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select operator" />
@@ -216,15 +277,17 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                     placeholder="Enter value"
                     value={selectedRule.condition.value}
                     onChange={(e) => handleConditionChange('value', e.target.value)}
+                    disabled={!isRuleEditing}
                   />
                 </div>
               </div>
               <div>
                 <Label>Action</Label>
-                <div className="space-y-2 mt-2 p-2 border rounded">
+                <div className="space-y-2 mt-2">
                   <Select 
                     value={selectedRule.action.type} 
                     onValueChange={(value) => handleActionChange('type', value)}
+                    disabled={!isRuleEditing}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select action type" />
@@ -237,6 +300,7 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                   <Select 
                     value={selectedRule.action.parameters.targetStage} 
                     onValueChange={(value) => handleActionChange('targetStage', value)}
+                    disabled={!isRuleEditing}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select target stage" />
@@ -248,12 +312,6 @@ export function WorkflowRouting({ rules: initialRules, stages, onSave }: Workflo
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setSelectedRuleId(null)}>Cancel</Button>
-                <Button onClick={handleSaveRule}>
-                  {isEditing ? "Update Rule" : "Add Rule"}
-                </Button>
               </div>
             </form>
           ) : (

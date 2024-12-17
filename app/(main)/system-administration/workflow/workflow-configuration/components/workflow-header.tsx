@@ -2,19 +2,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Pencil, Copy, Trash2, Save, X } from 'lucide-react'
+import { Workflow } from "../types/workflow"
 
 interface WorkflowHeaderProps {
-  workflow: {
-    id: string
-    name: string
-    type: string
-    description: string
-    documentReferencePattern: string
-    status?: string
-  }
+  workflow: Workflow
   isEditing: boolean
   onEditToggle: () => void
-  onSave?: () => void
+  onSave?: (workflow: Workflow) => void
 }
 
 export function WorkflowHeader({ workflow, isEditing, onEditToggle, onSave }: WorkflowHeaderProps) {
@@ -33,7 +27,7 @@ export function WorkflowHeader({ workflow, isEditing, onEditToggle, onSave }: Wo
         <div className="flex space-x-2">
           {!isEditing ? (
             <>
-              <Button variant="outline" onClick={onEditToggle}>
+              <Button variant="default" onClick={onEditToggle}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </Button>
@@ -52,7 +46,7 @@ export function WorkflowHeader({ workflow, isEditing, onEditToggle, onSave }: Wo
                 <X className="mr-2 h-4 w-4" />
                 Cancel
               </Button>
-              <Button variant="default" onClick={onSave}>
+              <Button variant="default" onClick={() => onSave?.(workflow)}>
                 <Save className="mr-2 h-4 w-4" />
                 Save Changes
               </Button>
@@ -62,7 +56,6 @@ export function WorkflowHeader({ workflow, isEditing, onEditToggle, onSave }: Wo
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">{workflow.description}</p>
-        <p className="text-sm text-muted-foreground mt-2">Document Reference Pattern: {workflow.documentReferencePattern}</p>
       </CardContent>
     </Card>
   )

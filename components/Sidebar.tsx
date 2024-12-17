@@ -98,7 +98,16 @@ const menuItems: MenuItem[] = [
     path: "/operational-planning",
     icon: "CalendarClock",
     subItems: [
-      { name: "Recipes Management", path: "/operational-planning/recipes-management" },
+      { 
+        name: "Recipe Management", 
+        path: "/operational-planning/recipe-management",
+        subItems: [
+          { name: "Recipe Library", path: "/operational-planning/recipe-management/recipes" },
+          { name: "Categories", path: "/operational-planning/recipe-management/categories" },
+          { name: "Costing", path: "/operational-planning/recipe-management/costing" },
+          { name: "Media Gallery", path: "/operational-planning/recipe-management/media" },
+        ]
+      },
       { name: "Menu Engineering", path: "/operational-planning/menu-engineering" },
       { name: "Demand Forecasting", path: "/operational-planning/demand-forecasting" },
       { name: "Inventory Planning", path: "/operational-planning/inventory-planning" },
@@ -147,7 +156,7 @@ const menuItems: MenuItem[] = [
     subItems: [
       { name: "User Management", path: "/system-administration/user-management" },
       { name: "Location Management", path: "/system-administration/location-management" },
-      { name: "Workflow Management", path: "/system-administration/workflow" },
+      { name: "Workflow Management", path: "/system-administration/workflow/workflow-configuration" },
       { name: "General Settings", path: "/system-administration/general-settings" },
       { name: "Notification Preferences", path: "/system-administration/notification-preferences" },
       { name: "License Management", path: "/system-administration/license-management" },

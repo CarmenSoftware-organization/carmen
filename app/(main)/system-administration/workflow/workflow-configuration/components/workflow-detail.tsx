@@ -5,21 +5,21 @@ import { WorkflowHeader } from "./workflow-header"
 import { WorkflowGeneral } from "./workflow-general"
 import { WorkflowStages } from "./workflow-stages"
 import { WorkflowRouting } from "./workflow-routing"
-import { WorkflowNotifications } from "./workflow-notifications"
 import { sampleWorkflows } from "../data/mockData"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { RoutingRule, WorkflowNotification, Workflow } from "../types/workflow"
+import { Workflow } from "../types/workflow"
+import { WorkflowProducts } from "./workflow-products"
 
 interface WorkflowDetailProps {
   workflowId: string
 }
 
 export function WorkflowDetail({ workflowId }: WorkflowDetailProps) {
-  const [workflow, setWorkflow] = useState<Workflow | undefined>(sampleWorkflows.find(w => w.id === workflowId));
-  const [isEditing, setIsEditing] = useState(false);
+  const [workflow, setWorkflow] = useState<Workflow | undefined>(sampleWorkflows.find(w => w.id === workflowId))
+  const [isEditing, setIsEditing] = useState(false)
 
   if (!workflow) {
     return (
@@ -34,48 +34,50 @@ export function WorkflowDetail({ workflowId }: WorkflowDetailProps) {
   }
 
   const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-  };
+    setIsEditing(!isEditing)
+  }
 
   const handleSave = (updatedWorkflow: Workflow) => {
-    setWorkflow(updatedWorkflow);
-    setIsEditing(false);
-  };
+    setWorkflow(updatedWorkflow)
+    setIsEditing(false)
+  }
 
   const stageNames = workflow.stages.map(stage => stage.name)
 
   return (
     <div className="container mx-auto py-6">
       <Button variant="ghost" asChild className="mb-4">
-        <Link href="/system-administration/workflow?tab=configuration">
+        <Link href="/system-administration/workflow/workflow-configuration">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Workflows
         </Link>
       </Button>
-      <WorkflowHeader workflow={workflow} isEditing={isEditing} onEditToggle={handleEditToggle} />
-      <Tabs defaultValue="general" className="mt-6">
+      <WorkflowHeader workflow={workflow} isEditing={isEditing} onEditToggle={handleEditToggle} onSave={handleSave} />
+      <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="stages">Stages</TabsTrigger>
           <TabsTrigger value="routing">Routing</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="products">Products</TabsTrigger>
         </TabsList>
         <TabsContent value="general">
-          <WorkflowGeneral workflow={workflow} isEditing={isEditing} onSave={handleSave} />
+          <WorkflowGeneral workflow={workflow} isEditing={isEditing} onSave={(updatedWorkflow) => handleSave({...workflow, ...updatedWorkflow})} />
         </TabsContent>
         <TabsContent value="stages">
           <WorkflowStages stages={workflow.stages} isEditing={isEditing} onSave={(stages) => handleSave({...workflow, stages})} />
         </TabsContent>
         <TabsContent value="routing">
           <WorkflowRouting 
-            rules={workflow.routingRules} 
+            rules={workflow.routingRules || []} 
             stages={stageNames} 
+            isEditing={isEditing}
             onSave={(routingRules) => handleSave({...workflow, routingRules})} 
           />
         </TabsContent>
-        <TabsContent value="notifications">
-          <WorkflowNotifications 
-            notifications={workflow.notifications} 
-            onSave={(notifications) => handleSave({...workflow, notifications})} 
+        <TabsContent value="products">
+          <WorkflowProducts 
+            products={workflow.products || []} 
+            isEditing={isEditing}
+            onSave={(products) => handleSave({...workflow, products})} 
           />
         </TabsContent>
       </Tabs>

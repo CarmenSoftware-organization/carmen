@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -33,7 +33,13 @@ export function WorkflowList({ workflows }: WorkflowListProps) {
   const [typeFilter, setTypeFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
+  const [mounted, setMounted] = useState(false)
   const itemsPerPage = 10
+
+  // Set mounted state after component mounts
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const filteredWorkflows = useMemo(() => {
     return workflows.filter((workflow) => {
@@ -52,6 +58,11 @@ export function WorkflowList({ workflows }: WorkflowListProps) {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage)
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!mounted) return '' // Return empty string if not mounted
+    return new Date(dateString).toLocaleString()
   }
 
   return (
@@ -124,7 +135,7 @@ export function WorkflowList({ workflows }: WorkflowListProps) {
                   {workflow.status}
                 </Badge>
               </TableCell>
-              <TableCell>{new Date(workflow.lastModified).toLocaleString()}</TableCell>
+              <TableCell>{mounted ? formatDate(workflow.lastModified) : ''}</TableCell>
               <TableCell className="text-right">
                 <Button variant="ghost" asChild>
                   <Link href={`/system-administration/workflow/workflow-configuration/${workflow.id}`}>Edit</Link>

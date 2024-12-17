@@ -1,16 +1,34 @@
 export type OperatorType = "eq" | "lt" | "gt" | "lte" | "gte"
 export type ActionType = "SKIP_STAGE" | "NEXT_STAGE"
 export type NotificationChannel = "Email" | "System"
-export type NotificationEventTrigger = "onApprove" | "onReject" | "onSendBack" | "onSubmit" | "onSLA"
+export type NotificationEventTrigger = "onSubmit" | "onApprove" | "onReject" | "onSendBack" | "onSLA"
 
-export interface WorkflowStage {
+export interface Product {
   id: number
   name: string
-  approver: string
+  code: string
+  category: string
+  subCategory?: string
+  itemGroup?: string
+}
+
+export interface Stage {
+  id: number
+  name: string
+  description: string
   sla: string
   slaUnit: string
-  approverRoles: string[]
   availableActions: string[]
+  hideFields: {
+    pricePerUnit: boolean
+    totalPrice: boolean
+  }
+  assignedUsers: {
+    id: number
+    name: string
+    department: string
+    location: string
+  }[]
 }
 
 export interface RoutingCondition {
@@ -44,6 +62,15 @@ export interface WorkflowNotification {
   channels: NotificationChannel[]
 }
 
+export interface Template {
+  id: number
+  name: string
+  eventTrigger: NotificationEventTrigger
+  description?: string
+  subjectLine: string
+  content: string
+}
+
 export interface Workflow {
   id: string
   name: string
@@ -51,8 +78,10 @@ export interface Workflow {
   description: string
   documentReferencePattern: string
   status: string
-  stages: WorkflowStage[]
+  stages: Stage[]
   routingRules: RoutingRule[]
   notifications: WorkflowNotification[]
+  notificationTemplates: Template[]
+  products: Product[]
 }
 

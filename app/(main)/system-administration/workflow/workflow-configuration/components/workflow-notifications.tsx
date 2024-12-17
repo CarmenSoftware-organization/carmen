@@ -91,7 +91,7 @@ export function WorkflowNotifications({ notifications: initialNotifications = []
     <div className="grid grid-cols-3 gap-6">
       <Card className="col-span-1">
         <CardHeader>
-          <CardTitle>Notification Events</CardTitle>
+          <CardTitle>Notification Templates</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2">
@@ -120,25 +120,25 @@ export function WorkflowNotifications({ notifications: initialNotifications = []
             ))}
           </ul>
           <Button className="w-full mt-4" onClick={handleAddNotification}>
-            <Plus className="mr-2 h-4 w-4" /> Add Event
+            <Plus className="mr-2 h-4 w-4" /> Add Template
           </Button>
         </CardContent>
       </Card>
 
       <Card className="col-span-2">
         <CardHeader>
-          <CardTitle>{isEditing ? "Edit Event" : "Add New Event"}</CardTitle>
+          <CardTitle>{isEditing ? "Edit Template" : "Add New Template"}</CardTitle>
         </CardHeader>
         <CardContent>
           {selectedNotification ? (
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
               <div>
-                <Label htmlFor="event">Event Name</Label>
+                <Label htmlFor="event">Template Name</Label>
                 <Input 
                   id="event" 
                   value={selectedNotification.event} 
                   onChange={handleInputChange}
-                  placeholder="Enter event name" 
+                  placeholder="Enter template name" 
                 />
               </div>
               <div>
@@ -169,46 +169,6 @@ export function WorkflowNotifications({ notifications: initialNotifications = []
                 />
               </div>
               <div>
-                <Label>Notification Channels</Label>
-                <div className="flex space-x-4 mt-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="channel-email" 
-                      checked={selectedNotification.channels.includes('Email')} 
-                      onCheckedChange={(checked) => handleChannelToggle('Email', checked as boolean)}
-                    />
-                    <label htmlFor="channel-email">Email</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="channel-system" 
-                      checked={selectedNotification.channels.includes('System')} 
-                      onCheckedChange={(checked) => handleChannelToggle('System', checked as boolean)}
-                    />
-                    <label htmlFor="channel-system">System</label>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <Label>Recipients</Label>
-                <div className="space-y-2 mt-2">
-                  <div className="flex space-x-2">
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select recipient type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="role">Role Based</SelectItem>
-                        <SelectItem value="department">Department Based</SelectItem>
-                        <SelectItem value="custom">Custom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input placeholder="Enter recipient" />
-                  </div>
-                  <Button variant="outline" size="sm">Add Recipient</Button>
-                </div>
-              </div>
-              <div>
                 <Label>Notification Template</Label>
                 <div className="space-y-2 mt-2">
                   <Input placeholder="Subject Line" />
@@ -222,12 +182,12 @@ export function WorkflowNotifications({ notifications: initialNotifications = []
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setSelectedNotificationId(null)}>Cancel</Button>
                 <Button onClick={handleSaveNotification}>
-                  {isEditing ? "Update Event" : "Add Event"}
+                  {isEditing ? "Update Template" : "Add Template"}
                 </Button>
               </div>
             </form>
           ) : (
-            <p className="text-muted-foreground">Select an event to view or edit details</p>
+            <p className="text-muted-foreground">Select a template to view or edit details</p>
           )}
         </CardContent>
       </Card>
