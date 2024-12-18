@@ -1,12 +1,11 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Edit2, Copy, Archive, Loader2, ImageIcon } from "lucide-react"
+import { Edit2, Copy, Archive, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Recipe } from "../data/mock-recipes"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import Image from "next/image"
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -15,7 +14,6 @@ interface RecipeCardProps {
 export function RecipeCard({ recipe }: RecipeCardProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [imageError, setImageError] = useState(false)
 
   const handleClone = async () => {
     setIsLoading(true)
@@ -43,26 +41,14 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="aspect-video relative bg-muted">
-        {imageError ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted">
-            <ImageIcon className="h-12 w-12 text-muted-foreground" />
-          </div>
-        ) : (
-          <div className="relative w-full h-full">
-            <Image
-              src={recipe.thumbnail || "/images/recipes/placeholder-recipe.jpg"}
-              alt={recipe.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={false}
-              onError={() => setImageError(true)}
-            />
-          </div>
-        )}
+      <div className="aspect-video relative">
+        <img
+          src={recipe.thumbnail || "../images/placeholder-recipe.jpg"}
+          alt={recipe.name}
+          className="object-cover w-full h-full"
+        />
         <Badge
-          className="absolute top-2 right-2 z-10"
+          className="absolute top-2 right-2"
           variant={recipe.status === "active" ? "default" : "secondary"}
         >
           {recipe.status}

@@ -21,6 +21,13 @@ import { ChevronLeft, Save, Plus, Edit2, Trash2, X, Clock, Thermometer, Loader2,
 import { cn } from "@/lib/utils"
 import { Recipe, Ingredient } from "../data/mock-recipes"
 import Image from "next/image"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 // Utility functions
 function formatFileSize(bytes: number): string {
@@ -146,6 +153,8 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
   const [overheadPercentage, setOverheadPercentage] = useState(20)
   const [targetFoodCostPercentage, setTargetFoodCostPercentage] = useState(33)
   const [isUploading, setIsUploading] = useState(false)
+  const [isIngredientDialogOpen, setIsIngredientDialogOpen] = useState(false)
+  const [isInstructionDialogOpen, setIsInstructionDialogOpen] = useState(false)
 
   const form = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeSchema),
@@ -193,8 +202,6 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
     const ingredient = form.getValues('ingredients')[index]
     setIngredientForm(ingredient)
     setEditingIngredientIndex(index)
-    const dialog = document.getElementById('add-ingredient-dialog') as HTMLDialogElement
-    if (dialog) dialog.showModal()
   }
 
   const handleRemoveIngredient = (index: number) => {
@@ -231,9 +238,6 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       cost: 0,
     })
     setEditingIngredientIndex(null)
-
-    const dialog = document.getElementById('add-ingredient-dialog') as HTMLDialogElement
-    if (dialog) dialog.close()
   }
 
   const calculateTotalCost = () => {
@@ -291,8 +295,6 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
     const instruction = form.getValues('instructions')[index]
     setInstructionForm(instruction)
     setEditingInstructionIndex(index)
-    const dialog = document.getElementById('add-instruction-dialog') as HTMLDialogElement
-    if (dialog) dialog.showModal()
   }
 
   const handleRemoveInstruction = (index: number) => {
@@ -329,23 +331,44 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       criticalControl: false,
     })
     setEditingInstructionIndex(null)
-
-    const dialog = document.getElementById('add-instruction-dialog') as HTMLDialogElement
-    if (dialog) dialog.close()
   }
 
   const openIngredientDialog = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const dialog = document.getElementById('add-ingredient-dialog') as HTMLDialogElement
-    if (dialog) dialog.showModal()
+    setIsIngredientDialogOpen(true)
   }
 
   const openInstructionDialog = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const dialog = document.getElementById('add-instruction-dialog') as HTMLDialogElement
-    if (dialog) dialog.showModal()
+    setIsInstructionDialogOpen(true)
+  }
+
+  const handleCloseIngredientDialog = () => {
+    setIsIngredientDialogOpen(false)
+    setIngredientForm({
+      name: '',
+      quantity: 0,
+      unit: '',
+      category: '',
+      cost: 0,
+    })
+    setEditingIngredientIndex(null)
+  }
+
+  const handleCloseInstructionDialog = () => {
+    setIsInstructionDialogOpen(false)
+    setInstructionForm({
+      stepNumber: 1,
+      description: '',
+      time: undefined,
+      temperature: undefined,
+      notes: '',
+      equipments: [],
+      criticalControl: false,
+    })
+    setEditingInstructionIndex(null)
   }
 
   // Media handling functions
@@ -719,30 +742,13 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           </Card>
 
           {/* Add/Edit Ingredient Dialog */}
-          <dialog
-            id="add-ingredient-dialog"
-            className="modal p-6 rounded-lg shadow-lg bg-background border"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <div className="space-y-4 min-w-[400px]">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">
+          <Dialog open={isIngredientDialogOpen} onOpenChange={setIsIngredientDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
                   {editingIngredientIndex === null ? 'Add Ingredient' : 'Edit Ingredient'}
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    const dialog = document.getElementById('add-ingredient-dialog') as HTMLDialogElement
-                    if (dialog) dialog.close()
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
+                </DialogTitle>
+              </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="ingredient-name">Name</Label>
@@ -835,34 +841,24 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
                     />
                   </div>
                 </div>
-
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      const dialog = document.getElementById('add-ingredient-dialog') as HTMLDialogElement
-                      if (dialog) dialog.close()
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleSaveIngredient()
-                    }}
-                  >
-                    {editingIngredientIndex === null ? 'Add' : 'Save'} Ingredient
-                  </Button>
-                </div>
               </div>
-            </div>
-          </dialog>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseIngredientDialog}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSaveIngredient}
+                >
+                  {editingIngredientIndex === null ? 'Add' : 'Save'} Ingredient
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         {/* Instructions Tab */}
@@ -968,29 +964,13 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           </Card>
 
           {/* Add/Edit Instruction Dialog */}
-          <dialog
-            id="add-instruction-dialog"
-            className="modal p-6 rounded-lg shadow-lg bg-background border"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <div className="space-y-4 min-w-[500px]">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">
+          <Dialog open={isInstructionDialogOpen} onOpenChange={setIsInstructionDialogOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>
                   {editingInstructionIndex === null ? 'Add Step' : 'Edit Step'}
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    const dialog = document.getElementById('add-instruction-dialog') as HTMLDialogElement
-                    if (dialog) dialog.close()
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
+                </DialogTitle>
+              </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Step Number</Label>
@@ -1106,29 +1086,24 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
                   />
                   <Label>Critical Control Point</Label>
                 </div>
-
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      const dialog = document.getElementById('add-instruction-dialog') as HTMLDialogElement
-                      if (dialog) dialog.close()
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={handleSaveInstruction}
-                  >
-                    {editingInstructionIndex === null ? 'Add' : 'Save'} Step
-                  </Button>
-                </div>
               </div>
-            </div>
-          </dialog>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseInstructionDialog}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSaveInstruction}
+                >
+                  {editingInstructionIndex === null ? 'Add' : 'Save'} Step
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         {/* Costing Tab */}
