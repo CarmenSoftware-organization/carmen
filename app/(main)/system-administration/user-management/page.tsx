@@ -35,8 +35,17 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Pencil,
+  Trash2,
+  MoreHorizontal
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface FilterCondition {
   id: string
@@ -182,6 +191,22 @@ export default function UserManagementPage() {
     return matchesSearch && matchesStatus && matchesAdvancedFilters
   })
 
+  const handleDelete = async (userId: string) => {
+    // In a real application, this would be an API call
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      setUsers(users.filter(user => user.id !== userId))
+      setSelectedUsers(selectedUsers.filter(id => id !== userId))
+    }
+  }
+
+  const handleView = (userId: string) => {
+    router.push(`/system-administration/user-management/${userId}?mode=view`)
+  }
+
+  const handleEdit = (userId: string) => {
+    router.push(`/system-administration/user-management/${userId}?mode=edit`)
+  }
+
   return (
     <div className="container mx-auto py-10">
       <div className="space-y-4 mb-6">
@@ -209,13 +234,13 @@ export default function UserManagementPage() {
               onValueChange={(value) => setStatusFilter(value === "all" ? null : value)}
             >
               <SelectTrigger className="w-[160px]">
-                <Filter className="h-4 w-4 mr-2" />
+                {/* <Filter className="h-4 w-4 mr-2" /> */}
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
                   <div className="flex items-center">
-                    {/* <Filter className="h-4 w-4 mr-2" /> */}
+                    <Filter className="h-4 w-4 mr-2" />
                     All Status
                   </div>
                 </SelectItem>
@@ -389,36 +414,53 @@ export default function UserManagementPage() {
                 <TableCell>{user.businessUnit}</TableCell>
                 <TableCell>{user.department}</TableCell>
                 <TableCell>
-                  <span
-                    className={`inline-block px-2 py-1 rounded text-sm ${
-                      user.accountStatus === "active"
-                        ? "bg-green-100 text-green-800"
-                        : user.accountStatus === "inactive"
-                        ? "bg-gray-100 text-gray-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {user.accountStatus.charAt(0).toUpperCase() +
-                      user.accountStatus.slice(1)}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {user.accountStatus === "active" && (
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    )}
+                    {user.accountStatus === "inactive" && (
+                      <XCircle className="h-4 w-4 text-gray-500" />
+                    )}
+                    {user.accountStatus === "suspended" && (
+                      <AlertCircle className="h-4 w-4 text-yellow-500" />
+                    )}
+                    {user.accountStatus.charAt(0).toUpperCase() + user.accountStatus.slice(1)}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleString()
+                    ? new Date(user.lastLogin).toLocaleDateString()
                     : "Never"}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      router.push(
-                        `/system-administration/user-management/${user.id}`
-                      )
-                    }
-                  >
-                    View
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleView(user.id)}>
+                        <Search className="h-4 w-4 mr-2" />
+                        View
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEdit(user.id)}>
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDelete(user.id)}
+                        className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
