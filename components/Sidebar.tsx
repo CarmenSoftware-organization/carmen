@@ -104,8 +104,8 @@ const menuItems: MenuItem[] = [
         subItems: [
           { name: "Recipe Library", path: "/operational-planning/recipe-management/recipes" },
           { name: "Categories", path: "/operational-planning/recipe-management/categories" },
-          { name: "Costing", path: "/operational-planning/recipe-management/costing" },
-          { name: "Media Gallery", path: "/operational-planning/recipe-management/media" },
+          { name: "Cuisine Types", path: "/operational-planning/recipe-management/cuisine-types" },
+         
         ]
       },
       { name: "Menu Engineering", path: "/operational-planning/menu-engineering" },

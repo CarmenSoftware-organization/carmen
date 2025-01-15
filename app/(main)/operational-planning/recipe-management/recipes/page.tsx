@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { RecipeList } from "./components/recipe-list"
+import RecipeList from "./components/recipe-list-new"
 import { RecipeListSkeleton } from "./components/recipe-list-skeleton"
 
 export default function RecipesPage() {

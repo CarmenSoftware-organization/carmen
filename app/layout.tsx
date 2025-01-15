@@ -1,13 +1,14 @@
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { UserProvider } from '@/lib/context/user-context'
+import { Providers } from './providers'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Environmental Management System',
-  description: 'Environmental management and monitoring dashboard',
+  title: 'Carmen - Food Service ERP',
+  description: 'Enterprise resource planning system for food service operations',
 }
 
 export default function RootLayout({
@@ -16,11 +17,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <UserProvider>
-          {children}
-        </UserProvider>
+        <Providers>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </Providers>
       </body>
     </html>
   )
