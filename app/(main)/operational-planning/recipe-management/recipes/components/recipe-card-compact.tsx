@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import { Recipe } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
 import { Card, CardContent } from "@/components/ui/card"
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
+import { RecipeImage } from "./recipe-image"
 
 interface RecipeCardCompactProps {
   recipe: Recipe
@@ -24,25 +24,19 @@ interface RecipeCardCompactProps {
 export function RecipeCardCompact({ recipe }: RecipeCardCompactProps) {
   return (
     <Card className="overflow-hidden transition-all hover:ring-2 hover:ring-primary/50 group-hover:shadow-lg">
-      <div className="relative aspect-video">
-        {recipe.image ? (
-          <Image
-            src={recipe.image}
-            alt={recipe.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            No image
-          </div>
-        )}
+      <div className="relative">
+        <RecipeImage
+          src={recipe.image}
+          alt={recipe.name}
+          aspectRatio="video"
+          priority={false}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <Badge 
-          variant={recipe.status === "active" ? "default" : "secondary"}
+          variant={recipe.status === "published" ? "default" : "secondary"}
           className="absolute top-2 right-2"
         >
-          {recipe.status === "active" ? (
+          {recipe.status === "published" ? (
             <CheckCircle2 className="h-3 w-3 mr-1" />
           ) : (
             <XCircle className="h-3 w-3 mr-1" />

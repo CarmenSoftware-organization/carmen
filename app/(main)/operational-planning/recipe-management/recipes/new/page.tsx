@@ -43,6 +43,7 @@ export default function CreateRecipePage() {
           totalCost: 0,
           carbonFootprint: 0,
           hasMedia: false,
+          deductFromStock: false,
           ingredients: [],
           steps: [],
           prepNotes: '',
@@ -59,7 +60,8 @@ export default function CreateRecipePage() {
           overheadPercentage: 20,
           recommendedPrice: 0,
           foodCostPercentage: 0,
-          grossProfit: 0
+          grossProfit: 0,
+          unitOfSale: 'portion'
         }} 
       />
     </div>

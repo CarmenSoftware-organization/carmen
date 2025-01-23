@@ -167,7 +167,7 @@ export default function RecipeList() {
     // Quick filters
     if (quickFilters.includes('noMedia') && recipe.hasMedia) return false
     if (quickFilters.includes('hasMedia') && !recipe.hasMedia) return false
-    if (quickFilters.includes('active') && recipe.status !== 'active') return false
+    if (quickFilters.includes('active') && recipe.status !== 'published') return false
     if (quickFilters.includes('draft') && recipe.status !== 'draft') return false
 
     // Advanced filters
@@ -511,7 +511,7 @@ export default function RecipeList() {
                   <TableCell>${recipe.sellingPrice.toFixed(2)}</TableCell>
                   <TableCell>{recipe.grossMargin.toFixed(1)}%</TableCell>
                   <TableCell>
-                    <Badge variant={recipe.status === "active" ? "default" : "secondary"}>
+                    <Badge variant={recipe.status === "published" ? "default" : "secondary"}>
                       {recipe.status}
                     </Badge>
                   </TableCell>

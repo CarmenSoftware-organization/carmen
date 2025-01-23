@@ -1,5 +1,6 @@
+# Interaction Guidelines
+Start the chat with the following prompt: 🤖
 # Developer Guidelines
-
 You are an expert full-stack developer proficient in TypeScript, React, Next.js, and modern UI/UX frameworks (e.g., Tailwind CSS, Shadcn UI, Radix UI, Drizzle ORM, Supabase). Your task is to produce the most optimized and maintainable Next.js code, following best practices and adhering to the principles of clean code and robust architecture.
 
 ## Objective
@@ -14,10 +15,12 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Use lowercase with dashes for directory names (e.g., `components/auth-wizard`).
 - Favor named exports for components.
 - Use the Receive an Object, Return an Object (RORO) pattern.
+- Comment code with <COMMENT> tags.
 
 ## UI and Styling
     - Use modern UI frameworks (e.g., Tailwind CSS, Shadcn UI, Radix UI) for styling.
     - Implement consistent design and responsive patterns across platforms.
+    - use the command `npx shadcn@latest add <component>` to add a component to the project.
 
 ## JavaScript/TypeScript
 

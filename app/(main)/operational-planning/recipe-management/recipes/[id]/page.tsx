@@ -1,4 +1,6 @@
-import { Suspense } from "react"
+"use client"
+
+import { Suspense, useState } from "react"
 import { Recipe, Ingredient, PreparationStep, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,11 +20,13 @@ import {
   UploadCloud,
   Thermometer,
   Plus,
+  Info,
 } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
-import React from "react"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Label } from "@/components/ui/label"
+import { RecipeImage } from "../components/recipe-image"
 
 interface RecipeViewPageProps {
   params: {
@@ -56,6 +60,7 @@ function formatMeasurement(quantity: number, unit: string): string {
 
 export default function RecipeViewPage({ params }: RecipeViewPageProps) {
   const recipe = mockRecipes.find(r => r.id === params.id)
+  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null)
 
   if (!recipe) {
     return (
@@ -82,7 +87,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto py-6 px-3 space-y-6">
       {/* Header Section */}
       <div className="flex justify-between items-start">
         <div className="space-y-1">
@@ -93,7 +98,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                 Back to Recipes
               </Button>
             </Link>
-            <Badge variant={recipe.status === 'active' ? 'default' : 'secondary'}>
+            <Badge variant={recipe.status === 'published' ? 'default' : 'secondary'}>
               {recipe.status}
             </Badge>
           </div>
@@ -130,23 +135,17 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
       <div className="grid grid-cols-3 gap-6">
         {/* Left Column - Overview and Image */}
         <div className="space-y-6">
-          <Card className="overflow-hidden">
-            {recipe.image ? (
-              <Image
-                src={recipe.image}
-                alt={recipe.name}
-                width={600}
-                height={400}
-                className="w-full object-cover aspect-video"
-              />
-            ) : (
-              <div className="w-full aspect-video bg-muted flex items-center justify-center">
-                No image available
-              </div>
-            )}
-          </Card>
+          {/* Recipe Image */}
+          <div className="relative">
+            <RecipeImage
+              src={recipe.image}
+              alt={recipe.name}
+              aspectRatio="video"
+              priority={true}
+            />
+          </div>
 
-          <Card className="p-6 space-y-4">
+          <Card className="px-3 py-6 space-y-4">
             <h2 className="text-lg font-semibold">Basic Information</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
@@ -187,17 +186,32 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                 <p className="text-muted-foreground">Last Modified</p>
                 <p className="font-medium">{recipe.updatedAt}</p>
               </div>
+              <div>
+                <p className="text-muted-foreground">Stock Management:</p>
+                <Badge variant={recipe.deductFromStock ? "default" : "secondary"}>
+                  {recipe.deductFromStock ? "Deduct from Stock" : "Manual Stock Management"}
+                </Badge>
+              </div>
             </div>
           </Card>
 
-          <Card className="p-6 space-y-4">
+          <Card className="px-3 py-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Carbon Footprint</h2>
               <Leaf className="h-5 w-5 text-green-500" />
             </div>
-            <p className="text-sm text-muted-foreground">
-              Standard Value: {recipe.carbonFootprint || 'Not available'}
-            </p>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Standard Value (CO₂eq):</span>
+                <span className="font-medium">{recipe.carbonFootprint} kg</span>
+              </div>
+              {recipe.carbonFootprintSource && (
+                <div className="text-sm text-muted-foreground">
+                  <span className="block font-medium mb-1">Source:</span>
+                  <span>{recipe.carbonFootprintSource}</span>
+                </div>
+              )}
+            </div>
           </Card>
         </div>
 
@@ -208,6 +222,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
               <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
               <TabsTrigger value="preparation">Preparation</TabsTrigger>
               <TabsTrigger value="cost">Cost Summary</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
 
@@ -215,7 +230,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
               <div className="grid grid-cols-[2fr,1fr] gap-4">
                 {/* Left Panel - Ingredients List */}
                 <div className="space-y-4">
-                  <Card className="p-6">
+                  <Card className="px-3 py-6">
                     <div className="flex justify-between items-center mb-6">
                       <div>
                         <h3 className="font-semibold">Recipe Components</h3>
@@ -228,57 +243,36 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                       {Object.entries(groupIngredientsByComponent(recipe.ingredients)).map(([component, ingredients]) => (
                         <div key={component} className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-muted-foreground">{component}</h3>
+                            <h3 className={cn(
+                              "text-lg font-semibold text-muted-foreground",
+                              component === 'Main Ingredients' && "italic"
+                            )}>
+                              {component}
+                            </h3>
                             <Badge variant="secondary">
                               {ingredients.length} {ingredients.length === 1 ? 'item' : 'items'}
                             </Badge>
                           </div>
                           <div className="space-y-4">
                             {ingredients.map((ingredient, index) => (
-                              <div key={index} className="bg-muted/50 rounded-lg p-4">
-                                <div className="flex justify-between items-start mb-3">
+                              <div 
+                                key={index} 
+                                className={cn(
+                                  "bg-muted/50 rounded-lg p-4 cursor-pointer hover:bg-muted/70 transition-colors",
+                                  selectedIngredient?.id === ingredient.id && "ring-2 ring-primary"
+                                )}
+                                onClick={() => setSelectedIngredient(ingredient)}
+                              >
+                                <div className="flex justify-between items-start">
                                   <div>
                                     <h4 className="font-medium">{ingredient.name}</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Recipe: {formatMeasurement(ingredient.quantity, ingredient.unit)}
-                                    </p>
                                   </div>
                                   <Badge 
-                                    variant={isInStock(ingredient) ? "outline" : "destructive"} 
+                                    variant="secondary"
                                     className="w-24 justify-center"
                                   >
-                                    {isInStock(ingredient) ? "In Stock" : "Out of Stock"}
+                                    {formatMeasurement(ingredient.quantity, ingredient.unit)}
                                   </Badge>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div className="space-y-2">
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Inventory Qty:</span>
-                                      <span>{formatMeasurement(ingredient.inventoryQty, ingredient.inventoryUnit)}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Wastage:</span>
-                                      <span>{ingredient.wastage}%</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Cost/Unit:</span>
-                                      <span>${ingredient.costPerUnit.toFixed(2)}/{ingredient.inventoryUnit}</span>
-                                    </div>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Net Cost:</span>
-                                      <span>${(ingredient.quantity * ingredient.costPerUnit).toFixed(2)}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">Wastage Cost:</span>
-                                      <span>${(ingredient.quantity * ingredient.costPerUnit * (ingredient.wastage / 100)).toFixed(2)}</span>
-                                    </div>
-                                    <div className="flex justify-between font-medium">
-                                      <span>Total Cost:</span>
-                                      <span>${ingredient.totalCost.toFixed(2)}</span>
-                                    </div>
-                                  </div>
                                 </div>
                               </div>
                             ))}
@@ -291,8 +285,53 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
 
                 {/* Right Panel - Inventory Details */}
                 <div className="space-y-4">
+                  {/* Ingredient Details */}
+                  <Card className="px-3 py-6">
+                    <h3 className="font-semibold mb-4">Ingredient Details</h3>
+                    {selectedIngredient ? (
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Status</span>
+                          <Badge variant={isInStock(selectedIngredient) ? "secondary" : "destructive"}>
+                            {isInStock(selectedIngredient) ? "In Stock" : "Out of Stock"}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Inventory Qty</span>
+                            <span>{formatMeasurement(selectedIngredient.inventoryQty, selectedIngredient.inventoryUnit || selectedIngredient.unit)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Wastage</span>
+                            <span>{selectedIngredient.wastage}%</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Cost/Unit</span>
+                            <span>${selectedIngredient.costPerUnit}/{selectedIngredient.unit}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Net Cost</span>
+                            <span>${(selectedIngredient.quantity * selectedIngredient.costPerUnit).toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Wastage Cost</span>
+                            <span>${((selectedIngredient.quantity * selectedIngredient.costPerUnit * selectedIngredient.wastage) / 100).toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm font-medium">
+                            <span>Total Cost</span>
+                            <span>${selectedIngredient.totalCost.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted-foreground text-center py-4">
+                        Select an ingredient to view details
+                      </div>
+                    )}
+                  </Card>
+
                   {/* Inventory Status */}
-                  <Card className="p-6">
+                  <Card className="px-3 py-6">
                     <h3 className="font-semibold mb-4">Inventory Status</h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -325,9 +364,9 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                     </div>
                   </Card>
 
-                  {/* Ingredient Details */}
-                  <Card className="p-6">
-                    <h3 className="font-semibold mb-4">Ingredient Details</h3>
+                  {/* Recipe Summary */}
+                  <Card className="px-3 py-6">
+                    <h3 className="font-semibold mb-4">Recipe Summary</h3>
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
@@ -360,7 +399,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                   </Card>
 
                   {/* Ordering Information */}
-                  <Card className="p-6">
+                  <Card className="px-3 py-6">
                     <h3 className="font-semibold mb-4">Ordering Information</h3>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center text-sm">
@@ -386,11 +425,24 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
 
             <TabsContent value="preparation" className="space-y-6">
               {recipe.steps.map((step) => (
-                <Card key={step.id} className="p-6">
-                  <div className="grid grid-cols-[auto,1fr] gap-6">
+                <Card key={step.id} className="px-3 py-6">
+                  <div className="grid grid-cols-[auto,300px,1fr] gap-6">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                       {step.order}
                     </div>
+
+                    {/* Step Image */}
+                    {step.image && (
+                      <div className="relative">
+                        <RecipeImage
+                          src={step.image}
+                          alt={`Step ${step.order}`}
+                          aspectRatio="4:3"
+                          priority={false}
+                        />
+                      </div>
+                    )}
+
                     <div className="space-y-4">
                       <div>
                         <h3 className="font-medium mb-2">Instructions</h3>
@@ -422,16 +474,6 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                           </div>
                         )}
                       </div>
-                      {step.image && (
-                        <div className="w-[300px] relative aspect-[4/3] rounded-lg overflow-hidden">
-                          <Image
-                            src={step.image}
-                            alt={`Step ${step.order}`}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      )}
                     </div>
                   </div>
                 </Card>
@@ -449,7 +491,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
 
               <div className="grid grid-cols-2 gap-6">
                 {/* Ingredient Costs */}
-                <Card className="p-6">
+                <Card className="px-3 py-6">
                   <h3 className="font-medium mb-4">Ingredient Costs</h3>
                   <div className="space-y-4">
                     <div className="border rounded-lg">
@@ -494,7 +536,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                 </Card>
 
                 {/* Cost Summary */}
-                <Card className="p-6">
+                <Card className="px-3 py-6">
                   <h3 className="font-medium mb-4">Cost Summary</h3>
                   <div className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
@@ -547,7 +589,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
               </div>
 
               {/* Pricing Analysis */}
-              <Card className="p-6">
+              <Card className="px-3 py-6">
                 <h3 className="font-medium mb-4">Pricing Analysis</h3>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-6">
@@ -616,7 +658,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
               </Card>
 
               {/* Competitor Analysis */}
-              <Card className="p-6">
+              <Card className="px-3 py-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-medium">Competitor Analysis</h3>
                   <Button variant="outline" size="sm">
@@ -647,7 +689,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
             </TabsContent>
 
             <TabsContent value="notes" className="space-y-4">
-              <Card className="p-6">
+              <Card className="px-3 py-6">
                 <div className="space-y-6">
                   <div>
                     <h3 className="font-semibold mb-2">Preparation Notes</h3>
@@ -660,6 +702,79 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                   <div>
                     <h3 className="font-semibold mb-2">Additional Information</h3>
                     <p className="text-muted-foreground">{recipe.additionalInfo || 'No additional information available.'}</p>
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="details" className="space-y-6">
+              {/* Recipe Description */}
+              <Card className="px-3 py-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium">Recipe Description</h3>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>A brief description of your recipe</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <p className="text-muted-foreground">
+                    {recipe.description || 'No description available.'}
+                  </p>
+                </div>
+              </Card>
+
+              {/* Ingredient Details */}
+              <Card className="px-3 py-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium">Ingredient Details</h3>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Additional details about the ingredients</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Allergens</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {recipe.allergens.length > 0 ? (
+                          recipe.allergens.map((allergen, index) => (
+                            <Badge key={index} variant="outline">
+                              {allergen}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground">No allergens listed</p>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Tags</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {recipe.tags.length > 0 ? (
+                          recipe.tags.map((tag, index) => (
+                            <Badge key={index} variant="outline">
+                              {tag}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground">No tags added</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Card>
