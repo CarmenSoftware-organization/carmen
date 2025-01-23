@@ -2,6 +2,30 @@
 
 ## Common Types
 
+### Money
+| Field    | Type   | Description                |
+|----------|--------|----------------------------|
+| amount   | number | The monetary amount        |
+| currency | string | The currency code          |
+
+### Attachment
+| Field         | Type      | Description                               |
+|---------------|-----------|-------------------------------------------|
+| id            | string    | Unique identifier for the attachment      |
+| file_name     | string    | Name of the file                          |
+| description   | string?   | Description of the attachment             |
+| is_public     | boolean   | Whether the attachment is publicly accessible |
+| date          | date      | Date when the file was attached           |
+| created_by    | string    | User who attached the file                |
+
+### ActivityLog
+| Field       | Type      | Description                               |
+|-------------|-----------|-------------------------------------------|
+| date        | timestamp | Date and time of the activity             |
+| created_by  | string    | User who performed the action             |
+| action_type | string    | Type of action performed                  |
+| log_message | string    | Description of the activity               |
+
 ## Currency and Exchange Rate
 
 ### Currency
@@ -10,195 +34,422 @@
 | id          | number  | Unique identifier for the currency        |
 | code        | string  | Currency code (e.g., USD, EUR)            |
 | description | string  | Full name or description of the currency  |
-| active      | boolean | Whether the currency is currently active  |
-| currency    | string  | Currency symbol or code for display       |
+| is_active   | boolean | Whether the currency is currently active  |
+| symbol      | string  | Currency symbol or code for display       |
 
 ### ExchangeRate
-| Field        | Type   | Description                               |
-|--------------|--------|-------------------------------------------|
-| id           | number | Unique identifier for the exchange rate   |
-| currencyCode | string | Code of the currency for this rate        |
-| currencyName | string | Full name of the currency                 |
-| rate         | number | The exchange rate value                   |
-| lastUpdated  | string | Date when the rate was last updated       |
+| Field          | Type      | Description                               |
+|----------------|-----------|-------------------------------------------|
+| id             | number    | Unique identifier for the exchange rate   |
+| currency_code  | string    | Code of the currency for this rate        |
+| currency_name  | string    | Full name of the currency                 |
+| rate          | number    | The exchange rate value                   |
+| last_updated  | timestamp | Date when the rate was last updated       |
 
 ## Inventory
 
-### Item
-| Field            | Type          | Description                               |
-|------------------|---------------|-------------------------------------------|
-| itemId           | number        | Unique identifier for the item            |
-| itemCode         | string        | Unique code for the item                  |
-| itemName         | string        | Name of the item                          |
-| description      | string?       | Detailed description of the item          |
-| categoryId       | number        | ID of the category this item belongs to   |
-| baseUnitId       | number        | ID of the base unit for this item         |
-| costingMethod    | CostingMethod | Method used for costing this item         |
-| isActive         | boolean       | Whether the item is currently active      |
-| isSerialized     | boolean       | Whether the item is tracked by serial numbers |
-| minimumQuantity  | number?       | Minimum quantity to maintain in inventory |
-| maximumQuantity  | number?       | Maximum quantity to maintain in inventory |
-| reorderPoint     | number?       | Quantity at which to reorder              |
-| reorderQuantity  | number?       | Suggested quantity to reorder             |
-| leadTime         | number?       | Lead time for reordering in days          |
-| lastPurchaseDate | Date?         | Date of last purchase                     |
-| lastPurchasePrice| number?       | Price of last purchase                    |
-| lastSaleDate     | Date?         | Date of last sale                         |
-| lastSalePrice    | number?       | Price of last sale                        |
-
 ### InventoryTransaction
-| Field           | Type            | Description                               |
-|-----------------|-----------------|-------------------------------------------|
-| transactionId   | number          | Unique identifier for the transaction     |
-| itemId          | number          | ID of the item involved                   |
-| locationId      | number          | ID of the location involved               |
-| transactionType | TransactionType | Type of transaction                       |
+| Field            | Type            | Description                               |
+|------------------|-----------------|-------------------------------------------|
+| transaction_id   | number          | Unique identifier for the transaction     |
+| item_id         | number          | ID of the item involved                   |
+| location_id     | number          | ID of the location involved               |
+| transaction_type| TransactionType | Type of transaction                       |
 | quantity        | number          | Quantity involved in the transaction      |
-| unitCost        | number          | Cost per unit for this transaction        |
-| totalCost       | number          | Total cost of the transaction             |
-| transactionDate | Date            | Date of the transaction                   |
-| referenceNo     | string?         | Reference number (e.g., GRN number)       |
-| referenceType   | string?         | Type of reference (e.g., 'GRN')           |
-| userId          | number          | ID of the user who performed the transaction |
+| unit_cost       | number          | Cost per unit for this transaction        |
+| total_cost      | number          | Total cost of the transaction             |
+| transaction_date| timestamp       | Date of the transaction                   |
+| reference_no    | string?         | Reference number (e.g., GRN number)       |
+| reference_type  | string?         | Type of reference (e.g., 'GRN')           |
+| user_id         | number          | ID of the user who performed the transaction |
 | notes           | string?         | Additional notes about the transaction    |
 
-## Goods Receive Note (GRN)
+### InventoryAdjustment
+| Field        | Type                | Description                               |
+|--------------|---------------------|-------------------------------------------|
+| id           | string              | Unique identifier for the adjustment      |
+| date         | timestamp           | Date of the adjustment                    |
+| type         | 'IN' \| 'OUT'       | Type of adjustment                        |
+| status       | AdjustmentStatus    | Status of the adjustment                  |
+| location     | string              | Location where adjustment is made         |
+| reason       | string              | Reason for the adjustment                 |
+| description  | string?             | Additional description                    |
+| department   | string              | Department making the adjustment          |
+| items        | StockMovementItem[] | Items being adjusted                      |
+| totals       | AdjustmentTotals    | Total quantities and costs               |
+| created_by   | string              | User who created the adjustment          |
+| created_at   | timestamp           | Creation date and time                    |
+| modified_by  | string?             | User who last modified the adjustment     |
+| modified_at  | timestamp?          | Last modification date and time           |
+| posted_by    | string?             | User who posted the adjustment            |
+| posted_at    | timestamp?          | Posting date and time                     |
+| approved_by  | string?             | User who approved the adjustment          |
+| approved_at  | timestamp?          | Approval date and time                    |
 
-### GoodsReceiveNote
+### StockMovementItem
 | Field          | Type     | Description                               |
 |----------------|----------|-------------------------------------------|
-| grnRefNo       | string   | Unique reference number for the GRN       |
-| date           | Date     | Date of the GRN                           |
-| invoiceDate    | Date?    | Date of the invoice                       |
-| invoiceNo      | string?  | Invoice number                            |
-| taxInvoiceDate | Date?    | Date of the tax invoice                   |
-| taxInvoiceNo   | string?  | Tax invoice number                        |
-| description    | string?  | Description of the GRN                    |
-| receiverId     | number   | ID of the receiver                        |
-| vendorId       | number   | ID of the vendor                          |
-| locationId     | number   | ID of the receiving location              |
-| currencyCode   | string   | Currency code for this GRN                |
-| exchangeRate   | number   | Exchange rate used                        |
-| status         | GRNStatus| Status of the GRN                         |
-| isConsignment  | boolean  | Whether this is a consignment receipt     |
-| isCash         | boolean  | Whether this is a cash purchase           |
-| cashBookId     | number?  | ID of the cash book (for cash purchases)  |
+| id             | string   | Unique identifier for the item            |
+| product_name   | string   | Name of the product                       |
+| sku            | string   | Stock keeping unit                        |
+| location       | Location | Location information                      |
+| lots           | Lot[]    | Lot information                          |
+| uom            | string   | Unit of measure                          |
+| unit_cost      | number   | Cost per unit                            |
+| total_cost     | number   | Total cost                               |
+| current_stock  | number   | Current stock level                       |
+| adjusted_stock | number   | Stock level after adjustment             |
+
+### Lot
+| Field        | Type      | Description                               |
+|--------------|-----------|-------------------------------------------|
+| lot_no       | string    | Lot number                                |
+| quantity     | number    | Quantity in the lot                       |
+| uom          | string    | Unit of measure                           |
+| expiry_date  | timestamp | Expiry date of the lot                    |
+
+## Goods Received Note (GRN)
+
+### GoodsReceiveNote
+| Field               | Type            | Description                               |
+|---------------------|-----------------|-------------------------------------------|
+| id                  | string          | Unique identifier for the GRN             |
+| ref                 | string          | Reference number                          |
+| date                | date            | Date of receipt                           |
+| invoice_date        | date?           | Date of the invoice                       |
+| invoice_number      | string?         | Invoice number                            |
+| tax_invoice_date    | date?           | Date of the tax invoice                   |
+| tax_invoice_number  | string?         | Tax invoice number                        |
+| description         | string          | Description of the receipt                |
+| receiver            | string          | Name of the receiver                      |
+| vendor              | string          | Name of the vendor                        |
+| vendor_id           | string          | ID of the vendor                          |
+| location            | string          | Location of receipt                       |
+| currency            | string          | Currency code                             |
+| status              | string          | Status of the GRN                         |
+| is_consignment      | boolean         | Whether this is a consignment receipt     |
+| is_cash             | boolean         | Whether this is a cash purchase           |
+| items               | GRNItem[]       | Items received                            |
+| attachments         | Attachment[]    | Attached documents                        |
+| activity_log        | ActivityLog[]   | Log of activities                         |
+| exchange_rate       | number          | Exchange rate used                        |
+| base_currency       | string          | Base currency code                        |
+| base_subtotal_price | number          | Subtotal in base currency                 |
+| subtotal_price      | number          | Subtotal in transaction currency          |
+| base_net_amount     | number          | Net amount in base currency               |
+| net_amount          | number          | Net amount in transaction currency        |
+| base_disc_amount    | number          | Discount amount in base currency          |
+| discount_amount     | number          | Discount amount in transaction currency   |
+| base_tax_amount     | number          | Tax amount in base currency               |
+| tax_amount          | number          | Tax amount in transaction currency        |
+| base_total_amount   | number          | Total amount in base currency             |
+| total_amount        | number          | Total amount in transaction currency      |
 
 ### GRNItem
-| Field              | Type          | Description                               |
-|--------------------|---------------|-------------------------------------------|
-| grnItemId          | number        | Unique identifier for the GRN item        |
-| grnRefNo           | string        | Reference to the parent GRN               |
-| poLineId           | number        | ID of the related purchase order line     |
-| itemId             | number        | ID of the item received                   |
-| storeLocationId    | number        | ID of the store location                  |
-| receivedQuantity   | number        | Quantity received                         |
-| receivedUnitId     | number        | ID of the unit used for receiving         |
-| isFOC              | boolean       | Whether the item is Free of Charge        |
-| price              | number        | Price per unit                            |
-| taxAmount          | number        | Tax amount for this item                  |
-| totalAmount        | number        | Total amount for this item                |
-| status             | GRNItemStatus | Status of the GRN item                    |
-| deliveryPoint      | string?       | Delivery point for this item              |
-| basePrice          | number        | Price in base unit                        |
-| baseQuantity       | number        | Quantity in base unit                     |
-| extraCost          | number        | Extra cost allocated to this item         |
-| totalCost          | number        | Total cost (basePrice + extraCost)        |
-| discountAdjustment | boolean       | Whether discount adjustment is applied    |
-| discountAmount     | number?       | Discount amount if applicable             |
-| taxAdjustment      | boolean       | Whether tax adjustment is applied         |
-| lotNumber          | string?       | LOT number for this item                  |
-| expiryDate         | Date?         | Expiry date for the item                  |
-| comment            | string?       | Comment for this GRN item                 |
+| Field               | Type          | Description                               |
+|---------------------|---------------|-------------------------------------------|
+| id                  | string        | Unique identifier for the GRN item        |
+| name                | string        | Name of the item                          |
+| description         | string        | Description of the item                   |
+| job_code            | string        | Job code                                  |
+| ordered_quantity    | number        | Quantity ordered                          |
+| received_quantity   | number        | Quantity received                         |
+| unit                | string        | Unit of measure                           |
+| unit_price          | number        | Price per unit                            |
+| subtotal_amount     | number        | Subtotal amount                           |
+| total_amount        | number        | Total amount                              |
+| tax_rate            | number        | Tax rate                                  |
+| tax_amount          | number        | Tax amount                                |
+| discount_rate       | number        | Discount rate                             |
+| discount_amount     | number        | Discount amount                           |
+| net_amount          | number        | Net amount                                |
+| expiry_date         | date?         | Expiry date                               |
+| serial_number       | string?       | Serial number                             |
+| notes               | string?       | Additional notes                          |
+| lot_number          | string        | Lot number                                |
+| delivery_point      | string        | Delivery point                            |
+| delivery_date       | timestamp     | Delivery date and time                    |
+| location            | string        | Location                                  |
+| is_free_of_charge   | boolean       | Whether item is free of charge            |
+| tax_included        | boolean       | Whether tax is included in price          |
+| adjustments         | Adjustments   | Tax and discount adjustments              |
+
+### Adjustments
+| Field    | Type    | Description                               |
+|----------|---------|-------------------------------------------|
+| discount | boolean | Whether discount adjustment is applied     |
+| tax      | boolean | Whether tax adjustment is applied         |
 
 ## Purchase Order (PO)
 
 ### PurchaseOrder
 | Field                | Type                | Description                               |
-|----------------------|---------------------|-------------------------------------------|
-| poId                 | number              | Unique identifier for the purchase order  |
-| vendorId             | number              | ID of the vendor                          |
-| orderDate            | Date                | Date the order was placed                 |
-| expectedDeliveryDate | Date?               | Expected delivery date                    |
-| status               | PurchaseOrderStatus | Status of the purchase order              |
-| totalAmount          | number              | Total amount of the purchase order        |
-| currencyCode         | string              | Currency code for this order              |
-| exchangeRate         | number              | Exchange rate used                        |
-| notes                | string?             | Additional notes                          |
-| createdBy            | number              | ID of the user who created the order      |
-| approvedBy           | number?             | ID of the user who approved the order     |
-| approvalDate         | Date?               | Date of approval                          |
+|---------------------|---------------------|-------------------------------------------|
+| id                  | string             | Unique identifier for the purchase order  |
+| number              | string             | Purchase order number                     |
+| vendor_id           | number             | ID of the vendor                          |
+| vendor_name         | string             | Name of the vendor                        |
+| order_date          | date               | Date the order was placed                 |
+| delivery_date       | date?              | Expected delivery date                    |
+| status              | PurchaseOrderStatus| Status of the purchase order              |
+| currency_code       | string             | Currency code for this order              |
+| exchange_rate       | number             | Exchange rate used                        |
+| notes               | string?            | Additional notes                          |
+| created_by          | number             | ID of the user who created the order      |
+| approved_by         | number?            | ID of the user who approved the order     |
+| approval_date       | date?              | Date of approval                          |
+| email               | string             | Contact email                             |
+| buyer               | string             | Buyer name                                |
+| credit_terms        | string             | Credit terms                              |
+| description         | string             | Description of the order                  |
+| remarks             | string             | Additional remarks                        |
+| items               | PurchaseOrderItem[]| Line items in the order                   |
+| base_currency_code  | string             | Base currency code                        |
+| base_subtotal_price | number             | Subtotal in base currency                 |
+| subtotal_price      | number             | Subtotal in transaction currency          |
+| base_net_amount     | number             | Net amount in base currency               |
+| net_amount          | number             | Net amount in transaction currency        |
+| base_disc_amount    | number             | Discount amount in base currency          |
+| discount_amount     | number             | Discount amount in transaction currency   |
+| base_tax_amount     | number             | Tax amount in base currency               |
+| tax_amount          | number             | Tax amount in transaction currency        |
+| base_total_amount   | number             | Total amount in base currency             |
+| total_amount        | number             | Total amount in transaction currency      |
 
-### PurchaseOrderLine
-| Field           | Type         | Description                               |
-|-----------------|--------------|-------------------------------------------|
-| poLineId        | number       | Unique identifier for the PO line         |
-| poId            | number       | ID of the parent purchase order           |
-| itemId          | number       | ID of the item ordered                    |
-| orderedQuantity | number       | Quantity ordered                          |
-| orderedUnitId   | number       | ID of the unit used for ordering          |
-| unitPrice       | number       | Price per unit                            |
-| receivedQuantity| number       | Quantity received so far                  |
-| lineStatus      | POLineStatus | Status of this line item                  |
-| lastReceiveDate | Date?        | Date of the last receipt for this line    |
-| lastPrice       | number?      | Last price this item was purchased at     |
-| lastVendorId    | number?      | ID of the last vendor for this item       |
+### PurchaseOrderItem
+| Field                | Type                    | Description                               |
+|---------------------|-------------------------|-------------------------------------------|
+| id                  | string                  | Unique identifier for the item            |
+| name                | string                  | Item name                                 |
+| description         | string                  | Item description                          |
+| conv_rate           | number                  | Conversion rate                           |
+| ordered_quantity    | number                  | Quantity ordered                          |
+| order_unit          | string                  | Unit of order                             |
+| base_quantity       | number                  | Quantity in base unit                     |
+| base_unit           | string                  | Base unit                                 |
+| base_receiving_qty  | number                  | Receiving quantity in base unit           |
+| received_quantity   | number                  | Quantity received                         |
+| remaining_quantity  | number                  | Remaining quantity to receive             |
+| unit_price          | number                  | Price per unit                            |
+| status              | PurchaseRequestItemStatus| Status of the item                       |
+| is_foc              | boolean                 | Whether item is Free of Charge            |
+| tax_rate            | number                  | Tax rate                                  |
+| discount_rate       | number                  | Discount rate                             |
+| attachments         | Attachment[]            | Attached files                            |
+| base_subtotal_price | number                  | Subtotal in base currency                 |
+| subtotal_price      | number                  | Subtotal in transaction currency          |
+| base_net_amount     | number                  | Net amount in base currency               |
+| net_amount          | number                  | Net amount in transaction currency        |
+| base_disc_amount    | number                  | Discount amount in base currency          |
+| discount_amount     | number                  | Discount amount in transaction currency   |
+| base_tax_amount     | number                  | Tax amount in base currency               |
+| tax_amount          | number                  | Tax amount in transaction currency        |
+| base_total_amount   | number                  | Total amount in base currency             |
+| total_amount        | number                  | Total amount in transaction currency      |
+| comment             | string?                 | Additional comments                       |
+| tax_included        | boolean                 | Whether tax is included in price          |
+| adjustments         | { discount: boolean; tax: boolean; } | Tax and discount adjustments |
+| last_receive_date   | timestamp?              | Date and time of last receipt             |
+| last_price          | number?                 | Last purchase price                       |
+| last_vendor_id      | number?                 | ID of last vendor                         |
+| attached_file       | File?                   | Attached file                             |
+| inventory_info      | InventoryInfo           | Inventory information                     |
+| received            | GRNItem[]?              | Received items                            |
 
-## Purchase Request (PR)
+### InventoryInfo
+| Field                  | Type      | Description                               |
+|------------------------|-----------|-------------------------------------------|
+| on_hand                | number    | Current on-hand quantity                  |
+| on_ordered             | number    | Quantity on order                         |
+| reorder_level          | number    | Reorder point                            |
+| restock_level          | number    | Restock level                            |
+| avg_monthly_usage      | number    | Average monthly usage                     |
+| last_price             | number    | Last purchase price                       |
+| last_order_date        | date      | Date of last order                        |
+| last_vendor            | string    | Last vendor name                          |
 
-### PurchaseRequest
-| Field               | Type            | Description                               |
-|---------------------|-----------------|-------------------------------------------|
-| id                  | string          | Unique identifier for the purchase request|
-| refNumber           | string          | Reference number for the request          |
-| date                | Date            | Date of the request                       |
-| type                | PRType          | Type of purchase request                  |
-| description         | string          | Description of the request                |
-| requestorId         | string          | ID of the requestor                       |
-| requestor           | object          | Details of the requestor                  |
-| currency            | string          | Currency code for this request            |
-| status              | DocumentStatus  | Status of the document                    |
-| workflowStatus      | WorkflowStatus  | Status in the approval workflow           |
-| currentWorkflowStage| WorkflowStage   | Current stage in the workflow             |
-| location            | string          | Location for the request                  |
-| items               | PurchaseRequestItem[] | Items requested                     |
-| attachments         | Attachment[]    | Attached files                            |
-| subtotal            | Money           | Subtotal amount                           |
-| tax                 | Money           | Tax amount                                |
-| totalAmount         | Money           | Total amount of the request               |
-| jobCode             | string          | Job code for this request                 |
-| department          | string          | Department making the request             |
-| budgetCode          | string          | Budget code for this request              |
-| allocatedBudget     | Money           | Budget allocated for this request         |
-| yearToDateSpending  | Money           | Year-to-date spending                     |
-| exchangeRate        | number          | Exchange rate used                        |
-| exchangeRateDate    | Date            | Date of the exchange rate                 |
-| paymentMethod       | string?         | Payment method                            |
-| paymentTerms        | string?         | Payment terms                             |
-| earlyPaymentDiscount| string?         | Early payment discount terms              |
-| comments            | Comment[]       | Comments on the request                   |
-| approvals           | WorkflowStep[]  | Approval steps                            |
-| deliveryPoint       | string          | Delivery point for the items              |
-| activityLog         | ActivityLogEntry[] | Log of activities on this request      |
-| additionalCharges   | Money           | Any additional charges                    |
+## Vendor Management
 
-### PurchaseRequestItem
+### Vendor
+| Field                     | Type         | Description                               |
+|---------------------------|--------------|-------------------------------------------|
+| id                        | string       | Unique identifier for the vendor          |
+| company_name              | string       | Name of the company                       |
+| business_registration_number| string       | Business registration number              |
+| tax_id                    | string       | Tax identification number                 |
+| establishment_date        | date         | Date of establishment                     |
+| business_type_id          | string       | Type of business                          |
+| rating                    | number       | Vendor rating                             |
+| is_active                 | boolean      | Whether the vendor is active              |
+| addresses                 | Address[]    | List of addresses                         |
+| contacts                  | Contact[]    | List of contacts                          |
+| certifications           | Certification[]| List of certifications                   |
+| environmental_impact      | EnvironmentalImpact? | Environmental impact data         |
+
+### Contact
+| Field      | Type    | Description                               |
+|------------|---------|-------------------------------------------|
+| id         | string  | Unique identifier for the contact         |
+| name       | string  | Contact name                              |
+| position   | string  | Position in the company                   |
+| phone      | string  | Phone number                              |
+| email      | string  | Email address                             |
+| department | string  | Department                                |
+| is_primary | boolean | Whether this is the primary contact       |
+
+### Address
+| Field         | Type    | Description                               |
+|---------------|---------|-------------------------------------------|
+| id            | string  | Unique identifier for the address         |
+| address_type  | string  | Type of address (e.g., BILLING, SHIPPING) |
+| address_line  | string  | Street address                            |
+| sub_district_id | string  | Sub-district identifier                   |
+| district_id   | string  | District identifier                       |
+| province_id   | string  | Province identifier                       |
+| postal_code   | string  | Postal code                               |
+| is_primary    | boolean | Whether this is the primary address       |
+
+### EnvironmentalImpact
+| Field           | Type                | Description                               |
+|-----------------|---------------------|-------------------------------------------|
+| carbon_footprint | ImpactMetric        | Carbon footprint measurement             |
+| energy_efficiency| ImpactMetric        | Energy efficiency measurement            |
+| waste_reduction  | ImpactMetric        | Waste reduction measurement              |
+| compliance_rate  | ImpactMetric        | Environmental compliance rate            |
+| last_updated     | timestamp           | Last update timestamp                     |
+| esg_score        | string              | Environmental, Social, Governance score   |
+| certifications  | VendorCertification[]| Environmental certifications             |
+
+### ImpactMetric
+| Field     | Type   | Description                               |
+|-----------|--------|-------------------------------------------|
+| value     | number | Metric value                              |
+| unit      | string | Unit of measurement                       |
+| trend     | number | Trend indicator                           |
+| benchmark | number | Benchmark value                           |
+
+## Store Requisition (SR)
+
+### Requisition
+| Field        | Type              | Description                               |
+|--------------|-------------------|-------------------------------------------|
+| date         | date              | Document date                             |
+| ref_no       | string           | Reference number (format: SR-YYYY-NNN)     |
+| request_to   | string           | Destination store/location                 |
+| store_name   | string           | Name of the store                         |
+| description  | string           | Description of the requisition            |
+| status       | string           | Status (Draft/In Process/Complete/Reject/Void) |
+| total_amount | number           | Total amount of requisition               |
+| movement     | Movement         | Movement details                          |
+| items        | RequisitionItem[]| List of items requested                   |
+| created_at   | timestamp        | Creation timestamp                        |
+| updated_at   | timestamp        | Last update timestamp                     |
+| timezone     | string           | IANA timezone identifier                  |
+
+### RequisitionItem
+| Field           | Type           | Description                               |
+|-----------------|----------------|-------------------------------------------|
+| id              | number         | Unique identifier for the item            |
+| description     | string         | Item description                          |
+| unit            | string         | Unit of measure                           |
+| qty_required    | number         | Quantity required                         |
+| qty_approved    | number         | Quantity approved                         |
+| cost_per_unit   | number         | Cost per unit                            |
+| total           | number         | Total cost                               |
+| request_date    | date           | Request date                             |
+| inventory       | InventoryState | Current inventory state                   |
+| item_info       | ItemInfo       | Item information                          |
+| qty_issued      | number         | Quantity issued                           |
+| approval_status | string         | Status (Accept/Reject/Review)             |
+| created_at      | timestamp      | Creation timestamp                        |
+| updated_at      | timestamp      | Last update timestamp                     |
+
+### InventoryState
 | Field       | Type   | Description                               |
 |-------------|--------|-------------------------------------------|
-| id          | string | Unique identifier for the item            |
-| description | string | Description of the item                   |
-| quantity    | number | Quantity requested                        |
-| unitPrice   | Money  | Price per unit                            |
-| totalPrice  | Money  | Total price for this item                 |
+| on_hand     | number | Current on-hand quantity                  |
+| on_order    | number | Quantity on order                         |
+| last_price  | number | Last purchase price                       |
+| last_vendor | string | Last vendor name                          |
+
+### ItemInfo
+| Field        | Type   | Description                               |
+|--------------|--------|-------------------------------------------|
+| location     | string | Item location                             |
+| location_code| string | Location code                             |
+| item_name    | string | Name of the item                          |
+| category     | string | Item category                             |
+| sub_category | string | Item subcategory                          |
+| item_group   | string | Item group                                |
+| bar_code     | string | Barcode                                   |
+| location_type| string | Location type (direct/inventory)          |
+
+### StockMovement
+| Field        | Type              | Description                               |
+|--------------|-------------------|-------------------------------------------|
+| id           | number            | Unique identifier for the movement        |
+| movement_type| string            | Type of movement                          |
+| source_doc   | string            | Source document reference                 |
+| commit_date  | timestamp         | Commit date and time                      |
+| posting_date | timestamp         | Posting date and time                     |
+| status       | string            | Movement status                           |
+| movement     | Movement          | Movement details                          |
+| items        | MovementItem[]    | Items being moved                         |
+| totals       | MovementTotals    | Movement totals                          |
+| created_at   | timestamp         | Creation timestamp                        |
+| updated_at   | timestamp         | Last update timestamp                     |
+| timezone     | string            | IANA timezone identifier                  |
+
+### Movement
+| Field           | Type   | Description                               |
+|-----------------|--------|-------------------------------------------|
+| source          | string | Source location code                      |
+| source_name     | string | Source location name                      |
+| destination     | string | Destination location code                 |
+| destination_name| string | Destination location name                 |
+| type            | string | Movement type                             |
+
+### MovementItem
+| Field       | Type         | Description                               |
+|-------------|--------------|-------------------------------------------|
+| id          | number       | Unique identifier for the item            |
+| product_name| string       | Name of the product                       |
+| sku         | string       | Stock keeping unit                        |
+| uom         | string       | Unit of measure                           |
+| before_qty   | number       | Quantity before movement                  |
+| in_qty       | number       | Incoming quantity                         |
+| out_qty      | number       | Outgoing quantity                         |
+| after_qty    | number       | Quantity after movement                   |
+| unit_cost    | number       | Cost per unit                            |
+| total_cost   | number       | Total cost                               |
+| location     | Location     | Location information                      |
+| lots         | LotMovement[]| Lot movement information                  |
+
+### Location
+| Field       | Type   | Description                               |
+|-------------|--------|-------------------------------------------|
+| type        | string | Location type (INV/DIR)                   |
+| code        | string | Location code                             |
+| name        | string | Location name                             |
+| display_type| string | Display type                              |
+
+### LotMovement
+| Field     | Type      | Description                               |
+|-----------|-----------|-------------------------------------------|
+| lot_no    | string    | Lot number                                |
+| quantity  | number    | Quantity in the lot                       |
+| uom       | string    | Unit of measure                           |
+| created_at| timestamp | Creation timestamp                        |
+
+### MovementTotals
+| Field     | Type   | Description                               |
+|-----------|--------|-------------------------------------------|
+| in_qty     | number | Total incoming quantity                   |
+| out_qty     | number | Total outgoing quantity                   |
+| total_cost  | number | Total cost                               |
+| lot_count   | number | Number of lots                           |
 
 ## Enums
-
-### DocumentStatus
-- DRAFT
-- SUBMITTED
-- IN_PROGRESS
-- COMPLETED
-- REJECTED
 
 ### CostingMethod
 - FIFO
@@ -221,35 +472,82 @@
 - REJECTED
 
 ### PurchaseOrderStatus
-- Open = "Open",
-- Voided = "Voided",
-- Closed = "Closed",
-- Draft = "Draft",
-- Sent = "Sent",
-- PartiallyReceived = "PartiallyReceived",
-- FullyReceived = "FullyReceived",
-- Cancelled = "Cancelled",
-- Deleted = "Deleted",
-
-### POLineStatus
 - Open
+- Voided
 - Closed
+- Draft
+- Sent
+- Partial
+- FullyReceived
+- Cancelled
+- Deleted
 
 ### PRType
-- GENERAL_PURCHASE
-- MARKET_LIST
-- ASSET_PURCHASE
-- SERVICE_REQUEST
+- GeneralPurchase
+- MarketList
+- AssetPurchase
+- ServiceRequest
+
+### DocumentStatus
+- Draft
+- Submitted
+- InProgress
+- Completed
+- Rejected
 
 ### WorkflowStatus
-- PENDING
-- APPROVED
-- REJECTED
+- Pending
+- Approved
+- Rejected
 
 ### WorkflowStage
-- REQUESTER
-- DEPARTMENT_HEAD_APPROVAL
-- PURCHASE_COORDINATOR_REVIEW
-- FINANCE_MANAGER_APPROVAL
-- GENERAL_MANAGER_APPROVAL
-- COMPLETED
+- Requester
+- DepartmentHeadApproval
+- PurchaseCoordinatorReview
+- FinanceManagerApproval
+- GeneralManagerApproval
+- Completed
+
+### CurrencyCode
+- USD
+- EUR
+- GBP
+- JPY
+- CNY
+- THB
+
+### AdjustmentStatus
+- Draft
+- Pending
+- Approved
+- Posted
+- Void
+
+### StoreRequisitionStatus
+- Draft
+- Submitted
+- Approved
+- InProcess
+- Completed
+- Rejected
+- Void
+
+### MovementType
+- Issue
+- Transfer
+- Return
+
+### LocationType
+- Direct
+- Inventory
+
+### ApprovalStatus
+- Accept
+- Reject
+- Review
+
+### MovementStatus
+- Pending
+- Committed
+- Posted
+- Void
