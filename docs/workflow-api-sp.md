@@ -414,4 +414,252 @@ BEGIN CATCH
   -- Return error to caller
   RETURN 0
 END CATCH
-``` 
+```
+
+## 5. Example Request/Response Payloads
+
+### 5.1 Workflow Configuration Examples
+
+#### Create Workflow
+```typescript
+// Request
+POST /api/workflows
+{
+  "name": "Purchase Request Workflow",
+  "type": "PURCHASE_REQUEST",
+  "description": "Standard purchase request approval workflow",
+  "documentReferencePattern": "PR-{YYYY}-{MM}-{0000}",
+  "status": "Draft",
+  "stages": [
+    {
+      "name": "Department Approval",
+      "description": "Initial approval by department head",
+      "sla": "24",
+      "slaUnit": "hours",
+      "availableActions": ["Approve", "Reject", "Send Back"],
+      "hideFields": {
+        "pricePerUnit": false,
+        "totalPrice": false
+      },
+      "assignedUsers": [
+        {
+          "id": 101,
+          "name": "John Smith",
+          "department": "IT",
+          "location": "Bangkok"
+        }
+      ]
+    },
+    {
+      "name": "Finance Review",
+      "description": "Financial review and budget verification",
+      "sla": "48",
+      "slaUnit": "hours",
+      "availableActions": ["Approve", "Reject", "Send Back"],
+      "hideFields": {
+        "pricePerUnit": false,
+        "totalPrice": false
+      },
+      "assignedUsers": [
+        {
+          "id": 102,
+          "name": "Jane Doe",
+          "department": "Finance",
+          "location": "Bangkok"
+        }
+      ]
+    }
+  ],
+  "routingRules": [
+    {
+      "name": "High Value Purchase",
+      "description": "Route high value purchases to finance",
+      "triggerStage": "Department Approval",
+      "condition": {
+        "field": "totalAmount",
+        "operator": "gt",
+        "value": "50000"
+      },
+      "action": {
+        "type": "NEXT_STAGE",
+        "parameters": {
+          "targetStage": "Finance Review"
+        }
+      }
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "event": "Request Submitted",
+      "eventTrigger": "onSubmit",
+      "description": "Notify when request is submitted",
+      "recipients": ["Requester", "Department Head"],
+      "channels": ["Email", "System"]
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Office Supplies",
+      "code": "OS-001",
+      "category": "Supplies",
+      "subCategory": "Office"
+    }
+  ]
+}
+
+// Response
+{
+  "id": "WF-2024-001",
+  "name": "Purchase Request Workflow",
+  "type": "PURCHASE_REQUEST",
+  // ... rest of the workflow data ...
+  "status": "Draft"
+}
+```
+
+### 5.2 Workflow Execution Examples
+
+#### Start Workflow
+```typescript
+// Request
+POST /api/workflows/WF-2024-001/execute
+{
+  "documentId": "PR-2024-03-0001",
+  "initiator": "user123",
+  "initialData": {
+    "requestType": "Purchase",
+    "department": "IT",
+    "totalAmount": 75000,
+    "currency": "THB",
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 10,
+        "unitPrice": 7500
+      }
+    ]
+  }
+}
+
+// Response
+{
+  "instanceId": "WFI-2024-001",
+  "currentStage": {
+    "id": 1,
+    "name": "Department Approval",
+    "description": "Initial approval by department head",
+    // ... rest of stage data ...
+  },
+  "status": "Pending_Approval"
+}
+```
+
+#### Process Stage Action
+```typescript
+// Request
+POST /api/workflows/WF-2024-001/instances/WFI-2024-001/action
+{
+  "action": "Approve",
+  "userId": "dept_head_123",
+  "comments": "Approved based on budget allocation",
+  "data": {
+    "approvalDate": "2024-03-20T10:30:00Z",
+    "budgetCode": "IT-2024-Q1"
+  }
+}
+
+// Response
+{
+  "nextStage": {
+    "id": 2,
+    "name": "Finance Review",
+    // ... rest of stage data ...
+  },
+  "status": "In_Progress"
+}
+```
+
+#### Get Instance Status
+```typescript
+// Request
+GET /api/workflows/WF-2024-001/instances/WFI-2024-001
+
+// Response
+{
+  "instanceId": "WFI-2024-001",
+  "workflow": {
+    "id": "WF-2024-001",
+    "name": "Purchase Request Workflow",
+    // ... rest of workflow data ...
+  },
+  "currentStage": {
+    "id": 2,
+    "name": "Finance Review",
+    // ... rest of stage data ...
+  },
+  "status": "In_Progress",
+  "history": [
+    {
+      "stage": {
+        "id": 1,
+        "name": "Department Approval"
+      },
+      "action": "Approve",
+      "actionBy": "dept_head_123",
+      "actionDate": "2024-03-20T10:30:00Z",
+      "comments": "Approved based on budget allocation"
+    }
+  ]
+}
+```
+
+### 5.3 Error Response Examples
+
+#### Validation Error
+```typescript
+// Response (400 Bad Request)
+{
+  "error": {
+    "code": "WF001",
+    "message": "Invalid workflow configuration",
+    "details": [
+      {
+        "field": "stages",
+        "error": "Workflow must have at least one stage"
+      }
+    ]
+  }
+}
+```
+
+#### Authorization Error
+```typescript
+// Response (403 Forbidden)
+{
+  "error": {
+    "code": "WF004",
+    "message": "Unauthorized action",
+    "details": {
+      "requiredRole": "WORKFLOW_ADMIN",
+      "action": "DELETE_WORKFLOW"
+    }
+  }
+}
+```
+
+#### SLA Breach Error
+```typescript
+// Response (400 Bad Request)
+{
+  "error": {
+    "code": "WF006",
+    "message": "SLA breach detected",
+    "details": {
+      "stage": "Department Approval",
+      "sla": "24 hours",
+      "elapsed": "26 hours"
+    }
+  }
+} 
