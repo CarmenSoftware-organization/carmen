@@ -449,6 +449,128 @@
 | total_cost  | number | Total cost                               |
 | lot_count   | number | Number of lots                           |
 
+## Recipe Management
+
+### Recipe
+| Field             | Type               | Description                               |
+|-------------------|--------------------|-------------------------------------------|
+| id                | string             | Unique recipe identifier                  |
+| title             | string             | Recipe title                              |
+| description       | string             | Detailed description                      |
+| ingredients       | Ingredient[]       | List of ingredients                       |
+| instructions      | string[]           | Step-by-step instructions                 |
+| cuisine           | CuisineType        | Associated cuisine type                   |
+| category          | Category           | Recipe category                           |
+| nutritionalInfo   | NutritionalInfo    | Nutritional breakdown                     |
+| tags              | string[]           | Search/taxonomy tags                      |
+| preparationTime   | number             | Prep time in minutes                      |
+| cookingTime       | number             | Cook time in minutes                      |
+| servings          | number             | Number of servings                        |
+| difficulty        | 'Easy'|'Medium'|'Hard' | Difficulty level                |
+| rating            | number?            | Average user rating                       |
+| createdAt         | Date               | Creation timestamp                        |
+| updatedAt         | Date               | Last update timestamp                     |
+| imageUrl          | string?            | URL of featured image                     |
+
+### Ingredient
+| Field         | Type     | Description                               |
+|---------------|----------|-------------------------------------------|
+| id            | string   | Unique ingredient ID                      |
+| name          | string   | Ingredient name                           |
+| quantity      | number   | Required quantity                         |
+| unit          | string   | Measurement unit                          |
+| notes         | string?  | Preparation notes                         |
+
+### RecipeCategory
+| Field         | Type     | Description                               |
+|---------------|----------|-------------------------------------------|
+| id            | string   | Unique category ID                        |
+| name          | string   | Category name                             |
+| description   | string   | Category description                      |
+| icon          | string?  | Optional icon URL                         |
+
+### RecipeCuisine
+| Field         | Type     | Description                               |
+|---------------|----------|-------------------------------------------|
+| id            | string   | Unique cuisine ID                         |
+| name          | string   | Cuisine name                              |
+| region        | string   | Geographic region                         |
+| characteristics | string[] | Key characteristics                      |
+
+
+### RoutingRule
+| Field         | Type               | Description                               |
+|---------------|--------------------|-------------------------------------------|
+| id            | number             | Rule ID                                   |
+| conditions    | RoutingCondition[] | Conditional logic                         |
+| actions       | RoutingAction[]    | Actions to trigger                        |
+
+### WorkflowNotification
+| Field         | Type                 | Description                               |
+|---------------|----------------------|-------------------------------------------|
+| id            | number               | Notification ID                           |
+| channels      | NotificationChannel[]| Delivery channels                        |
+| triggers      | NotificationEventTrigger[] | Event triggers                |
+| template      | Template             | Notification template                     |
+
+## System Administration
+
+### RoleConfiguration
+| Field         | Type         | Description                               |
+|---------------|--------------|-------------------------------------------|
+| name          | string       | Role name                                 |
+| permissions   | string[]     | List of permissions                       |
+| workflowAccess| string[]     | Accessible workflows                      |
+
+### AssignedUser
+| Field         | Type         | Description                               |
+|---------------|--------------|-------------------------------------------|
+| id            | number       | User ID                                   |
+| name          | string       | User name                                 |
+| email         | string       | User email                                |
+| roleId        | number       | Assigned role ID                          |
+
+
+## Workflow Management
+
+### WorkflowConfiguration
+| Field          | Type               | Description                               |
+|----------------|--------------------|-------------------------------------------|
+| name           | string             | Unique workflow name                     |
+| description    | string             | Workflow purpose description             |
+| stages         | WorkflowStage[]    | Ordered list of approval stages          |
+| rules          | WorkflowRule[]     | Conditional routing rules                |
+| actions        | WorkflowAction[]   | Automated actions per stage              |
+| version        | number             | Configuration version                    |
+| is_active      | boolean            | Whether workflow is active               |
+| created_at     | timestamp          | Creation timestamp                       |
+| updated_at     | timestamp          | Last update timestamp                    |
+
+### WorkflowStage
+| Field          | Type               | Description                               |
+|----------------|--------------------|-------------------------------------------|
+| stage_id       | number             | Unique stage identifier                  |
+| name           | string             | Stage name (e.g., 'Manager Approval')    |
+| approvers      | Approver[]         | List of eligible approvers               |
+| escalation_rules | EscalationRule[]  | Escalation configuration                 |
+| sla            | number             | Service level agreement in hours         |
+| notifications  | NotificationConfig[]| Notification settings                   |
+
+### WorkflowAction
+| Field          | Type               | Description                               |
+|----------------|--------------------|-------------------------------------------|
+| trigger        | string             | Event triggering the action              |
+| action_type    | string             | Type (e.g., 'EMAIL', 'STATUS_UPDATE')    |
+| parameters     | object             | Action-specific parameters               |
+| target_stage   | number?            | Relevant stage for action                |
+
+### RoutingRule
+| Field          | Type               | Description                               |
+|----------------|--------------------|-------------------------------------------|
+| condition      | string             | Conditional expression                   |
+| target_stage   | number             | Stage to route to                        |
+| priority       | number             | Rule evaluation priority                 |
+
 ## Enums
 
 ### CostingMethod
