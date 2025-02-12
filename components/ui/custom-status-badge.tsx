@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export enum BadgeStatus {
   Open = "Open",
@@ -34,89 +35,62 @@ export enum BadgeStatus {
   OUT = "OUT"
 }
 
-export interface IBadgeColors {
-  key: BadgeStatus;
-  Color: string;
-}
-
-export const StatusList: IBadgeColors[] = [
-  { key: BadgeStatus.Open, Color: "bg-emerald-300 text-emerald-800" },
-  { key: BadgeStatus.Closed, Color: "bg-slate-300 text-slate-800" },
-  { key: BadgeStatus.Draft, Color: "bg-amber-200 text-amber-800" },
-  { key: BadgeStatus.Sent, Color: "bg-sky-300 text-sky-800" },
-  { key: BadgeStatus.Committed, Color: "bg-violet-300 text-violet-800" },
-  { key: BadgeStatus.Saved, Color: "bg-teal-300 text-teal-800" },
-  { key: BadgeStatus.Voided, Color: "bg-rose-300 text-rose-800" },
-  { key: BadgeStatus.Approved, Color: "bg-green-300 text-green-800" },
-  { key: BadgeStatus.Rejected, Color: "bg-red-300 text-red-800" },
-  { key: BadgeStatus.Pending, Color: "bg-yellow-200 text-yellow-800" },
-  { key: BadgeStatus.InProgress, Color: "bg-blue-300 text-blue-800" },
-  { key: BadgeStatus.Completed, Color: "bg-lime-300 text-lime-800" },
-  { key: BadgeStatus.Cancelled, Color: "bg-pink-300 text-pink-800" },
-  { key: BadgeStatus.OnHold, Color: "bg-orange-200 text-orange-800" },
-  { key: BadgeStatus.Delayed, Color: "bg-amber-300 text-amber-800" },
-  { key: BadgeStatus.Partial, Color: "bg-yellow-300 text-yellow-800" },
-  { key: BadgeStatus.Submitted, Color: "bg-cyan-300 text-cyan-800" },
-  { key: BadgeStatus.Accepted, Color: "bg-emerald-300 text-emerald-800" },
-  { key: BadgeStatus.SendBack, Color: "bg-rose-300 text-rose-800" },
-  { key: BadgeStatus.Review, Color: "bg-amber-200 text-amber-800" },
-  { key: BadgeStatus.Deleted, Color: "bg-rose-300 text-rose-800" },
-  { key: BadgeStatus.Received, Color: "bg-emerald-300 text-emerald-800" },
-  { key: BadgeStatus.Active, Color: "bg-emerald-300 text-emerald-800" },
-  { key: BadgeStatus.Inactive, Color: "bg-slate-300 text-slate-800" },
-  { key: BadgeStatus.BelowMin, Color: "bg-destructive text-red-800" },
-  { key: BadgeStatus.Reorder, Color: "bg-yellow-500 text-amber-800" },
-  { key: BadgeStatus.OverMax, Color: "bg-blue-500 text-default-800" },
-  { key: BadgeStatus.Normal, Color: "bg-green-500 text-gray-800" },
-  { key: BadgeStatus.Posted, Color: "bg-emerald-300 text-emerald-800" },
-  { key: BadgeStatus.IN, Color: "bg-green-300 text-green-800" },
-  { key: BadgeStatus.OUT, Color: "bg-red-300 text-red-800" }
-];
+const statusStyles: Record<string, { bg: string, text: string }> = {
+  // Success states
+  Approved: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+  Completed: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+  Active: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+  Accepted: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+  Posted: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+  
+  // Primary states (using corporate blue)
+  Open: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
+  InProgress: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
+  Submitted: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
+  Sent: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
+  
+  // Warning states
+  Pending: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
+  OnHold: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
+  Review: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
+  Draft: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
+  
+  // Danger states
+  Rejected: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
+  Cancelled: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
+  Deleted: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
+  Voided: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
+  
+  // Neutral states
+  Closed: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-800 dark:text-gray-300' },
+  Inactive: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-800 dark:text-gray-300' },
+  
+  // Special states
+  Partial: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-800 dark:text-orange-300' },
+  BelowMin: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
+  OverMax: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-800 dark:text-blue-300' },
+  Normal: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+};
 
 interface StatusBadgeProps {
   status: string;
+  className?: string;
 }
 
-export default function StatusBadge({ status }: StatusBadgeProps) {
-  const styles: Record<string, string> = {
-    Accept: 'bg-green-100 text-green-800',
-    Reject: 'bg-red-100 text-red-800',
-    Review: 'bg-yellow-100 text-yellow-800',
-    Draft: 'bg-gray-100 text-gray-800',
-    InProgress: 'bg-blue-100 text-blue-800',
-    Complete: 'bg-emerald-100 text-emerald-800',
-    Void: 'bg-slate-100 text-slate-800',
-    DRAFT: 'bg-amber-100 text-amber-800',
-    POSTED: 'bg-emerald-100 text-emerald-800',
-    VOID: 'bg-rose-100 text-rose-800',
-  };
-
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
-      {status}
-    </span>
-  );
-}
-
-function CustomStatusBadge({
-  children,
-  badgeColor,
-  status,
-}: {
-  children: React.ReactNode;
-  badgeColor?: BadgeStatus;
-  status?: string;
-}) {
-  if (status) {
-    badgeColor = status as BadgeStatus;
-  }
+export default function StatusBadge({ status, className }: StatusBadgeProps) {
+  const style = statusStyles[status] || statusStyles['Normal'];
+  
   return (
     <Badge
-      className={`${
-        StatusList.find((color) => color.key === badgeColor)?.Color
-      } rounded-full`}
+      variant="secondary"
+      className={cn(
+        "px-2 py-1 font-medium rounded-full",
+        style.bg,
+        style.text,
+        className
+      )}
     >
-      {children}
+      {status}
     </Badge>
   );
 }

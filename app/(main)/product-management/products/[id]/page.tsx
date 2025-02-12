@@ -25,14 +25,13 @@ import {
 } from "@/components/ui/select"
 import { Package, AlertCircle } from 'lucide-react';
 import StatusBadge from '@/components/ui/custom-status-badge';
-import OrderUnitTab from '@/app/(main)/product-management/products/components/order-unit';
-import IngredientUnitTab from '@/app/(main)/product-management/products/components/ingredients';
-import StockCountUnitTab from '@/app/(main)/product-management/products/components/stock-count';
-import { EnvironmentImpactTab } from './components/tabs/environment-impact'
+import { OrderUnitTab } from '@/app/(main)/product-management/products/components/order-unit';
+import { IngredientUnitTab } from '@/app/(main)/product-management/products/components/ingredients';
+import { StockCountTab } from '@/app/(main)/product-management/products/components/stock-count';
 
 const productList: Product[] = [
   {
-    id: '1',
+    id: 'PRD001',
     productCode: 'PRD-001',
     name: 'Organic Jasmine Rice',
     description: 'Premium quality organic jasmine rice sourced from certified organic farms. Known for its fragrant aroma and soft, sticky texture when cooked.',
@@ -62,7 +61,6 @@ const productList: Product[] = [
     isForSale: true,
     isIngredient: true,
     weight: 1,
-    dimensions: { length: 10, width: 15, height: 20 },
     shelfLife: 365,
     storageInstructions: 'Store in a cool, dry place away from direct sunlight',
     imagesUrl: '/images/products/jasmine-rice.jpg',
@@ -97,7 +95,7 @@ const productList: Product[] = [
     ]
   },
   {
-    id: '2',
+    id: 'PRD002',
     productCode: 'PRD-002',
     name: 'Palm Sugar',
     description: 'Traditional Thai palm sugar made from coconut palm sap. Natural sweetener with caramel notes.',
@@ -127,7 +125,6 @@ const productList: Product[] = [
     isForSale: true,
     isIngredient: true,
     weight: 0.5,
-    dimensions: { length: 8, width: 8, height: 10 },
     shelfLife: 180,
     storageInstructions: 'Keep in airtight container in cool, dry place',
     imagesUrl: '/images/products/palm-sugar.jpg',
@@ -138,7 +135,7 @@ const productList: Product[] = [
         unitName: 'Kilogram',
         conversionFactor: 1,
         fromUnit: 'UNIT-004',
-        toUnit: 'UNIT-001', 
+        toUnit: 'UNIT-001',
         unitType: 'INVENTORY'
       },
       {
@@ -157,6 +154,198 @@ const productList: Product[] = [
         conversionFactor: 10,
         fromUnit: 'UNIT-006',
         toUnit: 'UNIT-004',
+        unitType: 'ORDER'
+      }
+    ]
+  },
+  {
+    id: 'PRD003',
+    productCode: 'PRD-003',
+    name: 'Fish Sauce Premium Grade',
+    description: 'High-quality fish sauce made from premium anchovies. Essential Thai cooking ingredient with rich umami flavor.',
+    localDescription: 'น้ำปลาชั้นเยี่ยม',
+    categoryId: 'CAT-003',
+    categoryName: 'Condiments',
+    subCategoryId: 'SCAT-003',
+    subCategoryName: 'Sauces',
+    itemGroupId: 'GRP-003',
+    itemGroupName: 'Thai Essentials',
+    primaryInventoryUnitId: 'UNIT-003',
+    primaryUnitName: 'L',
+    size: '700ml',
+    color: 'Amber',
+    barcode: '8851234567892',
+    isActive: true,
+    basePrice: 95.00,
+    currency: 'THB',
+    taxType: 'VAT',
+    taxRate: 7,
+    standardCost: 75.00,
+    lastCost: 78.50,
+    priceDeviationLimit: 12,
+    quantityDeviationLimit: 8,
+    minStockLevel: 75,
+    maxStockLevel: 750,
+    isForSale: true,
+    isIngredient: true,
+    weight: 0.7,
+    shelfLife: 730,
+    storageInstructions: 'Store at room temperature. Keep bottle tightly sealed.',
+    imagesUrl: '/images/products/fish-sauce.jpg',
+    unitConversions: [
+      {
+        id: 'CONV-007',
+        unitId: 'UNIT-007',
+        unitName: 'Liter',
+        conversionFactor: 1,
+        fromUnit: 'UNIT-007',
+        toUnit: 'UNIT-003',
+        unitType: 'INVENTORY'
+      },
+      {
+        id: 'CONV-008',
+        unitId: 'UNIT-008',
+        unitName: 'Bottle (700ml)',
+        conversionFactor: 0.7,
+        fromUnit: 'UNIT-008',
+        toUnit: 'UNIT-003',
+        unitType: 'ORDER'
+      },
+      {
+        id: 'CONV-009',
+        unitId: 'UNIT-009',
+        unitName: 'Case (12x700ml)',
+        conversionFactor: 8.4,
+        fromUnit: 'UNIT-009',
+        toUnit: 'UNIT-003',
+        unitType: 'ORDER'
+      }
+    ]
+  },
+  {
+    id: 'PRD004',
+    productCode: 'PRD-004',
+    name: 'Coconut Cream',
+    description: 'Rich and creamy first-pressed coconut cream. Perfect for curries, desserts, and traditional Thai dishes.',
+    localDescription: 'หัวกะทิ',
+    categoryId: 'CAT-004',
+    categoryName: 'Dairy & Alternatives',
+    subCategoryId: 'SCAT-004',
+    subCategoryName: 'Coconut Products',
+    itemGroupId: 'GRP-004',
+    itemGroupName: 'Thai Ingredients',
+    primaryInventoryUnitId: 'UNIT-003',
+    primaryUnitName: 'L',
+    size: '1L',
+    color: 'White',
+    barcode: '8851234567893',
+    isActive: true,
+    basePrice: 125.00,
+    currency: 'THB',
+    taxType: 'VAT',
+    taxRate: 7,
+    standardCost: 95.00,
+    lastCost: 98.50,
+    priceDeviationLimit: 10,
+    quantityDeviationLimit: 5,
+    minStockLevel: 100,
+    maxStockLevel: 1000,
+    isForSale: true,
+    isIngredient: true,
+    weight: 1.05,
+    shelfLife: 365,
+    storageInstructions: 'Store in refrigerator after opening. Use within 5 days.',
+    imagesUrl: '/images/products/coconut-cream.jpg',
+    unitConversions: [
+      {
+        id: 'CONV-010',
+        unitId: 'UNIT-010',
+        unitName: 'Liter',
+        conversionFactor: 1,
+        fromUnit: 'UNIT-010',
+        toUnit: 'UNIT-003',
+        unitType: 'INVENTORY'
+      },
+      {
+        id: 'CONV-011',
+        unitId: 'UNIT-011',
+        unitName: 'Can (1L)',
+        conversionFactor: 1,
+        fromUnit: 'UNIT-011',
+        toUnit: 'UNIT-003',
+        unitType: 'ORDER'
+      },
+      {
+        id: 'CONV-012',
+        unitId: 'UNIT-012',
+        unitName: 'Case (12x1L)',
+        conversionFactor: 12,
+        fromUnit: 'UNIT-012',
+        toUnit: 'UNIT-003',
+        unitType: 'ORDER'
+      }
+    ]
+  },
+  {
+    id: 'PRD005',
+    productCode: 'PRD-005',
+    name: 'Kaffir Lime Leaves',
+    description: 'Fresh kaffir lime leaves, essential for authentic Thai curries and soups. Adds distinctive citrus aroma.',
+    localDescription: 'ใบมะกรูด',
+    categoryId: 'CAT-005',
+    categoryName: 'Fresh Produce',
+    subCategoryId: 'SCAT-005',
+    subCategoryName: 'Herbs',
+    itemGroupId: 'GRP-005',
+    itemGroupName: 'Fresh Herbs',
+    primaryInventoryUnitId: 'UNIT-001',
+    primaryUnitName: 'KG',
+    size: '100g',
+    color: 'Green',
+    barcode: '8851234567894',
+    isActive: true,
+    basePrice: 180.00,
+    currency: 'THB',
+    taxType: 'NON_VAT',
+    taxRate: 0,
+    standardCost: 150.00,
+    lastCost: 155.00,
+    priceDeviationLimit: 20,
+    quantityDeviationLimit: 15,
+    minStockLevel: 2,
+    maxStockLevel: 10,
+    isForSale: true,
+    isIngredient: true,
+    weight: 0.1,
+    shelfLife: 7,
+    storageInstructions: 'Keep refrigerated in sealed container. Best used fresh.',
+    imagesUrl: '/images/products/kaffir-leaves.jpg',
+    unitConversions: [
+      {
+        id: 'CONV-013',
+        unitId: 'UNIT-013',
+        unitName: 'Kilogram',
+        conversionFactor: 1,
+        fromUnit: 'UNIT-013',
+        toUnit: 'UNIT-001',
+        unitType: 'INVENTORY'
+      },
+      {
+        id: 'CONV-014',
+        unitId: 'UNIT-014',
+        unitName: 'Pack (100g)',
+        conversionFactor: 0.1,
+        fromUnit: 'UNIT-014',
+        toUnit: 'UNIT-001',
+        unitType: 'ORDER'
+      },
+      {
+        id: 'CONV-015',
+        unitId: 'UNIT-015',
+        unitName: 'Box (1kg)',
+        conversionFactor: 1,
+        fromUnit: 'UNIT-015',
+        toUnit: 'UNIT-001',
         unitType: 'ORDER'
       }
     ]
@@ -243,89 +432,178 @@ const inventoryData = {
 
 function EditableTitle({ 
   value, 
-  onChange 
+  code,
+  onNameChange,
+  onCodeChange 
 }: { 
-  value: string, 
-  onChange: (value: string) => void 
+  value: string,
+  code: string,
+  onNameChange: (value: string) => void,
+  onCodeChange: (value: string) => void 
 }) {
   return (
-    <Input
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="text-2xl font-bold h-auto px-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none bg-transparent hover:bg-muted/50"
-    />
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">Product Code</label>
+          <Input
+            value={code}
+            onChange={(e) => onCodeChange(e.target.value)}
+            className="text-lg font-semibold h-auto"
+            placeholder="Enter product code"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">Product Name</label>
+          <Input
+            value={value}
+            onChange={(e) => onNameChange(e.target.value)}
+            className="text-lg font-semibold h-auto"
+            placeholder="Enter product name"
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 
-export default function ProductDetail({ params }: { params: { id: string } }) {
+export default function ProductDetail({ 
+  params,
+  searchParams
+}: { 
+  params: { id: string }
+  searchParams?: { [key: string]: string | string[] | undefined }
+}) {
   const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
   const [editedProduct, setEditedProduct] = useState<Product | null>(null);
+  const [isEditing, setIsEditing] = useState(Boolean(searchParams?.edit));
+  const isAddMode = params.id === 'new';
 
   useEffect(() => {
     async function fetchProduct() {
+      if (isAddMode) {
+        // Initialize empty product for add mode
+        const emptyProduct: Product = {
+          id: '',
+          productCode: '',
+          name: '',
+          description: '',
+          localDescription: '',
+          categoryId: '',
+          categoryName: '',
+          subCategoryId: '',
+          subCategoryName: '',
+          itemGroupId: '',
+          itemGroupName: '',
+          primaryInventoryUnitId: '',
+          primaryUnitName: '',
+          size: '',
+          color: '',
+          barcode: '',
+          isActive: true,
+          basePrice: 0,
+          currency: 'THB',
+          taxType: 'VAT',
+          taxRate: 7,
+          standardCost: 0,
+          lastCost: 0,
+          priceDeviationLimit: 0,
+          quantityDeviationLimit: 0,
+          minStockLevel: 0,
+          maxStockLevel: 0,
+          isForSale: true,
+          isIngredient: false,
+          weight: 0,
+          shelfLife: 0,
+          storageInstructions: '',
+          imagesUrl: '',
+          unitConversions: []
+        };
+        setProduct(emptyProduct);
+        setEditedProduct(emptyProduct);
+        setIsEditing(true);
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        // const response = await fetch(`/api/products/${params.id}`);
-        // if (!response.ok) {
-        //   throw new Error('Failed to fetch product');
-        // }
-        // const data = await response.json();
-        const data = productList[0];
-        setProduct(data as Product);
-      } catch (error) {
-        setError('Error fetching product');
-        console.error('Error fetching product:', error);
-      } finally {
+        // Case-insensitive product lookup
+        const data = productList.find(p => p.id.toLowerCase() === params.id.toLowerCase());
+        if (!data) throw new Error('Product not found');
+        
+        setProduct(data);
+        setEditedProduct(data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch product');
         setIsLoading(false);
       }
     }
 
     fetchProduct();
-  }, [params.id]);
-
-  useEffect(() => {
-    if (product && !editedProduct) {
-      setEditedProduct(product);
-    }
-  }, [product]);
+  }, [params.id, isAddMode]);
 
   const handleEdit = () => {
     setIsEditing(true);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditedProduct(product);
   };
 
   const handleSave = async () => {
     if (!editedProduct) return;
 
     try {
-      // const response = await fetch(`/api/products/${params.id}`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(editedProduct),
-      // });
+      if (isAddMode) {
+        // Create new product
+        // const response = await fetch('/api/products', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(editedProduct),
+        // });
+        
+        // if (!response.ok) throw new Error('Failed to create product');
+        // const newProduct = await response.json();
+        
+        toast({
+          title: "Success",
+          description: "Product created successfully",
+        });
+        router.push('/product-management/products');
+      } else {
+        // Update existing product
+        // const response = await fetch(`/api/products/${params.id}`, {
+        //   method: 'PUT',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(editedProduct),
+        // });
 
-      // if (!response.ok) throw new Error('Failed to update product');
-      
-      setProduct(editedProduct);
-      setIsEditing(false);
-      toast({
-        title: "Success",
-        description: "Product updated successfully",
-      });
+        // if (!response.ok) throw new Error('Failed to update product');
+        
+        setProduct(editedProduct);
+        setIsEditing(false);
+        toast({
+          title: "Success",
+          description: "Product updated successfully",
+        });
+      }
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Error saving product:', error);
       toast({
         title: "Error",
-        description: "Failed to update product",
+        description: isAddMode ? "Failed to create product" : "Failed to update product",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleCancel = () => {
+    if (isAddMode) {
+      router.push('/product-management/products');
+    } else {
+      setEditedProduct(product);
+      setIsEditing(false);
     }
   };
 
@@ -499,7 +777,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
   const actionButtons = (
     <>
-      {isEditing ? (
+      {isEditing || isAddMode ? (
         <>
           <Button onClick={handleSave} variant="default">Save</Button>
           <Button onClick={handleCancel} variant="outline">Cancel</Button>
@@ -519,14 +797,13 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         <TabsList>
           <TabsTrigger value="basic">Basic Info</TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
-          <TabsTrigger value="orderUnit">Order Unit</TabsTrigger>
-          <TabsTrigger value="ingredientUnit">Ingredient Unit</TabsTrigger>
-          <TabsTrigger value="stockCount">Stock Count</TabsTrigger>
-          <TabsTrigger value="environment">Environmental Impact</TabsTrigger>
+          <TabsTrigger value="order-unit">Order Unit</TabsTrigger>
+          <TabsTrigger value="ingredient-unit">Ingredient Unit</TabsTrigger>
+          <TabsTrigger value="stock-count">Stock Count</TabsTrigger>
         </TabsList>
         <TabsContent value="basic">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Now starts with Product Attributes */}
+            {/* Left Column - Product Attributes */}
             <div className="space-y-6">
               <Card>
                 <CardHeader>
@@ -536,32 +813,77 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Size</label>
-                      <p className="text-sm mt-1">{product.size}</p>
+                      {isEditing ? (
+                        <Input
+                          value={editedProduct?.size || ''}
+                          onChange={(e) => handleInputChange('size', e.target.value)}
+                          className="mt-1"
+                        />
+                      ) : (
+                        <p className="text-sm mt-1">{product.size}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Color</label>
-                      <p className="text-sm mt-1">{product.color}</p>
+                      {isEditing ? (
+                        <Input
+                          value={editedProduct?.color || ''}
+                          onChange={(e) => handleInputChange('color', e.target.value)}
+                          className="mt-1"
+                        />
+                      ) : (
+                        <p className="text-sm mt-1">{product.color}</p>
+                      )}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Weight</label>
-                      <p className="text-sm mt-1">{product.weight} kg</p>
+                      {isEditing ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input
+                            type="number"
+                            value={editedProduct?.weight || 0}
+                            onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
+                            className="flex-1"
+                            min={0}
+                            step={0.1}
+                          />
+                          <span className="text-sm text-muted-foreground">kg</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm mt-1">{product.weight} kg</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Shelf Life</label>
-                      <p className="text-sm mt-1">{product.shelfLife} days</p>
+                      {isEditing ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input
+                            type="number"
+                            value={editedProduct?.shelfLife || 0}
+                            onChange={(e) => handleInputChange('shelfLife', parseInt(e.target.value))}
+                            className="flex-1"
+                            min={0}
+                          />
+                          <span className="text-sm text-muted-foreground">days</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm mt-1">{product.shelfLife} days</p>
+                      )}
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Dimensions (L × W × H)</label>
-                    <p className="text-sm mt-1">
-                      {product.dimensions.length} × {product.dimensions.width} × {product.dimensions.height} cm
-                    </p>
-                  </div>
-                  <div>
                     <label className="text-sm font-medium text-muted-foreground">Storage Instructions</label>
-                    <p className="text-sm mt-1">{product.storageInstructions}</p>
+                    {isEditing ? (
+                      <Textarea
+                        value={editedProduct?.storageInstructions || ''}
+                        onChange={(e) => handleInputChange('storageInstructions', e.target.value)}
+                        className="mt-1"
+                      />
+                    ) : (
+                      <p className="text-sm mt-1">{product.storageInstructions}</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -574,33 +896,121 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Base Price</label>
-                      <p className="text-sm mt-1">{product.basePrice} {product.currency}</p>
+                      {isEditing ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input
+                            type="number"
+                            value={editedProduct?.basePrice || 0}
+                            onChange={(e) => handleInputChange('basePrice', parseFloat(e.target.value))}
+                            className="flex-1"
+                            min={0}
+                            step={0.01}
+                          />
+                          <span className="text-sm text-muted-foreground">{product.currency}</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm mt-1">{product.basePrice} {product.currency}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Standard Cost</label>
-                      <p className="text-sm mt-1">{product.standardCost} {product.currency}</p>
+                      {isEditing ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input
+                            type="number"
+                            value={editedProduct?.standardCost || 0}
+                            onChange={(e) => handleInputChange('standardCost', parseFloat(e.target.value))}
+                            className="flex-1"
+                            min={0}
+                            step={0.01}
+                          />
+                          <span className="text-sm text-muted-foreground">{product.currency}</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm mt-1">{product.standardCost} {product.currency}</p>
+                      )}
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Tax Type</label>
-                      <p className="text-sm mt-1">{product.taxType}</p>
+                      {isEditing ? (
+                        <Select
+                          value={editedProduct?.taxType || ''}
+                          onValueChange={(value) => handleInputChange('taxType', value)}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select tax type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="VAT">VAT</SelectItem>
+                            <SelectItem value="NON_VAT">Non-VAT</SelectItem>
+                            <SelectItem value="EXEMPT">Tax Exempt</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <p className="text-sm mt-1">{product.taxType}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Tax Rate</label>
-                      <p className="text-sm mt-1">{product.taxRate}%</p>
+                      {isEditing ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input
+                            type="number"
+                            value={editedProduct?.taxRate || 0}
+                            onChange={(e) => handleInputChange('taxRate', parseFloat(e.target.value))}
+                            className="flex-1"
+                            min={0}
+                            max={100}
+                            step={0.1}
+                          />
+                          <span className="text-sm text-muted-foreground">%</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm mt-1">{product.taxRate}%</p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Price Deviation Limit</label>
-                      <p className="text-sm mt-1">{product.priceDeviationLimit}%</p>
+                      {isEditing ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input
+                            type="number"
+                            value={editedProduct?.priceDeviationLimit || 0}
+                            onChange={(e) => handleInputChange('priceDeviationLimit', parseFloat(e.target.value))}
+                            className="flex-1"
+                            min={0}
+                            max={100}
+                            step={1}
+                          />
+                          <span className="text-sm text-muted-foreground">%</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm mt-1">{product.priceDeviationLimit}%</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Last Cost</label>
-                      <p className="text-sm mt-1">{product.lastCost} {product.currency}</p>
+                      {isEditing ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input
+                            type="number"
+                            value={editedProduct?.lastCost || 0}
+                            onChange={(e) => handleInputChange('lastCost', parseFloat(e.target.value))}
+                            className="flex-1"
+                            min={0}
+                            step={0.01}
+                          />
+                          <span className="text-sm text-muted-foreground">{product.currency}</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm mt-1">{product.lastCost} {product.currency}</p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -811,24 +1221,17 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
             </Card>
           </div>
         </TabsContent>
-        <TabsContent value="orderUnit">
-          <OrderUnitTab />
+        <TabsContent value="order-unit">
+          <OrderUnitTab isEditing={isEditing} />
         </TabsContent>
-        <TabsContent value="ingredientUnit">
-          <IngredientUnitTab />
+        <TabsContent value="ingredient-unit">
+          <IngredientUnitTab isEditing={isEditing} />
         </TabsContent>
-        <TabsContent value="stockCount">
-          <StockCountUnitTab />
-        </TabsContent>
-        <TabsContent value="environment">
-          <EnvironmentImpactTab />
+        <TabsContent value="stock-count">
+          <StockCountTab isEditing={isEditing} />
         </TabsContent>
       </Tabs>
       <div className="mt-4 space-x-2">
-        <Button onClick={saveConversions}>Save Conversions</Button>
-        <Button variant="secondary" asChild>
-          <Link href="/products">Back to Product List</Link>
-        </Button>
       </div>
     </>
   );
@@ -936,14 +1339,35 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   return (
     <DetailPageTemplate
       title={
-        isEditing ? (
-          <EditableTitle 
-            value={editedProduct?.name || ''} 
-            onChange={(value) => handleInputChange('name', value)} 
-          />
-        ) : (
-          product?.name || ''
-        )
+        <>
+          <div className="flex items-center gap-2">
+            <Link 
+              href="/product-management/products" 
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              ← Back to Product Lists
+            </Link>
+          </div>
+          {(isEditing || isAddMode) ? (
+            <EditableTitle 
+              value={editedProduct?.name || ''} 
+              code={editedProduct?.productCode || ''}
+              onNameChange={(value) => handleInputChange('name', value)}
+              onCodeChange={(value) => handleInputChange('productCode', value)} 
+            />
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-sm font-medium text-muted-foreground">Product Code</div>
+                <div className="text-lg font-semibold">{product?.productCode}</div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-muted-foreground">Product Name</div>
+                <div className="text-lg font-semibold">{product?.name}</div>
+              </div>
+            </div>
+          )}
+        </>
       }
       subtitle={isEditing ? editedProduct?.productCode : product?.productCode}
       status={

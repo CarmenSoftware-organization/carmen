@@ -905,7 +905,6 @@ export interface Product {
   isForSale: boolean;
   isIngredient: boolean;
   weight: number;
-  dimensions: { length: number; width: number; height: number };
   shelfLife: number;
   storageInstructions: string;
   unitConversions: UnitConversion[];

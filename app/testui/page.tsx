@@ -1,19 +1,15 @@
-import StatusBadge, { StatusList } from "@/components/ui/custom-status-badge";
-
-function StatusBadgeList() {
-  return (
-    <div className="flex gap-2">
-      {StatusList.map((status) => (
-        <StatusBadge key={status.key} status={status.key} />
-      ))}
-    </div>
-  );
-}
+import StatusBadge, { BadgeStatus } from "@/components/ui/custom-status-badge";
 
 export default function TestUI() {
   return (
-    <>
-      <StatusBadgeList />
-    </>
+    <div className="p-4 space-y-4">
+      <div className="grid grid-cols-4 gap-4">
+        {Object.values(BadgeStatus).map((status) => (
+          <div key={status} className="flex items-center space-x-2">
+            <StatusBadge status={status} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

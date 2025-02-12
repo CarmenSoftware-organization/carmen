@@ -1,5 +1,5 @@
 import StatusBadge from "@/components/ui/custom-status-badge";
-import { BadgeStatus, StatusList } from "@/components/ui/custom-status-badge";
+import { BadgeStatus } from "@/components/ui/custom-status-badge";
 import Link from "next/link";
 
 export default function HomePage() {

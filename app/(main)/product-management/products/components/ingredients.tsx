@@ -1,267 +1,332 @@
+'use client'
+
 import React, { useState } from 'react';
-import { Scale, Plus, Pencil, Save, X, AlertCircle, TrashIcon } from 'lucide-react';
+import { Scale, Plus, Pencil, Save, X, AlertCircle, TrashIcon, ArrowLeftRight, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import { Table, TableHeader, TableHead, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { Card } from "@/components/ui/card"
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-const productInfo = {
-  code: 'RAW-COFE-001',
-  name: 'Green Coffee Beans - Colombian Arabica',
-  inventoryUnit: 'BAG',
-  ingredientUnits: [
-    {
-      ingredientUnit: 'KG',
-      factor: 60,
-      description: 'Kilogram',
-      isDefault: true,
-      precision: 2,
-      minQty: 0.5
-    },
-    {
-      ingredientUnit: 'LB',
-      factor: 132.277,
-      description: 'Pound',
-      isDefault: false,
-      precision: 1,
-      minQty: 1
-    },
-    {
-      ingredientUnit: 'MT',
-      factor: 0.06,
-      description: 'Metric Ton',
-      isDefault: false,
-      precision: 3,
-      minQty: 0.001
-    }
-  ]
-};
-
-// Keep only the IngredientUnit interface that we're using
 interface IngredientUnit {
   ingredientUnit: string;
   factor: number;
   description: string;
   isDefault: boolean;
-  precision: number;
-  minQty: number;
+  isInverse: boolean;
 }
 
-export default function IngredientUnitTab() {
-  const [isEditing, setIsEditing] = useState(false);
-  const [units, setUnits] = useState(productInfo.ingredientUnits);
+const initialUnits: IngredientUnit[] = [
+  {
+    ingredientUnit: "KG",
+    factor: 1,
+    description: "Kilogram",
+    isDefault: true,
+    isInverse: true
+  },
+  {
+    ingredientUnit: "G",
+    factor: 0.001,
+    description: "Gram",
+    isDefault: false,
+    isInverse: true
+  }
+]
 
-  const handleDefaultChange = (changedUnit: IngredientUnit) => {
-    if (!isEditing) return;
-    
-    setUnits(units.map(unit => ({
+export interface IngredientUnitTabProps {
+  isEditing: boolean
+}
+
+export function IngredientUnitTab({ isEditing }: IngredientUnitTabProps) {
+  const [units, setUnits] = useState<IngredientUnit[]>(initialUnits)
+  const [isAddingUnit, setIsAddingUnit] = useState(false)
+  const [newUnit, setNewUnit] = useState<IngredientUnit>({
+    ingredientUnit: "",
+    factor: 0,
+    description: "",
+    isDefault: false,
+    isInverse: true
+  })
+
+  const handleDefaultChange = (unitCode: string) => {
+    setUnits(prev => prev.map(unit => ({
       ...unit,
-      isDefault: unit.ingredientUnit === changedUnit.ingredientUnit ? !unit.isDefault : unit.isDefault
-    })));
-  };
+      isDefault: unit.ingredientUnit === unitCode
+    })))
+  }
 
   const handleDeleteUnit = (unitCode: string) => {
-    if (!isEditing) return;
-    if (window.confirm('Are you sure you want to delete this unit?')) {
-      // Here you would make an API call to delete the unit
-      console.log(`Deleting unit: ${unitCode}`);
+    setUnits(prev => prev.filter(unit => unit.ingredientUnit !== unitCode))
+  }
+
+  const handleDirectionChange = (unitCode: string) => {
+    setUnits(prev => prev.map(unit => 
+      unit.ingredientUnit === unitCode 
+        ? { ...unit, isInverse: !unit.isInverse }
+        : unit
+    ))
+  }
+
+  const handleDescriptionChange = (unitCode: string, value: string) => {
+    setUnits(prev => prev.map(unit =>
+      unit.ingredientUnit === unitCode
+        ? { ...unit, description: value }
+        : unit
+    ))
+  }
+
+  const handleFactorChange = (unitCode: string, value: number) => {
+    setUnits(prev => prev.map(unit =>
+      unit.ingredientUnit === unitCode
+        ? { ...unit, factor: value }
+        : unit
+    ))
+  }
+
+  const getConversionText = (unit: IngredientUnit) => {
+    if (unit.isInverse) {
+      return `1 KG = ${(1 / unit.factor).toFixed(5)} ${unit.ingredientUnit}`
     }
-  };
+    return `1 ${unit.ingredientUnit} = ${unit.factor.toFixed(5)} KG`
+  }
+
+  const getCalculationText = (unit: IngredientUnit) => {
+    if (unit.isInverse) {
+      return `Qty × ${(1 / unit.factor).toFixed(5)}`
+    }
+    return `Qty × ${unit.factor.toFixed(5)}`
+  }
+
+  const handleAddNewClick = () => {
+    setIsAddingUnit(true)
+  }
+
+  const handleCancelAdd = () => {
+    setIsAddingUnit(false)
+    setNewUnit({
+      ingredientUnit: "",
+      factor: 0,
+      description: "",
+      isDefault: false,
+      isInverse: true
+    })
+  }
+
+  const handleSaveNewUnit = () => {
+    if (!newUnit.ingredientUnit || !newUnit.factor) return
+
+    setUnits(prev => [...prev, newUnit])
+    handleCancelAdd()
+  }
+
+  const handleNewUnitChange = (field: keyof IngredientUnit, value: any) => {
+    setNewUnit(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-4 border-b">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <Scale className="w-5 h-5 text-gray-500" />
-              <h2 className="text-sm font-medium text-gray-900">Ingredient Units</h2>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">Inventory Unit:</span>
-              <span className="text-sm font-medium bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                {productInfo.inventoryUnit}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="p-4 bg-gray-50">
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs text-gray-500">Product Code</label>
-              <div className="mt-1 text-sm font-medium">{productInfo.code}</div>
-            </div>
-            <div>
-              <label className="text-xs text-gray-500">Product Name</label>
-              <div className="mt-1 text-sm font-medium">{productInfo.name}</div>
-            </div>
-          </div>
-        </div>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Ingredient Units</h2>
+        {isEditing && !isAddingUnit && (
+          <Button variant="outline" size="sm" onClick={handleAddNewClick}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Unit
+          </Button>
+        )}
       </div>
 
-      {/* Ingredient Units Table */}
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-4 border-b flex justify-between items-center">
-          <h3 className="text-sm font-medium text-gray-900">Ingredient Units</h3>
-          <div className="flex items-center space-x-4">
-            <button className="text-sm text-gray-600 hover:text-gray-700 font-medium flex items-center">
-              <Plus className="w-4 h-4 mr-1" />
-              New Ingredient Unit
-            </button>
-            <button
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              {isEditing ? (
-                <>
-                  <X className="w-4 h-4 mr-1" />
-                  Cancel
-                </>
-              ) : (
-                <>
-                  <Pencil className="w-4 h-4 mr-1" />
-                  Edit
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-        
-        <div className="p-4">
-          <table className="w-full">
-            <thead>
-              <tr className="text-xs text-gray-500 uppercase">
-                <th className="px-4 py-2 text-left bg-gray-50">Ingredient Unit</th>
-                <th className="px-4 py-2 text-right bg-gray-50">Factor</th>
-                <th className="px-4 py-2 text-left bg-gray-50">Description</th>
-                <th className="px-4 py-2 text-right bg-gray-50">Precision</th>
-                <th className="px-4 py-2 text-right bg-gray-50">Min Qty</th>
-                <th className="px-4 py-2 text-center bg-gray-50">Recipe Default</th>
-                <th className="px-4 py-2 text-right bg-gray-50">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {units.map((unit) => (
-                <tr key={unit.ingredientUnit} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <span className="text-sm font-medium text-gray-900">
-                      {unit.ingredientUnit}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end space-x-1">
-                      <span className="text-sm tabular-nums text-right">
-                        {unit.factor.toLocaleString()}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {unit.ingredientUnit}/{productInfo.inventoryUnit}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-gray-500">{unit.description}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm tabular-nums text-right block">
-                      {unit.precision}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm tabular-nums text-right block">
-                      {unit.minQty}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <input
-                      type="checkbox"
-                      checked={unit.isDefault}
-                      onChange={() => handleDefaultChange(unit)}
-                      disabled={!isEditing}
-                      className="h-4 w-4 rounded text-blue-600 cursor-pointer disabled:cursor-default"
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="w-[150px]">Unit</TableHead>
+              <TableHead className="w-[250px]">Description</TableHead>
+              <TableHead className="w-[180px] text-right">Conversion Factor</TableHead>
+              <TableHead className="w-[120px] text-center">Default</TableHead>
+              <TableHead className="w-[120px] text-center">Direction</TableHead>
+              <TableHead>Conversion</TableHead>
+              {isEditing && <TableHead className="w-[100px]">Actions</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {units.map((unit) => (
+              <TableRow key={unit.ingredientUnit} className="hover:bg-muted/50">
+                <TableCell className="font-medium">{unit.ingredientUnit}</TableCell>
+                <TableCell>
+                  {isEditing ? (
+                    <Input
+                      value={unit.description}
+                      onChange={(e) => handleDescriptionChange(unit.ingredientUnit, e.target.value)}
+                      className="w-full"
                     />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end space-x-2">
-                      {isEditing && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-blue-600"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            onClick={() => handleDeleteUnit(unit.ingredientUnit)}
-                          >
-                            <TrashIcon className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
+                  ) : (
+                    unit.description
+                  )}
+                </TableCell>
+                <TableCell>
+                  {isEditing ? (
+                    <div className="flex items-center justify-end gap-2">
+                      <Input
+                        type="number"
+                        value={unit.factor}
+                        onChange={(e) => handleFactorChange(unit.ingredientUnit, parseFloat(e.target.value))}
+                        className="w-32 text-right"
+                        min={0.00001}
+                        step={0.00001}
+                      />
+                      <span className="text-muted-foreground">KG</span>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Quick Calculator */}
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-4 border-b">
-          <h3 className="text-sm font-medium text-gray-900">Ingredient Quantity Calculator</h3>
-        </div>
-        <div className="p-4">
-          <div className="flex items-center space-x-4">
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">Ingredient Qty</label>
-              <input
-                type="number"
-                className="w-32 p-2 border rounded-lg text-right"
-                defaultValue="1"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">Ingredient Unit</label>
-              <select className="w-32 p-2 border rounded-lg">
-                {units.map(unit => (
-                  <option key={unit.ingredientUnit} value={unit.ingredientUnit}>
-                    {unit.ingredientUnit}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="pt-6">
-              <span className="text-gray-500">=</span>
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">Inventory Quantity</label>
-              <div className="text-lg font-medium tabular-nums">
-                2 {productInfo.inventoryUnit}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Notes */}
-      <div className="bg-blue-50 rounded-lg p-4">
-        <div className="flex items-start space-x-2">
-          <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
-          <div>
-            <h4 className="text-sm font-medium text-blue-900">Ingredient Unit Information</h4>
-            <ul className="mt-2 text-sm text-blue-700 space-y-1">
-              <li>• Ingredient units are used for recipes and formulations</li>
-              <li>• Default unit will be used for recipe calculations</li>
-              <li>• Factor shows the conversion rate to inventory units</li>
-              <li>• Precision defines decimal places for quantity entry</li>
-              <li>• Min Qty sets the smallest allowed quantity</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+                  ) : (
+                    <div className="text-right">
+                      {unit.factor} <span className="text-muted-foreground">KG</span>
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex justify-center">
+                    <Switch
+                      checked={unit.isDefault}
+                      onCheckedChange={() => handleDefaultChange(unit.ingredientUnit)}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex justify-center">
+                    <Button
+                      variant={unit.isInverse ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => handleDirectionChange(unit.ingredientUnit)}
+                      disabled={!isEditing}
+                      className="relative"
+                    >
+                      <ArrowLeftRight 
+                        className={`h-4 w-4 transition-transform duration-200 ${unit.isInverse ? "rotate-180" : ""}`}
+                      />
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    <div className="font-medium">{getConversionText(unit)}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {getCalculationText(unit)}
+                    </div>
+                  </div>
+                </TableCell>
+                {isEditing && (
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteUnit(unit.ingredientUnit)}
+                      className="hover:text-destructive"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+            {isEditing && isAddingUnit && (
+              <TableRow>
+                <TableCell>
+                  <Select value={newUnit.ingredientUnit} onValueChange={(value) => handleNewUnitChange('ingredientUnit', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="G">Gram (G)</SelectItem>
+                      <SelectItem value="KG">Kilogram (KG)</SelectItem>
+                      <SelectItem value="LB">Pound (LB)</SelectItem>
+                      <SelectItem value="OZ">Ounce (OZ)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Input 
+                    value={newUnit.description}
+                    onChange={(e) => handleNewUnitChange('description', e.target.value)}
+                    placeholder="Enter description"
+                    className="w-full"
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-end gap-2">
+                    <Input 
+                      type="number" 
+                      value={newUnit.factor}
+                      onChange={(e) => handleNewUnitChange('factor', parseFloat(e.target.value))}
+                      className="w-32 text-right"
+                      min={0.00001}
+                      step={0.00001}
+                    />
+                    <span className="text-muted-foreground">KG</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex justify-center">
+                    <Switch
+                      checked={newUnit.isDefault}
+                      onCheckedChange={(checked) => handleNewUnitChange('isDefault', checked)}
+                    />
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex justify-center">
+                    <Button 
+                      variant={newUnit.isInverse ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => handleNewUnitChange('isInverse', !newUnit.isInverse)}
+                    >
+                      <ArrowLeftRight 
+                        className={`h-4 w-4 transition-transform duration-200 ${newUnit.isInverse ? "rotate-180" : ""}`}
+                      />
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    <div className="font-medium">{getConversionText(newUnit)}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {getCalculationText(newUnit)}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={handleSaveNewUnit}
+                      disabled={!newUnit.ingredientUnit || !newUnit.factor}
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={handleCancelAdd}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
-  );
+  )
 }
