@@ -1,14 +1,5 @@
 # Purchase Request Process Flow
 
-```mermaid
-%%{init: { 
-  'theme': 'base', 
-  'themeVariables': { 
-    'primaryColor': '#FFFFFF',
-    'edgeLabelBackground':'#F6F7F8'
-  }
-}}%%
-
 graph TD
     %% Start Point
     Start([Create Purchase Request]):::start

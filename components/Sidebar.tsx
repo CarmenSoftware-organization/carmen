@@ -86,7 +86,17 @@ const menuItems: MenuItem[] = [
     path: "/inventory-management",
     icon: "Package",
     subItems: [
-      { name: "Stock Overview", path: "/inventory-management/stock-overview" },
+      { 
+        name: "Stock Overview", 
+        path: "/inventory-management/stock-overview",
+        subItems: [
+          { name: "Overview", path: "/inventory-management/stock-overview" },
+          { name: "Inventory Balance", path: "/inventory-management/stock-overview/inventory-balance" },
+          { name: "Stock Card", path: "/inventory-management/stock-overview/stock-card" },
+          { name: "Slow Moving", path: "/inventory-management/stock-overview/slow-moving" },
+          { name: "Inventory Aging", path: "/inventory-management/stock-overview/inventory-aging" }
+        ]
+      },
       { name: "Inventory Adjustments", path: "/inventory-management/inventory-adjustments" },
       { name: "Spot Check", path: "/inventory-management/spot-check" },
       { name: "Physical Count", path: "/inventory-management/physical-count-management" },

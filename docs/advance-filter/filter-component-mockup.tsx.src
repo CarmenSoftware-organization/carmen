@@ -1,0 +1,254 @@
+import React, { useState } from 'react';
+import { 
+  Button, 
+  Card, 
+  CardContent, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Input,
+  Badge,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from '@/components/ui';
+import { ChevronDown, Plus, Save, X, Filter, Share2, Star, History, Code } from 'lucide-react';
+
+const AdvancedFilterMockup = () => {
+  const [activeFilters, setActiveFilters] = useState([
+    { id: 1, field: 'createdDate', operator: 'between', value: ['2023-01-01', '2023-03-31'], display: 'Created between Jan 1, 2023 - Mar 31, 2023' },
+    { id: 2, field: 'status', operator: 'in', value: ['active', 'pending'], display: 'Status is Active or Pending' }
+  ]);
+
+  const [savedFilters, setSavedFilters] = useState([
+    { id: 1, name: 'Recent Active Orders', isStarred: true },
+    { id: 2, name: 'High-Value Pending Items', isStarred: false },
+    { id: 3, name: 'Q1 Transactions', isStarred: true }
+  ]);
+
+  const removeFilter = (id) => {
+    setActiveFilters(activeFilters.filter(filter => filter.id !== id));
+  };
+
+  return (
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold">Orders List</h2>
+        
+        <div className="flex items-center space-x-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="h-8 px-2 lg:px-3">
+                <span>Saved Filters</span>
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72">
+              <div className="space-y-2">
+                <h3 className="font-medium">Saved Filters</h3>
+                <div className="space-y-1">
+                  {savedFilters.map((filter) => (
+                    <div key={filter.id} className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-100">
+                      <span>{filter.name}</span>
+                      <Star className={`h-4 w-4 ${filter.isStarred ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button className="h-8">
+                <Filter className="mr-2 h-4 w-4" />
+                <span>Add Filter</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle>Advanced Filter</SheetTitle>
+                <SheetDescription>
+                  Create complex filters to find exactly what you need.
+                </SheetDescription>
+              </SheetHeader>
+              
+              <Tabs defaultValue="build" className="mt-4">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="build">Build</TabsTrigger>
+                  <TabsTrigger value="json">JSON</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="build" className="space-y-4 py-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-12 gap-2">
+                      <div className="col-span-5">
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select field" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="name">Name</SelectItem>
+                            <SelectItem value="createdDate">Created Date</SelectItem>
+                            <SelectItem value="status">Status</SelectItem>
+                            <SelectItem value="amount">Amount</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="col-span-3">
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Operator" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="equals">Equals</SelectItem>
+                            <SelectItem value="contains">Contains</SelectItem>
+                            <SelectItem value="in">In</SelectItem>
+                            <SelectItem value="between">Between</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="col-span-4">
+                        <Input placeholder="Value" />
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center space-x-2">
+                        <Select defaultValue="and">
+                          <SelectTrigger className="w-20">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="and">AND</SelectItem>
+                            <SelectItem value="or">OR</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button variant="outline" size="sm">
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add
+                        </Button>
+                      </div>
+                      
+                      <Button variant="outline" size="sm">
+                        Add Group
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="json" className="py-4">
+                  <div className="bg-gray-100 p-3 rounded-md font-mono text-sm overflow-auto max-h-80">
+                    {`{
+  "conditions": [
+    {
+      "field": "createdDate",
+      "operator": "between",
+      "value": ["2023-01-01", "2023-03-31"]
+    },
+    {
+      "field": "status",
+      "operator": "in",
+      "value": ["active", "pending"]
+    }
+  ],
+  "logicalOperator": "AND"
+}`}
+                  </div>
+                </TabsContent>
+              </Tabs>
+              
+              <div className="mt-6 flex justify-between items-center">
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm">
+                    <History className="h-4 w-4 mr-1" />
+                    History
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Code className="h-4 w-4 mr-1" />
+                    Test
+                  </Button>
+                </div>
+                <div className="space-x-2">
+                  <Button variant="outline">Cancel</Button>
+                  <Button>Apply</Button>
+                </div>
+              </div>
+              
+              <div className="mt-4 border-t pt-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Save this filter</h3>
+                  <Button size="sm" variant="outline">
+                    <Save className="h-4 w-4 mr-1" />
+                    Save
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+      
+      {/* Active filters */}
+      {activeFilters.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center py-2">
+          <span className="text-sm font-medium text-gray-500">Active filters:</span>
+          {activeFilters.map((filter) => (
+            <Badge key={filter.id} variant="outline" className="flex items-center gap-1 px-2 py-1">
+              {filter.display}
+              <button onClick={() => removeFilter(filter.id)} className="ml-1 rounded-full hover:bg-gray-200">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+          <Button variant="ghost" size="sm" className="text-xs h-7">
+            Clear all
+          </Button>
+        </div>
+      )}
+      
+      {/* Results count */}
+      <div className="text-sm text-gray-500">
+        Showing 1-50 of 1,250 filtered results (from 1,000,000 total)
+      </div>
+      
+      {/* Table placeholder */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-60 flex items-center justify-center border rounded-md bg-gray-50">
+            <p className="text-gray-400">Table content would appear here</p>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" size="sm">Export Filtered Results</Button>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm">Previous</Button>
+            <Button variant="outline" size="sm">Next</Button>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+export default AdvancedFilterMockup;

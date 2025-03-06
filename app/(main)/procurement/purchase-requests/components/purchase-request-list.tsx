@@ -35,8 +35,36 @@ import {
 import { useRouter } from "next/navigation";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import StatusBadge from "@/components/ui/custom-status-badge";
+import { AdvancedFilter } from './advanced-filter'
 
-const sampleData = [
+interface PurchaseRequest {
+  id: string
+  type: string
+  description: string
+  requestor: string
+  department: string
+  date: string
+  status: string
+  amount: number
+  currentStage: string
+}
+
+type FilterField = keyof PurchaseRequest
+type FilterOperator = 'equals' | 'contains' | 'in' | 'between' | 'greaterThan' | 'lessThan'
+type FilterValue = 
+  | string 
+  | number 
+  | string[] // For 'in' operator with string values
+  | number[] // For 'in' operator with number values
+  | [number, number] // For 'between' operator
+
+interface Filter {
+  field: FilterField
+  operator: FilterOperator
+  value: FilterValue
+}
+
+const sampleData: PurchaseRequest[] = [
   {
     id: "PR-001",
     type: "General Purchase",
@@ -155,25 +183,70 @@ export function PurchaseRequestList() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedType, setSelectedType] = React.useState("All Types");
   const [selectedStatus, setSelectedStatus] = React.useState("All Statuses");
-  const [sortField, setSortField] = useState<
-    keyof (typeof sampleData)[0] | null
-  >(null);
+  const [sortField, setSortField] = useState<keyof PurchaseRequest | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const itemsPerPage = 7;
   const [selectedPRs, setSelectedPRs] = useState<string[]>([]);
+  const [advancedFilters, setAdvancedFilters] = useState<Filter[]>([]);
+  const [filteredData, setFilteredData] = useState<PurchaseRequest[]>(sampleData);
 
-  const filteredData = React.useMemo(() => {
-    return sampleData.filter((pr) => {
-      const matchesSearch = Object.values(pr).some((value) =>
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      const matchesType =
-        selectedType === "All Types" || pr.type === selectedType;
-      const matchesStatus =
-        selectedStatus === "All Statuses" || pr.status === selectedStatus;
-      return matchesSearch && matchesType && matchesStatus;
-    });
-  }, [searchTerm, selectedType, selectedStatus]);
+  const handleApplyAdvancedFilters = (filters: Filter[]) => {
+    setAdvancedFilters(filters)
+    const filtered = sampleData.filter((pr) => {
+      return filters.every((filter) => {
+        const fieldValue = pr[filter.field]
+        
+        switch (filter.operator) {
+          case 'equals':
+            return fieldValue === filter.value
+          case 'contains':
+            if (typeof fieldValue === 'string' && typeof filter.value === 'string') {
+              return fieldValue.toLowerCase().includes(filter.value.toLowerCase())
+            }
+            return false
+          case 'in':
+            if (Array.isArray(filter.value)) {
+              // Type guard for string arrays
+              if (filter.value.every(item => typeof item === 'string')) {
+                return (filter.value as string[]).includes(fieldValue as string)
+              }
+              // Type guard for number arrays
+              if (filter.value.every(item => typeof item === 'number')) {
+                return (filter.value as number[]).includes(fieldValue as number)
+              }
+            }
+            return false
+          case 'between':
+            if (Array.isArray(filter.value) && 
+                filter.value.length === 2 && 
+                typeof fieldValue === 'number' &&
+                typeof filter.value[0] === 'number' &&
+                typeof filter.value[1] === 'number') {
+              return fieldValue >= filter.value[0] && fieldValue <= filter.value[1]
+            }
+            return false
+          case 'greaterThan':
+            if (typeof fieldValue === 'number' && typeof filter.value === 'number') {
+              return fieldValue > filter.value
+            }
+            return false
+          case 'lessThan':
+            if (typeof fieldValue === 'number' && typeof filter.value === 'number') {
+              return fieldValue < filter.value
+            }
+            return false
+          default:
+            return true
+        }
+      })
+    })
+    setFilteredData(filtered)
+  }
+
+  const handleClearAdvancedFilters = () => {
+    setAdvancedFilters([])
+    setFilteredData(sampleData)
+  }
 
   const sortedAndFilteredData = useMemo(() => {
     let result = filteredData;
@@ -214,7 +287,7 @@ export function PurchaseRequestList() {
     setCurrentPage(1);
   };
 
-  const handleSort = (field: keyof (typeof sampleData)[0]) => {
+  const handleSort = (field: keyof PurchaseRequest) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -301,6 +374,7 @@ export function PurchaseRequestList() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -309,53 +383,28 @@ export function PurchaseRequestList() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem
-                onSelect={() => handleStatusChange("All Statuses")}
-              >
+              <DropdownMenuItem onSelect={() => handleStatusChange("All Statuses")}>
                 All Statuses
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => handleStatusChange("Draft")}>
-                <Badge variant="outline" className="mr-2">
-                  Draft
-                </Badge>{" "}
                 Draft
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() => handleStatusChange("Submitted")}
-              >
-                <Badge className="mr-2">Submitted</Badge> Submitted
+              <DropdownMenuItem onSelect={() => handleStatusChange("Submitted")}>
+                Submitted
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => handleStatusChange("Approved")}>
-                <Badge variant="secondary" className="mr-2">
-                  Approved
-                </Badge>{" "}
                 Approved
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => handleStatusChange("Rejected")}>
-                <Badge variant="destructive" className="mr-2">
-                  Rejected
-                </Badge>{" "}
                 Rejected
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Filter className="mr-2 h-4 w-4" /> More Filters
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Filter Options</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem>Date Range</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Department</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Requestor</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Amount Range</DropdownMenuCheckboxItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Clear Filters</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+          <AdvancedFilter 
+            onApplyFilters={handleApplyAdvancedFilters}
+            onClearFilters={handleClearAdvancedFilters}
+          />
         </div>
       </div>
     </>
@@ -433,14 +482,16 @@ export function PurchaseRequestList() {
                   { label: "Workflow Stage", field: "currentStage" },
                 ].map(({ label, field }) => (
                   <div key={field}>
-                    <p className="font-medium text-muted-foreground  text-sm">
+                    <p className="font-medium text-muted-foreground text-sm">
                       {label}
                     </p>
-                    {field === 'currentStage' ?
-                      <p className="text-sm"><StatusBadge status={pr[field as keyof typeof pr] as string}/></p>
-                    :
+                    {field === 'currentStage' ? (
+                      <div className="text-sm">
+                        <StatusBadge status={pr[field as keyof typeof pr] as string}/>
+                      </div>
+                    ) : (
                       <p className="text-sm">{pr[field as keyof typeof pr]}</p>
-                    }
+                    )}
                   </div>
                 ))}
               </div>
