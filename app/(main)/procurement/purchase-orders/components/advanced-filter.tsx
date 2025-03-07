@@ -2,33 +2,36 @@
 
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { CardContent } from "@/components/ui/card"
-import { CardFooter } from "@/components/ui/card"
-import { CardHeader } from "@/components/ui/card"
-import { CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { ChevronDown, Plus, Save, X, Filter, Share2, Star, History, Code, Trash2 } from 'lucide-react'
-import { DocumentStatus, PRType, WorkflowStatus, PurchaseRequest } from '@/lib/types'
-import { Label } from "@/components/ui/label"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Plus, Save, X, Filter, Star, Trash2 } from 'lucide-react'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { readSavedFilters, addSavedFilter, deleteSavedFilter, toggleFilterStar, SavedFilter, Filter as FilterType } from '@/lib/utils/filter-storage'
 import { toast } from 'sonner'
+import { PurchaseOrder } from '@/lib/types'
 
+type FilterField = keyof PurchaseOrder
 type FilterOperator = 'equals' | 'contains' | 'in' | 'between' | 'greaterThan' | 'lessThan'
 type LogicalOperator = 'AND' | 'OR'
 type FilterValue = string | number | string[] | number[] | [number, number]
 
-interface AdvancedFilterProps<T> {
-  onApplyFilters: (filters: FilterType<T>[]) => void
+interface AdvancedFilterProps {
+  onApplyFilters: (filters: FilterType<PurchaseOrder>[]) => void
   onClearFilters: () => void
-  filterFields: { value: keyof T; label: string }[]
 }
+
+const filterFields: { value: keyof PurchaseOrder; label: string }[] = [
+  { value: 'number', label: 'PO Number' },
+  { value: 'orderDate', label: 'Order Date' },
+  { value: 'DeliveryDate', label: 'Delivery Date' },
+  { value: 'vendorName', label: 'Vendor' },
+  { value: 'status', label: 'Status' },
+  { value: 'totalAmount', label: 'Total Amount' },
+  { value: 'currencyCode', label: 'Currency' },
+  { value: 'buyer', label: 'Buyer' },
+  { value: 'description', label: 'Description' }
+]
 
 const operators: { value: FilterOperator; label: string }[] = [
   { value: 'equals', label: 'Equals' },
@@ -44,16 +47,16 @@ const logicalOperators: { value: LogicalOperator; label: string }[] = [
   { value: 'OR', label: 'OR' }
 ]
 
-export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields }: AdvancedFilterProps<T>) {
-  const [activeFilters, setActiveFilters] = useState<FilterType<T>[]>([])
-  const [savedFilters, setSavedFilters] = useState<SavedFilter<T>[]>([])
+export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilterProps) {
+  const [activeFilters, setActiveFilters] = useState<FilterType<PurchaseOrder>[]>([])
+  const [savedFilters, setSavedFilters] = useState<SavedFilter<PurchaseOrder>[]>([])
   const [isOpen, setIsOpen] = useState(false)
 
   // Load saved filters on component mount
   useEffect(() => {
     const loadFilters = () => {
       try {
-        const filters = readSavedFilters<T>()
+        const filters = readSavedFilters<PurchaseOrder>()
         setSavedFilters(filters)
       } catch (error) {
         console.error('Error loading filters:', error)
@@ -64,42 +67,70 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
   }, [])
 
   const addFilter = () => {
-    if (filterFields.length > 0) {
-      setActiveFilters([...activeFilters, { 
-        field: filterFields[0].value,
-        operator: 'equals', 
-        value: '',
-        logicalOperator: activeFilters.length > 0 ? 'AND' : undefined
-      }])
-    }
+    setActiveFilters([...activeFilters, { 
+      field: 'number', 
+      operator: 'equals', 
+      value: '' as string,
+      logicalOperator: activeFilters.length > 0 ? 'AND' : undefined
+    }])
   }
 
   const removeFilter = (index: number) => {
     setActiveFilters(activeFilters.filter((_, i) => i !== index))
   }
 
-  const updateFilter = (index: number, field: keyof FilterType<T>, value: any) => {
+  const updateFilter = (index: number, field: keyof FilterType<PurchaseOrder>, value: any) => {
     const newFilters = [...activeFilters]
     const currentFilter = newFilters[index]
     
     if (field === 'value') {
       // Convert value based on field type
       const fieldType = currentFilter.field
-      if (fieldType === 'totalAmount') {
-        newFilters[index] = { 
-          ...currentFilter, 
-          value: Number(value) || 0 
-        }
-      } else if (fieldType === 'date') {
-        newFilters[index] = { 
-          ...currentFilter, 
-          value: value as string 
-        }
-      } else {
-        newFilters[index] = { 
-          ...currentFilter, 
-          value: value as string 
-        }
+      switch (fieldType) {
+        case 'totalAmount':
+          newFilters[index] = { 
+            ...currentFilter, 
+            value: Number(value) || 0 
+          }
+          break
+        case 'orderDate':
+        case 'DeliveryDate':
+          // Handle date fields
+          if (currentFilter.operator === 'between') {
+            // For between operator, expect array of two dates
+            newFilters[index] = {
+              ...currentFilter,
+              value: Array.isArray(value) ? value : [value, value]
+            }
+          } else {
+            newFilters[index] = { 
+              ...currentFilter, 
+              value: value as string 
+            }
+          }
+          break
+        case 'status':
+        case 'currencyCode':
+          // Handle enum fields
+          if (currentFilter.operator === 'in') {
+            // For 'in' operator, expect array of values
+            newFilters[index] = {
+              ...currentFilter,
+              value: Array.isArray(value) ? value : [value]
+            }
+          } else {
+            newFilters[index] = { 
+              ...currentFilter, 
+              value: value as string 
+            }
+          }
+          break
+        default:
+          // Handle string fields
+          newFilters[index] = { 
+            ...currentFilter, 
+            value: value as string 
+          }
       }
     } else {
       newFilters[index] = { ...currentFilter, [field]: value }
@@ -113,7 +144,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
     if (!name) return
 
     try {
-      const newSavedFilter: SavedFilter<T> = {
+      const newSavedFilter: SavedFilter<PurchaseOrder> = {
         id: Date.now(),
         name,
         isStarred: false,
@@ -129,14 +160,14 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
     }
   }
 
-  const applyFilter = (filter: SavedFilter<T>) => {
+  const applyFilter = (filter: SavedFilter<PurchaseOrder>) => {
     setActiveFilters(filter.filters)
     onApplyFilters(filter.filters)
   }
 
   const handleDeleteSavedFilter = (id: number) => {
     try {
-      deleteSavedFilter<T>(id)
+      deleteSavedFilter<PurchaseOrder>(id)
       setSavedFilters(savedFilters.filter(f => f.id !== id))
       toast.success('Filter deleted successfully')
     } catch (error) {
@@ -147,7 +178,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
 
   const handleToggleStar = (id: number) => {
     try {
-      toggleFilterStar<T>(id)
+      toggleFilterStar<PurchaseOrder>(id)
       setSavedFilters(savedFilters.map(f => 
         f.id === id ? { ...f, isStarred: !f.isStarred } : f
       ))
@@ -193,15 +224,15 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                       <div className="flex items-center gap-2 px-4">
                         <div className="h-px flex-1 bg-border" />
                         <Select
-                          value={filter.logicalOperator || ''}
-                          onValueChange={(value) => updateFilter(index, 'logicalOperator', value as LogicalOperator)}
+                          value={filter.logicalOperator}
+                          onValueChange={(value) => updateFilter(index, 'logicalOperator', value)}
                         >
                           <SelectTrigger className="w-[100px]">
                             <SelectValue placeholder="Operator" />
                           </SelectTrigger>
                           <SelectContent>
                             {logicalOperators.map(op => (
-                              <SelectItem key={String(op.value)} value={String(op.value)}>
+                              <SelectItem key={op.value} value={op.value}>
                                 {op.label}
                               </SelectItem>
                             ))}
@@ -215,15 +246,15 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                         <div className="grid grid-cols-12 gap-3">
                           <div className="col-span-5">
                             <Select
-                              value={String(filter.field)}
-                              onValueChange={(value) => updateFilter(index, 'field', value as keyof FilterType<T>)}
+                              value={filter.field}
+                              onValueChange={(value) => updateFilter(index, 'field', value as FilterField)}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select field" />
                               </SelectTrigger>
                               <SelectContent>
                                 {filterFields.map(field => (
-                                  <SelectItem key={String(field.value)} value={String(field.value)}>
+                                  <SelectItem key={field.value} value={field.value}>
                                     {field.label}
                                   </SelectItem>
                                 ))}
@@ -233,7 +264,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                           
                           <div className="col-span-3">
                             <Select
-                              value={String(filter.operator)}
+                              value={filter.operator}
                               onValueChange={(value) => updateFilter(index, 'operator', value as FilterOperator)}
                             >
                               <SelectTrigger>
@@ -241,7 +272,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                               </SelectTrigger>
                               <SelectContent>
                                 {operators.map(op => (
-                                  <SelectItem key={String(op.value)} value={String(op.value)}>
+                                  <SelectItem key={op.value} value={op.value}>
                                     {op.label}
                                   </SelectItem>
                                 ))}
@@ -250,11 +281,50 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                           </div>
                           
                           <div className="col-span-4">
-                            <Input 
-                              placeholder="Value" 
-                              value={filter.value as string}
-                              onChange={(e) => updateFilter(index, 'value', e.target.value)}
-                            />
+                            {filter.field === 'orderDate' || filter.field === 'DeliveryDate' ? (
+                              filter.operator === 'between' ? (
+                                <div className="flex gap-2">
+                                  <Input 
+                                    type="date"
+                                    placeholder="Start Date"
+                                    value={Array.isArray(filter.value) ? filter.value[0] : ''}
+                                    onChange={(e) => {
+                                      const currentValue = Array.isArray(filter.value) ? filter.value : ['', '']
+                                      updateFilter(index, 'value', [e.target.value, currentValue[1]])
+                                    }}
+                                  />
+                                  <Input 
+                                    type="date"
+                                    placeholder="End Date"
+                                    value={Array.isArray(filter.value) ? filter.value[1] : ''}
+                                    onChange={(e) => {
+                                      const currentValue = Array.isArray(filter.value) ? filter.value : ['', '']
+                                      updateFilter(index, 'value', [currentValue[0], e.target.value])
+                                    }}
+                                  />
+                                </div>
+                              ) : (
+                                <Input 
+                                  type="date"
+                                  placeholder="Value"
+                                  value={filter.value as string}
+                                  onChange={(e) => updateFilter(index, 'value', e.target.value)}
+                                />
+                              )
+                            ) : filter.field === 'totalAmount' ? (
+                              <Input 
+                                type="number"
+                                placeholder="Value"
+                                value={filter.value as number}
+                                onChange={(e) => updateFilter(index, 'value', e.target.value)}
+                              />
+                            ) : (
+                              <Input 
+                                placeholder="Value"
+                                value={filter.value as string}
+                                onChange={(e) => updateFilter(index, 'value', e.target.value)}
+                              />
+                            )}
                           </div>
                         </div>
                       </div>

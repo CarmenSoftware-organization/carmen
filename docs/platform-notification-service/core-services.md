@@ -1,6 +1,6 @@
 ```mermaid
 graph LR
-    subgraph Event Sources
+    subgraph EventSources
         ES_BusinessEvents[Business Process Events]
         ES_SystemEvents[System Events]
         ES_IntegrationEvents[Integration Events]
@@ -8,7 +8,7 @@ graph LR
         ES_ManualEvents[Manual Events]
     end
 
-    subgraph Core Notification Services
+    subgraph CoreNotificationServices
         CNS_EventHub[Event Hub]
         CNS_RulesEngine[Rules Engine]
         CNS_TemplateService[Template Service]
@@ -17,7 +17,7 @@ graph LR
         CNS_NotificationGenerator[Notification Generator]
     end
 
-    subgraph Delivery Services
+    subgraph DeliveryServices
         DS_InApp[In-App Service]
         DS_Email[Email Service]
         DS_SMS[SMS Service]
@@ -26,7 +26,7 @@ graph LR
         DS_Webhook[Webhook Service]
     end
 
-    subgraph Management & Analytics
+    subgraph Management&Analytics
         MA_Tracking[Tracking Service]
         MA_Escalation[Escalation Service]
         MA_Archiving[Archiving Service]
@@ -35,21 +35,21 @@ graph LR
         MA_Reporting[Reporting Service]
     end
 
-    subgraph Data Stores
+    subgraph DataStores
         Store_NotificationDB[Notification DB]
         Store_TemplateDB[Template DB]
         Store_PreferenceDB[Preference DB]
         Store_AnalyticsDB[Analytics DB]
     end
 
-    subgraph Integration Layer
+    subgraph IntegrationLayer
         IL_APIGateway[API Gateway]
         IL_SyncAdapters[Sync Adapters]
         IL_AsyncAdapters[Async Adapters]
         IL_Connectors[Connectors]
     end
 
-    Event Sources --> CNS_EventHub
+    EventSources --> CNS_EventHub
     CNS_EventHub --> CNS_RulesEngine
     CNS_RulesEngine --> CNS_TemplateService
     CNS_RulesEngine --> CNS_PreferenceService
@@ -57,19 +57,13 @@ graph LR
     CNS_TemplateService --> CNS_NotificationGenerator
     CNS_PreferenceService --> CNS_NotificationGenerator
     CNS_PriorityQueue --> CNS_NotificationGenerator
-    CNS_NotificationGenerator --> Delivery Services
+    CNS_NotificationGenerator --> DeliveryServices
 
-    Core Notification Services --> Management & Analytics
-    Core Notification Services --> Data Stores
-    Integration Layer --> Core Notification Services
-    Delivery Services --> Tracking Service
-    Management & Analytics --> Data Stores
-    Data Stores --> Analytics Service
+    CoreNotificationServices --> Management&Analytics
+    CoreNotificationServices --> DataStores
+    IntegrationLayer --> CoreNotificationServices
+    DeliveryServices --> TrackingService
+    Management&Analytics --> DataStores
+    DataStores --> AnalyticsService
 
-    style Core Notification Services fill:#f9f,stroke:#333,stroke-width:2px
-    style Delivery Services fill:#ccf,stroke:#333,stroke-width:2px
-    style Management & Analytics fill:#fcc,stroke:#333,stroke-width:2px
-    style Data Stores fill:#efe,stroke:#333,stroke-width:2px
-    style Integration Layer fill:#cfc,stroke:#333,stroke-width:2px
-    style Event Sources fill:#eee,stroke:#333,stroke-width:2px
 ```

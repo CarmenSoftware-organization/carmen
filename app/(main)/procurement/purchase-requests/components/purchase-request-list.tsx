@@ -36,146 +36,68 @@ import { useRouter } from "next/navigation";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import { AdvancedFilter } from './advanced-filter'
+import { Filter as FilterType } from '@/lib/utils/filter-storage'
+import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, CurrencyCode } from '@/lib/types'
 
-interface PurchaseRequest {
-  id: string
-  type: string
-  description: string
-  requestor: string
-  department: string
-  date: string
-  status: string
-  amount: number
-  currentStage: string
-}
-
-type FilterField = keyof PurchaseRequest
-type FilterOperator = 'equals' | 'contains' | 'in' | 'between' | 'greaterThan' | 'lessThan'
-type FilterValue = 
-  | string 
-  | number 
-  | string[] // For 'in' operator with string values
-  | number[] // For 'in' operator with number values
-  | [number, number] // For 'between' operator
-
-interface Filter {
-  field: FilterField
-  operator: FilterOperator
-  value: FilterValue
+interface CustomFilterType<T> {
+  field: keyof T
+  operator: 'equals' | 'contains' | 'greaterThan' | 'lessThan'
+  value: string | number
+  logicalOperator?: 'AND' | 'OR'
 }
 
 const sampleData: PurchaseRequest[] = [
   {
-    id: "PR-001",
-    type: "General Purchase",
-    description: "Office Supplies",
-    requestor: "John Doe",
-    department: "Administration",
-    date: "2023-06-15",
-    status: "Submitted",
-    amount: 500,
-    currentStage: "Initial Review",
-  },
-  {
-    id: "PR-002",
-    type: "Market List",
-    description: "Weekly Groceries",
-    requestor: "Jane Smith",
-    department: "Catering",
-    date: "2023-06-14",
-    status: "Approved",
-    amount: 750,
-    currentStage: "Procurement",
-  },
-  {
-    id: "PR-003",
-    type: "Asset Purchase",
-    description: "Laptop Computers",
-    requestor: "Mike Johnson",
+    id: "1",
+    refNumber: "PR001",
+    date: new Date("2024-03-20"),
+    type: PRType.GeneralPurchase,
+    vendor: "Tech Supplies Co.",
+    vendorId: 1,
+    deliveryDate: new Date("2024-03-25"),
+    description: "Office equipment",
+    requestorId: "user1",
+    requestor: {
+      name: "John Doe",
+      id: "user1",
+      department: "IT"
+    },
+    status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.pending,
+    currentWorkflowStage: WorkflowStage.departmentHeadApproval,
+    location: "HQ",
     department: "IT",
-    date: "2023-06-13",
-    status: "Rejected",
-    amount: 3000,
-    currentStage: "Final Review",
-  },
-  {
-    id: "PR-004",
-    type: "General Purchase",
-    description: "Office Furniture",
-    requestor: "Emily Brown",
-    department: "HR",
-    date: "2023-06-12",
-    status: "Draft",
-    amount: 1200,
-    currentStage: "Draft",
-  },
-  {
-    id: "PR-005",
-    type: "Market List",
-    description: "Monthly Supplies",
-    requestor: "David Lee",
-    department: "Facilities",
-    date: "2023-06-11",
-    status: "Submitted",
-    amount: 900,
-    currentStage: "Department Approval",
-  },
-  {
-    id: "PR-006",
-    type: "Asset Purchase",
-    description: "Server Equipment",
-    requestor: "Sarah Connor",
-    department: "IT",
-    date: "2023-06-10",
-    status: "Approved",
-    amount: 5000,
-    currentStage: "Procurement",
-  },
-  {
-    id: "PR-007",
-    type: "General Purchase",
-    description: "Marketing Materials",
-    requestor: "Tom Wilson",
-    department: "Marketing",
-    date: "2023-06-09",
-    status: "Submitted",
-    amount: 800,
-    currentStage: "Financial Review",
-  },
-  {
-    id: "PR-008",
-    type: "Market List",
-    description: "Event Catering",
-    requestor: "Alice Johnson",
-    department: "Events",
-    date: "2023-06-08",
-    status: "Approved",
-    amount: 1500,
-    currentStage: "Procurement",
-  },
-  {
-    id: "PR-009",
-    type: "Asset Purchase",
-    description: "Company Vehicles",
-    requestor: "Robert Davis",
-    department: "Operations",
-    date: "2023-06-07",
-    status: "Rejected",
-    amount: 50000,
-    currentStage: "Final Review",
-  },
-  {
-    id: "PR-010",
-    type: "General Purchase",
-    description: "Training Materials",
-    requestor: "Emma White",
-    department: "HR",
-    date: "2023-06-06",
-    status: "Draft",
-    amount: 300,
-    currentStage: "Draft",
-  },
+    jobCode: "IT2024Q1",
+    estimatedTotal: 1500,
+    currency: CurrencyCode.USD,
+    baseCurrencyCode: CurrencyCode.USD,
+    baseSubTotalPrice: 1500,
+    subTotalPrice: 1500,
+    baseNetAmount: 1500,
+    netAmount: 1500,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 0,
+    taxAmount: 0,
+    baseTotalAmount: 1500,
+    totalAmount: 1500
+  }
 ];
+
+const filterFields: { value: keyof PurchaseRequest; label: string }[] = [
+  { value: 'refNumber', label: 'PR Number' },
+  { value: 'type', label: 'Type' },
+  { value: 'status', label: 'Status' },
+  { value: 'department', label: 'Department' },
+  { value: 'description', label: 'Description' },
+  { value: 'totalAmount', label: 'Amount' }
+];
+
+type FieldConfig = {
+  label: string
+  field: keyof PurchaseRequest | 'requestor.name'
+  format?: (value: any) => string
+}
 
 export function PurchaseRequestList() {
   const router = useRouter();
@@ -187,56 +109,53 @@ export function PurchaseRequestList() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const itemsPerPage = 7;
   const [selectedPRs, setSelectedPRs] = useState<string[]>([]);
-  const [advancedFilters, setAdvancedFilters] = useState<Filter[]>([]);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterType<PurchaseRequest>[]>([]);
   const [filteredData, setFilteredData] = useState<PurchaseRequest[]>(sampleData);
+  const [filterStatus, setFilterStatus] = useState<DocumentStatus | 'All'>('All');
 
-  const handleApplyAdvancedFilters = (filters: Filter[]) => {
+  const handleApplyAdvancedFilters = (filters: FilterType<PurchaseRequest>[]) => {
     setAdvancedFilters(filters)
     const filtered = sampleData.filter((pr) => {
       return filters.every((filter) => {
         const fieldValue = pr[filter.field]
+        if (fieldValue === undefined) return false
+
+        // Handle different value types
+        let compareValue: string | number
+        if (fieldValue instanceof Date) {
+          compareValue = fieldValue.toISOString()
+        } else if (typeof fieldValue === 'object' && fieldValue !== null && 'name' in fieldValue) {
+          compareValue = fieldValue.name
+        } else {
+          compareValue = fieldValue as string | number
+        }
+
+        const filterValue = filter.value
         
         switch (filter.operator) {
           case 'equals':
-            return fieldValue === filter.value
+            return String(compareValue) === String(filterValue)
           case 'contains':
-            if (typeof fieldValue === 'string' && typeof filter.value === 'string') {
-              return fieldValue.toLowerCase().includes(filter.value.toLowerCase())
-            }
-            return false
+            return String(compareValue).toLowerCase().includes(String(filterValue).toLowerCase())
+          case 'greaterThan':
+            return typeof compareValue === 'number' && typeof filterValue === 'number' && compareValue > filterValue
+          case 'lessThan':
+            return typeof compareValue === 'number' && typeof filterValue === 'number' && compareValue < filterValue
           case 'in':
-            if (Array.isArray(filter.value)) {
-              // Type guard for string arrays
-              if (filter.value.every(item => typeof item === 'string')) {
-                return (filter.value as string[]).includes(fieldValue as string)
-              }
-              // Type guard for number arrays
-              if (filter.value.every(item => typeof item === 'number')) {
-                return (filter.value as number[]).includes(fieldValue as number)
-              }
+            if (Array.isArray(filterValue)) {
+              return filterValue.some(v => String(v) === String(compareValue))
             }
             return false
           case 'between':
-            if (Array.isArray(filter.value) && 
-                filter.value.length === 2 && 
-                typeof fieldValue === 'number' &&
-                typeof filter.value[0] === 'number' &&
-                typeof filter.value[1] === 'number') {
-              return fieldValue >= filter.value[0] && fieldValue <= filter.value[1]
-            }
-            return false
-          case 'greaterThan':
-            if (typeof fieldValue === 'number' && typeof filter.value === 'number') {
-              return fieldValue > filter.value
-            }
-            return false
-          case 'lessThan':
-            if (typeof fieldValue === 'number' && typeof filter.value === 'number') {
-              return fieldValue < filter.value
+            if (Array.isArray(filterValue) && filterValue.length === 2) {
+              const [min, max] = filterValue
+              if (typeof compareValue === 'number' && typeof min === 'number' && typeof max === 'number') {
+                return compareValue >= min && compareValue <= max
+              }
             }
             return false
           default:
-            return true
+            return false
         }
       })
     })
@@ -401,9 +320,10 @@ export function PurchaseRequestList() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <AdvancedFilter 
+          <AdvancedFilter<PurchaseRequest>
             onApplyFilters={handleApplyAdvancedFilters}
             onClearFilters={handleClearAdvancedFilters}
+            filterFields={filterFields}
           />
         </div>
       </div>
@@ -425,6 +345,40 @@ export function PurchaseRequestList() {
       </div>
     </>
   );
+
+  const fieldConfigs: FieldConfig[] = [
+    { 
+      label: "Date", 
+      field: "date",
+      format: (value: Date) => value.toLocaleDateString()
+    },
+    { 
+      label: "Type", 
+      field: "type" 
+    },
+    { 
+      label: "Description", 
+      field: "description" 
+    },
+    { 
+      label: "Requestor", 
+      field: "requestor.name",
+      format: (pr: PurchaseRequest) => pr.requestor.name
+    },
+    { 
+      label: "Department", 
+      field: "department" 
+    },
+    { 
+      label: "Amount", 
+      field: "totalAmount",
+      format: (value: number) => `$${value.toFixed(2)}`
+    },
+    { 
+      label: "Workflow Stage", 
+      field: "currentWorkflowStage" 
+    }
+  ]
 
   const content = (
     <>
@@ -473,25 +427,17 @@ export function PurchaseRequestList() {
                 </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
-                {[
-                  { label: "Date", field: "date" },
-                  { label: "Type", field: "type" },
-                  { label: "Requestor", field: "requestor" },
-                  { label: "Department", field: "department" },
-                  { label: "Amount", field: "amount" },
-                  { label: "Workflow Stage", field: "currentStage" },
-                ].map(({ label, field }) => (
+                {fieldConfigs.map(({ label, field, format }) => (
                   <div key={field}>
                     <p className="font-medium text-muted-foreground text-sm">
                       {label}
                     </p>
-                    {field === 'currentStage' ? (
-                      <div className="text-sm">
-                        <StatusBadge status={pr[field as keyof typeof pr] as string}/>
-                      </div>
-                    ) : (
-                      <p className="text-sm">{pr[field as keyof typeof pr]}</p>
-                    )}
+                    <p className="text-sm">
+                      {format 
+                        ? format(field === 'requestor.name' ? pr : pr[field as keyof PurchaseRequest])
+                        : String(field === 'requestor.name' ? pr.requestor.name : pr[field as keyof PurchaseRequest])
+                      }
+                    </p>
                   </div>
                 ))}
               </div>

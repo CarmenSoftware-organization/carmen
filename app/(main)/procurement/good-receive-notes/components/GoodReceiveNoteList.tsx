@@ -1,91 +1,50 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { CurrencyCode, PurchaseOrder, PurchaseRequest, PurchaseOrderStatus } from "@/lib/types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
-import {
-  ChevronDown,
-  Eye,
-  Trash2,
-  Plus,
-  X,
-  CheckSquare,
-  FileDown,
-  Mail,
-  Printer,
-  Edit2Icon,
-  ImageIcon,
-  MessageSquareIcon,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  ArrowUpDown,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ListPageTemplate from "@/components/templates/ListPageTemplate";
-import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";  
-import StatusBadge from "@/components/ui/custom-status-badge";
-import { randomUUID } from "crypto";
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown, Search, Eye, Edit2Icon, Trash2, Plus, FileDown, Printer } from 'lucide-react'
 import { AdvancedFilter } from './advanced-filter'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
+import { GoodsReceiveNote } from '@/lib/types'
+import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import StatusBadge from "@/components/ui/custom-status-badge"
+import { Label } from "@/components/ui/label"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import ListPageTemplate from "@/components/templates/ListPageTemplate"
 
-type FilterField = keyof PurchaseOrder
-type FilterOperator = 'equals' | 'contains' | 'in' | 'between' | 'greaterThan' | 'lessThan'
-type LogicalOperator = 'AND' | 'OR'
-type FilterValue = string | number | string[] | number[] | [number, number]
+// ... rest of the imports ...
 
-interface Filter {
-  field: FilterField
-  operator: FilterOperator
-  value: FilterValue
-  logicalOperator?: LogicalOperator
-}
-
-export function PurchaseOrderList() {
-  const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [filteredPOs, setFilteredPOs] = useState(Mock_purchaseOrders);
-  const [selectedPOs, setSelectedPOs] = useState<string[]>([]);
-  const [sortField, setSortField] = useState<keyof PurchaseOrder | null>(null);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showMoreFilters, setShowMoreFilters] = useState(false);
-  const itemsPerPage = 7;
-  const [advancedFilters, setAdvancedFilters] = useState<FilterType<PurchaseOrder>[]>([])
-  const [filteredData, setFilteredData] = useState<PurchaseOrder[]>(Mock_purchaseOrders)
+export function GoodReceiveNoteList() {
+  const router = useRouter()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
+  const [filteredGRNs, setFilteredGRNs] = useState(mockGoodsReceiveNotes)
+  const [selectedGRNs, setSelectedGRNs] = useState<string[]>([])
+  const [sortField, setSortField] = useState<keyof GoodsReceiveNote | null>(null)
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const itemsPerPage = 7
+  const [advancedFilters, setAdvancedFilters] = useState<FilterType<GoodsReceiveNote>[]>([])
+  const [filteredData, setFilteredData] = useState<GoodsReceiveNote[]>(mockGoodsReceiveNotes)
 
   useEffect(() => {
-    let filtered = Mock_purchaseOrders.filter(
-      (po) =>
-        (po.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          po.vendorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (statusFilter === "" || po.status === statusFilter)
-    );
+    let filtered = mockGoodsReceiveNotes.filter(
+      (grn) =>
+        (grn.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          grn.vendor.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (statusFilter === "" || grn.status === statusFilter)
+    )
 
     if (sortField) {
       filtered = filtered.sort((a, b) => {
@@ -95,42 +54,36 @@ export function PurchaseOrderList() {
         if (aValue < bValue) return sortOrder === "asc" ? -1 : 1
         if (aValue > bValue) return sortOrder === "asc" ? 1 : -1
         return 0
-      });
+      })
     }
 
-    setFilteredPOs(filtered);
-    setSelectedPOs([]);
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, sortField, sortOrder]);
+    setFilteredGRNs(filtered)
+    setSelectedGRNs([])
+    setCurrentPage(1)
+  }, [searchTerm, statusFilter, sortField, sortOrder])
 
-  const handleSelectPO = (id: string, checked: boolean) => {
+  const handleSelectGRN = (id: string, checked: boolean) => {
     if (checked) {
-      setSelectedPOs([...selectedPOs, id]);
+      setSelectedGRNs([...selectedGRNs, id])
     } else {
-      setSelectedPOs(selectedPOs.filter((poId) => poId !== id));
+      setSelectedGRNs(selectedGRNs.filter((grnId) => grnId !== id))
     }
-  };
+  }
 
-  const handleSort = (field: keyof PurchaseOrder) => {
+  const handleSort = (field: keyof GoodsReceiveNote) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
     } else {
-      setSortField(field);
-      setSortOrder("asc");
+      setSortField(field)
+      setSortOrder("asc")
     }
-  };
+  }
 
-  const totalPages = Math.ceil(filteredPOs.length / itemsPerPage);
-  const paginatedPOs = filteredPOs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleApplyAdvancedFilters = (filters: FilterType<PurchaseOrder>[]) => {
+  const handleApplyAdvancedFilters = (filters: FilterType<GoodsReceiveNote>[]) => {
     setAdvancedFilters(filters)
-    const filtered = Mock_purchaseOrders.filter((po) => {
+    const filtered = mockGoodsReceiveNotes.filter((grn) => {
       return filters.reduce((result, filter, index) => {
-        const fieldValue = po[filter.field as keyof PurchaseOrder]
+        const fieldValue = grn[filter.field as keyof GoodsReceiveNote]
         let matches = false
         
         switch (filter.operator) {
@@ -189,19 +142,25 @@ export function PurchaseOrderList() {
 
   const handleClearAdvancedFilters = () => {
     setAdvancedFilters([])
-    setFilteredData(Mock_purchaseOrders)
+    setFilteredData(mockGoodsReceiveNotes)
   }
 
+  const totalPages = Math.ceil(filteredGRNs.length / itemsPerPage)
+  const paginatedGRNs = filteredGRNs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+    setSearchTerm(e.target.value)
+  }
 
   const filters = (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div className="w-full sm:w-1/2 flex space-x-2">
           <Input
-            placeholder="Search POs..."
+            placeholder="Search GRNs..."
             className="w-full"
             value={searchTerm}
             onChange={handleSearch}
@@ -220,10 +179,11 @@ export function PurchaseOrderList() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onSelect={() => setStatusFilter("")}>All Statuses</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Open")}>Open</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Sent")}>Sent</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Partial Received")}>Partial Received</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Closed")}>Closed</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Pending")}>Pending</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Received")}>Received</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Partial")}>Partial</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Cancelled")}>Cancelled</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Voided")}>Voided</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <AdvancedFilter 
@@ -233,24 +193,25 @@ export function PurchaseOrderList() {
         </div>
       </div>
     </>
-  );
+  )
 
   const content = (
     <>
       <div className="space-y-2">
-        {paginatedPOs.map((po) => (
-          <Card key={po.poId} className="hover:bg-accent">
+        {paginatedGRNs.map((grn) => (
+          <Card key={grn.id} className="hover:bg-accent">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-4">
                   <Checkbox
-                    checked={selectedPOs.includes(po.poId)}
-                    onCheckedChange={(checked) => handleSelectPO(po.poId, checked as boolean)}
+                    checked={selectedGRNs.includes(grn.id)}
+                    onCheckedChange={(checked) => handleSelectGRN(grn.id, checked as boolean)}
                   />
-                  <StatusBadge status={po.status} />
+                  <StatusBadge status={grn.status} />
                   <div>
                     <h3 className="text-lg font-semibold">
-                    <span className="font-normal text-muted-foreground"> {po.number} </span><span className=""> {po.vendorName}</span>
+                      <span className="font-normal text-muted-foreground">{grn.ref}</span>
+                      <span className="">{grn.vendor}</span>
                     </h3>
                   </div>
                 </div>
@@ -259,7 +220,7 @@ export function PurchaseOrderList() {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/procurement/purchase-orders/${po.poId}`}>
+                          <Link href={`/procurement/good-receive-notes/${grn.id}`}>
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
@@ -269,7 +230,7 @@ export function PurchaseOrderList() {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/procurement/purchase-orders/${po.poId}/edit`}>
+                          <Link href={`/procurement/good-receive-notes/${grn.id}/edit`}>
                             <Edit2Icon className="h-4 w-4" />
                           </Link>
                         </Button>
@@ -290,27 +251,27 @@ export function PurchaseOrderList() {
               <div className="grid grid-cols-2 sm:grid-cols-7 gap-4 text-sm">
                 <div className="text-left">
                   <Label className="text-sm text-muted-foreground">Date</Label>
-                  <p>{po.orderDate.toLocaleDateString()}</p>
+                  <p>{grn.date.toLocaleDateString()}</p>
                 </div>
-                <div className="text-Left">
-                  <Label className="text-sm text-muted-foreground">Delivery Date</Label>
-                  <p>{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</p>
+                <div className="text-left">
+                  <Label className="text-sm text-muted-foreground">Invoice Date</Label>
+                  <p>{grn.invoiceDate ? grn.invoiceDate.toLocaleDateString() : "N/A"}</p>
                 </div>
                 <div className="">
                   <Label className="text-sm text-muted-foreground">Currency</Label>
-                  <p>{po.currencyCode}</p>
+                  <p>{grn.currency}</p>
                 </div>
                 <div className="text-right">
                   <Label className="text-sm text-muted-foreground">Net Amount</Label>
-                  <p>{po.netAmount.toFixed(2)}</p>
+                  <p>{grn.netAmount.toFixed(2)}</p>
                 </div>
                 <div className="text-right">
                   <Label className="text-sm text-muted-foreground">Tax Amount</Label>
-                  <p>{po.taxAmount.toFixed(2)}</p>
+                  <p>{grn.taxAmount.toFixed(2)}</p>
                 </div>
                 <div className="text-right">
-                  <Label className="text-sm text-muted-foreground">Amount</Label>
-                  <p>{po.totalAmount.toFixed(2)}</p>
+                  <Label className="text-sm text-muted-foreground">Total Amount</Label>
+                  <p>{grn.totalAmount.toFixed(2)}</p>
                 </div>
               </div>
             </CardContent>
@@ -319,7 +280,7 @@ export function PurchaseOrderList() {
       </div>
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredPOs.length)} of {filteredPOs.length} results
+          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredGRNs.length)} of {filteredGRNs.length} results
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -364,12 +325,12 @@ export function PurchaseOrderList() {
         </div>
       </div>
     </>
-  );
+  )
 
   const actionButtons = (
     <>
       <Button className="group">
-        <Plus className="mr-2 h-4 w-4" /> New Purchase Order
+        <Plus className="mr-2 h-4 w-4" /> New Goods Receive Note
       </Button>
       <Button variant="outline" className="group">
         <FileDown className="mr-2 h-4 w-4" />
@@ -380,16 +341,14 @@ export function PurchaseOrderList() {
         Print
       </Button>
     </>
-  );
+  )
 
   return (
     <ListPageTemplate
-      title="Purchase Orders"
+      title="Goods Receive Notes"
       actionButtons={actionButtons}
       filters={filters}
       content={content}
     />
-  );
-};
-
-export default PurchaseOrderList;
+  )
+} 

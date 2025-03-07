@@ -55,6 +55,7 @@
     "react-hook-form": "^7.53.2",
     "recharts": "^2.13.3",
     "shadcn": "^2.1.6",
+    "sonner": "^2.0.1",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.3",

@@ -2,58 +2,102 @@
 
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { CardContent } from "@/components/ui/card"
-import { CardFooter } from "@/components/ui/card"
-import { CardHeader } from "@/components/ui/card"
-import { CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { ChevronDown, Plus, Save, X, Filter, Share2, Star, History, Code, Trash2 } from 'lucide-react'
-import { DocumentStatus, PRType, WorkflowStatus, PurchaseRequest } from '@/lib/types'
-import { Label } from "@/components/ui/label"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Plus, Save, X, Filter, Star, Trash2 } from 'lucide-react'
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { readSavedFilters, addSavedFilter, deleteSavedFilter, toggleFilterStar, SavedFilter, Filter as FilterType } from '@/lib/utils/filter-storage'
+import { readSavedFilters, addSavedFilter, deleteSavedFilter, toggleFilterStar, SavedFilter, Filter as BaseFilter } from '@/lib/utils/filter-storage'
 import { toast } from 'sonner'
 
-type FilterOperator = 'equals' | 'contains' | 'in' | 'between' | 'greaterThan' | 'lessThan'
-type LogicalOperator = 'AND' | 'OR'
-type FilterValue = string | number | string[] | number[] | [number, number]
-
-interface AdvancedFilterProps<T> {
-  onApplyFilters: (filters: FilterType<T>[]) => void
-  onClearFilters: () => void
-  filterFields: { value: keyof T; label: string }[]
+// Define the CreditNote interface based on the API spec
+interface CreditNote {
+  id: string
+  refNumber: string
+  date: string
+  poId: string
+  poRefNumber: string
+  grnId?: string
+  grnRefNumber?: string
+  status: CreditNoteStatus
+  type: CreditNoteType
+  reason: string
+  location: string
+  department: string
+  vendor: string
+  vendorId: number
+  requestedBy: {
+    id: string
+    name: string
+    department: string
+  }
+  approvedBy?: {
+    id: string
+    name: string
+    department: string
+  }
+  currency: string
+  baseCurrencyCode: string
+  exchangeRate: number
+  totalQuantity: number
+  baseSubTotalAmount: number
+  subTotalAmount: number
+  baseTaxAmount: number
+  taxAmount: number
+  baseTotalAmount: number
+  totalAmount: number
+  createdAt: string
+  updatedAt: string
 }
 
-const operators: { value: FilterOperator; label: string }[] = [
+type CreditNoteStatus = 'Draft' | 'Pending Approval' | 'Approved' | 'Rejected' | 'Cancelled' | 'Completed'
+type CreditNoteType = 'Return' | 'Price Adjustment' | 'Quality Issue' | 'Quantity Discrepancy'
+
+// Define our own Filter type to ensure type safety
+type FilterFields = typeof filterFields[number]['value']
+
+interface AdvancedFilterProps {
+  onApplyFilters: (filters: BaseFilter<CreditNote>[]) => void
+  onClearFilters: () => void
+}
+
+const filterFields = [
+  { value: 'refNumber', label: 'Credit Note #' },
+  { value: 'date', label: 'Date' },
+  { value: 'vendor', label: 'Vendor' },
+  { value: 'status', label: 'Status' },
+  { value: 'type', label: 'Type' },
+  { value: 'reason', label: 'Reason' },
+  { value: 'location', label: 'Location' },
+  { value: 'department', label: 'Department' },
+  { value: 'totalAmount', label: 'Total Amount' },
+  { value: 'currency', label: 'Currency' }
+] as const
+
+const operators = [
   { value: 'equals', label: 'Equals' },
   { value: 'contains', label: 'Contains' },
   { value: 'in', label: 'In' },
   { value: 'between', label: 'Between' },
   { value: 'greaterThan', label: 'Greater Than' },
   { value: 'lessThan', label: 'Less Than' }
-]
+] as const
 
-const logicalOperators: { value: LogicalOperator; label: string }[] = [
+const logicalOperators = [
   { value: 'AND', label: 'AND' },
   { value: 'OR', label: 'OR' }
-]
+] as const
 
-export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields }: AdvancedFilterProps<T>) {
-  const [activeFilters, setActiveFilters] = useState<FilterType<T>[]>([])
-  const [savedFilters, setSavedFilters] = useState<SavedFilter<T>[]>([])
+export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilterProps) {
+  const [activeFilters, setActiveFilters] = useState<BaseFilter<CreditNote>[]>([])
+  const [savedFilters, setSavedFilters] = useState<SavedFilter<CreditNote>[]>([])
   const [isOpen, setIsOpen] = useState(false)
 
   // Load saved filters on component mount
   useEffect(() => {
     const loadFilters = () => {
       try {
-        const filters = readSavedFilters<T>()
+        const filters = readSavedFilters<CreditNote>()
         setSavedFilters(filters)
       } catch (error) {
         console.error('Error loading filters:', error)
@@ -64,41 +108,33 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
   }, [])
 
   const addFilter = () => {
-    if (filterFields.length > 0) {
-      setActiveFilters([...activeFilters, { 
-        field: filterFields[0].value,
-        operator: 'equals', 
-        value: '',
-        logicalOperator: activeFilters.length > 0 ? 'AND' : undefined
-      }])
-    }
+    setActiveFilters([...activeFilters, { 
+      field: 'refNumber', 
+      operator: 'equals', 
+      value: '',
+      logicalOperator: activeFilters.length > 0 ? 'AND' : undefined
+    }])
   }
 
   const removeFilter = (index: number) => {
     setActiveFilters(activeFilters.filter((_, i) => i !== index))
   }
 
-  const updateFilter = (index: number, field: keyof FilterType<T>, value: any) => {
+  const updateFilter = (index: number, field: keyof BaseFilter<CreditNote>, value: string) => {
     const newFilters = [...activeFilters]
     const currentFilter = newFilters[index]
     
     if (field === 'value') {
       // Convert value based on field type
-      const fieldType = currentFilter.field
-      if (fieldType === 'totalAmount') {
+      if (currentFilter.field === 'totalAmount') {
         newFilters[index] = { 
           ...currentFilter, 
           value: Number(value) || 0 
         }
-      } else if (fieldType === 'date') {
-        newFilters[index] = { 
-          ...currentFilter, 
-          value: value as string 
-        }
       } else {
         newFilters[index] = { 
           ...currentFilter, 
-          value: value as string 
+          value: value
         }
       }
     } else {
@@ -113,7 +149,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
     if (!name) return
 
     try {
-      const newSavedFilter: SavedFilter<T> = {
+      const newSavedFilter: SavedFilter<CreditNote> = {
         id: Date.now(),
         name,
         isStarred: false,
@@ -129,14 +165,14 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
     }
   }
 
-  const applyFilter = (filter: SavedFilter<T>) => {
+  const applyFilter = (filter: SavedFilter<CreditNote>) => {
     setActiveFilters(filter.filters)
     onApplyFilters(filter.filters)
   }
 
   const handleDeleteSavedFilter = (id: number) => {
     try {
-      deleteSavedFilter<T>(id)
+      deleteSavedFilter<CreditNote>(id)
       setSavedFilters(savedFilters.filter(f => f.id !== id))
       toast.success('Filter deleted successfully')
     } catch (error) {
@@ -147,7 +183,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
 
   const handleToggleStar = (id: number) => {
     try {
-      toggleFilterStar<T>(id)
+      toggleFilterStar<CreditNote>(id)
       setSavedFilters(savedFilters.map(f => 
         f.id === id ? { ...f, isStarred: !f.isStarred } : f
       ))
@@ -194,14 +230,14 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                         <div className="h-px flex-1 bg-border" />
                         <Select
                           value={filter.logicalOperator || ''}
-                          onValueChange={(value) => updateFilter(index, 'logicalOperator', value as LogicalOperator)}
+                          onValueChange={(value: string) => updateFilter(index, 'logicalOperator', value as 'AND' | 'OR')}
                         >
                           <SelectTrigger className="w-[100px]">
                             <SelectValue placeholder="Operator" />
                           </SelectTrigger>
                           <SelectContent>
                             {logicalOperators.map(op => (
-                              <SelectItem key={String(op.value)} value={String(op.value)}>
+                              <SelectItem key={op.value} value={op.value}>
                                 {op.label}
                               </SelectItem>
                             ))}
@@ -216,7 +252,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                           <div className="col-span-5">
                             <Select
                               value={String(filter.field)}
-                              onValueChange={(value) => updateFilter(index, 'field', value as keyof FilterType<T>)}
+                              onValueChange={(value: string) => updateFilter(index, 'field', value as keyof CreditNote)}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select field" />
@@ -234,14 +270,14 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                           <div className="col-span-3">
                             <Select
                               value={String(filter.operator)}
-                              onValueChange={(value) => updateFilter(index, 'operator', value as FilterOperator)}
+                              onValueChange={(value: string) => updateFilter(index, 'operator', value as BaseFilter<CreditNote>['operator'])}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Operator" />
                               </SelectTrigger>
                               <SelectContent>
                                 {operators.map(op => (
-                                  <SelectItem key={String(op.value)} value={String(op.value)}>
+                                  <SelectItem key={op.value} value={op.value}>
                                     {op.label}
                                   </SelectItem>
                                 ))}
@@ -252,7 +288,7 @@ export function AdvancedFilter<T>({ onApplyFilters, onClearFilters, filterFields
                           <div className="col-span-4">
                             <Input 
                               placeholder="Value" 
-                              value={filter.value as string}
+                              value={filter.value?.toString() || ''}
                               onChange={(e) => updateFilter(index, 'value', e.target.value)}
                             />
                           </div>

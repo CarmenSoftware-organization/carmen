@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Eye, Edit, Trash, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Plus, Filter, ArrowUpDown, Download, Printer } from 'lucide-react'
+import { Search, Eye, Edit, Trash, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
@@ -19,65 +19,135 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { FilterBuilder } from './FilterBuilder'
-
-type GoodsReceiveNoteStatus = 
-  | "Draft"
-  | "In Process"
-  | "Complete"
-  | "Reject"
-  | "Voided"
-  | "Accept"
-  | "Review"
+import { AdvancedFilter } from './advanced-filter'
+import { Filter as FilterType } from '@/lib/utils/filter-storage'
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [statusFilter, setStatusFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
-  const [sortField, setSortField] = useState<string | null>(null)
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-
-  const filteredGRNs = mockGoodsReceiveNotes.filter((grn: GoodsReceiveNote) => {
-    const matchesSearch = 
-      grn.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      grn.vendor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      grn.description.toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesStatus = statusFilter === 'all' || grn.status === statusFilter
-
-    return matchesSearch && matchesStatus
-  })
-
-  const sortedAndFilteredGRNs = filteredGRNs.sort((a, b) => {
-    const aValue = a[sortField as keyof GoodsReceiveNote]
-    const bValue = b[sortField as keyof GoodsReceiveNote]
-
-    if (aValue == null && bValue == null) return 0
-    if (aValue == null) return sortDirection === 'asc' ? -1 : 1
-    if (bValue == null) return sortDirection === 'asc' ? 1 : -1
-
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
-    return 0
-  })
-
-  const totalPages = Math.ceil(sortedAndFilteredGRNs.length / itemsPerPage)
-  const paginatedGRNs = sortedAndFilteredGRNs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
+  const [filteredGRNs, setFilteredGRNs] = useState(mockGoodsReceiveNotes)
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [sortField, setSortField] = useState<keyof GoodsReceiveNote | null>(null)
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const itemsPerPage = 7
+  const [advancedFilters, setAdvancedFilters] = useState<FilterType<GoodsReceiveNote>[]>([])
 
   const handleBulkAction = (action: string) => {
     console.log(`Bulk action: ${action} on items:`, selectedItems)
+    // Implement bulk action logic here
+    if (action === 'delete') {
+      setFilteredGRNs(prev => prev.filter(grn => !selectedItems.includes(grn.id)))
+    }
+    setSelectedItems([])
   }
 
-  const toggleItemSelection = (id: string) => {
-    setSelectedItems(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+  const applyFilters = () => {
+    let filtered = mockGoodsReceiveNotes.filter(
+      (grn) =>
+        (grn.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          grn.vendor.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (statusFilter === "" || grn.status === statusFilter)
     )
+
+    // Apply advanced filters
+    if (advancedFilters.length > 0) {
+      filtered = filtered.filter((grn) => {
+        return advancedFilters.reduce((result, filter, index) => {
+          const fieldValue = grn[filter.field as keyof GoodsReceiveNote]
+          let matches = false
+          
+          // Skip comparison if fieldValue is undefined or null
+          if (fieldValue === undefined || fieldValue === null) {
+            return index === 0 ? false : result
+          }
+
+          switch (filter.operator) {
+            case 'equals':
+              if (typeof fieldValue === 'string' || typeof fieldValue === 'number' || fieldValue instanceof Date) {
+                if (typeof filter.value === typeof fieldValue || (fieldValue instanceof Date && typeof filter.value === 'string')) {
+                  matches = fieldValue.toString() === filter.value.toString()
+                }
+              }
+              break
+            case 'contains':
+              if (typeof fieldValue === 'string' && typeof filter.value === 'string') {
+                matches = fieldValue.toLowerCase().includes(filter.value.toLowerCase())
+              }
+              break
+            case 'in':
+              if (Array.isArray(filter.value)) {
+                matches = filter.value.some(val => val === fieldValue)
+              }
+              break
+            case 'between':
+              if (Array.isArray(filter.value) && filter.value.length === 2) {
+                if (fieldValue instanceof Date && typeof filter.value[0] === 'string' && typeof filter.value[1] === 'string') {
+                  const startDate = new Date(filter.value[0])
+                  const endDate = new Date(filter.value[1])
+                  matches = fieldValue >= startDate && fieldValue <= endDate
+                } else if (typeof fieldValue === 'number' && typeof filter.value[0] === 'number' && typeof filter.value[1] === 'number') {
+                  matches = fieldValue >= filter.value[0] && fieldValue <= filter.value[1]
+                }
+              }
+              break
+            case 'greaterThan':
+              if (typeof fieldValue === 'number' && typeof filter.value === 'number') {
+                matches = fieldValue > filter.value
+              } else if (fieldValue instanceof Date && typeof filter.value === 'string') {
+                matches = fieldValue > new Date(filter.value)
+              }
+              break
+            case 'lessThan':
+              if (typeof fieldValue === 'number' && typeof filter.value === 'number') {
+                matches = fieldValue < filter.value
+              } else if (fieldValue instanceof Date && typeof filter.value === 'string') {
+                matches = fieldValue < new Date(filter.value)
+              }
+              break
+            default:
+              matches = true
+          }
+
+          // First filter doesn't have a logical operator
+          if (index === 0) return matches
+
+          // Apply logical operator
+          return filter.logicalOperator === 'AND'
+            ? result && matches
+            : result || matches
+        }, true)
+      })
+    }
+
+    if (sortField) {
+      filtered = filtered.sort((a, b) => {
+        const aValue = a[sortField]
+        const bValue = b[sortField]
+        if (aValue == null || bValue == null) return 0
+        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1
+        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1
+        return 0
+      })
+    }
+
+    setFilteredGRNs(filtered)
+    setSelectedItems([])
+    setCurrentPage(1)
+  }
+
+  // Update useEffect to use applyFilters
+  React.useEffect(() => {
+    applyFilters()
+  }, [searchTerm, statusFilter, sortField, sortOrder, advancedFilters])
+
+  const handleApplyAdvancedFilters = (filters: FilterType<GoodsReceiveNote>[]) => {
+    setAdvancedFilters(filters)
+  }
+
+  const handleClearAdvancedFilters = () => {
+    setAdvancedFilters([])
   }
 
   const toggleSelectAll = () => {
@@ -99,6 +169,12 @@ export function GoodsReceiveNoteList() {
   const handleAddNewGoodsReceiveNote = () => {
     router.push('/procurement/goods-received-note/0?mode=create')
   }
+
+  const totalPages = Math.ceil(filteredGRNs.length / itemsPerPage)
+  const paginatedGRNs = filteredGRNs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   const title = 'Goods Receive Notes'
   const actionButtons = (
@@ -135,220 +211,191 @@ export function GoodsReceiveNoteList() {
     </>
   )
 
-  const filter = (
-    <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
-      <div className="w-full sm:w-auto flex-grow">
-        <Input
-          placeholder="Search goods receive notes..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      <select 
-        className="w-full sm:w-auto border rounded p-2"
-        value={statusFilter}
-        onChange={(e) => setStatusFilter(e.target.value)}
-      >
-        <option value="all">All Statuses</option>
-        <option value="draft">Draft</option>
-        <option value="submitted">Submitted</option>
-        <option value="approved">Approved</option>
-        <option value="rejected">Rejected</option>
-      </select>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
-            More Filters
-          </Button>
-        </DialogTrigger>
-        <DialogContent className='sm:w-[70vw] max-w-[60vw]'>
-          <FilterBuilder 
-            fields={[
-              { value: 'ref', label: 'Reference' },
-              { value: 'vendor', label: 'Vendor' },
-              { value: 'date', label: 'Date' },
-              { value: 'invoiceNumber', label: 'Invoice Number' },
-              { value: 'invoiceDate', label: 'Invoice Date' },
-              { value: 'status', label: 'Status' },
-            ]}
-            onFilterChange={(filters) => {
-              // Handle filter changes
-              console.log(filters)
-              // You'll need to implement the actual filtering logic
-            }}
+  const filters = (
+    <>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div className="w-full sm:w-1/2 flex space-x-2">
+          <Input
+            placeholder="Search GRNs..."
+            className="w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </DialogContent>
-      </Dialog>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">
-            <ArrowUpDown className="mr-2 h-4 w-4" />
-            Sort
+          <Button variant="secondary" size="icon">
+            <Search className="h-4 w-4" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => {
-            setSortField('date')
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-          }}>
-            Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => {
-            setSortField('vendor')
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-          }}>
-            Vendor {sortField === 'vendor' && (sortDirection === 'asc' ? '↑' : '↓')}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => {
-            setSortField('status')
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-          }}>
-            Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {statusFilter || "All Statuses"}
+                <ChevronLeft className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => setStatusFilter("")}>All Statuses</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Pending")}>Pending</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Received")}>Received</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Partial")}>Partial</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Cancelled")}>Cancelled</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setStatusFilter("Voided")}>Voided</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <AdvancedFilter 
+            onApplyFilters={handleApplyAdvancedFilters}
+            onClearFilters={handleClearAdvancedFilters}
+          />
+        </div>
+      </div>
+    </>
   )
 
   const content = (
-    <div className="space-y-2">
-      {paginatedGRNs.map((grn) => (
-        <Card key={grn.id}>
-          <CardContent className="p-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-              <div className="flex items-center space-x-3 mb-2 sm:mb-0">
-                <Checkbox
-                  checked={selectedItems.includes(grn.id)}
-                  onCheckedChange={(checked) => toggleItemSelection(grn.id)}
-                />
-                <StatusBadge status={grn.status} />
+    <>
+      {bulkActions}
+      <div className="space-y-2">
+        {paginatedGRNs.map((grn) => (
+          <Card key={grn.id}>
+            <CardContent className="p-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+                <div className="flex items-center space-x-3 mb-2 sm:mb-0">
+                  <Checkbox
+                    checked={selectedItems.includes(grn.id)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedItems([...selectedItems, grn.id])
+                      } else {
+                        setSelectedItems(selectedItems.filter(id => id !== grn.id))
+                      }
+                    }}
+                  />
+                  <StatusBadge status={grn.status} />
                   <h3 className="text-muted-foreground text-lg">{grn.ref}</h3>
                   <h3 className="font-semibold text-lg">{grn.description}</h3>
-              </div>
-              <TooltipProvider>
-                <div className="flex space-x-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>View</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleGoodsReceiveNoteAction(grn.id, 'edit')}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Edit</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Delete</TooltipContent>
-                  </Tooltip>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem>Print</DropdownMenuItem>
-                      <DropdownMenuItem>Export</DropdownMenuItem>
-                      <DropdownMenuItem>Share</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
-              </TooltipProvider>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-sm">
-              <div>
-                <p className="text-gray-500">Date</p>
-                <p>{grn.date.toLocaleDateString()}</p>
+                <TooltipProvider>
+                  <div className="flex space-x-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>View</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleGoodsReceiveNoteAction(grn.id, 'edit')}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete</TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TooltipProvider>
               </div>
-              <div>
-                <p className="text-gray-500">Vendor</p>
-                <p>{grn.vendor}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-7 gap-4 text-sm">
+                <div className="text-left">
+                  <span className="text-sm text-muted-foreground">Date</span>
+                  <p>{grn.date.toLocaleDateString()}</p>
+                </div>
+                <div className="text-left">
+                  <span className="text-sm text-muted-foreground">Invoice Date</span>
+                  <p>{grn.invoiceDate ? grn.invoiceDate.toLocaleDateString() : "N/A"}</p>
+                </div>
+                <div className="">
+                  <span className="text-sm text-muted-foreground">Currency</span>
+                  <p>{grn.currency}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm text-muted-foreground">Net Amount</span>
+                  <p>{grn.netAmount.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm text-muted-foreground">Tax Amount</span>
+                  <p>{grn.taxAmount.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm text-muted-foreground">Total Amount</span>
+                  <p>{grn.totalAmount.toFixed(2)}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-gray-500">Invoice #</p>
-                <p>{grn.invoiceNumber}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Invoice Date</p>
-                <p>{grn.invoiceDate.toLocaleDateString()}</p>
-              </div>
-              <div className="col-span-2 sm:col-span-1 text-right">
-                <p className="text-gray-500">Total Amount</p>
-                <p className="font-semibold ">{calculateTotalAmount(grn).toFixed(2)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-      <div className="flex justify-end items-center mt-4 space-x-4">
-        <span className="text-sm text-gray-500">
-          Page {currentPage} of {totalPages}
-        </span>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredGRNs.length)} of {filteredGRNs.length} results
+        </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
           >
-            <ChevronsLeft className="h-4 w-4" />
+            <span className="sr-only">First page</span>
+            «
           </Button>
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <span className="sr-only">Previous page</span>
+            ‹
           </Button>
+          <span className="text-sm font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
-            <ChevronRight className="h-4 w-4" />
+            <span className="sr-only">Next page</span>
+            ›
           </Button>
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
             onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}
           >
-            <ChevronsRight className="h-4 w-4" />
+            <span className="sr-only">Last page</span>
+            »
           </Button>
         </div>
       </div>
-    </div>
+    </>
   )
 
   return (
     <ListPageTemplate
       title={title}
       actionButtons={actionButtons}
-      filters={filter}
+      filters={filters}
       content={content}
-      bulkActions={bulkActions}
     />
   )
 }
