@@ -27,6 +27,12 @@ interface SubMenuItem {
     path: string;
     icon?: string;
     description?: string;
+    subItems?: Array<{
+      name: string;
+      path: string;
+      icon?: string;
+      description?: string;
+    }>;
   }>;
 }
 
@@ -172,7 +178,22 @@ const menuItems: MenuItem[] = [
       { name: "License Management", path: "/system-administration/license-management" },
       { name: "Security Settings", path: "/system-administration/security-settings" },
       { name: "Data Backup and Recovery", path: "/system-administration/data-backup-and-recovery" },
-      { name: "System Integrations", path: "/system-administration/system-integrations" },
+      { 
+        name: "System Integrations", 
+        path: "/system-administration/system-integrations",
+        subItems: [
+          { 
+            name: "POS Integration", 
+            path: "/system-administration/system-integrations/pos",
+            subItems: [
+              { name: "Dashboard", path: "/system-administration/system-integrations/pos" },
+              { name: "Mapping", path: "/system-administration/system-integrations/pos/mapping/recipes" },
+              { name: "Transactions", path: "/system-administration/system-integrations/pos/transactions" },
+              { name: "Settings", path: "/system-administration/system-integrations/pos/settings" },
+            ]
+          },
+        ]
+      },
     ],
   },
   {

@@ -5,9 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ListPageTemplate from '@/components/templates/ListPageTemplate';
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { AdvancedFilter } from './components/advanced-filter';
+import { FilterType } from '@/lib/utils/filter-storage';
+import { toast } from '@/components/ui/use-toast';
+import { Vendor } from './[id]/types';
 
-interface Vendor {
+// Define a simplified vendor interface for the list page
+interface VendorListItem {
   id: string;
   companyName: string;
   businessType: { name: string };
@@ -91,8 +98,11 @@ const VendorDataList = { vendors : [
 
 export default function VendorList(): JSX.Element {
   const router = useRouter();
-  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [vendors, setVendors] = useState<VendorListItem[]>([]);
+  const [filteredVendors, setFilteredVendors] = useState<VendorListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilters, setActiveFilters] = useState<FilterType<VendorListItem>[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     async function fetchVendors() {
@@ -106,9 +116,11 @@ export default function VendorList(): JSX.Element {
         const data = VendorDataList;
 
         setVendors(data.vendors || []);
+        setFilteredVendors(data.vendors || []);
       } catch (err) {
         console.error('Fetch error:', err);
         setVendors([]);
+        setFilteredVendors([]);
       } finally {
         setIsLoading(false);
       }
@@ -117,8 +129,137 @@ export default function VendorList(): JSX.Element {
     fetchVendors();
   }, []);
 
+  // Apply filters and search to vendors
+  useEffect(() => {
+    try {
+      let filtered = [...vendors];
+      
+      // Apply search filter
+      if (searchQuery) {
+        filtered = filtered.filter(
+          vendor =>
+            vendor.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            vendor.businessType?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            vendor.addresses.some(a => a.addressLine.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            vendor.contacts.some(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                     c.phone.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+      }
+      
+      // Apply advanced filters
+      if (activeFilters.length > 0) {
+        filtered = filtered.filter(vendor => {
+          return activeFilters.every(filter => {
+            const field = filter.field;
+            const value = filter.value;
+            const operator = filter.operator;
+
+            // Handle nested fields like businessType.name
+            let fieldValue: any;
+            if (field.toString().includes('.')) {
+              const [parentField, childField] = field.toString().split('.');
+              const parentValue = vendor[parentField as keyof VendorListItem];
+              
+              // Handle nested objects
+              if (parentValue && typeof parentValue === 'object' && !Array.isArray(parentValue)) {
+                fieldValue = (parentValue as any)[childField];
+              } else {
+                fieldValue = undefined;
+              }
+            } else {
+              fieldValue = vendor[field];
+            }
+
+            // Handle undefined or null values
+            if (fieldValue === undefined || fieldValue === null) {
+              return false;
+            }
+
+            // Convert to string for comparison if not already a string
+            const stringFieldValue = String(fieldValue).toLowerCase();
+            const stringValue = String(value).toLowerCase();
+
+            switch (operator) {
+              case 'equals':
+                return stringFieldValue === stringValue;
+              case 'contains':
+                return stringFieldValue.includes(stringValue);
+              case 'startsWith':
+                return stringFieldValue.startsWith(stringValue);
+              case 'endsWith':
+                return stringFieldValue.endsWith(stringValue);
+              case 'greaterThan':
+                return Number(fieldValue) > Number(value);
+              case 'lessThan':
+                return Number(fieldValue) < Number(value);
+              default:
+                return true;
+            }
+          });
+        });
+      }
+
+      setFilteredVendors(filtered);
+    } catch (error) {
+      console.error('Error filtering vendors:', error);
+      toast({
+        title: "Error filtering vendors",
+        description: "There was a problem filtering the vendors.",
+        variant: "destructive"
+      });
+    }
+  }, [activeFilters, vendors, searchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setSearchQuery(e.target.value);
+    } catch (error) {
+      console.error('Error handling search:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem with the search.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleAddVendor = () => {
-    router.push('/vendor-management/manage-vendors/new');
+    try {
+      router.push('/vendor-management/manage-vendors/new');
+    } catch (error) {
+      console.error('Error navigating to add vendor:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem navigating to add vendor page.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleApplyFilters = (filters: FilterType<VendorListItem>[]) => {
+    try {
+      setActiveFilters(filters);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem applying the filters.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleClearFilters = () => {
+    try {
+      setActiveFilters([]);
+    } catch (error) {
+      console.error('Error clearing filters:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem clearing the filters.",
+        variant: "destructive"
+      });
+    }
   };
 
   const actionButtons = (
@@ -127,11 +268,31 @@ export default function VendorList(): JSX.Element {
     </Button>
   );
 
+  const filters = (
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="w-full sm:w-1/2 flex space-x-2">
+        <Input
+          placeholder="Search vendors..."
+          className="w-full"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+        <Button variant="secondary" size="icon">
+          <Search className="h-4 w-4" />
+        </Button>
+      </div>
+      <AdvancedFilter 
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+      />
+    </div>
+  );
+
   const content = (
     <>
       {isLoading ? (
         <div>Loading...</div>
-      ) : vendors.length > 0 ? (
+      ) : filteredVendors.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
@@ -143,7 +304,7 @@ export default function VendorList(): JSX.Element {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vendors.map((vendor) => (
+            {filteredVendors.map((vendor) => (
               <TableRow key={vendor.id}>
                 <TableCell>{vendor.companyName}</TableCell>
                 <TableCell>{vendor.businessType?.name}</TableCell>
@@ -174,6 +335,7 @@ export default function VendorList(): JSX.Element {
     <ListPageTemplate
       title="Vendor Management"
       actionButtons={actionButtons}
+      filters={filters}
       content={content}
     />
   );

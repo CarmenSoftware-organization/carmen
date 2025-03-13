@@ -407,7 +407,6 @@ export default function PRDetailPage() {
     </div>
   );
 }
-
 function getEmptyPurchaseRequest(): PurchaseRequest {
   return {
     id: "",

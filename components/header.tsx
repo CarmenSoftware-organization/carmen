@@ -34,6 +34,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { QuickAccessNav } from "@/components/quick-access-nav";
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -104,6 +105,8 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
                 <SelectItem value="BU2" className="text-foreground dark:text-gray-100">Business Unit 2</SelectItem>
               </SelectContent>
             </Select>
+            
+            <QuickAccessNav />
             
             <Button
               variant="ghost"

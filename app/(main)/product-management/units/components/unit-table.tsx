@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Table,
   TableBody,
@@ -36,6 +36,7 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
   const [sortField, setSortField] = useState<keyof Unit>("code")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null)
+  const selectAllCheckboxRef = useRef<HTMLButtonElement>(null)
 
   const handleSort = (field: keyof Unit) => {
     if (field === sortField) {
@@ -104,16 +105,26 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
   const isAllSelected = sortedUnits.length > 0 && selectedItems.length === sortedUnits.length
   const isPartiallySelected = selectedItems.length > 0 && selectedItems.length < sortedUnits.length
 
+  useEffect(() => {
+    if (selectAllCheckboxRef.current) {
+      // @ts-ignore - indeterminate is a DOM property but not in the types
+      selectAllCheckboxRef.current.indeterminate = isPartiallySelected
+    }
+  }, [isPartiallySelected])
+
   return (
-    <>
-      <div className="rounded-md border">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        {/* ... */}
+      </div>
+      <div className="border rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">
                 <Checkbox
+                  ref={selectAllCheckboxRef}
                   checked={isAllSelected}
-                  indeterminate={isPartiallySelected}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all"
                 />
@@ -207,6 +218,6 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   )
 } 

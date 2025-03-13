@@ -74,7 +74,7 @@ export function ExportSidepanel({ isOpen, onClose }: ExportSidepanelProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-[500px] w-[90vw] flex flex-col h-full">
+      <SheetContent side="right" className="w-[400px] sm:w-[600px] md:w-[800px] p-0">
         <SheetHeader className="flex-shrink-0">
           <SheetTitle>PO Export</SheetTitle>
         </SheetHeader>

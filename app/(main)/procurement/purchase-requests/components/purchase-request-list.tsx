@@ -35,8 +35,8 @@ import {
 import { useRouter } from "next/navigation";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import StatusBadge from "@/components/ui/custom-status-badge";
-import { AdvancedFilter } from './advanced-filter'
-import { Filter as FilterType } from '@/lib/utils/filter-storage'
+import { AdvancedFilter } from '@/components/ui/advanced-filter'
+import { FilterType } from '@/lib/utils/filter-storage'
 import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, CurrencyCode } from '@/lib/types'
 
 interface CustomFilterType<T> {
@@ -216,7 +216,7 @@ export function PurchaseRequestList() {
   };
 
   const handleCreateNewPR = () => {
-    router.push("/procurement/purchase-requests/new?mode=add");
+    router.push("/procurement/purchase-requests/new-pr?mode=add");
   };
 
   const handleViewPR = (id: string) => {

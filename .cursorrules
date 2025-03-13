@@ -8,6 +8,9 @@ You have two modes of operation:
 1. Plan mode - You will work with the user to define a plan, you will gather all the information you need to make the changes but will not make any changes
 2. Act mode - You will make changes to the codebase based on the plan
 
+## Important Rules
+Whenever you are using shadcn use this command only `npx shadcn@latest add <component-name>` DONT EVER use `npx shadcn-ui@latest add <component-name>`
+
 - You start in plan mode and will not move to act mode until the plan is approved by the user.
 - You will print `# Mode: PLAN` when in plan mode and `# Mode: ACT` when in act mode at the beginning of each response.
 - Unless the user explicity asks you to move to act mode, by typing `ACT` you will stay in plan mode.
@@ -16,7 +19,7 @@ You have two modes of operation:
 - When in plan mode always output the full updated plan in every response.
 
 # Developer Guidelines
-You are an expert full-stack developer proficient in TypeScript, React, Next.js, and modern UI/UX frameworks (e.g., Tailwind CSS, Shadcn UI, Radix UI, Drizzle ORM, Supabase). Your task is to produce the most optimized and maintainable Next.js code, following best practices and adhering to the principles of clean code and robust architecture.
+You are an expert full-stack senior developer proficient in TypeScript, Next.js, and modern UI/UX frameworks (e.g., Tailwind CSS, Shadcn UI,  Prisma ORM, Supabase). Your task is to produce the most optimized and maintainable Next.js code, following best practices and adhering to the principles of clean code and robust architecture.
 
 ## Objective
 - Create a Next.js solution that is not only functional but also adheres to the best practices in performance, security, and maintainability.
@@ -32,10 +35,491 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Use the Receive an Object, Return an Object (RORO) pattern.
 - Comment code with <COMMENT> tags.
 
+## File Structure
+app
+├── (auth)
+│   ├── layout.tsx
+│   ├── login
+│   │   └── [[...login]]
+│   │       └── page.tsx
+│   └── signup
+│       └── [[...signup]]
+│           └── page.tsx
+├── (main)
+│   ├── TEMPLATE
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── dashboard
+│   │   ├── environment-dashboard.tsx
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── edit-profile
+│   │   └── page.tsx
+│   ├── finance
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   ├── account-code-mapping
+│   │   │   └── page.tsx
+│   │   ├── currency-management
+│   │   │   └── page.tsx
+│   │   ├── department-list
+│   │   │   ├── components
+│   │   │   │   └── department-list.tsx
+│   │   │   └── page.tsx
+│   │   ├── exchange-rates
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── help-support
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── inventory-management
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   ├── components
+│   │   │   ├── stock-in-detail.tsx
+│   │   │   ├── stock-in-jv-entry.tsx
+│   │   │   └── stock-in-list.tsx
+│   │   ├── inventory-adjustment
+│   │   │   └── [id]
+│   │   ├── inventory-adjustments
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── filter-sort-options.tsx
+│   │   │   │   ├── header-actions.tsx
+│   │   │   │   ├── header-information.tsx
+│   │   │   │   ├── inventory-adjustment-detail.tsx
+│   │   │   │   ├── inventory-adjustment-list.tsx
+│   │   │   │   ├── journal-entries
+│   │   │   │   │   ├── journal-header.tsx
+│   │   │   │   │   └── journal-table.tsx
+│   │   │   │   ├── right-panel
+│   │   │   │   │   └── right-panel.tsx
+│   │   │   │   ├── stock-movement
+│   │   │   │   │   └── stock-movement-table.tsx
+│   │   │   │   └── types.ts
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── period-end
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── physical-count
+│   │   │   ├── active
+│   │   │   │   └── [id]
+│   │   │   │       └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── active-count-form.tsx
+│   │   │   │   ├── final-review.tsx
+│   │   │   │   ├── item-review.tsx
+│   │   │   │   ├── location-selection.tsx
+│   │   │   │   └── setup.tsx
+│   │   │   ├── dashboard
+│   │   │   │   ├── components
+│   │   │   │   │   └── counts-table.tsx
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── physical-count-management
+│   │   │   ├── components
+│   │   │   │   ├── count-detail-card.tsx
+│   │   │   │   ├── count-detail-form.tsx
+│   │   │   │   ├── count-list-item.tsx
+│   │   │   │   ├── count-progress.tsx
+│   │   │   │   └── new-count-form.tsx
+│   │   │   └── page.tsx
+│   │   ├── spot-check
+│   │   │   ├── active
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── completed
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── count-detail-card.tsx
+│   │   │   │   ├── count-detail-form.tsx
+│   │   │   │   ├── count-items.tsx
+│   │   │   │   ├── count-list-item.tsx
+│   │   │   │   ├── count-progress.tsx
+│   │   │   │   ├── item-selection.tsx
+│   │   │   │   ├── location-selection.tsx
+│   │   │   │   ├── new-spot-check-form.tsx
+│   │   │   │   ├── review.tsx
+│   │   │   │   ├── setup.tsx
+│   │   │   │   └── spot-check-nav.tsx
+│   │   │   ├── count
+│   │   │   ├── dashboard
+│   │   │   │   └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── new
+│   │   │   │   ├── layout.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── types.ts
+│   │   ├── stock-in
+│   │   │   └── page.tsx
+│   │   └── stock-overview
+│   │       ├── inventory-aging
+│   │       │   └── page.tsx
+│   │       ├── inventory-balance
+│   │       │   └── page.tsx
+│   │       ├── slow-moving
+│   │       │   └── page.tsx
+│   │       └── stock-card
+│   │           └── page.tsx
+│   ├── layout.tsx
+│   ├── main-layout-client.tsx
+│   ├── operational-planning
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   └── recipe-management
+│   │       ├── categories
+│   │       │   ├── components
+│   │       │   │   └── category-list.tsx
+│   │       │   ├── data
+│   │       │   │   └── mock-categories.ts
+│   │       │   └── page.tsx
+│   │       ├── cuisine-types
+│   │       │   ├── components
+│   │       │   │   └── cuisine-list.tsx
+│   │       │   ├── data
+│   │       │   │   └── mock-cuisines.ts
+│   │       │   └── page.tsx
+│   │       ├── images
+│   │       │   └── recipes
+│   │       │       ├── steps
+│   │       │       └── thai-green-curry.jpg
+│   │       └── recipes
+│   │           ├── [id]
+│   │           │   ├── edit
+│   │           │   │   └── page.tsx
+│   │           │   └── page.tsx
+│   │           ├── components
+│   │           │   ├── recipe-card-compact.tsx
+│   │           │   ├── recipe-card.tsx
+│   │           │   ├── recipe-form-skeleton.tsx
+│   │           │   ├── recipe-form.tsx
+│   │           │   ├── recipe-image.tsx
+│   │           │   ├── recipe-list-new.tsx
+│   │           │   ├── recipe-list-skeleton.tsx
+│   │           │   ├── recipe-list.tsx
+│   │           │   └── recipe-view-skeleton.tsx
+│   │           ├── create
+│   │           │   └── page.tsx
+│   │           ├── data
+│   │           │   └── mock-recipes.ts
+│   │           ├── images
+│   │           │   ├── caesar-salad.jpg
+│   │           │   └── thai-green-curry.jpg
+│   │           ├── new
+│   │           │   └── page.tsx
+│   │           └── page.tsx
+│   ├── procurement
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   ├── credit-note
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── StockMovementTab.tsx
+│   │   │   │   ├── advanced-filter.tsx
+│   │   │   │   ├── cn-lot-application.tsx
+│   │   │   │   ├── credit-note-detail.tsx
+│   │   │   │   ├── credit-note-management.tsx
+│   │   │   │   ├── credit-note.tsx
+│   │   │   │   ├── grn-selection.tsx
+│   │   │   │   ├── inventory.tsx
+│   │   │   │   ├── item-and-lot-selection.tsx
+│   │   │   │   ├── item-details-edit.tsx
+│   │   │   │   ├── journal-entries.tsx
+│   │   │   │   ├── lot-selection.tsx
+│   │   │   │   ├── stock-movement.tsx
+│   │   │   │   ├── tax-entries.tsx
+│   │   │   │   └── vendor-selection.tsx
+│   │   │   ├── new
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── goods-received-note
+│   │   │   ├── [id]
+│   │   │   │   ├── edit
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── edit.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── FilterBuilder.tsx
+│   │   │   │   ├── GoodsReceiveNoteDetail.tsx
+│   │   │   │   ├── GoodsReceiveNoteList.tsx
+│   │   │   │   ├── SummaryTotal.tsx
+│   │   │   │   ├── advanced-filter.tsx
+│   │   │   │   ├── goods-receive-note.tsx
+│   │   │   │   └── tabs
+│   │   │   │       ├── ActivityLogTab.tsx
+│   │   │   │       ├── AttachmentTab.tsx
+│   │   │   │       ├── BulkActions.tsx
+│   │   │   │       ├── CommentTab.tsx
+│   │   │   │       ├── CommentsAttachmentsTab.tsx
+│   │   │   │       ├── ExtraCostsTab.tsx
+│   │   │   │       ├── FinancialSummaryTab.tsx
+│   │   │   │       ├── GoodsReceiveNoteItems.tsx
+│   │   │   │       ├── GoodsReceiveNoteItemsBulkActions.tsx
+│   │   │   │       ├── StockMovementTab.tsx
+│   │   │   │       ├── TaxTab.tsx
+│   │   │   │       ├── inventory-breakdown.tsx
+│   │   │   │       ├── itemDetailForm.tsx
+│   │   │   │       ├── pending-purchase-orders.tsx
+│   │   │   │       └── stock-movement.tsx
+│   │   │   ├── create
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── my-approvals
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── purchase-orders
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── ColumnSelectionScreen.tsx
+│   │   │   │   ├── ExportContext.tsx
+│   │   │   │   ├── ExportSidepanel.tsx
+│   │   │   │   ├── FilterBuilder.tsx
+│   │   │   │   ├── PODetailPage.tsx
+│   │   │   │   ├── PrintOptionsSidepanel.tsx
+│   │   │   │   ├── PurchaseOrderList.tsx
+│   │   │   │   ├── SummaryTotal.tsx
+│   │   │   │   ├── advanced-filter.tsx
+│   │   │   │   ├── createpofrompr.tsx
+│   │   │   │   ├── po-item-form.tsx
+│   │   │   │   └── tabs
+│   │   │   │       ├── ActivityLogTab.tsx
+│   │   │   │       ├── CommentsAttachmentsTab.tsx
+│   │   │   │       ├── FinancialDetailsTab.tsx
+│   │   │   │       ├── GeneralInfoTab.tsx
+│   │   │   │       ├── GoodsReceiveNoteTab.tsx
+│   │   │   │       ├── InventoryStatusTab.tsx
+│   │   │   │       ├── ItemsTab.tsx
+│   │   │   │       ├── RelatedDocumentsTab.tsx
+│   │   │   │       ├── Summary.tsx
+│   │   │   │       ├── VendorInfoTab.tsx
+│   │   │   │       ├── goods-receive-note-table.tsx
+│   │   │   │       ├── inventory-breakdown.tsx
+│   │   │   │       ├── item-details.tsx
+│   │   │   │       ├── pending-purchase-orders.tsx
+│   │   │   │       └── pr-items-table.tsx
+│   │   │   ├── create
+│   │   │   │   └── components
+│   │   │   ├── new
+│   │   │   └── page.tsx
+│   │   ├── purchase-requests
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── PRDetailPage.tsx
+│   │   │   │   ├── PRForm.tsx
+│   │   │   │   ├── PRHeader.tsx
+│   │   │   │   ├── SummaryTotal.tsx
+│   │   │   │   ├── advanced-filter.tsx
+│   │   │   │   ├── dashboard-approval.tsx
+│   │   │   │   ├── inventory-breakdown.tsx
+│   │   │   │   ├── item-details-edit-form.tsx
+│   │   │   │   ├── pending-purchase-orders.tsx
+│   │   │   │   ├── pricing-form.tsx
+│   │   │   │   ├── purchase-request-list.tsx
+│   │   │   │   ├── sampleData.ts
+│   │   │   │   ├── tabs
+│   │   │   │   │   ├── ActivityTab.tsx
+│   │   │   │   │   ├── AttachmentsTab.tsx
+│   │   │   │   │   ├── BudgetsTab.tsx
+│   │   │   │   │   ├── DetailsTab.tsx
+│   │   │   │   │   ├── ItemsTab.tsx
+│   │   │   │   │   ├── Summary-pr-table.tsx
+│   │   │   │   │   ├── WorkflowTab.tsx
+│   │   │   │   │   └── budget-tab.tsx
+│   │   │   │   ├── utils.tsx
+│   │   │   │   └── vendor-comparison.tsx
+│   │   │   ├── new-pr
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   └── vendor-comparison
+│   │       └── page.tsx
+│   ├── product-management
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   ├── categories
+│   │   │   ├── components
+│   │   │   │   └── category-list.tsx
+│   │   │   └── page.tsx
+│   │   ├── docs
+│   │   │   └── ui-prd.md
+│   │   ├── page.tsx
+│   │   ├── products
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── counting-unit-tab.tsx
+│   │   │   │   ├── ingredients.tsx
+│   │   │   │   ├── inventory.tsx
+│   │   │   │   ├── order-unit.tsx
+│   │   │   │   ├── product-list.tsx
+│   │   │   │   └── stock-count.tsx
+│   │   │   ├── data
+│   │   │   │   └── mock-product-units.ts
+│   │   │   └── page.tsx
+│   │   └── units
+│   │       ├── components
+│   │       │   ├── unit-form.tsx
+│   │       │   ├── unit-list.tsx
+│   │       │   └── unit-table.tsx
+│   │       ├── data
+│   │       │   └── mock-units.ts
+│   │       └── page.tsx
+│   ├── production
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── recipe-management
+│   │   └── recipes
+│   │       └── components
+│   │           └── recipe-list-view.tsx
+│   ├── reporting-analytics
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── store-operations
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   ├── components
+│   │   │   ├── stock-replenishment.tsx
+│   │   │   ├── store-requisition-list.tsx
+│   │   │   └── wastage-reporting.tsx
+│   │   ├── page.tsx
+│   │   ├── stock-replenishment
+│   │   │   └── page.tsx
+│   │   ├── store-requisitions
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── approval-log-dialog.tsx
+│   │   │   │   ├── filter-builder.tsx
+│   │   │   │   ├── header-actions.tsx
+│   │   │   │   ├── header-info.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── list-filters.tsx
+│   │   │   │   ├── list-header.tsx
+│   │   │   │   ├── stock-movement-sr.tsx
+│   │   │   │   ├── store-requisition-detail.tsx
+│   │   │   │   └── tabs
+│   │   │   │       └── journal-entries-tab.tsx
+│   │   │   ├── page.tsx
+│   │   │   ├── types
+│   │   │   │   └── index.ts
+│   │   │   └── types.ts
+│   │   └── wastage-reporting
+│   │       └── page.tsx
+│   ├── system-administration
+│   │   ├── [subItem]
+│   │   │   └── page.tsx
+│   │   ├── account-code-mapping
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── user-dashboard
+│   │   │   └── page.tsx
+│   │   ├── user-management
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── components
+│   │   │   │   ├── bulk-actions.tsx
+│   │   │   │   └── user-form-dialog.tsx
+│   │   │   └── page.tsx
+│   │   └── workflow
+│   │       ├── page.tsx
+│   │       ├── role-assignment
+│   │       │   ├── components
+│   │       │   │   ├── assigned-users.tsx
+│   │       │   │   ├── configuration-panel.tsx
+│   │       │   │   ├── layout.tsx
+│   │       │   │   ├── role-configuration.tsx
+│   │       │   │   └── role-list.tsx
+│   │       │   ├── data
+│   │       │   │   └── mockData.ts
+│   │       │   ├── page.tsx
+│   │       │   └── types
+│   │       │       └── approver.ts
+│   │       └── workflow-configuration
+│   │           ├── [id]
+│   │           │   └── page.tsx
+│   │           ├── components
+│   │           │   ├── workflow-detail.tsx
+│   │           │   ├── workflow-general.tsx
+│   │           │   ├── workflow-header.tsx
+│   │           │   ├── workflow-list.tsx
+│   │           │   ├── workflow-notifications.tsx
+│   │           │   ├── workflow-products.tsx
+│   │           │   ├── workflow-routing.tsx
+│   │           │   ├── workflow-stages.tsx
+│   │           │   └── workflow-templates.tsx
+│   │           ├── data
+│   │           │   └── mockData.ts
+│   │           ├── page.tsx
+│   │           └── types
+│   │               └── workflow.ts
+│   └── vendor-management
+│       ├── [subItem]
+│       │   └── page.tsx
+│       ├── manage-vendors
+│       │   ├── [id]
+│       │   │   ├── components
+│       │   │   │   ├── addresses-tab.tsx
+│       │   │   │   ├── basic-info-tab.tsx
+│       │   │   │   └── contacts-tab.tsx
+│       │   │   ├── hooks
+│       │   │   │   └── use-vendor.ts
+│       │   │   ├── page.tsx
+│       │   │   ├── sections
+│       │   │   │   ├── addresses-section.tsx
+│       │   │   │   ├── basic-info-section.tsx
+│       │   │   │   ├── certifications-section.tsx
+│       │   │   │   ├── contacts-section.tsx
+│       │   │   │   ├── environmental-profile.tsx
+│       │   │   │   └── environmental-section.tsx
+│       │   │   └── types.ts
+│       │   ├── actions.ts
+│       │   ├── data
+│       │   │   └── mock.ts
+│       │   └── page.tsx
+│       ├── page.tsx
+│       └── price-lists
+│           ├── [id]
+│           │   └── page.tsx
+│           └── page.tsx
+├── api
+├── components
+│   └── ui
+│       └── skeleton.tsx
+├── data
+│   └── mock-recipes.ts
+├── favicon.ico
+├── fonts
+│   ├── GeistMonoVF.woff
+│   └── GeistVF.woff
+├── globals.css
+├── layout.tsx
+├── lib
+│   ├── create-safe-action.ts
+│   ├── history.ts
+│   └── types.ts
+├── page.tsx
+├── providers.tsx
+└── testui
+    └── page.tsx
+
 ## UI and Styling
-    - Use modern UI frameworks (e.g., Tailwind CSS, Shadcn UI, Radix UI) for styling.
+    - Use modern UI frameworks (e.g., Tailwind CSS, Shadcn UI) for styling.
     - Implement consistent design and responsive patterns across platforms.
-    - use the command `npx shadcn@latest add <component>` to add a component to the project.
+    - use the command `npx shadcn@latest add <component-name>` to add a component to the project.
 
 ## JavaScript/TypeScript
 
@@ -45,6 +529,15 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Avoid unnecessary curly braces in conditional statements.
 - For single-line statements in conditionals, omit curly braces.
 - Use concise, one-line syntax for simple conditional statements (e.g., if (condition) doSomething()).
+
+## TypeScript Usage
+- Use TypeScript for all code; prefer interfaces over types
+- Avoid enums; use const objects with 'as const' assertion
+- Use functional components with TypeScript interfaces
+- Define strict types for message passing between different parts of the extension
+- Use absolute imports for all files @/...
+- Avoid try/catch blocks unless there's good reason to translate or handle error in that abstraction
+- Use explicit return types for all functions
 
 ## Error Handling and Validation
 
@@ -61,7 +554,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Use functional components and TypeScript interfaces.
 - Use declarative JSX.
 - Use function, not const, for components.
-- Use Shadcn UI, Radix, and Tailwind CSS for components and styling.
+- Use Shadcn UI, and Tailwind CSS for components and styling.
 - Implement responsive design with Tailwind CSS.
 - Use mobile-first approach for responsive design.
 - Place static content and interfaces at file end.
@@ -92,20 +585,20 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Leverage Supabase Storage for file uploads and management.
 - Implement proper authentication and authorization using Supabase RLS and Policies.
 
-## Drizzle ORM
+## Prisma ORM
 
-- Use Drizzle ORM for type-safe database operations and schema management.
-- Define database schema using Drizzle's schema declaration syntax.
-- Utilize Drizzle's query builder for complex database queries.
-- Implement migrations using Drizzle's migration system.
-- Use Drizzle's relation methods for handling relationships between tables.
-- Leverage Drizzle's type inference for type-safe database operations.
+- Use Prisma ORM for type-safe database operations and schema management.
+- Define database schema using Prisma's schema declaration syntax.
+- Utilize Prismae's query builder for complex database queries.
+- Implement migrations using Prisma's migration system.
+- Use Prisma's relation methods for handling relationships between tables.
+- Leverage Prisma's type inference for type-safe database operations.
 - Implement database seeding scripts using Drizzle when necessary.
-- Use Drizzle's built-in security features to prevent SQL injection.
-- Integrate Drizzle with Next.js API routes and server components for efficient data fetching.
-- Implement custom Drizzle plugins when needed for specific database operations.
-- Use Drizzle's transaction support for operations that require atomic execution.
-- Implement proper error handling for database operations using Drizzle.
+- Use Prisma's built-in security features to prevent SQL injection.
+- Integrate Prisma with Next.js API routes and server components for efficient data fetching.
+- Implement custom Prisma plugins when needed for specific database operations.
+- Use Prisma's transaction support for operations that require atomic execution.
+- Implement proper error handling for database operations using Prisma.
 
 ## Key Conventions
 
@@ -141,7 +634,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 
 - Use React Server Components for data fetching when possible.
 - Implement the preload pattern to prevent waterfalls.
-- Utilize Drizzle ORM for efficient and type-safe database operations.
+- Utilize Prisma ORM for efficient and type-safe database operations.
 - Use server actions for API functionality, including data mutations and complex data fetching.
 - Implement proper error handling and validation in server actions.
 
@@ -156,7 +649,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Use integration tests for complex components and pages.
 - Implement end-to-end tests for critical user flows.
 - Use Supabase local development for testing database interactions.
-- Implement unit tests for Drizzle ORM queries and migrations.
+- Implement unit tests for Prisma ORM queries and migrations.
 
 ## Accessibility
 
@@ -170,7 +663,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Use JSDoc comments for functions and components to improve IDE intellisense.
 - Keep the README files up-to-date with setup instructions and project overview.
 - Document Supabase schema, RLS policies when used.
-- Document Drizzle ORM schema, migrations, and custom plugins.
+- Document Prisma ORM schema, migrations, and custom plugins.
 
 ## Methodology
    1. **System 2 Thinking**: Approach the problem with analytical rigor. Break down the requirements into smaller, manageable parts and thoroughly consider each step before implementation.

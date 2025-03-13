@@ -11,6 +11,9 @@ import { Search, ArrowUpDown, Pencil, Eye, Plus, Printer, Upload, ArrowLeft, Fil
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { AdvancedFilter } from './advanced-filter'
+import { FilterType } from '@/lib/utils/filter-storage'
+import { toast } from '@/components/ui/use-toast'
 
 interface Product {
   id: string;
@@ -77,6 +80,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   const pageSize = 10;
   const [sortField, setSortField] = useState<keyof Product | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [activeFilters, setActiveFilters] = useState<FilterType<Product>[]>([]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -308,12 +312,66 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   useEffect(() => {
     let filtered = [...products];
     
+    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(
         product =>
           product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           product.productCode.toLowerCase().includes(searchQuery.toLowerCase())
       );
+    }
+
+    // Apply advanced filters
+    if (activeFilters.length > 0) {
+      filtered = filtered.filter(product => {
+        return activeFilters.every(filter => {
+          const field = filter.field;
+          const value = filter.value;
+          const operator = filter.operator;
+
+          // Handle nested fields like businessType.name
+          let fieldValue: any;
+          if (field.toString().includes('.')) {
+            const [parentField, childField] = field.toString().split('.');
+            const parentValue = product[parentField as keyof Product];
+            
+            // Handle nested objects
+            if (parentValue && typeof parentValue === 'object' && !Array.isArray(parentValue)) {
+              fieldValue = (parentValue as any)[childField];
+            } else {
+              fieldValue = undefined;
+            }
+          } else {
+            fieldValue = product[field];
+          }
+
+          // Handle undefined or null values
+          if (fieldValue === undefined || fieldValue === null) {
+            return false;
+          }
+
+          // Convert to string for comparison if not already a string
+          const stringFieldValue = String(fieldValue).toLowerCase();
+          const stringValue = String(value).toLowerCase();
+
+          switch (operator) {
+            case 'equals':
+              return stringFieldValue === stringValue;
+            case 'contains':
+              return stringFieldValue.includes(stringValue);
+            case 'startsWith':
+              return stringFieldValue.startsWith(stringValue);
+            case 'endsWith':
+              return stringFieldValue.endsWith(stringValue);
+            case 'greaterThan':
+              return Number(fieldValue) > Number(value);
+            case 'lessThan':
+              return Number(fieldValue) < Number(value);
+            default:
+              return true;
+          }
+        });
+      });
     }
 
     // Apply sorting if a sort field is selected
@@ -343,7 +401,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     
     setFilteredProducts(filtered);
     setTotalPages(Math.ceil(filtered.length / pageSize));
-  }, [products, searchQuery, pageSize, sortField, sortDirection]);
+  }, [products, searchQuery, pageSize, sortField, sortDirection, activeFilters]);
 
   const getCurrentPageData = () => {
     return filteredProducts.slice(
@@ -384,85 +442,120 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     console.log('Bulk status update:', selectedItems, status);
   };
 
+  const handleApplyFilters = (filters: FilterType<Product>[]) => {
+    try {
+      setActiveFilters(filters);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem applying the filters.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleClearFilters = () => {
+    try {
+      setActiveFilters([]);
+    } catch (error) {
+      console.error('Error clearing filters:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem clearing the filters.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   const actionButtons = (
-    <>
+    <div className="flex items-center space-x-2">
       <Button onClick={handleAddProduct}>
-        <Plus className="h-4 w-4" /> Add Product
+        <Plus className="mr-2 h-4 w-4" />
+        Add Product
       </Button>
-      <Button variant="secondary" onClick={handleImport}>
-        <Upload className="h-4 w-4" /> Import
+      <Button variant="outline" onClick={handleImport}>
+        <Upload className="mr-2 h-4 w-4" />
+        Import
       </Button>
       <Button variant="outline" onClick={handleGenerateReport}>
-        <Printer className="h-4 w-4" /> Print
+        <FileText className="mr-2 h-4 w-4" />
+        Report
       </Button>
-    </>
+    </div>
+  );
+
+  const filters = (
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="w-full sm:w-1/2 flex space-x-2">
+        <Input
+          placeholder="Search products..."
+          className="w-full"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+        <Button variant="secondary" size="icon">
+          <Search className="h-4 w-4" />
+        </Button>
+      </div>
+      <AdvancedFilter 
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+      />
+    </div>
   );
 
   const content = (
     <div className="flex-1 space-y-4">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-2">
-          <div className="relative w-1/2">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search products..."
-              onChange={handleSearchChange}
-              className="pl-8 w-full"
-            />
-          </div>
-          {selectedItems.length === 0 && (
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              More Filters
-            </Button>
-          )}
-        </div>
-
-        {selectedItems.length > 0 ? (
-          <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-            <span className="text-sm text-muted-foreground ml-2">
-              {selectedItems.length} items selected
-            </span>
-            <div className="flex items-center gap-2 ml-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(true)}
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Set Active
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(false)}
-              >
-                <XCircle className="w-4 h-4 mr-2" />
-                Set Inactive
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBulkExport}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export Selected
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Selected
-              </Button>
-            </div>
-          </div>
-        ) : null}
+        {/* Removing the redundant More Filters button */}
       </div>
+
+      {selectedItems.length > 0 ? (
+        <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+          <span className="text-sm text-muted-foreground ml-2">
+            {selectedItems.length} items selected
+          </span>
+          <div className="flex items-center gap-2 ml-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkStatusUpdate(true)}
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Set Active
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkStatusUpdate(false)}
+            >
+              <XCircle className="w-4 h-4 mr-2" />
+              Set Inactive
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBulkExport}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Selected
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDelete}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Selected
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {getCurrentPageData().length > 0 ? (
         <div className="rounded-md border">
@@ -629,6 +722,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     <ListPageTemplate
       title="Products"
       actionButtons={actionButtons}
+      filters={filters}
       content={content}
     />
   );
