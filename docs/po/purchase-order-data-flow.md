@@ -23,13 +23,13 @@ flowchart TD
     Vendor[Vendor]
     
     %% Processes
-    CreatePO[1.0\nCreate PO]
-    ManageItems[2.0\nManage Items]
-    CalculateFinancials[3.0\nCalculate Financials]
-    ApprovalProcess[4.0\nApproval Process]
-    VendorCommunication[5.0\nVendor Communication]
-    GoodsReceipt[6.0\nGoods Receipt]
-    Reporting[7.0\nReporting]
+    CreatePO[1.0 Create PO]
+    ManageItems[2.0 Manage Items]
+    CalculateFinancials[3.0 Calculate Financials]
+    ApprovalProcess[4.0 Approval Process]
+    VendorCommunication[5.0 Vendor Communication]
+    GoodsReceipt[6.0 Goods Receipt]
+    Reporting[7.0 Reporting]
     
     %% Data Stores
     PurchaseOrdersDB[(Purchase Orders DB)]
@@ -78,12 +78,12 @@ flowchart TD
     ProcurementOfficer[Procurement Officer]
     
     %% Processes
-    InitiatePO[1.1\nInitiate PO]
-    SelectVendor[1.2\nSelect Vendor]
-    EnterBasicInfo[1.3\nEnter Basic Info]
-    ValidatePO[1.4\nValidate PO]
-    GeneratePONumber[1.5\nGenerate PO Number]
-    SavePO[1.6\nSave PO]
+    InitiatePO[1.1 Initiate PO]
+    SelectVendor[1.2 Select Vendor]
+    EnterBasicInfo[1.3 Enter Basic Info]
+    ValidatePO[1.4 Validate PO]
+    GeneratePONumber[1.5 Generate PO Number]
+    SavePO[1.6 Save PO]
     
     %% Data Stores
     PurchaseOrdersDB[(Purchase Orders DB)]
@@ -118,12 +118,12 @@ flowchart TD
     ProcurementOfficer[Procurement Officer]
     
     %% Processes
-    AddItem[2.1\nAdd Item]
-    SearchItems[2.2\nSearch Items]
-    ConfigureItem[2.3\nConfigure Item]
-    CalculateItemFinancials[2.4\nCalculate Item Financials]
-    ValidateItem[2.5\nValidate Item]
-    SaveItem[2.6\nSave Item]
+    AddItem[2.1 Add Item]
+    SearchItems[2.2 Search Items]
+    ConfigureItem[2.3 Configure Item]
+    CalculateItemFinancials[2.4 Calculate Item Financials]
+    ValidateItem[2.5 Validate Item]
+    SaveItem[2.6 Save Item]
     
     %% Data Stores
     ItemsDB[(Items DB)]
@@ -158,12 +158,12 @@ flowchart TD
     Approver[Approver]
     
     %% Processes
-    SubmitForApproval[4.1\nSubmit for Approval]
-    NotifyApprovers[4.2\nNotify Approvers]
-    ReviewPO[4.3\nReview PO]
-    MakeDecision[4.4\nMake Decision]
-    UpdateStatus[4.5\nUpdate Status]
-    NotifyStakeholders[4.6\nNotify Stakeholders]
+    SubmitForApproval[4.1 Submit for Approval]
+    NotifyApprovers[4.2 Notify Approvers]
+    ReviewPO[4.3 Review PO]
+    MakeDecision[4.4 Make Decision]
+    UpdateStatus[4.5 Update Status]
+    NotifyStakeholders[4.6 Notify Stakeholders]
     
     %% Data Stores
     PurchaseOrdersDB[(Purchase Orders DB)]
@@ -201,13 +201,13 @@ flowchart TD
     Vendor[Vendor]
     
     %% Processes
-    DeliverGoods[6.1\nDeliver Goods]
-    ReceiveGoods[6.2\nReceive Goods]
-    VerifyAgainstPO[6.3\nVerify Against PO]
-    RecordDiscrepancies[6.4\nRecord Discrepancies]
-    CreateGRN[6.5\nCreate GRN]
-    UpdateInventory[6.6\nUpdate Inventory]
-    UpdatePOStatus[6.7\nUpdate PO Status]
+    DeliverGoods[6.1 Deliver Goods]
+    ReceiveGoods[6.2 Receive Goods]
+    VerifyAgainstPO[6.3 Verify Against PO]
+    RecordDiscrepancies[6.4 Record Discrepancies]
+    CreateGRN[6.5 Create GRN]
+    UpdateInventory[6.6 Update Inventory]
+    UpdatePOStatus[6.7 Update PO Status]
     
     %% Data Stores
     PurchaseOrdersDB[(Purchase Orders DB)]
