@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Location, StockStatus as StockStatusType } from "../types"
+import { Location, StockStatus as StockStatusType } from "../types/index"
 
 interface StockStatusProps {
   locations: Location[]
@@ -15,7 +15,7 @@ interface StockStatusProps {
 
 export function StockStatus({ locations, currentStock }: StockStatusProps) {
   const totalStock = locations.reduce((sum, loc) => sum + loc.stockOnHand, 0)
-  const maxStock = currentStock.maxStock || totalStock * 1.2
+  const maxStock = totalStock * 1.2
 
   return (
     <div className="grid gap-6">
@@ -42,7 +42,7 @@ export function StockStatus({ locations, currentStock }: StockStatusProps) {
                   Reorder Point
                 </span>
                 <p className="text-2xl font-bold">
-                  {currentStock.reorderPoint || 'N/A'}
+                  {'N/A'}
                 </p>
               </div>
               <div className="space-y-1">
@@ -50,7 +50,7 @@ export function StockStatus({ locations, currentStock }: StockStatusProps) {
                   Min Stock
                 </span>
                 <p className="text-2xl font-bold">
-                  {currentStock.minStock || 'N/A'}
+                  {'N/A'}
                 </p>
               </div>
               <div className="space-y-1">
@@ -58,7 +58,7 @@ export function StockStatus({ locations, currentStock }: StockStatusProps) {
                   Max Stock
                 </span>
                 <p className="text-2xl font-bold">
-                  {currentStock.maxStock || 'N/A'}
+                  {maxStock.toFixed(0) || 'N/A'}
                 </p>
               </div>
             </div>

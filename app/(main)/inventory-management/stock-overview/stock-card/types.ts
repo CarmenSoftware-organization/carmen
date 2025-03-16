@@ -88,6 +88,43 @@ export interface ValuationRecord {
   runningAverageCost: number
 }
 
+export interface FilterCriteria {
+  search: string
+  locations: string[]
+  itemStatus: string
+  stockStatus: string
+  dateRange?: {
+    from: string
+    to: string
+  }
+}
+
+export interface StockCard {
+  id: string
+  itemId: string
+  itemCode: string
+  itemName: string
+  category: string
+  uom: string
+  currentStock: {
+    totalStock: number
+    valueOnHand: number
+    averageCost: number
+    lastPurchaseDate: string
+    lastMovementDate: string
+  }
+  minStock: number
+  maxStock: number
+  locations: Array<{
+    id: string
+    name: string
+    stockOnHand: number
+    availableStock: number
+    reservedStock: number
+  }>
+  movements: any[]
+}
+
 export interface StockCardData {
   product: Product
   summary: StockSummary

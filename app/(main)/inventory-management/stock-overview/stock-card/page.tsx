@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -28,7 +28,7 @@ import {
 } from "./components/index"
 import { generateMockStockCardData, StockCardData } from "./index"
 
-export default function StockCardPage() {
+function StockCardContent() {
   const searchParams = useSearchParams()
   const productId = searchParams.get("productId") || "unknown"
   const [isLoading, setIsLoading] = useState(true)
@@ -240,5 +240,47 @@ export default function StockCardPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function StockCardPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto py-6 space-y-6">
+      {/* Header skeleton */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="space-y-1">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-24" />
+        </div>
+      </div>
+      
+      {/* Summary cards skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i}>
+            <CardContent className="pt-6">
+              <Skeleton className="h-4 w-24 mb-2" />
+              <Skeleton className="h-8 w-16" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Tabs skeleton */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-[400px] w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>}>
+      <StockCardContent />
+    </Suspense>
   )
 } 

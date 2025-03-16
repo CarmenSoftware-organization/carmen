@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { StockCardDetail } from "../components/stock-card-detail"
 import { notFound } from "next/navigation"
+import { MovementType } from "../types"
 
 interface StockCardDetailPageProps {
   params: {
@@ -17,12 +18,11 @@ export default function StockCardDetailPage({ params }: StockCardDetailPageProps
   // In a real application, we would fetch the stock card data here
   // For now, we'll use mock data
   const stockCard = {
+    id: params.id,
     itemId: params.id,
     itemCode: "ITEM-001",
     itemName: "Sample Item",
-    itemGroup: "Raw Materials",
     category: "Food",
-    subCategory: "Vegetables",
     uom: "KG",
     locations: [
       {
@@ -35,27 +35,24 @@ export default function StockCardDetailPage({ params }: StockCardDetailPageProps
     ],
     movements: [
       {
-        transactionId: "1",
-        date: new Date(),
-        type: "GRN",
+        id: "1",
+        date: new Date().toISOString(),
+        type: "STOCK_IN" as MovementType,
         quantity: 100,
-        unitCost: 10,
-        totalCost: 1000,
+        unit: "KG",
         reference: "GRN-001",
-        location: "Main Warehouse",
-        documentNo: "GRN-001",
+        notes: "Initial stock"
       },
     ],
     currentStock: {
       totalStock: 100,
       valueOnHand: 1000,
       averageCost: 10,
-      lastPurchaseDate: new Date(),
-      lastMovementDate: new Date(),
-      minStock: 50,
-      maxStock: 150,
-      reorderPoint: 75,
+      lastPurchaseDate: new Date().toISOString(),
+      lastMovementDate: new Date().toISOString(),
     },
+    minStock: 50,
+    maxStock: 150
   }
 
   if (!stockCard) {

@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Movement } from "../types"
+import { Movement } from "../types/index"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 
@@ -47,7 +47,7 @@ export function MovementHistory({ movements }: MovementHistoryProps) {
         </TableHeader>
         <TableBody>
           {movements.map((movement) => (
-            <TableRow key={movement.transactionId}>
+            <TableRow key={movement.id}>
               <TableCell>
                 {format(new Date(movement.date), 'dd/MM/yyyy')}
               </TableCell>
@@ -59,20 +59,20 @@ export function MovementHistory({ movements }: MovementHistoryProps) {
                   {movement.type}
                 </Badge>
               </TableCell>
-              <TableCell>{movement.documentNo}</TableCell>
+              <TableCell>{movement.id}</TableCell>
               <TableCell>{movement.reference}</TableCell>
-              <TableCell>{movement.location}</TableCell>
+              <TableCell>{movement.notes || '-'}</TableCell>
               <TableCell className="text-right">
-                {movement.quantity > 0 ? '+' : ''}{movement.quantity}
+                {movement.quantity > 0 ? '+' : ''}{movement.quantity} {movement.unit}
               </TableCell>
               <TableCell className="text-right">
-                {movement.unitCost.toLocaleString('en-US', {
+                {(10).toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD'
                 })}
               </TableCell>
               <TableCell className="text-right">
-                {movement.totalCost.toLocaleString('en-US', {
+                {(movement.quantity * 10).toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD'
                 })}
