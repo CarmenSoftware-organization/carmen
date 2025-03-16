@@ -1,5 +1,29 @@
 # Purchase Request Module - API and Stored Procedures Documentation
 
+## 0. Authentication and Authorization
+
+All API endpoints in the Purchase Request module require authentication unless explicitly stated otherwise. Authentication is handled via JWT tokens.
+
+### Authentication Requirements
+```typescript
+// Request Header
+Authorization: Bearer <jwt_token>
+```
+
+### Authorization Levels
+- **Requester**: Can create and view their own PRs
+- **Department Head**: Can approve/reject PRs from their department
+- **Purchase Coordinator**: Can review all PRs
+- **Finance Manager**: Can approve/reject PRs based on budget
+- **General Manager**: Can approve/reject high-value PRs
+
+### Permission Checks
+The API performs permission checks based on:
+- User role
+- Department association
+- PR ownership
+- Workflow stage
+
 ## 1. REST API Endpoints
 
 ### 1.1 Purchase Request Management
@@ -614,8 +638,45 @@ RETURNS TABLE (
 - PR011: Activity logging failed
 - PR012: Invalid activity type
 - PR013: Activity retrieval failed
+- PR014: Invalid item data
+- PR015: Budget limit exceeded
+- PR016: Attachment upload failed
+- PR017: Invalid file type
+- PR018: File size limit exceeded
+- PR019: Workflow configuration error
+- PR020: Rate limit exceeded
 
-### 4.2 Stored Procedure Error Handling
+### 4.2 HTTP Status Codes
+- 200 OK: Request succeeded
+- 201 Created: Resource created successfully
+- 400 Bad Request: Invalid request data
+- 401 Unauthorized: Authentication required
+- 403 Forbidden: Insufficient permissions
+- 404 Not Found: Resource not found
+- 409 Conflict: Resource conflict (e.g., duplicate reference number)
+- 422 Unprocessable Entity: Validation failed
+- 429 Too Many Requests: Rate limit exceeded
+- 500 Internal Server Error: Server-side error
+
+### 4.3 Error Response Format
+```typescript
+{
+  "error": {
+    "code": "PR001",
+    "message": "Invalid purchase request data",
+    "details": [
+      {
+        "field": "deliveryDate",
+        "message": "Delivery date must be in the future"
+      }
+    ],
+    "requestId": "req-123456",
+    "timestamp": "2024-03-20T09:00:00Z"
+  }
+}
+```
+
+### 4.4 Stored Procedure Error Handling
 ```sql
 BEGIN TRY
   -- Procedure logic
@@ -646,7 +707,7 @@ BEGIN CATCH
 END CATCH
 ```
 
-### 4.3 Activity Log Error Handling
+### 4.5 Activity Log Error Handling
 ```sql
 BEGIN TRY
   -- Activity logging logic
@@ -677,6 +738,70 @@ BEGIN CATCH
   -- Return error to caller
   RETURN 0
 END CATCH
+```
+
+## 6. Rate Limiting
+
+The PR API implements rate limiting to prevent abuse:
+
+- Standard endpoints: 100 requests per minute
+- Bulk operations: 20 requests per minute
+- Export operations: 5 requests per minute
+
+Rate limit headers are included in all responses:
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1616176800
+```
+
+## 7. Versioning
+
+The PR API is versioned to ensure backward compatibility:
+
+```
+/api/v1/purchase-requests
+```
+
+When breaking changes are introduced, a new version will be released:
+
+```
+/api/v2/purchase-requests
+```
+
+## 8. Webhooks
+
+The PR API supports webhooks for real-time notifications:
+
+### 8.1 Available Events
+- `pr.created`: Triggered when a new PR is created
+- `pr.updated`: Triggered when a PR is updated
+- `pr.status_changed`: Triggered when a PR's status changes
+- `pr.workflow_advanced`: Triggered when a PR advances in the workflow
+- `pr.comment_added`: Triggered when a comment is added to a PR
+
+### 8.2 Webhook Payload
+```typescript
+{
+  "event": "pr.status_changed",
+  "timestamp": "2024-03-20T09:00:00Z",
+  "data": {
+    "prId": "PR-2024-001",
+    "previousStatus": "Draft",
+    "newStatus": "Submitted",
+    "userId": "USER123"
+  }
+}
+```
+
+### 8.3 Webhook Configuration
+```typescript
+POST /api/webhook-subscriptions
+{
+  "url": "https://example.com/webhook",
+  "events": ["pr.created", "pr.status_changed"],
+  "secret": "your_webhook_secret"
+}
 ```
 
 ## 5. Example Request/Response Payloads

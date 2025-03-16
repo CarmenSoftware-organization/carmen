@@ -98,7 +98,7 @@ const menuItems: MenuItem[] = [
         subItems: [
           { name: "Overview", path: "/inventory-management/stock-overview" },
           { name: "Inventory Balance", path: "/inventory-management/stock-overview/inventory-balance" },
-          { name: "Stock Card", path: "/inventory-management/stock-overview/stock-card" },
+          { name: "Stock Cards", path: "/inventory-management/stock-overview/stock-cards" },
           { name: "Slow Moving", path: "/inventory-management/stock-overview/slow-moving" },
           { name: "Inventory Aging", path: "/inventory-management/stock-overview/inventory-aging" }
         ]

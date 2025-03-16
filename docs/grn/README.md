@@ -1,89 +1,64 @@
 # Goods Received Note Module Documentation
 
-This directory contains comprehensive documentation for the Goods Received Note (GRN) module in the Carmen F&B Management System.
+> **Document Status**: Initial Draft - Content Consolidation (Phase 1)  
+> **Last Updated**: March 14, 2024  
+> **Next Update**: Phase 2 - Content Migration
 
-## Documentation Index
+## Overview
 
-### Business Documentation
+The Goods Received Note (GRN) module is a core component of the Carmen F&B Management System, enabling efficient management of inventory receipts from vendors. This documentation set provides comprehensive information about the module's functionality, technical specifications, user experience design, component architecture, and API endpoints.
 
-- [Goods Received Note Business Analysis](goods-received-note-ba.md) - Detailed business analysis of the GRN module
-- [GRN Business Analysis](grn-ba.md) - Additional business analysis documentation for GRN
+## Documentation Structure
 
-### Technical Documentation
+The GRN module documentation is organized into the following sections:
 
-- [GRN API Specification](grn-api-sp.md) - API specification for the GRN module
-- [GRN Module PRD](grn-module-prd.md) - Product Requirements Document for the GRN module
-- [GRN Page Flow](grn-page-flow.md) - Page flow diagrams for the GRN module
-- [GRN Component Structure](grn-component-structure.md) - Component structure and hierarchy for the GRN module
+### Core Documentation
 
-## Key Features
+- [**GRN-Overview.md**](./GRN-Overview.md) - High-level overview of the module, its purpose, key features, and business context
+- [**GRN-Technical-Specification.md**](./GRN-Technical-Specification.md) - Detailed technical specifications, including data models, interfaces, and implementation details
+- [**GRN-User-Experience.md**](./GRN-User-Experience.md) - User experience design, including user personas, journeys, interface descriptions, and visual user flow diagrams
+- [**GRN-User-Flow-Diagram.md**](./GRN-User-Flow-Diagram.md) - Visual representations of user flows and process workflows using Mermaid diagrams
+- [**GRN-Component-Specifications.md**](./GRN-Component-Specifications.md) - Specifications for the React components that make up the module
 
-The Goods Received Note module provides the following key features:
+### API Documentation
 
-1. **GRN Management**
-   - Creation of goods received notes
-   - Editing and updating GRN details
-   - Viewing GRN history and status
-   - Cancellation and deletion of GRNs
+- [**GRN-API-Overview.md**](./GRN-API-Overview.md) - Introduction to the Goods Received Note API, including conventions and common patterns
+- [**GRN-API-Endpoints-Overview.md**](./GRN-API-Endpoints-Overview.md) - Overview of all API endpoints for GRN management
+- [**GRN-API-Endpoints-Core.md**](./GRN-API-Endpoints-Core.md) - Core CRUD operations for GRNs
+- [**GRN-API-Endpoints-Financial.md**](./GRN-API-Endpoints-Financial.md) - Financial operations (journal entries, tax entries, extra costs)
+- [**GRN-API-Endpoints-Items.md**](./GRN-API-Endpoints-Items.md) - Item operations (add, update, delete items)
+- [**GRN-API-Endpoints-Attachments.md**](./GRN-API-Endpoints-Attachments.md) - Attachment operations (upload, download, delete files)
+- [**GRN-API-Endpoints-Comments.md**](./GRN-API-Endpoints-Comments.md) - Comment operations (add, update, delete comments)
 
-2. **Item Management**
-   - Adding items to GRNs
-   - Specifying quantities, units, and prices
-   - Managing item details and specifications
-   - Tracking item receipt status
+### Supporting Documentation
 
-3. **Quality Control**
-   - Quality inspection recording
-   - Acceptance/rejection of items
-   - Defect tracking and reporting
-   - Quality metrics and analysis
+- [**testing.md**](../testing.md) - Testing strategies and procedures for the GRN module
+- [**troubleshooting.md**](../troubleshooting.md) - Common issues and their solutions
 
-4. **Financial Management**
-   - Calculation of received goods value
-   - Tax handling and adjustments
-   - Integration with accounting systems
-   - Financial reporting
+## Getting Started
 
-5. **Workflow and Approvals**
-   - Configurable approval workflows
-   - Role-based approval processes
-   - Status tracking and notifications
-   - Audit trail of approval actions
+If you're new to the Goods Received Note module, we recommend starting with the [GRN-Overview.md](./GRN-Overview.md) document to understand the module's purpose and key features. Then, depending on your role and interests, you can explore the technical specifications, user experience design, or API documentation.
 
-6. **Integration**
-   - Connection to vendor management
-   - Integration with purchase orders
-   - Inventory management integration
-   - Financial system integration
-
-7. **Reporting and Analytics**
-   - GRN status reporting
-   - Receipt analysis by category
-   - Vendor performance analysis
-   - Processing time analysis
-
-## User Roles
-
-The Goods Received Note module supports the following user roles:
-
-| Role | Description | Key Permissions |
-|------|-------------|----------------|
-| Warehouse Staff | Receives goods and creates GRNs | Create, edit, view GRNs; add items; record receipts |
-| Warehouse Manager | Approves GRNs | View GRNs; approve/reject GRNs; manage exceptions |
-| Quality Control | Inspects received goods | Inspect items; record quality issues; approve/reject items |
-| Finance Officer | Reviews financial aspects | View GRNs; review financial details; export reports |
-| Finance Manager | Approves financial aspects | Finance Officer permissions; financial approval of GRNs |
-| Procurement Officer | Links GRNs to purchase orders | View GRNs; link to POs; manage vendor communications |
-| General User | Basic access to relevant GRNs | View assigned GRNs; add comments |
-
-## Implementation Status
-
-The Goods Received Note module is currently in the implementation phase, with core functionality available and additional features being developed.
+For a visual understanding of the GRN process flow, refer to the [GRN-User-Flow-Diagram.md](./GRN-User-Flow-Diagram.md) document, which provides Mermaid diagrams illustrating the complete lifecycle of a GRN and how different user roles interact with the system.
 
 ## Related Modules
 
-The GRN module integrates closely with the following modules:
-- Purchase Order (PO) module
-- Inventory Management module
-- Credit Note (CN) module
-- Financial Management module 
+The Goods Received Note module interacts with several other modules in the Carmen F&B Management System:
+
+- **Purchase Order** - For linking GRNs to purchase orders
+- **Inventory Management** - For updating inventory levels
+- **Finance** - For generating journal entries and invoices
+- **User Management** - For user authentication and authorization
+
+## Contributing
+
+To contribute to this documentation, please follow these guidelines:
+
+1. Create a branch from the main repository
+2. Make your changes
+3. Submit a pull request with a clear description of the changes
+4. Ensure all links and references are updated correctly
+
+## Contact
+
+For questions or feedback about this documentation, please contact the Carmen F&B Management System documentation team. 

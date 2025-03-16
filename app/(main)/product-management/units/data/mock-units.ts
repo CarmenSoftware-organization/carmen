@@ -107,38 +107,6 @@ export const mockUnits: Unit[] = [
     updatedAt: new Date("2024-01-01")
   },
 
-  // Counting Units
-  {
-    id: "11",
-    code: "PC",
-    name: "Piece",
-    description: "Single item count",
-    type: "COUNTING",
-    isActive: true,
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01")
-  },
-  {
-    id: "12",
-    code: "DOZ",
-    name: "Dozen",
-    description: "Group of twelve items",
-    type: "COUNTING",
-    isActive: true,
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01")
-  },
-  {
-    id: "13",
-    code: "GRS",
-    name: "Gross",
-    description: "Group of 144 items (12 dozens)",
-    type: "COUNTING",
-    isActive: false,
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01")
-  },
-
   // Additional Units with Various States
   {
     id: "14",

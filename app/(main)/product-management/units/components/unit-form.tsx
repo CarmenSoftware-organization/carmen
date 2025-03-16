@@ -29,7 +29,7 @@ const unitSchema = z.object({
   code: z.string().min(1, "Code is required").max(10, "Code must be 10 characters or less"),
   name: z.string().min(1, "Name is required").max(50, "Name must be 50 characters or less"),
   description: z.string().max(200, "Description must be 200 characters or less").optional(),
-  type: z.enum(["INVENTORY", "ORDER", "RECIPE", "COUNTING"], {
+  type: z.enum(["INVENTORY", "ORDER", "RECIPE"], {
     required_error: "Please select a unit type",
   }),
   isActive: z.boolean().default(true),
@@ -127,7 +127,6 @@ export function UnitForm({ unit, onSuccess, onCancel }: UnitFormProps) {
                   <SelectItem value="INVENTORY">Inventory</SelectItem>
                   <SelectItem value="ORDER">Order</SelectItem>
                   <SelectItem value="RECIPE">Recipe</SelectItem>
-                  <SelectItem value="COUNTING">Counting</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>

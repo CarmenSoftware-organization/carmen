@@ -14,6 +14,7 @@ Query Parameters: {
   fromDate?: string
   toDate?: string
   vendor?: string
+  prId?: string  // Added to filter POs by source PR
   page?: number
   limit?: number
   sortBy?: string
@@ -33,6 +34,7 @@ interface PurchaseOrder {
   type: POType
   description: string
   prId?: string // Reference to Purchase Request
+  prNumber?: string // PR reference number
   requestorId: string
   requestor: {
     name: string
@@ -97,7 +99,7 @@ Body: {
 Response: PurchaseOrder
 
 interface POItemCreate {
-  prItemId?: string
+  prItemId?: string  // Reference to source PR item
   location: string
   name: string
   description: string
@@ -122,9 +124,31 @@ POST /api/purchase-orders/:poId/items
 Body: POItemCreate
 Response: POItem
 
+interface POItemCreate {
+  prItemId?: string  // Reference to source PR item
+  location: string
+  name: string
+  description: string
+  unit: string
+  quantityOrdered: number
+  price: number
+  deliveryDate: string
+  deliveryPoint: string
+  itemCategory: string
+  itemSubcategory?: string
+  taxRate?: number
+  discountRate?: number
+  accountCode?: string
+}
+
 interface POItem extends POItemCreate {
   id: string
   poId: string
+  prItemId?: string  // Reference to source PR item
+  prNumber?: string  // Source PR number
+  prRequestor?: string  // Source PR requestor
+  prDepartment?: string  // Source PR department
+  prRequestDate?: string  // Source PR request date
   totalAmount: number
   taxAmount: number
   discountAmount: number
@@ -355,6 +379,48 @@ Response: {
     [key: string]: any // Additional context-specific details
   }
 }
+```
+
+### 1.7 PR-to-PO Traceability
+
+#### Get PO Items by PR Item
+```typescript
+GET /api/purchase-requests/:prId/items/:prItemId/po-items
+Response: {
+  data: POItem[]
+  total: number
+}
+```
+
+#### Get PR Source for PO Item
+```typescript
+GET /api/purchase-orders/:poId/items/:itemId/pr-source
+Response: {
+  prId: string
+  prNumber: string
+  prItemId: string
+  requestor: {
+    id: string
+    name: string
+    department: string
+  }
+  requestDate: string
+  originalQuantity: number
+  originalUnit: string
+  remainingQuantity: number
+}
+```
+
+#### Get PR-to-PO Traceability Report
+```typescript
+GET /api/reports/pr-to-po-traceability
+Query Parameters: {
+  prId?: string
+  poId?: string
+  fromDate?: string
+}
+
+> **Note**: For detailed information on PR-to-PO traceability, refer to the [Procurement Process Flow](../Procurement-Process-Flow.md) document.
 ```
 
 ## 2. Stored Procedures

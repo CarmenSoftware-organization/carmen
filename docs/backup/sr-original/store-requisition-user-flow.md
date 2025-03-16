@@ -1,5 +1,7 @@
 # Store Requisition Module - User Flow Diagrams
 
+> **IMPORTANT**: This content has been migrated to [SR-User-Experience.md](./SR-User-Experience.md). Please refer to that document for the most up-to-date information.
+
 This document provides visual representations of the user flows within the Store Requisition module of the Carmen F&B Management System.
 
 ## 1. Main Store Requisition Process Flow

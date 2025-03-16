@@ -653,7 +653,7 @@ export default function ProductDetail({
     }
   };
 
-  const handleAddConversion = async (unitType: 'INVENTORY' | 'ORDER' | 'RECIPE' | 'COUNTING') => {
+  const handleAddConversion = async (unitType: 'INVENTORY' | 'ORDER' | 'RECIPE') => {
     if (!product) return; // Add this line to handle the case when product is null
     try {
       const response = await fetch('/api/product-units', {

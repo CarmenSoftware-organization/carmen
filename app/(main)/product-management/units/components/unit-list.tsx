@@ -26,7 +26,7 @@ export interface Unit {
   code: string
   name: string
   description?: string
-  type: 'INVENTORY' | 'ORDER' | 'RECIPE' | 'COUNTING'
+  type: 'INVENTORY' | 'ORDER' | 'RECIPE'
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -104,7 +104,6 @@ export function UnitList() {
               <SelectItem value="INVENTORY">Inventory</SelectItem>
               <SelectItem value="ORDER">Order</SelectItem>
               <SelectItem value="RECIPE">Recipe</SelectItem>
-              <SelectItem value="COUNTING">Counting</SelectItem>
             </SelectContent>
           </Select>
         </div>

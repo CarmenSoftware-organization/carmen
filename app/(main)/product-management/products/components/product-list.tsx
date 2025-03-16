@@ -60,7 +60,7 @@ interface UnitConversion {
   toUnit: string;
   unitName: string;
   conversionFactor: number;
-  unitType: "INVENTORY" | "ORDER" | "RECIPE" | "COUNTING";
+  unitType: "INVENTORY" | "ORDER" | "RECIPE";
 }
 
 interface ProductListProps {

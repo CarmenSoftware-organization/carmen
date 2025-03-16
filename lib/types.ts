@@ -919,7 +919,7 @@ export interface UnitConversion {
   unitName: string;
 
   conversionFactor: number;
-  unitType: "INVENTORY" | "ORDER" | "RECIPE" | "COUNTING";
+  unitType: "INVENTORY" | "ORDER" | "RECIPE";
 }
 
 export interface Vendor {

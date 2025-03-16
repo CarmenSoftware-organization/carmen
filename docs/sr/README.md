@@ -1,53 +1,59 @@
 # Store Requisition Module Documentation
 
-This directory contains documentation for the Store Requisition (SR) module within the Carmen F&B Management System. The Store Requisition module is essential for managing internal requests for goods between different stores or departments, ensuring proper inventory management and transfer processes.
+> **Document Status**: Initial Draft - Content Consolidation (Phase 1)  
+> **Last Updated**: March 14, 2024  
+> **Next Update**: Phase 2 - Content Migration
 
-## Business Documentation
+## Overview
 
-- [Store Requisition Business Analysis](./store-requisition-ba.md) - Comprehensive business analysis of the Store Requisition module
-- [Store Requisition Business Logic](./store-requisition-logic.md) - Detailed business rules and logic for the Store Requisition module
-- [Store Requisitions Specification](./store-requisitions.md) - Detailed specifications for the Store Requisition module
-- [Store Requisition Product Requirements Document](./store-requisition-prd.md) - Comprehensive product requirements for the Store Requisition module
+The Store Requisition (SR) module is a core component of the Carmen F&B Management System, enabling efficient management of internal stock requests between warehouses and stores. This documentation set provides comprehensive information about the module's functionality, technical specifications, user experience design, component architecture, and API endpoints.
 
-## Diagrams and Flows
+## Documentation Structure
 
-- [Store Requisition User Flow Diagrams](./store-requisition-user-flow.md) - Visual representations of user flows and processes
+The SR module documentation is organized into the following sections:
 
-## Key Features
+### Core Documentation
 
-1. **Request Management**
-   - Creation and submission of store requisitions
-   - Tracking of requisition status
-   - Management of requisition details and items
+- [**SR-Overview.md**](./SR-Overview.md) - High-level overview of the module, its purpose, key features, and business context
+- [**SR-Technical-Specification.md**](./SR-Technical-Specification.md) - Detailed technical specifications, including data models, interfaces, and implementation details
+- [**SR-User-Experience.md**](./SR-User-Experience.md) - User experience design, including user personas, journeys, interface descriptions, and visual user flow diagrams
+- [**SR-Component-Specifications.md**](./SR-Component-Specifications.md) - Specifications for the React components that make up the module
 
-2. **Approval Workflow**
-   - Multi-level approval process
-   - Role-based approval assignments
-   - Approval history tracking
+### API Documentation
 
-3. **Inventory Management**
-   - Real-time inventory availability checking
-   - Reservation of inventory for approved requisitions
-   - Tracking of fulfilled quantities
+- [**SR-API-Overview.md**](./SR-API-Overview.md) - Introduction to the Store Requisition API, including conventions and common patterns
+- [**SR-API-Requisition-Endpoints.md**](./SR-API-Requisition-Endpoints.md) - API endpoints for requisition management
+- [**SR-API-Approval-Endpoints.md**](./SR-API-Approval-Endpoints.md) - API endpoints for the approval process
+- [**SR-API-StockMovement-Endpoints.md**](./SR-API-StockMovement-Endpoints.md) - API endpoints for stock movement operations
+- [**SR-API-JournalEntry-Endpoints.md**](./SR-API-JournalEntry-Endpoints.md) - API endpoints for journal entries
 
-4. **Transfer Processing**
-   - Generation of transfer documents
-   - Tracking of item movements between locations
-   - Confirmation of received items
+### Supporting Documentation
 
-5. **Reporting and Analytics**
-   - Requisition status reporting
-   - Transfer history tracking
-   - Performance metrics and analytics
+- [**testing.md**](../testing.md) - Testing strategies and procedures for the SR module
+- [**troubleshooting.md**](../troubleshooting.md) - Common issues and their solutions
 
-## User Roles
+## Getting Started
 
-- **Requester**: Creates and submits store requisitions
-- **Approver**: Reviews and approves/rejects requisitions
-- **Fulfiller**: Processes approved requisitions and prepares items for transfer
-- **Receiver**: Confirms receipt of transferred items
-- **Manager**: Oversees the entire process and accesses reports
+If you're new to the Store Requisition module, we recommend starting with the [SR-Overview.md](./SR-Overview.md) document to understand the module's purpose and key features. Then, depending on your role and interests, you can explore the technical specifications, user experience design, or API documentation.
 
-## Implementation Status
+## Related Modules
 
-The Store Requisition module is currently implemented with core functionality available in the system. Ongoing enhancements focus on improving the user experience and adding advanced analytics capabilities. 
+The Store Requisition module interacts with several other modules in the Carmen F&B Management System:
+
+- **Inventory Management** - For stock level tracking and updates
+- **Finance** - For journal entry generation and posting
+- **Workflow** - For approval process management
+- **User Management** - For user authentication and authorization
+
+## Contributing
+
+To contribute to this documentation, please follow these guidelines:
+
+1. Create a branch from the main repository
+2. Make your changes
+3. Submit a pull request with a clear description of the changes
+4. Ensure all links and references are updated correctly
+
+## Contact
+
+For questions or feedback about this documentation, please contact the Carmen F&B Management System documentation team. 

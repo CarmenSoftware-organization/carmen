@@ -77,14 +77,7 @@ The Purchase Order module manages the following key functions:
 - **PO_014**: Budget validation required
 - **PO_015**: Total amount calculations must include all adjustments
 
-### 3.4 Status Rules
-- **PO_016**: Status transitions must follow defined workflow
-- **PO_017**: Status changes must be logged
-- **PO_018**: Closed POs cannot be modified
-- **PO_019**: Voided POs require documentation
-- **PO_020**: Partial receipts must be tracked
-
-### 3.5 UI Rules
+### 3.4 UI Rules
 - **PO_021**: PO list must display key information (PO number, vendor, date, status, total)
 - **PO_022**: Item grid must support inline editing for quantities and prices
 - **PO_023**: Financial summary must update in real-time as items are modified
@@ -106,7 +99,7 @@ The Purchase Order module manages the following key functions:
 - **PO_039**: Calendar controls must indicate working days and holidays
 - **PO_040**: Date range validations must consider time zone differences
 
-### 3.6 System Calculations Rules
+### 3.5 System Calculations Rules
 - **PO_036**: Item subtotal = Round(Quantity (3 decimals) × Unit Price (2 decimals), 2)
 - **PO_037**: Item discount amount = Round(Round(Subtotal, 2) × Discount Rate, 2)
 - **PO_038**: Item net amount = Round(Round(Subtotal, 2) - Round(Discount Amount, 2), 2)
@@ -127,6 +120,18 @@ The Purchase Order module manages the following key functions:
 - **PO_053**: Percentage calculations must round result before applying to base amount
 - **PO_054**: Cross-currency calculations must round after each currency conversion
 - **PO_055**: Tax-inclusive price breakdowns must round each component
+
+### 3.6 PR-to-PO Traceability Rules
+- **PO_056**: PO items created from PR items must maintain reference to source PR item ID
+- **PO_057**: PO items must store PR number, requestor, and department for traceability
+- **PO_058**: Changes to PO item quantities must be validated against PR item quantities
+- **PO_059**: PO items must display their source PR information when available
+- **PO_060**: Reports must be able to trace PO items back to their PR sources
+- **PO_061**: When a PO is created from multiple PRs, each item must maintain its individual PR source
+- **PO_062**: PR-to-PO item mapping must be maintained even if the PO item is modified
+- **PO_063**: Historical PR data must be preserved in PO items even if the source PR is archived
+- **PO_064**: PR-to-PO traceability data must be included in audit logs
+- **PO_065**: PR-to-PO traceability must be maintained throughout the PO lifecycle
 
 ## 4. Data Definitions
 
@@ -233,7 +238,7 @@ enum PurchaseOrderStatus {
 5. Apply taxes and discounts
 6. Validate budget availability
 7. Generate PO number
-8. Save and activate PO
+8. Save PO
 
 ### 5.2 Financial Processing
 1. Calculate item subtotals
@@ -244,21 +249,17 @@ enum PurchaseOrderStatus {
 6. Convert currencies if needed
 7. Calculate final totals
 
-### 5.3 Status Management
-1. Track PO status changes
-2. Update related documents
-3. Manage partial receipts
-4. Handle order modifications
-5. Process order closure
-6. Handle order cancellation
-
-### 5.4 Document Management
+### 5.3 Document Management
 1. Generate PO document
-2. Manage attachments
-3. Track version history
-4. Handle amendments
-5. Process approvals
-6. Maintain audit trail
+2. Store document in document management system
+3. Track document versions
+4. Manage document access
+5. Support document printing and sharing
+
+### 5.4 Delivery Management
+1. Manage delivery logistics
+2. Track delivery status
+3. Handle exceptions
 
 ## 6. Validation and Testing
 

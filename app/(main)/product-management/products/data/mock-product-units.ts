@@ -37,34 +37,6 @@ export const mockStockCountUnits: StockCountUnit[] = [
   }
 ]
 
-// Counting Units
-export interface CountingUnit {
-  baseUnit: string // This should match product's baseInventoryUnit
-  countPrecision: string
-  packDefinitions: {
-    packUnit: string
-    quantity: number
-    baseUnitEquivalent: number
-  }[]
-}
-
-export const mockCountingUnits: CountingUnit = {
-  baseUnit: mockBaseProduct.baseInventoryUnit,
-  countPrecision: "0.001",
-  packDefinitions: [
-    {
-      packUnit: "Sack",
-      quantity: 50,
-      baseUnitEquivalent: 50
-    },
-    {
-      packUnit: "Bag",
-      quantity: 25,
-      baseUnitEquivalent: 25
-    }
-  ]
-}
-
 // Order Units
 export interface OrderUnit {
   unit: string
@@ -123,18 +95,16 @@ export const mockOrderUnits: OrderUnitConfig = {
 // Combined product units configuration
 export interface ProductUnitsConfig {
   baseProduct: BaseProductUnit
-  countingUnits: CountingUnit
   orderUnits: OrderUnitConfig
   stockCountUnits: StockCountUnit[]
 }
 
 export const mockProductUnits: ProductUnitsConfig = {
   baseProduct: mockBaseProduct,
-  countingUnits: mockCountingUnits,
   orderUnits: mockOrderUnits,
   stockCountUnits: mockStockCountUnits
 }
 
 // Example usage:
 // import { mockProductUnits } from './mock-product-units'
-// const { baseProduct, countingUnits, orderUnits, stockCountUnits } = mockProductUnits 
+// const { baseProduct, orderUnits, stockCountUnits } = mockProductUnits 

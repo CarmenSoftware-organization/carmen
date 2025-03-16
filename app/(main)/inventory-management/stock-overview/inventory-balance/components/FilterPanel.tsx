@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import {
   Popover,
@@ -16,6 +15,13 @@ import {
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import type { BalanceReportParams } from "../types"
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select"
 
 interface FilterPanelProps {
   params: BalanceReportParams
@@ -38,6 +44,7 @@ export function FilterPanel({
   const [categoryTo, setCategoryTo] = useState(params.categoryRange.to)
   const [productFrom, setProductFrom] = useState(params.productRange.from)
   const [productTo, setProductTo] = useState(params.productRange.to)
+  const [valuationMethod, setValuationMethod] = useState(params.valuationMethod)
 
   // Apply filters
   const applyFilters = () => {
@@ -55,6 +62,7 @@ export function FilterPanel({
         from: productFrom,
         to: productTo,
       },
+      valuationMethod: valuationMethod as 'FIFO' | 'WEIGHTED_AVERAGE',
     })
   }
 
@@ -67,6 +75,7 @@ export function FilterPanel({
     setCategoryTo("")
     setProductFrom("")
     setProductTo("")
+    setValuationMethod('FIFO')
     
     onFilterChange({
       asOfDate: new Date().toISOString().substring(0, 10),
@@ -82,77 +91,18 @@ export function FilterPanel({
         from: "",
         to: "",
       },
+      valuationMethod: 'FIFO',
     })
   }
 
-  // Clear a single filter
-  const clearFilter = (filterType: string) => {
-    switch (filterType) {
-      case "date":
-        setDateValue(new Date())
-        onFilterChange({
-          asOfDate: new Date().toISOString().substring(0, 10),
-        })
-        break
-      case "location":
-        setLocationFrom("")
-        setLocationTo("")
-        onFilterChange({
-          locationRange: {
-            from: "",
-            to: "",
-          },
-        })
-        break
-      case "category":
-        setCategoryFrom("")
-        setCategoryTo("")
-        onFilterChange({
-          categoryRange: {
-            from: "",
-            to: "",
-          },
-        })
-        break
-      case "product":
-        setProductFrom("")
-        setProductTo("")
-        onFilterChange({
-          productRange: {
-            from: "",
-            to: "",
-          },
-        })
-        break
-      default:
-        break
-    }
-  }
-
   return (
-    <Card className="h-fit">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">Filters</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Date Filter */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="date" className="text-sm font-medium">
-              As of Date
-            </Label>
-            {dateValue && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs"
-                onClick={() => clearFilter("date")}
-              >
-                <X className="h-3 w-3 mr-1" />
-                Clear
-              </Button>
-            )}
-          </div>
+          <Label htmlFor="date" className="text-sm font-medium">
+            As of Date
+          </Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -177,170 +127,109 @@ export function FilterPanel({
           </Popover>
         </div>
 
-        <Separator />
+        {/* Valuation Method */}
+        <div className="space-y-2">
+          <Label htmlFor="valuation-method" className="text-sm font-medium">
+            Valuation Method
+          </Label>
+          <Select
+            value={valuationMethod}
+            onValueChange={(value) => setValuationMethod(value as 'FIFO' | 'WEIGHTED_AVERAGE')}
+          >
+            <SelectTrigger id="valuation-method" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="FIFO">FIFO</SelectItem>
+              <SelectItem value="WEIGHTED_AVERAGE">Weighted Average</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Empty space for alignment */}
+        <div></div>
 
         {/* Location Filter */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="location" className="text-sm font-medium">
-              Location
-            </Label>
-            {(locationFrom || locationTo) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs"
-                onClick={() => clearFilter("location")}
-              >
-                <X className="h-3 w-3 mr-1" />
-                Clear
-              </Button>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center space-x-1">
-              <Label htmlFor="location-from" className="w-12 text-xs whitespace-nowrap">
-                From:
-              </Label>
-              <Input
-                id="location-from"
-                value={locationFrom}
-                onChange={(e) => setLocationFrom(e.target.value)}
-                placeholder="Location code"
-                className="h-8"
-              />
-            </div>
-            <div className="flex items-center space-x-1">
-              <Label htmlFor="location-to" className="w-12 text-xs whitespace-nowrap">
-                To:
-              </Label>
-              <Input
-                id="location-to"
-                value={locationTo}
-                onChange={(e) => setLocationTo(e.target.value)}
-                placeholder="Location code"
-                className="h-8"
-              />
-            </div>
+          <Label className="text-sm font-medium">
+            Location Range
+          </Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Input
+              placeholder="From"
+              value={locationFrom}
+              onChange={(e) => setLocationFrom(e.target.value)}
+              className="h-9"
+            />
+            <Input
+              placeholder="To"
+              value={locationTo}
+              onChange={(e) => setLocationTo(e.target.value)}
+              className="h-9"
+            />
           </div>
         </div>
-
-        <Separator />
 
         {/* Category Filter */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="category" className="text-sm font-medium">
-              Category
-            </Label>
-            {(categoryFrom || categoryTo) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs"
-                onClick={() => clearFilter("category")}
-              >
-                <X className="h-3 w-3 mr-1" />
-                Clear
-              </Button>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center space-x-1">
-              <Label htmlFor="category-from" className="w-12 text-xs whitespace-nowrap">
-                From:
-              </Label>
-              <Input
-                id="category-from"
-                value={categoryFrom}
-                onChange={(e) => setCategoryFrom(e.target.value)}
-                placeholder="Category code"
-                className="h-8"
-              />
-            </div>
-            <div className="flex items-center space-x-1">
-              <Label htmlFor="category-to" className="w-12 text-xs whitespace-nowrap">
-                To:
-              </Label>
-              <Input
-                id="category-to"
-                value={categoryTo}
-                onChange={(e) => setCategoryTo(e.target.value)}
-                placeholder="Category code"
-                className="h-8"
-              />
-            </div>
+          <Label className="text-sm font-medium">
+            Category Range
+          </Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Input
+              placeholder="From"
+              value={categoryFrom}
+              onChange={(e) => setCategoryFrom(e.target.value)}
+              className="h-9"
+            />
+            <Input
+              placeholder="To"
+              value={categoryTo}
+              onChange={(e) => setCategoryTo(e.target.value)}
+              className="h-9"
+            />
           </div>
         </div>
-
-        <Separator />
 
         {/* Product Filter */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="product" className="text-sm font-medium">
-              Product
-            </Label>
-            {(productFrom || productTo) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs"
-                onClick={() => clearFilter("product")}
-              >
-                <X className="h-3 w-3 mr-1" />
-                Clear
-              </Button>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center space-x-1">
-              <Label htmlFor="product-from" className="w-12 text-xs whitespace-nowrap">
-                From:
-              </Label>
-              <Input
-                id="product-from"
-                value={productFrom}
-                onChange={(e) => setProductFrom(e.target.value)}
-                placeholder="Product code"
-                className="h-8"
-              />
-            </div>
-            <div className="flex items-center space-x-1">
-              <Label htmlFor="product-to" className="w-12 text-xs whitespace-nowrap">
-                To:
-              </Label>
-              <Input
-                id="product-to"
-                value={productTo}
-                onChange={(e) => setProductTo(e.target.value)}
-                placeholder="Product code"
-                className="h-8"
-              />
-            </div>
+          <Label className="text-sm font-medium">
+            Product Range
+          </Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Input
+              placeholder="From"
+              value={productFrom}
+              onChange={(e) => setProductFrom(e.target.value)}
+              className="h-9"
+            />
+            <Input
+              placeholder="To"
+              value={productTo}
+              onChange={(e) => setProductTo(e.target.value)}
+              className="h-9"
+            />
           </div>
         </div>
+      </div>
 
-        <Separator />
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 pt-2">
-          <Button
-            onClick={applyFilters}
-            className="flex-1"
-            disabled={isLoading}
-          >
-            Apply Filters
-          </Button>
-          <Button
-            variant="outline"
-            onClick={resetFilters}
-            disabled={isLoading}
-          >
-            Reset
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="flex justify-end gap-2 pt-2">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={resetFilters}
+          disabled={isLoading}
+        >
+          Reset
+        </Button>
+        <Button 
+          size="sm"
+          onClick={applyFilters}
+          disabled={isLoading}
+        >
+          Apply Filters
+        </Button>
+      </div>
+    </div>
   )
 } 

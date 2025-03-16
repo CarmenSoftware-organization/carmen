@@ -13,7 +13,7 @@ This document covers the requirements for the Purchase Order module, including:
 - Purchase Order creation and management
 - Item management within Purchase Orders
 - Financial calculations and currency handling
-- Status tracking and workflow
+- Status tracking
 - Integration with other modules
 - User interface requirements
 - Reporting and analytics
@@ -72,9 +72,8 @@ F&B businesses require robust procurement systems to manage their supply chain e
    - As a finance manager, I want automatic calculation of subtotals, taxes, and discounts so that financial data is accurate.
    - As a finance manager, I want to see both transaction currency and base currency amounts so that I can understand the financial impact.
 
-4. **Status and Workflow**
+4. **Status Tracking**
    - As a procurement officer, I want to track the status of purchase orders so that I know where they are in the process.
-   - As a manager, I want to approve or reject purchase orders so that I can maintain control over spending.
 
 5. **Integration**
    - As a procurement officer, I want integration with vendor management so that I can easily select vendors and see their information.
@@ -109,44 +108,38 @@ F&B businesses require robust procurement systems to manage their supply chain e
 - **PO-FR-016**: The system shall support Free of Charge (FOC) items.
 - **PO-FR-017**: The system shall track received quantities against ordered quantities.
 - **PO-FR-018**: The system shall calculate remaining quantities for items.
+- **PO-FR-019**: The system shall maintain traceability between PO items and their source PR items.
+- **PO-FR-020**: The system shall display PR source information for PO items when available.
+- **PO-FR-021**: The system shall allow users to filter and search PO items by PR reference.
+- **PO-FR-022**: The system shall include PR-to-PO traceability data in reports and exports.
 
 #### 3.1.3 Financial Management
-- **PO-FR-019**: The system shall calculate subtotals for each item.
-- **PO-FR-020**: The system shall calculate taxes based on configurable tax rates.
-- **PO-FR-021**: The system shall calculate discounts based on configurable discount rates.
-- **PO-FR-022**: The system shall calculate net amounts (subtotal - discount).
-- **PO-FR-023**: The system shall calculate total amounts (net amount + tax).
-- **PO-FR-024**: The system shall support multiple currencies.
-- **PO-FR-025**: The system shall convert amounts between transaction currency and base currency.
-- **PO-FR-026**: The system shall allow users to override calculated values with appropriate permissions.
-- **PO-FR-027**: The system shall validate financial calculations for accuracy.
+- **PO-FR-023**: The system shall calculate subtotals for each item.
+- **PO-FR-024**: The system shall calculate taxes based on configurable tax rates.
+- **PO-FR-025**: The system shall calculate discounts based on configurable discount rates.
+- **PO-FR-026**: The system shall calculate net amounts (subtotal - discount).
+- **PO-FR-027**: The system shall calculate total amounts (net amount + tax).
+- **PO-FR-028**: The system shall support multiple currencies.
+- **PO-FR-029**: The system shall convert amounts between transaction currency and base currency.
+- **PO-FR-030**: The system shall allow users to override calculated values with appropriate permissions.
+- **PO-FR-031**: The system shall validate financial calculations for accuracy.
 
-#### 3.1.4 Status and Workflow
-- **PO-FR-028**: The system shall support the following statuses: Draft, Submitted, Approved, Rejected, Cancelled, Closed.
-- **PO-FR-029**: The system shall enforce status transitions according to defined workflows.
-- **PO-FR-030**: The system shall require appropriate approvals for status changes.
-- **PO-FR-031**: The system shall notify relevant users of status changes.
-- **PO-FR-032**: The system shall track the history of status changes.
-- **PO-FR-033**: The system shall support partial receipts and update status accordingly.
-- **PO-FR-034**: The system shall automatically close purchase orders when fully received.
+#### 3.1.4 Integration
+- **PO-FR-032**: The system shall integrate with the Vendor Management module.
+- **PO-FR-033**: The system shall integrate with the Purchase Request module.
+- **PO-FR-034**: The system shall integrate with the Goods Received Note module.
+- **PO-FR-035**: The system shall integrate with the Inventory Management module.
+- **PO-FR-036**: The system shall integrate with the Financial Management module.
+- **PO-FR-037**: The system shall integrate with the Notification module for alerts.
 
-#### 3.1.5 Integration
-- **PO-FR-035**: The system shall integrate with the Vendor Management module.
-- **PO-FR-036**: The system shall integrate with the Purchase Request module.
-- **PO-FR-037**: The system shall integrate with the Goods Received Note module.
-- **PO-FR-038**: The system shall integrate with the Inventory Management module.
-- **PO-FR-039**: The system shall integrate with the Financial Management module.
-- **PO-FR-040**: The system shall integrate with the Workflow module for approvals.
-- **PO-FR-041**: The system shall integrate with the Notification module for alerts.
-
-#### 3.1.6 Reporting and Analytics
-- **PO-FR-042**: The system shall provide a list view of purchase orders with filtering and sorting.
-- **PO-FR-043**: The system shall provide detailed views of individual purchase orders.
-- **PO-FR-044**: The system shall generate purchase order documents for printing and sharing.
-- **PO-FR-045**: The system shall provide reports on purchase order status.
-- **PO-FR-046**: The system shall provide reports on vendor performance.
-- **PO-FR-047**: The system shall provide reports on spending by category, department, etc.
-- **PO-FR-048**: The system shall allow export of purchase order data to common formats (CSV, Excel, PDF).
+#### 3.1.5 Reporting and Analytics
+- **PO-FR-038**: The system shall provide a list view of purchase orders with filtering and sorting.
+- **PO-FR-039**: The system shall provide detailed views of individual purchase orders.
+- **PO-FR-040**: The system shall generate purchase order documents for printing and sharing.
+- **PO-FR-041**: The system shall provide reports on purchase order status.
+- **PO-FR-042**: The system shall provide reports on vendor performance.
+- **PO-FR-043**: The system shall provide reports on spending by category, department, etc.
+- **PO-FR-044**: The system shall allow export of purchase order data to common formats (CSV, Excel, PDF).
 
 ### 3.2 Non-Functional Requirements
 
@@ -245,7 +238,7 @@ F&B businesses require robust procurement systems to manage their supply chain e
 - Users can create, edit, and manage purchase orders.
 - Users can add, edit, and remove items from purchase orders.
 - Financial calculations are accurate and consistent.
-- Status transitions follow defined workflows.
+- Status tracking works correctly.
 - Integration with other modules works correctly.
 - Reports and analytics provide accurate information.
 

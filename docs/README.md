@@ -7,6 +7,7 @@ This directory contains comprehensive documentation for the Carmen F&B Managemen
 ### System-Wide Documentation
 
 - [Design Documentation](./design) - System-wide design documents, architecture, and specifications
+- [Procurement Process Flow](./Procurement-Process-Flow.md) - End-to-end procurement process across PR, PO, GRN, and CN modules
 
 ### Module Documentation
 
@@ -37,4 +38,15 @@ When creating or updating documentation:
 3. Use Markdown format for all documentation
 4. Include diagrams using Mermaid syntax where appropriate
 5. Keep documentation up-to-date with implementation changes
-6. Cross-reference related documents when applicable 
+6. Cross-reference related documents when applicable
+
+## Recent Updates
+
+- **March 14, 2024**: Added purchase-request-ba.md to the list of consolidated documents in PR module
+- **March 14, 2024**: Renamed module-map.md to PR-Module-Structure.md in PR module documentation
+- **March 14, 2024**: Completed documentation refinement (Phase 3) for the PR module
+- **March 14, 2024**: Enhanced Integration Points documentation across modules
+- **March 14, 2024**: Added detailed User Role specifications for PR module
+- **March 12, 2024**: Completed documentation consolidation (Phase 2) for the PR module
+- **March 12, 2024**: Created comprehensive Procurement Process Flow document
+- **March 12, 2024**: Updated cross-references between procurement-related modules 

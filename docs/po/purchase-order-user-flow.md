@@ -31,35 +31,11 @@ flowchart TD
     
     FixErrors --> ValidatePO
     
-    SaveDraft --> Submit[Submit for Approval]
-    Submit --> End([End])
+    SaveDraft --> SendToVendor[Send to Vendor]
+    SendToVendor --> End([End])
 ```
 
-## 2. Purchase Order Approval Flow
-
-```mermaid
-flowchart TD
-    Start([Start]) --> ReceiveNotification[Receive Approval Notification]
-    ReceiveNotification --> ReviewPO[Review Purchase Order]
-    
-    ReviewPO --> Decision{Approve?}
-    
-    Decision -->|Yes| ApprovePO[Approve PO]
-    Decision -->|No| RejectPO[Reject PO]
-    Decision -->|Request Changes| RequestChanges[Request Changes]
-    
-    ApprovePO --> NotifyCreator[Notify Creator]
-    RejectPO --> ProvideReason[Provide Rejection Reason]
-    RequestChanges --> SpecifyChanges[Specify Required Changes]
-    
-    ProvideReason --> NotifyCreator
-    SpecifyChanges --> NotifyCreator
-    
-    NotifyCreator --> UpdateStatus[Update PO Status]
-    UpdateStatus --> End([End])
-```
-
-## 3. Goods Receipt Flow
+## 2. Goods Receipt Flow
 
 ```mermaid
 flowchart TD
@@ -88,7 +64,7 @@ flowchart TD
     KeepOpen --> End
 ```
 
-## 4. Purchase Order Modification Flow
+## 3. Purchase Order Modification Flow
 
 ```mermaid
 flowchart TD
@@ -96,29 +72,21 @@ flowchart TD
     SelectPO --> CheckStatus{Check Status}
     
     CheckStatus -->|Draft| EditPO[Edit PO]
-    CheckStatus -->|Submitted/Approved| RequestChange[Request Change]
-    CheckStatus -->|Closed/Voided| CannotEdit[Cannot Edit]
+    CheckStatus -->|Other Status| CannotEdit[Cannot Edit]
     
     EditPO --> ModifyDetails[Modify PO Details]
-    RequestChange --> SubmitChangeRequest[Submit Change Request]
     CannotEdit --> End([End])
     
     ModifyDetails --> EditItems[Edit Items]
-    SubmitChangeRequest --> WaitApproval[Wait for Approval]
     
     EditItems --> RecalculateFinancials[Recalculate Financials]
-    WaitApproval --> ApprovalDecision{Approved?}
     
     RecalculateFinancials --> SaveChanges[Save Changes]
-    ApprovalDecision -->|Yes| CreateRevision[Create PO Revision]
-    ApprovalDecision -->|No| NotifyRejection[Notify Rejection]
     
     SaveChanges --> End
-    CreateRevision --> End
-    NotifyRejection --> End
 ```
 
-## 5. Purchase Order Reporting Flow
+## 4. Purchase Order Reporting Flow
 
 ```mermaid
 flowchart TD
@@ -150,70 +118,63 @@ flowchart TD
     ExportReport --> End
 ```
 
-## 6. Integrated User Flow
+## 5. Purchase Order Status Transition Flow
 
 ```mermaid
 flowchart TD
-    Start([Start]) --> NeedPO{Need PO?}
+    Start([Start]) --> Draft[Draft]
     
-    NeedPO -->|Yes| CreatePR[Create Purchase Request]
-    NeedPO -->|No| End([End])
+    Draft -->|Send to Vendor| Sent[Sent]
+    Draft -->|Delete| Deleted[Deleted]
     
-    CreatePR --> PRApproval[PR Approval Process]
-    PRApproval --> PRApproved{PR Approved?}
+    Sent -->|Receive Some Items| Partial[Partially Received]
+    Sent -->|Receive All Items| FullyReceived[Fully Received]
+    Sent -->|Void| Voided[Voided]
     
-    PRApproved -->|Yes| CreatePO[Create Purchase Order]
-    PRApproved -->|No| ReviseRequest[Revise Request]
+    Partial -->|Receive Remaining Items| FullyReceived
+    Partial -->|Close with Partial Receipt| Closed[Closed]
+    Partial -->|Void| Voided
     
-    ReviseRequest --> CreatePR
+    FullyReceived -->|Close PO| Closed
+    FullyReceived -->|Void| Voided
     
-    CreatePO --> POApproval[PO Approval Process]
-    POApproval --> POApproved{PO Approved?}
+    Voided --> End([End])
+    Closed --> End([End])
+    Deleted --> End([End])
+
+    classDef draftActions fill:#e6f7ff,stroke:#1890ff;
+    classDef activeActions fill:#f6ffed,stroke:#52c41a;
+    classDef terminalActions fill:#fff2e8,stroke:#fa8c16;
     
-    POApproved -->|Yes| SendToVendor[Send to Vendor]
-    POApproved -->|No| RevisePO[Revise PO]
-    
-    RevisePO --> CreatePO
-    
-    SendToVendor --> TrackDelivery[Track Delivery]
-    TrackDelivery --> GoodsReceived{Goods Received?}
-    
-    GoodsReceived -->|Yes| CreateGRN[Create Goods Received Note]
-    GoodsReceived -->|No| FollowUp[Follow Up with Vendor]
-    
-    FollowUp --> TrackDelivery
-    
-    CreateGRN --> UpdateInventory[Update Inventory]
-    UpdateInventory --> FullyReceived{Fully Received?}
-    
-    FullyReceived -->|Yes| ClosePO[Close PO]
-    FullyReceived -->|No| KeepOpen[Keep PO Open]
-    
-    ClosePO --> End
-    KeepOpen --> TrackDelivery
+    class Draft draftActions;
+    class Sent,Partial,FullyReceived activeActions;
+    class Closed,Voided,Deleted terminalActions;
 ```
 
-## 7. User Role Interactions
+> **Important Business Rule**: Purchase Orders can only be deleted while in draft status. Once a Purchase Order has been sent to a vendor (active state), it can only be voided or closed, not deleted. This ensures data integrity and maintains a proper audit trail.
+
+## 6. User Role Interactions
 
 ```mermaid
 flowchart TD
     ProcurementOfficer[Procurement Officer] -->|Creates| PO[Purchase Order]
     ProcurementOfficer -->|Manages| Items[PO Items]
     ProcurementOfficer -->|Tracks| Status[PO Status]
+    ProcurementOfficer -->|Sends to| Vendor[Vendor]
+    ProcurementOfficer -->|Can Delete| DraftPO[Draft PO]
+    ProcurementOfficer -->|Can Void| ActivePO[Active PO]
     
     FinanceManager[Finance Manager] -->|Reviews| Financials[Financial Details]
-    FinanceManager -->|Approves| Budget[Budget Allocation]
+    FinanceManager -->|Monitors| Budget[Budget Allocation]
     
-    DepartmentManager[Department Manager] -->|Approves| DeptPO[Department POs]
+    DepartmentManager[Department Manager] -->|Reviews| DeptPO[Department POs]
     
     InventoryManager[Inventory Manager] -->|Receives| Goods[Goods]
     InventoryManager -->|Creates| GRN[Goods Received Note]
+    InventoryManager -->|Can Close| ActivePO
     
-    Vendor[Vendor] -->|Receives| SentPO[Sent PO]
+    Vendor -->|Receives| SentPO[Sent PO]
     Vendor -->|Delivers| OrderedItems[Ordered Items]
-    
-    PO -->|Requires| Approval[Approval]
-    Approval -->|By| Approvers[Approvers]
     
     Items -->|Affect| Inventory[Inventory Levels]
     
@@ -222,6 +183,60 @@ flowchart TD
     
     SentPO -->|Leads to| OrderedItems
     OrderedItems -->|Triggers| GRN
+    
+    DraftPO -.-> PO
+    ActivePO -.-> PO
 ```
 
-These diagrams illustrate the key user flows and interactions within the Purchase Order module, from creation to closure, including approval processes, goods receipt, and reporting. 
+## 7. Mobile User Flow
+
+```mermaid
+flowchart TD
+    Start([Start]) --> Login[Login to System]
+    
+    Login --> Dashboard[View Dashboard]
+    
+    Dashboard --> POList[View PO List]
+    Dashboard --> CreatePO[Create New PO]
+    Dashboard --> Reports[View Reports]
+    
+    POList --> FilterPOs[Filter POs]
+    POList --> SelectPO[Select PO]
+    
+    SelectPO --> ViewDetails[View PO Details]
+    
+    ViewDetails --> ViewItems[View Items]
+    ViewDetails --> ViewStatus[View Status]
+    ViewDetails --> ViewAttachments[View Attachments]
+    
+    ViewDetails --> Actions{Actions}
+    
+    Actions -->|Draft PO| EditPO[Edit PO]
+    Actions -->|Sent PO| ReceiveGoods[Receive Goods]
+    Actions -->|Any PO| AddComment[Add Comment]
+    Actions -->|Any PO| SharePO[Share PO]
+    
+    EditPO --> SaveChanges[Save Changes]
+    ReceiveGoods --> CreateGRN[Create GRN]
+    
+    SaveChanges --> ViewDetails
+    CreateGRN --> ViewDetails
+    AddComment --> ViewDetails
+    SharePO --> ViewDetails
+    
+    CreatePO --> EnterDetails[Enter PO Details]
+    EnterDetails --> AddItems[Add Items]
+    AddItems --> ReviewPO[Review PO]
+    ReviewPO --> SavePO[Save PO]
+    SavePO --> SendToVendor[Send to Vendor]
+    SendToVendor --> Dashboard
+    
+    Reports --> ConfigureReport[Configure Report]
+    ConfigureReport --> ViewReport[View Report]
+    ViewReport --> ExportReport[Export Report]
+    ExportReport --> Dashboard
+    
+    ViewDetails --> Dashboard
+```
+
+These diagrams illustrate the key user flows and interactions within the Purchase Order module, from creation to closure, including goods receipt, reporting, and mobile interactions. 

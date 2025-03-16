@@ -375,6 +375,11 @@ interface PurchaseOrder {
   buyer?: string;
   creditTerms?: string;
   
+  // PR Reference
+  prId?: string;
+  prNumber?: string;
+  prRequestor?: string;
+  
   // Financial fields
   baseCurrencyCode: string;
   baseSubtotalPrice: number;
@@ -416,6 +421,14 @@ interface PurchaseOrderItem {
   itemId: string;
   name: string;
   description?: string;
+  
+  // PR Item Reference for Traceability
+  prItemId?: string;
+  prNumber?: string;
+  prRequestor?: string;
+  prRequestDate?: Date;
+  prDepartment?: string;
+  
   convRate: number;
   orderedQuantity: number;
   orderUnit: string;
