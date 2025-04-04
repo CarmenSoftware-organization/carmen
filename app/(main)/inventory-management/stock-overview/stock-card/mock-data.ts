@@ -6,7 +6,7 @@ import {
   LotInformation, 
   MovementRecord, 
   ValuationRecord 
-} from "./types"
+} from "../types"
 
 // Helper function to generate a date string within the last 30 days
 const getRandomRecentDate = (daysAgo = 30) => {

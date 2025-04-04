@@ -8,15 +8,15 @@ import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 export default function GoodsReceiveNotePage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams()
   const mode = searchParams?.get('mode') as GoodsReceiveNoteMode || 'view'
-  const id = params.id
+  const id = decodeURIComponent(params.id)
 
   let grnData: GoodsReceiveNote | undefined
 
-  if (id === '0') {
-    // Create a new GRN with default values
+  // Handle create mode
+  if (id === 'create') {
     grnData = {
-      id: '0',
-      ref: '',
+      id: '',
+      ref: `GRN/${new Date().getFullYear()}/${String(mockGoodsReceiveNotes.length + 1).padStart(3, '0')}`,
       date: new Date(),
       invoiceDate: new Date(),
       invoiceNumber: '',
@@ -40,7 +40,7 @@ export default function GoodsReceiveNotePage({ params }: { params: { id: string 
       extraCosts: [],
       comments: [],
       attachments: [],
-      activityLog: [],  
+      activityLog: [],
       baseSubTotalPrice: 0,
       subTotalPrice: 0,
       baseNetAmount: 0,
@@ -51,14 +51,21 @@ export default function GoodsReceiveNotePage({ params }: { params: { id: string 
       taxAmount: 0,
       baseTotalAmount: 0,
       totalAmount: 0,
-
     }
   } else {
-    grnData = mockGoodsReceiveNotes.find(grn => grn.id === id)
+    // Find existing GRN
+    grnData = mockGoodsReceiveNotes.find(grn => grn.id === id || grn.ref === id)
   }
 
   if (!grnData) {
-    return <div>Goods Receive Note not found</div>
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-2">Goods Receive Note not found</h2>
+          <p className="text-muted-foreground">The requested GRN could not be found.</p>
+        </div>
+      </div>
+    )
   }
 
   return <GoodsReceiveNoteComponent initialData={grnData} mode={mode} />

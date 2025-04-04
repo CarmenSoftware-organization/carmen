@@ -5,7 +5,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export default function ActivityLogTab({ poData }: { poData: any }) {
+interface ActivityLogEntry {
+  date: string
+  user: string
+  action: string
+  details: string
+}
+
+interface PurchaseOrderData {
+  activityLog?: ActivityLogEntry[]
+}
+
+export default function ActivityLogTab({ poData }: { poData: PurchaseOrderData }) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Activity Log</h2>
@@ -46,7 +57,7 @@ export default function ActivityLogTab({ poData }: { poData: any }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {poData.activityLog && poData.activityLog.map((activity: any, index: number) => (
+          {poData.activityLog && poData.activityLog.map((activity: ActivityLogEntry, index: number) => (
             <TableRow key={index}>
               <TableCell>{activity.date}</TableCell>
               <TableCell>{activity.user}</TableCell>

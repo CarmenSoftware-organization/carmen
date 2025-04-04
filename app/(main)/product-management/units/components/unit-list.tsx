@@ -20,6 +20,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { mockUnits } from "../data/mock-units"
+import { AdvancedFilter } from "@/components/ui/advanced-filter"
+import { FilterType } from "@/lib/utils/filter-storage"
+import { toast } from "@/components/ui/use-toast"
 
 export interface Unit {
   id: string
@@ -38,20 +41,70 @@ export function UnitList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+  const [activeFilters, setActiveFilters] = useState<FilterType<Unit>[]>([])
 
   // Use mock data
   const units = mockUnits
 
   const filteredUnits = units.filter((unit) => {
+    // Apply search filter
     const matchesSearch = 
       unit.code.toLowerCase().includes(search.toLowerCase()) ||
       unit.name.toLowerCase().includes(search.toLowerCase()) ||
       unit.description?.toLowerCase().includes(search.toLowerCase())
     
+    // Apply type filter
     const matchesType = filterType === "all" || unit.type === filterType
     
-    return matchesSearch && matchesType
-  })
+    // Apply advanced filters
+    const matchesAdvancedFilters = activeFilters.length === 0 || activeFilters.every(filter => {
+      const field = filter.field;
+      const value = filter.value;
+      const operator = filter.operator;
+
+      // Get the field value
+      const fieldValue = unit[field as keyof Unit];
+
+      // Handle undefined or null values
+      if (fieldValue === undefined || fieldValue === null) {
+        return false;
+      }
+
+      // Convert to string for comparison if not already a string
+      const stringFieldValue = String(fieldValue).toLowerCase();
+      const stringValue = String(value).toLowerCase();
+
+      switch (operator) {
+        case 'equals':
+          return stringFieldValue === stringValue;
+        case 'contains':
+          return stringFieldValue.includes(stringValue);
+        case 'startsWith':
+          return stringFieldValue.startsWith(stringValue);
+        case 'endsWith':
+          return stringFieldValue.endsWith(stringValue);
+        case 'greaterThan':
+          return fieldValue > value;
+        case 'lessThan':
+          return fieldValue < value;
+        default:
+          return true;
+      }
+    });
+    
+    return matchesSearch && matchesType && matchesAdvancedFilters;
+  });
+
+  const totalPages = Math.ceil(filteredUnits.length / pageSize)
+  
+  const getCurrentPageData = () => {
+    return filteredUnits.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    )
+  }
 
   const handleSelectItems = (itemIds: string[]) => {
     setSelectedItems(itemIds)
@@ -71,9 +124,47 @@ export function UnitList() {
     console.log('Export items:', selectedItems)
   }
 
+  const handleApplyFilters = (filters: FilterType<Unit>[]) => {
+    try {
+      setActiveFilters(filters);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem applying the filters.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleClearFilters = () => {
+    try {
+      setActiveFilters([]);
+    } catch (error) {
+      console.error('Error clearing filters:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem clearing the filters.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Define filter fields for the advanced filter
+  const filterFields = [
+    { value: 'code' as keyof Unit, label: 'Code' },
+    { value: 'name' as keyof Unit, label: 'Name' },
+    { value: 'description' as keyof Unit, label: 'Description' },
+    { value: 'type' as keyof Unit, label: 'Type' },
+    { value: 'isActive' as keyof Unit, label: 'Status' },
+    { value: 'createdAt' as keyof Unit, label: 'Created Date' },
+    { value: 'updatedAt' as keyof Unit, label: 'Updated Date' }
+  ];
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Units</h1>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -81,82 +172,148 @@ export function UnitList() {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center space-x-2">
-          <div className="relative w-96">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search units..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="w-full sm:w-1/2 flex space-x-2">
+            <div className="relative flex-1">
+              <Input
+                placeholder="Search units..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full"
+              />
+              <Button variant="secondary" size="icon" className="absolute right-0 top-0">
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value={filterType}
+              onValueChange={setFilterType}
+            >
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="INVENTORY">Inventory</SelectItem>
+                <SelectItem value="ORDER">Order</SelectItem>
+                <SelectItem value="RECIPE">Recipe</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <AdvancedFilter
+              onApplyFilters={handleApplyFilters}
+              onClearFilters={handleClearFilters}
+              filterFields={filterFields}
             />
           </div>
-          <Select
-            value={filterType}
-            onValueChange={setFilterType}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="INVENTORY">Inventory</SelectItem>
-              <SelectItem value="ORDER">Order</SelectItem>
-              <SelectItem value="RECIPE">Recipe</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {selectedItems.length > 0 && (
-          <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-            <span className="text-sm text-muted-foreground ml-2">
-              {selectedItems.length} items selected
-            </span>
-            <div className="flex items-center gap-2 ml-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(true)}
-              >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Set Active
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(false)}
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                Set Inactive
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBulkExport}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export Selected
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Selected
-              </Button>
+          <div className="mb-4">
+            <div className="flex flex-wrap items-center gap-2 p-2 bg-muted rounded-lg">
+              <span className="text-sm text-muted-foreground ml-2">
+                {selectedItems.length} items selected
+              </span>
+              <div className="flex flex-wrap items-center gap-2 ml-0 sm:ml-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleBulkStatusUpdate(true)}
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Set Active
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleBulkStatusUpdate(false)}
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Set Inactive
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkExport}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Selected
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Selected
+                </Button>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      <UnitTable
-        units={filteredUnits}
-        onEdit={setSelectedUnit}
-        selectedItems={selectedItems}
-        onSelectItems={handleSelectItems}
-      />
+      <div className="space-y-4">
+        <UnitTable
+          units={getCurrentPageData()}
+          onEdit={setSelectedUnit}
+          selectedItems={selectedItems}
+          onSelectItems={handleSelectItems}
+        />
+
+        {/* Pagination */}
+        {filteredUnits.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground text-center sm:text-left">
+              Showing {filteredUnits.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0} to {Math.min(currentPage * pageSize, filteredUnits.length)} of {filteredUnits.length} results
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+              >
+                <span className="sr-only">First page</span>
+                «
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <span className="sr-only">Previous page</span>
+                ‹
+              </Button>
+              <span className="text-sm font-medium">
+                Page {currentPage} of {totalPages || 1}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages || totalPages === 0}
+              >
+                <span className="sr-only">Next page</span>
+                ›
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages || totalPages === 0}
+              >
+                <span className="sr-only">Last page</span>
+                »
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">

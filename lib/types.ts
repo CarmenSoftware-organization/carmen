@@ -269,10 +269,12 @@ export enum POLineStatus {
 
 // Purchase Request (PR) Types
 
-export interface PurchaseRequest_1 {
+export interface PurchaseRequest {
   id: string;
   refNumber: string;
   date: Date;
+  vendor: string;
+  vendorId: number;
   type: PRType;
   deliveryDate: Date;
   description: string;
@@ -282,30 +284,15 @@ export interface PurchaseRequest_1 {
     id: string;
     department: string;
   };
-  currency: string;
   status: DocumentStatus;
   workflowStatus: WorkflowStatus;
   currentWorkflowStage: WorkflowStage;
   location: string;
-  items: PurchaseRequestItem[];
-  attachments: Attachment[];
-  subtotal: Money;
-  tax: Money;
-  jobCode: string;
   department: string;
-  budgetCode: string;
-  allocatedBudget: Money;
-  yearToDateSpending: Money;
-  exchangeRate: number;
-  exchangeRateDate: Date;
-  paymentMethod?: string;
-  paymentTerms?: string;
-  earlyPaymentDiscount?: string;
-  comments: Comment[];
-  approvals: WorkflowStep[];
-  deliveryPoint: string;
-  activityLog: ActivityLogEntry[];
-  additionalCharges: Money;
+  jobCode: string;
+  estimatedTotal: number;
+  currency: string;
+  baseCurrencyCode: string;
   baseSubTotalPrice: number;
   subTotalPrice: number;
   baseNetAmount: number;
@@ -316,6 +303,7 @@ export interface PurchaseRequest_1 {
   taxAmount: number;
   baseTotalAmount: number;
   totalAmount: number;
+  items?: PurchaseRequestItem[];
 }
 
 // export enum WorkflowStatus {
@@ -664,42 +652,6 @@ export enum WorkflowStage {
   completed = "Completed",
 }
 
-export interface PurchaseRequest {
-  id: string;
-  refNumber: string;
-  date: Date;
-  vendor: string;
-  vendorId: number;
-  type: PRType;
-  deliveryDate: Date;
-  description: string;
-  requestorId: string;
-  requestor: {
-    name: string;
-    id: string;
-    department: string;
-  };
-  status: DocumentStatus;
-  workflowStatus: WorkflowStatus;
-  currentWorkflowStage: WorkflowStage;
-  location: string;
-  department: string;
-  jobCode: string;
-  estimatedTotal: number;
-  currency: string;
-  baseCurrencyCode: string;
-  baseSubTotalPrice: number;
-  subTotalPrice: number;
-  baseNetAmount: number;
-  netAmount: number;
-  baseDiscAmount: number;
-  discountAmount: number;
-  baseTaxAmount: number;
-  taxAmount: number;
-  baseTotalAmount: number;
-  totalAmount: number;
-}
-
 export type WorkflowAction = "approve" | "reject" | "sendBack";
 
 export interface ItemDetail {
@@ -878,7 +830,6 @@ export enum CurrencyCode {
 }
 
 export interface Product {
-  [x: string]: any;
   id: string;
   productCode: string;
   name: string;
@@ -909,6 +860,7 @@ export interface Product {
   storageInstructions: string;
   unitConversions: UnitConversion[];
   imagesUrl: string;
+  department?: string;
 }
 
 export interface UnitConversion {
@@ -954,4 +906,28 @@ export interface Contact {
   email: string;
   department: string;
   isPrimary: boolean;
+}
+
+export interface PRTemplate {
+  id: string;
+  name: string;
+  description: string;
+  type: PRType;
+  category: string;
+  department?: string;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDefault?: boolean;
+  isGlobal?: boolean;
+  prData: {
+    vendor?: string;
+    vendorId?: number;
+    description?: string;
+    location?: string;
+    department?: string;
+    jobCode?: string;
+    currency?: string;
+    items: Partial<PurchaseRequestItem>[];
+  };
 }

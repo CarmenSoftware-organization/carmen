@@ -29,8 +29,6 @@ import {
   Globe,
   Moon,
   Sun,
-  Menu,
-  X,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -84,7 +82,7 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
             </Button>
             <div className="flex flex-col">
               <Link
-                href="/dashboard"
+                href="/procurement"
                 className="text-xl md:text-2xl font-bold text-foreground dark:text-gray-100"
               >
                 CARMEN

@@ -11,190 +11,103 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { toast } from '@/components/ui/use-toast'
-import { FilterType, SavedFilter, saveFilter, getSavedFilters, deleteFilter } from '@/lib/utils/filter-storage'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-
-// Define the VendorListItem interface to match the one in page.tsx
-interface VendorListItem {
-  id: string;
-  companyName: string;
-  businessType: { name: string };
-  addresses: { addressLine: string; isPrimary: boolean }[];
-  contacts: { name: string; phone: string; isPrimary: boolean }[];
-}
-
-// Define these types locally to avoid circular dependencies
-type FilterOperator = 'equals' | 'contains' | 'startsWith' | 'endsWith' | 'greaterThan' | 'lessThan' | 'between' | 'in' | 'notIn' | 'isNull' | 'isNotNull'
-type LogicalOperator = 'AND' | 'OR'
+import { FilterType, SavedFilter, FilterOperator, LogicalOperator, saveFilter, deleteFilter, getSavedFilters } from '@/lib/utils/filter-storage'
+import { Vendor } from '../[id]/types'
 
 interface AdvancedFilterProps {
-  onApplyFilters: (filters: FilterType<VendorListItem>[]) => void
-  onClearFilters: () => void
+  onFilterChange: (filters: FilterType<Vendor>[]) => void
 }
 
 const filterFields = [
   { value: 'companyName', label: 'Company Name' },
-  { value: 'businessType.name', label: 'Business Type' },
-  { value: 'id', label: 'Vendor ID' }
-]
+  { value: 'businessRegistrationNumber', label: 'Registration No.' },
+  { value: 'taxId', label: 'Tax ID' },
+  { value: 'businessTypeId', label: 'Business Type' },
+  { value: 'addresses.addressLine', label: 'Address' },
+  { value: 'contacts.name', label: 'Contact Name' },
+  { value: 'contacts.phone', label: 'Contact Phone' },
+  { value: 'rating', label: 'Rating' },
+  { value: 'isActive', label: 'Status' }
+] as const
 
-export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilterProps) {
+export function AdvancedFilter({ onFilterChange }: AdvancedFilterProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('build')
-  const [activeFilters, setActiveFilters] = useState<FilterType<VendorListItem>[]>([])
-  const [savedFilters, setSavedFilters] = useState<SavedFilter<VendorListItem>[]>([])
+  const [activeFilters, setActiveFilters] = useState<FilterType<Vendor>[]>([])
+  const [savedFilters, setSavedFilters] = useState<SavedFilter<Vendor>[]>([])
 
-  // Load saved filters on mount
   useEffect(() => {
-    loadSavedFilters()
+    const filters = getSavedFilters<Vendor>('vendor-management')
+    setSavedFilters(filters)
   }, [])
 
-  const loadSavedFilters = async () => {
-    try {
-      const filters = await getSavedFilters<VendorListItem>()
-      setSavedFilters(filters)
-    } catch (error) {
-      console.error('Error loading filters:', error)
-      toast({
-        title: "Error loading filters",
-        description: "There was a problem loading your saved filters.",
-        variant: "destructive"
-      })
-    }
+  const removeFilter = (index: number) => {
+    const newFilters = activeFilters.filter((_, i) => i !== index)
+    setActiveFilters(newFilters)
+    onFilterChange(newFilters)
   }
 
-  const handleDeleteSavedFilter = async (filterId: string) => {
-    try {
-      await deleteFilter<VendorListItem>(filterId)
-      setSavedFilters(savedFilters.filter(f => f.id !== filterId))
-      toast({
-        title: "Filter deleted",
-        description: "Your filter has been deleted successfully."
-      })
-    } catch (error) {
-      console.error('Error deleting filter:', error)
-      toast({
-        title: "Error deleting filter",
-        description: "There was a problem deleting your filter.",
-        variant: "destructive"
-      })
-    }
-  }
-
-  const handleToggleStar = async (filter: SavedFilter<VendorListItem>) => {
-    try {
-      const updatedFilter = await saveFilter<VendorListItem>({
-        ...filter,
-        isDefault: !filter.isDefault
-      })
-      setSavedFilters(savedFilters.map(f => 
-        f.id === filter.id ? { ...f, isDefault: !f.isDefault } : f
-      ))
-    } catch (error) {
-      console.error('Error updating filter:', error)
-      toast({
-        title: "Error updating filter",
-        description: "There was a problem updating your filter.",
-        variant: "destructive"
-      })
-    }
-  }
-
-  const applyFilter = (filter: SavedFilter<VendorListItem>) => {
-    try {
-      onApplyFilters(filter.filters)
-      setIsOpen(false)
-    } catch (error) {
-      console.error('Error applying filter:', error)
-      toast({
-        title: "Error applying filter",
-        description: "There was a problem applying your filter.",
-        variant: "destructive"
-      })
-    }
+  const clearAllFilters = () => {
+    setActiveFilters([])
+    onFilterChange([])
   }
 
   const addFilter = () => {
-    try {
-      setActiveFilters([...activeFilters, {
-        field: '' as keyof VendorListItem,
-        operator: 'equals',
-        value: '',
-      }])
-    } catch (error) {
-      console.error('Error adding filter:', error)
+    const newFilter: FilterType<Vendor> = {
+      field: 'companyName',
+      operator: 'equals',
+      value: ''
     }
-  }
-
-  const removeFilter = (index: number) => {
-    try {
-      setActiveFilters(activeFilters.filter((_, i) => i !== index))
-    } catch (error) {
-      console.error('Error removing filter:', error)
-    }
+    setActiveFilters([...activeFilters, newFilter])
   }
 
   const handleLogicalOperatorChange = (index: number, value: LogicalOperator) => {
-    try {
-      const newFilters = [...activeFilters]
-      if (newFilters[index]) {
-        newFilters[index] = {
-          ...newFilters[index],
-          logicalOperator: value
-        }
-        setActiveFilters(newFilters)
+    const newFilters = [...activeFilters]
+    if (newFilters[index]) {
+      newFilters[index] = {
+        ...newFilters[index],
+        logicalOperator: value
       }
-    } catch (error) {
-      console.error('Error changing logical operator:', error)
+      setActiveFilters(newFilters)
+      onFilterChange(newFilters)
     }
   }
 
-  const handleFieldChange = (index: number, value: string) => {
-    try {
-      const newFilters = [...activeFilters]
-      if (newFilters[index]) {
-        newFilters[index] = { 
-          ...newFilters[index], 
-          field: value as keyof VendorListItem 
-        }
-        setActiveFilters(newFilters)
-      }
-    } catch (error) {
-      console.error('Error changing field:', error)
+  const handleFieldChange = (index: number, value: keyof Vendor | string) => {
+    const newFilters = [...activeFilters]
+    if (newFilters[index]) {
+      newFilters[index] = { ...newFilters[index], field: value }
+      setActiveFilters(newFilters)
+      onFilterChange(newFilters)
     }
   }
 
   const handleOperatorChange = (index: number, value: FilterOperator) => {
-    try {
-      const newFilters = [...activeFilters]
-      if (newFilters[index]) {
-        newFilters[index] = { ...newFilters[index], operator: value }
-        setActiveFilters(newFilters)
-      }
-    } catch (error) {
-      console.error('Error changing operator:', error)
+    const newFilters = [...activeFilters]
+    if (newFilters[index]) {
+      newFilters[index] = { ...newFilters[index], operator: value }
+      setActiveFilters(newFilters)
+      onFilterChange(newFilters)
     }
   }
 
   const handleValueChange = (index: number, value: string) => {
-    try {
-      const newFilters = [...activeFilters]
-      if (newFilters[index]) {
-        newFilters[index] = { ...newFilters[index], value }
-        setActiveFilters(newFilters)
-      }
-    } catch (error) {
-      console.error('Error changing value:', error)
+    const newFilters = [...activeFilters]
+    if (newFilters[index]) {
+      newFilters[index] = { ...newFilters[index], value }
+      setActiveFilters(newFilters)
+      onFilterChange(newFilters)
     }
   }
 
   const handleSaveFilter = async () => {
-    try {
-      const name = prompt('Enter a name for this filter:')
-      if (!name) return
+    const name = prompt('Enter a name for this filter:')
+    if (!name) return
 
+    try {
       const now = new Date().toISOString()
-      const newFilter: SavedFilter<VendorListItem> = {
+      const newFilter: SavedFilter<Vendor> = {
         id: Date.now().toString(),
         name,
         filters: activeFilters,
@@ -203,7 +116,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
         isDefault: false
       }
       
-      await saveFilter(newFilter)
+      await saveFilter('vendor-management', newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
       toast({
@@ -211,7 +124,6 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
         description: "Your filter has been saved successfully."
       })
     } catch (error) {
-      console.error('Error saving filter:', error)
       toast({
         title: "Error saving filter",
         description: "There was a problem saving your filter.",
@@ -220,68 +132,78 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
     }
   }
 
-  const handleApplyFilters = () => {
+  const handleToggleStar = (filter: SavedFilter<Vendor>) => {
+    const updatedFilters = savedFilters.map(f => 
+      f.id === filter.id ? { ...f, isDefault: !f.isDefault } : f
+    )
+    setSavedFilters(updatedFilters)
+    if (filter.isDefault) {
+      deleteFilter('vendor-management', filter.id)
+    } else {
+      saveFilter('vendor-management', { ...filter, isDefault: true })
+    }
+  }
+
+  const handleDeleteSavedFilter = async (filterId: string) => {
     try {
-      onApplyFilters(activeFilters)
-      setIsOpen(false)
-    } catch (error) {
-      console.error('Error applying filters:', error)
+      await deleteFilter(filterId, 'vendor-management')
+      setSavedFilters(savedFilters.filter(f => f.id !== filterId))
       toast({
-        title: "Error applying filters",
-        description: "There was a problem applying your filters.",
+        title: "Filter deleted",
+        description: "Your filter has been deleted successfully."
+      })
+    } catch (error) {
+      toast({
+        title: "Error deleting filter",
+        description: "There was a problem deleting your filter.",
         variant: "destructive"
       })
     }
   }
 
-  // Generate a display string for a filter
-  const getFilterDisplay = (filter: FilterType<VendorListItem>): string => {
-    try {
-      const field = filterFields?.find(f => f.value === filter.field)?.label || String(filter.field)
-      
-      let operatorText = ''
-      switch (filter.operator) {
-        case 'equals': operatorText = 'is'; break
-        case 'contains': operatorText = 'contains'; break
-        case 'in': operatorText = 'is one of'; break
-        case 'between': operatorText = 'is between'; break
-        case 'greaterThan': operatorText = 'is greater than'; break
-        case 'lessThan': operatorText = 'is less than'; break
-        default: operatorText = filter.operator
-      }
-      
-      let valueText = ''
-      if (Array.isArray(filter.value)) {
-        valueText = filter.value.join(', ')
-      } else {
-        valueText = String(filter.value)
-      }
-      
-      return `${field} ${operatorText} ${valueText}`
-    } catch (error) {
-      console.error('Error generating filter display:', error)
-      return 'Invalid filter'
+  const applyFilter = (filter: SavedFilter<Vendor>) => {
+    setActiveFilters(filter.filters)
+    onFilterChange(filter.filters)
+    setIsOpen(false)
+  }
+
+  const getFilterDisplay = (filter: FilterType<Vendor>): string => {
+    const field = filterFields?.find(f => f.value === filter.field)?.label || filter.field
+    
+    let operatorText = ''
+    switch (filter.operator) {
+      case 'equals': operatorText = 'is'; break
+      case 'contains': operatorText = 'contains'; break
+      case 'in': operatorText = 'is one of'; break
+      case 'between': operatorText = 'is between'; break
+      case 'greaterThan': operatorText = 'is greater than'; break
+      case 'lessThan': operatorText = 'is less than'; break
+      default: operatorText = filter.operator
     }
+    
+    let valueText = ''
+    if (Array.isArray(filter.value)) {
+      valueText = filter.value.join(', ')
+    } else {
+      valueText = filter.value
+    }
+    
+    return `${field} ${operatorText} ${valueText}`
   }
 
   const getJsonView = () => {
-    try {
-      return JSON.stringify({
-        conditions: activeFilters.map(filter => ({
-          field: filter.field,
-          operator: filter.operator,
-          value: filter.value
-        })),
-        logicalOperator: "AND"
-      }, null, 2)
-    } catch (error) {
-      console.error('Error generating JSON view:', error)
-      return '{}'
-    }
+    return JSON.stringify({
+      conditions: activeFilters.map(filter => ({
+        field: filter.field,
+        operator: filter.operator,
+        value: filter.value
+      })),
+      logicalOperator: "AND"
+    }, null, 2)
   }
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center gap-2">
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="outline" className="h-8 px-2 lg:px-3">
@@ -296,36 +218,27 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
               {savedFilters.length === 0 && (
                 <p className="text-sm text-muted-foreground">No saved filters yet</p>
               )}
-              {savedFilters.map((filter) => (
-                <div key={filter.id} className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-100">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
+              {savedFilters.map(filter => (
+                <div key={filter.id} className="flex items-center justify-between">
+                  <button
+                    className="flex items-center gap-2 text-sm hover:text-primary"
+                    onClick={() => applyFilter(filter)}
+                  >
+                    {filter.name}
+                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      className={`text-${filter.isDefault ? 'yellow' : 'gray'}-500 hover:text-yellow-600`}
                       onClick={() => handleToggleStar(filter)}
-                      className="h-6 w-6"
                     >
-                      <Star className={`h-4 w-4 ${filter.isDefault ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-                    </Button>
-                    <span className="text-sm">{filter.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => applyFilter(filter)}
-                      className="h-6 w-6"
-                    >
-                      <Filter className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
+                      <Star className="h-4 w-4" />
+                    </button>
+                    <button
+                      className="text-gray-500 hover:text-red-600"
                       onClick={() => handleDeleteSavedFilter(filter.id)}
-                      className="h-6 w-6"
                     >
                       <X className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -333,168 +246,157 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
           </div>
         </PopoverContent>
       </Popover>
-      
+
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button className="h-8">
+          <Button variant="outline" className="h-8 px-2 lg:px-3">
             <Filter className="mr-2 h-4 w-4" />
-            <span>Add Filter</span>
+            Advanced Filter
+            {activeFilters.length > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {activeFilters.length}
+              </Badge>
+            )}
           </Button>
         </SheetTrigger>
-        <SheetContent className="sm:max-w-md">
+        <SheetContent className="w-[400px] sm:w-[540px]">
           <SheetHeader>
             <SheetTitle>Advanced Filter</SheetTitle>
             <SheetDescription>
-              Create complex filters to find exactly what you need.
+              Build complex filters to find exactly what you're looking for.
             </SheetDescription>
           </SheetHeader>
-          
-          <Tabs defaultValue="build" className="mt-4" value={activeTab} onValueChange={setActiveTab}>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="build">Build</TabsTrigger>
-              <TabsTrigger value="json">JSON</TabsTrigger>
+              <TabsTrigger value="build">
+                <Filter className="mr-2 h-4 w-4" />
+                Build
+              </TabsTrigger>
+              <TabsTrigger value="code">
+                <Code className="mr-2 h-4 w-4" />
+                JSON
+              </TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="build" className="space-y-4 py-4">
-              <ScrollArea className="h-[300px] pr-4">
-                <div className="space-y-4">
-                  {activeFilters.map((filter, index) => (
-                    <div key={index} className="space-y-2">
-                      {index > 0 && (
+
+            <TabsContent value="build" className="mt-4 space-y-4">
+              <div className="space-y-4">
+                {activeFilters.map((filter, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    {index > 0 && (
+                      <Select
+                        value={filter.logicalOperator || 'AND'}
+                        onValueChange={(value) => handleLogicalOperatorChange(index, value as LogicalOperator)}
+                      >
+                        <SelectTrigger className="w-[100px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AND">AND</SelectItem>
+                          <SelectItem value="OR">OR</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <div className="flex-1 space-y-2">
+                      <div className="flex gap-2">
                         <Select
-                          value={filter.logicalOperator || 'AND'}
-                          onValueChange={(value) => handleLogicalOperatorChange(index, value as LogicalOperator)}
+                          value={filter.field}
+                          onValueChange={(value) => handleFieldChange(index, value)}
                         >
-                          <SelectTrigger className="w-20">
+                          <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="AND">AND</SelectItem>
-                            <SelectItem value="OR">OR</SelectItem>
+                            {filterFields.map(field => (
+                              <SelectItem key={field.value} value={field.value}>
+                                {field.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
-                      )}
-                      
-                      <div className="grid grid-cols-12 gap-2">
-                        <div className="col-span-5">
-                          <Select
-                            value={String(filter.field)}
-                            onValueChange={(value) => handleFieldChange(index, value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select field" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {filterFields.map((field) => (
-                                <SelectItem key={String(field.value)} value={String(field.value)}>
-                                  {field.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="col-span-3">
-                          <Select
-                            value={filter.operator}
-                            onValueChange={(value) => handleOperatorChange(index, value as FilterOperator)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Operator" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="equals">Equals</SelectItem>
-                              <SelectItem value="contains">Contains</SelectItem>
-                              <SelectItem value="in">In</SelectItem>
-                              <SelectItem value="between">Between</SelectItem>
-                              <SelectItem value="greaterThan">Greater than</SelectItem>
-                              <SelectItem value="lessThan">Less than</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="col-span-3">
-                          <Input
-                            placeholder="Value"
-                            value={filter.value}
-                            onChange={(e) => handleValueChange(index, e.target.value)}
-                          />
-                        </div>
-                        
-                        <div className="col-span-1 flex items-center justify-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeFilter(index)}
-                            className="h-8 w-8"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <Select
+                          value={filter.operator}
+                          onValueChange={(value) => handleOperatorChange(index, value as FilterOperator)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="equals">Equals</SelectItem>
+                            <SelectItem value="contains">Contains</SelectItem>
+                            <SelectItem value="startsWith">Starts with</SelectItem>
+                            <SelectItem value="endsWith">Ends with</SelectItem>
+                            <SelectItem value="greaterThan">Greater than</SelectItem>
+                            <SelectItem value="lessThan">Less than</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeFilter(index)}
+                          className="h-10 w-10"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
+                      <Input
+                        placeholder="Value"
+                        value={filter.value}
+                        onChange={(e) => handleValueChange(index, e.target.value)}
+                      />
                     </div>
-                  ))}
-                  
-                  <Button variant="outline" size="sm" onClick={addFilter}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Condition
-                  </Button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <Button onClick={addFilter} variant="outline" className="w-full">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Filter
+                </Button>
+                {activeFilters.length > 0 && (
+                  <>
+                    <Button onClick={handleSaveFilter} variant="outline">
+                      <Save className="mr-2 h-4 w-4" />
+                      Save
+                    </Button>
+                    <Button onClick={clearAllFilters} variant="outline">
+                      <X className="mr-2 h-4 w-4" />
+                      Clear
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              {activeFilters.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Active Filters</h4>
+                  <ScrollArea className="h-[100px] rounded-md border p-2">
+                    <div className="space-y-2">
+                      {activeFilters.map((filter, index) => (
+                        <div key={index} className="flex items-center gap-2 text-sm">
+                          {index > 0 && (
+                            <Badge variant="outline">
+                              {filter.logicalOperator || 'AND'}
+                            </Badge>
+                          )}
+                          <span>{getFilterDisplay(filter)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
                 </div>
-              </ScrollArea>
+              )}
             </TabsContent>
-            
-            <TabsContent value="json" className="py-4">
-              <div className="bg-gray-100 p-3 rounded-md font-mono text-sm overflow-auto max-h-[300px]">
-                {getJsonView()}
+
+            <TabsContent value="code" className="mt-4">
+              <div className="rounded-md bg-muted p-4">
+                <pre className="text-sm">{getJsonView()}</pre>
               </div>
             </TabsContent>
           </Tabs>
-          
-          <div className="mt-6 flex justify-between items-center">
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <History className="h-4 w-4 mr-1" />
-                History
-              </Button>
-              <Button size="sm" variant="outline">
-                <Code className="h-4 w-4 mr-1" />
-                Test
-              </Button>
-            </div>
-            <div className="space-x-2">
-              <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-              <Button onClick={handleApplyFilters}>Apply</Button>
-            </div>
-          </div>
-          
-          <div className="mt-4 border-t pt-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-medium">Save this filter</h3>
-              <Button size="sm" variant="outline" onClick={handleSaveFilter}>
-                <Save className="h-4 w-4 mr-1" />
-                Save
-              </Button>
-            </div>
-          </div>
         </SheetContent>
       </Sheet>
-      
-      {/* Active filters display */}
-      {activeFilters.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          {activeFilters.map((filter, index) => (
-            <Badge key={index} variant="outline" className="flex items-center gap-1 px-2 py-1">
-              {getFilterDisplay(filter)}
-              <button onClick={() => removeFilter(index)} className="ml-1 rounded-full hover:bg-gray-200">
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={onClearFilters}>
-            Clear all
-          </Button>
-        </div>
-      )}
     </div>
   )
 } 

@@ -52,22 +52,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import Inventory from "./inventory"
 import JournalEntries  from "./journal-entries"
 import TaxEntries  from "./tax-entries"
-import { StockMovementTab } from "./StockMovementTab"
 import StockMovementContent from "./stock-movement";
 import StatusBadge from "@/components/ui/custom-status-badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
-type CreditNoteReason =
-  | "PRICING_ERROR"
-  | "DAMAGED_GOODS"
-  | "RETURN"
-  | "DISCOUNT_AGREEMENT"
-  | "OTHER";
 
 interface CreditNoteHeaderProps {
   creditNoteNumber: string;
@@ -117,21 +109,13 @@ function CreditNoteHeader({
       <CardHeader>
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <ArrowLeft className="h-4 w-4" />
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
             </Button>
             <div className="flex items-center space-x-2">
               <h2 className="text-lg font-semibold">Credit Note</h2>
-              <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  status === 'DRAFT'
-                  ? 'bg-gray-100 text-gray-800'
-                  : status === 'POSTED'
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-                }`}>
-                {status}
-              </span>
+              <StatusBadge status={status} />
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -361,7 +345,7 @@ interface CreditNoteItem {
 }
 
 export function CreditNoteComponent() {
-  const [showPanel, setShowPanel] = useState(true);
+  const [showPanel, setShowPanel] = useState(false);
   const [headerData, setHeaderData] = useState({
     creditNoteNumber: "CN-2024-001",
     date: "2024-03-20",
@@ -425,113 +409,6 @@ export function CreditNoteComponent() {
       setNewComment('');
     }
   };
-
-  const mockStockMovements = [
-    {
-      id: 1,
-      commitDate: '2024-01-15',
-      postingDate: '2024-01-15',
-      movementType: 'CREDIT_NOTE',
-      sourceDocument: 'CN-2024-001', 
-      store: 'WH-001',
-      status: 'Posted',
-      items: [
-        {
-          id: 1,
-          productName: 'Coffee mate 450 g.',
-          sku: 'BEV-CM450-001',
-          uom: 'Bag',
-          beforeQty: 200,
-          inQty: 0,
-          outQty: 50,
-          afterQty: 150,
-          unitCost: 125.00,
-          totalCost: -6250.00,
-          location: {
-            type: 'INV',
-            code: 'WH-001',
-            name: 'Main Warehouse',
-            displayType: 'Inventory'
-          },
-          lots: [
-            {
-              lotNo: 'L20240115-001',
-              quantity: -30,
-              uom: 'Bag'
-            },
-            {
-              lotNo: 'L20240115-002', 
-              quantity: -20,
-              uom: 'Bag'
-            }
-          ]
-        },
-        {
-          id: 2,
-          productName: 'Heineken Beer 330ml',
-          sku: 'BEV-HB330-002',
-          uom: 'Bottle',
-          beforeQty: 470,
-          inQty: 0,
-          outQty: 120,
-          afterQty: 350,
-          unitCost: 85.00,
-          totalCost: -10200.00,
-          location: {
-            type: 'DIR',
-            code: 'BAR-001',
-            name: 'Main Bar',
-            displayType: 'Direct'
-          },
-          lots: [
-            {
-              lotNo: 'L20240115-003',
-              quantity: -120,
-              uom: 'Bottle'
-            }
-          ]
-        },
-        {
-          id: 3,
-          productName: 'Bath Towel Premium White',
-          sku: 'HK-BT700-001',
-          uom: 'Piece',
-          beforeQty: 250,
-          inQty: 0,
-          outQty: 50,
-          afterQty: 200,
-          unitCost: 450.00,
-          totalCost: -22500.00,
-          location: {
-            type: 'DIR',
-            code: 'HK-001',
-            name: 'Housekeeping Store',
-            displayType: 'Direct'
-          },
-          lots: [
-            {
-              lotNo: 'L20240115-004',
-              quantity: -50,
-              uom: 'Piece'
-            }
-          ]
-        }
-      ],
-      totals: {
-        inQty: 0,
-        outQty: 220,
-        totalCost: -38950.00,
-        lotCount: 4
-      },
-      movement: {
-        source: 'Multiple',
-        sourceName: 'Multiple Locations',
-        destination: 'Supplier',
-        destinationName: 'Thai Beverage Co.',
-        type: 'Stock Return'
-      }
-    }
-  ]
 
   const mockItems: CreditNoteItem[] = [
     {
@@ -645,7 +522,7 @@ export function CreditNoteComponent() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Item Details</CardTitle>
-                  <Button size="sm">
+                  <Button variant="default" size="sm">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Item
                   </Button>
@@ -654,15 +531,15 @@ export function CreditNoteComponent() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[200px]">Location</TableHead>
-                        <TableHead className="w-[200px]">Product</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Unit</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Net Amount</TableHead>
-                        <TableHead>Tax Amount</TableHead>
-                        <TableHead>Total Amount</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="w-[200px] font-bold">Location</TableHead>
+                        <TableHead className="w-[200px] font-bold">Product</TableHead>
+                        <TableHead className="font-bold">Quantity</TableHead>
+                        <TableHead className="font-bold">Unit</TableHead>
+                        <TableHead className="font-bold">Price</TableHead>
+                        <TableHead className="font-bold">Net Amount</TableHead>
+                        <TableHead className="font-bold">Tax Amount</TableHead>
+                        <TableHead className="font-bold">Total Amount</TableHead>
+                        <TableHead className="text-right font-bold">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -711,22 +588,33 @@ export function CreditNoteComponent() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleOpeninfo()}
-                            >
-                              <Info className="h-4 w-4" />
-                              <span className="sr-only">View</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4" />
-                              <span className="sr-only">Edit</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
+                            <div className="flex justify-end space-x-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleOpeninfo()}
+                                className="h-8 w-8"
+                              >
+                                <Info className="h-4 w-4" />
+                                <span className="sr-only">View Details</span>
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <Edit className="h-4 w-4" />
+                                <span className="sr-only">Edit Item</span>
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete Item</span>
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -754,9 +642,9 @@ export function CreditNoteComponent() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Description</TableHead>
-                      <TableHead className="text-right">Amount (USD)</TableHead>
-                      <TableHead className="text-right">Base Amount (PHP)</TableHead>
+                      <TableHead className="font-bold">Description</TableHead>
+                      <TableHead className="text-right font-bold">Amount (USD)</TableHead>
+                      <TableHead className="text-right font-bold">Base Amount (PHP)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -783,58 +671,48 @@ export function CreditNoteComponent() {
         </div>
         
         {showPanel && (
-          <div className="lg:w-1/4 pt-0 space-y-4">
-            <Card className="sticky top-4">
+          <div className="lg:w-1/4 space-y-4">
+            <Card>
               <CardHeader>
                 <CardTitle>Comments & Attachments</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4 mb-4">
+              <CardContent>
+                <div className="space-y-4">
                   {comments.map((comment) => (
-                    <Card key={comment.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start space-x-4">
-                          <Avatar>
-                            <AvatarImage src={comment.avatar} alt={comment.user} />
-                            <AvatarFallback>{comment.user.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center">
-                              <h3 className="font-semibold">{comment.user}</h3>
-                              <span className="text-sm text-gray-500">{comment.timestamp}</span>
-                            </div>
-                            <p className="mt-1">{comment.content}</p>
-                            {comment.attachments && comment.attachments.length > 0 && (
-                              <div className="mt-2">
-                                <h4 className="text-sm font-semibold">Attachments:</h4>
-                                <ul className="list-disc list-inside">
-                                  {comment.attachments.map((attachment, index) => (
-                                    <li key={index} className="text-sm text-blue-500 hover:underline">
-                                      <a href="#">{attachment}</a>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
+                    <div key={comment.id} className="flex space-x-3">
+                      <Avatar>
+                        <AvatarImage src={comment.avatar} alt={comment.user} />
+                        <AvatarFallback>{comment.user[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-medium">{comment.user}</div>
+                          <div className="text-xs text-muted-foreground">{comment.timestamp}</div>
                         </div>
-                      </CardContent>
-                    </Card>
+                        <p className="text-sm text-muted-foreground mt-1">{comment.content}</p>
+                        {comment.attachments && comment.attachments.length > 0 && (
+                          <div className="flex items-center space-x-2 mt-2">
+                            <Paperclip className="h-4 w-4 text-muted-foreground" />
+                            <div className="text-sm text-muted-foreground">
+                              {comment.attachments.join(', ')}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   ))}
-                </div>
-                
-                <div className="flex items-start space-x-2">
-                  <Textarea
-                    placeholder="Add a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="flex-1"
-                  />
-                  <div className="space-y-2">
-                    <Button variant="outline" size="icon">
+                  <div className="flex items-center space-x-2 mt-4">
+                    <Button variant="outline" size="icon" className="h-8 w-8">
                       <Paperclip className="h-4 w-4" />
+                      <span className="sr-only">Attach File</span>
                     </Button>
-                    <Button onClick={handleAddComment}>
+                    <Input
+                      placeholder="Add a comment..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button variant="default" size="sm" onClick={handleAddComment}>
                       <Send className="h-4 w-4 mr-2" />
                       Send
                     </Button>
@@ -842,29 +720,25 @@ export function CreditNoteComponent() {
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader>
-                <CardTitle>Audit Log</CardTitle>
+                <CardTitle>Activity Log</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent>
                 <div className="space-y-4">
                   {auditLogs.map((log) => (
-                    <div key={log.id} className="flex items-start space-x-4 border-b pb-3 last:border-0">
+                    <div key={log.id} className="flex space-x-3">
                       <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
                         <History className="h-4 w-4" />
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <span className="font-medium">{log.user}</span>
-                            <span className="text-gray-500"> {log.action.toLowerCase()} </span>
-                            <span>{log.details}</span>
-                          </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-medium">{log.user}</div>
+                          <div className="text-xs text-muted-foreground">{log.timestamp}</div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {log.timestamp}
-                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {log.action} - {log.details}
+                        </p>
                       </div>
                     </div>
                   ))}

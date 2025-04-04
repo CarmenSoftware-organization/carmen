@@ -15,11 +15,11 @@ interface Certification {
 interface CertificationsSectionProps {
   certifications: Certification[]
   isEditing: boolean
-  onCertificationChange: (name: string, value: any) => void
+  onCertificationChange: (name: keyof Certification, value: Certification[keyof Certification]) => void
 }
 
 export function CertificationsSection({ certifications, isEditing, onCertificationChange }: CertificationsSectionProps) {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: Certification['status']) => {
     switch (status) {
       case 'active':
         return 'bg-green-500'

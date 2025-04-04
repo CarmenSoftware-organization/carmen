@@ -108,7 +108,7 @@ export function BalanceTable({ params, report, isLoading }: BalanceTableProps) {
     </TableRow>
   )
 
-  const renderProductRow = (product: ProductBalance, categoryId: string) => {
+  const renderProductRow = (product: ProductBalance) => {
     const isExpanded = expandedProducts[product.id]
     const inventoryStatus = getInventoryStatus(product)
     
@@ -160,7 +160,7 @@ export function BalanceTable({ params, report, isLoading }: BalanceTableProps) {
     )
   }
 
-  const renderCategoryRow = (category: CategoryBalance, locationId: string) => {
+  const renderCategoryRow = (category: CategoryBalance) => {
     const isExpanded = expandedCategories[category.id]
     
     return (
@@ -182,7 +182,7 @@ export function BalanceTable({ params, report, isLoading }: BalanceTableProps) {
           <TableCell></TableCell>
           <TableCell className="text-right font-medium">{formatCurrency(category.totals.value)}</TableCell>
         </TableRow>
-        {isExpanded && category.products.map(product => renderProductRow(product, category.id))}
+        {isExpanded && category.products.map(product => renderProductRow(product))}
       </>
     )
   }
@@ -208,7 +208,7 @@ export function BalanceTable({ params, report, isLoading }: BalanceTableProps) {
           <TableCell></TableCell>
           <TableCell className="text-right font-semibold">{formatCurrency(location.totals.value)}</TableCell>
         </TableRow>
-        {isExpanded && location.categories.map(category => renderCategoryRow(category, location.id))}
+        {isExpanded && location.categories.map(category => renderCategoryRow(category))}
       </>
     )
   }

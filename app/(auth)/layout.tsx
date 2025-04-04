@@ -1,7 +1,11 @@
-interface AuthLayoutProps {
-  children: React.ReactNode;
-}
-
-export default async function AuthLayout({ children }: AuthLayoutProps) {
-  return <div className="flex h-screen items-center justify-center">{children}</div>;
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <div className="min-h-screen bg-background">
+      {children}
+    </div>
+  )
 }

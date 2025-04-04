@@ -4,7 +4,24 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 
-export default function CommentsAttachmentsTab({ poData }: { poData: any }) {
+interface Comment {
+  date: string
+  user: string
+  text: string
+}
+
+interface Attachment {
+  fileName: string
+  uploadedBy: string
+  date: string
+}
+
+interface PurchaseOrderData {
+  comments?: Comment[]
+  attachments?: Attachment[]
+}
+
+export default function CommentsAttachmentsTab({ poData }: { poData: PurchaseOrderData }) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Comments & Attachments</h2>
@@ -28,7 +45,7 @@ export default function CommentsAttachmentsTab({ poData }: { poData: any }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {poData.comments && poData.comments.map((comment: any, index: number) => (
+            {poData.comments && poData.comments.map((comment: Comment, index: number) => (
               <TableRow key={index}>
                 <TableCell>{comment.date}</TableCell>
                 <TableCell>{comment.user}</TableCell>
@@ -61,7 +78,7 @@ export default function CommentsAttachmentsTab({ poData }: { poData: any }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {poData.attachments && poData.attachments.map((attachment: any, index: number) => (
+            {poData.attachments && poData.attachments.map((attachment: Attachment, index: number) => (
               <TableRow key={index}>
                 <TableCell>{attachment.fileName}</TableCell>
                 <TableCell>{attachment.uploadedBy}</TableCell>

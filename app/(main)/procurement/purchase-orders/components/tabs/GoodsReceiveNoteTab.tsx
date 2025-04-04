@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye } from 'lucide-react';
+import { PurchaseOrder } from '@/lib/types'
 
 interface GoodsReceiveNote {
   id: string;
@@ -13,7 +14,7 @@ interface GoodsReceiveNote {
 }
 
 interface GoodsReceiveNoteTabProps {
-  poData: any; // Replace 'any' with your PurchaseOrder type
+  poData: PurchaseOrder;
 }
 
 const mockGRNs: GoodsReceiveNote[] = [

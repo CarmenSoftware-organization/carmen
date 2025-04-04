@@ -12,7 +12,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { StockCard } from "../types"
+import { StockCard } from "@/app/(main)/inventory-management/stock-overview/types"
 import { MovementHistory } from "./movement-history"
 import { StockStatus } from "./stock-status"
 import { Analytics } from "./analytics"

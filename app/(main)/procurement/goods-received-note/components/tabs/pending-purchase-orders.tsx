@@ -47,7 +47,7 @@ export function PendingPurchaseOrdersComponent() {
 
   useEffect(() => {
     console.log("poData", poData)
-  }, [poData])
+  }, [])
 
   return (
     <>

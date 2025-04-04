@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Location, StockStatus as StockStatusType } from "../types/index"
+import { Location, StockStatus as StockStatusType } from "@/app/(main)/inventory-management/stock-overview/types"
 
 interface StockStatusProps {
   locations: Location[]

@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { StockCard } from "../types"
+import { StockCard } from "@/app/(main)/inventory-management/stock-overview/types"
 
 interface AnalyticsProps {
   data: StockCard

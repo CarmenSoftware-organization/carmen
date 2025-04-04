@@ -1,0 +1,13 @@
+# Ignore node_modules and build directories
+node_modules
+.next
+out
+
+# Ignore specific problem files with exhaustive-deps issues
+app/(main)/procurement/credit-note/components/advanced-filter.tsx
+app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteList.tsx
+app/(main)/operational-planning/recipe-management/recipes/components/*.tsx
+app/(main)/operational-planning/recipe-management/categories/components/*.tsx
+app/(main)/operational-planning/recipe-management/cuisine-types/components/*.tsx
+app/(main)/system-administration/system-integrations/pos/**/*.tsx
+app/(main)/vendor-management/manage-vendors/components/advanced-filter.tsx 

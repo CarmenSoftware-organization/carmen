@@ -46,28 +46,51 @@ import { CreditNoteDetail } from "../../credit-note/components/credit-note-detai
 interface PODetailPageProps {
   params: { id: string }
   backLink?: React.ReactElement | string
+  initialData?: PurchaseOrder
 }
 
-export function PODetailPage({ params, backLink: propBackLink }: PODetailPageProps) {
+export function PODetailPage({ params, backLink: propBackLink, initialData }: PODetailPageProps) {
   const router = useRouter();
-  const [poData, setPOData] = useState<PurchaseOrder | null>(null);
+  const [poData, setPOData] = useState<PurchaseOrder | null>(initialData || null);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    const samplePO: PurchaseOrder | undefined = Mock_purchaseOrders.filter(
-      (po) => po.poId === (params.id)
-    )[0];
+  console.log("PODetailPage received initialData:", initialData);
+  console.log("PODetailPage initialData.items:", initialData?.items);
 
-    setPOData(samplePO as PurchaseOrder);
-  }, [params.id]);
+  useEffect(() => {
+    // If we have initialData, use it
+    if (initialData) {
+      console.log("Using initialData in PODetailPage");
+      // Make sure to create a new object to ensure reactivity
+      setPOData({
+        ...initialData,
+        items: Array.isArray(initialData.items) ? [...initialData.items] : []
+      });
+      return;
+    }
+
+    // Otherwise, fetch data based on ID
+    if (params.id !== "new") {
+      const foundPO = Mock_purchaseOrders.find(
+        (po) => po.poId === params.id
+      );
+      if (foundPO) {
+        // Make sure to create a new object to ensure reactivity
+        setPOData({
+          ...foundPO,
+          items: Array.isArray(foundPO.items) ? [...foundPO.items] : []
+        });
+      }
+    }
+  }, [params.id, initialData]);
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
   const handleSave = () => {
-    // Implement save functionality
     setIsEditing(false);
+    // In a real app, you would save the data to the server here
   };
 
   const handleCancel = () => {

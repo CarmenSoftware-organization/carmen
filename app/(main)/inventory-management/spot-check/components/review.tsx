@@ -1,192 +1,242 @@
 'use client';
 
-import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { 
-  getLocationsByDepartment, 
-  getProductsByDepartment,
-  type Location,
-  type Product
-} from '@/lib/mock/inventory-data';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft, ArrowRight, CalendarIcon, CheckCircle2, Clock, FileCheck, MapPin, User } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import type { Location } from '@/lib/mock/inventory-data';
+
+interface CountItem {
+  id: string;
+  name: string;
+  sku: string;
+  description?: string;
+  category?: string;
+  unit?: string;
+  expectedCount?: number;
+  actualCount?: number;
+  discrepancy?: number;
+  hasDiscrepancy?: boolean;
+  variancePercent?: number;
+}
 
 interface ReviewProps {
   formData: {
-    counterName: string;
+    name: string;
     department: string;
-    dateTime: Date;
-    notes: string;
+    description: string;
     targetCount: string;
-    selectedLocations: string[];
     selectedItems: string[];
+    selectedLocations: string[];
+    dateTime?: Date;
+    notes?: string;
+    counts?: Record<string, number>;
+    [key: string]: string | string[] | Record<string, number> | Date | undefined;
   };
-  onNext: () => void;
+  selectedItems: CountItem[];
+  selectedLocations: Location[];
   onBack: () => void;
-  onStartCount: () => void;
+  onSubmit: () => void;
 }
 
-export function Review({ formData, onNext, onBack, onStartCount }: ReviewProps) {
-  const locations = useMemo(() => {
-    const departmentLocations = getLocationsByDepartment(formData.department);
-    return departmentLocations.filter(loc => 
-      formData.selectedLocations.includes(loc.id)
-    );
-  }, [formData.department, formData.selectedLocations]);
+export function Review({ formData, selectedItems, selectedLocations, onBack, onSubmit }: ReviewProps) {
+  const { toast } = useToast();
 
-  const items = useMemo(() => {
-    const departmentItems = getProductsByDepartment(formData.department);
-    return departmentItems.filter(item => 
-      formData.selectedItems.includes(item.id)
-    );
-  }, [formData.department, formData.selectedItems]);
+  const itemsWithCounts = selectedItems.map(item => {
+    const count = formData.counts?.[item.id] || 0;
+    const expected = item.expectedCount || 0;
+    const discrepancy = count - expected;
+    const variancePercent = expected === 0 ? 0 : (discrepancy / expected) * 100;
+    
+    return {
+      ...item,
+      actualCount: count,
+      discrepancy,
+      hasDiscrepancy: discrepancy !== 0,
+      variancePercent
+    };
+  });
 
-  const totalValue = useMemo(() => 
-    items.reduce((sum, item) => sum + item.value, 0)
-  , [items]);
+  const discrepancyItems = itemsWithCounts.filter(item => item.hasDiscrepancy);
+  
+  const handleConfirmCount = () => {
+    toast({
+      title: "Spot check submitted",
+      description: "Your spot check has been successfully submitted",
+    });
+    onSubmit();
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-medium">Review Spot Check</h2>
-        <p className="text-sm text-muted-foreground">
-          Review the details of your spot check before starting.
-        </p>
-      </div>
-
-      {/* Basic Information */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h3 className="font-medium mb-2">Basic Information</h3>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="text-sm text-muted-foreground">Counter</dt>
-                  <dd>{formData.counterName}</dd>
+        <CardHeader>
+          <CardTitle>Review Spot Check</CardTitle>
+          <CardDescription>
+            Review and confirm your spot check before submission
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">General Information</h3>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Count Name:</span>
+                  <span>{formData.name}</span>
                 </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground">Department</dt>
-                  <dd>{formData.department}</dd>
+                
+                <div className="flex items-center gap-2 text-sm">
+                  <FileCheck className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Department:</span>
+                  <span>{formData.department}</span>
                 </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground">Date & Time</dt>
-                  <dd>{format(formData.dateTime, 'PPpp')}</dd>
+                
+                <div className="flex items-center gap-2 text-sm">
+                  <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Date:</span>
+                  <span>{formData.dateTime ? format(formData.dateTime, 'PPP') : 'Not set'}</span>
                 </div>
-              </dl>
+                
+                <div className="flex items-center gap-2 text-sm">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Time:</span>
+                  <span>{formData.dateTime ? format(formData.dateTime, 'p') : 'Not set'}</span>
+                </div>
+                
+                {formData.notes && (
+                  <div className="pt-2">
+                    <span className="font-medium text-sm">Notes:</span>
+                    <p className="text-sm text-muted-foreground mt-1">{formData.notes}</p>
+                  </div>
+                )}
+              </div>
             </div>
-            <div>
-              <h3 className="font-medium mb-2">Count Details</h3>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="text-sm text-muted-foreground">Target Count</dt>
-                  <dd>{formData.targetCount} items</dd>
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Count Summary</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">Total Items</p>
+                  <p className="text-2xl font-bold">{selectedItems.length}</p>
                 </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground">Selected Items</dt>
-                  <dd>{items.length} items</dd>
+                
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">Locations</p>
+                  <p className="text-2xl font-bold">{selectedLocations.length}</p>
                 </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground">Total Value</dt>
-                  <dd>${totalValue.toFixed(2)}</dd>
+                
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">Items with Discrepancy</p>
+                  <p className="text-2xl font-bold">{discrepancyItems.length}</p>
                 </div>
-              </dl>
+                
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">Completed</p>
+                  <p className="text-2xl font-bold">{Object.keys(formData.counts || {}).length}/{selectedItems.length}</p>
+                </div>
+              </div>
             </div>
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Locations</h3>
+              <span className="text-sm text-muted-foreground">{selectedLocations.length} locations selected</span>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {selectedLocations.map((location) => (
+                <div 
+                  key={location.id}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted"
+                >
+                  <MapPin className="h-3 w-3" />
+                  {location.name}
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Items</h3>
+              <span className="text-sm text-muted-foreground">{selectedItems.length} items selected</span>
+            </div>
+            
+            <ScrollArea className="h-[300px] rounded-md border">
+              <div className="p-4 space-y-3">
+                {itemsWithCounts.map((item) => (
+                  <div 
+                    key={item.id}
+                    className="p-3 rounded-lg border bg-card"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-medium">{item.name}</h4>
+                        <p className="text-sm text-muted-foreground">{item.sku}</p>
+                      </div>
+                      
+                      {item.hasDiscrepancy ? (
+                        <div className={`py-1 px-2 rounded-md text-xs font-medium ${item.discrepancy < 0 ? 'bg-destructive/10 text-destructive' : 'bg-green-100 text-green-700'}`}>
+                          {item.discrepancy < 0 ? item.discrepancy : `+${item.discrepancy}`}
+                        </div>
+                      ) : (
+                        <div className="flex items-center text-green-600">
+                          <CheckCircle2 className="h-4 w-4 mr-1" />
+                          <span className="text-xs font-medium">Matched</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Expected</p>
+                        <p className="font-medium">{item.expectedCount}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Actual</p>
+                        <p className="font-medium">{item.actualCount}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Variance</p>
+                        <p className={`font-medium ${item.discrepancy < 0 ? 'text-destructive' : item.discrepancy > 0 ? 'text-green-600' : ''}`}>
+                          {item.variancePercent.toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+          
+          <div className="flex items-center justify-between pt-6">
+            <Button
+              variant="outline"
+              onClick={onBack}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            
+            <Button
+              onClick={handleConfirmCount}
+            >
+              Submit Count
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
           </div>
         </CardContent>
       </Card>
-
-      {/* Selected Locations */}
-      <div>
-        <h3 className="font-medium mb-2">Selected Locations</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {locations.map((location) => (
-            <Card key={location.id}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h4 className="font-medium">{location.name}</h4>
-                    <p className="text-sm text-muted-foreground">{location.code}</p>
-                  </div>
-                  <Badge>{location.type}</Badge>
-                </div>
-                <p className="text-sm">
-                  <span className="text-muted-foreground">Floor:</span>{' '}
-                  {location.floor}
-                  {location.building && (
-                    <>, <span className="text-muted-foreground">Building:</span> {location.building}</>
-                  )}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Selected Items */}
-      <div>
-        <h3 className="font-medium mb-2">Selected Items</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h4 className="font-medium">{item.name}</h4>
-                    <p className="text-sm text-muted-foreground">{item.code}</p>
-                  </div>
-                  <Badge>{item.category}</Badge>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>
-                    <span className="text-muted-foreground">Stock:</span>{' '}
-                    {item.currentStock} {item.uom}
-                  </span>
-                  <span>
-                    <span className="text-muted-foreground">Value:</span>{' '}
-                    ${item.value.toFixed(2)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Notes */}
-      {formData.notes && (
-        <div>
-          <h3 className="font-medium mb-2">Notes</h3>
-          <Card>
-            <CardContent className="p-4">
-              <p className="whitespace-pre-wrap">{formData.notes}</p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={onBack}
-        >
-          Back
-        </Button>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={onStartCount}
-          >
-            Start Count
-          </Button>
-          <Button onClick={onNext}>
-            Submit
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

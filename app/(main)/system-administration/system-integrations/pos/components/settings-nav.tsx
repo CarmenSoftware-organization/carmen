@@ -22,7 +22,7 @@ export function SettingsNav({ activeTab }: SettingsNavProps) {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard">
+              <Link href="/procurement">
                 <Home className="h-4 w-4" />
                 <span className="sr-only">Home</span>
               </Link>

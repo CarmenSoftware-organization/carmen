@@ -22,8 +22,8 @@ import { Label } from "@/components/ui/label"
 import { ArrowDownUp, Filter, X } from "lucide-react"
 
 interface FilterSortOptionsProps {
-  onFilterChange: (filters: any) => void
-  onSortChange: (sort: any) => void
+  onFilterChange: (filters: string[]) => void
+  onSortChange: (sort: { field: string; order: 'asc' | 'desc' }) => void
 }
 
 export function FilterSortOptions({ onFilterChange, onSortChange }: FilterSortOptionsProps) {

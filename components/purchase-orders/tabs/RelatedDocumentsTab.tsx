@@ -4,7 +4,26 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-export default function RelatedDocumentsTab({ poData }: { poData: any }) {
+interface RelatedDocument {
+  type: string
+  referenceNumber: string
+  date: string
+}
+
+interface PurchaseOrderData {
+  purchaseRequest?: {
+    referenceNumber: string
+  }
+  goodsReceivedNote?: {
+    referenceNumber: string
+  }
+  invoice?: {
+    referenceNumber: string
+  }
+  relatedDocuments?: RelatedDocument[]
+}
+
+export default function RelatedDocumentsTab({ poData }: { poData: PurchaseOrderData }) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Related Documents</h2>
@@ -35,7 +54,7 @@ export default function RelatedDocumentsTab({ poData }: { poData: any }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {poData.relatedDocuments && poData.relatedDocuments.map((doc: any, index: number) => (
+          {poData.relatedDocuments && poData.relatedDocuments.map((doc: RelatedDocument, index: number) => (
             <TableRow key={index}>
               <TableCell>{doc.type}</TableCell>
               <TableCell>{doc.referenceNumber}</TableCell>

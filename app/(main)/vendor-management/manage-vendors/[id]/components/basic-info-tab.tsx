@@ -9,7 +9,7 @@ import { Vendor } from '@/lib/types'
 interface BasicInfoTabProps {
   vendor: Vendor
   isEditing: boolean
-  onFieldChange: (name: string, value: any) => void
+  onFieldChange: (name: keyof Vendor, value: Vendor[keyof Vendor]) => void
 }
 
 export function BasicInfoTab({ vendor, isEditing, onFieldChange }: BasicInfoTabProps) {
@@ -22,7 +22,7 @@ export function BasicInfoTab({ vendor, isEditing, onFieldChange }: BasicInfoTabP
             id="companyName"
             name="companyName"
             value={vendor.companyName}
-            onChange={(e) => onFieldChange('companyName', e.target.value)}
+            onChange={(e) => onFieldChange('companyName', e.target.value as Vendor[keyof Vendor])}
             disabled={!isEditing}
           />
         </div>
@@ -33,7 +33,7 @@ export function BasicInfoTab({ vendor, isEditing, onFieldChange }: BasicInfoTabP
             id="businessRegistrationNumber"
             name="businessRegistrationNumber"
             value={vendor.businessRegistrationNumber}
-            onChange={(e) => onFieldChange('businessRegistrationNumber', e.target.value)}
+            onChange={(e) => onFieldChange('businessRegistrationNumber', e.target.value as Vendor[keyof Vendor])}
             disabled={!isEditing}
           />
         </div>
@@ -45,7 +45,7 @@ export function BasicInfoTab({ vendor, isEditing, onFieldChange }: BasicInfoTabP
         <Switch
           id="isActive"
           checked={vendor.isActive}
-          onCheckedChange={(checked) => onFieldChange('isActive', checked)}
+          onCheckedChange={(checked) => onFieldChange('isActive', checked as Vendor[keyof Vendor])}
           disabled={!isEditing}
         />
         <Label htmlFor="isActive">Active</Label>

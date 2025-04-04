@@ -48,7 +48,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
 
   const loadSavedFilters = async () => {
     try {
-      const filters = await getSavedFilters<PurchaseOrder>()
+      const filters = await getSavedFilters<PurchaseOrder>("purchase-orders")
       setSavedFilters(filters)
     } catch (error) {
       toast({
@@ -61,7 +61,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
 
   const handleDeleteSavedFilter = async (filterId: string) => {
     try {
-      await deleteFilter<PurchaseOrder>(filterId)
+      await deleteFilter(filterId, "purchase-orders")
       setSavedFilters(savedFilters.filter(f => f.id !== filterId))
       toast({
         title: "Filter deleted",
@@ -78,7 +78,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
 
   const handleToggleStar = async (filter: SavedFilter<PurchaseOrder>) => {
     try {
-      const updatedFilter = await saveFilter<PurchaseOrder>({
+      await saveFilter("purchase-orders", {
         ...filter,
         isDefault: !filter.isDefault
       })
@@ -161,7 +161,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
         isDefault: false
       }
       
-      await saveFilter(newFilter)
+      await saveFilter("purchase-orders", newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
       toast({

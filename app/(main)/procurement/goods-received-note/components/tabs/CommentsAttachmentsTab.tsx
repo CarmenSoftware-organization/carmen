@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Paperclip, Send } from 'lucide-react';
+import { GoodsReceiveNote } from '@/lib/types';
 
 interface Comment {
   id: string;
@@ -16,7 +17,7 @@ interface Comment {
 }
 
 interface CommentsAttachmentsTabProps {
-  poData: any; // Replace 'any' with your PurchaseOrder type
+  poData: GoodsReceiveNote;
 }
 
 const mockComments: Comment[] = [

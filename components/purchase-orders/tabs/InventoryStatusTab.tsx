@@ -4,7 +4,19 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-export default function InventoryStatusTab({ poData }: { poData: any }) {
+interface InventoryItem {
+  description: string
+  currentStock: number
+  onOrder: number
+  reorderPoint: number
+  restockLevel: number
+}
+
+interface PurchaseOrderData {
+  items?: InventoryItem[]
+}
+
+export default function InventoryStatusTab({ poData }: { poData: PurchaseOrderData }) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Inventory Status</h2>
@@ -15,11 +27,11 @@ export default function InventoryStatusTab({ poData }: { poData: any }) {
         </div>
         <div>
           <Label>Total Current Stock</Label>
-          <Input value={poData.items?.reduce((sum: number, item: any) => sum + item.currentStock, 0) || 0} readOnly />
+          <Input value={poData.items?.reduce((sum: number, item: InventoryItem) => sum + item.currentStock, 0) || 0} readOnly />
         </div>
         <div>
           <Label>Total On Order</Label>
-          <Input value={poData.items?.reduce((sum: number, item: any) => sum + item.onOrder, 0) || 0} readOnly />
+          <Input value={poData.items?.reduce((sum: number, item: InventoryItem) => sum + item.onOrder, 0) || 0} readOnly />
         </div>
         <div>
           <Button className="mt-6">Refresh Inventory Status</Button>
@@ -36,7 +48,7 @@ export default function InventoryStatusTab({ poData }: { poData: any }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {poData.items && poData.items.map((item: any, index: number) => (
+          {poData.items && poData.items.map((item: InventoryItem, index: number) => (
             <TableRow key={index}>
               <TableCell>{item.description}</TableCell>
               <TableCell>{item.currentStock}</TableCell>

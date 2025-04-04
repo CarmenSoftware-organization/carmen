@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { StockCardDetail } from "../components/stock-card-detail"
 import { notFound } from "next/navigation"
-import { MovementType } from "../types"
+import { MovementType } from "@/app/(main)/inventory-management/stock-overview/types"
 
 interface StockCardDetailPageProps {
   params: {

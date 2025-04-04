@@ -2,15 +2,15 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
-import { Search, ArrowUpDown, ChevronDown, ChevronUp, X, AlertCircle } from 'lucide-react'
+import { Search, ArrowUpDown, AlertCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { GRNItem, GRNItemStatus, GRNStatus, GoodsReceiveNote, Vendor } from '@/lib/types'
-import type { GoodsReceiveNoteItem, GoodsReceiveNoteStatus } from '@/lib/types'
+import { GoodsReceiveNote, Vendor } from '@/lib/types'
+import type { GoodsReceiveNoteItem } from '@/lib/types'
 import {
   Card,
   CardContent,
@@ -36,7 +36,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -47,21 +46,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 
 // Local types
 type SortConfig = {
   key: keyof GoodsReceiveNote | null
   direction: 'ascending' | 'descending'
-}
-
-type ExpandedRows = {
-  [key: string]: boolean
 }
 
 type CreditNoteType = 'item-based' | 'amount-only' | null
@@ -353,10 +342,25 @@ const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
   }
 ]
 
-export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNoteCreate?: (creditNote: any) => void }) {
+// Define the custom type that matches what we're actually passing to the function
+interface ItemBasedCreditNote {
+  type: 'item-based';
+  vendor: string | number | undefined;
+  items: Array<SelectedItem & { gainLoss: number }>;
+}
+
+interface AmountOnlyCreditNote {
+  type: 'amount-only';
+  vendor: string | number | undefined;
+  amount: number;
+  reason: string;
+}
+
+type CreatedCreditNote = ItemBasedCreditNote | AmountOnlyCreditNote;
+
+export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNoteCreate?: (creditNote: CreatedCreditNote) => void }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
-  const [expandedRows, setExpandedRows] = useState<ExpandedRows>({})
   const [selectedGRN, setSelectedGRN] = useState<GoodsReceiveNote | null>(null)
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([])
   const [creditNoteType, setCreditNoteType] = useState<CreditNoteType>(null)
@@ -374,20 +378,27 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
   }, [])
 
   const sortedGRNs = useMemo(() => {
-    let sortableGRNs = [...mockGoodsReceiveNotes]
-    // if (sortConfig.key) {
-    //   sortableGRNs.sort((a: GoodsReceiveNote, b: GoodsReceiveNote) => {
-    //     if (a[sortConfig.key!] < b[sortConfig.key!]) {
-    //       return sortConfig.direction === 'ascending' ? -1 : 1
-    //     }
-    //     if (a[sortConfig.key!] > b[sortConfig.key!]) {
-    //       return sortConfig.direction === 'ascending' ? 1 : -1
-    //     }
-    //     return 0
-    //   })
-    // }
-    return sortableGRNs
-  }, [sortConfig])
+    // Create a copy of the array
+    const sortableGRNs = [...mockGoodsReceiveNotes];
+    
+    if (sortConfig.key !== null) {
+      sortableGRNs.sort((a, b) => {
+        const key = sortConfig.key as keyof GoodsReceiveNote;
+        // Convert values to strings for safe comparison
+        const aValue = String(a[key]);
+        const bValue = String(b[key]);
+        
+        if (aValue < bValue) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableGRNs;
+  }, [mockGoodsReceiveNotes, sortConfig.key, sortConfig.direction]);
 
   const filteredGRNs = useMemo(() => {
     return sortedGRNs.filter(grn => 
@@ -403,12 +414,6 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
       direction = 'descending'
     }
     setSortConfig({ key, direction })
-  }
-
-
-
-  const toggleRowExpansion = (id: string) => {
-    setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }))
   }
 
   const SortableHeader = ({ label, sortKey }: { label: string, sortKey: keyof GoodsReceiveNote }) => (
@@ -533,19 +538,6 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
       })
     }
     router.push(`/procurement/credit-note/1`);
-    // resetForm()
-  }
-
-  const resetForm = () => {
-    setSelectedGRN(null)
-    setSelectedItems([])
-    setCreditNoteType(null)
-    setAmountOnlyValue('')
-    setAmountOnlyReason('')
-    setCurrentStep('selectType')
-    setErrors({})
-    setIsConfirmDialogOpen(false)
-    setIsTypeDialogOpen(true)
   }
 
   const getProgressPercentage = () => {

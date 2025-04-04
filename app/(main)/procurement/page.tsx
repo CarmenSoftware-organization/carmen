@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 // Mock data for graphs
@@ -31,8 +31,15 @@ const topVendorsData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
+interface DashboardItem {
+  id: string;
+  content: string;
+  type: 'purchaseOrderTrend' | 'supplierDistribution' | 'topVendors' | 'text';
+  data?: string;
+}
+
 // Mock dashboard items
-const initialItems = [
+const initialItems: DashboardItem[] = [
   { id: 'item1', content: 'Purchase Order Trend', type: 'purchaseOrderTrend' },
   { id: 'item2', content: 'Supplier Distribution', type: 'supplierDistribution' },
   { id: 'item3', content: 'Top 5 Vendors by Spend', type: 'topVendors' },
@@ -42,9 +49,9 @@ const initialItems = [
 ];
 
 export default function ProcurementPage() {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState<DashboardItem[]>(initialItems);
 
-  const onDragEnd = (result: any) => {
+  const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
@@ -56,7 +63,7 @@ export default function ProcurementPage() {
     setItems(newItems);
   };
 
-  const renderDashboardItem = (item: any) => {
+  const renderDashboardItem = (item: DashboardItem) => {
     switch (item.type) {
       case 'purchaseOrderTrend':
         return (

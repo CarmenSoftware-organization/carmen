@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Download, MessageSquare, Paperclip } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { PurchaseOrder } from '@/lib/types';
 
 interface RelatedDocument {
   id: string;
@@ -17,7 +18,7 @@ interface RelatedDocument {
 }
 
 interface RelatedDocumentsTabProps {
-  poData: any; // Replace 'any' with your PurchaseOrder type
+  poData: PurchaseOrder;
 }
 
 const mockDocuments: RelatedDocument[] = [

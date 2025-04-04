@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Filter, ArrowUpDown, Pencil, MoreVertical, FileSpreadsheet, Upload, Plus, Printer } from "lucide-react"
+import { Search, Filter, ArrowUpDown, Pencil, MoreVertical, Upload, Plus, Printer } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge'
 
@@ -174,11 +174,11 @@ export default function PricelistList(): JSX.Element {
                 <TableHead className="w-12 py-3">
                   <Checkbox className="ml-3" />
                 </TableHead>
-                <TableHead className="py-3 font-medium text-gray-600">Name</TableHead>
-                <TableHead className="py-3 font-medium text-gray-600">Start Date</TableHead>
-                <TableHead className="py-3 font-medium text-gray-600">End Date</TableHead>
-                <TableHead className="py-3 font-medium text-gray-600">Status</TableHead>
-                <TableHead className="py-3 text-right font-medium text-gray-600">Actions</TableHead>
+                <TableHead className="py-3 font-medium font-bold text-gray-600">Name</TableHead>
+                <TableHead className="py-3 font-medium font-bold text-gray-600">Start Date</TableHead>
+                <TableHead className="py-3 font-medium font-bold text-gray-600">End Date</TableHead>
+                <TableHead className="py-3 font-medium font-bold text-gray-600">Status</TableHead>
+                <TableHead className="py-3 text-right font-medium font-bold text-gray-600">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

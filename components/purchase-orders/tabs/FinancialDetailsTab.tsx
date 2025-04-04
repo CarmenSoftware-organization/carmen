@@ -4,7 +4,18 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-export default function FinancialDetailsTab({ poData }: { poData: any }) {
+interface PurchaseOrderFinancialData {
+  currency: string
+  netAmount: number
+  discountAmount: number
+  taxAmount: number
+  totalAmount: number
+  paymentTerms: string
+  paymentMethod: string
+  dueDate: string
+}
+
+export default function FinancialDetailsTab({ poData }: { poData: PurchaseOrderFinancialData }) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Financial Details</h2>

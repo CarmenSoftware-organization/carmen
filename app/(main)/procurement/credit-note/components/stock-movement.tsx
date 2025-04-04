@@ -88,19 +88,19 @@ export default function StockMovementContent() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Location
                   </th>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Product
                   </th>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Lot No.
                   </th>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Unit
                   </th>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
                     <div className="flex flex-col items-end gap-2">
                       <div className="flex items-center gap-2">
                         <div className="w-16"></div>
@@ -113,13 +113,13 @@ export default function StockMovementContent() {
                       </div>
                     </div>
                   </th>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Unit Cost
                   </th>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Extra Cost
                   </th>
-                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-2 py-3 bg-gray-50 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Total Cost
                   </th>
                 </tr>
@@ -129,7 +129,7 @@ export default function StockMovementContent() {
                   <tr key={movement.id}>
                     <td className="px-2 py-4 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
-                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                           movement.locationType === 'INV' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
                         }`}>
                           {movement.location}

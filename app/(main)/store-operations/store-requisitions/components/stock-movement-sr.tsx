@@ -1,26 +1,10 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Warehouse, Store } from 'lucide-react';
-
-interface StockMovement {
-  id: number;
-  lotNo: string;
-  location: string;
-  locationCode: string;
-  locationType: string;
-  product: string;
-  productDescription: string;
-  unit: string;
-  quantity: number;
-  subtotal: number;
-}
+import React from 'react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Warehouse, Store } from 'lucide-react'
 
 const StockMovementContent = () => {
-  const [selectedMovement, setSelectedMovement] = useState(null);
-
   const movements = [
     {
       id: 1,
@@ -135,11 +119,11 @@ const StockMovementContent = () => {
         type: 'Stock Return'
       }
     }
-  ];
+  ]
 
   const getLocationIcon = (type: string) => {
-    return type === 'INV' ? <Warehouse className="h-4 w-4" /> : <Store className="h-4 w-4" />;
-  };
+    return type === 'INV' ? <Warehouse className="h-4 w-4" /> : <Store className="h-4 w-4" />
+  }
 
   const getLocationTypeLabel = (type: string) => {
     return type === 'INV' ? 'Inventory' : 'Consignment';

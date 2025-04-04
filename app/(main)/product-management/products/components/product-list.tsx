@@ -1,17 +1,15 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import ListPageTemplate from '@/components/templates/ListPageTemplate';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowUpDown, Pencil, Eye, Plus, Printer, Upload, ArrowLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter } from "lucide-react"
+import { Search, ArrowUpDown, Pencil, Eye, Plus, FileText, CheckCircle, XCircle, Download, Trash2, Upload, Edit } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { AdvancedFilter } from './advanced-filter'
+import { AdvancedFilter } from '@/components/ui/advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
 import { toast } from '@/components/ui/use-toast'
 
@@ -63,11 +61,7 @@ interface UnitConversion {
   unitType: "INVENTORY" | "ORDER" | "RECIPE";
 }
 
-interface ProductListProps {
-  onBack: () => void;
-}
-
-export default function ProductList({ onBack }: ProductListProps): JSX.Element {
+export default function ProductList(): JSX.Element {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -100,6 +94,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   };
 
   const handleEditProduct = (id: string) => {
+    console.log('Navigating to edit page:', id);
     router.push(`/product-management/products/${id}?edit`);
   };
 
@@ -330,19 +325,19 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
           const operator = filter.operator;
 
           // Handle nested fields like businessType.name
-          let fieldValue: any;
+          let fieldValue: unknown;
           if (field.toString().includes('.')) {
             const [parentField, childField] = field.toString().split('.');
             const parentValue = product[parentField as keyof Product];
             
             // Handle nested objects
             if (parentValue && typeof parentValue === 'object' && !Array.isArray(parentValue)) {
-              fieldValue = (parentValue as any)[childField];
+              fieldValue = (parentValue as Record<string, unknown>)[childField];
             } else {
               fieldValue = undefined;
             }
           } else {
-            fieldValue = product[field];
+            fieldValue = product[field as keyof Product];
           }
 
           // Handle undefined or null values
@@ -437,6 +432,16 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     console.log('Bulk export:', selectedItems);
   };
 
+  const handleDelete = (id: string) => {
+    // Implement delete logic
+    console.log('Deleting product:', id);
+    setProducts(products.filter(product => product.id !== id));
+    toast({
+      title: "Product Deleted",
+      description: "The product has been successfully deleted.",
+    });
+  };
+
   const handleBulkStatusUpdate = (status: boolean) => {
     // Implement bulk status update logic
     console.log('Bulk status update:', selectedItems, status);
@@ -469,20 +474,36 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     }
   };
 
+  // Define filter fields for the advanced filter
+  const filterFields = [
+    { value: 'productCode' as keyof Product, label: 'Product Code' },
+    { value: 'name' as keyof Product, label: 'Product Name' },
+    { value: 'description' as keyof Product, label: 'Description' },
+    { value: 'categoryId' as keyof Product, label: 'Category' },
+    { value: 'subCategoryId' as keyof Product, label: 'Subcategory' },
+    { value: 'itemGroup' as keyof Product, label: 'Item Group' },
+    { value: 'primaryInventoryUnitId' as keyof Product, label: 'Primary Unit' },
+    { value: 'isActive' as keyof Product, label: 'Active Status' },
+    { value: 'basePrice' as keyof Product, label: 'Base Price' },
+    { value: 'currency' as keyof Product, label: 'Currency' },
+    { value: 'isForSale' as keyof Product, label: 'For Sale' },
+    { value: 'isIngredient' as keyof Product, label: 'Is Ingredient' }
+  ];
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   const actionButtons = (
-    <div className="flex items-center space-x-2">
-      <Button onClick={handleAddProduct}>
+    <div className="flex flex-col sm:flex-row gap-2">
+      <Button className="w-full sm:w-auto" onClick={handleAddProduct}>
         <Plus className="mr-2 h-4 w-4" />
         Add Product
       </Button>
-      <Button variant="outline" onClick={handleImport}>
+      <Button variant="outline" className="w-full sm:w-auto" onClick={handleImport}>
         <Upload className="mr-2 h-4 w-4" />
         Import
       </Button>
-      <Button variant="outline" onClick={handleGenerateReport}>
+      <Button variant="outline" className="w-full sm:w-auto" onClick={handleGenerateReport}>
         <FileText className="mr-2 h-4 w-4" />
         Report
       </Button>
@@ -490,228 +511,291 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   );
 
   const filters = (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div className="w-full sm:w-1/2 flex space-x-2">
-        <Input
-          placeholder="Search products..."
-          className="w-full"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-        <Button variant="secondary" size="icon">
-          <Search className="h-4 w-4" />
-        </Button>
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full sm:w-1/2 flex space-x-2">
+          <Input
+            placeholder="Search products..."
+            className="w-full"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+          <Button variant="secondary" size="icon">
+            <Search className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <AdvancedFilter 
+            onApplyFilters={handleApplyFilters}
+            onClearFilters={handleClearFilters}
+            filterFields={filterFields}
+          />
+        </div>
       </div>
-      <AdvancedFilter 
-        onApplyFilters={handleApplyFilters}
-        onClearFilters={handleClearFilters}
-      />
+      
+      {selectedItems.length > 0 && (
+        <div className="mb-4">
+          <div className="flex flex-wrap items-center gap-2 p-2 bg-muted rounded-lg">
+            <span className="text-sm text-muted-foreground ml-2">
+              {selectedItems.length} items selected
+            </span>
+            <div className="flex flex-wrap items-center gap-2 ml-0 sm:ml-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleBulkStatusUpdate(true)}
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Set Active
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleBulkStatusUpdate(false)}
+              >
+                <XCircle className="w-4 h-4 mr-2" />
+                Set Inactive
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkExport}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Selected
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Selected
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
   const content = (
-    <div className="flex-1 space-y-4">
-      <div className="flex flex-col gap-4">
-        {/* Removing the redundant More Filters button */}
-      </div>
-
-      {selectedItems.length > 0 ? (
-        <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-          <span className="text-sm text-muted-foreground ml-2">
-            {selectedItems.length} items selected
-          </span>
-          <div className="flex items-center gap-2 ml-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleBulkStatusUpdate(true)}
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Set Active
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleBulkStatusUpdate(false)}
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Set Inactive
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBulkExport}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export Selected
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleBulkDelete}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Selected
-            </Button>
+    <div className="space-y-6">
+      {getCurrentPageData().length > 0 ? (
+        <div className="rounded-lg border bg-white">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50/75">
+                  <TableHead className="w-[50px] py-3 font-medium text-gray-600">
+                    <Checkbox 
+                      checked={
+                        getCurrentPageData().length > 0 &&
+                        getCurrentPageData().every(product => 
+                          selectedItems.includes(product.id)
+                        )
+                      }
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </TableHead>
+                  <TableHead 
+                    className="py-3 font-medium text-gray-600 cursor-pointer"
+                    onClick={() => handleSort('name')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Name
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="py-3 font-medium text-gray-600 cursor-pointer hidden sm:table-cell"
+                    onClick={() => handleSort('categoryId')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Category
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="py-3 font-medium text-gray-600 cursor-pointer hidden md:table-cell"
+                    onClick={() => handleSort('subCategoryId')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Subcategory
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="py-3 font-medium text-gray-600 cursor-pointer hidden lg:table-cell"
+                    onClick={() => handleSort('itemGroup')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Item Group
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="py-3 font-medium text-gray-600 cursor-pointer"
+                    onClick={() => handleSort('isActive')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Status
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="py-3 font-medium text-gray-600 w-[120px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {getCurrentPageData().map((product) => (
+                  <TableRow 
+                    key={product.id}
+                    className="group hover:bg-gray-50/50 cursor-pointer"
+                    onClick={() => handleViewProduct(product.id)}
+                  >
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox 
+                        checked={selectedItems.includes(product.id)}
+                        onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{product.name}</span>
+                          <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
+                            {product.productCode}
+                          </Badge>
+                        </div>
+                        <span className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
+                          {product.description || 'No description available'}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">{product.categoryId}</TableCell>
+                    <TableCell className="hidden md:table-cell">{product.subCategoryId}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{product.itemGroup}</TableCell>
+                    <TableCell>
+                      <StatusBadge 
+                        status={product.isActive ? 'Active' : 'Inactive'}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewProduct(product.id);
+                          }}
+                          className="h-8 w-8"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditProduct(product.id);
+                          }}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(product.id);
+                          }}
+                          className="h-8 w-8 hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {getCurrentPageData().length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <p className="text-sm text-muted-foreground">No results found</p>
+                        <Button variant="outline" size="sm" onClick={handleAddProduct}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Product
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
-      ) : null}
-
-      {getCurrentPageData().length > 0 ? (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50/75">
-                <TableHead className="w-12 py-3">
-                  <Checkbox 
-                    className="ml-3"
-                    checked={
-                      getCurrentPageData().length > 0 &&
-                      getCurrentPageData().every(product => 
-                        selectedItems.includes(product.id)
-                      )
-                    }
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('name')}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortField === 'name' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('categoryId')}
-                >
-                  <div className="flex items-center gap-1">
-                    Category
-                    {sortField === 'categoryId' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('subCategoryId')}
-                >
-                  <div className="flex items-center gap-1">
-                    Subcategory
-                    {sortField === 'subCategoryId' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('itemGroup')}
-                >
-                  <div className="flex items-center gap-1">
-                    Item Group
-                    {sortField === 'itemGroup' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('isActive')}
-                >
-                  <div className="flex items-center gap-1">
-                    Status
-                    {sortField === 'isActive' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead className="py-3 text-right font-medium text-gray-600">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {getCurrentPageData().map((product) => (
-                <TableRow 
-                  key={product.id}
-                  className="group hover:bg-gray-50/50 cursor-pointer border-b last:border-b-0"
-                >
-                  <TableCell className="py-4 pl-4" onClick={(e) => e.stopPropagation()}>
-                    <Checkbox 
-                      checked={selectedItems.includes(product.id)}
-                      onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
-                    />
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{product.name}</span>
-                        <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
-                          {product.productCode}
-                        </Badge>
-                      </div>
-                      <span className="text-sm text-gray-500 mt-0.5">
-                        {product.description || 'No description available'}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-4 text-gray-600">{product.categoryId}</TableCell>
-                  <TableCell className="py-4 text-gray-600">{product.subCategoryId}</TableCell>
-                  <TableCell className="py-4 text-gray-600">{product.itemGroup}</TableCell>
-                  <TableCell className="py-4">
-                    <StatusBadge 
-                      status={product.isActive ? 'Active' : 'Inactive'}
-                    />
-                  </TableCell>
-                  <TableCell className="py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewProduct(product.id)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditProduct(product.id)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
       ) : (
-        <div className="text-center py-10 border rounded-lg bg-gray-50">
-          <p className="text-gray-600 mb-4">No products found</p>
-          <Button onClick={handleAddProduct}>Add Your First Product</Button>
+        <div className="flex flex-col items-center justify-center gap-4 py-8 border rounded-lg bg-gray-50/50">
+          <p className="text-sm text-muted-foreground">No products found</p>
+          <Button onClick={handleAddProduct}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Your First Product
+          </Button>
         </div>
       )}
 
       {/* Pagination */}
       {getCurrentPageData().length > 0 && (
-        <div className="flex items-center justify-between border-t pt-6 pb-4 px-2">
-          <p className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages}
-          </p>
-          <div className="flex gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </Button>
-            ))}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-8">
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredProducts.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0} to {Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} results
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">First page</span>
+              «
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">Previous page</span>
+              ‹
+            </Button>
+            <span className="text-sm font-medium">
+              Page {currentPage} of {totalPages || 1}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">Next page</span>
+              ›
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">Last page</span>
+              »
+            </Button>
           </div>
         </div>
       )}

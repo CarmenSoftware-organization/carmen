@@ -9,6 +9,8 @@ import { Vendor, EnvironmentalImpact } from '../types'
 // No need to extend Vendor since our local type already has environmentalImpact
 type VendorWithEnvironmental = Vendor
 
+type FieldValue = string | number | boolean | Date | null;
+
 export function useVendor(id: string) {
   const router = useRouter()
   const [vendor, setVendor] = useState<VendorWithEnvironmental | null>(null)
@@ -133,7 +135,7 @@ export function useVendor(id: string) {
     }
   }
 
-  const handleFieldChange = (name: string, value: any) => {
+  const handleFieldChange = (name: string, value: FieldValue) => {
     setVendor(prev => {
       if (!prev) return prev
       return { ...prev, [name]: value }

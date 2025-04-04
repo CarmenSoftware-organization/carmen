@@ -104,19 +104,6 @@ export function CountDetailForm({
     }));
   };
 
-  const getStatusBadgeVariant = (status: CountDetailData['items'][0]['status']) => {
-    switch (status) {
-      case 'good':
-        return 'default';
-      case 'damaged':
-        return 'destructive';
-      case 'missing':
-        return 'warning';
-      case 'expired':
-        return 'secondary';
-    }
-  };
-
   return (
     <Card className="w-full max-w-4xl mx-4 flex flex-col h-[calc(100vh-8rem)]">
       <CardHeader className="space-y-4 border-b">

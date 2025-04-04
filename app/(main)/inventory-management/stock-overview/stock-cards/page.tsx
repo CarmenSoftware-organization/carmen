@@ -32,23 +32,7 @@ import {
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { formatCurrency, formatNumber } from "../inventory-balance/utils"
-
-// Mock product data for the stock card list
-interface Product {
-  id: string
-  code: string
-  name: string
-  category: string
-  unit: string
-  status: "Active" | "Inactive"
-  currentStock: number
-  minimumStock: number
-  maximumStock: number
-  value: number
-  averageCost: number
-  lastMovementDate: string
-  locationCount: number
-}
+import { Product } from "../types"
 
 // Generate mock data
 const generateMockProducts = (): Product[] => {
@@ -81,6 +65,10 @@ const generateMockProducts = (): Product[] => {
       category,
       unit,
       status,
+      description: `Description for Product ${i}`,
+      lastUpdated: new Date().toISOString().split('T')[0],
+      createdAt: new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0],
+      createdBy: "system",
       currentStock,
       minimumStock,
       maximumStock,
@@ -137,13 +125,13 @@ export default function StockCardListPage() {
       }
       
       // Stock level filter
-      if (stockFilter === "low" && product.currentStock > product.minimumStock) {
+      if (stockFilter === "low" && product.currentStock! > product.minimumStock!) {
         return false
       }
-      if (stockFilter === "high" && product.currentStock < product.maximumStock) {
+      if (stockFilter === "high" && product.currentStock! < product.maximumStock!) {
         return false
       }
-      if (stockFilter === "normal" && (product.currentStock <= product.minimumStock || product.currentStock >= product.maximumStock)) {
+      if (stockFilter === "normal" && (product.currentStock! <= product.minimumStock! || product.currentStock! >= product.maximumStock!)) {
         return false
       }
       
@@ -164,10 +152,10 @@ export default function StockCardListPage() {
           comparison = a.category.localeCompare(b.category)
           break
         case "stock":
-          comparison = a.currentStock - b.currentStock
+          comparison = (a.currentStock || 0) - (b.currentStock || 0)
           break
         case "value":
-          comparison = a.value - b.value
+          comparison = (a.value || 0) - (b.value || 0)
           break
         default:
           comparison = a.name.localeCompare(b.name)
@@ -196,9 +184,13 @@ export default function StockCardListPage() {
   
   // Render stock level badge
   const renderStockLevelBadge = (product: Product) => {
-    if (product.currentStock <= product.minimumStock) {
+    const currentStock = product.currentStock || 0;
+    const minimumStock = product.minimumStock || 0;
+    const maximumStock = product.maximumStock || 0;
+    
+    if (currentStock <= minimumStock) {
       return <Badge variant="destructive">Low</Badge>
-    } else if (product.currentStock >= product.maximumStock) {
+    } else if (currentStock >= maximumStock) {
       return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">High</Badge>
     } else {
       return <Badge variant="outline" className="bg-green-100 text-green-800">Normal</Badge>
@@ -423,13 +415,19 @@ export default function StockCardListPage() {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            {formatNumber(product.currentStock)} {product.unit}
+                            {formatNumber(product.currentStock || 0)} {product.unit}
                           </TableCell>
                           <TableCell className="text-right">
                             {renderStockLevelBadge(product)}
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              {formatNumber(product.minimumStock || 0)} / {formatNumber(product.maximumStock || 0)}
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            {formatCurrency(product.value)}
+                            {formatCurrency(product.value || 0)}
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              {formatCurrency(product.averageCost || 0)} / {product.unit}
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))

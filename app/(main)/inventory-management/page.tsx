@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import type { DropResult } from 'react-beautiful-dnd';
 
 // Mock data for graphs
 const inventoryLevelsData = [
@@ -32,20 +33,27 @@ const inventoryTurnoverData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-// Mock dashboard items
-const initialItems = [
-  { id: 'item1', content: 'Inventory Levels', type: 'inventoryLevels' },
-  { id: 'item2', content: 'Inventory Value Trend', type: 'inventoryValue' },
-  { id: 'item3', content: 'Inventory Turnover', type: 'inventoryTurnover' },
-  { id: 'item4', content: 'Low Stock Alerts', type: 'text', data: '7 items below reorder point' },
-  { id: 'item5', content: 'Upcoming Stock Takes', type: 'text', data: '2 stock takes scheduled next week' },
+// Mock data for initial items
+const initialItems: DashboardItem[] = [
+  { id: 'item1', content: 'Inventory Levels by Category', type: 'inventoryLevels' },
+  { id: 'item2', content: 'Inventory Value Over Time', type: 'inventoryValue' },
+  { id: 'item3', content: 'Inventory Turnover Rate', type: 'inventoryTurnover' },
+  { id: 'item4', content: 'Low Stock Alerts', type: 'text', data: '3 items below reorder point' },
+  { id: 'item5', content: 'Expiring Items', type: 'text', data: '2 items expiring within 30 days' },
   { id: 'item6', content: 'Recent Transfers', type: 'text', data: '5 inter-location transfers in the last 24 hours' },
 ];
 
-export default function InventoryManagementPage() {
-  const [items, setItems] = useState(initialItems);
+interface DashboardItem {
+  id: string;
+  content: string;
+  type: 'inventoryLevels' | 'inventoryValue' | 'inventoryTurnover' | 'text';
+  data?: string;
+}
 
-  const onDragEnd = (result: any) => {
+export default function InventoryManagementPage() {
+  const [items, setItems] = useState<DashboardItem[]>(initialItems);
+
+  const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
@@ -57,7 +65,7 @@ export default function InventoryManagementPage() {
     setItems(newItems);
   };
 
-  const renderDashboardItem = (item: any) => {
+  const renderDashboardItem = (item: DashboardItem) => {
     switch (item.type) {
       case 'inventoryLevels':
         return (

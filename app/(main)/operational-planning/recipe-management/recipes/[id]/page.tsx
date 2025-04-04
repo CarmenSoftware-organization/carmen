@@ -1,12 +1,11 @@
 "use client"
 
-import { Suspense, useState } from "react"
-import { Recipe, Ingredient, PreparationStep, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { useState } from "react"
+import { Ingredient, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   ArrowLeft,
   Clock,
@@ -17,7 +16,6 @@ import {
   History,
   Leaf,
   AlertCircle,
-  UploadCloud,
   Thermometer,
   Plus,
   Info,
@@ -72,7 +70,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
             </div>
             <h2 className="text-2xl font-semibold">Recipe Not Found</h2>
             <p className="text-muted-foreground max-w-md">
-              The recipe you're looking for doesn't exist or may have been deleted.
+              The recipe you&apos;re looking for doesn&apos;t exist or may have been deleted.
             </p>
             <Link href="/operational-planning/recipe-management/recipes">
               <Button>

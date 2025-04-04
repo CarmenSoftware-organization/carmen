@@ -31,7 +31,6 @@ import {
 import { useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Box } from 'lucide-react'
 import StatusBadge from '@/components/ui/custom-status-badge'
 import {
   DropdownMenu,
@@ -354,14 +353,19 @@ const mockApprovalLogs: ApprovalLogs = {
 
 // Add the ApprovalBadge component
 function ApprovalBadge({ status }: { status: 'Accept' | 'Reject' | 'Review' }) {
-  const styles = {
-    Accept: 'bg-green-100 text-green-800',
-    Reject: 'bg-red-100 text-red-800',
-    Review: 'bg-yellow-100 text-yellow-800'
+  const getStatusColor = (status: 'Accept' | 'Reject' | 'Review') => {
+    switch (status) {
+      case 'Accept':
+        return 'bg-green-100 text-green-800'
+      case 'Reject':
+        return 'bg-red-100 text-red-800'
+      case 'Review':
+        return 'bg-yellow-100 text-yellow-800'
+    }
   }
 
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
+    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
       {status}
     </span>
   )
@@ -686,7 +690,7 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
               Items
             </TabsTrigger>
             <TabsTrigger value="stock-movements" className="flex items-center gap-2 px-6">
-              <Box className="h-4 w-4" />
+              <Calculator className="h-4 w-4" />
               Stock Movements
             </TabsTrigger>
             <TabsTrigger value="journal-entries" className="flex items-center gap-2 px-6">

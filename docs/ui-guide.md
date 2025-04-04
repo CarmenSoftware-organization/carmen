@@ -16,13 +16,13 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
 ## 1. Page Layouts
 
 ### Structure
-- **Container**: Typically wrapped in a `div` with `container mx-auto py-6` classes
+- **Container**: Typically wrapped in a `div` with `container mx-auto py-6 px-9` classes
 - **Header Section**: Contains page title, description, and action buttons
 - **Content Area**: Main content of the page, often with spacing (`space-y-6` or `space-y-8`)
 
 ### Common Pattern
 ```tsx
-<div className="container mx-auto py-6">
+<div className="container mx-auto py-6 px-9">
   <div className="space-y-8">
     <div className="flex justify-between items-center">
       <h1 className="text-3xl font-bold">{pageTitle}</h1>
@@ -39,6 +39,7 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
 
 ### Best Practices
 - Use consistent spacing between sections (typically 6-8 units)
+- Always include 36px left and right padding (px-9 in Tailwind) for all pages
 - Maintain a clear visual hierarchy with proper heading sizes
 - Include breadcrumbs for deep navigation structures
 - Ensure responsive behavior with appropriate grid layouts
@@ -79,7 +80,7 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
 
 ### Structure
 - **Container**: Often wrapped in a `<Card>` or div with `rounded-lg border bg-white`
-- **Header Section**: Contains filters, search, and action buttons
+- **Header Section**: Contains title and action buttons, search, quick filters, advance filtiers
 - **Table Component**: Using the shadcn `<Table>` component with proper headers
 - **Pagination**: Positioned at the bottom of the table
 
@@ -132,6 +133,9 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
 - **Content Sections**: Organized in cards or sections with clear headings
 - **Tabs**: Often used to organize different aspects of the detail view
 - **Information Display**: Typically using label-value pairs
+- **View Modes**: 
+  - **View Mode**: Read-only display of information with Edit button
+  - **Edit Mode**: Interactive form fields for modifying information
 
 ### Common Pattern
 ```tsx
@@ -142,7 +146,17 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
       <p className="text-muted-foreground">{item.description}</p>
     </div>
     <div className="flex gap-2">
-      {/* Action buttons */}
+      {isEditMode ? (
+        <>
+          <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+          <Button onClick={handleSave}>Save</Button>
+        </>
+      ) : (
+        <Button onClick={() => setIsEditMode(true)}>
+          <Edit2Icon className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
+      )}
     </div>
   </div>
   
@@ -156,13 +170,31 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
     <TabsContent value="tab1" className="space-y-4">
       <Card className="px-3 py-6">
         <h3 className="font-semibold mb-4">Section Title</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-muted-foreground">Label</p>
-            <p className="font-medium">{value}</p>
+        {isEditMode ? (
+          <form className="grid grid-cols-2 gap-4">
+            {/* Form fields for editing */}
+            <FormField
+              control={form.control}
+              name="fieldName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Label</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </form>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Label</p>
+              <p className="font-medium">{value}</p>
+            </div>
+            {/* More information pairs */}
           </div>
-          {/* More information pairs */}
-        </div>
+        )}
       </Card>
     </TabsContent>
     
@@ -176,7 +208,11 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
 - Maintain consistent spacing and alignment
 - Use tabs for organizing complex information
 - Implement a clear visual hierarchy with proper headings
-- Include appropriate actions for editing or managing the item
+- Toggle between View and Edit modes with proper state management
+- Preserve form values when switching between view/edit modes
+- Use consistent action button placement across both modes
+- In Edit mode, maintain the same layout structure as View mode
+- Provide clear visual indication of which mode the user is in
 
 ## 5. Dashboard Layouts
 

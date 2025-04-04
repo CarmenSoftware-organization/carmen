@@ -18,16 +18,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Calendar as CalendarIcon
 } from 'lucide-react'
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { DateRange } from "react-day-picker"
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range"
 import { StockInDetail } from './stock-in-detail'

@@ -7,7 +7,7 @@ import { Address } from '@/lib/types'
 interface AddressesTabProps {
   addresses: Address[]
   isEditing: boolean
-  onAddressChange: (name: string, value: any) => void
+  onAddressChange: (name: keyof Address, value: Address[keyof Address]) => void
 }
 
 export function AddressesTab({ addresses, isEditing, onAddressChange }: AddressesTabProps) {

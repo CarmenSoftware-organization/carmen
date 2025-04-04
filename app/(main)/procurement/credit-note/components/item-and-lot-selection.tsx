@@ -8,17 +8,62 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
+interface ReferenceLot {
+  lotNumber: string;
+  receiveDate: string;
+  grnNumber: string;
+  grnDate: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  quantity: number;
+  unitCost: number;
+  remaining?: number;
+}
+
+interface AvailableLot extends ReferenceLot {
+  availableQty: number;
+}
+
+interface GRNItem {
+  id: string;
+  productName: string;
+  productDescription: string;
+  orderQuantity: number;
+  unitPrice: number;
+  location: string;
+  orderUnit: string;
+  inventoryUnit: string;
+  referenceLots: ReferenceLot[];
+  availableLots?: AvailableLot[];
+}
+
+interface SelectedItem extends GRNItem {
+  appliedLots: ReferenceLot[];
+  returnQuantity: number;
+  discountAmount: number;
+}
+
+interface FIFOSummary {
+  totalReceivedQty: number;
+  weightedAverageCost: number;
+  currentCost: number;
+  costVariance: number;
+  returnAmount: number;
+  costOfGoodsSold: number;
+  realizedGainLoss: number;
+}
+
 interface ItemAndLotSelectionProps {
   isOpen: boolean
   onClose: () => void
-  onSave: (selectedItems: any[]) => void
-  grnItems: any[] // Items from the selected GRN
-  grnNumber: string // GRN number
+  onSave: (selectedItems: (SelectedItem & FIFOSummary)[]) => void
+  grnItems: GRNItem[] 
+  grnNumber: string
   creditNoteType: "return" | "discount"
 }
 
 export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumber, creditNoteType }: ItemAndLotSelectionProps) {
-  const [selectedItems, setSelectedItems] = useState<any[]>([])
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([])
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   useEffect(() => {
@@ -26,7 +71,7 @@ export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumb
     setExpandedItems([])
   }, [isOpen])
 
-  const handleItemSelect = (item: any) => {
+  const handleItemSelect = (item: GRNItem) => {
     const index = selectedItems.findIndex(i => i.id === item.id)
     if (index > -1) {
       setSelectedItems(selectedItems.filter(i => i.id !== item.id))
@@ -35,14 +80,14 @@ export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumb
     }
   }
 
-  const handleLotSelection = (itemId: string, lot: any) => {
+  const handleLotSelection = (itemId: string, lot: ReferenceLot) => {
     setSelectedItems(prevItems => 
       prevItems.map(item => 
         item.id === itemId
           ? {
               ...item,
-              appliedLots: item.appliedLots.some((l: any) => l.lotNumber === lot.lotNumber)
-                ? item.appliedLots.filter((l: any) => l.lotNumber !== lot.lotNumber)
+              appliedLots: item.appliedLots.some((l) => l.lotNumber === lot.lotNumber)
+                ? item.appliedLots.filter((l) => l.lotNumber !== lot.lotNumber)
                 : [...item.appliedLots, lot]
             }
           : item
@@ -78,12 +123,18 @@ export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumb
     )
   }
 
-  const calculateFIFOSummary = (item: any) => {
-    const totalReceivedQty = item.referenceLots.reduce((sum: number, lot: any) => sum + lot.quantity, 0)
-    const weightedAverageCost = item.referenceLots.reduce((sum: number, lot: any) => sum + (lot.quantity * lot.unitCost), 0) / totalReceivedQty
+  const calculateFIFOSummary = (item: GRNItem | SelectedItem): FIFOSummary => {
+    const selectedItem: SelectedItem = 'returnQuantity' in item 
+      ? item as SelectedItem 
+      : { ...item, appliedLots: [], returnQuantity: 0, discountAmount: 0 };
+
+    const totalReceivedQty = item.referenceLots.reduce((sum, lot) => sum + lot.quantity, 0)
+    const weightedAverageCost = item.referenceLots.length > 0 
+      ? item.referenceLots.reduce((sum, lot) => sum + (lot.quantity * lot.unitCost), 0) / totalReceivedQty 
+      : 0;
     const currentCost = item.unitPrice
     const costVariance = currentCost - weightedAverageCost
-    const returnQuantity = item.returnQuantity || 0
+    const returnQuantity = selectedItem.returnQuantity || 0
     const returnAmount = returnQuantity * currentCost
     const costOfGoodsSold = returnQuantity * weightedAverageCost
     const realizedGainLoss = returnAmount - costOfGoodsSold
@@ -242,7 +293,7 @@ export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumb
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                  {item.referenceLots.map((lot: any) => (
+                                  {item.referenceLots.map((lot: ReferenceLot) => (
                                     <TableRow key={lot.lotNumber}>
                                       <TableCell>{lot.lotNumber}</TableCell>
                                       <TableCell>{lot.receiveDate}</TableCell>
@@ -251,12 +302,12 @@ export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumb
                                       <TableCell>{lot.invoiceNumber}</TableCell>
                                       <TableCell>{lot.invoiceDate}</TableCell>
                                       <TableCell>{lot.quantity}</TableCell>
-                                      <TableCell>{lot.unitCost.toFixed(2)}</TableCell>
+                                      <TableCell>{lot.unitCost?.toFixed(2)}</TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>
                               </Table>
-                              {creditNoteType === "return" && (
+                              {creditNoteType === "return" && item.availableLots && item.availableLots.length > 0 && (
                                 <>
                                   <h4 className="text-sm font-semibold my-2">Applied Lots</h4>
                                   <Table>
@@ -274,11 +325,11 @@ export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumb
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                      {item.availableLots.map((lot: any) => (
+                                      {item.availableLots.map((lot: AvailableLot) => (
                                         <TableRow key={lot.lotNumber}>
                                           <TableCell>
                                             <Checkbox
-                                              checked={selectedItems.find(i => i.id === item.id)?.appliedLots.some((l: any) => l.lotNumber === lot.lotNumber)}
+                                              checked={selectedItems.find(i => i.id === item.id)?.appliedLots.some(l => l.lotNumber === lot.lotNumber)}
                                               onCheckedChange={() => handleLotSelection(item.id, lot)}
                                             />
                                           </TableCell>

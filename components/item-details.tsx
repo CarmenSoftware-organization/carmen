@@ -46,7 +46,7 @@ export function ItemDetailsComponent({
     setMode(newMode)
   }
 
-  const handleInputChange = (field: keyof PurchaseOrderItem, value: any) => {
+  const handleInputChange = (field: keyof PurchaseOrderItem, value: PurchaseOrderItem[keyof PurchaseOrderItem]) => {
     setItemData(prev => ({ ...prev, [field]: value }))
   }
 

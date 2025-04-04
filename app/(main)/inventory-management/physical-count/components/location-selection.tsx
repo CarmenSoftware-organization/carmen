@@ -9,12 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { mockLocations, getLocationsByDepartment, Location } from '@/lib/mock/inventory-data';
 
+interface LocationFormData {
+  selectedLocations: string[];
+  department: string;
+}
+
 interface LocationSelectionProps {
-  formData: {
-    selectedLocations: string[];
-    department: string;
-  };
-  setFormData: (data: any) => void;
+  formData: LocationFormData;
+  setFormData: (data: LocationFormData) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -33,12 +35,12 @@ export function LocationSelection({ formData, setFormData, onNext, onBack }: Loc
   const [selectedType, setSelectedType] = useState('all');
 
   const handleLocationSelect = (locationId: string) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      selectedLocations: prev.selectedLocations.includes(locationId)
-        ? prev.selectedLocations.filter((id: string) => id !== locationId)
-        : [...prev.selectedLocations, locationId],
-    }));
+    setFormData({
+      ...formData,
+      selectedLocations: formData.selectedLocations.includes(locationId)
+        ? formData.selectedLocations.filter((id: string) => id !== locationId)
+        : [...formData.selectedLocations, locationId],
+    });
   };
 
   // Get locations for the selected department

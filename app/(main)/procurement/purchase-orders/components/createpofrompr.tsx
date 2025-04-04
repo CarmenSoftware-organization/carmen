@@ -20,13 +20,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
@@ -122,22 +115,33 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
     direction: "asc",
   });
 
+  const filteredRequests = useMemo(() => {
+    return purchaseRequests.filter(pr => {
+      if (!searchTerm) return true;
+      return pr.refNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pr.requestor.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [searchTerm]);
+
   const filteredAndSortedPurchaseRequests = useMemo(() => {
-    return purchaseRequests
-      .filter(
-        (pr) =>
-          pr.refNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          pr.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          pr.vendor.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    return filteredRequests
       .sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key])
-          return sortConfig.direction === "asc" ? -1 : 1;
-        if (a[sortConfig.key] > b[sortConfig.key])
-          return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
+        if (sortConfig.key === 'date' || sortConfig.key === 'deliveryDate') {
+          const aValue = a[sortConfig.key] as Date;
+          const bValue = b[sortConfig.key] as Date;
+          return sortConfig.direction === "asc" 
+            ? aValue.getTime() - bValue.getTime()
+            : bValue.getTime() - aValue.getTime();
+        } else {
+          const aValue = String(a[sortConfig.key]);
+          const bValue = String(b[sortConfig.key]);
+          
+          return sortConfig.direction === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
       });
-  }, [purchaseRequests, searchTerm, sortConfig]);
+  }, [filteredRequests, sortConfig]);
 
   const handleSelectPR = (id: string, checked: boolean) => {
     if (checked) {

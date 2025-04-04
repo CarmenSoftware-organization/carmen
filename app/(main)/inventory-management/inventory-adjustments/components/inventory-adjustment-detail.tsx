@@ -1,32 +1,18 @@
 'use client'
 
 import { useState } from "react"
-import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   FileText,
-  Hash,
-  Check,
-  X,
   Calculator,
   Package,
   Plus,
   Edit,
   Trash,
-  ArrowLeft, 
-  Printer, 
-  Edit2, 
-  XCircle,
-  Calendar,
-  Building2,
-  Store,
 } from 'lucide-react'
 
 import { HeaderInformation } from "./header-information"
@@ -35,7 +21,7 @@ import { StockMovementTable } from "./stock-movement/stock-movement-table"
 import { JournalHeader } from "./journal-entries/journal-header"
 import { JournalTable } from "./journal-entries/journal-table"
 import StatusBadge from "@/components/ui/custom-status-badge"
-import { StockMovementItem, JournalEntry, JournalHeader as JournalHeaderType } from "./types"
+import type { JournalEntry, JournalHeader as JournalHeaderType } from "./types"
 
 interface InventoryAdjustmentDetailProps {
   id: string
@@ -84,18 +70,6 @@ interface InventoryAdjustment {
     outQty: number
     totalCost: number
   }
-}
-
-interface Item {
-  id: string
-  code: string
-  name: string
-  description?: string
-  unit: string
-  quantity: number
-  currentStock: number
-  adjustedStock: number
-  status: 'good' | 'damaged' | 'expired'
 }
 
 const mockAdjustment: InventoryAdjustment = {
@@ -258,21 +232,10 @@ const mockJournalEntries: {
 }
 
 export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps) {
-  const router = useRouter()
   const [isEditMode, setIsEditMode] = useState(false)
-  const [activeTab, setActiveTab] = useState("stock")
 
   const handleHeaderUpdate = (field: string, value: string) => {
     console.log('Updating header field:', field, value)
-  }
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      good: "default",
-      damaged: "destructive",
-      expired: "warning",
-    }
-    return variants[status as keyof typeof variants] || "secondary"
   }
 
   return (
@@ -293,7 +256,7 @@ export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps
 
           <Tabs defaultValue="stock" className="w-full">
             <TabsList>
-            <TabsTrigger value="items" className="flex items-center gap-2">
+              <TabsTrigger value="items" className="flex items-center gap-2">
                 <FileText className="h-4 w-4 mr-2" />
                 Items
               </TabsTrigger>
@@ -305,7 +268,6 @@ export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps
                 <Calculator className="h-4 w-4" />
                 Journal Entries
               </TabsTrigger>
-              
             </TabsList>
 
             <TabsContent value="stock" className="mt-4">

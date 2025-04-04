@@ -11,39 +11,22 @@ export default function MainLayoutClient({
   children: React.ReactNode
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [isLargeScreen, setIsLargeScreen] = useState(false)
   const pathname = usePathname()
 
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen((prev) => !prev)
-  }
-
+  // Close mobile sidebar on route change
   useEffect(() => {
-    const handleResize = () => {
-      const largeScreen = window.innerWidth >= 1024
-      setIsLargeScreen(largeScreen)
-      setIsSidebarOpen(largeScreen)
-    }
-
-    window.addEventListener('resize', handleResize)
-    handleResize()
-
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  useEffect(() => {
-    if (!isLargeScreen) {
-      setIsSidebarOpen(false)
-    }
-  }, [pathname, isLargeScreen])
+    setIsSidebarOpen(false)
+  }, [pathname])
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar isOpen={isSidebarOpen || isLargeScreen} onClose={() => setIsSidebarOpen(false)} />
-      <div className="flex-1 flex flex-col overflow-hidden lg:pl-[280px]">
-        <Header onSidebarToggle={handleSidebarToggle} isSidebarOpen={isSidebarOpen} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 pt-16">
-          {children}
+    <div className="min-h-screen bg-background">
+      <Header onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+      <div className="flex min-h-[calc(100vh-64px)] pt-16">
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <main className="flex-1 overflow-y-auto bg-background lg:pl-[280px]">
+          <div className="mx-auto max-w-7xl px-2 md:px-4">
+            {children}
+          </div>
         </main>
       </div>
     </div>

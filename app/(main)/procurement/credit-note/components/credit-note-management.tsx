@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -56,14 +56,6 @@ export function CreditNoteManagement() {
   const handleDelete = (id: number) => {
     console.log(`Deleting credit note ${id}`)
     setCreditNotes(creditNotes.filter(note => note.id !== id))
-  }
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedNotes(paginatedCreditNotes.map(note => note.id))
-    } else {
-      setSelectedNotes([])
-    }
   }
 
   const handleSelectNote = (id: number, checked: boolean) => {

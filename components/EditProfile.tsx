@@ -1,15 +1,12 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { CameraIcon, Trash2Icon } from 'lucide-react'
+import { CameraIcon } from 'lucide-react'
 import { toast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
 
 export default function EditProfile() {
   const [formData, setFormData] = useState({
@@ -25,28 +22,7 @@ export default function EditProfile() {
     signature: ''
   })
 
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [isDrawing, setIsDrawing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (canvas) {
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.lineWidth = 2
-        ctx.strokeStyle = '#000000'
-      }
-    }
-  }, [])
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value })
-  }
-
-  const handleSelectChange = (value: string, field: string) => {
-    setFormData({ ...formData, [field]: value })
-  }
 
   const getInitials = (name: string) => {
     return name
@@ -54,43 +30,6 @@ export default function EditProfile() {
       .map(part => part[0])
       .join('')
       .toUpperCase()
-  }
-
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDrawing(true)
-    draw(e)
-  }
-
-  const stopDrawing = () => {
-    setIsDrawing(false)
-    const canvas = canvasRef.current
-    if (canvas) {
-      setFormData({ ...formData, signature: canvas.toDataURL() })
-    }
-  }
-
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return
-    const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
-    if (ctx && canvas) {
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      ctx.lineTo(x, y)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.moveTo(x, y)
-    }
-  }
-
-  const clearSignature = () => {
-    const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
-    if (ctx && canvas) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      setFormData({ ...formData, signature: '' })
-    }
   }
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,20 +59,32 @@ export default function EditProfile() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <Card>
+      <Card className="bg-background dark:bg-gray-800 border dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">Edit Profile</CardTitle>
+          <CardTitle className="text-3xl font-bold text-foreground dark:text-gray-100">
+            Edit Profile
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="flex items-center space-x-4">
-              <Avatar className="w-24 h-24">
+              <Avatar className="w-24 h-24 border dark:border-gray-600">
                 <AvatarImage src={formData.profilePicture} alt={formData.username} />
-                <AvatarFallback className="bg-gray-200 text-gray-600 text-2xl font-semibold">
+                <AvatarFallback className="bg-muted dark:bg-gray-700 text-foreground dark:text-gray-100 text-2xl font-semibold">
                   {getInitials(`${formData.firstName} ${formData.lastName}`)}
                 </AvatarFallback>
               </Avatar>
-              <Button type="button" variant="secondary" className="bg-blue-500 text-white hover:bg-blue-600" onClick={triggerFileInput}>
+              <Button 
+                type="button" 
+                variant="secondary" 
+                className={cn(
+                  "bg-primary hover:bg-primary/90",
+                  "text-primary-foreground",
+                  "dark:bg-gray-700 dark:hover:bg-gray-600",
+                  "dark:text-gray-100"
+                )}
+                onClick={triggerFileInput}
+              >
                 <CameraIcon className="w-4 h-4 mr-2" />
                 Change Picture
               </Button>
@@ -149,7 +100,12 @@ export default function EditProfile() {
             {/* ... (rest of the form fields remain the same) ... */}
 
             <div className="flex justify-end">
-              <Button type="submit">Save Changes</Button>
+              <Button 
+                type="submit"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100"
+              >
+                Save Changes
+              </Button>
             </div>
           </form>
         </CardContent>

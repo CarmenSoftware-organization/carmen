@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,17 +16,69 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { format, parse } from "date-fns"
 import { Calendar as CalendarIcon, X, HelpCircle, Upload, Users, BarChart2, Package, TruckIcon, Edit, Trash2, Plus } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
+
+interface FormData {
+  status: string
+  location: string
+  name: string
+  description: string
+  unit: string
+  quantityRequested: number
+  quantityApproved: number
+  deliveryDate: string
+  deliveryPoint: string
+  currency: string
+  currencyRate: number
+  price: number
+  foc: number
+  netAmount: number
+  adjustment: boolean
+  discountAmount: number
+  taxAmount: number
+  totalAmount: number
+  vendor: string
+  vendorItemCode: string
+  comment: string
+  image: string | null
+  createdBy: string
+  createdDate: string
+  lastModifiedBy: string
+  lastModifiedDate: string
+  itemCategory: string
+  itemSubcategory: string
+  inventoryInfo: {
+    onHand: number
+    onOrdered: number
+    reorderLevel: number
+    restockLevel: number
+    averageMonthlyUsage: number
+    lastPrice: number
+    lastOrderDate: string
+    lastVendor: string
+  }
+}
 
 type ItemDetailsFormProps = {
   onSave: (formData: FormData) => void
   onCancel: () => void
   onDelete?: () => void
-  initialData?: any
+  initialData?: FormData
 }
 
 type FormMode = 'add' | 'edit' | 'view'
 
-const sampleItemData = {
+interface FormFieldProps {
+  id: keyof FormData
+  label: string
+  required?: boolean
+  tooltip?: string
+  children: React.ReactNode
+  smallText?: string
+  baseValue?: string | number
+}
+
+const sampleItemData: FormData = {
   status: 'Accepted',
   location: "FB: Food & Beverage",
   name: "Premium Coffee Beans",
@@ -72,7 +125,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
     initialData?.deliveryDate ? parse(initialData.deliveryDate, 'yyyy-MM-dd', new Date()) : undefined
   )
   const [image, setImage] = useState<string | null>(initialData?.image || null)
-  const [formData, setFormData] = useState(initialData)
+  const [formData, setFormData] = useState<FormData>(initialData)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -84,6 +137,24 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      // Validate file type and size
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload an image file",
+          variant: "destructive"
+        })
+        return
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "File too large",
+          description: "Image must be less than 5MB",
+          variant: "destructive"
+        })
+        return
+      }
+
       const reader = new FileReader()
       reader.onloadend = () => {
         setImage(reader.result as string)
@@ -99,22 +170,44 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
     }
   }
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = event.target
-    setFormData((prevData: typeof initialData) => ({ ...prevData, [name]: value }))
-  }
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const formDataToSubmit = new FormData(event.currentTarget)
-    if (deliveryDate) {
-      formDataToSubmit.set('deliveryDate', format(deliveryDate, 'yyyy-MM-dd'))
+    
+    const submissionData: FormData = {
+      ...formData,
+      deliveryDate: deliveryDate ? format(deliveryDate, 'yyyy-MM-dd') : formData.deliveryDate,
+      image: image || null,
     }
-    onSave(formDataToSubmit)
-    setMode('view')
+
+    try {
+      onSave(submissionData)
+      setMode('view')
+    } catch (err) {
+      console.error('Form submission error:', err)
+      toast({
+        title: "Error",
+        description: "Failed to save changes. Please try again.",
+        variant: "destructive"
+      })
+    }
   }
 
-  const FormField = ({ id, label, required = false, tooltip, children, smallText, baseValue }: any) => (
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = event.target
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: type === 'number' ? Number(value) : value
+    }))
+  }
+
+  const handleCheckboxChange = (checked: boolean | string, field: keyof FormData) => {
+    setFormData(prevData => ({
+      ...prevData,
+      [field]: typeof checked === 'boolean' ? checked : checked === 'true'
+    }))
+  }
+
+  const FormField = ({ id, label, required = false, tooltip, children, smallText, baseValue }: FormFieldProps) => (
     <div>
       <div className="flex items-center space-x-2">
         <Label htmlFor={id} className={cn(required && "after:content-['*'] after:ml-0.5 after:text-red-500")}>
@@ -132,7 +225,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
         )}
       </div>
       {mode === 'view' ? (
-        <div className="mt-1 text-sm">{formData[id] || 'N/A'}</div>
+        <div className="mt-1 text-sm">{String(formData[id])}</div>
       ) : (
         children
       )}
@@ -423,7 +516,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                       id="adjustment" 
                       name="adjustment" 
                       checked={formData.adjustment}
-                      onCheckedChange={(checked) => setFormData((prevData: typeof initialData) => ({ ...prevData, adjustment: checked }))}
+                      onCheckedChange={(checked) => handleCheckboxChange(checked, 'adjustment')}
                       disabled={mode === 'view'} 
                     />
                     <Label htmlFor="adjustment">Price Adjustment</Label>
@@ -507,7 +600,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                   disabled={mode === 'view'} 
                 />
               </FormField>
-              <FormField id="image" label="Image Attachment" tooltip="Upload an image of the item">
+              <FormField id="image" label="Image Attachment" tooltip="Upload an image of the item (max 5MB)">
                 <div className="flex items-center space-x-2">
                   <Input
                     id="image"
@@ -541,8 +634,15 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                   )}
                 </div>
                 {image && (
-                  <div className="mt-2">
-                    <img src={image} alt="Attached" className="max-w-xs h-auto rounded-md" />
+                  <div className="mt-2 relative w-[320px] h-[240px]">
+                    <Image
+                      src={image}
+                      alt="Item preview"
+                      fill
+                      sizes="(max-width: 320px) 100vw, 320px"
+                      className="rounded-md object-contain"
+                      priority={false}
+                    />
                   </div>
                 )}
               </FormField>

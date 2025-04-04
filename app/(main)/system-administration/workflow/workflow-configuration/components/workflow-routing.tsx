@@ -227,7 +227,12 @@ export function WorkflowRouting({
                 <Label htmlFor="triggerStage">Trigger Stage</Label>
                 <Select 
                   value={selectedRule.triggerStage} 
-                  onValueChange={(value) => handleInputChange({ target: { id: 'triggerStage', value } } as any)}
+                  onValueChange={(value) => handleInputChange({ 
+                    target: { 
+                      id: 'triggerStage', 
+                      value 
+                    } 
+                  } as React.ChangeEvent<HTMLInputElement>)}
                   disabled={!isRuleEditing}
                 >
                   <SelectTrigger id="triggerStage">

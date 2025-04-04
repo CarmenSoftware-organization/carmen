@@ -13,10 +13,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+  Card,
+  CardContent,
+} from "@/components/ui/card"
 import {
   Select,
   SelectContent,
@@ -24,35 +23,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { BulkActions } from "./components/bulk-actions"
-import { UserFormDialog } from "./components/user-form-dialog"
-import { 
-  PlusCircle, 
-  X, 
-  UserPlus, 
-  Search, 
-  Filter,
-  SlidersHorizontal,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Pencil,
-  Trash2,
-  MoreHorizontal
-} from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-interface FilterCondition {
-  id: string
-  field: string
-  operator: string
-  value: string
-}
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
+import { BulkActions } from "./components/bulk-actions"
+import { EnhancedFilter, FilterCondition, SavedFilter } from "./components/enhanced-filter"
+import { StatusBadge } from "./components/status-badge"
+import { UserCard } from "./components/user-card"
+import { 
+  UserPlus, 
+  Search, 
+  Pencil,
+  Trash2,
+  MoreHorizontal,
+  LayoutGrid,
+  LayoutList,
+  Download,
+  FileText,
+  FileSpreadsheet
+} from "lucide-react"
 
 interface User {
   id: string
@@ -63,28 +66,9 @@ interface User {
   roles: string[]
   hodStatus: boolean
   inviteStatus?: string
-  lastLogin?: string
+  lastLogin?: string | null
   accountStatus: string
 }
-
-const FILTER_FIELDS = [
-  { label: "Name", value: "name" },
-  { label: "Email", value: "email" },
-  { label: "Business Unit", value: "businessUnit" },
-  { label: "Department", value: "department" },
-  { label: "Role", value: "roles" },
-  { label: "HOD Status", value: "hodStatus" },
-  { label: "Invite Status", value: "inviteStatus" },
-  { label: "Account Status", value: "accountStatus" },
-]
-
-const FILTER_OPERATORS = [
-  { label: "Contains", value: "contains" },
-  { label: "Equals", value: "equals" },
-  { label: "Not equals", value: "notEquals" },
-  { label: "Is empty", value: "isEmpty" },
-  { label: "Is not empty", value: "isNotEmpty" },
-]
 
 // Mock data for demonstration
 const mockUsers: User[] = [
@@ -112,6 +96,112 @@ const mockUsers: User[] = [
     lastLogin: "2024-02-19T15:30:00Z",
     accountStatus: "active",
   },
+  {
+    id: "3",
+    name: "Michael Johnson",
+    email: "michael.johnson@example.com",
+    businessUnit: "Finance",
+    department: "Accounting",
+    roles: ["finance_manager", "user"],
+    hodStatus: true,
+    inviteStatus: "pending",
+    lastLogin: "2024-02-15T09:45:00Z",
+    accountStatus: "active",
+  },
+  {
+    id: "4",
+    name: "Emily Williams",
+    email: "emily.williams@example.com",
+    businessUnit: "Marketing",
+    department: "Digital Marketing",
+    roles: ["marketing_specialist", "user"],
+    hodStatus: false,
+    inviteStatus: "sent",
+    lastLogin: "2024-02-18T14:20:00Z",
+    accountStatus: "inactive",
+  },
+  {
+    id: "5",
+    name: "David Brown",
+    email: "david.brown@example.com",
+    businessUnit: "Operations",
+    department: "Supply Chain",
+    roles: ["operations_manager", "user"],
+    hodStatus: true,
+    inviteStatus: "accepted",
+    lastLogin: "2024-02-17T11:30:00Z",
+    accountStatus: "active",
+  },
+  {
+    id: "6",
+    name: "Sarah Miller",
+    email: "sarah.miller@example.com",
+    businessUnit: "Human Resources",
+    department: "Talent Acquisition",
+    roles: ["hr_specialist", "user"],
+    hodStatus: false,
+    inviteStatus: "expired",
+    lastLogin: null,
+    accountStatus: "suspended",
+  },
+  {
+    id: "7",
+    name: "James Wilson",
+    email: "james.wilson@example.com",
+    businessUnit: "IT",
+    department: "Infrastructure",
+    roles: ["it_admin", "user"],
+    hodStatus: false,
+    inviteStatus: "accepted",
+    lastLogin: "2024-02-16T16:15:00Z",
+    accountStatus: "active",
+  },
+  {
+    id: "8",
+    name: "Jessica Taylor",
+    email: "jessica.taylor@example.com",
+    businessUnit: "Customer Support",
+    department: "Technical Support",
+    roles: ["support_lead", "user"],
+    hodStatus: true,
+    inviteStatus: "accepted",
+    lastLogin: "2024-02-14T10:10:00Z",
+    accountStatus: "active",
+  },
+]
+
+// Mock filter presets
+const mockPresets: SavedFilter[] = [
+  {
+    id: "preset1",
+    name: "Active Users",
+    conditions: [
+      {
+        id: "cond1",
+        field: "accountStatus",
+        operator: "equals",
+        value: "active",
+      },
+    ],
+    isDefault: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "preset2",
+    name: "Pending Invites",
+    conditions: [
+      {
+        id: "cond2",
+        field: "inviteStatus",
+        operator: "equals",
+        value: "pending",
+      },
+    ],
+    isDefault: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
 ]
 
 export default function UserManagementPage() {
@@ -119,84 +209,136 @@ export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>(mockUsers)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [filterConditions, setFilterConditions] = useState<FilterCondition[]>([])
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [savedFilters, setSavedFilters] = useState<SavedFilter[]>(mockPresets)
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table")
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const addFilterCondition = () => {
-    const newCondition: FilterCondition = {
-      id: Math.random().toString(36).substr(2, 9),
-      field: FILTER_FIELDS[0].value,
-      operator: FILTER_OPERATORS[0].value,
-      value: "",
-    }
-    setFilterConditions([...filterConditions, newCondition])
-  }
-
-  const removeFilterCondition = (id: string) => {
-    setFilterConditions(filterConditions.filter((condition) => condition.id !== id))
-  }
-
-  const updateFilterCondition = (
-    id: string,
-    field: keyof FilterCondition,
-    value: string
-  ) => {
-    setFilterConditions(
-      filterConditions.map((condition) =>
-        condition.id === id ? { ...condition, [field]: value } : condition
-      )
-    )
-  }
-
-  const handleBulkAction = async (action: string, data: any) => {
-    // Implement bulk action logic here
+  const handleBulkAction = async (action: string, data: Record<string, string>) => {
+    setIsLoading(true)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
     console.log("Bulk action:", action, data, "for users:", selectedUsers)
-  }
-
-  const handleUserSubmit = async (userData: Omit<User, "id">) => {
-    // In a real application, this would be an API call
-    router.push("/system-administration/user-management/new")
+    
+    if (action === "delete") {
+      setUsers(users.filter(user => !selectedUsers.includes(user.id)))
+      setSelectedUsers([])
+    } else if (action === "status") {
+      setUsers(users.map(user => 
+        selectedUsers.includes(user.id) 
+          ? { ...user, accountStatus: data.status } 
+          : user
+      ))
+    }
+    
+    setIsLoading(false)
   }
 
   const applyFilters = (user: User) => {
-    return filterConditions.every((condition) => {
-      const fieldValue = user[condition.field as keyof User]
+    if (filterConditions.length === 0) return true;
+    
+    let result = true;
+    let currentOperator: 'AND' | 'OR' | undefined = undefined;
+    
+    for (let i = 0; i < filterConditions.length; i++) {
+      const condition = filterConditions[i];
+      const fieldValue = user[condition.field as keyof User];
+      
+      // Evaluate the current condition
+      let conditionResult = true;
       
       switch (condition.operator) {
         case "contains":
-          return String(fieldValue)
+          conditionResult = String(fieldValue)
             .toLowerCase()
-            .includes(condition.value.toLowerCase())
+            .includes(String(condition.value).toLowerCase());
+          break;
         case "equals":
-          return String(fieldValue).toLowerCase() === condition.value.toLowerCase()
+          conditionResult = String(fieldValue).toLowerCase() === String(condition.value).toLowerCase();
+          break;
         case "notEquals":
-          return String(fieldValue).toLowerCase() !== condition.value.toLowerCase()
+          conditionResult = String(fieldValue).toLowerCase() !== String(condition.value).toLowerCase();
+          break;
         case "isEmpty":
-          return !fieldValue || String(fieldValue).trim() === ""
+          conditionResult = !fieldValue || String(fieldValue).trim() === "";
+          break;
         case "isNotEmpty":
-          return fieldValue && String(fieldValue).trim() !== ""
+          conditionResult = !!fieldValue && String(fieldValue).trim() !== "";
+          break;
+        case "greaterThan":
+          conditionResult = Number(fieldValue) > Number(condition.value);
+          break;
+        case "lessThan":
+          conditionResult = Number(fieldValue) < Number(condition.value);
+          break;
+        case "in":
+          if (Array.isArray(condition.value)) {
+            conditionResult = condition.value.includes(String(fieldValue));
+          } else if (typeof condition.value === 'string') {
+            const values = condition.value.split(',').map(v => v.trim().toLowerCase());
+            conditionResult = values.includes(String(fieldValue).toLowerCase());
+          }
+          break;
+        case "between":
+          if (Array.isArray(condition.value) && condition.value.length === 2) {
+            const [min, max] = condition.value;
+            conditionResult = Number(fieldValue) >= Number(min) && Number(fieldValue) <= Number(max);
+          } else if (typeof condition.value === 'string') {
+            const [min, max] = condition.value.split(',').map(v => Number(v.trim()));
+            conditionResult = Number(fieldValue) >= min && Number(fieldValue) <= max;
+          }
+          break;
         default:
-          return true
+          conditionResult = true;
       }
-    })
+      
+      // Apply the logical operator
+      if (i === 0) {
+        result = conditionResult;
+      } else if (currentOperator === 'AND') {
+        result = result && conditionResult;
+      } else if (currentOperator === 'OR') {
+        result = result || conditionResult;
+      }
+      
+      // Store the operator for the next iteration
+      currentOperator = condition.logicalOperator;
+    }
+    
+    return result;
   }
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
+      searchQuery === "" ||
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = !statusFilter || user.accountStatus === statusFilter
     const matchesAdvancedFilters = filterConditions.length === 0 || applyFilters(user)
-    return matchesSearch && matchesStatus && matchesAdvancedFilters
+    return matchesSearch && matchesAdvancedFilters
   })
 
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage)
+
   const handleDelete = async (userId: string) => {
+    setIsLoading(true)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
     // In a real application, this would be an API call
     if (window.confirm("Are you sure you want to delete this user?")) {
       setUsers(users.filter(user => user.id !== userId))
       setSelectedUsers(selectedUsers.filter(id => id !== userId))
     }
+    
+    setIsLoading(false)
   }
 
   const handleView = (userId: string) => {
@@ -207,265 +349,450 @@ export default function UserManagementPage() {
     router.push(`/system-administration/user-management/${userId}?mode=edit`)
   }
 
-  return (
-    <div className="container mx-auto py-10">
-      <div className="space-y-4 mb-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <Button onClick={() => router.push("/system-administration/user-management/new")}>
-            <UserPlus className="h-4 w-4 mr-2" />
-            Add New User
-          </Button>
-        </div>
+  const handleFilterChange = (conditions: FilterCondition[]) => {
+    setFilterConditions(conditions)
+    setCurrentPage(1) // Reset to first page when filters change
+  }
 
+  const handleSaveFilter = (filter: SavedFilter) => {
+    setSavedFilters([...savedFilters, filter])
+  }
+
+  const handleDeleteSavedFilter = (id: string) => {
+    setSavedFilters(savedFilters.filter(filter => filter.id !== id))
+  }
+
+  const handleToggleDefaultFilter = (id: string) => {
+    setSavedFilters(savedFilters.map(filter => 
+      filter.id === id 
+        ? { ...filter, isDefault: !filter.isDefault } 
+        : filter
+    ))
+  }
+
+  const handleSelectUser = (userId: string, isSelected: boolean | string | string[] | null | undefined) => {
+    if (isSelected) {
+      setSelectedUsers([...selectedUsers, userId])
+    } else {
+      setSelectedUsers(selectedUsers.filter(id => id !== userId))
+    }
+  }
+
+  const handleSelectAllUsers = (isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedUsers(filteredUsers.map(user => user.id))
+    } else {
+      setSelectedUsers([])
+    }
+  }
+
+  const exportData = (format: 'csv' | 'excel') => {
+    // In a real application, this would trigger a download
+    console.log(`Exporting data in ${format} format`, filteredUsers)
+    alert(`Exporting ${filteredUsers.length} users in ${format} format`)
+  }
+
+  return (
+    <div className="container mx-auto py-6">
+      <div className="space-y-6 px-6">
+        {/* Header Section */}
         <div className="flex justify-between items-center">
-          <div className="relative w-[300px]">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-            <Input
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
+          <div>
+            <h1 className="text-3xl font-bold">User Management</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage user accounts, permissions, and access
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Select
-              value={statusFilter || "all"}
-              onValueChange={(value) => setStatusFilter(value === "all" ? null : value)}
-            >
-              <SelectTrigger className="w-[160px]">
-                {/* <Filter className="h-4 w-4 mr-2" /> */}
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  <div className="flex items-center">
-                    <Filter className="h-4 w-4 mr-2" />
-                    All Status
-                  </div>
-                </SelectItem>
-                <SelectItem value="active">
-                  <div className="flex items-center">
-                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                    Active
-                  </div>
-                </SelectItem>
-                <SelectItem value="inactive">
-                  <div className="flex items-center">
-                    <XCircle className="h-4 w-4 mr-2 text-gray-500" />
-                    Inactive
-                  </div>
-                </SelectItem>
-                <SelectItem value="suspended">
-                  <div className="flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-2 text-yellow-500" />
-                    Suspended
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <PopoverTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
-                  More Filters {filterConditions.length > 0 && `(${filterConditions.length})`}
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-4" align="end">
-                <div className="space-y-4">
-                  <div className="font-medium flex items-center">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filters
-                  </div>
-                  {filterConditions.map((condition) => (
-                    <div key={condition.id} className="flex items-center gap-2">
-                      <Select
-                        value={condition.field}
-                        onValueChange={(value) =>
-                          updateFilterCondition(condition.id, "field", value)
-                        }
-                      >
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FILTER_FIELDS.map((field) => (
-                            <SelectItem key={field.value} value={field.value}>
-                              {field.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={condition.operator}
-                        onValueChange={(value) =>
-                          updateFilterCondition(condition.id, "operator", value)
-                        }
-                      >
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FILTER_OPERATORS.map((operator) => (
-                            <SelectItem key={operator.value} value={operator.value}>
-                              {operator.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {!["isEmpty", "isNotEmpty"].includes(condition.operator) && (
-                        <Input
-                          value={condition.value}
-                          onChange={(e) =>
-                            updateFilterCondition(
-                              condition.id,
-                              "value",
-                              e.target.value
-                            )
-                          }
-                          className="flex-1"
-                          placeholder="Value"
-                        />
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeFilterCondition(condition.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={addFilterCondition}
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Add filter
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => exportData('csv')}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportData('excel')}>
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Export as Excel
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button onClick={() => router.push("/system-administration/user-management/new")}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Add New User
+            </Button>
           </div>
         </div>
 
-        <div className="flex items-center">
-          <BulkActions
-            selectedCount={selectedUsers.length}
-            onAction={handleBulkAction}
-          />
-        </div>
-      </div>
-
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <input
-                  type="checkbox"
-                  checked={
-                    filteredUsers.length > 0 &&
-                    filteredUsers.every((user) =>
-                      selectedUsers.includes(user.id)
-                    )
-                  }
+        {/* Search and Filter Section */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="relative w-full md:w-[300px]">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <Input
+                  placeholder="Search users..."
+                  value={searchQuery}
                   onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedUsers(filteredUsers.map((user) => user.id))
-                    } else {
-                      setSelectedUsers([])
-                    }
+                    setSearchQuery(e.target.value)
+                    setCurrentPage(1) // Reset to first page when search changes
                   }}
-                  className="h-4 w-4"
+                  className="pl-9"
                 />
-              </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Business Unit</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Last Login</TableHead>
-              <TableHead className="w-24">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selectedUsers.includes(user.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedUsers([...selectedUsers, user.id])
-                      } else {
-                        setSelectedUsers(
-                          selectedUsers.filter((id) => id !== user.id)
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <EnhancedFilter
+                  filterConditions={filterConditions}
+                  onFilterChange={handleFilterChange}
+                  savedFilters={savedFilters}
+                  onSaveFilter={handleSaveFilter}
+                  onDeleteSavedFilter={handleDeleteSavedFilter}
+                  onToggleDefaultFilter={handleToggleDefaultFilter}
+                />
+                <div className="border-l h-8 mx-2" />
+                <div className="bg-muted rounded-md p-1">
+                  <Button
+                    variant={viewMode === "table" ? "default" : "ghost"}
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setViewMode("table")}
+                  >
+                    <LayoutList className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setViewMode("grid")}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bulk Actions */}
+        {selectedUsers.length > 0 && (
+          <div className="bg-muted/50 border rounded-lg p-6 flex items-center">
+            <div className="ml-2 mr-4">
+              <Checkbox
+                checked={
+                  filteredUsers.length > 0 &&
+                  filteredUsers.every((user) => selectedUsers.includes(user.id))
+                }
+                onCheckedChange={handleSelectAllUsers}
+                className="mr-2"
+              />
+              <span className="text-sm font-medium">{selectedUsers.length} selected</span>
+            </div>
+            <BulkActions
+              selectedCount={selectedUsers.length}
+              onAction={handleBulkAction}
+            />
+          </div>
+        )}
+
+        {/* Loading Indicator */}
+        {isLoading && (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
+
+        {/* Content Section */}
+        <div className="bg-white rounded-lg border">
+          {filteredUsers.length === 0 ? (
+            <div className="text-center py-12 px-6">
+              <UserPlus className="h-12 w-12 mx-auto text-muted-foreground opacity-20" />
+              <h3 className="mt-4 text-lg font-medium">No users found</h3>
+              <p className="text-muted-foreground mt-1">
+                Try adjusting your search or filter criteria
+              </p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => {
+                  setSearchQuery("")
+                  setFilterConditions([])
+                }}
+              >
+                Clear filters
+              </Button>
+            </div>
+          ) : viewMode === "table" ? (
+            // Table View
+            <div className="px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50/75">
+                    <TableHead className="w-12 py-3 font-medium text-gray-600">
+                      <Checkbox
+                        checked={
+                          paginatedUsers.length > 0 &&
+                          paginatedUsers.every((user) => selectedUsers.includes(user.id))
+                        }
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedUsers([
+                              ...selectedUsers,
+                              ...paginatedUsers
+                                .filter((user) => !selectedUsers.includes(user.id))
+                                .map((user) => user.id),
+                            ])
+                          } else {
+                            setSelectedUsers(
+                              selectedUsers.filter(
+                                (id) => !paginatedUsers.find((user) => user.id === id)
+                              )
+                            )
+                          }
+                        }}
+                      />
+                    </TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Name</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Email</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Department</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Roles</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Status</TableHead>
+                    <TableHead className="py-3 font-medium text-gray-600">Last Login</TableHead>
+                    <TableHead className="w-24 py-3 font-medium text-gray-600">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedUsers.map((user) => (
+                    <TableRow 
+                      key={user.id} 
+                      className="group hover:bg-gray-50/50 cursor-pointer"
+                      onClick={() => handleView(user.id)}
+                    >
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedUsers.includes(user.id)}
+                          onCheckedChange={(checked) => {
+                            handleSelectUser(user.id, checked as boolean)
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <span className="text-xs text-muted-foreground mr-1">{user.businessUnit}</span>
+                          <span className="text-xs mx-1">•</span>
+                          <span>{user.department}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {user.roles.slice(0, 2).map((role) => (
+                            <Badge 
+                              key={role} 
+                              variant="outline" 
+                              className="bg-primary/10 text-primary hover:bg-primary/20 text-xs"
+                            >
+                              {role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                            </Badge>
+                          ))}
+                          {user.roles.length > 2 && (
+                            <Badge variant="outline" className="bg-muted text-muted-foreground text-xs">
+                              +{user.roles.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <StatusBadge status={user.accountStatus} type="account" />
+                          {user.inviteStatus && (
+                            <StatusBadge status={user.inviteStatus} type="invite" size="sm" />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {user.lastLogin
+                          ? new Date(user.lastLogin).toLocaleDateString()
+                          : "Never"}
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => handleEdit(user.id)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => handleDelete(user.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleView(user.id)}>
+                                <Search className="h-4 w-4 mr-2" />
+                                View
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEdit(user.id)}>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(user.id)}
+                                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            // Grid View
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {paginatedUsers.map((user) => (
+                  <UserCard
+                    key={user.id}
+                    user={user}
+                    isSelected={selectedUsers.includes(user.id)}
+                    onSelect={handleSelectUser}
+                    onView={handleView}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {filteredUsers.length > 0 && (
+            <div className="flex items-center justify-between border-t px-6 py-2">
+              <div className="text-sm text-muted-foreground">
+                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} users
+              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(p => Math.max(1, p - 1));
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => 
+                      page === 1 || 
+                      page === totalPages || 
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    )
+                    .map((page, index, array) => {
+                      // Add ellipsis
+                      if (index > 0 && array[index - 1] !== page - 1) {
+                        return (
+                          <React.Fragment key={`ellipsis-${page}`}>
+                            <PaginationItem>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                            <PaginationItem>
+                              <PaginationLink
+                                href="#"
+                                isActive={page === currentPage}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCurrentPage(page);
+                                }}
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          </React.Fragment>
                         )
                       }
-                    }}
-                    className="h-4 w-4"
-                  />
-                </TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.businessUnit}</TableCell>
-                <TableCell>{user.department}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {user.accountStatus === "active" && (
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    )}
-                    {user.accountStatus === "inactive" && (
-                      <XCircle className="h-4 w-4 text-gray-500" />
-                    )}
-                    {user.accountStatus === "suspended" && (
-                      <AlertCircle className="h-4 w-4 text-yellow-500" />
-                    )}
-                    {user.accountStatus.charAt(0).toUpperCase() + user.accountStatus.slice(1)}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleDateString()
-                    : "Never"}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleView(user.id)}>
-                        <Search className="h-4 w-4 mr-2" />
-                        View
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(user.id)}>
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleDelete(user.id)}
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            href="#"
+                            isActive={page === currentPage}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCurrentPage(page);
+                            }}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(p => Math.min(totalPages, p + 1));
+                      }}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Items per page:</span>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={(value) => {
+                    setItemsPerPage(Number(value))
+                    setCurrentPage(1) // Reset to first page when changing items per page
+                  }}
+                >
+                  <SelectTrigger className="h-8 w-[70px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

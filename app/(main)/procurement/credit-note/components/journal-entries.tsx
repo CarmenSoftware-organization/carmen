@@ -2,8 +2,26 @@ import React, { useState } from 'react';
 import { Building, Calculator, AlertCircle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
+interface JournalEntry {
+  account: { code: string; name: string };
+  department: { code: string; name: string };
+  costCenter: string;
+  description: string;
+  reference: string;
+  debit?: number;
+  credit?: number;
+  orderNo: number;
+  tax?: { code: string; rate: number };
+}
+
+interface EntryGroup {
+  group: string;
+  description: string;
+  entries: JournalEntry[];
+}
+
 // Mock data for journal entries
-const mockEntries = [
+const mockEntries: EntryGroup[] = [
   {
     group: 'Primary Entries',
     description: 'Main credit note adjustments',
@@ -77,7 +95,7 @@ export default function JournalEntries() {
   };
 
   // Calculate group totals
-  const calculateGroupTotals = (entries: any[]) => {
+  const calculateGroupTotals = (entries: JournalEntry[]) => {
     return entries.reduce((acc, entry) => ({
       debit: acc.debit + (entry.debit || 0),
       credit: acc.credit + (entry.credit || 0)
@@ -203,13 +221,13 @@ export default function JournalEntries() {
                   <table className="w-full">
                     <thead>
                       <tr className="text-xs text-gray-500 uppercase">
-                        <th className="py-2 text-left">#</th>
-                        <th className="py-2 text-left">Account</th>
-                        <th className="py-2 text-left">Department</th>
-                        <th className="py-2 text-left">Description</th>
-                        <th className="py-2 text-right">Debit</th>
-                        <th className="py-2 text-right">Credit</th>
-                        <th className="py-2 text-left">Reference</th>
+                        <th className="py-2 text-left font-bold">#</th>
+                        <th className="py-2 text-left font-bold">Account</th>
+                        <th className="py-2 text-left font-bold">Department</th>
+                        <th className="py-2 text-left font-bold">Description</th>
+                        <th className="py-2 text-right font-bold">Debit</th>
+                        <th className="py-2 text-right font-bold">Credit</th>
+                        <th className="py-2 text-left font-bold">Reference</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">

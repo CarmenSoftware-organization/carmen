@@ -126,7 +126,7 @@ export function IngredientUnitTab({ isEditing }: IngredientUnitTabProps) {
     handleCancelAdd()
   }
 
-  const handleNewUnitChange = (field: keyof IngredientUnit, value: any) => {
+  const handleNewUnitChange = (field: keyof IngredientUnit, value: IngredientUnit[keyof IngredientUnit]) => {
     setNewUnit(prev => ({
       ...prev,
       [field]: value

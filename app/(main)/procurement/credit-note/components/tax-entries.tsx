@@ -193,10 +193,10 @@ export default function TaxImpact() {
           <table className="w-full">
             <thead>
               <tr className="text-xs text-gray-500 uppercase">
-                <th className="text-left py-2">Account</th>
-                <th className="text-left py-2">Description</th>
-                <th className="text-right py-2">Debit</th>
-                <th className="text-right py-2">Credit</th>
+                <th className="text-left py-2 font-bold">Account</th>
+                <th className="text-left py-2 font-bold">Description</th>
+                <th className="text-right py-2 font-bold">Debit</th>
+                <th className="text-right py-2 font-bold">Credit</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">

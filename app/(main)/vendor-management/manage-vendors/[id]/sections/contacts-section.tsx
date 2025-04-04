@@ -7,7 +7,7 @@ import { Contact } from '@/lib/types'
 interface ContactsSectionProps {
   contacts: Contact[]
   isEditing: boolean
-  onContactChange: (name: string, value: any) => void
+  onContactChange: (name: keyof Contact, value: Contact[keyof Contact]) => void
 }
 
 export function ContactsSection({ contacts, isEditing, onContactChange }: ContactsSectionProps) {

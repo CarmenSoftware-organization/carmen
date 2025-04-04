@@ -1,14 +1,5 @@
 import { Metadata } from 'next'
-import PurchaseOrderList from './components/PurchaseOrderList'
-import { Button } from "@/components/ui/button"
-import Link from 'next/link'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { PlusCircle } from 'lucide-react'
+import { PurchaseOrderList } from './components/PurchaseOrderList'
 
 export const metadata: Metadata = {
   title: 'Purchase Orders',
@@ -17,6 +8,8 @@ export const metadata: Metadata = {
 
 export default function PurchaseOrdersPage() {
   return (
+    <div className="container mx-auto py-6 px-4">
       <PurchaseOrderList />
+    </div>
   )
 }

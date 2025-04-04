@@ -4,7 +4,6 @@ import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import {
   Select,
@@ -16,28 +15,30 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import {
-  User,
   Building2,
-  Users,
-  Mail,
-  Briefcase,
-  UserCog,
   ArrowLeft,
   Save,
-  Shield,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Building,
-  UserCircle,
-  ScrollText,
-  Pencil
+  Edit,
+  X,
+  MoreVertical,
+  KeyRound,
+  Send,
+  Trash2,
 } from "lucide-react"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Label } from "@/components/ui/label"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
 
 // Mock data
 const businessUnits = ["Sales", "Engineering", "Marketing", "Finance", "HR"]
@@ -52,7 +53,21 @@ const roles = ["admin", "user", "manager", "developer", "sales_manager"]
 const locations = ["HQ", "Branch 1", "Branch 2", "Branch 3", "Remote"]
 
 // Mock data for demonstration
-const mockUsers = {
+const mockUsers: Record<string, {
+  id: string;
+  name: string;
+  email: string;
+  businessUnit: string;
+  department: string;
+  roles: string[];
+  locations: string[];
+  hodStatus: boolean;
+  hodDepartments: string[];
+  inviteStatus: string;
+  lastLogin: string;
+  accountStatus: string;
+  createdAt?: string;
+}> = {
   "1": {
     id: "1",
     name: "John Doe",
@@ -66,6 +81,7 @@ const mockUsers = {
     inviteStatus: "accepted",
     lastLogin: "2024-02-20T10:00:00Z",
     accountStatus: "active",
+    createdAt: "2023-01-15T08:30:00Z",
   },
   "2": {
     id: "2",
@@ -80,6 +96,7 @@ const mockUsers = {
     inviteStatus: "accepted",
     lastLogin: "2024-02-19T15:30:00Z",
     accountStatus: "active",
+    createdAt: "2023-02-10T09:15:00Z",
   },
 }
 
@@ -93,7 +110,6 @@ export default function UserDetailPage({
   const mode = searchParams.get("mode") || "view"
   const isNewUser = params.id === "new"
   const isViewMode = mode === "view" && !isNewUser
-
   const [formData, setFormData] = useState(() => {
     if (isNewUser) {
       return {
@@ -101,28 +117,37 @@ export default function UserDetailPage({
         email: "",
         businessUnit: "",
         department: "",
-        roles: [] as string[],
-        locations: [] as string[],
+        roles: [],
+        locations: [],
         hodStatus: false,
-        hodDepartments: [] as string[],
+        hodDepartments: [],
         inviteStatus: "pending",
         accountStatus: "inactive",
+        lastLogin: "",
+        createdAt: new Date().toISOString(),
+      }
+    } else {
+      return mockUsers[params.id] || {
+        name: "",
+        email: "",
+        businessUnit: "",
+        department: "",
+        roles: [],
+        locations: [],
+        hodStatus: false,
+        hodDepartments: [],
+        inviteStatus: "pending",
+        accountStatus: "inactive",
+        lastLogin: "",
+        createdAt: new Date().toISOString(),
       }
     }
-    // Load mock data for existing user
-    return mockUsers[params.id as keyof typeof mockUsers] || {
-      name: "",
-      email: "",
-      businessUnit: "",
-      department: "",
-      roles: [] as string[],
-      locations: [] as string[],
-      hodStatus: false,
-      hodDepartments: [] as string[],
-      inviteStatus: "pending",
-      accountStatus: "inactive",
-    }
   })
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSave = async () => {
     try {
@@ -142,9 +167,9 @@ export default function UserDetailPage({
   }
 
   const handleMultiSelect = (field: "roles" | "locations" | "hodDepartments", value: string) => {
-    const currentValues = formData[field]
+    const currentValues = formData[field] as string[]
     const newValues = currentValues.includes(value)
-      ? currentValues.filter((v) => v !== value)
+      ? currentValues.filter((v: string) => v !== value)
       : [...currentValues, value]
     setFormData({ ...formData, [field]: newValues })
   }
@@ -156,287 +181,227 @@ export default function UserDetailPage({
     })
   }
 
+  const handleResetPassword = () => {
+    toast.success(`Password reset link sent to ${formData.email}`)
+  }
+
+  const handleResendInvite = () => {
+    toast.success(`Invitation resent to ${formData.email}`)
+  }
+
+  const handleDelete = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this user? This action cannot be undone."
+    )
+    if (confirmed) {
+      toast.success("User deleted successfully")
+      router.push("/system-administration/user-management")
+    }
+  }
+
   return (
-    <div className="container mx-auto py-10">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleCancel}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <h1 className="text-3xl font-bold">
-                {isNewUser ? "Add New User" : isViewMode ? "User Details" : "Edit User"}
-              </h1>
-            </div>
-            <p className="text-gray-500">
-              {isNewUser
-                ? "Create a new user account"
-                : isViewMode
-                ? "View user account details"
-                : "Update user account details"}
-            </p>
+    <div className="container mx-auto py-6">
+      <div className="space-y-6 px-6">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="h-8 w-8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-2xl font-bold">{formData.name}</h1>
+            <Badge
+              variant={
+                formData.accountStatus === "active"
+                  ? "success"
+                  : formData.accountStatus === "inactive"
+                  ? "secondary"
+                  : "destructive"
+              }
+              className="ml-2"
+            >
+              {formData.accountStatus.charAt(0).toUpperCase() +
+                formData.accountStatus.slice(1)}
+            </Badge>
           </div>
-          <div className="flex gap-2">
-            {isViewMode ? (
-              <Button onClick={() => router.push(`/system-administration/user-management/${params.id}?mode=edit`)}>
-                <Pencil className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            ) : (
-              <>
-                <Button variant="outline" onClick={handleCancel}>
-                  Cancel
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/system-administration/user-management/${params.id}?mode=edit`)}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreVertical className="h-4 w-4" />
                 </Button>
-                <Button onClick={handleSave}>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
-                </Button>
-              </>
-            )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleResetPassword()}>
+                  <KeyRound className="h-4 w-4 mr-2" />
+                  Reset Password
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleResendInvite()}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Resend Invite
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => handleDelete()}
+                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete User
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Basic Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserCircle className="h-5 w-5" />
-                Basic Information
-              </CardTitle>
-              <CardDescription>User's personal and contact details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Full Name
-                </label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  placeholder="Enter full name"
-                  disabled={isViewMode}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email Address
-                </label>
-                <Input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  placeholder="Enter email address"
-                  disabled={isViewMode}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Organization Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Organization Details
-              </CardTitle>
-              <CardDescription>User's position and department information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Building className="h-4 w-4" />
-                  Business Unit
-                </label>
-                <Select
-                  value={formData.businessUnit}
-                  onValueChange={(value) =>
-                    setFormData({
-                      ...formData,
-                      businessUnit: value,
-                      department: "",
-                    })
-                  }
-                  disabled={isViewMode}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select business unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {businessUnits.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Assigned Department
-                </label>
-                <Select
-                  value={formData.department}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, department: value })
-                  }
-                  disabled={isViewMode || !formData.businessUnit}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select assigned department" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {formData.businessUnit &&
-                      departments[formData.businessUnit as keyof typeof departments].map(
-                        (dept) => (
-                          <SelectItem key={dept} value={dept}>
-                            {dept}
-                          </SelectItem>
-                        )
-                      )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Access Control */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Access Control
-              </CardTitle>
-              <CardDescription>User's roles and permissions</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <UserCog className="h-4 w-4" />
-                  Roles
-                </label>
-                <Select
-                  value=""
-                  onValueChange={(value) => handleMultiSelect("roles", value)}
-                  disabled={isViewMode}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select roles" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">User Profile</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center text-center">
+                  <Avatar className="h-24 w-24 mb-4">
+                    <AvatarImage src={""} />
+                    <AvatarFallback className="text-2xl">
+                      {formData.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <h3 className="text-xl font-semibold">{formData.name}</h3>
+                  <p className="text-muted-foreground">{formData.email}</p>
+                  <div className="flex items-center mt-1 text-sm text-muted-foreground">
+                    <Building2 className="h-3 w-3 mr-1" />
+                    <span>{formData.department}</span>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                    {formData.roles.map((role) => (
+                      <Badge
+                        key={role}
+                        variant="outline"
+                        className="bg-primary/10 text-primary hover:bg-primary/20"
+                      >
                         {role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </SelectItem>
+                      </Badge>
                     ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.roles.map((role) => (
-                    <Badge
-                      key={role}
-                      variant="secondary"
-                      className={isViewMode ? undefined : "cursor-pointer pr-1.5"}
-                    >
-                      {role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      {!isViewMode && (
-                        <button
-                          onClick={() => removeItem("roles", role)}
-                          className="ml-1 hover:text-red-500"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </Badge>
-                  ))}
+                  </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Assigned Locations
-                </label>
-                <Select
-                  value=""
-                  onValueChange={(value) => handleMultiSelect("locations", value)}
-                  disabled={isViewMode}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select locations" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations.map((location) => (
-                      <SelectItem key={location} value={location}>
-                        {location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.locations.map((location) => (
-                    <Badge
-                      key={location}
-                      variant="secondary"
-                      className={isViewMode ? undefined : "cursor-pointer pr-1.5"}
-                    >
-                      {location}
-                      {!isViewMode && (
-                        <button
-                          onClick={() => removeItem("locations", location)}
-                          className="ml-1 hover:text-red-500"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Head of Department
-                  </label>
-                  <Switch
-                    checked={formData.hodStatus}
-                    onCheckedChange={(checked) => {
-                      setFormData({
-                        ...formData,
-                        hodStatus: checked,
-                        hodDepartments: checked ? formData.hodDepartments : []
-                      })
-                    }}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    value={""}
+                    onChange={(e) => handleInputChange(e)}
                     disabled={isViewMode}
+                    placeholder="Enter phone number"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="alternativeEmail">Alternative Email</Label>
+                  <Input
+                    id="alternativeEmail"
+                    value={""}
+                    onChange={(e) => handleInputChange(e)}
+                    disabled={isViewMode}
+                    placeholder="Enter alternative email"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-                {formData.hodStatus && (
-                  <div className="space-y-2 ml-6">
-                    <label className="text-sm font-medium">
-                      Department Head Of
-                    </label>
+          <div className="space-y-6 md:col-span-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Basic Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange(e)}
+                      disabled={isViewMode}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input
+                      id="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange(e)}
+                      disabled={isViewMode}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="businessUnit">Business Unit</Label>
                     <Select
-                      value=""
-                      onValueChange={(value) => handleMultiSelect("hodDepartments", value)}
+                      value={formData.businessUnit}
+                      onValueChange={(value) =>
+                        setFormData({
+                          ...formData,
+                          businessUnit: value,
+                          department: "",
+                        })
+                      }
                       disabled={isViewMode}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select departments" />
+                      <SelectTrigger id="businessUnit">
+                        <SelectValue placeholder="Select business unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {businessUnits.map((unit) => (
+                          <SelectItem key={unit} value={unit}>
+                            {unit}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="department">Department</Label>
+                    <Select
+                      value={formData.department}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, department: value })
+                      }
+                      disabled={isViewMode || !formData.businessUnit}
+                    >
+                      <SelectTrigger id="department">
+                        <SelectValue placeholder="Select department" />
                       </SelectTrigger>
                       <SelectContent>
                         {formData.businessUnit &&
@@ -449,103 +414,179 @@ export default function UserDetailPage({
                           )}
                       </SelectContent>
                     </Select>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {formData.hodDepartments.map((dept) => (
-                        <Badge
-                          key={dept}
-                          variant="secondary"
-                          className={isViewMode ? undefined : "cursor-pointer pr-1.5"}
-                        >
-                          {dept}
-                          {!isViewMode && (
-                            <button
-                              onClick={() => removeItem("hodDepartments", dept)}
-                              className="ml-1 hover:text-red-500"
-                            >
-                              ×
-                            </button>
-                          )}
-                        </Badge>
-                      ))}
+                  </div>
+                  <div>
+                    <Label htmlFor="position">Position</Label>
+                    <Input
+                      id="position"
+                      value={""}
+                      onChange={(e) => handleInputChange(e)}
+                      disabled={isViewMode}
+                      placeholder="Enter position"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="employeeId">Employee ID</Label>
+                    <Input
+                      id="employeeId"
+                      value={""}
+                      onChange={(e) => handleInputChange(e)}
+                      disabled={isViewMode}
+                      placeholder="Enter employee ID"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Access Control</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="roles">Roles</Label>
+                  {!isViewMode ? (
+                    <Select
+                      onValueChange={(value) => handleMultiSelect("roles", value)}
+                    >
+                      <SelectTrigger id="roles">
+                        <SelectValue placeholder="Select role to add" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roles.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.roles.map((role) => (
+                      <Badge
+                        key={role}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
+                        {role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {!isViewMode && (
+                          <X
+                            className="h-3 w-3 ml-1 cursor-pointer"
+                            onClick={() => removeItem("roles", role)}
+                          />
+                        )}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="locations">Assigned Locations</Label>
+                  {!isViewMode ? (
+                    <Select
+                      onValueChange={(value) => handleMultiSelect("locations", value)}
+                    >
+                      <SelectTrigger id="locations">
+                        <SelectValue placeholder="Select location to add" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locations.map((location) => (
+                          <SelectItem key={location} value={location}>
+                            {location}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.locations.map((location) => (
+                      <Badge
+                        key={location}
+                        variant="outline"
+                        className="flex items-center gap-1"
+                      >
+                        {location}
+                        {!isViewMode && (
+                          <X
+                            className="h-3 w-3 ml-1 cursor-pointer"
+                            onClick={() => removeItem("locations", location)}
+                          />
+                        )}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Account Status</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="accountStatus">Account Status</Label>
+                    <Select
+                      value={formData.accountStatus}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, accountStatus: value })
+                      }
+                      disabled={isViewMode}
+                    >
+                      <SelectTrigger id="accountStatus">
+                        <SelectValue placeholder="Select account status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="suspended">Suspended</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="inviteStatus">Invite Status</Label>
+                    <Select
+                      value={formData.inviteStatus}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, inviteStatus: value })
+                      }
+                      disabled={isViewMode}
+                    >
+                      <SelectTrigger id="inviteStatus">
+                        <SelectValue placeholder="Select invite status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="sent">Sent</SelectItem>
+                        <SelectItem value="accepted">Accepted</SelectItem>
+                        <SelectItem value="expired">Expired</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Last Login</Label>
+                    <div className="h-10 px-3 py-2 rounded-md border border-input bg-background text-sm">
+                      {formData.lastLogin
+                        ? new Date(formData.lastLogin).toLocaleString()
+                        : "Never"}
                     </div>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Account Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ScrollText className="h-5 w-5" />
-                Account Status
-              </CardTitle>
-              <CardDescription>User's account and invitation status</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Account Status
-                </label>
-                <Select
-                  value={formData.accountStatus}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, accountStatus: value })
-                  }
-                  disabled={isViewMode}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select account status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">
-                      <div className="flex items-center">
-                        <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                        Active
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="space-y-2">
+                      <Label>Created At</Label>
+                      <div className="h-10 px-3 py-2 rounded-md border border-input bg-background text-sm">
+                        {formData.createdAt ? new Date(formData.createdAt).toLocaleString() : 'N/A'}
                       </div>
-                    </SelectItem>
-                    <SelectItem value="inactive">
-                      <div className="flex items-center">
-                        <XCircle className="h-4 w-4 mr-2 text-gray-500" />
-                        Inactive
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="suspended">
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2 text-yellow-500" />
-                        Suspended
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Invite Status
-                </label>
-                <Select
-                  value={formData.inviteStatus}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, inviteStatus: value })
-                  }
-                  disabled={isViewMode}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select invite status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="sent">Sent</SelectItem>
-                    <SelectItem value="accepted">Accepted</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

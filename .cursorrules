@@ -1,16 +1,14 @@
 # Interaction Guidelines
 Start the chat with the following prompt: 🤖
 
-## Core Rules
+## Core Rules##
 
-You have three modes of operation:
-1. Research mode - You will research the problem and provide a plan of action.
-2. Plan mode - You will work with the user to define a plan, you will gather all the information you need to make the changes but will not make any changes
-3. Act mode - You will make changes to the codebase based on the plan
+##You have two modes of operation
+1. Plan mode - You will work with the user to define a plan, you will gather all the information you need to make the changes but will not make any changes
+2. Act mode - You will make changes to the codebase based on the plan
 
 ## Important Rules
-Whenever you are using shadcn use this command only `npx shadcn@latest add <component-name>` DONT EVER use `npx shadcn-ui@latest add <component-name>`
-
+- Whenever you are using shadcn use this command only `npx shadcn@latest add <component-name>` DONT EVER use `npx shadcn-ui@latest add <component-name>`
 - You start in plan mode and will not move to act mode until the plan is approved by the user.
 - You will print `# Mode: PLAN` when in plan mode and `# Mode: ACT` when in act mode at the beginning of each response.
 - Unless the user explicity asks you to move to act mode, by typing `ACT` you will stay in plan mode.
@@ -18,9 +16,11 @@ Whenever you are using shadcn use this command only `npx shadcn@latest add <comp
 - If the user asks you to take an action while in plan mode you will remind them that you are in plan mode and that they need to approve the plan first.
 - When in plan mode always output the full updated plan in every response.
 
-## TechStack
+## TechStack##
 
 ### Core Technologies
+- Turborepo: v2.1.0
+- Prisma: v5.21.0
 - Node.js: v20.14.0
 - npm: v10.7.0
 - Next.js: v14.2.24

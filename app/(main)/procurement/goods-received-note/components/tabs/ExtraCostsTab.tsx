@@ -44,6 +44,7 @@ export function ExtraCostsTab({
   const [newCostAmount, setNewCostAmount] = useState("");
   const [distributionMethod, setDistributionMethod] =
     useState<CostDistributionMethod>(CostDistributionMethod.NET_AMOUNT);
+  const [localCosts, setLocalCosts] = useState<ExtraCost[]>(initialCosts);
 
   const addCost = () => {
     if (newCostAmount) {
@@ -70,6 +71,12 @@ export function ExtraCostsTab({
   };
 
   const totalExtraCost = costs.reduce((sum, cost) => sum + cost.amount, 0);
+
+  useEffect(() => {
+    if (costs.length !== localCosts.length) {
+      setLocalCosts(costs);
+    }
+  }, [costs, localCosts.length]);
 
   useEffect(() => {
     onCostsChange(costs, distributionMethod);

@@ -22,12 +22,18 @@ import { AddressesSection } from './sections/addresses-section'
 import { ContactsSection } from './sections/contacts-section'
 import { EnvironmentalProfile } from './sections/environmental-profile'
 import { CertificationsSection } from './sections/certifications-section'
+import { PrimaryContactSection } from './sections/primary-contact-section'
+import { PrimaryAddressSection } from './sections/primary-address-section'
 
 export default function VendorDetailPage({ params }: { params: { id: string } }) {
   return (
-    <Suspense fallback={<VendorDetailSkeleton />}>
-      <VendorDetail id={params.id} />
-    </Suspense>
+    <div className="container mx-auto py-6 px-4">
+      <div className="space-y-8">
+        <Suspense fallback={<VendorDetailSkeleton />}>
+          <VendorDetail id={params.id} />
+        </Suspense>
+      </div>
+    </div>
   )
 }
 
@@ -83,7 +89,10 @@ function VendorDetail({ id }: { id: string }) {
     }
   }
 
-  const handleFieldChange = (name: string, value: any) => {
+  type FieldValue = string | number | boolean | object | null
+  type FieldName = string
+
+  const handleFieldChange = (name: FieldName, value: FieldValue) => {
     setVendor(prev => {
       if (!prev) return prev
       return { ...prev, [name]: value }
@@ -132,64 +141,55 @@ function VendorDetail({ id }: { id: string }) {
 
   const content = (
     <>
-      {/* Header with back button and title - styled like Credit Note example */}
-      <div className="flex items-center mb-6">
-        <button 
-          onClick={() => router.push('/vendor-management/manage-vendors')}
-          className="mr-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Back to vendor list"
-        >
-          <ChevronLeft className="h-6 w-6 text-gray-700" />
-        </button>
-        <h1 className="text-2xl font-semibold">{vendor.companyName}</h1>
-        <div className="ml-3">
-          <Badge variant={vendor.isActive ? "default" : "secondary"} className="text-sm">
-            {vendor.isActive ? "Active" : "Inactive"}
-          </Badge>
-        </div>
-      </div>
-
       {/* Summary Card */}
-      <Card className="mb-6">
+      <Card className="border-none shadow-none bg-gray-50/50">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium">Primary Address</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm font-medium text-muted-foreground">Primary Address</p>
+                    <p className="text-sm font-medium">
                       {primaryAddress ? primaryAddress.addressLine : "No address provided"}
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium">Primary Contact</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm font-medium text-muted-foreground">Primary Contact</p>
+                    <p className="text-sm font-medium">
                       {primaryContact ? `${primaryContact.name} (${primaryContact.phone})` : "No contact provided"}
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium">Registration & Tax</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm font-medium text-muted-foreground">Registration & Tax</p>
+                    <p className="text-sm font-medium">
                       Reg: {vendor.businessRegistrationNumber} | Tax ID: {vendor.taxId}
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium">Established</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm font-medium text-muted-foreground">Established</p>
+                    <p className="text-sm font-medium">
                       {vendor.establishmentDate}
                     </p>
                   </div>
@@ -197,13 +197,13 @@ function VendorDetail({ id }: { id: string }) {
               </div>
             </div>
             
-            <div className="mt-4 md:mt-0 md:ml-6 flex flex-col items-center justify-center">
+            <div className="mt-6 md:mt-0 md:ml-6 flex flex-col items-center justify-center">
               <div className="text-center">
-                <div className="inline-flex items-center justify-center rounded-full bg-blue-100 p-3 mb-2">
-                  <Award className="h-6 w-6 text-blue-600" />
+                <div className="inline-flex items-center justify-center rounded-full bg-primary/10 p-3 mb-3">
+                  <Award className="h-6 w-6 text-primary" />
                 </div>
-                <p className="text-sm font-medium">Vendor Rating</p>
-                <p className="text-2xl font-bold">{vendor.rating}/5</p>
+                <p className="text-sm font-medium text-muted-foreground">Vendor Rating</p>
+                <p className="text-2xl font-bold text-primary">{Number(vendor.rating).toFixed(2)}/5</p>
               </div>
             </div>
           </div>
@@ -212,7 +212,7 @@ function VendorDetail({ id }: { id: string }) {
 
       {/* Tabbed Interface */}
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-4 w-full justify-start">
+        <TabsList className="mb-6 w-full justify-start bg-background">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="contacts">Contacts & Addresses</TabsTrigger>
           <TabsTrigger value="certifications">Certifications</TabsTrigger>
@@ -220,13 +220,13 @@ function VendorDetail({ id }: { id: string }) {
         </TabsList>
         
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-6">
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-medium">Basic Information</CardTitle>
+            <CardHeader className="px-6">
+              <CardTitle>Basic Information</CardTitle>
               <CardDescription>General information about the vendor</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-6">
               <BasicInfoSection
                 vendor={vendor}
                 isEditing={isEditing}
@@ -235,46 +235,42 @@ function VendorDetail({ id }: { id: string }) {
             </CardContent>
           </Card>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-medium">Primary Address</CardTitle>
-                    <CardDescription>Main location of the vendor</CardDescription>
-                  </div>
-                </div>
+              <CardHeader className="px-6">
+                <CardTitle>Primary Address</CardTitle>
+                <CardDescription>Main location of the vendor</CardDescription>
               </CardHeader>
-              <CardContent>
-                {primaryAddress && (
-                  <div className="space-y-2">
-                    <p><span className="font-medium">Address:</span> {primaryAddress.addressLine}</p>
-                    <p><span className="font-medium">Postal Code:</span> {primaryAddress.postalCode}</p>
-                    <p><span className="font-medium">Address Type:</span> {primaryAddress.addressType}</p>
-                    <p><span className="font-medium">Primary:</span> {primaryAddress.isPrimary ? "Yes" : "No"}</p>
-                  </div>
-                )}
+              <CardContent className="px-6">
+                <PrimaryAddressSection
+                  address={primaryAddress}
+                  isEditing={isEditing}
+                  onFieldChange={(name, value) => {
+                    const updatedAddresses = vendor.addresses.map(addr => 
+                      addr.id === primaryAddress?.id ? { ...addr, [name]: value } : addr
+                    )
+                    handleFieldChange('addresses', updatedAddresses)
+                  }}
+                />
               </CardContent>
             </Card>
             
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-medium">Primary Contact</CardTitle>
-                    <CardDescription>Main point of contact</CardDescription>
-                  </div>
-                </div>
+              <CardHeader className="px-6">
+                <CardTitle>Primary Contact</CardTitle>
+                <CardDescription>Main point of contact</CardDescription>
               </CardHeader>
-              <CardContent>
-                {primaryContact && (
-                  <div className="space-y-2">
-                    <p><span className="font-medium">Name:</span> {primaryContact.name}</p>
-                    <p><span className="font-medium">Phone:</span> {primaryContact.phone}</p>
-                    <p><span className="font-medium">Email:</span> {primaryContact.email}</p>
-                    <p><span className="font-medium">Position:</span> {primaryContact.position}</p>
-                  </div>
-                )}
+              <CardContent className="px-6">
+                <PrimaryContactSection
+                  contact={primaryContact}
+                  isEditing={isEditing}
+                  onFieldChange={(name, value) => {
+                    const updatedContacts = vendor.contacts.map(contact => 
+                      contact.id === primaryContact?.id ? { ...contact, [name]: value } : contact
+                    )
+                    handleFieldChange('contacts', updatedContacts)
+                  }}
+                />
               </CardContent>
             </Card>
           </div>
@@ -401,10 +397,26 @@ function VendorDetail({ id }: { id: string }) {
 
   return (
     <DetailPageTemplate
-      title={`Vendor Details`}
+      title={
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/vendor-management/manage-vendors')}
+            className="h-8 w-8 -ml-2"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold">{vendor.companyName}</span>
+            <Badge variant={vendor.isActive ? "default" : "secondary"}>
+              {vendor.isActive ? "Active" : "Inactive"}
+            </Badge>
+          </div>
+        </div>
+      }
       actionButtons={actionButtons}
       content={content}
-      backLink="/vendor-management/manage-vendors"
     />
   )
 }
@@ -412,12 +424,6 @@ function VendorDetail({ id }: { id: string }) {
 function VendorDetailSkeleton() {
   return (
     <div className="space-y-6">
-      {/* Back button and title skeleton */}
-      <div className="flex items-center mb-6">
-        <Skeleton className="h-6 w-6 rounded-full mr-4" />
-        <Skeleton className="h-8 w-[250px]" />
-      </div>
-      
       {/* Summary Card Skeleton */}
       <Card className="mb-6">
         <CardContent className="p-6">

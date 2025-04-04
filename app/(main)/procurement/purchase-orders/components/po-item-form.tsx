@@ -88,21 +88,29 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose }
     return value.toFixed(decimals)
   }
 
+  const getDisplayValue = (value: string | number | File | null, decimals?: number): string => {
+    if (value === null) return '';
+    if (typeof value === 'number' && decimals !== undefined) return formatNumber(value, decimals);
+    if (typeof value === 'string') return value;
+    if (value instanceof File) return value.name;
+    return String(value);
+  }
+
   const renderField = (label: string, name: keyof typeof formData, type: string = 'text', baseField?: keyof typeof formData, convRate?: boolean, suffix?: string, decimals?: number) => {
     const value = formData[name]
     const baseValue = baseField ? formData[baseField] : null
     const convRateValue = convRate ? formData.convRate : null
-    const formattedValue = typeof value === 'number' && decimals !== undefined ? formatNumber(value, decimals) : value
-    const formattedBaseValue = typeof baseValue === 'number' && decimals !== undefined ? formatNumber(baseValue, decimals) : baseValue
+    const displayValue = getDisplayValue(value, decimals)
+    const displayBaseValue = baseValue !== null ? getDisplayValue(baseValue, decimals) : null
 
     if (mode === 'view') {
       return (
-        <div className="mb-2">
+        <div className="mb-4">
           <Label className="text-sm font-medium">{label}</Label>
-          {/* <div className="mt-0.5">{formattedValue}{suffix}</div> */}
+          <div className="mt-1 text-base">{displayValue}{suffix}</div>
           {baseValue && (
-            <div className="text-xs text-gray-500">
-              {/* {formattedBaseValue} */}
+            <div className="text-xs text-gray-500 mt-0.5">
+              Base: {displayBaseValue}
               {convRateValue && ` (Conv: ${convRateValue})`}
             </div>
           )}
@@ -110,32 +118,32 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose }
       )
     }
     return (
-      <div className="mb-2">
+      <div className="mb-4">
         <Label htmlFor={name} className="text-sm font-medium">{label}</Label>
-        <div className="relative">
+        <div className="relative mt-1">
           {type === 'textarea' ? (
             <Textarea
               id={name}
               name={name}
-              value={value as string}
+              value={typeof value === 'string' ? value : ''}
               onChange={handleInputChange}
-              className="mt-0.5 w-full"
+              className="w-full min-h-[100px]"
             />
           ) : (
             <Input
               type={type}
               id={name}
               name={name}
-              value={formattedValue as string}
+              value={displayValue}
               onChange={handleInputChange}
-              className="mt-0.5 w-full"
+              className="w-full"
             />
           )}
           {suffix && <span className="absolute right-3 top-1/2 transform -translate-y-1/2">{suffix}</span>}
         </div>
         {baseValue && (
-          <div className="text-xs text-gray-500 mt-0.5">
-            {/* {formattedBaseValue} */}
+          <div className="text-xs text-gray-500 mt-1">
+            Base: {displayBaseValue}
             {convRateValue && ` (Conv: ${convRateValue})`}
           </div>
         )}
@@ -144,19 +152,19 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose }
   }
 
   return (
-    <div className="max-w-[1400px] w-full mx-auto p-6 bg-white rounded-lg shadow-lg relative my-8">
+    <div className="max-w-[90vw] w-full mx-auto p-8 bg-white rounded-lg shadow-lg relative my-8">
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 right-2 z-10"
+        className="absolute top-4 right-4 z-10"
         onClick={onClose}
       >
-        <X className="h-4 w-4" />
+        <X className="h-5 w-5" />
         <span className="sr-only">Close</span>
       </Button>
 
-      <form className="grid grid-cols-6 gap-4 mt-8">
-        <div className="col-span-6 flex justify-between items-center mb-4">
+      <form className="grid grid-cols-12 gap-6 mt-8">
+        <div className="col-span-12 flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold">Item Details</h3>
           {mode === 'view' && (
             <Button onClick={handleModeChange} variant="outline" size="sm">
@@ -165,72 +173,35 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose }
           )}
         </div>
 
-        <div className="col-span-1">
+        <div className="col-span-3">
           {renderField('Name', 'name')}
         </div>
-        <div className="col-span-5">
+        <div className="col-span-9">
           {renderField('Description', 'description', 'textarea')}
         </div>
-        <div className="col-span-1">{renderField('Order Unit', 'itemOrderUnit', 'text', 'baseUnit', true)}</div>
-        <div className="col-span-1">{renderField('Approved Qty', 'approvedQty', 'number', 'baseApprovedQty', false, '', 3)}</div>
-        <div className="col-span-1">{renderField('Received Qty', 'receivedQty', 'number', 'baseReceivedQty', false, '', 3)}</div>
-        <div className="col-span-1">{renderField('FOC', 'foc', 'number', 'baseFocQty', false, '', 3)}</div>
-        <div className="col-span-1">{renderField('Cancel Qty', 'cancelQty', 'number', 'baseCancelQty', false, '', 3)}</div>
-        <div className="col-span-1">{renderField('Price per Unit', 'pricePerUnit', 'number', 'basePricePerUnit', false, '', 2)}</div>
+        
+        <div className="col-span-2">{renderField('Order Unit', 'itemOrderUnit', 'text', 'baseUnit', true)}</div>
+        <div className="col-span-2">{renderField('Approved Qty', 'approvedQty', 'number', 'baseApprovedQty', false, '', 3)}</div>
+        <div className="col-span-2">{renderField('Received Qty', 'receivedQty', 'number', 'baseReceivedQty', false, '', 3)}</div>
+        <div className="col-span-2">{renderField('FOC', 'foc', 'number', 'baseFocQty', false, '', 3)}</div>
+        <div className="col-span-2">{renderField('Cancel Qty', 'cancelQty', 'number', 'baseCancelQty', false, '', 3)}</div>
+        <div className="col-span-2">{renderField('Price per Unit', 'pricePerUnit', 'number', 'basePricePerUnit', false, '', 2)}</div>
 
-        <div className="col-span-3">
-          <h4 className="text-lg font-medium mt-3 mb-1">Comment</h4>
+        <div className="col-span-6">
+          <h4 className="text-lg font-medium mb-3">Comment</h4>
           <Textarea
             id="comment"
             name="comment"
             value={formData.comment}
             onChange={handleInputChange}
             placeholder="Add your comment here..."
-            className="w-full mt-1"
-            rows={4}
+            className="w-full"
+            rows={5}
           />
-        </div>
-
-        <div className="col-span-3 flex justify-end">
-          <div className="w-full grid grid-cols-3 gap-4">
-            <div className="col-span-2">Net Amount</div>
-            <div className="col-span-1 text-right">{renderField('', 'netAmount', 'number', 'baseNetAmount', false, '', 2)}</div>
-            
-            <div className="col-span-1">
-              <div className="flex items-center">
-                <Checkbox
-                  id="adjDiscount"
-                  checked={adjustments.discount}
-                  onCheckedChange={() => handleCheckboxChange('discount')}
-                />
-                <label htmlFor="adjDiscount" className="ml-2 text-sm">Discount</label>
-              </div>
-            </div>
-            <div className="col-span-1">{renderField('', 'discPercentage', 'number', undefined, undefined, '%')}</div>
-            <div className="col-span-1 text-right">{renderField('', 'discAmount', 'number', 'baseDiscAmount', false, '', 2)}</div>
-            
-            <div className="col-span-1">
-              <div className="flex items-center">
-                <Checkbox
-                  id="adjTax"
-                  checked={adjustments.tax}
-                  onCheckedChange={() => handleCheckboxChange('tax')}
-                />
-                <label htmlFor="adjTax" className="ml-2 text-sm">Tax</label>
-              </div>
-            </div>
-            <div className="col-span-1">{renderField('', 'taxRate', 'number', undefined, undefined, '%')}</div>
-            <div className="col-span-1 text-right">{renderField('', 'taxAmount', 'number', 'baseTaxAmount', false, '', 2)}</div>
-            
-            <div className="col-span-2">Total Amount</div>
-            <div className="col-span-1 text-right">{renderField('', 'totalAmount', 'number', 'baseTotalAmount', false, '', 2)}</div>
-          </div>
-        </div>
-
-        <div className="col-span-6">
-          <h4 className="text-lg font-medium mt-3 mb-1">File Attachment</h4>
-          <div className="flex items-center space-x-2">
-            <Button type="button" onClick={triggerFileUpload} variant="outline">
+          
+          <h4 className="text-lg font-medium mt-6 mb-3">File Attachment</h4>
+          <div className="flex items-center space-x-3">
+            <Button type="button" onClick={triggerFileUpload} variant="outline" size="lg">
               <Upload className="mr-2 h-4 w-4" /> Upload File
             </Button>
             <span className="text-sm text-gray-500">
@@ -245,19 +216,58 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose }
           />
         </div>
 
-        <div className="col-span-6 flex justify-between items-center mt-6">
-          <div className="space-x-2">
+        <div className="col-span-6">
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h4 className="text-lg font-medium mb-4">Financial Summary</h4>
+            <div className="grid grid-cols-3 gap-y-4">
+              <div className="col-span-2 flex items-center">Net Amount</div>
+              <div className="col-span-1 text-right">{renderField('', 'netAmount', 'number', 'baseNetAmount', false, '', 2)}</div>
+              
+              <div className="col-span-1">
+                <div className="flex items-center">
+                  <Checkbox
+                    id="adjDiscount"
+                    checked={adjustments.discount}
+                    onCheckedChange={() => handleCheckboxChange('discount')}
+                  />
+                  <label htmlFor="adjDiscount" className="ml-2 text-sm font-medium">Discount</label>
+                </div>
+              </div>
+              <div className="col-span-1">{renderField('', 'discPercentage', 'number', undefined, undefined, '%')}</div>
+              <div className="col-span-1 text-right">{renderField('', 'discAmount', 'number', 'baseDiscAmount', false, '', 2)}</div>
+              
+              <div className="col-span-1">
+                <div className="flex items-center">
+                  <Checkbox
+                    id="adjTax"
+                    checked={adjustments.tax}
+                    onCheckedChange={() => handleCheckboxChange('tax')}
+                  />
+                  <label htmlFor="adjTax" className="ml-2 text-sm font-medium">Tax</label>
+                </div>
+              </div>
+              <div className="col-span-1">{renderField('', 'taxRate', 'number', undefined, undefined, '%')}</div>
+              <div className="col-span-1 text-right">{renderField('', 'taxAmount', 'number', 'baseTaxAmount', false, '', 2)}</div>
+              
+              <div className="col-span-2 flex items-center font-bold">Total Amount</div>
+              <div className="col-span-1 text-right font-bold">{renderField('', 'totalAmount', 'number', 'baseTotalAmount', false, '', 2)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-span-12 flex justify-between items-center mt-6 pt-6 border-t">
+          <div className="space-x-3">
             {mode === 'edit' && (
               <>
-                <Button type="submit">Save Changes</Button>
-                <Button type="button" variant="outline" onClick={handleCancel}>Cancel</Button>
+                <Button type="submit" size="lg">Save Changes</Button>
+                <Button type="button" variant="outline" size="lg" onClick={handleCancel}>Cancel</Button>
               </>
             )}
           </div>
-          <div className="space-x-2">
-            <Button variant="outline" size="sm">On Hand</Button>
-            <Button variant="outline" size="sm">On Order</Button>
-            <Button variant="outline" size="sm">PR Details</Button>
+          <div className="space-x-3">
+            <Button variant="outline">On Hand</Button>
+            <Button variant="outline">On Order</Button>
+            <Button variant="outline">PR Details</Button>
           </div>
         </div>
       </form>

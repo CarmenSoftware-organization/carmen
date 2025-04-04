@@ -21,7 +21,8 @@ import {
   XCircle,
   ExternalLink,
   Layers,
-  FileBarChart2
+  FileBarChart2,
+  Activity
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -311,63 +312,63 @@ export default function POSIntegrationPage() {
         <Card className="overflow-hidden transition-all hover:shadow-md">
           <CardHeader className="pb-2 bg-slate-50">
             <CardTitle className="flex items-center gap-2">
-              <Layers className="h-5 w-5 text-primary" />
+              <Activity className="h-5 w-5 text-primary" />
               <span>Operations</span>
             </CardTitle>
             <CardDescription>
-              Manage daily POS operations and transactions
+              Monitor and manage POS operations
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium">View Transactions</h3>
-                  <p className="text-xs text-muted-foreground">Browse and filter transaction history</p>
+                  <h3 className="text-sm font-medium">Interface Posting</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {systemStatus.pendingApprovals > 0 ? (
+                      <span className="text-amber-600 font-medium">{systemStatus.pendingApprovals} transactions pending</span>
+                    ) : (
+                      "Manage interface transactions"
+                    )}
+                  </p>
+                </div>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/system-administration/system-integrations/pos/interface-posting">
+                    View
+                  </Link>
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium">Consumptions</h3>
+                  <p className="text-xs text-muted-foreground">View and manage POS consumptions</p>
+                </div>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/system-administration/system-integrations/pos/consumptions">
+                    View
+                  </Link>
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium">Transactions</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {systemStatus.failedTransactions > 0 ? (
+                      <span className="text-red-600 font-medium">{systemStatus.failedTransactions} failed transactions</span>
+                    ) : (
+                      "View transaction history"
+                    )}
+                  </p>
                 </div>
                 <Button asChild variant="outline" size="sm">
                   <Link href="/system-administration/system-integrations/pos/transactions">
-                    View All
-                  </Link>
-                </Button>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium">Failed Transactions</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {systemStatus.failedTransactions > 0 ? (
-                      <span className="text-red-600 font-medium">{systemStatus.failedTransactions} transactions failed</span>
-                    ) : (
-                      "No failed transactions"
-                    )}
-                  </p>
-                </div>
-                <Button asChild variant="outline" size="sm" disabled={systemStatus.failedTransactions === 0}>
-                  <Link href="/system-administration/system-integrations/pos/transactions?filter=failed">
-                    Review
-                  </Link>
-                </Button>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium">Stock-out Review</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {systemStatus.pendingApprovals > 0 ? (
-                      <span className="text-blue-600 font-medium">{systemStatus.pendingApprovals} pending approvals</span>
-                    ) : (
-                      "No pending approvals"
-                    )}
-                  </p>
-                </div>
-                <Button asChild variant="outline" size="sm" disabled={systemStatus.pendingApprovals === 0}>
-                  <Link href="/system-administration/system-integrations/pos/transactions/stock-out-review">
-                    Approve
+                    View
                   </Link>
                 </Button>
               </div>
@@ -375,7 +376,7 @@ export default function POSIntegrationPage() {
           </CardContent>
           <CardFooter className="pt-0 pb-3 flex justify-end">
             <Button asChild size="sm">
-              <Link href="/system-administration/system-integrations/pos/transactions">
+              <Link href="/system-administration/system-integrations/pos/interface-posting">
                 Go to Operations
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>

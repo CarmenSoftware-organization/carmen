@@ -24,7 +24,7 @@ An advanced filtering capability will significantly enhance user productivity an
 ### Functional Requirements
 
 #### 1. Filter Creation
-- Support for multiple filter types:
+- Support for multiple filter types dynamic value field:
   - Text (exact match, contains, starts with, ends with)
   - Numbers (equal to, greater than, less than, between, formatted with locale support)
   - Dates (on, before, after, between, relative dates like "last 7 days")
@@ -42,6 +42,7 @@ An advanced filtering capability will significantly enhance user productivity an
 - Save filter configurations with custom names
 - Tag filters for better organization
 - Share filters with other users or user groups
+- Allow to modify existing filter
 - Set default filters for specific screens
 - View filter history
 - Duplicate existing filters as starting points

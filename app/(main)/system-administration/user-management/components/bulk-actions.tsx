@@ -10,9 +10,17 @@ import {
   Building2
 } from "lucide-react"
 
+type BulkActionData = {
+  invite?: { emails: string[] }
+  status?: { status: 'active' | 'inactive' | 'suspended' }
+  role?: { roleIds: string[] }
+  department?: { departmentId: string }
+  delete?: never
+}
+
 interface BulkActionsProps {
   selectedCount: number
-  onAction: (action: string, data?: any) => Promise<void>
+  onAction: <T extends keyof BulkActionData>(action: T, data?: BulkActionData[T]) => Promise<void>
 }
 
 export function BulkActions({

@@ -1,45 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogClose,
-  DialogFooter,
 } from "@/components/ui/custom-dialog";
 import {
-  CalendarIcon,
   Edit2Icon,
-  PlusIcon,
   XIcon,
-  EyeIcon,
   SaveIcon,
-  Table,
 } from "lucide-react";
-import { PurchaseOrderItem, PurchaseOrderStatus } from "@/lib/types";
+import { PurchaseOrderItem } from "@/lib/types";
 import { PrItemsTable } from "./pr-items-table";
 import InventoryBreakdown from "./inventory-breakdown";
 import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 import { GoodsReceiveNoteTable } from "./goods-receive-note-table";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import SummaryTable from "./Summary";
 
 type Mode = "view" | "edit" | "add";
@@ -59,7 +44,6 @@ export function ItemDetailsComponent({
   initialData,
   onSubmit,
 }: ItemDetailsComponentProps) {
-  const [activeTab, setActiveTab] = useState("details");
   const [mode, setMode] = useState<Mode>(initialMode);
   const [itemData, setItemData] = useState<Partial<PurchaseOrderItem>>(
     initialData || {}
@@ -79,10 +63,6 @@ export function ItemDetailsComponent({
 
   const handleModeChange = (newMode: Mode) => {
     setMode(newMode);
-  };
-
-  const handleInputChange = (field: keyof PurchaseOrderItem, value: any) => {
-    setItemData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {

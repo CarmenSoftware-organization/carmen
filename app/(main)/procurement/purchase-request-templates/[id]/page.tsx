@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { PRDetailTemplate } from "@/components/templates/PRDetailTemplate"
+import { PRDetailTemplate } from "../components/templates/PRDetailTemplate"
 import { Button } from "@/components/ui/button"
 import { PurchaseRequest } from "@/lib/types"
 import { samplePRData } from "../../purchase-requests/components/sampleData"

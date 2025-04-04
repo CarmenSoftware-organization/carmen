@@ -1,10 +1,16 @@
 'use client'
 
 import { Input } from '@/components/ui/input'
-import { Calendar, Hash, Building2, Store, FileText } from 'lucide-react'
+import { Calendar, Hash } from 'lucide-react'
+
+interface StoreRequisition {
+  refNo: string
+  date: string
+  expectedDeliveryDate: string
+}
 
 interface HeaderInfoProps {
-  requisition: any // Replace with proper type
+  requisition: StoreRequisition
   isEditMode: boolean
   onHeaderUpdate: (field: string, value: string) => void
 }

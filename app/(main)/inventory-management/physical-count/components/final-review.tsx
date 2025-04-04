@@ -9,6 +9,14 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { mockLocations, getLocationsByDepartment, getProductsByLocation } from '@/lib/mock/inventory-data';
 
+interface CountItem {
+  id: string;
+  name: string;
+  sku?: string;
+  category?: string;
+  quantity?: number;
+}
+
 interface FinalReviewProps {
   formData: {
     counterName: string;
@@ -16,7 +24,7 @@ interface FinalReviewProps {
     dateTime: Date;
     notes: string;
     selectedLocations: string[];
-    items: any[];
+    items: CountItem[];
   };
   onNext: () => void;
   onBack: () => void;

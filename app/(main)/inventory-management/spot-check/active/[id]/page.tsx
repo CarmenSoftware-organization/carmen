@@ -16,6 +16,9 @@ import { Card } from '@/components/ui/card';
 import { CountDetailForm } from '../../components/count-detail-form';
 import { mockCounts, mockProducts, mockLocations } from '@/lib/mock/inventory-data';
 import { useRouter } from 'next/navigation';
+import { SpotCheckNav } from '../../components/spot-check-nav';
+import { CountItems } from '../../components/count-items';
+import { CountItem } from '../../types';
 
 interface PageProps {
   params: {
@@ -41,6 +44,8 @@ interface CountDetailData {
 export default function ActiveCountPage({ params }: PageProps) {
   const router = useRouter();
   const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
   // Get count session from mock data
   const countSession = mockCounts.find(count => count.id === params.id) || mockCounts[0];
@@ -48,9 +53,25 @@ export default function ActiveCountPage({ params }: PageProps) {
     mockLocations.find(loc => loc.id === locId)
   ).filter(loc => loc) as typeof mockLocations;
   
-  const countProducts = mockProducts.filter(product => 
-    countSession.locations.includes(product.locationId)
-  );
+  // Convert mockProducts to CountItem type
+  const countProducts: CountItem[] = mockProducts
+    .filter(product => countSession.locations.includes(product.locationId))
+    .map(product => {
+      // Find the location for this product to get the department
+      const location = mockLocations.find(loc => loc.id === product.locationId);
+      const department = location?.responsibleDepartment || 'Kitchen';
+      
+      return {
+        id: product.id,
+        name: product.name,
+        description: product.name, // Using name as description since Product doesn't have description
+        expectedCount: product.currentStock || 0,
+        department: department,
+        code: product.code,
+        category: product.category || 'General',
+        currentStock: product.currentStock
+      };
+    });
 
   const handleSubmit = (data: CountDetailData) => {
     console.log('Count submitted:', data);
@@ -60,6 +81,23 @@ export default function ActiveCountPage({ params }: PageProps) {
 
   const handleClose = () => {
     router.push('/inventory-management/spot-check');
+  };
+
+  const steps = [
+    { id: 1, name: 'Setup', description: 'Basic information' },
+    { id: 2, name: 'Locations', description: 'Select areas to count' },
+    { id: 3, name: 'Items', description: 'Choose items to count' },
+    { id: 4, name: 'Count', description: 'Perform the count' },
+    { id: 5, name: 'Review', description: 'Check and submit results' }
+  ];
+
+  const handleStepChange = (step: number) => {
+    setCurrentStep(step);
+  };
+
+  const handleCountChange = (id: string, count: number) => {
+    console.log(`Setting count for ${id} to ${count}`);
+    // In a real app, you would update state here
   };
 
   return (
@@ -127,21 +165,22 @@ export default function ActiveCountPage({ params }: PageProps) {
           </div>
         </Card>
 
-        <CountDetailForm
-          items={countProducts.map(product => ({
-            id: product.id,
-            name: product.name,
-            code: product.code,
-            currentStock: product.currentStock,
-            unit: product.uom || 'pcs'
-          }))}
-          locationName={countLocations[0]?.name || ''}
-          userName={countSession.counter}
-          date={countSession.startDate.toLocaleDateString()}
-          reference={countSession.id}
-          onClose={handleClose}
-          onSubmit={handleSubmit}
+        <SpotCheckNav 
+          currentStep={currentStep} 
+          steps={steps}
+          onChange={handleStepChange}
         />
+
+        <div className="pt-6">
+          {currentStep === 4 && (
+            <CountItems 
+              items={countProducts}
+              selectedItem={selectedItem}
+              setSelectedItem={setSelectedItem}
+              onCountChange={handleCountChange}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

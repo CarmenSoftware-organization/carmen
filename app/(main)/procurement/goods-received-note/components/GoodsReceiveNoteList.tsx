@@ -2,14 +2,12 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Search, Eye, Edit, Trash, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Search, FileText, Edit, Plus, Download, Printer, ChevronDown, ArrowUpDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { BulkActions } from './tabs/BulkActions'
 import StatusBadge from '@/components/ui/custom-status-badge'
-import { Card, CardContent } from '@/components/ui/card'
 import ListPageTemplate from '@/components/templates/ListPageTemplate'
 import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 import {
@@ -18,9 +16,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { AdvancedFilter } from './advanced-filter'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
@@ -31,7 +36,7 @@ export function GoodsReceiveNoteList() {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [sortField, setSortField] = useState<keyof GoodsReceiveNote | null>(null)
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const itemsPerPage = 7
+  const itemsPerPage = 10
   const [advancedFilters, setAdvancedFilters] = useState<FilterType<GoodsReceiveNote>[]>([])
 
   const handleBulkAction = (action: string) => {
@@ -43,7 +48,7 @@ export function GoodsReceiveNoteList() {
     setSelectedItems([])
   }
 
-  const applyFilters = () => {
+  const applyFilters = React.useCallback(() => {
     let filtered = mockGoodsReceiveNotes.filter(
       (grn) =>
         (grn.ref.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -135,12 +140,11 @@ export function GoodsReceiveNoteList() {
     setFilteredGRNs(filtered)
     setSelectedItems([])
     setCurrentPage(1)
-  }
+  }, [searchTerm, statusFilter, sortField, sortOrder, advancedFilters])
 
-  // Update useEffect to use applyFilters
   React.useEffect(() => {
     applyFilters()
-  }, [searchTerm, statusFilter, sortField, sortOrder, advancedFilters])
+  }, [searchTerm, statusFilter, sortField, sortOrder, advancedFilters, applyFilters])
 
   const handleApplyAdvancedFilters = (filters: FilterType<GoodsReceiveNote>[]) => {
     setAdvancedFilters(filters)
@@ -151,23 +155,28 @@ export function GoodsReceiveNoteList() {
   }
 
   const toggleSelectAll = () => {
-    if (selectedItems.length === paginatedGRNs.length) {
+    if (selectedItems.length === filteredGRNs.length) {
       setSelectedItems([])
     } else {
-      setSelectedItems(paginatedGRNs.map(grn => grn.id))
+      setSelectedItems(filteredGRNs.map(grn => grn.id))
     }
   }
 
-  const calculateTotalAmount = (grn: GoodsReceiveNote) => {
-    return grn.items.reduce((total, item) => total + item.netAmount, 0)
+  const handleSort = (field: keyof GoodsReceiveNote) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortOrder("asc")
+    }
   }
 
   const handleGoodsReceiveNoteAction = (id: string, mode: GoodsReceiveNoteMode) => {
-    router.push(`/procurement/goods-received-note/${id}?mode=${mode}`)
+    router.push(`/procurement/goods-received-note/${encodeURIComponent(id)}?mode=${mode}`)
   }
 
   const handleAddNewGoodsReceiveNote = () => {
-    router.push('/procurement/goods-received-note/0?mode=create')
+    router.push('/procurement/goods-received-note/create')
   }
 
   const totalPages = Math.ceil(filteredGRNs.length / itemsPerPage)
@@ -178,7 +187,7 @@ export function GoodsReceiveNoteList() {
 
   const title = 'Goods Receive Notes'
   const actionButtons = (
-    <div className="flex flex-col sm:flex-row ">
+    <div className="flex flex-col sm:flex-row gap-2">
       <Button className="w-full sm:w-auto" onClick={handleAddNewGoodsReceiveNote}>
         <Plus className="mr-2 h-4 w-4" />Goods Receive Note
       </Button>
@@ -191,29 +200,9 @@ export function GoodsReceiveNoteList() {
     </div>
   )
 
-  const bulkActions = (
-    <>
-      {selectedItems.length > 0 && (
-        <div className="mb-4">
-          <BulkActions
-            selectedItems={selectedItems}
-            onAction={handleBulkAction}
-          />
-        </div>
-      )}
-      <div className="mb-4 flex items-center">
-        <Checkbox
-          checked={selectedItems.length === paginatedGRNs.length && paginatedGRNs.length > 0}
-          onCheckedChange={toggleSelectAll}
-        />
-        <span className="ml-2">Select All</span>
-      </div>
-    </>
-  )
-
   const filters = (
-    <>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="w-full sm:w-1/2 flex space-x-2">
           <Input
             placeholder="Search GRNs..."
@@ -230,7 +219,7 @@ export function GoodsReceiveNoteList() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 {statusFilter || "All Statuses"}
-                <ChevronLeft className="ml-2 h-4 w-4" />
+                <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -242,108 +231,198 @@ export function GoodsReceiveNoteList() {
               <DropdownMenuItem onSelect={() => setStatusFilter("Voided")}>Voided</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <AdvancedFilter 
+          <AdvancedFilter
             onApplyFilters={handleApplyAdvancedFilters}
             onClearFilters={handleClearAdvancedFilters}
           />
         </div>
       </div>
-    </>
+      
+      {selectedItems.length > 0 && (
+        <div className="mb-4">
+          <BulkActions
+            selectedCount={selectedItems.length}
+            onAction={handleBulkAction}
+          />
+        </div>
+      )}
+    </div>
   )
 
   const content = (
-    <>
-      {bulkActions}
-      <div className="space-y-2">
-        {paginatedGRNs.map((grn) => (
-          <Card key={grn.id}>
-            <CardContent className="p-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                <div className="flex items-center space-x-3 mb-2 sm:mb-0">
+    <div className="space-y-4">
+      <div className="rounded-lg border bg-white overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50/75">
+                <TableHead className="w-[50px] py-3 text-gray-600 font-bold">
                   <Checkbox
-                    checked={selectedItems.includes(grn.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedItems([...selectedItems, grn.id])
-                      } else {
-                        setSelectedItems(selectedItems.filter(id => id !== grn.id))
-                      }
-                    }}
+                    checked={selectedItems.length === paginatedGRNs.length && paginatedGRNs.length > 0}
+                    onCheckedChange={toggleSelectAll}
                   />
-                  <StatusBadge status={grn.status} />
-                  <h3 className="text-muted-foreground text-lg">{grn.ref}</h3>
-                  <h3 className="font-semibold text-lg">{grn.description}</h3>
-                </div>
-                <TooltipProvider>
-                  <div className="flex space-x-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>View</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleGoodsReceiveNoteAction(grn.id, 'edit')}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Edit</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Delete</TooltipContent>
-                    </Tooltip>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 font-bold">
+                  <div className="flex items-center cursor-pointer" onClick={() => handleSort('ref')}>
+                    GRN Number
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
                   </div>
-                </TooltipProvider>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-7 gap-4 text-sm">
-                <div className="text-left">
-                  <span className="text-sm text-muted-foreground">Date</span>
-                  <p>{grn.date.toLocaleDateString()}</p>
-                </div>
-                <div className="text-left">
-                  <span className="text-sm text-muted-foreground">Invoice Date</span>
-                  <p>{grn.invoiceDate ? grn.invoiceDate.toLocaleDateString() : "N/A"}</p>
-                </div>
-                <div className="">
-                  <span className="text-sm text-muted-foreground">Currency</span>
-                  <p>{grn.currency}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm text-muted-foreground">Net Amount</span>
-                  <p>{grn.netAmount.toFixed(2)}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm text-muted-foreground">Tax Amount</span>
-                  <p>{grn.taxAmount.toFixed(2)}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm text-muted-foreground">Total Amount</span>
-                  <p>{grn.totalAmount.toFixed(2)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 hidden md:table-cell font-bold">
+                  <div className="flex items-center cursor-pointer" onClick={() => handleSort('date')}>
+                    Date
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 hidden lg:table-cell font-bold">
+                  <div className="flex items-center cursor-pointer" onClick={() => handleSort('invoiceDate')}>
+                    Invoice Date
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 hidden sm:table-cell font-bold">
+                  <div className="flex items-center cursor-pointer" onClick={() => handleSort('vendor')}>
+                    Vendor
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 hidden lg:table-cell font-bold">
+                  <div className="flex items-center cursor-pointer" onClick={() => handleSort('currency')}>
+                    Currency
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 text-right hidden md:table-cell font-bold">
+                  <div className="flex items-center justify-end cursor-pointer" onClick={() => handleSort('netAmount')}>
+                    Net Amount
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 text-right hidden lg:table-cell font-bold">
+                  <div className="flex items-center justify-end cursor-pointer" onClick={() => handleSort('taxAmount')}>
+                    Tax Amount
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 text-right font-bold">
+                  <div className="flex items-center justify-end cursor-pointer" onClick={() => handleSort('totalAmount')}>
+                    Total Amount
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 font-bold">
+                  <div className="flex items-center cursor-pointer" onClick={() => handleSort('status')}>
+                    Status
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead className="py-3 text-gray-600 w-[100px] font-bold">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedGRNs.map((grn) => (
+                <TableRow key={grn.id} className="group hover:bg-gray-50/50 cursor-pointer">
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedItems.includes(grn.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedItems([...selectedItems, grn.id])
+                        } else {
+                          setSelectedItems(selectedItems.filter(id => id !== grn.id))
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {grn.ref}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {new Date(grn.date).toLocaleDateString('en-GB')}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {grn.invoiceDate ? new Date(grn.invoiceDate).toLocaleDateString('en-GB') : "N/A"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {grn.vendor}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {grn.currency}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right hidden md:table-cell" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {grn.netAmount.toFixed(2)}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right hidden lg:table-cell" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {grn.taxAmount.toFixed(2)}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right" onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      {grn.totalAmount.toFixed(2)}
+                    </div>
+                  </TableCell>
+                  <TableCell onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}>
+                    <div className="text-sm font-bold">
+                      <StatusBadge status={grn.status} />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-end items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleGoodsReceiveNoteAction(grn.id, 'view')
+                        }}
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleGoodsReceiveNoteAction(grn.id, 'edit')
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {paginatedGRNs.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={11} className="h-24 text-center">
+                    No results found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredGRNs.length)} of {filteredGRNs.length} results
+      
+      <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground text-center sm:text-left">
+          Showing {filteredGRNs.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} to {Math.min(currentPage * itemsPerPage, filteredGRNs.length)} of {filteredGRNs.length} results
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -365,13 +444,13 @@ export function GoodsReceiveNoteList() {
             ‹
           </Button>
           <span className="text-sm font-medium">
-            Page {currentPage} of {totalPages}
+            Page {currentPage} of {totalPages || 1}
           </span>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || totalPages === 0}
           >
             <span className="sr-only">Next page</span>
             ›
@@ -380,14 +459,14 @@ export function GoodsReceiveNoteList() {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || totalPages === 0}
           >
             <span className="sr-only">Last page</span>
             »
           </Button>
         </div>
       </div>
-    </>
+    </div>
   )
 
   return (

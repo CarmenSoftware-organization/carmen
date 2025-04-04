@@ -157,7 +157,7 @@ export function StockCountTab({ isEditing }: StockCountTabProps) {
     })
   }
 
-  const handleNewUnitChange = (field: keyof StockCountUnit, value: any) => {
+  const handleNewUnitChange = (field: keyof StockCountUnit, value: StockCountUnit[keyof StockCountUnit]) => {
     setNewUnit(prev => ({ ...prev, [field]: value }))
     // Clear validation error for the field being changed
     if (validationErrors[field as keyof typeof validationErrors]) {
@@ -259,7 +259,7 @@ export function StockCountTab({ isEditing }: StockCountTabProps) {
               <TableCell>
                 <Input
                   value={newUnit.countUnit}
-                  onChange={(e) => handleNewUnitChange('countUnit', e.target.value)}
+                  onChange={(e) => handleNewUnitChange('countUnit', e.target.value as StockCountUnit['countUnit'])}
                   placeholder="Enter unit"
                   className={validationErrors.countUnit ? 'border-red-500' : ''}
                 />
@@ -270,7 +270,7 @@ export function StockCountTab({ isEditing }: StockCountTabProps) {
               <TableCell>
                 <Input
                   value={newUnit.description}
-                  onChange={(e) => handleNewUnitChange('description', e.target.value)}
+                  onChange={(e) => handleNewUnitChange('description', e.target.value as StockCountUnit['description'])}
                   placeholder="Enter description"
                   className={validationErrors.description ? 'border-red-500' : ''}
                 />
@@ -282,7 +282,7 @@ export function StockCountTab({ isEditing }: StockCountTabProps) {
                 <Input
                   type="number"
                   value={newUnit.factor}
-                  onChange={(e) => handleNewUnitChange('factor', parseFloat(e.target.value))}
+                  onChange={(e) => handleNewUnitChange('factor', parseFloat(e.target.value) as StockCountUnit['factor'])}
                   step="0.000001"
                   placeholder="Enter factor"
                   className={`text-right ${validationErrors.factor ? 'border-red-500' : ''}`}
@@ -294,14 +294,14 @@ export function StockCountTab({ isEditing }: StockCountTabProps) {
               <TableCell>
                 <Switch
                   checked={newUnit.isDefault}
-                  onCheckedChange={(checked) => handleNewUnitChange('isDefault', checked)}
+                  onCheckedChange={(checked) => handleNewUnitChange('isDefault', checked as StockCountUnit['isDefault'])}
                 />
               </TableCell>
               <TableCell>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleNewUnitChange('isInverse', !newUnit.isInverse)}
+                  onClick={() => handleNewUnitChange('isInverse', !newUnit.isInverse as StockCountUnit['isInverse'])}
                   className="p-0"
                 >
                   <ArrowLeftRight className={`w-4 h-4 transition-transform ${newUnit.isInverse ? 'rotate-180' : ''}`} />

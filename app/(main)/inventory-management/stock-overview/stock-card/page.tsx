@@ -26,7 +26,7 @@ import {
   StockCardLotInformation,
   StockCardValuation
 } from "./components/index"
-import { generateMockStockCardData, StockCardData } from "./index"
+import { generateMockStockCardData, StockCardData } from "../index"
 
 function StockCardContent() {
   const searchParams = useSearchParams()

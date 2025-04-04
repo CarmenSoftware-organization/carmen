@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { AlertTriangle, BarChart2, Calendar, Info, Tag } from "lucide-react"
-import { StockCardData } from "../types"
-import { formatCurrency, formatNumber } from "../../inventory-balance/utils"
+import { StockCardData } from "../../types"
+import { formatCurrency, formatDate, formatNumber } from "../../inventory-balance/utils"
 
 interface StockCardGeneralInfoProps {
   data: StockCardData

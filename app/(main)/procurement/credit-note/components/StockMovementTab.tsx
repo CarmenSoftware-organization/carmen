@@ -1,13 +1,12 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { GoodsReceiveNoteMode, StockMovement } from '@/lib/types'
+import { StockMovement } from '@/lib/types'
 
 interface StockMovementTabProps {
-  mode: GoodsReceiveNoteMode
   movements?: StockMovement[]
 }
 
-export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps) {
+export function StockMovementTab({ movements = [] }: StockMovementTabProps) {
   if (movements.length === 0) {
     return <div>No stock movements available.</div>
   }

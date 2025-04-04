@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Movement } from "../types/index"
+import { Movement } from "@/app/(main)/inventory-management/stock-overview/types"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 

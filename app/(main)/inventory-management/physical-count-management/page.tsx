@@ -25,6 +25,20 @@ interface CountData {
   completedCount: number
 }
 
+interface CountDetailData {
+  items: {
+    id: string;
+    name: string;
+    sku: string;
+    description: string;
+    expectedQuantity: number;
+    actualQuantity: number;
+    unit: string;
+    isSubmitted: boolean;
+  }[];
+  notes: string;
+}
+
 const countData = [
   {
     storeName: "Main Kitchen Store",
@@ -97,7 +111,7 @@ export default function PhysicalCountManagement() {
     setShowNewCountForm(false)
   }
 
-  const handleCountDetailSubmit = (data: any) => {
+  const handleCountDetailSubmit = (data: CountDetailData) => {
     console.log('Count details submitted:', data)
     setShowCountDetailForm(false)
     // Here you would typically update the count status and other relevant data

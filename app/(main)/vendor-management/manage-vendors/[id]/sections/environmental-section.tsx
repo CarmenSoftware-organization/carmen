@@ -2,13 +2,16 @@
 
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Vendor, EnvironmentalImpact } from '../types'
+
+type EnvironmentalFieldPath = 
+  | `environmentalImpact.${keyof EnvironmentalImpact}`
+  | `environmentalImpact.${keyof EnvironmentalImpact}.value`
 
 interface EnvironmentalSectionProps {
   vendor: Vendor
   isEditing: boolean
-  onFieldChange: (name: string, value: any) => void
+  onFieldChange: (name: EnvironmentalFieldPath, value: number | string) => void
 }
 
 export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: EnvironmentalSectionProps) {

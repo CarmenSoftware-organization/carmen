@@ -18,14 +18,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { MoreHorizontalIcon, SearchIcon } from "lucide-react"
 import { FilterSortOptions } from "./filter-sort-options"
 import StatusBadge  from "@/components/ui/custom-status-badge"
 
+interface InventoryAdjustment {
+  id: string;
+  date: string;
+  type: string;
+  status: string;
+  location: string;
+  reason: string;
+  items: number;
+  totalValue: number;
+}
+
+interface SortConfig {
+  field: keyof InventoryAdjustment;
+  order: 'asc' | 'desc';
+}
 
 // Mock data - replace with actual API call
-const mockAdjustments = [
+const mockAdjustments: InventoryAdjustment[] = [
   {
     id: "ADJ-2024-001",
     date: "2024-01-15",
@@ -112,7 +126,14 @@ export function InventoryAdjustmentList() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
   const [activeFilters, setActiveFilters] = useState<string[]>([])
-  const [sortConfig, setSortConfig] = useState({ field: "date", order: "desc" })
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: "date", order: "desc" })
+
+  // Handle sort change from FilterSortOptions component
+  const handleSortChange = (sort: { field: string; order: 'asc' | 'desc' }) => {
+    // Type-safe conversion from string to keyof InventoryAdjustment
+    const field = sort.field as keyof InventoryAdjustment;
+    setSortConfig({ field, order: sort.order });
+  };
 
   const filteredAndSortedData = useMemo(() => {
     let filtered = mockAdjustments
@@ -138,21 +159,21 @@ export function InventoryAdjustmentList() {
     }
 
     // Apply sorting
-    return [...filtered].sort((a: any, b: any) => {
-      const aValue = a[sortConfig.field]
-      const bValue = b[sortConfig.field]
+    return [...filtered].sort((a, b) => {
+      const aValue = a[sortConfig.field];
+      const bValue = b[sortConfig.field];
       
       if (typeof aValue === 'string') {
         return sortConfig.order === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue)
+          ? aValue.localeCompare(bValue as string)
+          : (bValue as string).localeCompare(aValue)
       }
       
       return sortConfig.order === 'asc'
-        ? aValue - bValue
-        : bValue - aValue
+        ? (aValue as number) - (bValue as number)
+        : (bValue as number) - (aValue as number)
     })
-  }, [mockAdjustments, searchQuery, activeFilters, sortConfig])
+  }, [searchQuery, activeFilters, sortConfig])
 
   return (
     <div className="space-y-4">
@@ -168,7 +189,7 @@ export function InventoryAdjustmentList() {
         </div>
         <FilterSortOptions
           onFilterChange={setActiveFilters}
-          onSortChange={setSortConfig}
+          onSortChange={handleSortChange}
         />
       </div>
 

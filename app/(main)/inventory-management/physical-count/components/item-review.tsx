@@ -17,14 +17,17 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { mockProducts, getProductsByLocation, Product } from '@/lib/mock/inventory-data';
+import React from 'react';
+
+interface FormData {
+  selectedLocations: string[];
+  items: Product[];
+  department: string;
+}
 
 interface ItemReviewProps {
-  formData: {
-    selectedLocations: string[];
-    items: any[];
-    department: string;
-  };
-  setFormData: (data: any) => void;
+  formData: FormData;
+  setFormData: (data: FormData) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -53,53 +56,57 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
     }
   };
 
-  // Get all products from selected locations
-  const locationProducts = formData.selectedLocations.flatMap(locationId => 
-    getProductsByLocation(locationId)
-  );
+  // Get all products from selected locations and remove duplicates
+  const uniqueProducts = React.useMemo(() => {
+    const locationProducts = formData.selectedLocations.flatMap(locationId => 
+      getProductsByLocation(locationId)
+    );
+    return Array.from(new Map(locationProducts.map(item => [item.id, item])).values());
+  }, [formData.selectedLocations]);
 
-  // Remove duplicates (in case a product exists in multiple locations)
-  const uniqueProducts = Array.from(new Map(locationProducts.map(item => [item.id, item])).values());
-
-  const filteredItems = uniqueProducts.filter((item) => {
-    const matchesSearch =
-      item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === 'all' || item.category.toLowerCase() === selectedCategory.toLowerCase();
-    return matchesSearch && matchesCategory;
-  });
-
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    if (!sortField) return 0;
-    
-    let aValue = a[sortField as keyof Product];
-    let bValue = b[sortField as keyof Product];
-    
-    // Handle dates
-    if (sortField === 'lastCountDate') {
-      aValue = aValue ? new Date(aValue).getTime() : 0;
-      bValue = bValue ? new Date(bValue).getTime() : 0;
-    }
-
-    // Handle undefined values
-    if (aValue === undefined && bValue === undefined) return 0;
-    if (aValue === undefined) return 1;
-    if (bValue === undefined) return -1;
-    
-    const modifier = sortDirection === 'asc' ? 1 : -1;
-    return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * modifier;
-  });
-
-  // Update items in formData when locations change
+  // Update items in formData when unique products change
   useEffect(() => {
-    if (formData.selectedLocations.length > 0) {
-      setFormData((prev: any) => ({
-        ...prev,
+    if (formData.selectedLocations.length > 0 && formData.items !== uniqueProducts) {
+      setFormData({
+        ...formData,
         items: uniqueProducts
-      }));
+      });
     }
-  }, [formData.selectedLocations, setFormData]);
+  }, [formData, setFormData, uniqueProducts]);
+
+  const filteredItems = React.useMemo(() => {
+    return uniqueProducts.filter((item) => {
+      const matchesSearch =
+        item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        selectedCategory === 'all' || item.category.toLowerCase() === selectedCategory.toLowerCase();
+      return matchesSearch && matchesCategory;
+    });
+  }, [uniqueProducts, searchQuery, selectedCategory]);
+
+  const sortedItems = React.useMemo(() => {
+    if (!sortField) return filteredItems;
+    
+    return [...filteredItems].sort((a, b) => {
+      let aValue = a[sortField as keyof Product];
+      let bValue = b[sortField as keyof Product];
+      
+      // Handle dates
+      if (sortField === 'lastCountDate') {
+        aValue = aValue ? new Date(aValue).getTime() : 0;
+        bValue = bValue ? new Date(bValue).getTime() : 0;
+      }
+
+      // Handle undefined values
+      if (aValue === undefined && bValue === undefined) return 0;
+      if (aValue === undefined) return 1;
+      if (bValue === undefined) return -1;
+      
+      const modifier = sortDirection === 'asc' ? 1 : -1;
+      return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * modifier;
+    });
+  }, [filteredItems, sortField, sortDirection]);
 
   return (
     <Card>

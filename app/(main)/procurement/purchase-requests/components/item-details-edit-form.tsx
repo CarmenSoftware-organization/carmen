@@ -1,17 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,7 +14,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import {
   Calendar as CalendarIcon,
   X,
@@ -31,7 +23,6 @@ import {
   Edit,
   XIcon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogClose,
@@ -41,11 +32,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/custom-dialog";
 import InventoryBreakdown from "./inventory-breakdown";
-import VendorComparison from "./vendor-comparison";
 import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 import { PricingFormComponent } from "./pricing-form";
 import StatusBadge from "@/components/ui/custom-status-badge";
-import { PurchaseRequestItemStatus, PurchaseRequestItem } from "@/lib/types";
+import { PurchaseRequestItem } from "@/lib/types";
 
 type ItemDetailsFormProps = {
   onSave: (formData: PurchaseRequestItem) => void;
@@ -123,7 +113,6 @@ export function ItemDetailsEditForm({
   const [formData, setFormData] = useState<PurchaseRequestItem>(initialData ? { ...emptyItemData, ...initialData } : emptyItemData);
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(formData.deliveryDate);
   const [isInventoryBreakdownOpen, setIsInventoryBreakdownOpen] = useState(false);
-  const [isVendorComparisonOpen, setIsVendorComparisonOpen] = useState(false);
   const [isOnOrderOpen, setIsOnOrderOpen] = useState(false);
 
   const handleInputChange = (
@@ -142,6 +131,16 @@ export function ItemDetailsEditForm({
     onModeChange("view");
   };
 
+  interface FormFieldProps {
+    id: string;
+    label: string;
+    required?: boolean;
+    children?: React.ReactNode;
+    smallText?: string;
+    baseValue?: string | number;
+    readOnly?: boolean;
+  }
+
   const FormField = ({
     id,
     label,
@@ -149,7 +148,8 @@ export function ItemDetailsEditForm({
     children,
     smallText,
     baseValue,
-  }: any) => (
+    readOnly,
+  }: FormFieldProps) => (
     <div>
       <div className="flex items-center space-x-2">
         <Label

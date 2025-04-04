@@ -16,14 +16,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockDepartments } from '@/lib/mock/inventory-data';
 
+interface SetupFormData {
+  counterName: string;
+  department: string;
+  dateTime: Date;
+  notes: string;
+}
+
 interface SetupProps {
-  formData: {
-    counterName: string;
-    department: string;
-    dateTime: Date;
-    notes: string;
-  };
-  setFormData: (data: any) => void;
+  formData: SetupFormData;
+  setFormData: (data: SetupFormData) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -31,17 +33,17 @@ interface SetupProps {
 export function PhysicalCountSetup({ formData, setFormData, onNext, onBack }: SetupProps) {
   useEffect(() => {
     // Auto-fill counter name from user context
-    setFormData((prev: any) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       counterName: 'John Doe', // Replace with actual user name from context
-    }));
+    });
   }, [setFormData]);
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
+  const handleInputChange = (field: keyof SetupFormData, value: string | Date) => {
+    setFormData({
+      ...formData,
       [field]: value,
-    }));
+    });
   };
 
   const isValid = formData.department && formData.dateTime;

@@ -66,7 +66,11 @@ export function ListFilters({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[150px]">
           <DropdownMenuRadioGroup value={sortBy} onValueChange={onSort}>
-            {/* ... sort options ... */}
+            <DropdownMenuRadioItem value="date">Date</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="refNo">Reference No.</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="status">Status</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="requestor">Requestor</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="department">Department</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -142,7 +142,7 @@ export function OrderUnitTab({ isEditing }: OrderUnitTabProps) {
     handleCancelAdd()
   }
 
-  const handleNewUnitChange = (field: keyof OrderUnit, value: any) => {
+  const handleNewUnitChange = (field: keyof OrderUnit, value: OrderUnit[keyof OrderUnit]) => {
     setNewUnit(prev => ({
       ...prev,
       [field]: value
@@ -257,7 +257,7 @@ export function OrderUnitTab({ isEditing }: OrderUnitTabProps) {
                 <TableCell>
                   <Select 
                     value={newUnit.orderUnit}
-                    onValueChange={(value) => handleNewUnitChange('orderUnit', value)}
+                    onValueChange={(value) => handleNewUnitChange('orderUnit', value as OrderUnit['orderUnit'])}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select unit" />
@@ -274,7 +274,7 @@ export function OrderUnitTab({ isEditing }: OrderUnitTabProps) {
                 <TableCell>
                   <Input
                     value={newUnit.description}
-                    onChange={(e) => handleNewUnitChange('description', e.target.value)}
+                    onChange={(e) => handleNewUnitChange('description', e.target.value as OrderUnit['description'])}
                     placeholder="Enter description"
                     className="w-full"
                   />
@@ -284,7 +284,7 @@ export function OrderUnitTab({ isEditing }: OrderUnitTabProps) {
                     <Input
                       type="number"
                       value={newUnit.factor}
-                      onChange={(e) => handleNewUnitChange('factor', parseFloat(e.target.value))}
+                      onChange={(e) => handleNewUnitChange('factor', parseFloat(e.target.value) as OrderUnit['factor'])}
                       className="w-32 text-right"
                       min={0.00001}
                       step={0.00001}
@@ -296,7 +296,7 @@ export function OrderUnitTab({ isEditing }: OrderUnitTabProps) {
                   <div className="flex justify-center">
                     <Switch
                       checked={newUnit.isDefault}
-                      onCheckedChange={(checked) => handleNewUnitChange('isDefault', checked)}
+                      onCheckedChange={(checked) => handleNewUnitChange('isDefault', checked as OrderUnit['isDefault'])}
                     />
                   </div>
                 </TableCell>
@@ -305,7 +305,7 @@ export function OrderUnitTab({ isEditing }: OrderUnitTabProps) {
                     <Button
                       variant={newUnit.isInverse ? "secondary" : "ghost"}
                       size="sm"
-                      onClick={() => handleNewUnitChange('isInverse', !newUnit.isInverse)}
+                      onClick={() => handleNewUnitChange('isInverse', !newUnit.isInverse as OrderUnit['isInverse'])}
                       className="relative"
                     >
                       <ArrowLeftRight 

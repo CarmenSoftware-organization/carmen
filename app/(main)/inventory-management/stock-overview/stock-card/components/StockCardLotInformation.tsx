@@ -7,7 +7,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,8 +19,8 @@ import {
   SelectValue 
 } from "@/components/ui/select"
 import { FileDown, Search } from "lucide-react"
-import { StockCardData } from "../types"
-import { formatCurrency, formatNumber } from "../../inventory-balance/utils"
+import { StockCardData } from "../../types"
+import { formatCurrency, formatDate, formatNumber } from "../../inventory-balance/utils"
 
 interface StockCardLotInformationProps {
   data: StockCardData

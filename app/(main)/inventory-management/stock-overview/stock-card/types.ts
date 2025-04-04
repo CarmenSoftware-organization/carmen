@@ -122,7 +122,7 @@ export interface StockCard {
     availableStock: number
     reservedStock: number
   }>
-  movements: any[]
+  movements: MovementRecord[]
 }
 
 export interface StockCardData {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Plus, X, Filter, Star, Search, Save, ChevronDown, History, Code } from 'lucide-react'
+import { Plus, X, Filter, Star, Save, ChevronDown, History, Code } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,9 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { toast } from '@/components/ui/use-toast'
-import { FilterType, SavedFilter, saveFilter, getSavedFilters, deleteFilter, BaseFilter } from '@/lib/utils/filter-storage'
+import { SavedFilter, saveFilter, getSavedFilters, deleteFilter, BaseFilter } from '@/lib/utils/filter-storage'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 // Define the CreditNote interface based on the API spec
@@ -59,9 +58,6 @@ type CreditNoteType = 'Return' | 'Price Adjustment' | 'Quality Issue' | 'Quantit
 type FilterOperator = 'equals' | 'contains' | 'startsWith' | 'endsWith' | 'greaterThan' | 'lessThan' | 'between' | 'in' | 'notIn' | 'isNull' | 'isNotNull'
 type LogicalOperator = 'AND' | 'OR'
 
-// Define our own Filter type to ensure type safety
-type FilterFields = typeof filterFields[number]['value']
-
 interface AdvancedFilterProps {
   onApplyFilters: (filters: BaseFilter<CreditNote>[]) => void
   onClearFilters: () => void
@@ -90,20 +86,20 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
 
   const loadSavedFilters = async () => {
     try {
-      const filters = await getSavedFilters<CreditNote>()
+      const filters = await getSavedFilters<CreditNote>('credit-note')
       setSavedFilters(filters)
     } catch (error) {
       toast({
-        title: "Error loading filters",
-        description: "There was a problem loading your saved filters.",
-        variant: "destructive"
+        title: "Error loading saved filters",
+        description: "There was an error loading your saved filters.",
+        variant: "destructive",
       })
     }
   }
 
   const handleDeleteSavedFilter = async (filterId: string) => {
     try {
-      await deleteFilter<CreditNote>(filterId)
+      await deleteFilter<CreditNote>(filterId, 'credit-note')
       setSavedFilters(savedFilters.filter(f => f.id !== filterId))
       toast({
         title: "Filter deleted",
@@ -120,7 +116,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
 
   const handleToggleStar = async (filter: SavedFilter<CreditNote>) => {
     try {
-      const updatedFilter = await saveFilter<CreditNote>({
+      await saveFilter('credit-note', {
         ...filter,
         isDefault: !filter.isDefault
       })
@@ -203,7 +199,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
         isDefault: false
       }
       
-      await saveFilter(newFilter)
+      await saveFilter('credit-note', newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
       toast({

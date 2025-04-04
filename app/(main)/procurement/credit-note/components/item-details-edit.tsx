@@ -7,6 +7,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card"
 import { EditedItem } from '@/lib/types/credit-note'
 
+// This type matches the array type in EditedItem.appliedLots
+interface AppliedLot {
+  lotNumber: string;
+  receiveDate: string | Date;
+  grnNumber: string;
+  invoiceNumber: string;
+  availableQty?: number; // Optional because it might not exist in all contexts
+  unitCost?: number;     // Optional because it might not exist in all contexts
+}
+
+// Helper function to format dates as strings
+const formatDate = (date: string | Date): string => {
+  if (date instanceof Date) {
+    return date.toLocaleDateString();
+  }
+  return date;
+};
+
 interface ItemDetailsEditProps {
   isOpen: boolean
   onClose: () => void
@@ -177,10 +195,10 @@ export function ItemDetailsEdit({ isOpen, onClose, onSave, item, creditNoteType 
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {editedItem.appliedLots.map((lot: any) => (
+                      {editedItem.appliedLots.map((lot: AppliedLot) => (
                         <TableRow key={lot.lotNumber}>
                           <TableCell>{lot.lotNumber}</TableCell>
-                          <TableCell>{lot.receiveDate}</TableCell>
+                          <TableCell>{formatDate(lot.receiveDate)}</TableCell>
                           <TableCell>{lot.grnNumber}</TableCell>
                           <TableCell>{lot.invoiceNumber}</TableCell>
                           <TableCell>{lot.availableQty}</TableCell>

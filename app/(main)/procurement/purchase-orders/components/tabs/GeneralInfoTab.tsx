@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { PurchaseOrder } from '@/lib/types'
 
-export default function GeneralInfoTab({ poData }: { poData: any }) {
+export default function GeneralInfoTab({ poData }: { poData: PurchaseOrder }) {
   const [isEditing, setIsEditing] = React.useState(false)
 
   const handleEdit = () => {
@@ -26,15 +27,25 @@ export default function GeneralInfoTab({ poData }: { poData: any }) {
       <form className="grid grid-cols-4 gap-4">
         <div>
           <Label htmlFor="poNumber">PO Reference Number</Label>
-          <Input id="poNumber" value={poData.id} readOnly={!isEditing} />
+          <Input id="poNumber" value={poData.poId} readOnly={!isEditing} />
         </div>
         <div>
           <Label htmlFor="poDate">PO Date</Label>
-          <Input id="poDate" type="date" value={poData.date} readOnly={!isEditing} />
+          <Input 
+            id="poDate" 
+            type="date" 
+            value={poData.orderDate ? poData.orderDate.toISOString().substring(0, 10) : ''} 
+            readOnly={!isEditing} 
+          />
         </div>
         <div>
           <Label htmlFor="deliveryDate">Delivery Date</Label>
-          <Input id="deliveryDate" type="date" value={poData.deliveryDate} readOnly={!isEditing} />
+          <Input 
+            id="deliveryDate" 
+            type="date" 
+            value={poData.DeliveryDate ? poData.DeliveryDate.toISOString().substring(0, 10) : ''} 
+            readOnly={!isEditing} 
+          />
         </div>
         <div>
           <Label htmlFor="status">Status</Label>
@@ -50,11 +61,11 @@ export default function GeneralInfoTab({ poData }: { poData: any }) {
         </div>
         <div className="col-span-2">
           <Label htmlFor="vendor">Vendor Information</Label>
-          <Input id="vendor" value={poData.vendor} readOnly={!isEditing} />
+          <Input id="vendor" value={poData.vendorName} readOnly={!isEditing} />
         </div>
         <div>
           <Label htmlFor="currency">Currency</Label>
-          <Input id="currency" value={poData.currency} readOnly={!isEditing} />
+          <Input id="currency" value={poData.currencyCode} readOnly={!isEditing} />
         </div>
         <div>
           <Label htmlFor="creditTerms">Credit Terms</Label>

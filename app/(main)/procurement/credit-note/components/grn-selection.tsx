@@ -5,21 +5,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Search } from 'lucide-react'
 
+interface GRNData {
+  id: string;
+  number: string;
+  date: string;
+  invoiceNumber: string;
+  amount: number;
+}
+
 interface GRNSelectionProps {
   isOpen: boolean
   onClose: () => void
-  onSelect: (grn: any) => void
+  onSelect: (grn: GRNData) => void
   vendorId: string
 }
 
 export function GRNSelection({ isOpen, onClose, onSelect, vendorId }: GRNSelectionProps) {
-  const [grnList, setGrnList] = useState<any[]>([])
-  const [filteredGrnList, setFilteredGrnList] = useState<any[]>([])
+  const [grnList, setGrnList] = useState<GRNData[]>([])
+  const [filteredGrnList, setFilteredGrnList] = useState<GRNData[]>([])
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     // Mock GRN data - replace with actual API call
-    const mockGRNs = [
+    const mockGRNs: GRNData[] = [
       { id: '1', number: 'GRN20240101-001', date: '2024-01-01', invoiceNumber: 'INV001', amount: 10000 },
       { id: '2', number: 'GRN20240102-001', date: '2024-01-02', invoiceNumber: 'INV002', amount: 15000 },
       { id: '3', number: 'GRN20240103-001', date: '2024-01-03', invoiceNumber: 'INV003', amount: 20000 },
@@ -40,7 +48,7 @@ export function GRNSelection({ isOpen, onClose, onSelect, vendorId }: GRNSelecti
     setFilteredGrnList(filtered)
   }
 
-  const handleGRNSelect = (grn: any) => {
+  const handleGRNSelect = (grn: GRNData) => {
     onSelect(grn)
     onClose()
   }

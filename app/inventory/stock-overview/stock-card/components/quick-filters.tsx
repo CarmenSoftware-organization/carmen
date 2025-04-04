@@ -20,7 +20,7 @@ interface QuickFiltersProps {
 export function QuickFilters({ onFilterChange }: QuickFiltersProps) {
   const [filters, setFilters] = useState<Partial<FilterCriteria>>({})
 
-  const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
+  const handleFilterChange = (key: keyof FilterCriteria, value: FilterCriteria[keyof FilterCriteria]) => {
     const newFilters = { ...filters, [key]: value }
     setFilters(newFilters)
     onFilterChange?.(newFilters)

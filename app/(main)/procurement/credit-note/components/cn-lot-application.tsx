@@ -1,23 +1,12 @@
 "use client";
 
 import {
-  Box,
   Calculator,
-  ChevronDown,
   Clock,
-  CreditCard,
-  Package,
   RefreshCcw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -26,10 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface GRNDetails {
   number: string
@@ -43,9 +28,9 @@ interface CnLotApplicationProps {
 export function CnLotApplication({ 
   grnDetails = { number: 'N/A', date: 'N/A' } 
 }: CnLotApplicationProps) {
-  const [selectedLots, setSelectedLots] = useState(["LOT001"]);
+  const [selectedLots] = useState(["LOT001"]);
 
-  const getOrdinalValue = (number: any) => {
+  const getOrdinalValue = (number: number) => {
     const suffixes = ["th", "st", "nd", "rd"];
     const v = number % 100;
     return number + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);

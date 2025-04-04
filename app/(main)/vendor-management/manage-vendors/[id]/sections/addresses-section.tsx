@@ -7,7 +7,7 @@ import { Address } from '@/lib/types'
 interface AddressesSectionProps {
   addresses: Address[]
   isEditing: boolean
-  onAddressChange: (name: string, value: any) => void
+  onAddressChange: (name: keyof Address, value: Address[keyof Address]) => void
 }
 
 export function AddressesSection({ addresses, isEditing, onAddressChange }: AddressesSectionProps) {

@@ -1,8 +1,9 @@
 import StockMovementContent from './stock-movement'
+import { StockMovement } from '@/lib/types'
 
 interface StockMovementTabProps {
   mode: string
-  movements: any[] // Update this type based on your actual movement type
+  movements: StockMovement[]
 }
 
 export function StockMovementTab({ mode, movements }: StockMovementTabProps) {

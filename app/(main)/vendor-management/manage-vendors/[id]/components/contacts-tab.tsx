@@ -7,7 +7,7 @@ import { Contact } from '@/lib/types'
 interface ContactsTabProps {
   contacts: Contact[]
   isEditing: boolean
-  onContactChange: (name: string, value: any) => void
+  onContactChange: (name: keyof Contact, value: Contact[keyof Contact]) => void
 }
 
 export function ContactsTab({ contacts, isEditing, onContactChange }: ContactsTabProps) {

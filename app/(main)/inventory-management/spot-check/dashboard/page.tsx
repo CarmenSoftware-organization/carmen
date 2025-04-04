@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { PageHeader } from "@/components/page-header"
 import { PageWrapper } from "@/components/page-wrapper"
@@ -9,15 +8,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  BarChart3,
   ClipboardList,
   Clock,
   PlayCircle,
@@ -26,7 +16,9 @@ import {
   ArrowRight,
   Users,
   Boxes,
+  Plus,
 } from "lucide-react"
+import Link from 'next/link'
 
 // Mock data for demonstration
 const activeCounts = [
@@ -112,6 +104,12 @@ const stats = [
 ]
 
 export default function SpotCheckDashboard() {
+  const counts = [
+    { id: '1', name: 'Liquor Monthly Count', date: new Date('2023-06-01'), status: 'active', items: 25, locations: 3, createdBy: 'John Smith', completedItems: 18 },
+    { id: '2', name: 'Bar Stock Verification', date: new Date('2023-05-28'), status: 'completed', items: 42, locations: 2, createdBy: 'Sarah Johnson', completedItems: 42 },
+    { id: '3', name: 'High-Value Items Check', date: new Date('2023-06-05'), status: 'active', items: 15, locations: 1, createdBy: 'Mike Wilson', completedItems: 8 },
+  ]
+  
   return (
     <PageWrapper>
       <div className="flex flex-col gap-8">
@@ -119,6 +117,16 @@ export default function SpotCheckDashboard() {
           title="Spot Check Dashboard"
           description="Monitor active counts, review pending variances, and track spot check activities"
         />
+
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Spot Check Dashboard</h1>
+          <Link href="/inventory-management/spot-check/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Spot Check
+            </Button>
+          </Link>
+        </div>
 
         {/* Stats Overview */}
         <div className="grid gap-4 md:grid-cols-3">
@@ -275,6 +283,49 @@ export default function SpotCheckDashboard() {
               </ScrollArea>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="bg-white rounded-lg border shadow-sm">
+          <div className="p-4 border-b">
+            <h2 className="font-semibold">Recent Spot Checks</h2>
+          </div>
+          <div className="divide-y">
+            {counts.map(count => (
+              <div key={count.id} className="p-4 hover:bg-gray-50">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-medium">{count.name}</h3>
+                    <div className="flex gap-2 text-sm text-muted-foreground mt-1">
+                      <span>{count.date.toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>{count.locations} locations</span>
+                      <span>•</span>
+                      <span>{count.items} items</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className={`px-2 py-1 rounded text-xs font-medium 
+                      ${count.status === 'active' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                      {count.status === 'active' ? 'Active' : 'Completed'}
+                    </div>
+                    <Link href={`/inventory-management/spot-check/active/${count.id}`}>
+                      <Button variant="outline" size="sm">
+                        {count.status === 'active' ? 'Continue' : 'View'}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+                {count.status === 'active' && (
+                  <div className="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="bg-blue-500 h-full" 
+                      style={{ width: `${Math.round((count.completedItems || 0) / count.items * 100)}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </PageWrapper>

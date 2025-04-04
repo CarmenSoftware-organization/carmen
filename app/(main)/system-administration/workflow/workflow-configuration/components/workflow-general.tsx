@@ -7,17 +7,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 
+interface Workflow {
+  id: string
+  name: string
+  type: string
+  description: string
+  documentReferencePattern: string
+  status?: string
+}
+
 interface WorkflowGeneralProps {
-  workflow: {
-    id: string
-    name: string
-    type: string
-    description: string
-    documentReferencePattern: string
-    status?: string
-  }
+  workflow: Workflow
   isEditing: boolean
-  onSave: (updatedWorkflow: any) => void
+  onSave: (updatedWorkflow: Workflow) => void
 }
 
 export function WorkflowGeneral({ workflow, isEditing, onSave }: WorkflowGeneralProps) {

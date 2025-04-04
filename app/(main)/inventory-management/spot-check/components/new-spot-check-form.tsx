@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -8,18 +9,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Package } from "lucide-react"
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { SpotCheckDetails } from "../types"
-import { useState, useEffect } from "react"
+import type { SpotCheckDetails } from "../types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Package } from "lucide-react"
+import { useUser } from "@/lib/context/user-context"
+import React from "react"
 
 interface InventoryItem {
   id: string
@@ -273,6 +273,7 @@ export function NewSpotCheckForm({
 }: NewSpotCheckFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedItems, setSelectedItems] = useState<InventoryItem[]>([])
+  const { user } = useUser()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -283,18 +284,18 @@ export function NewSpotCheckForm({
     },
   })
 
-  const fetchSelectedItems = async (values: FormValues) => {
+  // Memoize fetchSelectedItems to prevent unnecessary recreations
+  const fetchSelectedItems = React.useCallback(async (values: FormValues) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500))
     const items = filterItems(values)
     setSelectedItems(items)
     return items
-  }
+  }, [])
 
   const handleSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true)
-      console.log("Form values:", values)
 
       // Validate required fields
       if (!values.counterId || !values.departmentId || !values.storeId) {
@@ -325,7 +326,6 @@ export function NewSpotCheckForm({
         }))
       }
 
-      console.log("Submitting details:", details)
       await onSubmit(details)
     } catch (error) {
       console.error("Form submission error:", error)
@@ -339,19 +339,38 @@ export function NewSpotCheckForm({
     }
   }
 
-  // Add effect to update selected items when form values change
+  // Watch for form changes and update selected items
   useEffect(() => {
+    const relevantFields = ["itemCount", "selectionType", "minimumPrice", "departmentId", "storeId"]
+    
     const subscription = form.watch((value, { name }) => {
       // Only fetch items if relevant fields change
-      if (["itemCount", "selectionType", "minimumPrice", "departmentId", "storeId"].includes(name || "")) {
+      if (relevantFields.includes(name || "")) {
         const values = form.getValues()
         if (values.itemCount && values.selectionType && values.departmentId && values.storeId) {
-          fetchSelectedItems(values)
+          void fetchSelectedItems(values)
         }
       }
     })
+    
     return () => subscription.unsubscribe()
-  }, [form.watch])
+  }, [form, fetchSelectedItems])
+
+  // Set initial values from user context
+  useEffect(() => {
+    if (!user) return
+
+    const userFields = {
+      counterId: user.id,
+      departmentId: user.department,
+    }
+
+    Object.entries(userFields).forEach(([field, value]) => {
+      if (value && form.getValues(field as keyof FormValues) !== value) {
+        form.setValue(field as keyof FormValues, value)
+      }
+    })
+  }, [user, form])
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">

@@ -4,7 +4,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function GeneralInfoTab({ poData }: { poData: any }) {
+interface PurchaseOrderGeneralData {
+  id: string
+  date: string
+  deliveryDate: string
+  status: string
+  description: string
+  buyer: string
+  vendor: string
+  currency: string
+  creditTerms: string
+  remarks: string
+}
+
+export default function GeneralInfoTab({ poData }: { poData: PurchaseOrderGeneralData }) {
   const [isEditing, setIsEditing] = React.useState(false)
 
   const handleEdit = () => {

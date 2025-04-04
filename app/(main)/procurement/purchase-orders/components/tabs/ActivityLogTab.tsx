@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StatusBadge from "@/components/ui/custom-status-badge";
+import { PurchaseOrder } from '@/lib/types';
 
 interface ActivityLog {
   id: string;
@@ -23,7 +24,7 @@ interface ActivityLog {
 }
 
 interface ActivityLogTabProps {
-  poData: any; // Replace 'any' with your PurchaseOrder type
+  poData: PurchaseOrder;
 }
 
 const mockActivityLogs: ActivityLog[] = [

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Edit2, Trash2 } from "lucide-react"
+import { Edit2, Eye, Trash2 } from "lucide-react"
 import { Unit } from "./unit-list"
 import StatusBadge from "@/components/ui/custom-status-badge"
 import {
@@ -102,26 +102,28 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
     }
   }
 
+  const handleViewUnit = (unit: Unit) => {
+    // In a real app, this would navigate to a detail view
+    console.log("View unit:", unit)
+  }
+
   const isAllSelected = sortedUnits.length > 0 && selectedItems.length === sortedUnits.length
   const isPartiallySelected = selectedItems.length > 0 && selectedItems.length < sortedUnits.length
 
   useEffect(() => {
     if (selectAllCheckboxRef.current) {
-      // @ts-ignore - indeterminate is a DOM property but not in the types
+      // @ts-expect-error - indeterminate is a DOM property but not in the types
       selectAllCheckboxRef.current.indeterminate = isPartiallySelected
     }
   }, [isPartiallySelected])
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        {/* ... */}
-      </div>
-      <div className="border rounded-md">
+    <div className="rounded-lg border bg-white overflow-hidden">
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">
+            <TableRow className="bg-gray-50/75">
+              <TableHead className="w-[50px] py-3 font-bold text-gray-600">
                 <Checkbox
                   ref={selectAllCheckboxRef}
                   checked={isAllSelected}
@@ -130,70 +132,114 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
                 />
               </TableHead>
               <TableHead 
-                className="cursor-pointer"
+                className="py-3  font-bold text-gray-600 cursor-pointer"
                 onClick={() => handleSort("code")}
               >
                 Code
               </TableHead>
               <TableHead 
-                className="cursor-pointer"
+                className="py-3  font-bold text-gray-600 cursor-pointer"
                 onClick={() => handleSort("name")}
               >
                 Name
               </TableHead>
               <TableHead 
-                className="cursor-pointer"
+                className="py-3  font-bold text-gray-600 cursor-pointer hidden md:table-cell"
+                onClick={() => handleSort("description")}
+              >
+                Description
+              </TableHead>
+              <TableHead 
+                className="py-3 font-bold text-gray-600 cursor-pointer"
                 onClick={() => handleSort("type")}
               >
                 Type
               </TableHead>
               <TableHead 
-                className="cursor-pointer"
+                className="py-3 font-bold text-gray-600 cursor-pointer"
                 onClick={() => handleSort("isActive")}
               >
                 Status
               </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="py-3 font-bold text-gray-600 text-right w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedUnits.map((unit) => (
-              <TableRow key={unit.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedItems.includes(unit.id)}
-                    onCheckedChange={(checked) => handleSelectOne(checked as boolean, unit.id)}
-                    aria-label={`Select ${unit.name}`}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{unit.code}</TableCell>
-                <TableCell>{unit.name}</TableCell>
-                <TableCell>{unit.type}</TableCell>
-                <TableCell>
-                  <StatusBadge status={unit.isActive ? "Active" : "Inactive"} />
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEdit(unit)}
-                      className="hover:text-primary"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setUnitToDelete(unit)}
-                      className="hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+            {sortedUnits.length > 0 ? (
+              sortedUnits.map((unit) => (
+                <TableRow 
+                  key={unit.id}
+                  className="group hover:bg-gray-50/50 cursor-pointer"
+                  onClick={() => handleViewUnit(unit)}
+                >
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedItems.includes(unit.id)}
+                      onCheckedChange={(checked) => handleSelectOne(checked as boolean, unit.id)}
+                      aria-label={`Select ${unit.name}`}
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{unit.code}</TableCell>
+                  <TableCell>{unit.name}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {unit.description ? (
+                      <span className="line-clamp-1">{unit.description}</span>
+                    ) : (
+                      <span className="text-gray-400 italic">No description</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-800">
+                      {unit.type}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={unit.isActive ? "Active" : "Inactive"} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost" 
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewUnit(unit);
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost" 
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(unit);
+                        }}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost" 
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setUnitToDelete(unit);
+                        }}
+                        className="hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  No units found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
