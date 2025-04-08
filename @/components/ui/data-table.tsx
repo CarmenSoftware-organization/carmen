@@ -41,7 +41,8 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface DataTableProps<TData, TValue> {
+// EXPORT the interface
+export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   rowSelection: RowSelectionState

@@ -80,7 +80,7 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
         });
       }
     }
-  }, [uniqueProducts, formData.selectedLocations.length]); // Simplified dependencies
+  }, [uniqueProducts, formData.selectedLocations.length, formData.items, setFormData]);
 
   const filteredItems = React.useMemo(() => {
     return uniqueProducts.filter((item: Product) => {

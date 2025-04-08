@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from "react"
 import { useMappingStore, MappingItem } from "../store/mapping-store"
 import { columns } from "./columns"
-import { DataTable } from "@/components/ui/data-table" // Reusable DataTable
+import { DataTable } from "../../../../../components/ui/data-table"
 import { MappingDialog } from "./mapping-dialog"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,10 +16,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog" // Import AlertDialog components
-import { bulkDeleteMapping } from "../actions/bulk-delete-mapping" // Import delete action
+} from "@/components/ui/alert-dialog"
+import { bulkDeleteMapping } from "../actions/bulk-delete-mapping"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { ColumnDef } from "@tanstack/react-table"
 
 // Mock API call (replace with actual server action)
 async function saveMappingToDatabase(mapping: MappingItem): Promise<MappingItem> {
@@ -135,8 +136,10 @@ export function MappingList({ items, isLoading, title }: MappingListProps) {
       }
   }, [getSelectedUnmappedIds, setRowSelection, removeItemsByIds]);
 
-  // Prepare columns with the edit handler
-  const tableColumns = useMemo(() => columns(handleEditMapping), [handleEditMapping])
+  // Define columns with explicit type 
+  const tableColumns = useMemo(() => columns(handleEditMapping), [
+    handleEditMapping,
+  ])
 
   return (
     <div className="space-y-4">
@@ -159,13 +162,14 @@ export function MappingList({ items, isLoading, title }: MappingListProps) {
         )}
       </div>
 
+      {/* Pass props directly again */}
       <DataTable
         columns={tableColumns}
-        data={items} // Pass the items to display
+        data={items} 
         isLoading={isLoading}
-        rowSelection={rowSelection} // Controlled state from store
-        onRowSelectionChange={setRowSelection} // Update handler from store
-        enableRowSelection={true} // Explicitly enable row selection
+        rowSelection={rowSelection} 
+        onRowSelectionChange={setRowSelection} 
+        enableRowSelection={true} 
       />
 
       {/* Pass isBulkModeActive to the dialog */}
