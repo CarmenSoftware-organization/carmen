@@ -1,3 +1,4 @@
+
 export interface SpotCheckDetails {
   countId: string
   counter: string

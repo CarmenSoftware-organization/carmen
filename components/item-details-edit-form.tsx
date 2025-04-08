@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,37 +14,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { format, parse } from "date-fns"
 import { Calendar as CalendarIcon, X, HelpCircle, Upload, Users, BarChart2, Package, TruckIcon, Edit, Trash2, Plus } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from 'sonner'
+
+'use client'
 
 interface FormData {
-  status: string
-  location: string
+  id: string
   name: string
   description: string
+  quantity: number
+  image?: string
+  status: string
+  location: string
   unit: string
   quantityRequested: number
   quantityApproved: number
   deliveryDate: string
   deliveryPoint: string
   currency: string
-  currencyRate: number
-  price: number
-  foc: number
-  netAmount: number
-  adjustment: boolean
-  discountAmount: number
-  taxAmount: number
-  totalAmount: number
-  vendor: string
   vendorItemCode: string
   comment: string
-  image: string | null
   createdBy: string
   createdDate: string
-  lastModifiedBy: string
-  lastModifiedDate: string
-  itemCategory: string
-  itemSubcategory: string
+  price: number
   inventoryInfo: {
     onHand: number
     onOrdered: number
@@ -59,11 +49,11 @@ interface FormData {
   }
 }
 
-type ItemDetailsFormProps = {
-  onSave: (formData: FormData) => void
+interface ItemDetailsEditFormProps {
+  initialData: FormData
+  onSave: (data: FormData) => void
   onCancel: () => void
-  onDelete?: () => void
-  initialData?: FormData
+  onDelete: () => void
 }
 
 type FormMode = 'add' | 'edit' | 'view'
@@ -79,59 +69,52 @@ interface FormFieldProps {
 }
 
 const sampleItemData: FormData = {
+  id: "ITEM-123456",
   status: 'Accepted',
   location: "FB: Food & Beverage",
   name: "Premium Coffee Beans",
   description: "Organic, fair-trade coffee beans (1kg bag)",
+  quantity: 50,
   unit: "Bag",
   quantityRequested: 50,
   quantityApproved: 45,
   deliveryDate: "2023-08-15",
   deliveryPoint: "2: Main Kitchen",
   currency: "USD",
-  currencyRate: 1.0,
-  price: 15.99,
-  foc: 2,
-  netAmount: 767.52,
-  adjustment: true,
-  discountAmount: 38.38,
-  taxAmount: 72.91,
-  totalAmount: 802.05,
-  vendor: "Global Coffee Suppliers Ltd.",
   vendorItemCode: "GCS-PREM-COF-1KG",
   comment: "High-demand item. Consider increasing regular order quantity.",
   image: "https://example.com/images/premium-coffee-beans.jpg",
   createdBy: "Sarah Johnson",
   createdDate: "2023-06-01",
-  lastModifiedBy: "Mike Thompson",
-  lastModifiedDate: "2023-07-10",
-  itemCategory: "Food & Beverage",
-  itemSubcategory: "Coffee & Tea",
+  price: 15.99,
   inventoryInfo: {
     onHand: 75,
-    onOrdered: 100,
+    onOrdered: 50,
     reorderLevel: 30,
     restockLevel: 200,
-    averageMonthlyUsage: 120,
-    lastPrice: 15.50,
-    lastOrderDate: "2023-05-15",
+    averageMonthlyUsage: 100,
+    lastPrice: 15.99,
+    lastOrderDate: "2023-07-10",
     lastVendor: "Global Coffee Suppliers Ltd."
   }
 }
 
-export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = sampleItemData }: ItemDetailsFormProps) {
+export function ItemDetailsEditForm({ initialData, onSave, onCancel, onDelete }: ItemDetailsEditFormProps) {
   const [mode, setMode] = useState<FormMode>(initialData ? 'view' : 'add')
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(
     initialData?.deliveryDate ? parse(initialData.deliveryDate, 'yyyy-MM-dd', new Date()) : undefined
   )
-  const [image, setImage] = useState<string | null>(initialData?.image || null)
-  const [formData, setFormData] = useState<FormData>(initialData)
+  const [image, setImage] = useState<string | undefined>(initialData?.image)
+  const [formData, setFormData] = useState<FormData>({
+    ...initialData,
+    image: initialData.image || undefined
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setFormData(initialData)
     setDeliveryDate(initialData?.deliveryDate ? parse(initialData.deliveryDate, 'yyyy-MM-dd', new Date()) : undefined)
-    setImage(initialData?.image || null)
+    setImage(initialData?.image || undefined)
   }, [initialData])
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,18 +122,14 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
     if (file) {
       // Validate file type and size
       if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload an image file",
-          variant: "destructive"
+        toast.error("Invalid file type", {
+          description: "Please upload an image file"
         })
         return
       }
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          title: "File too large",
-          description: "Image must be less than 5MB",
-          variant: "destructive"
+        toast.error("File too large", {
+          description: "Image must be less than 5MB"
         })
         return
       }
@@ -164,7 +143,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
   }
 
   const handleRemoveImage = () => {
-    setImage(null)
+    setImage(undefined)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -176,18 +155,19 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
     const submissionData: FormData = {
       ...formData,
       deliveryDate: deliveryDate ? format(deliveryDate, 'yyyy-MM-dd') : formData.deliveryDate,
-      image: image || null,
+      image: image
     }
 
     try {
       onSave(submissionData)
       setMode('view')
-    } catch (err) {
-      console.error('Form submission error:', err)
-      toast({
-        title: "Error",
-        description: "Failed to save changes. Please try again.",
-        variant: "destructive"
+      toast.success("Item details updated", {
+        description: "The item details have been updated successfully."
+      })
+    } catch (error) {
+      console.error('Error updating item details:', error)
+      toast.error("Error updating item details", {
+        description: "There was a problem updating the item details."
       })
     }
   }
@@ -461,17 +441,6 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                     </SelectContent>
                   </Select>
                 </FormField>
-                <FormField id="currencyRate" label="Currency Rate" tooltip="Exchange rate if applicable" baseValue="1.000000">
-                  <Input 
-                    id="currencyRate" 
-                    name="currencyRate" 
-                    type="number" 
-                    step="0.000001" 
-                    value={formData.currencyRate} 
-                    onChange={handleInputChange}
-                    disabled={mode === 'view'} 
-                  />
-                </FormField>
                 <FormField id="price" label="Price" required tooltip="Price per unit" baseValue="$5.99">
                   <Input 
                     id="price" 
@@ -482,89 +451,6 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                     value={formData.price} 
                     onChange={handleInputChange}
                     required 
-                    disabled={mode === 'view'} 
-                  />
-                </FormField>
-                <FormField id="foc" label="FOC Quantity" tooltip="Free of Charge quantity" baseValue="0">
-                  <Input 
-                    id="foc" 
-                    name="foc" 
-                    type="number" 
-                    min="0" 
-                    step="1" 
-                    value={formData.foc} 
-                    onChange={handleInputChange}
-                    disabled={mode === 'view'} 
-                  />
-                </FormField>
-                <FormField id="netAmount" label="Net Amount" tooltip="Net amount before discounts and taxes" baseValue="$59.90">
-                  <Input 
-                    id="netAmount" 
-                    name="netAmount" 
-                    type="number" 
-                    min="0" 
-                    step="0.01" 
-                    value={formData.netAmount} 
-                    onChange={handleInputChange}
-                    readOnly 
-                    disabled={mode === 'view'} 
-                  />
-                </FormField>
-                <FormField id="adjustment" label="Adjustment" tooltip="Check if price adjustment is needed">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="adjustment" 
-                      name="adjustment" 
-                      checked={formData.adjustment}
-                      onCheckedChange={(checked) => handleCheckboxChange(checked, 'adjustment')}
-                      disabled={mode === 'view'} 
-                    />
-                    <Label htmlFor="adjustment">Price Adjustment</Label>
-                  </div>
-                </FormField>
-                <FormField id="discountAmount" label="Discount Amount" tooltip="Total discount amount" baseValue="$0.00">
-                  <Input 
-                    id="discountAmount" 
-                    name="discountAmount" 
-                    type="number" 
-                    min="0" 
-                    step="0.01" 
-                    value={formData.discountAmount} 
-                    onChange={handleInputChange}
-                    disabled={mode === 'view'} 
-                  />
-                </FormField>
-                <FormField id="taxAmount" label="Tax Amount" tooltip="Total tax amount" baseValue="$4.19">
-                  <Input 
-                    id="taxAmount" 
-                    name="taxAmount" 
-                    type="number" 
-                    min="0" 
-                    step="0.01" 
-                    value={formData.taxAmount} 
-                    onChange={handleInputChange}
-                    disabled={mode === 'view'} 
-                  />
-                </FormField>
-                <FormField id="totalAmount" label="Total Amount" tooltip="Final total amount" baseValue="$64.09">
-                  <Input 
-                    id="totalAmount" 
-                    name="totalAmount" 
-                    type="number" 
-                    min="0" 
-                    step="0.01" 
-                    value={formData.totalAmount} 
-                    onChange={handleInputChange}
-                    readOnly 
-                    disabled={mode === 'view'} 
-                  />
-                </FormField>
-                <FormField id="vendor" label="Vendor" tooltip="Current vendor for this item">
-                  <Input 
-                    id="vendor" 
-                    name="vendor" 
-                    value={formData.vendor} 
-                    onChange={handleInputChange}
                     disabled={mode === 'view'} 
                   />
                 </FormField>
@@ -657,22 +543,6 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
                     <p className="font-medium">Created Date</p>
                     <p className="text-muted-foreground">{formData.createdDate}</p>
                   </div>
-                  <div>
-                    <p className="font-medium">Last Modified By</p>
-                    <p className="text-muted-foreground">{formData.lastModifiedBy}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Last Modified Date</p>
-                    <p className="text-muted-foreground">{formData.lastModifiedDate}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Item Category</p>
-                    <p className="text-muted-foreground">{formData.itemCategory}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Item Subcategory</p>
-                    <p className="text-muted-foreground">{formData.itemSubcategory}</p>
-                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -691,7 +561,7 @@ export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = 
               setMode('view')
               setFormData(initialData)
               setDeliveryDate(initialData?.deliveryDate ? parse(initialData.deliveryDate, 'yyyy-MM-dd', new Date()) : undefined)
-              setImage(initialData?.image || null)
+              setImage(initialData?.image || undefined)
             }}>
               Cancel
             </Button>

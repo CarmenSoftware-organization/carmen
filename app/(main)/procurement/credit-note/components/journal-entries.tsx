@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Building, Calculator, AlertCircle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
+
 interface JournalEntry {
   account: { code: string; name: string };
   department: { code: string; name: string };

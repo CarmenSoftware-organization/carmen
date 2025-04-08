@@ -1,34 +1,32 @@
 "use client"
-
 import { useState } from "react"
 import Link from "next/link"
+import { DateRange } from "react-day-picker"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { DateRangePicker } from "@/components/ui/date-picker"
+import { Input } from "@/components/ui/input"
+
 import { 
   ArrowLeft, 
   ArrowDownToLine, 
-  Check, 
   ChevronDown, 
-  Filter, 
   MoreHorizontal, 
   Search, 
   Trash,
   RefreshCcw,
   Eye 
 } from "lucide-react"
-import { DateRange } from "react-day-picker"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { DateRangePicker } from "@/components/ui/date-picker"
-import { 
+import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { 
+import {
   Select, 
   SelectContent, 
   SelectGroup, 
@@ -37,7 +35,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select"
-import { 
+import {
   Table, 
   TableBody, 
   TableCell, 
@@ -54,7 +52,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Separator } from "@/components/ui/separator"
 
 // Mock transaction data
 const transactions = [
@@ -153,7 +150,11 @@ const transactions = [
 ]
 
 // Status badge component
-function StatusBadge({ status }: { status: string }) {
+interface StatusBadgeProps {
+  status: string
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "completed":
@@ -185,12 +186,6 @@ export default function TransactionsPage() {
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [expandedRows, setExpandedRows] = useState<string[]>([])
   const [itemsPerPage, setItemsPerPage] = useState<number>(10)
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  
-  // Filter states
-  const [locationFilter, setLocationFilter] = useState<string[]>([])
-  const [statusFilter, setStatusFilter] = useState<string[]>([])
-  const [transactionTypeFilter, setTransactionTypeFilter] = useState<string[]>([])
 
   // Toggle row selection
   const toggleRowSelection = (id: string) => {

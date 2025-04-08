@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { GoodsReceiveNoteMode } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+
 interface TaxTabProps {
   mode: GoodsReceiveNoteMode;
   taxInvoiceNumber?: string;

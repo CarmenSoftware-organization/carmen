@@ -8,13 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import {
   Calendar as CalendarIcon,
   X,
@@ -48,7 +48,7 @@ type ItemDetailsFormProps = {
 
 const emptyItemData: PurchaseRequestItem = {
   id: "",
-  status: "Pending" ,
+  status: "Pending",
   location: "",
   name: "",
   description: "",
@@ -110,7 +110,9 @@ export function ItemDetailsEditForm({
   mode,
   onModeChange,
 }: ItemDetailsFormProps) {
-  const [formData, setFormData] = useState<PurchaseRequestItem>(initialData ? { ...emptyItemData, ...initialData } : emptyItemData);
+  const [formData, setFormData] = useState<PurchaseRequestItem>(
+    initialData ? { ...emptyItemData, ...initialData } : emptyItemData
+  );
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(formData.deliveryDate);
   const [isInventoryBreakdownOpen, setIsInventoryBreakdownOpen] = useState(false);
   const [isOnOrderOpen, setIsOnOrderOpen] = useState(false);
@@ -197,370 +199,247 @@ export function ItemDetailsEditForm({
         </h2>
         <div className="flex items-center gap-2">
           {mode === "view" && (
-            <Button variant="outline" onClick={() => onModeChange("edit")}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onModeChange("edit")}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+              {onDelete && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={onDelete}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              )}
+            </>
           )}
-          <div className="flex flex-wrap justify-end gap-2 mt-4">
-        {mode === "view" ? (
-          <>
-            {/* <Button variant="outline" onClick={onCancel}>
-              Close
-            </Button> */}
-          </>
-        ) : (
-          <>
-            <Button variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" form="itemForm">
-              Save
-            </Button>
-          </>
-        )}
-      </div>
-          <Button variant="ghost" size="icon" onClick={onCancel}>
-            <X className="h-4 w-4" />
-          </Button>
         </div>
       </div>
-      <ScrollArea className="h-[calc(100vh-200px)]">
-        <form onSubmit={handleSubmit} className="space-y-4 p-4">
-          {/* Basic Item Information */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
+
+      <form onSubmit={handleSubmit}>
+        <ScrollArea className="h-[calc(100vh-200px)]">
+          <div className="space-y-6 p-2">
+            {/* Basic Information */}
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold">Basic Information</h3>
-              <StatusBadge status={formData.status} />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-7 gap-2">
-              <FormField id="location" label="Location" required>
-                <Input
-                  id="location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  required
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              <div className="sm:col-span-2">
-              <FormField id="name" label="Product name" required>
-                <Input
-                  id="name"
-                  name="Product name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              </div>
-              <div className="sm:col-span-3">
-                <FormField id="description" label="Description" readOnly>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField id="name" label="Item Name" required>
                   <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    readOnly={mode === "view"}
+                  />
+                </FormField>
+                <FormField id="description" label="Description">
+                  <Textarea
                     id="description"
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    readOnly={true}
-                    className="h-8 text-sm"
+                    readOnly={mode === "view"}
                   />
                 </FormField>
               </div>
-              <div className="sm:col-span-1">
-                <FormField id="jobcode" label="Job code">
+            </div>
+
+            {/* Inventory Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Inventory Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField id="onHand" label="On Hand">
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="onHand"
+                      name="onHand"
+                      value={formData.inventoryInfo.onHand}
+                      readOnly
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setIsInventoryBreakdownOpen(true)}
+                    >
+                      <Package className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </FormField>
+                <FormField id="onOrdered" label="On Order">
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="onOrdered"
+                      name="onOrdered"
+                      value={formData.inventoryInfo.onOrdered}
+                      readOnly
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setIsOnOrderOpen(true)}
+                    >
+                      <TruckIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </FormField>
+                <FormField id="unit" label="Unit" required>
                   <Input
-                      id="jobcode"
-                    name="jobcode"
-                    value={formData.jobCode}
+                    id="unit"
+                    name="unit"
+                    value={formData.unit}
                     onChange={handleInputChange}
                     required
-                    disabled={mode === "view"}
-                    className="h-8 text-sm"
+                    readOnly={mode === "view"}
                   />
                 </FormField>
               </div>
             </div>
-            <div className="w-full">
-                <FormField id="comment" label="Comment">
-                  {mode === "view" ? (
-                    <div className="mt-1 text-sm">{formData.comment}</div>
-                  ) : (
-                    <Textarea
-                      id="comment"
-                      name="comment"
-                      value={formData.comment}
-                      onChange={handleInputChange}
-                      placeholder="Add any additional notes here"
-                      className="text-sm h-8"
-                    />
-                  )}
-                </FormField>
-              </div>
-          </div>
 
-          <Separator className="my-2" />
-
-          {/* Quantity and Delivery Section */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
+            {/* Quantity and Delivery */}
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold">Quantity and Delivery</h3>
-              <div className="flex gap-2">
-                <Dialog
-                  open={isInventoryBreakdownOpen}
-                  onOpenChange={setIsInventoryBreakdownOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      <Package className="mr-2 h-4 w-4" />
-                      On Hand
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[60vw] w-[80vw] overflow-y-auto [&>button]:hidden">
-                    <DialogHeader>
-                      <div className="flex justify-between w-full items-center">
-                        <DialogTitle>On Hand by Location</DialogTitle>
-                        <DialogClose asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setIsInventoryBreakdownOpen(false)}
-                          >
-                            <XIcon className="h-4 w-4" />
-                          </Button>
-                        </DialogClose>
-                      </div>
-                    </DialogHeader>
-                    <InventoryBreakdown />
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      <TruckIcon className="mr-2 h-4 w-4" />
-                      On Order
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[60vw] overflow-y-auto [&>button]:hidden">
-                    <DialogHeader>
-                      <div className="flex justify-between w-full items-center">
-                        <DialogTitle>Pending Purchase Order</DialogTitle>
-                        <DialogClose asChild>
-                          <Button variant="ghost" size="sm" onClick={() => setIsOnOrderOpen(false)}>
-                            <XIcon className="h-4 w-4" />
-                          </Button>
-                        </DialogClose>
-                      </div>
-                    </DialogHeader>
-                    <PendingPurchaseOrdersComponent />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
-              <FormField
-                id="unit"
-                label="Order Unit"
-                required
-                smallText="Base: Kg | 1 Bag = 0.5 Kg"
-              >
-                <Input
-                  id="unit"
-                  name="unit"
-                  value={formData.unit}
-                  onChange={handleInputChange}
-                  required
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              <FormField
-                id="quantityRequested"
-                label="Quantity Requested"
-                required
-                smallText="5 Kg"
-              >
-                <Input
-                  id="quantityRequested"
-                  name="quantityRequested"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={formData.quantityRequested}
-                  onChange={handleInputChange}
-                  required
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              <FormField
-                id="quantityApproved"
-                label="Quantity Approved"
-                smallText="4.5 Kg"
-              >
-                <Input
-                  id="quantityApproved"
-                  name="quantityApproved"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={formData.quantityApproved}
-                  onChange={handleInputChange}
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              <FormField id="foc" label="FOC Qty" baseValue="0">
-                <Input
-                  id="foc"
-                  name="foc"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={formData.foc}
-                  onChange={handleInputChange}
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              <FormField id="deliveryDate" label="Delivery Date" required>
-                {mode === "view" ? (
-                  <div>
-                    {deliveryDate ? format(deliveryDate, "PPP") : "Not set"}
-                  </div>
-                ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField id="quantityRequested" label="Quantity Requested" required>
+                  <Input
+                    type="number"
+                    id="quantityRequested"
+                    name="quantityRequested"
+                    value={formData.quantityRequested}
+                    onChange={handleInputChange}
+                    required
+                    readOnly={mode === "view"}
+                  />
+                </FormField>
+                <FormField id="deliveryDate" label="Delivery Date" required>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
-                        variant={"outline"}
+                        variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal h-8 text-sm",
+                          "w-full justify-start text-left font-normal",
                           !deliveryDate && "text-muted-foreground"
                         )}
+                        disabled={mode === "view"}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {deliveryDate ? (
-                          format(deliveryDate, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+                        {deliveryDate ? format(deliveryDate, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
                         selected={deliveryDate}
-                        onSelect={(date) => {
-                          setDeliveryDate(date);
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            deliveryDate: date ? date : new Date(),
-                          }));
-                        }}
+                        onSelect={setDeliveryDate}
                         initialFocus
                       />
                     </PopoverContent>
                   </Popover>
-                )}
-              </FormField>
-              <FormField id="deliveryPoint" label="Delivery Point">
-                <Input
-                  id="deliveryPoint"
-                  name="deliveryPoint"
-                  value={formData.deliveryPoint}
-                  onChange={handleInputChange}
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
+                </FormField>
+                <FormField id="deliveryPoint" label="Delivery Point" required>
+                  <Input
+                    id="deliveryPoint"
+                    name="deliveryPoint"
+                    value={formData.deliveryPoint}
+                    onChange={handleInputChange}
+                    required
+                    readOnly={mode === "view"}
+                  />
+                </FormField>
+              </div>
             </div>
 
-            {/* Inventory Information Section */}
-            <div className="mt-2">
-              <div className="bg-muted p-2 rounded-md">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div>
-                    <p className="font-medium">On Hand</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.onHand} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">On Ordered</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.onOrdered} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Reorder Level</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.reorderLevel} Kg
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Restock Level</p>
-                    <p className="text-muted-foreground">
-                      {formData.inventoryInfo?.restockLevel} Kg
-                    </p>
-                  </div>
-                </div>
+            {/* Pricing Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Pricing Information</h3>
+              <PricingFormComponent
+                data={formData}
+                initialMode={mode}
+              />
+            </div>
+
+            {/* Additional Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Additional Information</h3>
+              <div className="grid grid-cols-1 gap-4">
+                <FormField id="comment" label="Comments">
+                  <Textarea
+                    id="comment"
+                    name="comment"
+                    value={formData.comment}
+                    onChange={handleInputChange}
+                    readOnly={mode === "view"}
+                  />
+                </FormField>
               </div>
             </div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">
-              Vendor and Additional Information
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-              <FormField id="vendor" label="Vendor">
-                <Input
-                  id="vendor"
-                  name="vendor"
-                  value={formData.vendor}
-                  onChange={handleInputChange}
-                  placeholder="Vendor name"
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              <FormField id="pricelistNumber" label="Pricelist Number">
-                <Input
-                  id="pricelistNumber"
-                  name="pricelistNumber"
-                  value={formData.pricelistNumber}
-                  onChange={handleInputChange}
-                  placeholder="Pricelist #"
-                  disabled={mode === "view"}
-                  className="h-8 text-sm"
-                />
-              </FormField>
-              
+        </ScrollArea>
+
+        {mode !== "view" && (
+          <div className="flex justify-end gap-2 mt-6">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit">Save</Button>
+          </div>
+        )}
+      </form>
+
+      <InventoryBreakdown
+        isOpen={isInventoryBreakdownOpen}
+        onClose={() => setIsInventoryBreakdownOpen(false)}
+        itemData={{
+          name: formData.name,
+          description: formData.description,
+          status: formData.status,
+        }}
+        inventoryData={[
+          {
+            location: "Main Kitchen",
+            quantityOnHand: 25,
+            units: "KG",
+            par: 30,
+            reorderPoint: 15,
+            minStock: 10,
+            maxStock: 50
+          },
+          {
+            location: "Bar Storage",
+            quantityOnHand: 10,
+            units: "KG",
+            par: 15,
+            reorderPoint: 8,
+            minStock: 5,
+            maxStock: 20
+          }
+        ]}
+      />
+
+      <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] [&>button]:hidden">
+          <DialogHeader>
+            <div className="flex justify-between w-full items-center">
+              <DialogTitle>Pending Purchase Orders</DialogTitle>
+              <DialogClose asChild>
+                <Button variant="ghost" size="sm">
+                  <XIcon className="h-4 w-4" />
+                </Button>
+              </DialogClose>
             </div>
-          </div>
-          <Separator className="my-2" />
-
-          {/* Pricing Section */}
-          <div>
-            <PricingFormComponent 
-              initialMode={mode} 
-              data={formData}
-            />
-          </div>
-
-          <Separator className="my-2" />
-
-          {/* Vendor and Additional Information Section */}
-          
-
-          <Separator className="my-2" />
-
-        </form>
-      </ScrollArea>
-      
+          </DialogHeader>
+          <PendingPurchaseOrdersComponent />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

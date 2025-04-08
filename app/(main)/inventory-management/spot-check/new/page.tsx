@@ -1,8 +1,9 @@
-'use client';
+'use client'
 
 import { NewSpotCheckForm } from "../components/new-spot-check-form"
 import { useRouter } from "next/navigation"
 import { SpotCheckDetails } from "../types"
+import { UserProvider } from "@/lib/context/user-context"
 
 export default function NewSpotCheckPage() {
   const router = useRouter()
@@ -41,13 +42,15 @@ export default function NewSpotCheckPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-background">
-      <NewSpotCheckForm
-        stores={stores}
-        departments={departments}
-        counters={counters}
-        onSubmit={handleCreateSpotCheck}
-      />
-    </div>
+    <UserProvider>
+      <div className="h-[calc(100vh-4rem)] bg-background">
+        <NewSpotCheckForm
+          stores={stores}
+          departments={departments}
+          counters={counters}
+          onSubmit={handleCreateSpotCheck}
+        />
+      </div>
+    </UserProvider>
   )
 }

@@ -1,7 +1,9 @@
 import React, { ReactNode } from 'react';
 
+
 interface ListPageTemplateProps {
   title: string;
+  description?: string;
   actionButtons?: ReactNode;
   filters?: ReactNode;
   content: ReactNode;
@@ -10,6 +12,7 @@ interface ListPageTemplateProps {
 
 const ListPageTemplate: React.FC<ListPageTemplateProps> = ({
   title,
+  description,
   actionButtons,
   filters,
   content,
@@ -18,7 +21,10 @@ const ListPageTemplate: React.FC<ListPageTemplateProps> = ({
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-bold">{title}</h1>
+        <div>
+          <h1 className="text-3xl font-bold">{title}</h1>
+          {description && <p className="text-muted-foreground mt-1">{description}</p>}
+        </div>
         {actionButtons && <div className="flex flex-wrap gap-2">{actionButtons}</div>}
       </div>
       

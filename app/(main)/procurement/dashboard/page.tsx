@@ -1,35 +1,41 @@
-'use client';
+'use client'
 
 import { DashboardTemplate } from "@/components/templates/DashboardTemplate";
 import { ShoppingCart, TrendingUp, AlertCircle, Clock } from "lucide-react";
 
 // Sample data - replace with real data in production
-const stats = [
-  {
-    title: "Total Purchase Requests",
-    value: "156",
-    description: "+12% from last month",
-    icon: ShoppingCart
-  },
-  {
-    title: "Pending Approvals",
-    value: "23",
-    description: "5 urgent requests",
-    icon: Clock
-  },
-  {
-    title: "Total Spend",
-    value: "$45,231",
-    description: "Last 30 days",
-    icon: TrendingUp
-  },
-  {
-    title: "Critical Items",
-    value: "8",
-    description: "Require attention",
-    icon: AlertCircle
-  }
-];
+const dashboardData = {
+  metrics: [
+    {
+      title: "Total Purchase Orders",
+      value: "156",
+      change: "+12%",
+      trend: "up",
+      icon: ShoppingCart,
+    },
+    {
+      title: "Pending Approvals",
+      value: "8",
+      change: "-25%",
+      trend: "down",
+      icon: Clock,
+    },
+    {
+      title: "Budget Utilization",
+      value: "75%",
+      change: "+5%",
+      trend: "up",
+      icon: TrendingUp,
+    },
+    {
+      title: "Critical Items",
+      value: "3",
+      change: "-2",
+      trend: "down",
+      icon: AlertCircle,
+    },
+  ],
+};
 
 const charts = [
   {
@@ -59,7 +65,7 @@ export default function ProcurementDashboard() {
     <DashboardTemplate
       title="Procurement Dashboard"
       description="Overview of procurement activities and metrics"
-      stats={stats}
+      stats={dashboardData.metrics}
       charts={charts}
     />
   );

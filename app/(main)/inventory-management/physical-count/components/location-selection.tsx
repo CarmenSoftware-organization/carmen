@@ -1,24 +1,22 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { mockLocations, getLocationsByDepartment, Location } from '@/lib/mock/inventory-data';
+import { getLocationsByDepartment } from '@/lib/mock/inventory-data';
 
-interface LocationFormData {
-  selectedLocations: string[];
+interface FormData {
+  locations: string[];
   department: string;
 }
 
 interface LocationSelectionProps {
-  formData: LocationFormData;
-  setFormData: (data: LocationFormData) => void;
-  onNext: () => void;
-  onBack: () => void;
+  formData: FormData;
+  onChange: (data: Partial<FormData>) => void;
 }
 
 const locationTypes = [
@@ -30,31 +28,44 @@ const locationTypes = [
   { value: 'maintenance', label: 'Maintenance' },
 ];
 
-export function LocationSelection({ formData, setFormData, onNext, onBack }: LocationSelectionProps) {
+export function LocationSelection({ formData, onChange }: LocationSelectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
 
-  const handleLocationSelect = (locationId: string) => {
-    setFormData({
-      ...formData,
-      selectedLocations: formData.selectedLocations.includes(locationId)
-        ? formData.selectedLocations.filter((id: string) => id !== locationId)
-        : [...formData.selectedLocations, locationId],
+  // Memoize handlers
+  const handleLocationSelect = useCallback((locationId: string) => {
+    onChange({
+      locations: formData.locations.includes(locationId)
+        ? formData.locations.filter((id: string) => id !== locationId)
+        : [...formData.locations, locationId],
     });
-  };
+  }, [formData.locations, onChange]);
 
-  // Get locations for the selected department
-  const departmentLocations = formData.department 
-    ? getLocationsByDepartment(formData.department)
-    : [];
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
 
-  const filteredLocations = departmentLocations.filter((location) => {
-    const matchesSearch = 
-      location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      location.code.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = selectedType === 'all' || location.type === selectedType;
-    return matchesSearch && matchesType;
-  });
+  const handleTypeChange = useCallback((value: string) => {
+    setSelectedType(value);
+  }, []);
+
+  // Get locations for the selected department - memoize to prevent unnecessary recalculations
+  const departmentLocations = useMemo(() => {
+    return formData.department 
+      ? getLocationsByDepartment(formData.department)
+      : [];
+  }, [formData.department]);
+
+  // Memoize the filtered locations
+  const filteredLocations = useMemo(() => {
+    return departmentLocations.filter((location) => {
+      const matchesSearch = 
+        location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        location.code.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = selectedType === 'all' || location.type === selectedType;
+      return matchesSearch && matchesType;
+    });
+  }, [departmentLocations, searchQuery, selectedType]);
 
   return (
     <Card>
@@ -73,13 +84,13 @@ export function LocationSelection({ formData, setFormData, onNext, onBack }: Loc
               type="text"
               placeholder="Search locations..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="pl-9"
             />
           </div>
           <Select
             value={selectedType}
-            onValueChange={setSelectedType}
+            onValueChange={handleTypeChange}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select type" />
@@ -106,7 +117,7 @@ export function LocationSelection({ formData, setFormData, onNext, onBack }: Loc
                 key={location.id}
                 className={cn(
                   "p-4 rounded-lg border cursor-pointer transition-colors",
-                  formData.selectedLocations.includes(location.id)
+                  formData.locations.includes(location.id)
                     ? "bg-primary/5 border-primary"
                     : "hover:bg-muted/50"
                 )}
@@ -135,7 +146,7 @@ export function LocationSelection({ formData, setFormData, onNext, onBack }: Loc
 
         <div className="mt-6 flex items-center justify-between text-sm text-muted-foreground">
           <div>
-            Selected {formData.selectedLocations.length} of {filteredLocations.length} locations
+            Selected {formData.locations.length} of {filteredLocations.length} locations
           </div>
           <div>
             {locationTypes.length - 1} types | {departmentLocations.length} total locations

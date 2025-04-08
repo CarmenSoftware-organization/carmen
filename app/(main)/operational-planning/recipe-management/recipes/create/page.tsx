@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useRouter } from 'next/navigation'
 import { RecipeForm } from '../components/recipe-form'
@@ -8,19 +8,14 @@ export default function CreateRecipePage() {
   const router = useRouter()
 
   const handleSubmit = async (recipe: Recipe) => {
-    try {
-      // TODO: Replace with actual API call
-      console.log('Creating recipe:', recipe)
-      
-      // For now, just navigate back to recipes list
-      router.push('/operational-planning/recipe-management/recipes')
-    } catch (error) {
-      console.error('Error creating recipe:', error)
-      // TODO: Show error toast
-    }
+    console.log('Creating recipe:', recipe)
+    router.push(`/operational-planning/recipe-management/recipes/${recipe.id}`)
   }
 
   return (
-    <RecipeForm onSubmit={handleSubmit} />
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Create New Recipe</h1>
+      <RecipeForm onSubmit={handleSubmit} />
+    </div>
   )
 } 

@@ -1,8 +1,8 @@
-'use client';
+'use client'
 
 import React, { useState } from 'react';
-import { FilterBuilder, FilterCondition } from './filter-builder';
 import { v4 as uuidv4 } from 'uuid';
+import { FilterBuilder, FilterCondition } from './filter-builder';
 
 const testFields = [
   {

@@ -1,55 +1,72 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { GoodsReceiveNoteDetail } from '@/app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail'
-import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
-import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 
-export default function EditGoodsReceiveNote({ params }: { params: { id: string } }) {
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+export default function EditGRNPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const [mode, setMode] = useState<GoodsReceiveNoteMode>('edit')
-  const [loading, setLoading] = useState(true)
-  const [grnData, setGrnData] = useState<GoodsReceiveNote | null>(null)
-
-  useEffect(() => {
-    // In a real application, you would fetch the GRN data from an API
-    // For this example, we'll use the sample data
-    const grn = mockGoodsReceiveNotes.find(grn => grn.id === params.id)
-    if (grn) {
-      setGrnData(grn)
-    } else {
-      // Handle case where GRN is not found
-      console.error('GRN not found')
-      router.push('/procurement/goods-received-note')
-    }
-    setLoading(false)
-  }, [params.id, router])
-
-  const handleModeChange = (newMode: GoodsReceiveNoteMode) => {
-    if (newMode === 'view') {
-      // Navigate back to the view page
-      router.push(`/procurement/goods-received-note/${params.id}`)
-    } else {
-      setMode(newMode)
-    }
-  }
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
-  if (!grnData) {
-    return <div>GRN not found</div>
-  }
+  const [activeTab, setActiveTab] = useState("details")
 
   return (
-    <div className="container mx-auto p-6">
-      <GoodsReceiveNoteDetail 
-        id={params.id} 
-        mode={mode} 
-        onModeChange={handleModeChange}
-        initialData={grnData}
-      />
+    <div className="container mx-auto py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Edit GRN #{params.id}</h1>
+        <div className="space-x-2">
+          <Button variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
+          <Button>Save Changes</Button>
+        </div>
+      </div>
+
+      <Card className="p-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="items">Items</TabsTrigger>
+            <TabsTrigger value="costs">Extra Costs</TabsTrigger>
+            <TabsTrigger value="attachments">Attachments</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details">
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="vendor">Vendor</Label>
+                <Select>
+                  <option value="">Select Vendor</option>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="date">Date</Label>
+                <Input type="date" id="date" />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea id="notes" rows={4} />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="items">
+            {/* Items table will go here */}
+          </TabsContent>
+
+          <TabsContent value="costs">
+            {/* Extra costs form will go here */}
+          </TabsContent>
+
+          <TabsContent value="attachments">
+            {/* Attachments upload will go here */}
+          </TabsContent>
+        </Tabs>
+      </Card>
     </div>
   )
 }

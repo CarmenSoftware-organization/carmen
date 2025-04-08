@@ -1,15 +1,15 @@
 'use client'
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DetailPageTemplate from '@/components/templates/DetailPageTemplate';
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/custom-dialog"
+import { mockPriceLists } from '../data/mock-price-lists';
 
 interface Pricelist {
   id: string;
@@ -38,94 +38,13 @@ interface PricelistItem {
   lastReceivedPrice: number;
 }
 
-const pricelistData : Pricelist = {
-  id: "1",
-  number: "PL-2023-001",
-  name: "Summer Sale 2023",
-  description: "Special discounts for summer products",
-  startDate: "2023-06-01",
-  endDate: "2023-08-31",
-  isActive: true,
-  items: [
-    {
-      id: "1",
-      rank: 1,
-      sku: "SUM-001",
-      productName: "Beach Umbrella",
-      name: "Large Beach Umbrella",
-      taxRate: 0.08,
-      price: 39.99,
-      unit: "each",
-      discountPercentage: 10,
-      discountAmount: 4.00,
-      minQuantity: 1,
-      total: 35.99,
-      lastReceivedPrice: 25.00
-    },
-    {
-      id: "2",
-      rank: 2,
-      sku: "SUM-002",
-      productName: "Sunscreen",
-      name: "SPF 50 Sunscreen",
-      taxRate: 0.08,
-      price: 12.99,
-      unit: "bottle",
-      discountPercentage: 5,
-      discountAmount: 0.65,
-      minQuantity: 2,
-      total: 12.34,
-      lastReceivedPrice: 8.50
-    },
-    {
-      id: "3",
-      rank: 3,
-      sku: "SUM-003",
-      productName: "Beach Towel",
-      name: "Extra Large Beach Towel",
-      taxRate: 0.08,
-      price: 24.99,
-      unit: "each",
-      discountPercentage: 15,
-      discountAmount: 3.75,
-      minQuantity: 1,
-      total: 21.24,
-      lastReceivedPrice: 15.00
-    },
-    {
-      id: "4",
-      rank: 4,
-      sku: "SUM-004",
-      productName: "Cooler",
-      name: "20L Portable Cooler",
-      taxRate: 0.08,
-      price: 49.99,
-      unit: "each",
-      discountPercentage: 20,
-      discountAmount: 10.00,
-      minQuantity: 1,
-      total: 39.99,
-      lastReceivedPrice: 30.00
-    },
-    {
-      id: "5",
-      rank: 5,
-      sku: "SUM-005",
-      productName: "Flip Flops",
-      name: "Comfortable Flip Flops",
-      taxRate: 0.08,
-      price: 14.99,
-      unit: "pair",
-      discountPercentage: 0,
-      discountAmount: 0,
-      minQuantity: 1,
-      total: 14.99,
-      lastReceivedPrice: 7.50
-    }
-  ]
-} 
+interface PageProps {
+  params: {
+    id: string;
+  }
+}
 
-export default function PricelistDetail({ params }: { params: { id: string } }) {
+export default function PricelistDetail({ params }: PageProps) {
   const router = useRouter();
   const [pricelist, setPricelist] = useState<Pricelist | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -133,24 +52,25 @@ export default function PricelistDetail({ params }: { params: { id: string } }) 
   const [selectedItem, setSelectedItem] = useState<PricelistItem | null>(null);
 
   useEffect(() => {
-    async function fetchPricelist() {
+    const loadPriceListData = () => {
       try {
-        // const response = await fetch(`/api/pricelists/${params.id}`);
-        // if (!response.ok) {
-        //   throw new Error('Failed to fetch pricelist');
-        // }
-        // const data = await response.json();
-        const data = pricelistData;
-        setPricelist(data);
-      } catch (error) {
-        setError('Error fetching pricelist');
-        console.error('Error fetching pricelist:', error);
-      } finally {
+        const found = mockPriceLists.find((pl: Pricelist) => pl.id === params.id);
+        
+        if (found) {
+          setPricelist(found);
+        } else {
+          setError('Price list not found');
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error loading price list:', err);
+        setError('Failed to load price list data');
         setIsLoading(false);
       }
-    }
+    };
 
-    fetchPricelist();
+    loadPriceListData();
   }, [params.id]);
 
   const handleEdit = () => {

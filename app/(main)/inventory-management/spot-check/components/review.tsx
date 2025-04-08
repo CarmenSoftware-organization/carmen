@@ -1,13 +1,14 @@
-'use client';
-
 import { format } from 'date-fns';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, ArrowRight, CalendarIcon, CheckCircle2, Clock, FileCheck, MapPin, User } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner"
 import type { Location } from '@/lib/mock/inventory-data';
+
+'use client';
+
 
 interface CountItem {
   id: string;
@@ -23,28 +24,30 @@ interface CountItem {
   variancePercent?: number;
 }
 
-interface ReviewProps {
-  formData: {
-    name: string;
-    department: string;
-    description: string;
-    targetCount: string;
-    selectedItems: string[];
-    selectedLocations: string[];
-    dateTime?: Date;
-    notes?: string;
-    counts?: Record<string, number>;
-    [key: string]: string | string[] | Record<string, number> | Date | undefined;
-  };
-  selectedItems: CountItem[];
-  selectedLocations: Location[];
-  onBack: () => void;
-  onSubmit: () => void;
+interface Item {
+  id: string
+  expectedCount: number
+  name: string
+  sku: string
 }
 
-export function Review({ formData, selectedItems, selectedLocations, onBack, onSubmit }: ReviewProps) {
-  const { toast } = useToast();
+interface FormData {
+  counts: Record<string, number>
+  name: string
+  department: string
+  dateTime?: Date
+  notes?: string
+}
 
+interface ReviewProps {
+  selectedItems: Item[]
+  selectedLocations: Location[]
+  onBack: () => void
+  onSubmit: () => void
+  formData: FormData
+}
+
+export function Review({ selectedItems, selectedLocations, onBack, onSubmit, formData }: ReviewProps) {
   const itemsWithCounts = selectedItems.map(item => {
     const count = formData.counts?.[item.id] || 0;
     const expected = item.expectedCount || 0;
@@ -63,10 +66,7 @@ export function Review({ formData, selectedItems, selectedLocations, onBack, onS
   const discrepancyItems = itemsWithCounts.filter(item => item.hasDiscrepancy);
   
   const handleConfirmCount = () => {
-    toast({
-      title: "Spot check submitted",
-      description: "Your spot check has been successfully submitted",
-    });
+    toast.success("Spot check submitted successfully");
     onSubmit();
   };
 

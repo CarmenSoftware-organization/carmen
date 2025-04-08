@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { X, Filter, Save, ChevronDown } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
 
 export interface FilterOption {
   id: string

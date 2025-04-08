@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Scale, Plus, Pencil, Save, X, AlertCircle, TrashIcon, ArrowLeftRight } from 'lucide-react';
-import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Table, TableHeader, TableHead, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { Card } from "@/components/ui/card"
 import { 
+
   Select,
   SelectContent,
   SelectItem,
@@ -55,7 +55,7 @@ export interface OrderUnitTabProps {
   isEditing: boolean
 }
 
-export function OrderUnitTab({ isEditing }: OrderUnitTabProps) {
+export function OrderUnitTab({ isEditing = false }: OrderUnitTabProps) {
   const [units, setUnits] = useState<OrderUnit[]>(productInfo.orderUnits)
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)

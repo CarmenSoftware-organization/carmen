@@ -1,8 +1,9 @@
-
-// File: tabs/AttachmentsTab.tsx
 import React from 'react'
 import { Button } from "@/components/ui/button"
 import { PaperclipIcon } from 'lucide-react'
+
+
+// File: tabs/AttachmentsTab.tsx
 
 export const AttachmentsTab: React.FC = () => {
   return (

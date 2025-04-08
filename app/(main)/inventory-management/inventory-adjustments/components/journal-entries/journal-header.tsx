@@ -1,3 +1,5 @@
+'use client'
+
 import StatusBadge from "@/components/ui/custom-status-badge"
 
 interface JournalHeader {

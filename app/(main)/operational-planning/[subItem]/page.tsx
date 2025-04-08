@@ -1,12 +1,20 @@
-import ComingSoon from '@/components/ComingSoon';
-import { notFound } from 'next/navigation';
+'use client'
 
-export default function OperationalPlanningSubItemPage({ params }: { params: { subItem: string } }) {
-  const title = params.subItem.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+import { notFound } from 'next/navigation'
+import ComingSoon from '@/components/ComingSoon'
+
+interface PageProps {
+  params: {
+    subItem: string
+  }
+}
+
+export default function OperationalPlanningSubItemPage({ params }: PageProps) {
+  const title = params.subItem.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
   
   if (!['dashboard', 'recipes-management', 'menu-engineering', 'demand-forecasting', 'inventory-planning'].includes(params.subItem)) {
-    notFound();
+    notFound()
   }
 
-  return <ComingSoon title={`Operational Planning: ${title}`} />;
+  return <ComingSoon title={title} />
 }

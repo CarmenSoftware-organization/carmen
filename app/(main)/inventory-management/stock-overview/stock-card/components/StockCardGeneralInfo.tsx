@@ -1,9 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+'use client'
+
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { AlertTriangle, BarChart2, Calendar, Info, Tag } from "lucide-react"
-import { StockCardData } from "../../types"
-import { formatCurrency, formatDate, formatNumber } from "../../inventory-balance/utils"
+import { AlertTriangle, BarChart2, Info, Tag } from "lucide-react"
+import { StockCardData, LocationStock } from "../../types"
+import { formatCurrency, formatNumber } from "../../inventory-balance/utils"
 
 interface StockCardGeneralInfoProps {
   data: StockCardData
@@ -69,7 +70,7 @@ export function StockCardGeneralInfo({ data }: StockCardGeneralInfoProps) {
             <div className="pt-2">
               <p className="text-muted-foreground text-sm mb-2">Tags</p>
               <div className="flex flex-wrap gap-2">
-                {product.tags.map((tag) => (
+                {product.tags.map((tag: string) => (
                   <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                     <Tag className="h-3 w-3" />
                     {tag}
@@ -173,7 +174,7 @@ export function StockCardGeneralInfo({ data }: StockCardGeneralInfoProps) {
                 </tr>
               </thead>
               <tbody>
-                {locationStocks.map((location) => (
+                {locationStocks.map((location: LocationStock) => (
                   <tr key={location.locationId} className="border-b">
                     <td className="py-3">{location.locationName}</td>
                     <td className="py-3 text-right">{formatNumber(location.quantity)} {product.unit}</td>

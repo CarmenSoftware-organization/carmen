@@ -1,217 +1,130 @@
 "use client"
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Check, Star, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DialogFooter } from "@/components/ui/custom-dialog"
-import StatusBadge from "@/components/ui/custom-status-badge"
 
-// Mock data for vendors including preferred status, price lists, and ratings
-const initialVendors = [
-  { 
-    id: 1, 
-    name: "Vendor A", 
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Check, Star, Plus } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+
+interface Vendor {
+  id: string
+  name: string
+  isPreferred: boolean
+  rating: number
+  priceList: {
+    itemCode: string
+    price: number
+    lastUpdated: string
+  }[]
+  performance: {
+    deliveryTime: number
+    qualityScore: number
+    responseTime: number
+  }
+}
+
+const mockVendors: Vendor[] = [
+  {
+    id: "1",
+    name: "Vendor A",
     isPreferred: true,
     rating: 4.5,
-    priceLists: [
-      { id: 1, name: "Standard", unitPrice: 10, minQuantity: 100, orderUnit: "pcs", isPreferred: true, priceListNumber: "PL001" },
-      { id: 2, name: "Premium", unitPrice: 12, minQuantity: 50, orderUnit: "pcs", isPreferred: false, priceListNumber: "PL002" }
-    ]
+    priceList: [
+      { itemCode: "ITEM-001", price: 100, lastUpdated: "2024-03-01" },
+      { itemCode: "ITEM-002", price: 150, lastUpdated: "2024-03-01" },
+    ],
+    performance: {
+      deliveryTime: 2,
+      qualityScore: 95,
+      responseTime: 24,
+    },
   },
-  { 
-    id: 2, 
-    name: "Vendor B", 
+  {
+    id: "2",
+    name: "Vendor B",
     isPreferred: false,
     rating: 3.8,
-    priceLists: [
-      { id: 3, name: "Basic", unitPrice: 11, minQuantity: 50, orderUnit: "pcs", isPreferred: false, priceListNumber: "PL003" },
-      { id: 4, name: "Bulk", unitPrice: 9, minQuantity: 200, orderUnit: "pcs",  isPreferred: true, priceListNumber: "PL004" }
-    ]
-  },
-  { 
-    id: 3, 
-    name: "Vendor C", 
-    isPreferred: false,
-    rating: 4.2,
-    priceLists: [
-      { id: 5, name: "Standard", unitPrice: 9.5, minQuantity: 200, orderUnit: "pcs",  isPreferred: true, priceListNumber: "PL005" }
-    ]
+    priceList: [
+      { itemCode: "ITEM-001", price: 110, lastUpdated: "2024-02-28" },
+      { itemCode: "ITEM-002", price: 145, lastUpdated: "2024-02-28" },
+    ],
+    performance: {
+      deliveryTime: 3,
+      qualityScore: 88,
+      responseTime: 48,
+    },
   },
 ]
 
-// Sample item data
-const itemData = {
-  name: "Organic Quinoa",
-  description: "Premium organic white quinoa grains",
-  status: "Accepted",
-  requestedQuantity: 500,
-  approvedQuantity: 450,
-  unit: "Kg"
-}
-
-export default function VendorComparison() {
-  const [vendors, setVendors] = useState(initialVendors)
-  const [newVendor, setNewVendor] = useState({
-    name: "",
-    rating: "",
-    priceName: "",
-    unitPrice: "",
-    minQuantity: "",
-    orderUnit: "pcs",
-    priceListNumber: "",
-  })
-  const [selectedVendor, setSelectedVendor] = useState<number | null>(null)
-
-  const renderRating = (rating: number) => {
-    return (
-      <div className="flex items-center">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={`w-4 h-4 ${
-              star <= Math.round(rating)
-                ? "text-yellow-400 fill-current"
-                : "text-gray-300"
-            }`}
-          />
-        ))}
-        <span className="ml-2 text-sm text-gray-600">{rating.toFixed(1)}</span>
-      </div>
-    )
-  }
-
-  const handleAddNewVendor = () => {
-    if (newVendor.name && newVendor.rating && newVendor.priceName && newVendor.unitPrice && newVendor.minQuantity && newVendor.priceListNumber) {
-      const newVendorObj = {
-        id: vendors.length + 1,
-        name: newVendor.name,
-        isPreferred: false,
-        rating: parseFloat(newVendor.rating),
-        priceLists: [
-          {
-            id: Date.now(),
-            name: newVendor.priceName,
-            unitPrice: parseFloat(newVendor.unitPrice),
-            minQuantity: parseInt(newVendor.minQuantity),
-            orderUnit: newVendor.orderUnit,
-            isPreferred: true,
-            priceListNumber: newVendor.priceListNumber
-          }
-        ]
-      }
-      setVendors([...vendors, newVendorObj])
-      setNewVendor({
-        name: "",
-        rating: "",
-        priceName: "",
-        unitPrice: "",
-        minQuantity: "",
-        orderUnit: "pcs",
-        priceListNumber: "",
-      })
-    }
-  }
-
-  const handleVendorSelection = (vendorId: number) => {
-    setSelectedVendor(prevSelected => prevSelected === vendorId ? null : vendorId)
-  }
-
-  const handleCancelSelection = () => {
-    setSelectedVendor(null)
-  }
-
-  const handleSelectVendor = () => {
-    if (selectedVendor) {
-      console.log(`Vendor with ID ${selectedVendor} has been selected.`)
-      // Here you would typically do something with the selected vendor,
-      // such as updating the UI or sending the selection to a parent component
-    }
-  }
+export function VendorComparison() {
+  const [selectedVendor, setSelectedVendor] = useState<string | null>(null)
 
   return (
-    <>
-      <div className="mb-6 bg-muted p-4 rounded-md">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-bold">{itemData.name}</h2>
-          <StatusBadge status={itemData.status} />
-        </div>
-        <p className="text-gray-600 mb-2">{itemData.description}</p>
-        <div className="flex justify-between text-sm text-gray-500">
-          <span>Requested: {itemData.requestedQuantity} {itemData.unit}</span>
-          <span>Approved: {itemData.approvedQuantity} {itemData.unit}</span>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
+    <Card>
+      <CardHeader>
+        <CardTitle>Vendor Comparison</CardTitle>
+      </CardHeader>
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">Select</TableHead>
               <TableHead>Vendor</TableHead>
-              <TableHead className="w-[50px]">Prefer Vendor</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Rating</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Used List</TableHead>
-              <TableHead>Price List Number</TableHead>
-              <TableHead>Unit Price</TableHead>
-              <TableHead>Min. Quantity</TableHead>
+              <TableHead>Delivery Time (days)</TableHead>
+              <TableHead>Quality Score</TableHead>
+              <TableHead>Response Time (hrs)</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vendors.flatMap((vendor) =>
-              vendor.priceLists.map((priceList, index) => (
-                <TableRow key={`${vendor.id}-${priceList.id}`}>
-                  {index === 0 && (
-                    <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                      <Checkbox
-                        checked={selectedVendor === vendor.id}
-                        onCheckedChange={() => handleVendorSelection(vendor.id)}
-                      />
-                    </TableCell>
+            {mockVendors.map((vendor) => (
+              <TableRow key={vendor.id}>
+                <TableCell>
+                  {vendor.name}
+                  {vendor.isPreferred && (
+                    <Badge variant="secondary" className="ml-2">
+                      Preferred
+                    </Badge>
                   )}
-                  {index === 0 ? (
-                    <>
-                      <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                        {vendor.name}
-                      </TableCell>
-                      <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                        {vendor.isPreferred && <Check className="w-4 h-4 text-green-500" />}
-                      </TableCell>
-                      <TableCell rowSpan={vendor.priceLists.length} className="align-top">
-                        {vendor.rating}
-                      </TableCell>
-                    </>
+                </TableCell>
+                <TableCell>
+                  {vendor.isPreferred ? (
+                    <Check className="h-4 w-4 text-green-500" />
                   ) : null}
-                  <TableCell>{priceList.name}</TableCell>
-                  <TableCell>
-                    {priceList.isPreferred && <Check className="w-4 h-4 text-green-500" />}
-                  </TableCell>
-                  <TableCell>{priceList.priceListNumber}</TableCell>
-                  <TableCell>${priceList.unitPrice.toFixed(2)} / {priceList.orderUnit}</TableCell>
-                  <TableCell>{priceList.minQuantity} {priceList.orderUnit}</TableCell>
-                </TableRow>
-              ))
-            )}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    {vendor.rating}
+                    <Star className="h-4 w-4 ml-1 text-yellow-500" />
+                  </div>
+                </TableCell>
+                <TableCell>{vendor.performance.deliveryTime}</TableCell>
+                <TableCell>{vendor.performance.qualityScore}%</TableCell>
+                <TableCell>{vendor.performance.responseTime}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedVendor(vendor.id)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Select
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
-      </div>
-      
-      <DialogFooter>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={handleCancelSelection} disabled={selectedVendor === null}>
-            Cancel
-          </Button>
-          <Button onClick={handleSelectVendor} disabled={selectedVendor === null}>
-            Select
-          </Button>
-        </div>
-      </DialogFooter>
-    </>
+      </CardContent>
+    </Card>
   )
 }

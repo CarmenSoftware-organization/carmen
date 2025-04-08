@@ -1,74 +1,24 @@
-"use client"
+'use client'
 
 import { useState, useMemo } from "react"
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
 import Link from "next/link"
 import { ExternalLink } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DataTable } from "@/components/ui/data-table"
-import { columns } from "./components/columns"
-
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { 
-  MappingHeader, 
-  FilterBar, 
   StatusBadge, 
   RowActions,
-  FilterGroup,
-  AppliedFilter,
   ActionType,
 } from "../components"
-
 import { RecipeMapping } from "./types"
-import { recipeMappings, categories, locations } from "./data"
-
-const data = [
-  // ... rest of the code ...
-]
+import { recipeMappings } from "./data"
+import { columns } from "./components/columns"
 
 export default function RecipeMappingPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([])
-  
-  // Setup filter groups
-  const filterGroups: FilterGroup[] = [
-    {
-      id: "status",
-      label: "Status",
-      type: "multiple",
-      options: [
-        { id: "mapped", label: "Mapped", value: "mapped" },
-        { id: "unmapped", label: "Unmapped", value: "unmapped" },
-        { id: "error", label: "Error", value: "error" },
-      ],
-    },
-    {
-      id: "category",
-      label: "Category",
-      type: "multiple",
-      options: categories.map(cat => ({
-        id: cat.id,
-        label: cat.name,
-        value: cat.name,
-      })),
-    },
-    {
-      id: "location",
-      label: "Location",
-      type: "multiple",
-      options: locations.map(loc => ({
-        id: loc.id,
-        label: loc.name,
-        value: loc.name,
-      })),
-    },
-  ]
-
-  // Handle search
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
 
   // Handle row actions
   const handleRowAction = (action: ActionType, recipe: RecipeMapping) => {
@@ -76,7 +26,7 @@ export default function RecipeMappingPage() {
     // Implement action handlers here
   }
 
-  // Filter data based on search query and applied filters
+  // Filter data based on search query
   const filteredData = useMemo(() => {
     return recipeMappings.filter(recipe => {
       // Apply search filter
@@ -91,31 +41,9 @@ export default function RecipeMappingPage() {
           return false
         }
       }
-
-      // Apply status filters
-      const statusFilters = appliedFilters
-        .filter(f => f.groupId === "status")
-        .map(f => f.value)
-      
-      if (statusFilters.length > 0 && !statusFilters.includes(recipe.status)) {
-        return false
-      }
-
-      // Apply category filters
-      const categoryFilters = appliedFilters
-        .filter(f => f.groupId === "category")
-        .map(f => f.value)
-      
-      if (categoryFilters.length > 0 && !categoryFilters.includes(recipe.category)) {
-        return false
-      }
-
-      // Apply location filters (in a real app, would filter by recipe-location relationship)
-      // For demo purposes, we'll assume all recipes are available in all locations
-      
       return true
     })
-  }, [searchQuery, appliedFilters])
+  }, [searchQuery])
 
   // Define columns
   const columns: ColumnDef<RecipeMapping>[] = [
@@ -192,74 +120,29 @@ export default function RecipeMappingPage() {
     },
   ]
 
-  // Get row class based on status
-  const getRowClassName = (recipe: RecipeMapping) => {
-    if (recipe.status === "error") {
-      return "bg-red-50 dark:bg-red-900/10"
-    }
-    if (recipe.status === "unmapped") {
-      return "bg-amber-50 dark:bg-amber-900/10"
-    }
-    return ""
-  }
-
   return (
-    <div className="flex-1 space-y-4 px-2 py-4 md:px-4 md:py-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Recipe Mapping</h2>
-        <div className="flex items-center space-x-2">
-          <Button>Map New Recipe</Button>
-          <Button variant="secondary">Export</Button>
-        </div>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Recipes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">25</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Mapped Recipes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">18</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Unmapped Recipes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">7</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Last Sync
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">5m ago</div>
-          </CardContent>
-        </Card>
+    <div className="container mx-auto py-10">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Recipe Mapping</h1>
+        <Button>Add New Mapping</Button>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Recipe Mappings</CardTitle>
+          <CardTitle>Recipe Mapping</CardTitle>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={filteredData} />
+          <div className="mb-4">
+            <Input
+              placeholder="Search recipes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
+          <DataTable 
+            columns={columns}
+            data={filteredData}
+          />
         </CardContent>
       </Card>
     </div>

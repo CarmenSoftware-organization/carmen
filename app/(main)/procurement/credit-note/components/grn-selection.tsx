@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Search } from 'lucide-react'
 
+
 interface GRNData {
   id: string;
   number: string;
@@ -25,18 +26,32 @@ export function GRNSelection({ isOpen, onClose, onSelect, vendorId }: GRNSelecti
   const [filteredGrnList, setFilteredGrnList] = useState<GRNData[]>([])
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    // Mock GRN data - replace with actual API call
+  // Mock function to load GRNs
+  const loadGRNs = async () => {
+    // TODO: Replace with actual API call
     const mockGRNs: GRNData[] = [
-      { id: '1', number: 'GRN20240101-001', date: '2024-01-01', invoiceNumber: 'INV001', amount: 10000 },
-      { id: '2', number: 'GRN20240102-001', date: '2024-01-02', invoiceNumber: 'INV002', amount: 15000 },
-      { id: '3', number: 'GRN20240103-001', date: '2024-01-03', invoiceNumber: 'INV003', amount: 20000 },
-      { id: '4', number: 'GRN20240104-001', date: '2024-01-04', invoiceNumber: 'INV004', amount: 12000 },
-      { id: '5', number: 'GRN20240105-001', date: '2024-01-05', invoiceNumber: 'INV005', amount: 18000 },
+      {
+        id: '1',
+        number: 'GRN-001',
+        date: '2024-03-25',
+        invoiceNumber: 'INV-001',
+        amount: 1500.00
+      },
+      {
+        id: '2',
+        number: 'GRN-002',
+        date: '2024-03-24',
+        invoiceNumber: 'INV-002',
+        amount: 2300.50
+      }
     ]
     setGrnList(mockGRNs)
     setFilteredGrnList(mockGRNs)
-  }, [vendorId])
+  }
+
+  useEffect(() => {
+    loadGRNs()
+  }, [vendorId]) // Add vendorId as dependency since we'll need to reload when it changes
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase()

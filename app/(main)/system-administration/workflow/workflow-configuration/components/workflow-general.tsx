@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,17 +14,17 @@ interface Workflow {
   type: string
   description: string
   documentReferencePattern: string
-  status?: string
+  status: string
 }
 
 interface WorkflowGeneralProps {
   workflow: Workflow
   isEditing: boolean
-  onSave: (updatedWorkflow: Workflow) => void
+  onSave: (updatedWorkflow: Partial<Workflow>) => void
 }
 
 export function WorkflowGeneral({ workflow, isEditing, onSave }: WorkflowGeneralProps) {
-  const [editedWorkflow, setEditedWorkflow] = useState({ ...workflow })
+  const [editedWorkflow, setEditedWorkflow] = useState<Workflow>(workflow)
 
   // Reset form when workflow prop changes or edit mode is disabled
   useEffect(() => {

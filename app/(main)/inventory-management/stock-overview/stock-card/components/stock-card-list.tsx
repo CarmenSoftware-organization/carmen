@@ -1,5 +1,10 @@
 'use client'
 
+import { useState, Fragment } from "react"
+import { ChevronDown, ChevronRight, MoreHorizontal, ArrowUpDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -14,12 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { ChevronDown, ChevronRight, MoreHorizontal, ArrowUpDown } from "lucide-react"
 import { StockCard } from "../types"
-import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
 
 const mockData: StockCard[] = [
   {
@@ -117,23 +117,30 @@ interface StockCardListProps {
   onViewDetails?: (itemId: string) => void
 }
 
-export function StockCardList({ data = mockData, isLoading, onViewDetails }: StockCardListProps) {
-  const [groupBy, setGroupBy] = useState<'category' | null>(null)
+type GroupKey = 'category' | null
+type StockStatus = {
+  label: string
+  variant: 'default' | 'destructive' | 'secondary'
+  bgColor: string
+}
+
+export function StockCardList({ data = mockData, isLoading = false, onViewDetails }: StockCardListProps) {
+  const [groupBy, setGroupBy] = useState<GroupKey>(null)
 
   const groupedData = groupBy
-    ? data.reduce((acc, item) => {
-        const key = item[groupBy]
+    ? data.reduce<Record<string, StockCard[]>>((acc, item) => {
+        const key = item[groupBy] as string
         if (!acc[key]) acc[key] = []
         acc[key].push(item)
         return acc
-      }, {} as Record<string, StockCard[]>)
+      }, {})
     : { "": data }
 
-  const getStockStatus = (item: StockCard) => {
-    if (item.currentStock.totalStock <= 0) return { label: "Out of Stock", variant: "destructive" as const, bgColor: "bg-red-50" }
-    if (item.currentStock.totalStock <= item.minStock) return { label: "Low Stock", variant: "secondary" as const, bgColor: "bg-yellow-50" }
-    if (item.currentStock.totalStock >= item.maxStock) return { label: "Excess Stock", variant: "default" as const, bgColor: "bg-blue-50" }
-    return { label: "In Stock", variant: "default" as const, bgColor: "bg-green-50" }
+  const getStockStatus = (item: StockCard): StockStatus => {
+    if (item.currentStock.totalStock <= 0) return { label: "Out of Stock", variant: "destructive", bgColor: "bg-red-50" }
+    if (item.currentStock.totalStock <= item.minStock) return { label: "Low Stock", variant: "secondary", bgColor: "bg-yellow-50" }
+    if (item.currentStock.totalStock >= item.maxStock) return { label: "Excess Stock", variant: "default", bgColor: "bg-blue-50" }
+    return { label: "In Stock", variant: "default", bgColor: "bg-green-50" }
   }
 
   return (
@@ -197,9 +204,9 @@ export function StockCardList({ data = mockData, isLoading, onViewDetails }: Sto
           </TableHeader>
           <TableBody>
             {Object.entries(groupedData).map(([group, items]) => (
-              <>
+              <Fragment key={`group-${group}`}>
                 {group && (
-                  <TableRow key={`group-${group}`} className="hover:bg-transparent">
+                  <TableRow className="hover:bg-transparent">
                     <TableCell colSpan={9} className="bg-muted/50">
                       <div className="flex items-center gap-2 py-1">
                         <ChevronRight className="h-4 w-4" />
@@ -258,7 +265,7 @@ export function StockCardList({ data = mockData, isLoading, onViewDetails }: Sto
                     </TableRow>
                   )
                 })}
-              </>
+              </Fragment>
             ))}
             {data.length === 0 && (
               <TableRow>

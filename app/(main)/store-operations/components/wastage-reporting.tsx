@@ -1,11 +1,26 @@
 'use client'
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import { 
+  AlertTriangle,
+  ArrowUp,
+  Package,
+  TrendingUp,
+  Search,
+  Filter,
+  Plus,
+  Trash2,
+  Edit2,
+  Eye,
+  Download
+} from 'lucide-react'
+
+import { 
   LineChart,
   Line,
   XAxis,
@@ -17,13 +32,6 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { 
-  AlertTriangle,
-  Search,
-  Filter,
-  Plus,
-  Download
-} from 'lucide-react';
 
 const WastageReportingDashboard = () => {
   const monthlyWastage = [

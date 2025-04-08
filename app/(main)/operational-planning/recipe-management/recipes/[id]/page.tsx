@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { Ingredient, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Label } from "@/components/ui/label"
+import { RecipeImage } from "../components/recipe-image"
 import {
   ArrowLeft,
   Clock,
@@ -20,11 +25,6 @@ import {
   Plus,
   Info,
 } from "lucide-react"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Label } from "@/components/ui/label"
-import { RecipeImage } from "../components/recipe-image"
 
 interface RecipeViewPageProps {
   params: {

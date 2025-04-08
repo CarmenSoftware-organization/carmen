@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { User, UserContextType } from '../types/user';
 
 // Mock user data - replace with actual API call
@@ -15,7 +15,11 @@ const mockUser: User = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
+interface UserProviderProps {
+  children: ReactNode;
+}
+
+export function UserProvider({ children }: UserProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

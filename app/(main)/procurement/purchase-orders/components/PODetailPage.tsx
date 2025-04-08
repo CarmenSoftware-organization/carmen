@@ -1,12 +1,23 @@
-"use client";
-
+"use client"
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DetailPageTemplate from "@/components/templates/DetailPageTemplate";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import ItemsTab from "./tabs/ItemsTab";
+import FinancialDetailsTab from "./tabs/FinancialDetailsTab";
+import { GoodsReceiveNoteTab } from './tabs/GoodsReceiveNoteTab'
+import { RelatedDocumentsTab } from './tabs/RelatedDocumentsTab'
+import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
+import ActivityLogTab from "./tabs/ActivityLogTab";
+import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
+import StatusBadge from "@/components/ui/custom-status-badge";
+import SummaryTotal from "./SummaryTotal";
 import {
   ArrowLeft,
   Edit,
@@ -17,39 +28,25 @@ import {
   Mail,
   Printer,
 } from "lucide-react";
-import DetailPageTemplate from "@/components/templates/DetailPageTemplate";
 import {
   TooltipProvider,
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import ItemsTab from "./tabs/ItemsTab";
-import FinancialDetailsTab from "./tabs/FinancialDetailsTab";
-import GoodsReceiveNoteTab from "./tabs/GoodsReceiveNoteTab";
-import RelatedDocumentsTab from "./tabs/RelatedDocumentsTab";
-import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
-import ActivityLogTab from "./tabs/ActivityLogTab";
 import {
   PurchaseOrderItem,
   PurchaseOrderStatus,
   PurchaseOrder,
 } from "@/lib/types";
-import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
-import StatusBadge from "@/components/ui/custom-status-badge";
-import SummaryTotal from "./SummaryTotal";
-import { CreditNoteDetail } from "../../credit-note/components/credit-note-detail"
 
 interface PODetailPageProps {
-  params: { id: string }
-  backLink?: React.ReactElement | string
+  backLink?: React.ReactNode
   initialData?: PurchaseOrder
+  params?: { id: string }
 }
 
-export function PODetailPage({ params, backLink: propBackLink, initialData }: PODetailPageProps) {
+export function PODetailPage({ backLink: propBackLink, initialData, params }: PODetailPageProps) {
   const router = useRouter();
   const [poData, setPOData] = useState<PurchaseOrder | null>(initialData || null);
   const [isEditing, setIsEditing] = useState(false);
@@ -70,9 +67,9 @@ export function PODetailPage({ params, backLink: propBackLink, initialData }: PO
     }
 
     // Otherwise, fetch data based on ID
-    if (params.id !== "new") {
+    if (params?.id !== "new") {
       const foundPO = Mock_purchaseOrders.find(
-        (po) => po.poId === params.id
+        (po) => po.poId === params?.id
       );
       if (foundPO) {
         // Make sure to create a new object to ensure reactivity
@@ -82,7 +79,7 @@ export function PODetailPage({ params, backLink: propBackLink, initialData }: PO
         });
       }
     }
-  }, [params.id, initialData]);
+  }, [params?.id, initialData]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -99,17 +96,17 @@ export function PODetailPage({ params, backLink: propBackLink, initialData }: PO
 
   const handleDelete = () => {
     // Implement delete functionality
-    console.log("Delete PO:", params.id);
+    console.log("Delete PO:", params?.id);
   };
 
   const handlePrint = () => {
     // Implement print functionality
-    console.log("Print PO:", params.id);
+    console.log("Print PO:", params?.id);
   };
 
   const handleEmail = () => {
     // Implement email functionality
-    console.log("Email PO:", params.id);
+    console.log("Email PO:", params?.id);
   };
 
   const handleUpdateItem = (updatedItem: PurchaseOrderItem) => {

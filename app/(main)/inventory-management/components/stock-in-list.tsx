@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DateRange } from "react-day-picker"
+import { DatePickerWithRange } from "@/components/ui/date-picker-with-range"
+import { StockInDetail } from './stock-in-detail'
 import { 
   Pencil, 
   Eye, 
@@ -13,15 +15,11 @@ import {
   Plus, 
   Search, 
   Filter,
-  SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react'
-import { DateRange } from "react-day-picker"
-import { DatePickerWithRange } from "@/components/ui/date-picker-with-range"
-import { StockInDetail } from './stock-in-detail'
 
 // Add type definitions
 type TransactionStatus = 'Committed' | 'Saved' | 'Void'

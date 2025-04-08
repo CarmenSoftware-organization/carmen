@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { PRDetailTemplate } from "../components/templates/PRDetailTemplate"
 import { Button } from "@/components/ui/button"
 import { PurchaseRequest } from "@/lib/types"
+import { PRTemplate } from "@/lib/types/pr-template"; // Added import for PRTemplate
 import { samplePRData } from "../../purchase-requests/components/sampleData"
 import { mockTemplateItems } from "../types/template-items"
 import { ItemsTab } from "../components/ItemsTab"
@@ -79,21 +80,32 @@ export default function PRTemplateDetailPage({
       <Button variant="outline" onClick={() => console.log("Clone Template")}>
         Clone Template
       </Button>
-    </>
-  )
-
-  return (
-    <PRDetailTemplate
-      mode={mode}
-      title={`Template: ${formData.description}`}
-      formData={formData}
-      onModeChange={handleModeChange}
-      onSubmit={handleSubmit}
-      onInputChange={handleInputChange}
-      onFormDataChange={handleFormDataChange}
-      tabs={tabs}
-      actions={actions}
-      backUrl="/procurement/purchase-request-templates"
-    />
-  )
-} 
+     </>
+   )
+ 
+   // Adapt formData (PurchaseRequest) to fit PRTemplate structure
+   const templateForDetail: PRTemplate = {
+     id: formData.id,
+     name: formData.description || `Template ${params.id}`, // Use description or fallback for name
+     description: formData.description,
+     type: 'template', // Assuming 'template' type
+     items: [], // Placeholder, PRDetailTemplate doesn't render items directly
+     createdAt: formData.date || new Date(), // Use PR date or fallback
+     updatedAt: new Date(), // Placeholder
+     createdBy: formData.requestor?.id || 'system', // Use requestor ID or fallback
+     // Optional PRTemplate fields can be added here if needed
+   };
+ 
+   // Ensure mode is only 'view' or 'edit'
+   const validMode = (mode === 'edit' ? 'edit' : 'view');
+ 
+   return (
+     <PRDetailTemplate
+       mode={validMode} // Pass validated mode
+       template={templateForDetail} // Pass the adapted object
+       // Removed invalid props: title, formData, onModeChange, onSubmit, onInputChange, onFormDataChange, tabs, actions, backUrl
+       // onSave is optional and not needed for view mode primarily
+       // If mode is 'edit', onSave might be needed, but the component handles its own save button logic internally based on mode.
+     />
+   )
+ }

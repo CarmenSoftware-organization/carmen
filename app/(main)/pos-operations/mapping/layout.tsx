@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 
+
 export const metadata: Metadata = {
   title: "POS Mapping",
   description: "Map POS items to inventory items",

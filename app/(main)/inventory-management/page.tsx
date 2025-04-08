@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import type { DropResult } from 'react-beautiful-dnd';
 
+
 // Mock data for graphs
 const inventoryLevelsData = [
   { category: 'Food', current: 5000, reorder: 3000 },

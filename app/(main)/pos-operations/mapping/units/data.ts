@@ -1,5 +1,6 @@
 import { UnitMapping } from "./types"
 
+
 export const unitMappings: UnitMapping[] = [
   {
     id: "unit-001",
@@ -127,7 +128,7 @@ export const unitMappings: UnitMapping[] = [
     unitType: "both",
     baseUnit: "EA",
     conversionRate: 1,
-    status: "custom",
+    status: "pending",
     createdAt: new Date("2023-11-20T15:00:00"),
     updatedAt: new Date("2023-11-20T15:00:00"),
   },

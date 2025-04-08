@@ -1,16 +1,14 @@
-"use client"
+'use client'
 
-import { useState, useEffect, Suspense } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
 import { 
   ArrowLeft, 
-  Calendar, 
   Edit, 
   FileDown, 
   History, 
@@ -25,8 +23,9 @@ import {
   StockCardMovementHistory,
   StockCardLotInformation,
   StockCardValuation
-} from "./components/index"
-import { generateMockStockCardData, StockCardData } from "../index"
+} from "./components"
+import { StockCardData } from "../types"
+import { generateMockStockCardData } from "./mock-data"
 
 function StockCardContent() {
   const searchParams = useSearchParams()
@@ -210,76 +209,38 @@ function StockCardContent() {
         </Card>
       </div>
       
-      {/* Main Content */}
-      <Card>
-        <CardContent className="pt-6">
-          <Tabs defaultValue="general" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="general">General Information</TabsTrigger>
-              <TabsTrigger value="movement">Movement History</TabsTrigger>
-              <TabsTrigger value="lots">Lot Information</TabsTrigger>
-              <TabsTrigger value="valuation">Valuation</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="general">
-              <StockCardGeneralInfo data={stockCardData} />
-            </TabsContent>
-            
-            <TabsContent value="movement">
-              <StockCardMovementHistory data={stockCardData} />
-            </TabsContent>
-            
-            <TabsContent value="lots">
-              <StockCardLotInformation data={stockCardData} />
-            </TabsContent>
-            
-            <TabsContent value="valuation">
-              <StockCardValuation data={stockCardData} />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      {/* Tabs */}
+      <Tabs defaultValue="general" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="movement">Movement History</TabsTrigger>
+          <TabsTrigger value="lots">Lot Information</TabsTrigger>
+          <TabsTrigger value="valuation">Valuation</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="general">
+          <StockCardGeneralInfo data={stockCardData} />
+        </TabsContent>
+        
+        <TabsContent value="movement">
+          <StockCardMovementHistory data={stockCardData} />
+        </TabsContent>
+        
+        <TabsContent value="lots">
+          <StockCardLotInformation data={stockCardData} />
+        </TabsContent>
+        
+        <TabsContent value="valuation">
+          <StockCardValuation data={stockCardData} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
 
 export default function StockCardPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto py-6 space-y-6">
-      {/* Header skeleton */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="space-y-1">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-        <div className="flex gap-2">
-          <Skeleton className="h-10 w-24" />
-          <Skeleton className="h-10 w-24" />
-        </div>
-      </div>
-      
-      {/* Summary cards skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i}>
-            <CardContent className="pt-6">
-              <Skeleton className="h-4 w-24 mb-2" />
-              <Skeleton className="h-8 w-16" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      
-      {/* Tabs skeleton */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-[400px] w-full" />
-          </div>
-        </CardContent>
-      </Card>
-    </div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <StockCardContent />
     </Suspense>
   )

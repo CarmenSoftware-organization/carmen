@@ -1,7 +1,8 @@
 import { Metadata } from "next"
 import { StockCardDetail } from "../components/stock-card-detail"
 import { notFound } from "next/navigation"
-import { MovementType } from "@/app/(main)/inventory-management/stock-overview/types"
+import { MovementType, TransactionType } from "@/app/(main)/inventory-management/stock-overview/types"
+
 
 interface StockCardDetailPageProps {
   params: {
@@ -36,12 +37,23 @@ export default function StockCardDetailPage({ params }: StockCardDetailPageProps
     movements: [
       {
         id: "1",
-        date: new Date().toISOString(),
-        type: "STOCK_IN" as MovementType,
-        quantity: 100,
-        unit: "KG",
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toISOString().split('T')[1].substring(0, 8),
         reference: "GRN-001",
-        notes: "Initial stock"
+        referenceType: "Goods Receipt",
+        locationId: "1",
+        locationName: "Main Warehouse",
+        transactionType: "IN" as TransactionType,
+        reason: "Initial stock",
+        lotNumber: "LOT-001",
+        quantityBefore: 0,
+        quantityAfter: 100,
+        quantityChange: 100,
+        unitCost: 10,
+        valueBefore: 0,
+        valueAfter: 1000,
+        valueChange: 1000,
+        username: "admin"
       },
     ],
     currentStock: {

@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { StockCardList } from "./components/stock-card-list"
 import { QuickFilters } from "./components/quick-filters"
 
+
 export const metadata: Metadata = {
   title: "Stock Card | Inventory Overview",
   description: "View and manage stock cards for inventory items",

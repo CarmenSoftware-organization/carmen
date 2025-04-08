@@ -1,475 +1,579 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ChevronDown, ChevronRight, Menu, LayoutDashboard, Terminal, Settings } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
 interface MenuItem {
-  title: string;
-  path: string;
-  icon: string;
-  subItems: Array<SubMenuItem>;
+  id: string;
+  label: string;
+  icon?: keyof typeof LucideIcons;
+  href?: string;
+  items?: MenuItem[];
 }
-
-interface SubMenuItem {
-  name: string;
-  path: string;
-  icon?: string;
-  description?: string;
-  subItems?: Array<{
-    name: string;
-    path: string;
-    icon?: string;
-    description?: string;
-    subItems?: Array<{
-      name: string;
-      path: string;
-      icon?: string;
-      description?: string;
-    }>;
-  }>;
-}
-
-const menuItems: MenuItem[] = [
-  {
-    title: "Dashboard",
-    path: "/dashboard",
-    icon: "LayoutDashboard",
-    subItems: [],
-  },
-  {
-    title: "Procurement",
-    path: "/procurement",
-    icon: "ShoppingCart",
-    subItems: [
-      { name: "Dashboard", path: "/procurement/dashboard" },
-      { name: "My Approvals", path: "/procurement/my-approvals" },
-      { name: "Purchase Requests", path: "/procurement/purchase-requests" },
-      { name: "Purchase Orders", path: "/procurement/purchase-orders" },
-      { name: "Goods Received Note", path: "/procurement/goods-received-note" },
-      { name: "Credit Notes", path: "/procurement/credit-note" },
-      { name: "Purchase Request Templates", path: "/procurement/purchase-request-templates" },
-    ],
-  },
-  {
-    title: "Product Management",
-    path: "/product-management",
-    icon: "Package",
-    subItems: [
-      { name: "Dashboard", path: "/product-management/dashboard" },
-      { name: "Products", path: "/product-management/products" },
-      { name: "Categories", path: "/product-management/categories" },
-      { name: "Units", path: "/product-management/units" },
-      { name: "Reports", path: "/product-management/reports" },
-    ],
-  },
-  {
-    title: "Vendor Management",
-    path: "/vendor-management",
-    icon: "Users",
-    subItems: [
-      { name: "Dashboard", path: "/vendor-management/dashboard" },
-      { name: "Manage Vendors", path: "/vendor-management/manage-vendors" },
-      { name: "Price Lists", path: "/vendor-management/price-lists" },
-      { name: "Price Comparisons", path: "/vendor-management/price-comparisons" },
-    ],
-  },
-  {
-    title: "Store Operations",
-    path: "/store-operations",
-    icon: "Store",
-    subItems: [
-      { name: "Dashboard", path: "/store-operations/dashboard" },
-      { name: "Store Requisitions", path: "/store-operations/store-requisitions" },
-      { name: "Stock Replenishment", path: "/store-operations/stock-replenishment" },
-      { name: "Wastage Reporting", path: "/store-operations/wastage-reporting" },
-    ],
-  },
-  {
-    title: "POS Operations",
-    path: "/pos-operations",
-    icon: "Terminal",
-    subItems: [
-      { name: "Interface Posting", path: "/pos-operations/interface-posting" },
-      { name: "Consumptions", path: "/pos-operations/consumptions" },
-      { name: "Transactions", path: "/pos-operations/transactions" },
-      { 
-        name: "Mapping", 
-        path: "/pos-operations/mapping",
-        subItems: [
-          { name: "Recipe Mapping", path: "/pos-operations/mapping/recipes" },
-          { name: "Unit Mapping", path: "/pos-operations/mapping/units" },
-          { name: "Location Mapping", path: "/pos-operations/mapping/locations" }
-        ]
-      },
-      { name: "Reports", path: "/pos-operations/reports" },
-    ],
-  },
-  {
-    title: "Inventory Management",
-    path: "/inventory-management",
-    icon: "Package",
-    subItems: [
-      { name: "Dashboard", path: "/inventory-management/dashboard" },
-      { 
-        name: "Stock Overview", 
-        path: "/inventory-management/stock-overview",
-        subItems: [
-          { name: "Overview", path: "/inventory-management/stock-overview" },
-          { name: "Inventory Balance", path: "/inventory-management/stock-overview/inventory-balance" },
-          { name: "Stock Cards", path: "/inventory-management/stock-overview/stock-cards" },
-          { name: "Slow Moving", path: "/inventory-management/stock-overview/slow-moving" },
-          { name: "Inventory Aging", path: "/inventory-management/stock-overview/inventory-aging" }
-        ]
-      },
-      { name: "Inventory Adjustments", path: "/inventory-management/inventory-adjustments" },
-      { name: "Spot Check", path: "/inventory-management/spot-check" },
-      { name: "Physical Count", path: "/inventory-management/physical-count-management" },
-      { name: "Period End", path: "/inventory-management/period-end" },
-    ],
-  },
-  {
-    title: "Operational Planning",
-    path: "/operational-planning",
-    icon: "CalendarClock",
-    subItems: [
-      { name: "Dashboard", path: "/operational-planning/dashboard" },
-      { 
-        name: "Recipe Management", 
-        path: "/operational-planning/recipe-management",
-        subItems: [
-          { name: "Recipe Library", path: "/operational-planning/recipe-management/recipes" },
-          { name: "Categories", path: "/operational-planning/recipe-management/categories" },
-          { name: "Cuisine Types", path: "/operational-planning/recipe-management/cuisine-types" },
-        ]
-      },
-      { name: "Menu Engineering", path: "/operational-planning/menu-engineering" },
-      { name: "Demand Forecasting", path: "/operational-planning/demand-forecasting" },
-      { name: "Inventory Planning", path: "/operational-planning/inventory-planning" },
-    ],
-  },
-  {
-    title: "Production",
-    path: "/production",
-    icon: "Factory",
-    subItems: [
-      { name: "Dashboard", path: "/production/dashboard" },
-      { name: "Recipe Execution", path: "/production/recipe-execution" },
-      { name: "Batch Production", path: "/production/batch-production" },
-      { name: "Wastage Tracking", path: "/production/wastage-tracking" },
-      { name: "Quality Control", path: "/production/quality-control" },
-    ],
-  },
-  {
-    title: "Reporting & Analytics",
-    path: "/reporting-analytics",
-    icon: "BarChart2",
-    subItems: [
-      { name: "Dashboard", path: "/reporting-analytics/dashboard" },
-      { name: "Operational Reports", path: "/reporting-analytics/operational-reports" },
-      { name: "Financial Reports", path: "/reporting-analytics/financial-reports" },
-      { name: "Inventory Reports", path: "/reporting-analytics/inventory-reports" },
-      { name: "Vendor Performance", path: "/reporting-analytics/vendor-performance" },
-      { name: "Cost Analysis", path: "/reporting-analytics/cost-analysis" },
-      { name: "Sales Analysis", path: "/reporting-analytics/sales-analysis" },
-    ],
-  },
-  {
-    title: "Finance",
-    path: "/finance",
-    icon: "DollarSign",
-    subItems: [
-      { name: "Account Code Mapping", path: "/finance/account-code-mapping" },
-      { name: "Currency Management", path: "/finance/currency-management" },
-      { name: "Exchange Rates", path: "/finance/exchange-rates" },
-      { name: "Department and Cost Center", path: "/finance/department-list" },
-      { name: "Budget Planning and Control", path: "/finance/budget-planning-and-control" },
-    ],
-  },
-  {
-    title: "System Administration",
-    path: "/system-administration",
-    icon: "Settings",
-    subItems: [
-      { name: "User Management", path: "/system-administration/user-management" },
-      { name: "Location Management", path: "/system-administration/location-management" },
-      { name: "Workflow Management", path: "/system-administration/workflow/workflow-configuration" },
-      { name: "General Settings", path: "/system-administration/general-settings" },
-      { name: "Notification Preferences", path: "/system-administration/notification-preferences" },
-      { name: "License Management", path: "/system-administration/license-management" },
-      { name: "Security Settings", path: "/system-administration/security-settings" },
-      { name: "Data Backup and Recovery", path: "/system-administration/data-backup-and-recovery" },
-      { 
-        name: "System Integrations",
-        path: "/system-administration/system-integrations",
-        subItems: [
-          { 
-            name: "POS",
-            path: "/system-administration/system-integrations/pos",
-            subItems: [
-              { name: "Settings", path: "/system-administration/system-integrations/pos/settings" },
-            ]
-          }
-        ]
-      },
-    ],
-  },
-  {
-    title: "Help & Support",
-    path: "/help-support",
-    icon: "HelpCircle",
-    subItems: [
-      { name: "User Manuals", path: "/help-support/user-manuals" },
-      { name: "Video Tutorials", path: "/help-support/video-tutorials" },
-      { name: "FAQs", path: "/help-support/faqs" },
-      { name: "Support Ticket System", path: "/help-support/support-ticket-system" },
-      { name: "System Updates and Release Notes", path: "/help-support/system-updates-and-release-notes" },
-    ],
-  },
-];
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+interface SidebarMenuProps {
+  items: MenuItem[];
+  onClose?: () => void;
+}
+
+const menuItems: MenuItem[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: "LayoutDashboard",
+    href: "/dashboard",
+  },
+  {
+    id: "procurement",
+    label: "Procurement",
+    icon: "ShoppingCart",
+    items: [
+      {
+        id: "my-approvals",
+        label: "My Approvals",
+        href: "/procurement/my-approvals",
+      },
+      {
+        id: "purchase-requests",
+        label: "Purchase Requests",
+        href: "/procurement/purchase-requests",
+      },
+      {
+        id: "purchase-orders",
+        label: "Purchase Orders",
+        href: "/procurement/purchase-orders",
+      },
+      {
+        id: "goods-received-note",
+        label: "Goods Received Note",
+        href: "/procurement/goods-received-note",
+      },
+      {
+        id: "credit-note",
+        label: "Credit Note",
+        href: "/procurement/credit-note",
+      },
+      {
+        id: "vendor-comparison",
+        label: "Vendor Comparison",
+        href: "/procurement/vendor-comparison",
+      }
+    ],
+  },
+  {
+    id: "store-operations",
+    label: "Store Operations",
+    icon: "Store",
+    items: [
+      {
+        id: "store-requisitions-so",
+        label: "Store Requisitions",
+        href: "/store-operations/store-requisitions",
+        icon: "ClipboardList"
+      },
+      {
+        id: "stock-replenishment",
+        label: "Stock Replenishment",
+        href: "/store-operations/stock-replenishment",
+        icon: "RefreshCw"
+      },
+      {
+        id: "wastage-reporting",
+        label: "Wastage Reporting",
+        href: "/store-operations/wastage-reporting",
+        icon: "Trash2"
+      },
+    ],
+  },
+  {
+    id: "inventory",
+    label: "Inventory Management",
+    icon: "Package",
+    items: [
+      {
+        id: "stock-overview",
+        label: "Stock Overview",
+        items: [
+          {
+            id: "inventory-balance",
+            label: "Inventory Balance",
+            href: "/inventory-management/stock-overview/inventory-balance",
+          },
+          {
+            id: "inventory-aging",
+            label: "Inventory Aging",
+            href: "/inventory-management/stock-overview/inventory-aging",
+          },
+          {
+            id: "slow-moving",
+            label: "Slow Moving",
+            href: "/inventory-management/stock-overview/slow-moving",
+          },
+          {
+            id: "stock-cards",
+            label: "Stock Cards",
+            href: "/inventory-management/stock-overview/stock-cards",
+          },
+        ],
+      },
+      {
+        id: "stock-in",
+        label: "Stock In",
+        href: "/inventory-management/stock-in",
+      },
+      {
+        id: "physical-count",
+        label: "Physical Count",
+        href: "/inventory-management/physical-count",
+      },
+      {
+        id: "spot-check",
+        label: "Spot Check",
+        href: "/inventory-management/spot-check",
+      },
+      {
+        id: "inventory-adjustments",
+        label: "Inventory Adjustments",
+        href: "/inventory-management/inventory-adjustments",
+      },
+      {
+        id: "period-end",
+        label: "Period End",
+        href: "/inventory-management/period-end",
+      },
+    ],
+  },
+  {
+    id: "vendor-management",
+    label: "Vendor Management",
+    icon: "Users",
+    items: [
+      {
+        id: "manage-vendors",
+        label: "Manage Vendors",
+        href: "/vendor-management/manage-vendors",
+      },
+      {
+        id: "price-lists",
+        label: "Price Lists",
+        href: "/vendor-management/price-lists",
+      },
+    ],
+  },
+  {
+    id: "product-management",
+    label: "Product Management",
+    icon: "Package",
+    items: [
+      {
+        id: "products",
+        label: "Products",
+        href: "/product-management/products",
+      },
+      {
+        id: "categories",
+        label: "Categories",
+        href: "/product-management/categories",
+      },
+      {
+        id: "units",
+        label: "Units",
+        href: "/product-management/units",
+      },
+    ],
+  },
+  {
+    id: "operational-planning",
+    label: "Operational Planning",
+    icon: "CalendarClock",
+    items: [
+      {
+        id: "recipe-management",
+        label: "Recipe Management",
+        items: [
+          {
+            id: "recipes",
+            label: "Recipes",
+            href: "/operational-planning/recipe-management/recipes",
+          },
+          {
+            id: "categories",
+            label: "Categories",
+            href: "/operational-planning/recipe-management/categories",
+          },
+          {
+            id: "cuisine-types",
+            label: "Cuisine Types",
+            href: "/operational-planning/recipe-management/cuisine-types",
+          },
+          {
+            id: "recipe-units",
+            label: "Units",
+            href: "/product-management/units",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "production",
+    label: "Production",
+    icon: "Factory",
+    href: "/production",
+  },
+  {
+    id: "pos-operations",
+    label: "POS Operations",
+    icon: "ShoppingBag",
+    items: [
+      {
+        id: "pos-ops-dashboard",
+        label: "Dashboard",
+        href: "/pos-operations/dashboard",
+      },
+      {
+        id: "pos-ops-transactions",
+        label: "Transactions",
+        href: "/pos-operations/transactions",
+      },
+      {
+        id: "pos-ops-consumptions",
+        label: "Consumptions",
+        href: "/pos-operations/consumptions",
+      },
+      {
+        id: "pos-ops-interface-posting",
+        label: "Interface Posting",
+        href: "/pos-operations/interface-posting",
+      },
+      {
+        id: "pos-ops-reports",
+        label: "Reports",
+        href: "/pos-operations/reports",
+      },
+      {
+        id: "pos-ops-mapping",
+        label: "Mapping",
+        href: "/pos-operations/mapping",
+      },
+    ],
+  },
+  {
+    id: "finance",
+    label: "Finance",
+    icon: "DollarSign",
+    items: [
+      {
+        id: "department-list",
+        label: "Department List",
+        href: "/finance/department-list",
+      },
+      {
+        id: "currency-management",
+        label: "Currency Management",
+        href: "/finance/currency-management",
+      },
+      {
+        id: "exchange-rates",
+        label: "Exchange Rates",
+        href: "/finance/exchange-rates",
+      },
+      {
+        id: "account-code-mapping",
+        label: "Account Code Mapping",
+        href: "/finance/account-code-mapping",
+      },
+    ],
+  },
+  {
+    id: "reporting-analytics",
+    label: "Reporting & Analytics",
+    icon: "BarChart2",
+    href: "/reporting-analytics",
+  },
+  {
+    id: "system-administration",
+    label: "System Administration",
+    icon: "Settings",
+    items: [
+      {
+        id: "user-management",
+        label: "User Management",
+        href: "/system-administration/user-management",
+      },
+      {
+        id: "workflow",
+        label: "Workflow",
+        items: [
+          {
+            id: "workflow-configuration",
+            label: "Workflow Configuration",
+            href: "/system-administration/workflow/workflow-configuration",
+          },
+          {
+            id: "role-assignment",
+            label: "Role Assignment",
+            href: "/system-administration/workflow/role-assignment",
+          },
+        ],
+      },
+      {
+        id: "account-code-mapping",
+        label: "Account Code Mapping",
+        href: "/system-administration/account-code-mapping",
+      },
+    ],
+  },
+  {
+    id: "pos-integrations",
+    label: "POS Integrations",
+    icon: "TerminalSquare",
+    items: [
+      {
+        id: "pos-mapping",
+        label: "Mapping",
+        items: [
+          {
+            id: "pos-locations",
+            label: "Locations",
+            href: "/system-administration/system-integrations/pos/mapping/locations",
+          },
+          {
+            id: "pos-recipes",
+            label: "Recipes",
+            href: "/system-administration/system-integrations/pos/mapping/recipes",
+          },
+          {
+            id: "pos-units",
+            label: "Units",
+            href: "/system-administration/system-integrations/pos/mapping/units",
+          },
+        ],
+      },
+      {
+        id: "pos-operational",
+        label: "Operational",
+        items: [
+          {
+            id: "pos-sales-data",
+            label: "Sales Data",
+            href: "/system-administration/system-integrations/pos/operational/sales-data",
+          },
+          {
+            id: "pos-inventory-sync",
+            label: "Inventory Sync",
+            href: "/system-administration/system-integrations/pos/operational/inventory-sync",
+          },
+          {
+            id: "pos-reports",
+            label: "Reports",
+            href: "/system-administration/system-integrations/pos/operational/reports",
+          },
+        ],
+      },
+      {
+        id: "pos-settings",
+        label: "Settings",
+        items: [
+          {
+            id: "pos-config",
+            label: "Configuration",
+            href: "/system-administration/system-integrations/pos/settings/config",
+          },
+          {
+            id: "pos-system",
+            label: "System Setup",
+            href: "/system-administration/system-integrations/pos/settings/system",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "help-support",
+    label: "Help & Support",
+    icon: "HelpCircle",
+    href: "/help-support",
+  },
+];
+
+function SidebarMenu({ items, onClose }: SidebarMenuProps) {
+  const pathname = usePathname();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  // Auto-expand menu items based on current path
+  useEffect(() => {
+    const pathParts = pathname.split('/').filter(Boolean);
+    const newExpandedItems: string[] = [];
+    
+    // Find parent menu items that should be expanded based on the current path
+    const findParentItems = (menuItems: MenuItem[], currentPath: string[]) => {
+      for (const item of menuItems) {
+        // Check if item has nested items
+        if (item.items && item.items.length > 0) {
+          // Check if any of the nested items match the current path
+          const matchesPath = item.items.some(subItem => {
+            // Check if the current path includes this item
+            if (subItem.href && pathname.startsWith(subItem.href)) {
+              return true;
+            }
+            // Check nested items
+            if (subItem.items && subItem.items.length > 0) {
+              return findParentItems([subItem], currentPath);
+            }
+            return false;
+          });
+          
+          if (matchesPath) {
+            newExpandedItems.push(item.id);
+            // Also expand any nested items that match the path
+            findParentItems(item.items, currentPath);
+          }
+        }
+      }
+      
+      return newExpandedItems.length > 0;
+    };
+    
+    findParentItems(items, pathParts);
+    setExpandedItems(newExpandedItems);
+  }, [pathname, items]);
+
+  const toggleItem = (id: string) => {
+    setExpandedItems(prev => 
+      prev.includes(id) 
+        ? prev.filter(item => item !== id) 
+        : [...prev, id]
+    );
+  };
+
+  // Helper function to safely get icon component
+  const getIcon = (iconName: string | undefined): React.ReactNode => {
+    if (!iconName) return null;
+    // Cast to any to avoid type issues with the Lucide icons
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const IconComponent = (LucideIcons as any)[iconName];
+    return IconComponent ? <IconComponent size={16} className="mr-2 flex-shrink-0" /> : null;
+  };
+
+  const renderMenuItem = (item: MenuItem, depth = 0) => {
+    const isActive = pathname === item.href;
+    const hasSubItems = item.items && item.items.length > 0;
+    const isExpanded = expandedItems.includes(item.id);
+    
+    return (
+      <div key={item.id} className="w-full">
+        {item.href ? (
+          <Link
+            href={item.href}
+            className={cn(
+              "flex items-center w-full px-3 py-2 text-sm",
+              "hover:bg-accent/50",
+              depth > 0 && "pl-6",
+              depth > 1 && "pl-9",
+              isActive && "bg-accent/50 font-medium"
+            )}
+            onClick={(e) => {
+              if (hasSubItems) {
+                e.preventDefault();
+                toggleItem(item.id);
+              } else {
+                onClose && onClose();
+              }
+            }}
+          >
+            {getIcon(item.icon)}
+            <span>{item.label}</span>
+          </Link>
+        ) : (
+          <button
+            className={cn(
+              "flex items-center justify-between w-full px-3 py-2 text-sm",
+              "hover:bg-accent/50 text-left",
+              depth > 0 && "pl-6",
+              depth > 1 && "pl-9"
+            )}
+            onClick={() => toggleItem(item.id)}
+          >
+            <span className="flex items-center">
+              {getIcon(item.icon)}
+              <span>{item.label}</span>
+            </span>
+            {hasSubItems && (
+              isExpanded ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )
+            )}
+          </button>
+        )}
+        
+        {hasSubItems && isExpanded && (
+          <div className="mt-1">
+            {item.items!.map(subItem => renderMenuItem(subItem, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="py-2">
+      {items.map(item => renderMenuItem(item))}
+    </div>
+  );
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   return (
     <>
-      {/* Mobile Sidebar */}
-      <Sheet open={isOpen} onOpenChange={onClose}>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            className="lg:hidden"
-            size="icon"
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-[280px] top-[64px] border-r dark:border-gray-800">
-          <SidebarContent menuItems={menuItems} />
-        </SheetContent>
-      </Sheet>
+      {/* Mobile sidebar */}
+      <div 
+        className={cn(
+          "fixed inset-y-0 left-0 z-50",
+          "w-[280px] bg-background",
+          "border-r border-border",
+          "transform transition-transform duration-300 ease-in-out",
+          "top-[64px]",
+          "overflow-y-auto",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:hidden"
+        )}
+      >
+        <SidebarMenu items={menuItems} onClose={onClose} />
+      </div>
 
-      {/* Desktop Sidebar */}
-      <aside className={cn(
-        "fixed h-[calc(100vh-64px)] w-[280px]",
-        "bg-background dark:bg-gray-950",
-        "border-r border-border dark:border-gray-800",
-        "shadow-sm dark:shadow-gray-900/50",
-        "transition-all duration-300 ease-in-out",
-        "top-[64px] left-0",
-        "hidden lg:block"
-      )}>
-        <SidebarContent menuItems={menuItems} />
-      </aside>
+      {/* Desktop sidebar */}
+      <div 
+        className={cn(
+          "fixed inset-y-0 left-0",
+          "w-[280px] bg-background",
+          "border-r border-border",
+          "top-[64px]",
+          "overflow-y-auto",
+          "hidden lg:block"
+        )}
+      >
+        <SidebarMenu items={menuItems} onClose={onClose} />
+      </div>
 
-      {/* Mobile Overlay */}
+      {/* Backdrop for mobile */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 lg:hidden z-40"
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
     </>
   );
 }
-
-interface SidebarContentProps {
-  menuItems: MenuItem[];
-}
-
-function SidebarContent({ menuItems }: SidebarContentProps) {
-  const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [expandedSubItems, setExpandedSubItems] = useState<string[]>([]);
-
-  const isExpanded = (title: string) => expandedItems.includes(title);
-  const isSubExpanded = (name: string) => expandedSubItems.includes(name);
-
-  const toggleExpand = (title: string) => {
-    setExpandedItems((prev: string[]) =>
-      prev.includes(title)
-        ? prev.filter((item) => item !== title)
-        : [...prev, title]
-    );
-  };
-
-  const toggleSubExpand = (name: string) => {
-    setExpandedSubItems((prev: string[]) =>
-      prev.includes(name)
-        ? prev.filter((item) => item !== name)
-        : [...prev, name]
-    );
-  };
-
-  const handleSubItemClick = (subItem: SubMenuItem, event: React.MouseEvent) => {
-    if (subItem.subItems?.length) {
-      event.preventDefault();
-      toggleSubExpand(subItem.name);
-    }
-  };
-
-  // Helper function to safely get icon component
-  const getIcon = (iconName: string): React.ElementType => {
-    return (LucideIcons as unknown as Record<string, React.ElementType>)[iconName] || LucideIcons.Circle;
-  };
-
-  return (
-    <ScrollArea className="h-full">
-      <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
-          <div className="space-y-1">
-            {menuItems.map((item, index) => {
-              const IconComponent = getIcon(item.icon);
-              const isActive = pathname === item.path;
-              const isItemExpanded = isExpanded(item.title);
-              const isDashboard = item.title === "Dashboard";
-
-              return (
-                <div key={index} className="space-y-1">
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    className={cn(
-                      "w-full h-9",
-                      "text-foreground dark:text-gray-100",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      "dark:hover:bg-gray-800 dark:hover:text-gray-100",
-                      isActive && "bg-accent/50 dark:bg-gray-800"
-                    )}
-                    asChild={!isDashboard}
-                  >
-                    {isDashboard ? (
-                      <div className="flex items-center justify-between w-full">
-                        <Link href={item.path} className="flex items-center">
-                          <IconComponent className="h-4 w-4" />
-                          <span className="ml-2">{item.title}</span>
-                        </Link>
-                      </div>
-                    ) : (
-                      item.subItems?.length > 0 ? (
-                        <div 
-                          className="flex items-center justify-between w-full"
-                          onClick={() => toggleExpand(item.title)}
-                        >
-                          <span className="flex items-center">
-                            <IconComponent className="h-4 w-4" />
-                            <span className="ml-2">{item.title}</span>
-                          </span>
-                          {isItemExpanded ? (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                          )}
-                        </div>
-                      ) : (
-                        <Link href={item.path} className="flex items-center">
-                          <IconComponent className="h-4 w-4" />
-                          <span className="ml-2">{item.title}</span>
-                        </Link>
-                      )
-                    )}
-                  </Button>
-
-                  {isItemExpanded && item.subItems?.length > 0 && (
-                    <div className="pl-6 space-y-1">
-                      {item.subItems.map((subItem, subIndex) => {
-                        const SubIconComponent = subItem.icon ? getIcon(subItem.icon) : undefined;
-                        const isSubActive = pathname === subItem.path;
-                        const isSubItemExpanded = isSubExpanded(subItem.name);
-
-                        return (
-                          <div key={subIndex} className="space-y-1">
-                            <Button
-                              variant={isSubActive ? "secondary" : "ghost"}
-                              className={cn(
-                                "w-full justify-between",
-                                "text-foreground dark:text-gray-100",
-                                "hover:bg-accent hover:text-accent-foreground",
-                                "dark:hover:bg-gray-800 dark:hover:text-gray-100",
-                                isSubActive && "bg-accent/50 dark:bg-gray-800"
-                              )}
-                              onClick={(e) => handleSubItemClick(subItem, e)}
-                              asChild={!subItem.subItems}
-                            >
-                              {subItem.subItems ? (
-                                <div className="flex items-center justify-between w-full">
-                                  <span className="flex items-center">
-                                    {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
-                                    <div>
-                                      <span>{subItem.name}</span>
-                                      {subItem.description && (
-                                        <p className="text-xs text-muted-foreground dark:text-gray-400">{subItem.description}</p>
-                                      )}
-                                    </div>
-                                  </span>
-                                  {isSubItemExpanded ? (
-                                    <ChevronDown className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
-                                  )}
-                                </div>
-                              ) : (
-                                <Link href={subItem.path} className="flex items-center w-full">
-                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
-                                  <div>
-                                    <span>{subItem.name}</span>
-                                    {subItem.description && (
-                                      <p className="text-xs text-muted-foreground dark:text-gray-400">{subItem.description}</p>
-                                    )}
-                                  </div>
-                                </Link>
-                              )}
-                            </Button>
-
-                            {subItem.subItems && isSubItemExpanded && (
-                              <div className="pl-6 space-y-1">
-                                {subItem.subItems.map((subSubItem, subSubIndex) => {
-                                  const SubSubIconComponent = subSubItem.icon ? getIcon(subSubItem.icon) : undefined;
-                                  const isSubSubActive = pathname === subSubItem.path;
-
-                                  return (
-                                    <Button
-                                      key={subSubIndex}
-                                      variant={isSubSubActive ? "secondary" : "ghost"}
-                                      className={cn(
-                                        "w-full justify-start",
-                                        "text-foreground dark:text-gray-100",
-                                        "hover:bg-accent hover:text-accent-foreground",
-                                        "dark:hover:bg-gray-800 dark:hover:text-gray-100",
-                                        isSubSubActive && "bg-accent/50 dark:bg-gray-800"
-                                      )}
-                                      asChild
-                                    >
-                                      <Link href={subSubItem.path} className="flex items-center">
-                                        {SubSubIconComponent && <SubSubIconComponent className="h-4 w-4 mr-2" />}
-                                        <span>{subSubItem.name}</span>
-                                      </Link>
-                                    </Button>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </ScrollArea>
-  );
-}
-
-export default Sidebar;

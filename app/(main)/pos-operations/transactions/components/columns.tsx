@@ -1,13 +1,15 @@
+"use client"
+
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal } from "lucide-react"
 
 interface Transaction {
   id: string
@@ -33,7 +35,7 @@ export const columns: ColumnDef<Transaction>[] = [
         <Badge
           variant={
             type === "sale"
-              ? "success"
+              ? "default"
               : type === "refund"
               ? "destructive"
               : "secondary"
@@ -73,7 +75,7 @@ export const columns: ColumnDef<Transaction>[] = [
         <Badge
           variant={
             status === "completed"
-              ? "success"
+              ? "default"
               : status === "pending"
               ? "secondary"
               : "destructive"
@@ -87,7 +89,6 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const transaction = row.original
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

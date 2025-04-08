@@ -1,8 +1,9 @@
-
-// File: tabs/BudgetsTab.tsx
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { BudgetData } from '@/lib/types'
+
+
+// File: tabs/BudgetsTab.tsx
 
 const budgetData: BudgetData[] = [
     {

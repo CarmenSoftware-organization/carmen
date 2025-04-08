@@ -1,10 +1,20 @@
-"use client";
+'use client'
 
 import React, { useState, useMemo } from "react";
 import { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import ListPageTemplate from "@/components/templates/ListPageTemplate";
+import StatusBadge from "@/components/ui/custom-status-badge";
+import { AdvancedFilter } from './advanced-filter'
+import { CreatePOModal } from "./create-po-modal";
+import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { FilterType } from "@/lib/utils/filter-storage";
+import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import {
   Table,
   TableBody,
@@ -34,38 +44,100 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import ListPageTemplate from "@/components/templates/ListPageTemplate";
-import StatusBadge from "@/components/ui/custom-status-badge";
-import { AdvancedFilter } from './advanced-filter'
-import { Filter as FilterType } from '@/lib/utils/filter-storage'
-import { CreatePOModal } from "./create-po-modal";
-import Link from "next/link";
-import { mockPurchaseOrders } from '../data/mock-data';
+
+type SortableFields = keyof Pick<PurchaseOrder, 
+  'number' | 
+  'vendorName' | 
+  'orderDate' | 
+  'totalAmount'
+>;
+
+const purchaseOrders: PurchaseOrder[] = [
+  {
+    poId: "1",
+    number: "PO-001",
+    vendorId: 1,
+    vendorName: "Vendor A",
+    orderDate: new Date("2024-03-20"),
+    DeliveryDate: new Date("2024-03-25"),
+    status: PurchaseOrderStatus.Draft,
+    currencyCode: "USD",
+    exchangeRate: 1,
+    notes: "Sample order A",
+    createdBy: 1,
+    email: "vendor.a@example.com",
+    buyer: "John Doe",
+    creditTerms: "Net 30",
+    description: "Sample order A",
+    remarks: "",
+    items: [],
+    baseCurrencyCode: "USD",
+    baseSubTotalPrice: 1500.00,
+    subTotalPrice: 1500.00,
+    baseNetAmount: 1500.00,
+    netAmount: 1500.00,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 0,
+    taxAmount: 0,
+    baseTotalAmount: 1500.00,
+    totalAmount: 1500.00
+  },
+  {
+    poId: "2",
+    number: "PO-002",
+    vendorId: 2,
+    vendorName: "Vendor B",
+    orderDate: new Date("2024-03-19"),
+    DeliveryDate: new Date("2024-03-24"),
+    status: PurchaseOrderStatus.Sent,
+    currencyCode: "USD",
+    exchangeRate: 1,
+    notes: "Sample order B",
+    createdBy: 1,
+    email: "vendor.b@example.com",
+    buyer: "Jane Smith",
+    creditTerms: "Net 30",
+    description: "Sample order B",
+    remarks: "",
+    items: [],
+    baseCurrencyCode: "USD",
+    baseSubTotalPrice: 2300.00,
+    subTotalPrice: 2300.00,
+    baseNetAmount: 2300.00,
+    netAmount: 2300.00,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 0,
+    taxAmount: 0,
+    baseTotalAmount: 2300.00,
+    totalAmount: 2300.00
+  }
+];
+
+interface AdvancedFilterProps {
+  onApplyFilters: (filters: FilterType<PurchaseOrder>[]) => void;
+  onClearFilters: () => void;
+}
 
 export function PurchaseOrderList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedPOs, setSelectedPOs] = useState<string[]>([]);
-  const [sortField, setSortField] = useState<keyof PurchaseOrder | null>(null);
+  const [sortField, setSortField] = useState<SortableFields | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const itemsPerPage = 10;
   
-  const handleSelectPO = (id: string, checked: boolean) => {
+  const handleSelectPO = (poId: string, checked: boolean) => {
     if (checked) {
-      setSelectedPOs([...selectedPOs, id]);
+      setSelectedPOs([...selectedPOs, poId]);
     } else {
-      setSelectedPOs(selectedPOs.filter((poId) => poId !== id));
+      setSelectedPOs(selectedPOs.filter((id) => id !== poId));
     }
   };
 
-  const handleSort = (field: keyof PurchaseOrder) => {
+  const handleSort = (field: SortableFields) => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -75,11 +147,7 @@ export function PurchaseOrderList() {
   };
 
   const handleApplyAdvancedFilters = (filters: FilterType<PurchaseOrder>[]) => {
-    // This function now directly affects the sortedAndFilteredData through its dependencies
-    // No need to set filteredPOs state
     if (filters && filters.length > 0) {
-      // We'll update the search term and status to match the filters
-      // This will trigger the useMemo to recalculate
       const statusFilter = filters.find(f => f.field === 'status');
       if (statusFilter) {
         setSelectedStatus(statusFilter.value as string);
@@ -98,7 +166,7 @@ export function PurchaseOrderList() {
     setCurrentPage(1);
   };
 
-  const handleClearAdvancedFilters = () => {
+  const handleClearFilters = () => {
     setSearchTerm("");
     setSelectedStatus("All Statuses");
     setCurrentPage(1);
@@ -122,7 +190,7 @@ export function PurchaseOrderList() {
 
   // Apply filters and sorting
   const sortedAndFilteredData = useMemo(() => {
-    let result = mockPurchaseOrders;
+    let result = purchaseOrders;
 
     // Apply search filter
     if (searchTerm) {
@@ -180,50 +248,6 @@ export function PurchaseOrderList() {
     </div>
   ) : null;
 
-  const filters = (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search POs..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-          </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                {selectedStatus}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => handleStatusChange("All Statuses")}>
-                All Statuses
-              </DropdownMenuItem>
-              {Object.values(PurchaseOrderStatus).map((status) => (
-                <DropdownMenuItem key={status} onSelect={() => handleStatusChange(status)}>
-                  {status}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        
-        <div className="flex gap-2">
-          <AdvancedFilter 
-            onApplyFilters={handleApplyAdvancedFilters}
-            onClearFilters={handleClearAdvancedFilters}
-          />
-        </div>
-      </div>
-    </div>
-  );
-
   const actionButtons = (
     <div className="flex flex-col sm:flex-row gap-2">
       <CreatePOModal />
@@ -247,89 +271,171 @@ export function PurchaseOrderList() {
           Manage your purchase orders to vendors. Track order status, delivery dates, and payment terms for all your procurement activities.
         </p>
       </div>
+      
+      {/* Status Summary Panel */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {Object.values(PurchaseOrderStatus).map(status => {
+          const count = sortedAndFilteredData.filter(po => po.status === status).length;
+          const total = sortedAndFilteredData
+            .filter(po => po.status === status)
+            .reduce((sum, po) => sum + po.totalAmount, 0);
+            
+          return (
+            <div 
+              key={status}
+              className="bg-white p-4 rounded-lg border cursor-pointer hover:border-primary"
+              onClick={() => setSelectedStatus(status)}
+            >
+              <StatusBadge status={status} className="mb-2" />
+              <div className="mt-2 font-semibold">{count} Orders</div>
+              <div className="text-sm text-muted-foreground">${total.toLocaleString()}</div>
+            </div>
+          );
+        })}
+      </div>
 
       <div className="rounded-lg border bg-white overflow-hidden">
+        <div className="p-4 flex flex-col md:flex-row justify-between gap-4">
+          <div className="relative flex items-center max-w-md w-full">
+            <Search className="absolute left-3 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search by PO number, vendor, or description..."
+              className="pl-9 w-full"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex">
+                  {selectedStatus}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleStatusChange("All Statuses")}>
+                  All Statuses
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {Object.values(PurchaseOrderStatus).map((status) => (
+                  <DropdownMenuItem key={status} onClick={() => handleStatusChange(status)}>
+                    <StatusBadge status={status} className="mr-2" />
+                    {status}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <AdvancedFilter
+              onApplyFilters={handleApplyAdvancedFilters}
+              onClearFilters={handleClearFilters}
+            />
+          </div>
+        </div>
+
+        {bulkActions && (
+          <div className="px-4 py-2 bg-muted flex items-center justify-between">
+            <div className="text-sm font-medium">
+              {selectedPOs.length} Purchase Orders selected
+            </div>
+            {bulkActions}
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/75">
-                <TableHead className="w-12 py-3 font-bold text-gray-600">
+              <TableRow>
+                <TableCell className="w-[40px] pl-4">
                   <Checkbox
-                    checked={selectedPOs.length === paginatedPOs.length && paginatedPOs.length > 0}
+                    checked={
+                      paginatedPOs.length > 0 &&
+                      selectedPOs.length === paginatedPOs.length
+                    }
                     onCheckedChange={handleSelectAllPOs}
                   />
-                </TableHead>
-                <TableHead className="py-3 font-bold text-gray-600">
-                  <div className="flex items-center gap-2">
+                </TableCell>
+                <TableCell
+                  className="cursor-pointer"
+                  onClick={() => handleSort("number")}
+                >
+                  <div className="flex items-center">
                     PO Number
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="p-0 h-auto"
-                      onClick={() => handleSort('number')}
-                    >
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
+                    {sortField === "number" && (
+                      <ArrowUpDown
+                        className={cn(
+                          "ml-2 h-4 w-4",
+                          sortOrder === "desc" ? "transform rotate-180" : ""
+                        )}
+                      />
+                    )}
                   </div>
-                </TableHead>
-                <TableHead className="py-3 font-bold text-gray-600">
-                  <div className="flex items-center gap-2">
+                </TableCell>
+                <TableCell
+                  className="cursor-pointer hidden md:table-cell"
+                  onClick={() => handleSort("vendorName")}
+                >
+                  <div className="flex items-center">
                     Vendor
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="p-0 h-auto"
-                      onClick={() => handleSort('vendorName')}
-                    >
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
+                    {sortField === "vendorName" && (
+                      <ArrowUpDown
+                        className={cn(
+                          "ml-2 h-4 w-4",
+                          sortOrder === "desc" ? "transform rotate-180" : ""
+                        )}
+                      />
+                    )}
                   </div>
-                </TableHead>
-                <TableHead className="py-3 font-bold text-gray-600 hidden md:table-cell">
-                  <div className="flex items-center gap-2">
+                </TableCell>
+                <TableCell
+                  className="cursor-pointer"
+                  onClick={() => handleSort("orderDate")}
+                >
+                  <div className="flex items-center">
                     Date
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="p-0 h-auto"
-                      onClick={() => handleSort('orderDate')}
-                    >
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
+                    {sortField === "orderDate" && (
+                      <ArrowUpDown
+                        className={cn(
+                          "ml-2 h-4 w-4",
+                          sortOrder === "desc" ? "transform rotate-180" : ""
+                        )}
+                      />
+                    )}
                   </div>
-                </TableHead>
-                <TableHead className="py-3 font-bold text-gray-600 hidden lg:table-cell">Delivery Date</TableHead>
-                <TableHead className="py-3 font-bold text-gray-600 hidden md:table-cell">Description</TableHead>
-                <TableHead className="py-3 font-bold text-gray-600 hidden lg:table-cell">Buyer</TableHead>
-                <TableHead className="py-3 font-bold text-gray-600 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    Amount
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="p-0 h-auto"
-                      onClick={() => handleSort('totalAmount')}
-                    >
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">Delivery Date</TableCell>
+                <TableCell className="hidden lg:table-cell">Currency</TableCell>
+                <TableCell className="hidden md:table-cell">Net Amount</TableCell>
+                <TableCell className="hidden md:table-cell">Tax Amount</TableCell>
+                <TableCell
+                  className="cursor-pointer text-right"
+                  onClick={() => handleSort("totalAmount")}
+                >
+                  <div className="flex items-center justify-end">
+                    Total
+                    {sortField === "totalAmount" && (
+                      <ArrowUpDown
+                        className={cn(
+                          "ml-2 h-4 w-4",
+                          sortOrder === "desc" ? "transform rotate-180" : ""
+                        )}
+                      />
+                    )}
                   </div>
-                </TableHead>
-                <TableHead className="py-3 font-bold text-gray-600">Status</TableHead>
-                <TableHead className="py-3 font-bold text-gray-600 w-[100px]">Actions</TableHead>
+                </TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell className="hidden md:table-cell">Receiving</TableCell>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedPOs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="h-24 text-center">
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <p className="text-gray-500 mb-2">No purchase orders found</p>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        const createButton = document.querySelector('.create-po-button') as HTMLElement;
-                        if (createButton) createButton.click();
-                      }}>
-                        Create your first purchase order
-                      </Button>
+                  <TableCell colSpan={9} className="h-24 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <FileText className="h-8 w-8 mb-2" />
+                      <p>No purchase orders found</p>
+                      <p className="text-sm">Try adjusting your search or filters</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -349,49 +455,50 @@ export function PurchaseOrderList() {
                       />
                     </TableCell>
                     <TableCell className="py-4 font-medium">{po.number}</TableCell>
-                    <TableCell className="py-4">{po.vendorName}</TableCell>
-                    <TableCell className="py-4 hidden md:table-cell">{po.orderDate.toLocaleDateString()}</TableCell>
-                    <TableCell className="py-4 hidden lg:table-cell">{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</TableCell>
-                    <TableCell className="py-4 hidden md:table-cell">{po.description}</TableCell>
-                    <TableCell className="py-4 hidden lg:table-cell">{po.buyer}</TableCell>
+                    <TableCell className="py-4 hidden md:table-cell">{po.vendorName}</TableCell>
+                    <TableCell className="py-4">{po.orderDate.toLocaleDateString()}</TableCell>
+                    <TableCell className="py-4 hidden lg:table-cell">
+                      {po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}
+                    </TableCell>
+                    <TableCell className="py-4 hidden lg:table-cell">{po.currencyCode}</TableCell>
+                    <TableCell className="py-4 hidden md:table-cell text-right">${po.netAmount.toFixed(2)}</TableCell>
+                    <TableCell className="py-4 hidden md:table-cell text-right">${po.taxAmount.toFixed(2)}</TableCell>
                     <TableCell className="py-4 text-right">${po.totalAmount.toFixed(2)}</TableCell>
                     <TableCell className="py-4">
                       <StatusBadge status={po.status} />
                     </TableCell>
-                    <TableCell className="py-4" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex justify-end items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          asChild
-                        >
-                          <Link href={`/procurement/purchase-orders/${po.poId}`}>
-                            <FileText className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          asChild
-                        >
-                          <Link href={`/procurement/purchase-orders/${po.poId}/edit`}>
-                            <Edit className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => {
-                            // Handle delete action
-                            console.log('Delete PO:', po.poId);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </div>
+                    <TableCell className="py-4 hidden md:table-cell">
+                      {/* Show receiving status as a fraction */}
+                      {po.items.length > 0 ? (
+                        <div className="flex items-center">
+                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2 max-w-24">
+                            <div
+                              className={cn(
+                                "h-full rounded-full",
+                                po.status === PurchaseOrderStatus.FullyReceived 
+                                  ? "bg-green-500" 
+                                  : po.status === PurchaseOrderStatus.Partial
+                                    ? "bg-orange-500"
+                                    : "bg-primary"
+                              )}
+                              style={{
+                                width: `${
+                                  po.items.length === 0
+                                    ? 0
+                                    : (po.items.reduce((total, item) => total + (item.receivedQuantity || 0), 0) /
+                                      po.items.reduce((total, item) => total + item.orderedQuantity, 0)) * 100
+                                }%`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs">
+                            {po.items.reduce((total, item) => total + (item.receivedQuantity || 0), 0)}/
+                            {po.items.reduce((total, item) => total + item.orderedQuantity, 0)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">No items</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -399,64 +506,99 @@ export function PurchaseOrderList() {
             </TableBody>
           </Table>
         </div>
-      </div>
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, sortedAndFilteredData.length)}{" "}
-          of {sortedAndFilteredData.length} results
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-          >
-            <ChevronsLeft className="h-4 w-4" />
-            <span className="sr-only">First page</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Previous page</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            <span className="sr-only">Next page</span>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            <span className="sr-only">Last page</span>
-            <ChevronsRight className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-4 py-2 flex items-center justify-between border-t">
+            <div className="text-sm text-muted-foreground">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+              {Math.min(currentPage * itemsPerPage, sortedAndFilteredData.length)} of{" "}
+              {sortedAndFilteredData.length} entries
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              {/* Page Numbers */}
+              <div className="flex items-center text-sm space-x-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum = currentPage;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={i}
+                      variant={pageNum === currentPage ? "default" : "outline"}
+                      className={cn(
+                        "h-8 w-8",
+                        pageNum === currentPage
+                          ? "bg-primary text-primary-foreground"
+                          : ""
+                      )}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 
   return (
-    <ListPageTemplate
-      title="Purchase Orders"
-      actionButtons={actionButtons}
-      filters={filters}
-      content={content}
-      bulkActions={bulkActions}
-    />
+    <>
+      <ListPageTemplate
+        title="Purchase Orders"
+        description="Manage all purchase orders"
+        actionButtons={actionButtons}
+        content={content}
+      />
+    </>
   );
 }
 

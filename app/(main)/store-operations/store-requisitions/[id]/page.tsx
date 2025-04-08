@@ -1,4 +1,5 @@
-import { Card } from '@/components/ui/card'
+'use client'
+
 import { StoreRequisitionDetailComponent } from '../components/store-requisition-detail'
 
 interface StoreRequisitionDetailPageProps {

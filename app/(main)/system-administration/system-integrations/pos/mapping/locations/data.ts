@@ -1,5 +1,6 @@
 import { LocationMapping } from "./types"
 
+
 export const locationMappings: LocationMapping[] = [
   {
     id: "loc-001",

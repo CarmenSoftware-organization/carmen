@@ -33,7 +33,7 @@ export function AdvancedFilter({ fields, onApply }: AdvancedFilterProps) {
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuLabel>Filter By</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {fields.map((field) => (
+        {fields.map((field: FilterField) => (
           <DropdownMenuItem 
             key={field.value}
             onClick={() => onApply({ [field.value]: true })}

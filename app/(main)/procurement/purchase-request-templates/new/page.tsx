@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { PRDetailTemplate } from "../components/templates/PRDetailTemplate"
 import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from "@/lib/types"
 import { mockTemplateItems } from "../types/template-items"
@@ -97,14 +96,19 @@ export default function PRTemplateNewPage() {
   return (
     <PRDetailTemplate
       mode="edit"
-      title="Create New Template"
-      formData={formData}
-      onModeChange={handleModeChange}
-      onSubmit={handleSubmit}
-      onInputChange={handleInputChange}
-      onFormDataChange={handleFormDataChange}
-      tabs={tabs}
-      backUrl="/procurement/purchase-request-templates"
+      template={{
+        id: formData.id,
+        name: formData.description || "New Template",
+        description: formData.description || "",
+        type: 'template',
+        category: formData.department || "",
+        department: formData.department,
+        createdBy: formData.requestor?.name || "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        items: []
+      }}
+      onSave={() => handleSubmit(new Event('submit') as unknown as React.FormEvent)}
     />
   )
 } 

@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -174,11 +175,11 @@ export default function PricelistList(): JSX.Element {
                 <TableHead className="w-12 py-3">
                   <Checkbox className="ml-3" />
                 </TableHead>
-                <TableHead className="py-3 font-medium font-bold text-gray-600">Name</TableHead>
-                <TableHead className="py-3 font-medium font-bold text-gray-600">Start Date</TableHead>
-                <TableHead className="py-3 font-medium font-bold text-gray-600">End Date</TableHead>
-                <TableHead className="py-3 font-medium font-bold text-gray-600">Status</TableHead>
-                <TableHead className="py-3 text-right font-medium font-bold text-gray-600">Actions</TableHead>
+                <TableHead className="py-3  font-bold text-gray-600">Name</TableHead>
+                <TableHead className="py-3  font-bold text-gray-600">Start Date</TableHead>
+                <TableHead className="py-3  font-bold text-gray-600">End Date</TableHead>
+                <TableHead className="py-3  font-bold text-gray-600">Status</TableHead>
+                <TableHead className="py-3 text-right font-bold text-gray-600">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

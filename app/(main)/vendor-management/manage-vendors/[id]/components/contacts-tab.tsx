@@ -2,7 +2,9 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Contact } from '@/lib/types'
+import { Contact } from '../types'
+
+
 
 interface ContactsTabProps {
   contacts: Contact[]

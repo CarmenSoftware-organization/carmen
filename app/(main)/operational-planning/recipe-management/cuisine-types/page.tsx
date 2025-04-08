@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { CuisineList } from "./components/cuisine-list"
 import { Skeleton } from "@/components/ui/skeleton"
 
+
 function CuisineListSkeleton() {
   return (
     <div className="space-y-6">

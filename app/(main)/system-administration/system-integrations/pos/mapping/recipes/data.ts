@@ -1,5 +1,6 @@
 import { RecipeMapping } from "./types"
 
+
 export const recipeMappings: RecipeMapping[] = [
   {
     id: "recipe-001",

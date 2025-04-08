@@ -6,45 +6,40 @@ import { useState } from 'react'
 interface RecipeImageProps {
   src: string
   alt: string
-  aspectRatio?: 'video' | '4:3'
+  aspectRatio?: 'square' | 'video' | 'wide' | '4:3'
   priority?: boolean
-  className?: string
 }
 
-export function RecipeImage({ src, alt, aspectRatio = 'video', priority = false, className }: RecipeImageProps) {
-  const [error, setError] = useState(false)
+export function RecipeImage({
+  src,
+  alt,
+  aspectRatio = 'square',
+  priority = false,
+}: RecipeImageProps) {
   const [isLoading, setIsLoading] = useState(true)
 
-  const handleError = () => {
-    setError(true)
-    setIsLoading(false)
-  }
-
-  const handleLoad = () => {
-    setIsLoading(false)
+  const aspectRatioClasses = {
+    square: 'aspect-square',
+    video: 'aspect-video',
+    wide: 'aspect-[21/9]',
+    '4:3': 'aspect-[4/3]',
   }
 
   return (
-    <div className={`relative ${aspectRatio === 'video' ? 'aspect-video' : 'aspect-[4/3]'} ${className}`}>
-      {!error ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className={`object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          priority={priority}
-          onError={handleError}
-          onLoad={handleLoad}
-        />
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-muted-foreground">
-          No image available
-        </div>
-      )}
-      {isLoading && !error && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
-      )}
+    <div className={`overflow-hidden rounded-lg bg-muted ${aspectRatioClasses[aspectRatio]}`}>
+      <Image
+        src={src}
+        alt={alt}
+        width={800}
+        height={800}
+        className={`
+          h-full w-full object-cover
+          duration-700 ease-in-out
+          ${isLoading ? 'scale-110 blur-2xl grayscale' : 'scale-100 blur-0 grayscale-0'}
+        `}
+        onLoadingComplete={() => setIsLoading(false)}
+        priority={priority}
+      />
     </div>
   )
 } 

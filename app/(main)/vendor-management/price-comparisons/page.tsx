@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -341,13 +341,13 @@ export default function VendorPriceComparison() {
                         <td className="p-4">{item.minOrder} units</td>
                         <td className="p-4">{item.deliveryTime}</td>
                         <td className="p-4">
-                          <Badge variant={item.inStock ? "success" : "destructive"}>
+                          <Badge variant={item.inStock ? "default" : "destructive"}>
                             {item.inStock ? 'In Stock' : 'Out of Stock'}
                           </Badge>
                         </td>
                         <td className="p-4">
                           {item.price === bestPrice ? (
-                            <Badge variant="success">Best Price!</Badge>
+                            <Badge variant="default">Best Price!</Badge>
                           ) : (
                             <span className="text-destructive">
                               +${(item.price - bestPrice).toFixed(2)}

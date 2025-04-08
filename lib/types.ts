@@ -392,6 +392,12 @@ export interface PurchaseRequestItem {
   baseTotalAmount: number;
   totalAmount: number;
   baseCurrency?: string;
+  // Budget-related properties
+  budgetCode?: string;
+  department?: string;
+  budgetAmount?: number;
+  usedAmount?: number;
+  remainingAmount?: number;
 }
 
 export type PurchaseRequestItemStatus =

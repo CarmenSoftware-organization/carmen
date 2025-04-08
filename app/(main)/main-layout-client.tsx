@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import Header from '@/components/header'
 import Sidebar from '@/components/Sidebar'
@@ -10,8 +10,18 @@ export default function MainLayoutClient({
 }: {
   children: React.ReactNode
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Start with closed sidebar
+  const [businessUnit, setBusinessUnit] = useState('unit1') // Default value
   const pathname = usePathname()
+
+  // Use useCallback to create stable function references
+  const handleSidebarToggle = useCallback(() => {
+    setIsSidebarOpen(prev => !prev)
+  }, [])
+
+  const handleSidebarClose = useCallback(() => {
+    setIsSidebarOpen(false)
+  }, [])
 
   // Close mobile sidebar on route change
   useEffect(() => {
@@ -20,9 +30,13 @@ export default function MainLayoutClient({
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+      <Header 
+        onSidebarToggle={handleSidebarToggle} 
+        businessUnit={businessUnit}
+        setBusinessUnit={setBusinessUnit}
+      />
       <div className="flex min-h-[calc(100vh-64px)] pt-16">
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
         <main className="flex-1 overflow-y-auto bg-background lg:pl-[280px]">
           <div className="mx-auto max-w-7xl px-2 md:px-4">
             {children}

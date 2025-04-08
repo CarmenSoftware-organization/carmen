@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Calculator, ChevronDown, AlertCircle, FileText } from 'lucide-react';
+import { Calculator, ChevronDown, FileText } from 'lucide-react';
+
 
 // Number formatting function
 const formatNumber = (number: number, decimals = 2) => {

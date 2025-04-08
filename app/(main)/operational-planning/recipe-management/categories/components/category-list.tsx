@@ -1,8 +1,13 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { RecipeCategory, mockCategories } from "../data/mock-categories"
 import {
   Table,
   TableBody,
@@ -11,8 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,8 +36,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -60,7 +61,7 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react"
-import { RecipeCategory, mockCategories } from "../data/mock-categories"
+import { toast } from "sonner"
 
 interface FilterState {
   status: string[]
@@ -210,14 +211,13 @@ export function CategoryList() {
     })
   }
 
-  const handleConfirmDelete = async () => {
-    if (!selectedCategory) return
-    
-    // Here you would typically make an API call to delete the category
-    console.log("Deleting category:", selectedCategory.id)
-    
-    setIsDeleteDialogOpen(false)
-    setSelectedCategory(null)
+  const handleConfirmDelete = () => {
+    if (selectedCategory) {
+      // Delete logic here
+      toast.success(`Category "${selectedCategory.name}" deleted successfully`)
+      setIsDeleteDialogOpen(false)
+      setSelectedCategory(null)
+    }
   }
 
   const handleQuickFilter = (filter: string) => {

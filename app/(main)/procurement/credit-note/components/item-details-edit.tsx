@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card"
 import { EditedItem } from '@/lib/types/credit-note'
 
+
 // This type matches the array type in EditedItem.appliedLots
 interface AppliedLot {
   lotNumber: string;

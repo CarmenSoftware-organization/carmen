@@ -1,6 +1,7 @@
 import { PurchaseRequest } from '@/lib/types'
 import { ReactNode } from 'react'
 
+
 export interface PRListTemplateProps {
   data: PurchaseRequest[]
   onCreateNew?: () => void

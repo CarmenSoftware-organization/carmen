@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,8 @@ interface RecipeFormProps {
   initialData?: Recipe
   onSubmit: (data: Recipe) => void
 }
+
+type RecipeFieldValue = string | number | boolean | Date | File | string[] | null
 
 export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
   const [formData, setFormData] = useState<Recipe>(initialData || {
@@ -76,7 +78,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
     onSubmit(formData)
   }
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: RecipeFieldValue) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -104,18 +106,13 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
     }))
   }
 
-  const handleIngredientChange = (index: number, field: string, value: any) => {
-    setFormData(prev => {
-      const newIngredients = [...prev.ingredients]
-      newIngredients[index] = {
-        ...newIngredients[index],
-        [field]: value
-      }
-      return {
-        ...prev,
-        ingredients: newIngredients
-      }
-    })
+  const handleIngredientChange = (index: number, field: string, value: RecipeFieldValue) => {
+    setFormData(prev => ({
+      ...prev,
+      ingredients: prev.ingredients.map((ingredient, i) => 
+        i === index ? { ...ingredient, [field]: value } : ingredient
+      )
+    }))
   }
 
   const handleRemoveIngredient = (index: number) => {
@@ -160,18 +157,13 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
     }))
   }
 
-  const handleStepChange = (index: number, field: string, value: any) => {
-    setFormData(prev => {
-      const newSteps = [...prev.steps]
-      newSteps[index] = {
-        ...newSteps[index],
-        [field]: value
-      }
-      return {
-        ...prev,
-        steps: newSteps
-      }
-    })
+  const handleStepChange = (index: number, field: string, value: RecipeFieldValue) => {
+    setFormData(prev => ({
+      ...prev,
+      steps: prev.steps.map((step, i) => 
+        i === index ? { ...step, [field]: value } : step
+      )
+    }))
   }
 
   const handleRemoveStep = (index: number) => {

@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 
+
 interface InventoryLayoutProps {
   children: ReactNode
 }

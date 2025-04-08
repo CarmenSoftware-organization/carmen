@@ -1,8 +1,13 @@
-'use client';
+"use client"
 
 import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 // Mock data for graphs
 const productionVolumeData = [
@@ -48,8 +53,41 @@ const initialItems: DashboardItem[] = [
   { id: 'item6', content: 'Equipment Utilization', type: 'text', data: '85% average equipment utilization rate' },
 ];
 
+interface ProductionOrder {
+  id: string;
+  name: string;
+  status: string;
+  priority: string;
+  startTime: string;
+  endTime: string;
+  progress: number;
+}
+
+const mockOrders: ProductionOrder[] = [
+  {
+    id: "1",
+    name: "Order #12345",
+    status: "in-progress",
+    priority: "high",
+    startTime: "09:00 AM",
+    endTime: "11:00 AM",
+    progress: 60
+  },
+  {
+    id: "2",
+    name: "Order #12346",
+    status: "pending",
+    priority: "medium",
+    startTime: "11:30 AM",
+    endTime: "02:00 PM",
+    progress: 0
+  }
+];
+
 export default function ProductionPage() {
   const [items, setItems] = useState<DashboardItem[]>(initialItems);
+  const [orders, setOrders] = useState(mockOrders);
+  const [activeTab, setActiveTab] = useState("active");
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -121,36 +159,62 @@ export default function ProductionPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Production Dashboard</h1>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="dashboard">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-            >
-              {items.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      className="p-4 rounded-lg shadow-md bg-white"
-                    >
-                      <h2 className="text-lg font-semibold mb-2">{item.content}</h2>
-                      {renderDashboardItem(item)}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+    <div className="container mx-auto py-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold">Production Orders</h1>
+        <Button>Create Order</Button>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="active">Active Orders</TabsTrigger>
+          <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="active">
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="dashboard">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
+                  {items.map((item, index) => (
+                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="p-4 rounded-lg shadow-md bg-white"
+                        >
+                          <h2 className="text-lg font-semibold mb-2">{item.content}</h2>
+                          {renderDashboardItem(item)}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </TabsContent>
+
+        <TabsContent value="completed">
+          <div className="text-center py-8 text-muted-foreground">
+            No completed orders
+          </div>
+        </TabsContent>
+
+        <TabsContent value="scheduled">
+          <div className="text-center py-8 text-muted-foreground">
+            No scheduled orders
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

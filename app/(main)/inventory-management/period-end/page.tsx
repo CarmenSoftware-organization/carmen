@@ -3,11 +3,10 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
-import { Calendar as CalendarIcon, ChevronDown } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
@@ -28,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import { CalendarIcon } from "lucide-react"
 
 interface PeriodEndRecord {
   id: string

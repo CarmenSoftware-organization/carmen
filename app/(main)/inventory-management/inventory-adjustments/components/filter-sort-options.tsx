@@ -2,6 +2,9 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import { ArrowDownUp, Filter, X } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,17 +12,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ArrowDownUp, Filter, X } from "lucide-react"
 
 interface FilterSortOptionsProps {
   onFilterChange: (filters: string[]) => void

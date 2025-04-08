@@ -1,5 +1,6 @@
 import { Role, User, RoleConfiguration } from "../types/approver"
 
+
 export const roles: Role[] = [
   {
     id: 1,

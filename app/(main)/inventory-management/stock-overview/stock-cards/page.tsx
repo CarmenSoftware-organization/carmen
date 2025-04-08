@@ -1,35 +1,14 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
-import { 
-  ArrowUpDown, 
-  Download, 
-  FileDown, 
-  Filter, 
-  Search, 
-  SlidersHorizontal 
-} from "lucide-react"
-import Link from "next/link"
+import { ArrowUpDown, FileDown, Search, SlidersHorizontal } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { formatCurrency, formatNumber } from "../inventory-balance/utils"
 import { Product } from "../types"

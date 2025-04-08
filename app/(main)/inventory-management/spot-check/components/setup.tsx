@@ -1,24 +1,18 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUser } from '@/lib/context/user-context';
+import React, { useEffect, useState } from 'react'
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useUser } from '@/lib/context/user-context'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 // Create a mock function to replace missing import
 interface Department {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 function getInventoryDepartments(): Department[] {
@@ -27,34 +21,34 @@ function getInventoryDepartments(): Department[] {
     { id: 'storage', name: 'Storage' },
     { id: 'bar', name: 'Bar' }, 
     { id: 'restaurant', name: 'Restaurant' }
-  ];
+  ]
 }
 
 interface SpotCheckFormData {
-  name: string;
-  department: string;
-  description: string;
-  targetCount: string;
-  selectedItems: string[];
-  selectedLocations: string[];
-  dateTime?: Date;
-  notes?: string;
-  counts?: Record<string, number>;
-  [key: string]: string | string[] | Record<string, number> | Date | undefined;
+  name: string
+  department: string
+  description: string
+  targetCount: string
+  selectedItems: string[]
+  selectedLocations: string[]
+  dateTime?: Date
+  notes?: string
+  counts?: Record<string, number>
+  [key: string]: string | string[] | Record<string, number> | Date | undefined
 }
 
 interface SpotCheckSetupProps {
-  formData: SpotCheckFormData;
-  setFormData: (data: SpotCheckFormData) => void;
-  onNext: () => void;
-  onBack: () => void;
-  onStartCount: () => void;
+  formData: SpotCheckFormData
+  setFormData: (data: SpotCheckFormData) => void
+  onNext: () => void
+  onBack: () => void
+  onStartCount: () => void
 }
 
-export function SpotCheckSetup({ formData, setFormData, onNext, onBack, onStartCount }: SpotCheckSetupProps) {
-  const { user } = useUser();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const departments = getInventoryDepartments();
+export function SpotCheckSetup({ formData, setFormData, onNext, onBack }: SpotCheckSetupProps) {
+  const { user } = useUser()
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const departments = getInventoryDepartments()
 
   useEffect(() => {
     if (user) {
@@ -62,53 +56,53 @@ export function SpotCheckSetup({ formData, setFormData, onNext, onBack, onStartC
         ...formData,
         name: user.name || '',
         department: user.department || '',
-      });
+      })
     }
-  }, [user, setFormData, formData]);
+  }, [user, setFormData, formData])
 
   const handleInputChange = (field: keyof SpotCheckFormData, value: string | Date) => {
     setFormData({
       ...formData,
       [field]: value
-    });
+    })
     
     // Clear error when user types
     if (errors[field]) {
       setErrors({
         ...errors,
         [field]: ''
-      });
+      })
     }
-  };
+  }
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {}
     
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = 'Name is required'
     }
     
     if (!formData.department) {
-      newErrors.department = 'Department is required';
+      newErrors.department = 'Department is required'
     }
     
     if (!formData.targetCount || parseInt(formData.targetCount, 10) <= 0) {
-      newErrors.targetCount = 'Target count must be greater than 0';
+      newErrors.targetCount = 'Target count must be greater than 0'
     }
     
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     
     if (validateForm()) {
-      onNext();
+      onNext()
     }
-  };
+  }
 
-  const isValid = formData.department && formData.dateTime && formData.targetCount;
+  const isValid = formData.department && formData.dateTime && formData.targetCount
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -197,36 +191,21 @@ export function SpotCheckSetup({ formData, setFormData, onNext, onBack, onStartC
                 value={formData.notes || ''}
                 onChange={(e) => handleInputChange('notes', e.target.value)}
                 placeholder="Add any additional notes or instructions..."
-                className="min-h-[100px]"
+                className="min-h-[120px] resize-y"
               />
             </div>
           </div>
           
-          <div className="flex items-center justify-between p-6 pt-0">
-            <Button
-              variant="outline"
-              onClick={onBack}
-            >
+          <div className="flex justify-between pt-4">
+            <Button type="button" variant="outline" onClick={onBack}>
               Back
             </Button>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={onStartCount}
-                disabled={!isValid}
-              >
-                Start Count
-              </Button>
-              <Button
-                type="submit"
-                disabled={!isValid}
-              >
-                Next
-              </Button>
-            </div>
+            <Button type="submit" disabled={!isValid}>
+              Continue to Item Selection
+            </Button>
           </div>
         </CardContent>
       </Card>
     </form>
-  );
+  )
 }

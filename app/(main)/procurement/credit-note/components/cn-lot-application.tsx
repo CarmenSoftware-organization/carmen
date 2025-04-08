@@ -1,12 +1,11 @@
-"use client";
-
+"use client"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
 import {
   Calculator,
   Clock,
   RefreshCcw,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import React, { useState } from "react";
 import {
   Table,
   TableBody,

@@ -1,9 +1,10 @@
-"use client"
+'use client'
 
 import { useState, useMemo } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
-
+import { LocationMapping } from "./types"
+import { locationMappings, posTypes } from "./data"
 import { 
   MappingHeader, 
   FilterBar, 
@@ -14,9 +15,6 @@ import {
   AppliedFilter,
   ActionType,
 } from "../components"
-
-import { LocationMapping } from "./types"
-import { locationMappings, posTypes } from "./data"
 
 export default function LocationMappingPage() {
   const [searchQuery, setSearchQuery] = useState("")

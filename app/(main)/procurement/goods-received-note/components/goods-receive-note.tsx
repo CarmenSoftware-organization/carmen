@@ -1,10 +1,24 @@
 "use client";
-
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { HelpCircle, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, ChevronLeft, CalendarIcon, ArrowLeft } from "lucide-react";
+import { GoodsReceiveNoteItems } from "./tabs/GoodsReceiveNoteItems";
+import { ExtraCostsTab } from "./tabs/ExtraCostsTab";
+import { FinancialSummaryTab } from "./tabs/FinancialSummaryTab";
+import { ActivityLogTab } from "./tabs/ActivityLogTab";
+import { BulkActions } from "./tabs/BulkActions";
+import StatusBadge from "@/components/ui/custom-status-badge";
+import { useState } from "react";
+import { SummaryTotal } from "./SummaryTotal";
+import { CommentsAttachmentsTab } from "./tabs/CommentsAttachmentsTab";
+import { TaxTab } from "./tabs/TaxTab";
+import StockMovementContent from "./tabs/stock-movement";
 import {
   Select,
   SelectContent,
@@ -12,43 +26,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Tooltip, 
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, ChevronLeft, CalendarIcon } from "lucide-react";
 import {
   GoodsReceiveNote,
   GoodsReceiveNoteMode,
   GoodsReceiveNoteItem,
 } from "@/lib/types";
-import { GoodsReceiveNoteItems } from "./tabs/GoodsReceiveNoteItems";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ExtraCostsTab } from "./tabs/ExtraCostsTab";
-import { StockMovementTab } from "./tabs/StockMovementTab";
-import { FinancialSummaryTab } from "./tabs/FinancialSummaryTab";
-import { ActivityLogTab } from "./tabs/ActivityLogTab";
-import { BulkActions } from "./tabs/BulkActions";
-import StatusBadge from "@/components/ui/custom-status-badge";
-import { useState } from "react";
-import SummaryTotal from "./SummaryTotal";
-import ItemDetailForm  from "./tabs/itemDetailForm";
-import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
-import { TaxTab } from "./tabs/TaxTab";
-import StockMovementContent from "./tabs/stock-movement";
 
 interface GoodsReceiveNoteComponentProps {
   initialData: GoodsReceiveNote;
@@ -69,8 +57,6 @@ export function GoodsReceiveNoteComponent({
       ? new Date(initialData.taxInvoiceDate)
       : undefined,
   }));
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false)
   const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -130,24 +116,6 @@ export function GoodsReceiveNoteComponent({
     setSelectedItems([]);
   };
 
-  const calculateTotals = () => {
-    const subtotal = formData.items.reduce(
-      (sum, item) => sum + item.subTotalAmount,
-      0
-    );
-    const taxTotal = formData.items.reduce(
-      (sum, item) => sum + item.taxAmount,
-      0
-    );
-    const extraCostsTotal = formData.extraCosts.reduce(
-      (sum, cost) => sum + cost.amount,
-      0
-    );
-    const grandTotal = subtotal + taxTotal + extraCostsTotal;
-
-    return { subtotal, taxTotal, extraCostsTotal, grandTotal };
-  };
-
   const calculateDocumentTotals = () => {
     const netAmount = formData.items.reduce((sum, item) => sum + item.netAmount, 0);
     const taxAmount = formData.items.reduce((sum, item) => sum + item.taxAmount, 0);
@@ -168,14 +136,6 @@ export function GoodsReceiveNoteComponent({
   };
 
   const documentTotals = calculateDocumentTotals();
-
-  const totals = calculateTotals();
-
-  const toggleExpand = (id: string) => {
-    setExpandedItems((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
 
   const handleGoBack = () => {
     router.back();
@@ -523,7 +483,7 @@ export function GoodsReceiveNoteComponent({
                   <div className="mb-4 space-y-4">
                     {isEditable && selectedItems.length > 0 && (
                       <BulkActions
-                        selectedItems={selectedItems}
+                        selectedCount={selectedItems.length}
                         onAction={handleBulkAction}
                       />
                     )}

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 
+
 interface Comment {
   date: string
   user: string
@@ -21,7 +22,42 @@ interface PurchaseOrderData {
   attachments?: Attachment[]
 }
 
-export default function CommentsAttachmentsTab({ poData }: { poData: PurchaseOrderData }) {
+interface CommentsAttachmentsTabProps {
+  poData?: PurchaseOrderData
+}
+
+// Mock data for when no data is provided
+const mockComments: Comment[] = [
+  {
+    date: "2023-07-15",
+    user: "John Smith",
+    text: "Please expedite this order"
+  },
+  {
+    date: "2023-07-16",
+    user: "Jane Doe",
+    text: "Vendor confirmed availability"
+  }
+];
+
+const mockAttachments: Attachment[] = [
+  {
+    fileName: "requirements.pdf",
+    uploadedBy: "John Smith",
+    date: "2023-07-15"
+  },
+  {
+    fileName: "vendor_quote.pdf",
+    uploadedBy: "Jane Doe",
+    date: "2023-07-16"
+  }
+];
+
+export default function CommentsAttachmentsTab({ poData }: CommentsAttachmentsTabProps) {
+  // Use provided data or fallback to mock data
+  const comments = poData?.comments || mockComments;
+  const attachments = poData?.attachments || mockAttachments;
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Comments & Attachments</h2>
@@ -45,7 +81,7 @@ export default function CommentsAttachmentsTab({ poData }: { poData: PurchaseOrd
             </TableRow>
           </TableHeader>
           <TableBody>
-            {poData.comments && poData.comments.map((comment: Comment, index: number) => (
+            {comments.map((comment: Comment, index: number) => (
               <TableRow key={index}>
                 <TableCell>{comment.date}</TableCell>
                 <TableCell>{comment.user}</TableCell>
@@ -78,7 +114,7 @@ export default function CommentsAttachmentsTab({ poData }: { poData: PurchaseOrd
             </TableRow>
           </TableHeader>
           <TableBody>
-            {poData.attachments && poData.attachments.map((attachment: Attachment, index: number) => (
+            {attachments.map((attachment: Attachment, index: number) => (
               <TableRow key={index}>
                 <TableCell>{attachment.fileName}</TableCell>
                 <TableCell>{attachment.uploadedBy}</TableCell>

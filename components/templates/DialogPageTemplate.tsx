@@ -1,3 +1,8 @@
+"use client"
+
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import React, { ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
@@ -5,9 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/custom-dialog";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
-import React, { ReactNode } from "react";
 
 interface DialogPageTemplateProps {
   title: ReactNode;

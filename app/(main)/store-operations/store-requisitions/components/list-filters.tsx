@@ -1,5 +1,10 @@
-'use client'
+"use client"
 
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { ChevronDown, ArrowUpDown, SlidersHorizontal } from 'lucide-react'
+import { FilterBuilder } from './filter-builder'
+import { FilterCondition } from '../types/index'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,18 +19,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from '@/components/ui/button'
-import { ChevronDown, ArrowUpDown, SlidersHorizontal } from 'lucide-react'
-import { FilterBuilder } from './filter-builder'
-import { FilterCondition } from '../types/index'
+
+type StatusType = 'all' | 'draft' | 'in-process' | 'complete' | 'reject' | 'void'
+type SortByType = 'date' | 'refNo' | 'status' | 'requestor' | 'department'
 
 interface ListFiltersProps {
-  statusFilter: string
-  setStatusFilter: (value: string) => void
-  sortBy: string
-  onSort: (column: string) => void
+  statusFilter: StatusType
+  setStatusFilter: (value: StatusType) => void
+  sortBy: SortByType
+  onSort: (column: SortByType) => void
   filters: FilterCondition[]
   setFilters: React.Dispatch<React.SetStateAction<FilterCondition[]>>
+  onApplyFilters?: (filters: FilterCondition[]) => void
 }
 
 export function ListFilters({
@@ -34,8 +39,21 @@ export function ListFilters({
   sortBy,
   onSort,
   filters,
-  setFilters
-}: ListFiltersProps) {
+  setFilters,
+  onApplyFilters
+}: ListFiltersProps): React.ReactNode {
+  const handleApplyFilters = (): void => {
+    onApplyFilters?.(filters)
+  }
+
+  const handleStatusChange = (value: string): void => {
+    setStatusFilter(value as StatusType)
+  }
+
+  const handleSortChange = (value: string): void => {
+    onSort(value as SortByType)
+  }
+
   return (
     <div className="sm:col-span-7 flex justify-end gap-2">
       <DropdownMenu>
@@ -46,7 +64,7 @@ export function ListFilters({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[150px]">
-          <DropdownMenuRadioGroup value={statusFilter} onValueChange={setStatusFilter}>
+          <DropdownMenuRadioGroup value={statusFilter} onValueChange={handleStatusChange}>
             <DropdownMenuRadioItem value="all">All Status</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="draft">Draft</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="in-process">In Process</DropdownMenuRadioItem>
@@ -65,7 +83,7 @@ export function ListFilters({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[150px]">
-          <DropdownMenuRadioGroup value={sortBy} onValueChange={onSort}>
+          <DropdownMenuRadioGroup value={sortBy} onValueChange={handleSortChange}>
             <DropdownMenuRadioItem value="date">Date</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="refNo">Reference No.</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="status">Status</DropdownMenuRadioItem>
@@ -95,7 +113,7 @@ export function ListFilters({
           <div className="py-4">
             <FilterBuilder filters={filters} setFilters={setFilters} />
           </div>
-          <Button onClick={() => console.log('Applying filters:', filters)}>
+          <Button onClick={handleApplyFilters}>
             Apply Filters
           </Button>
         </DialogContent>

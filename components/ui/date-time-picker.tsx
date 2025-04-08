@@ -1,13 +1,14 @@
 'use client';
 
 import * as React from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DateTimePickerProps {
   value: Date;
@@ -16,25 +17,32 @@ interface DateTimePickerProps {
 }
 
 export function DateTimePicker({ value, onChange, disabled }: DateTimePickerProps) {
-  const [selectedTime, setSelectedTime] = React.useState(format(value || new Date(), "HH:mm"));
+  const [selectedTime, setSelectedTime] = React.useState(() => {
+    return format(value || new Date(), "HH:mm");
+  });
 
-  const handleTimeChange = (time: string) => {
+  React.useEffect(() => {
+    setSelectedTime(format(value || new Date(), "HH:mm"));
+  }, [value]);
+
+  const handleTimeChange = React.useCallback((time: string) => {
     setSelectedTime(time);
     const [hours, minutes] = time.split(':').map(Number);
     const newDate = new Date(value || new Date());
     newDate.setHours(hours);
     newDate.setMinutes(minutes);
     onChange(newDate);
-  };
+  }, [value, onChange]);
 
-  const handleDateSelect = (date: Date | undefined) => {
+  const handleDateSelect = React.useCallback((date: Date | undefined) => {
     if (date) {
       const [hours, minutes] = selectedTime.split(':').map(Number);
-      date.setHours(hours);
-      date.setMinutes(minutes);
-      onChange(date);
+      const newDate = new Date(date);
+      newDate.setHours(hours);
+      newDate.setMinutes(minutes);
+      onChange(newDate);
     }
-  };
+  }, [selectedTime, onChange]);
 
   return (
     <div className="flex gap-2">
@@ -47,6 +55,7 @@ export function DateTimePicker({ value, onChange, disabled }: DateTimePickerProp
               !value && "text-muted-foreground"
             )}
             disabled={disabled}
+            type="button"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {value ? format(value, "PPP") : <span>Pick a date</span>}

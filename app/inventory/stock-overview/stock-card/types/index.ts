@@ -1,3 +1,4 @@
+
 export type MovementType = 
   | "STOCK_IN"
   | "STOCK_OUT"

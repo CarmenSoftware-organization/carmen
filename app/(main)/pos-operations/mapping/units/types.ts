@@ -1,5 +1,6 @@
 import { StatusType } from "../components"
 
+
 export type UnitType = "recipe" | "sales" | "both"
 
 export interface UnitMapping {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { GoodsReceiveNote, GoodsReceiveNoteStatus } from '@/lib/types';
 import StatusBadge from '@/components/ui/custom-status-badge';
+
 
 interface GoodsReceiveNoteTabProps {
   poData: {
@@ -59,7 +59,7 @@ const mockItemsReceived: GoodsReceiveNoteItem[] = [
   },
 ];
 
-function GoodsReceiveNoteTab({ poData }: GoodsReceiveNoteTabProps) {
+function GoodsReceiveNoteTab() {
   // Use the mock data
   const grnItems: GoodsReceiveNoteItem[] = mockItemsReceived;
 

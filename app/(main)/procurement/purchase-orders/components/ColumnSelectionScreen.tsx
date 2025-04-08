@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+
 export interface ColumnSelectionConfig {
   header: string;
   excludeHeaders: boolean;
@@ -25,7 +26,7 @@ export interface ColumnSelectionScreenProps {
   isOpen: boolean;
 }
 
-export function ColumnSelectionScreen({ onClose, onSave, isOpen }: ColumnSelectionScreenProps) {
+export function ColumnSelectionScreen({ onSave, onClose, isOpen }: ColumnSelectionScreenProps) {
   const [header, setHeader] = useState('');
   const [excludeHeaders, setExcludeHeaders] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';

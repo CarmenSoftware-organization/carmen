@@ -1,33 +1,22 @@
+'use client'
+
 import { useState } from "react"
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FileDown, Search } from "lucide-react"
 import { StockCardData } from "../../types"
-import { formatCurrency, formatDate, formatNumber } from "../../inventory-balance/utils"
+import { formatCurrency, formatNumber } from "../../inventory-balance/utils"
 
 interface StockCardLotInformationProps {
   data: StockCardData
 }
 
 export function StockCardLotInformation({ data }: StockCardLotInformationProps) {
-  const { product, lotInformation } = data
+  const { lotInformation } = data
   
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("ALL")

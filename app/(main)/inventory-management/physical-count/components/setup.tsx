@@ -1,52 +1,64 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { DateTimePicker } from '@/components/ui/date-time-picker';
+import React, { useEffect, useCallback } from 'react'
+import { DateTimePicker } from '@/components/ui/date-time-picker'
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { mockDepartments } from '@/lib/mock/inventory-data'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockDepartments } from '@/lib/mock/inventory-data';
+} from "@/components/ui/select"
 
 interface SetupFormData {
-  counterName: string;
-  department: string;
-  dateTime: Date;
-  notes: string;
+  counterName: string
+  department: string
+  dateTime: Date
+  notes: string
+  type: string
 }
 
 interface SetupProps {
-  formData: SetupFormData;
-  setFormData: (data: SetupFormData) => void;
-  onNext: () => void;
-  onBack: () => void;
+  formData: SetupFormData
+  setFormData: (data: SetupFormData) => void
+  onNext: () => void
 }
 
-export function PhysicalCountSetup({ formData, setFormData, onNext, onBack }: SetupProps) {
+export function PhysicalCountSetup({ formData, setFormData, onNext }: SetupProps) {
   useEffect(() => {
     // Auto-fill counter name from user context
     setFormData({
       ...formData,
       counterName: 'John Doe', // Replace with actual user name from context
-    });
-  }, [setFormData]);
+    })
+  }, []) // Remove dependencies to prevent unnecessary re-renders
 
-  const handleInputChange = (field: keyof SetupFormData, value: string | Date) => {
+  useEffect(() => {
+    if (!formData.type) {
+      setFormData({ ...formData, type: 'full' })
+    }
+  }, []) // Remove dependencies to prevent unnecessary re-renders
+
+  const handleInputChange = useCallback((field: keyof SetupFormData, value: string | Date) => {
     setFormData({
       ...formData,
       [field]: value,
-    });
-  };
+    })
+  }, [formData, setFormData])
 
-  const isValid = formData.department && formData.dateTime;
+  const handleDateChange = useCallback((value: Date | undefined) => {
+    if (value) {
+      handleInputChange('dateTime', value)
+    }
+  }, [handleInputChange])
+
+  const isValid = formData.department && formData.dateTime
 
   return (
     <Card>
@@ -99,7 +111,7 @@ export function PhysicalCountSetup({ formData, setFormData, onNext, onBack }: Se
           </Label>
           <DateTimePicker
             value={formData.dateTime}
-            onChange={(value) => handleInputChange('dateTime', value)}
+            onChange={handleDateChange}
           />
         </div>
 
@@ -126,5 +138,5 @@ export function PhysicalCountSetup({ formData, setFormData, onNext, onBack }: Se
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

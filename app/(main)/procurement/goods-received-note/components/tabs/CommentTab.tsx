@@ -1,32 +1,25 @@
 import React, { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { GoodsReceiveNoteMode, Comment } from '@/lib/types'
 import { Edit, Trash } from 'lucide-react'
 
+
 interface CommentTabProps {
   mode: GoodsReceiveNoteMode
   comments: Comment[]
-  onAddComment: (comment: Omit<Comment, 'id' | 'number' | 'date'>) => void
   onEditComment: (id: string, text: string) => void
   onDeleteComment: (id: string) => void
 }
 
-export function CommentTab({ mode, comments, onAddComment, onEditComment, onDeleteComment }: CommentTabProps) {
+export function CommentTab({ mode, comments, onEditComment, onDeleteComment }: CommentTabProps) {
   const [newComment, setNewComment] = useState('')
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
   const [editedCommentText, setEditedCommentText] = useState('')
 
   const handleAddComment = () => {
     if (newComment.trim()) {
-      // onAddComment({
-      //   author: 'Current User', // Replace with actual user name
-      //   text: newComment,
-      //   content: '',
-      //   timestamp: new Date()
-      // })
       setNewComment('')
     }
   }

@@ -1,5 +1,6 @@
-'use client'
+"use client"
 
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Printer, Search } from 'lucide-react'
@@ -7,9 +8,20 @@ import { Plus, Printer, Search } from 'lucide-react'
 interface ListHeaderProps {
   searchTerm: string
   onSearchChange: (value: string) => void
+  onNewRequest?: () => void
+  onPrint?: () => void
 }
 
-export function ListHeader({ searchTerm, onSearchChange }: ListHeaderProps) {
+export function ListHeader({ 
+  searchTerm, 
+  onSearchChange,
+  onNewRequest,
+  onPrint
+}: ListHeaderProps): React.ReactNode {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    onSearchChange(e.target.value)
+  }
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between w-full">
@@ -17,6 +29,7 @@ export function ListHeader({ searchTerm, onSearchChange }: ListHeaderProps) {
         <div className="flex items-center gap-2">
           <Button 
             className="flex items-center gap-2"
+            onClick={onNewRequest}
           >
             <Plus className="h-4 w-4" />
             New Request
@@ -24,6 +37,7 @@ export function ListHeader({ searchTerm, onSearchChange }: ListHeaderProps) {
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
+            onClick={onPrint}
           >
             <Printer className="h-4 w-4" />
             Print
@@ -36,7 +50,7 @@ export function ListHeader({ searchTerm, onSearchChange }: ListHeaderProps) {
           className="pl-8 w-full"
           placeholder="Search requisitions..."
           value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
+          onChange={handleSearchChange}
           aria-label="Search requisitions"
         />
       </div>

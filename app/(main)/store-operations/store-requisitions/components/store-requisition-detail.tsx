@@ -4,6 +4,13 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useRouter } from 'next/navigation'
+import { Separator } from '@/components/ui/separator'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import StatusBadge from '@/components/ui/custom-status-badge'
+import { Input } from '@/components/ui/input'
+import { ApprovalLogDialog } from './approval-log-dialog'
+import { JournalEntriesTab } from './tabs/journal-entries-tab'
 import { 
   ArrowLeft, 
   Printer, 
@@ -28,26 +35,103 @@ import {
   X,
   Calculator
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { Separator } from '@/components/ui/separator'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import StatusBadge from '@/components/ui/custom-status-badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from '@/components/ui/input'
-import { ApprovalLogDialog } from './approval-log-dialog'
-import { JournalEntriesTab } from './tabs/journal-entries-tab'
+
+type ApprovalStatus = 'Accept' | 'Reject' | 'Review'
+
+interface StoreRequisitionItem {
+  id: number
+  description: string
+  unit: string
+  qtyRequired: number
+  qtyApproved: number
+  costPerUnit: number
+  total: number
+  requestDate: string
+  inventory: {
+    onHand: number
+    onOrder: number
+    lastPrice: number
+    lastVendor: string
+  }
+  itemInfo: {
+    location: string
+    locationCode: string
+    itemName: string
+    category: string
+    subCategory: string
+    itemGroup: string
+    barCode: string
+    locationType: string
+  }
+  qtyIssued: number
+  approvalStatus: ApprovalStatus
+}
+
+interface Comment {
+  id: number
+  by: string
+  date: string
+  comment: string
+}
+
+interface Attachment {
+  id: number
+  fileName: string
+  description: string
+  type: string
+  size: number
+  url: string
+  date: string
+  by: string
+  isPublic: boolean
+}
+
+interface ActivityLogEntry {
+  id: number
+  action: string
+  by: string
+  date: string
+  details: string
+  log: string
+}
+
+interface StoreRequisitionData {
+  refNo: string
+  date: string
+  expectedDeliveryDate: string
+  movementType: string
+  description: string
+  requestedFrom: string
+  department: string
+  jobCode: string
+  process: string
+  status: string
+  items: StoreRequisitionItem[]
+  comments: Comment[]
+  attachments: Attachment[]
+  activityLog: ActivityLogEntry[]
+}
 
 interface StoreRequisitionDetailProps {
   id: string
+  onBack?: () => void
+  onPrint?: () => void
+  onEdit?: () => void
+  onCancel?: () => void
+  onAddComment?: () => void
+  onBulkAction?: (action: 'Accept' | 'Reject' | 'Review' | 'Delete' | 'Split') => void
+  onHeaderUpdate?: (field: string, value: string) => void
+  onQuantityUpdate?: (itemId: number, field: 'qtyRequired' | 'qtyApproved' | 'qtyIssued', value: number) => void
 }
 
 // This would come from your API/database
-const mockRequisition = {
+const mockRequisition: StoreRequisitionData = {
   refNo: 'SR-2024-001',
   date: '2024-01-15',
   expectedDeliveryDate: '2024-01-20',
@@ -86,175 +170,11 @@ const mockRequisition = {
       },
       qtyIssued: 5,
       approvalStatus: 'Accept'
-    },
-    {
-      id: 2,
-      description: 'Coffee Beans (1kg)',
-      unit: 'Bag',
-      qtyRequired: 15,
-      qtyApproved: 15,
-      costPerUnit: 250.00,
-      total: 3750.00,
-      requestDate: '2024-01-20',
-      inventory: {
-        onHand: 30,
-        onOrder: 50,
-        lastPrice: 245.00,
-        lastVendor: 'Premium Coffee Supply'
-      },
-      itemInfo: {
-        location: 'Roastery Store',
-        locationCode: 'RS001',
-        itemName: 'Premium Coffee Beans',
-        category: 'Beverage',
-        subCategory: 'Coffee',
-        itemGroup: 'Raw Materials',
-        barCode: '8851234567891',
-        locationType: 'inventory'
-      },
-      qtyIssued: 10,
-      approvalStatus: 'Reject'
-    },
-    {
-      id: 3,
-      description: 'Paper Cups (16oz)',
-      unit: 'Pack',
-      qtyRequired: 20,
-      qtyApproved: 20,
-      costPerUnit: 85.00,
-      total: 1700.00,
-      requestDate: '2024-01-20',
-      inventory: {
-        onHand: 100,
-        onOrder: 200,
-        lastPrice: 82.00,
-        lastVendor: 'Packaging Solutions'
-      },
-      itemInfo: {
-        location: 'Main Warehouse',
-        locationCode: 'MW001',
-        itemName: 'Paper Cup 16oz',
-        category: 'Packaging',
-        subCategory: 'Cups',
-        itemGroup: 'Disposables',
-        barCode: '8851234567892',
-        locationType: 'direct'
-      },
-      qtyIssued: 15,
-      approvalStatus: 'Accept'
-    },
-    {
-      id: 4,
-      description: 'Chocolate Syrup',
-      unit: 'Bottle',
-      qtyRequired: 8,
-      qtyApproved: 6,
-      costPerUnit: 180.00,
-      total: 1080.00,
-      requestDate: '2024-01-20',
-      inventory: {
-        onHand: 15,
-        onOrder: 30,
-        lastPrice: 175.00,
-        lastVendor: 'Sweet Supplies Co.'
-      },
-      itemInfo: {
-        location: 'Central Kitchen',
-        locationCode: 'CK001',
-        itemName: 'Chocolate Syrup',
-        category: 'Ingredients',
-        subCategory: 'Syrups',
-        itemGroup: 'Flavorings',
-        barCode: '8851234567893',
-        locationType: 'direct'
-      },
-      qtyIssued: 4,
-      approvalStatus: 'Review'
-    },
-    {
-      id: 5,
-      description: 'Plastic Straws',
-      unit: 'Pack',
-      qtyRequired: 25,
-      qtyApproved: 25,
-      costPerUnit: 45.00,
-      total: 1125.00,
-      requestDate: '2024-01-20',
-      inventory: {
-        onHand: 200,
-        onOrder: 300,
-        lastPrice: 43.00,
-        lastVendor: 'Packaging Solutions'
-      },
-      itemInfo: {
-        location: 'Main Warehouse',
-        locationCode: 'MW001',
-        itemName: 'Plastic Straw',
-        category: 'Packaging',
-        subCategory: 'Straws',
-        itemGroup: 'Disposables',
-        barCode: '8851234567894',
-        locationType: 'direct'
-      },
-      qtyIssued: 20,
-      approvalStatus: 'Accept'
-    },
-    {
-      id: 6,
-      description: 'Green Tea Powder',
-      unit: 'Kg',
-      qtyRequired: 5,
-      qtyApproved: 4,
-      costPerUnit: 320.00,
-      total: 1280.00,
-      requestDate: '2024-01-20',
-      inventory: {
-        onHand: 8,
-        onOrder: 20,
-        lastPrice: 315.00,
-        lastVendor: 'Tea Suppliers Inc.'
-      },
-      itemInfo: {
-        location: 'Central Kitchen',
-        locationCode: 'CK001',
-        itemName: 'Green Tea Powder',
-        category: 'Beverage',
-        subCategory: 'Tea',
-        itemGroup: 'Raw Materials',
-        barCode: '8851234567895',
-        locationType: 'direct'
-      },
-      qtyIssued: 3,
-      approvalStatus: 'Reject'
     }
   ],
-  comments: [
-    {
-      id: 1,
-      date: '2024-01-15',
-      by: 'John Doe',
-      comment: 'Approved quantities adjusted based on current stock levels'
-    }
-  ],
-  attachments: [
-    {
-      id: 1,
-      fileName: 'requisition_details.pdf',
-      description: 'Detailed specifications',
-      isPublic: true,
-      date: '2024-01-15',
-      by: 'John Doe'
-    }
-  ],
-  activityLog: [
-    {
-      id: 1,
-      date: '2024-01-15',
-      by: 'John Doe',
-      action: 'Created',
-      log: 'Store requisition created'
-    }
-  ]
+  comments: [],
+  attachments: [],
+  activityLog: []
 }
 
 // Add mock data for stock movements
@@ -351,9 +271,8 @@ const mockApprovalLogs: ApprovalLogs = {
   ]
 } as const
 
-// Add the ApprovalBadge component
-function ApprovalBadge({ status }: { status: 'Accept' | 'Reject' | 'Review' }) {
-  const getStatusColor = (status: 'Accept' | 'Reject' | 'Review') => {
+function ApprovalBadge({ status }: { status: ApprovalStatus }) {
+  const getStatusColor = (status: ApprovalStatus) => {
     switch (status) {
       case 'Accept':
         return 'bg-green-100 text-green-800'
@@ -361,11 +280,13 @@ function ApprovalBadge({ status }: { status: 'Accept' | 'Reject' | 'Review' }) {
         return 'bg-red-100 text-red-800'
       case 'Review':
         return 'bg-yellow-100 text-yellow-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   return (
-    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
       {status}
     </span>
   )
@@ -467,61 +388,46 @@ const movements: StockMovement[] = [
   }
 ]
 
-export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailProps) {
+export function StoreRequisitionDetailComponent({
+  id,
+  onBack,
+  onPrint,
+  onEdit,
+  onCancel,
+  onAddComment,
+  onBulkAction,
+  onHeaderUpdate,
+  onQuantityUpdate
+}: StoreRequisitionDetailProps) {
   const router = useRouter()
-  const [items, setItems] = useState(mockRequisition.items)
   const [selectedItems, setSelectedItems] = useState<number[]>([])
-  const [isEditMode, setIsEditMode] = useState(false)
-
-  const handleBulkAction = (action: 'Accept' | 'Reject' | 'Review' | 'Delete' | 'Split') => {
-    if (!selectedItems.length) return
-
-    switch (action) {
-      case 'Accept':
-      case 'Reject':
-      case 'Review':
-        setItems(items.map(item => 
-          selectedItems.includes(item.id) 
-            ? { ...item, approvalStatus: action }
-            : item
-        ))
-        break
-      case 'Delete':
-        setItems(items.filter(item => !selectedItems.includes(item.id)))
-        break
-      case 'Split':
-        console.log('Splitting items:', selectedItems)
-        break
-    }
-    setSelectedItems([]) // Clear selection after action
-  }
 
   const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedItems(items.map(item => item.id))
-    } else {
-      setSelectedItems([])
-    }
+    setSelectedItems(checked ? mockRequisition.items.map(item => item.id) : [])
   }
 
   const handleSelectItem = (itemId: number, checked: boolean) => {
-    if (checked) {
-      setSelectedItems([...selectedItems, itemId])
-    } else {
-      setSelectedItems(selectedItems.filter(id => id !== itemId))
+    setSelectedItems(prev => 
+      checked ? [...prev, itemId] : prev.filter(id => id !== itemId)
+    )
+  }
+
+  const handleBulkAction = (action: 'Accept' | 'Reject' | 'Review' | 'Delete' | 'Split') => {
+    if (onBulkAction) {
+      onBulkAction(action)
     }
   }
 
   const handleHeaderUpdate = (field: string, value: string) => {
-    console.log('Updating header field:', field, value)
+    if (onHeaderUpdate) {
+      onHeaderUpdate(field, value)
+    }
   }
 
   const handleQuantityUpdate = (itemId: number, field: 'qtyRequired' | 'qtyApproved' | 'qtyIssued', value: number) => {
-    setItems(items.map(item => 
-      item.id === itemId 
-        ? { ...item, [field]: value }
-        : item
-    ))
+    if (onQuantityUpdate) {
+      onQuantityUpdate(itemId, field, value)
+    }
   }
 
   return (
@@ -545,61 +451,36 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {isEditMode ? (
-              <>
-                <Button 
-                  variant="outline"
-                  className="flex items-center gap-2"
-                  onClick={() => setIsEditMode(false)}
-                >
-                  <X className="h-4 w-4" />
-                  Cancel
-                </Button>
-                <Button 
-                  className="flex items-center gap-2"
-                  onClick={() => {
-                    // Save changes
-                    setIsEditMode(false)
-                  }}
-                >
-                  <Check className="h-4 w-4" />
-                  Save Changes
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button 
-                  className="flex items-center gap-2"
-                  onClick={() => setIsEditMode(true)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                  Edit
-                </Button>
-                <Button
-                  className="flex items-center gap-2"
-                  onClick={() => console.log('Submit')}
-                >
-                  Submit
-                </Button>
-              </>
-            )}
             <Button 
-              variant="outline" 
               className="flex items-center gap-2"
-              onClick={() => console.log('Print requisition')}
+              onClick={() => onEdit?.()}
             >
-              <Printer className="h-4 w-4" />
-              Print
+              <Edit2 className="h-4 w-4" />
+              Edit
             </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2 text-red-600 hover:text-red-600"
-              onClick={() => console.log('Void requisition')}
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => console.log('Submit')}
             >
-              <XCircle className="h-4 w-4" />
-              Void
+              Submit
             </Button>
           </div>
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => onPrint?.()}
+          >
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 text-red-600 hover:text-red-600"
+            onClick={() => onCancel?.()}
+          >
+            <XCircle className="h-4 w-4" />
+            Void
+          </Button>
         </div>
 
         {/* Updated Header Information with 6 columns */}
@@ -628,16 +509,12 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
               <Calendar className="h-4 w-4" />
               <span>Expected Delivery</span>
             </div>
-            {isEditMode ? (
-              <Input
-                type="date"
-                value={mockRequisition.expectedDeliveryDate}
-                onChange={(e) => handleHeaderUpdate('expectedDeliveryDate', e.target.value)}
-                className="h-8"
-              />
-            ) : (
-              <p className="font-medium">{mockRequisition.expectedDeliveryDate}</p>
-            )}
+            <Input
+              type="date"
+              value={mockRequisition.expectedDeliveryDate}
+              onChange={(e) => handleHeaderUpdate('expectedDeliveryDate', e.target.value)}
+              className="h-8"
+            />
           </div>
           
           {/* Column 4 */}
@@ -766,7 +643,7 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                         <input
                           type="checkbox"
                           className="rounded border-gray-300"
-                          checked={selectedItems.length === items.length}
+                          checked={selectedItems.length === mockRequisition.items.length}
                           onChange={(e) => handleSelectAll(e.target.checked)}
                         />
                       </th>
@@ -782,7 +659,7 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {items.map((item) => (
+                    {mockRequisition.items.map((item) => (
                       <>
                         {/* Primary Information Row */}
                         <tr key={item.id} className="group hover:bg-gray-50">
@@ -814,40 +691,28 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                             <p>{item.unit}</p>
                           </td>
                           <td className="p-4 text-right">
-                            {isEditMode ? (
-                              <Input
-                                type="number"
-                                value={item.qtyRequired}
-                                onChange={(e) => handleQuantityUpdate(item.id, 'qtyRequired', parseInt(e.target.value))}
-                                className="w-20 h-8 text-right"
-                              />
-                            ) : (
-                              <p>{item.qtyRequired}</p>
-                            )}
+                            <Input
+                              type="number"
+                              value={item.qtyRequired}
+                              onChange={(e) => handleQuantityUpdate(item.id, 'qtyRequired', parseInt(e.target.value))}
+                              className="w-20 h-8 text-right"
+                            />
                           </td>
                           <td className="p-4 text-right">
-                            {isEditMode ? (
-                              <Input
-                                type="number"
-                                value={item.qtyApproved}
-                                onChange={(e) => handleQuantityUpdate(item.id, 'qtyApproved', parseInt(e.target.value))}
-                                className="w-20 h-8 text-right"
-                              />
-                            ) : (
-                              <p>{item.qtyApproved}</p>
-                            )}
+                            <Input
+                              type="number"
+                              value={item.qtyApproved}
+                              onChange={(e) => handleQuantityUpdate(item.id, 'qtyApproved', parseInt(e.target.value))}
+                              className="w-20 h-8 text-right"
+                            />
                           </td>
                           <td className="p-4 text-right">
-                            {isEditMode ? (
-                              <Input
-                                type="number"
-                                value={item.qtyIssued || 0}
-                                onChange={(e) => handleQuantityUpdate(item.id, 'qtyIssued', parseInt(e.target.value))}
-                                className="w-20 h-8 text-right"
-                              />
-                            ) : (
-                              <p>{item.qtyIssued || 0}</p>
-                            )}
+                            <Input
+                              type="number"
+                              value={item.qtyIssued || 0}
+                              onChange={(e) => handleQuantityUpdate(item.id, 'qtyIssued', parseInt(e.target.value))}
+                              className="w-20 h-8 text-right"
+                            />
                           </td>
                           <td className="p-4 text-right">
                             <p className="font-medium">{item.total.toFixed(2)}</p>
@@ -877,7 +742,7 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                                 size="sm"
                                 className="text-red-600 hover:text-red-600"
                                 onClick={() => {
-                                  setItems(items.filter(i => i.id !== item.id))
+                                  // Implement the logic to remove the item
                                 }}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -1118,30 +983,30 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
           <div className="grid grid-cols-5 gap-8">
             <div>
               <div className="text-sm text-gray-500 mb-1">Total Items</div>
-              <div className="text-lg font-medium">{items.length}</div>
+              <div className="text-lg font-medium">{mockRequisition.items.length}</div>
             </div>
             <div>
               <div className="text-sm text-gray-500 mb-1">Total Quantity</div>
               <div className="text-lg font-medium">
-                {items.reduce((sum, item) => sum + item.qtyRequired, 0)}
+                {mockRequisition.items.reduce((sum, item) => sum + item.qtyRequired, 0)}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-500 mb-1">Total Approved</div>
               <div className="text-lg font-medium">
-                {items.reduce((sum, item) => sum + item.qtyApproved, 0)}
+                {mockRequisition.items.reduce((sum, item) => sum + item.qtyApproved, 0)}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-500 mb-1">Total Issued</div>
               <div className="text-lg font-medium">
-                {items.reduce((sum, item) => sum + (item.qtyIssued || 0), 0)}
+                {mockRequisition.items.reduce((sum, item) => sum + (item.qtyIssued || 0), 0)}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-500 mb-1">Total Amount</div>
               <div className="text-lg font-medium">
-                {items.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
+                {mockRequisition.items.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
               </div>
             </div>
           </div>

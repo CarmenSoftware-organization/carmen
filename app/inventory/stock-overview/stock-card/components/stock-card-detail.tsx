@@ -1,8 +1,15 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
+import { StockCard } from "@/app/(main)/inventory-management/stock-overview/stock-card/types"
+import { MovementHistory } from "./movement-history"
+import { StockStatus } from "./stock-status"
+import { Analytics } from "./analytics"
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -12,10 +19,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { StockCard } from "@/app/(main)/inventory-management/stock-overview/types"
-import { MovementHistory } from "./movement-history"
-import { StockStatus } from "./stock-status"
-import { Analytics } from "./analytics"
 
 interface StockCardDetailProps {
   data: StockCard
@@ -92,7 +95,12 @@ export function StockCardDetail({ data }: StockCardDetailProps) {
           <MovementHistory movements={data.movements} />
         </TabsContent>
         <TabsContent value="status">
-          <StockStatus locations={data.locations} currentStock={data.currentStock} />
+          <StockStatus 
+            locations={data.locations} 
+            currentStock={data.currentStock}
+            minStock={data.minStock}
+            maxStock={data.maxStock}
+          />
         </TabsContent>
         <TabsContent value="analytics">
           <Analytics data={data} />

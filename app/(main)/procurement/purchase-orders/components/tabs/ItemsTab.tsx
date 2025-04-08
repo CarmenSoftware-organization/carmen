@@ -1,4 +1,9 @@
+"use client"
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ItemDetailsComponent } from "./item-details";
+import StatusBadge, { BadgeStatus } from "@/components/ui/custom-status-badge";
 import {
   Table,
   TableBody,
@@ -7,12 +12,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   PurchaseOrder,
   PurchaseOrderItem,
 } from "@/lib/types";
+
 import {
   Tooltip,
   TooltipContent,
@@ -25,8 +30,6 @@ import {
   Edit,
   X,
 } from "lucide-react";
-import { ItemDetailsComponent } from "./item-details";
-import StatusBadge from "@/components/ui/custom-status-badge";
 
 interface ItemsTabProps {
   onUpdateItem: (updatedItem: PurchaseOrderItem) => void;
@@ -35,7 +38,7 @@ interface ItemsTabProps {
   poData: PurchaseOrder;
 }
 
-export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem }: ItemsTabProps) {
+export default function ItemsTab({ onUpdateItem, onAddItem, onDeleteItem, poData }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [viewingItem, setViewingItem] = useState<PurchaseOrderItem | null>(
     null
@@ -142,7 +145,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
                     onCheckedChange={(checked) => {
                       if (checked) {
                         setSelectedItems(
-                          items.map((item) => item.id)
+                          items.map((item: PurchaseOrderItem) => item.id)
                         );
                       } else {
                         setSelectedItems([]);
@@ -170,7 +173,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
                   </TableCell>
                 </TableRow>
               ) : (
-                items.map((item) => (
+                items.map((item: PurchaseOrderItem) => (
                   <TableRow key={item.id} className="group">
                     <TableCell>
                       <Checkbox

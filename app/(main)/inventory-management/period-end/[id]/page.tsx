@@ -2,27 +2,13 @@
 
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
-import { ArrowLeft, Calendar, CheckCircle2, ClipboardList } from "lucide-react"
-
+import { ArrowLeft, ClipboardList, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 interface PeriodEndDetail {
   id: string
@@ -104,11 +90,7 @@ const mockPeriodEndDetail: PeriodEndDetail = {
   ]
 }
 
-export default function PeriodEndDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default function PeriodEndDetailPage() {
   const router = useRouter()
 
   const getStatusBadge = (status: PeriodEndDetail['status']) => {

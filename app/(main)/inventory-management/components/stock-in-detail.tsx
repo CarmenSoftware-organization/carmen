@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { 
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
   ArrowLeft,
   Save,
   Lock,
-  FileText,
   Printer,
   Plus,
   Trash2,
@@ -29,7 +29,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 
 // Add these constants at the top of the file after imports
 
@@ -159,29 +158,9 @@ interface StockInDetailProps {
   } | null | undefined
 }
 
-// Add this helper function to determine the location type
-const getLocationType = (storeId: string) => {
-  if (INVENTORY_LOCATIONS.some(loc => loc.id === storeId)) return 'inventory'
-  if (DIRECT_ISSUE_LOCATIONS.some(loc => loc.id === storeId)) return 'direct'
-  return null
-}
-
 export function StockInDetail({ mode, onClose, data }: StockInDetailProps) {
   const isViewMode = mode === 'view'
-  const isEditMode = mode === 'edit'
   const isAddMode = mode === 'add'
-
-  // Fix the state initialization
-  const [selectedMovementType, setSelectedMovementType] = React.useState(
-    data?.store ? 
-      getLocationType(data.store) === 'inventory' ? 
-        TRANSACTION_TYPES.INVENTORY.TRANSFER_IN.id : 
-        TRANSACTION_TYPES.DIRECT.PURCHASE_RECEIVE.id
-      : ''
-  )
-
-  // Get location type based on store
-  const locationType = data?.store ? getLocationType(data.store) : null
 
   const handleSave = () => {
     // Handle save logic

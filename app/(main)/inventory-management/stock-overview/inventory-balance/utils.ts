@@ -1,3 +1,4 @@
+
 /**
  * Formats a number with thousand separators and optional decimal places
  */

@@ -2,6 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+
 export function RecipeViewSkeleton() {
   return (
     <div className="container mx-auto py-6 space-y-6">

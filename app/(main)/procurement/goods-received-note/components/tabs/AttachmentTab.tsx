@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { GoodsReceiveNoteMode, Attachment } from '@/lib/types'
 import { Edit, Trash, Download } from 'lucide-react'
 
+
 interface AttachmentTabProps {
   mode: GoodsReceiveNoteMode
   attachments: Attachment[]
@@ -15,7 +16,14 @@ interface AttachmentTabProps {
   onDownloadAttachment: (id: string) => void
 }
 
-export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttachment, onDeleteAttachment, onDownloadAttachment }: AttachmentTabProps) {
+export function AttachmentTab({
+  mode = 'view',
+  attachments = [],
+  onAddAttachment,
+  onEditAttachment,
+  onDeleteAttachment,
+  onDownloadAttachment
+}: AttachmentTabProps) {
   const [newFileName, setNewFileName] = useState('')
   const [newDescription, setNewDescription] = useState('')
   const [newPublicAccess, setNewPublicAccess] = useState(false)

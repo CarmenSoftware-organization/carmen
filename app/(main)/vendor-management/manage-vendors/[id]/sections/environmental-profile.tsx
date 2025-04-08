@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { AlertCircle, Award, Leaf, BarChart2, FileText, Activity } from 'lucide-react'
+import { EnvironmentalImpact } from '../types'
 
 interface MetricCardProps {
   title: string
@@ -41,34 +42,6 @@ const MetricCard = ({ title, value, subtext, icon: Icon, trend }: MetricCardProp
     </CardContent>
   </Card>
 )
-
-interface EnvironmentalImpact {
-  carbonFootprint: {
-    value: number
-    unit: string
-    trend: number
-  }
-  energyEfficiency: {
-    value: number
-    benchmark: number
-    trend: number
-  }
-  wasteReduction: {
-    value: number
-    trend: number
-  }
-  complianceRate: {
-    value: number
-    trend: number
-  }
-  lastUpdated: string
-  esgScore: string
-  certifications: Array<{
-    name: string
-    status: 'Active' | 'Expired' | 'Pending'
-    expiry: string
-  }>
-}
 
 interface VendorEnvironmentalProps {
   vendorId: string

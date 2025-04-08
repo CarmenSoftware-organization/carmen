@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 
+
 interface ProductManagementLayoutProps {
   children: ReactNode
 }

@@ -1,6 +1,9 @@
+"use client"
+
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { MoreHorizontal, History, Edit, Trash } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, History, Edit, Trash } from "lucide-react"
 
 interface UnitMapping {
   id: string
@@ -59,8 +61,6 @@ export const columns: ColumnDef<UnitMapping>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const mapping = row.original
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

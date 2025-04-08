@@ -1,10 +1,11 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { updateVendor } from '../../actions'
 import { Vendor, EnvironmentalImpact } from '../types'
+
+'use client'
+
 
 // No need to extend Vendor since our local type already has environmentalImpact
 type VendorWithEnvironmental = Vendor
@@ -80,8 +81,11 @@ export function useVendor(id: string) {
         
         setVendor(mockVendor)
         setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch vendor')
+      } catch (error) {
+        console.error('Error fetching vendor:', error)
+        toast.error("Error fetching vendor", {
+          description: "There was a problem loading the vendor details."
+        })
       } finally {
         setIsLoading(false)
       }
@@ -101,17 +105,14 @@ export function useVendor(id: string) {
     const result = await updateVendor(vendor)
     
     if (result.error) {
-      toast({
-        title: "Error",
-        description: result.error,
-        variant: "destructive"
+      toast.error("Error updating vendor", {
+        description: result.error
       })
       return
     }
 
-    toast({
-      title: "Success",
-      description: "Vendor updated successfully"
+    toast.success("Vendor updated", {
+      description: "The vendor has been updated successfully."
     })
     
     setIsEditing(false)
@@ -121,16 +122,13 @@ export function useVendor(id: string) {
   const handleDelete = async () => {
     try {
       // Mock delete success
-      toast({
-        title: "Success",
-        description: "Vendor deleted successfully"
+      toast.success("Vendor deleted", {
+        description: "The vendor has been deleted successfully."
       })
       router.push('/vendor-management/manage-vendors')
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete vendor",
-        variant: "destructive"
+      toast.error("Error deleting vendor", {
+        description: "There was a problem deleting the vendor."
       })
     }
   }
@@ -140,6 +138,32 @@ export function useVendor(id: string) {
       if (!prev) return prev
       return { ...prev, [name]: value }
     })
+  }
+
+  const updateVendor = async (updatedData: Partial<Vendor>) => {
+    try {
+      // Simulating API call with mock data
+      if (!vendor) {
+        return { success: false, error: "Vendor not found" }
+      }
+      
+      const updatedVendor: Vendor = {
+        ...vendor,
+        ...updatedData
+      }
+      
+      setVendor(updatedVendor)
+      toast.success("Vendor updated", {
+        description: "The vendor has been updated successfully."
+      })
+      return { success: true }
+    } catch (error) {
+      console.error('Error updating vendor:', error)
+      toast.error("Error updating vendor", {
+        description: "There was a problem updating the vendor."
+      })
+      return { success: false, error: "There was a problem updating the vendor." }
+    }
   }
 
   return {

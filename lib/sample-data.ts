@@ -1,5 +1,6 @@
 import { GoodsReceiveNote, GoodsReceiveNoteItem, StockMovement, Department, AccountCode, Comment, Attachment, ActivityLogEntry } from './types'
 
+
  const sampleDepartments: Department[] = [
   { id: "DEPT-001", name: "Food & Beverage" },
   { id: "DEPT-002", name: "Housekeeping" },

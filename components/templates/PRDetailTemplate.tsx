@@ -3,38 +3,38 @@
 import React from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import StatusBadge from "@/components/ui/custom-status-badge"
+import { PurchaseRequest, PRType, Requestor } from "@/lib/types"
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardFooter,
+  CardFooter
 } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  PrinterIcon,
-  DownloadIcon,
-  ShareIcon,
-  PencilIcon,
+  Printer as PrinterIcon,
+  Download as DownloadIcon,
+  Share as ShareIcon,
+  Pencil as PencilIcon,
   CheckCircle,
   X,
   ArrowLeft,
-  UserIcon,
-  Building2Icon,
+  User as UserIcon,
+  Building2 as Building2Icon
 } from "lucide-react"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectItem,
+  SelectItem
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import StatusBadge from "@/components/ui/custom-status-badge"
-import { PurchaseRequest, PRType, Requestor } from "@/lib/types"
 
 interface SummaryTotalProps {
   prData: PurchaseRequest
@@ -107,7 +107,6 @@ export function PRDetailTemplate({
             <div className="flex justify-between items-center">
               <h1 className="text-2xl font-bold">{title}</h1>
               <div className="flex items-center gap-2">
-                {/* Edit/Save/Cancel buttons */}
                 {mode === "view" ? (
                   <Button onClick={() => onModeChange("edit")}>
                     <PencilIcon className="mr-2 h-4 w-4" />
@@ -129,10 +128,8 @@ export function PRDetailTemplate({
                   </>
                 )}
 
-                {/* Separator between edit/save buttons and action buttons */}
                 <div className="w-px h-6 bg-border mx-2" />
 
-                {/* Action buttons that are always visible */}
                 <Button variant="outline" size="sm">
                   <PrinterIcon className="mr-2 h-4 w-4" />
                   Print
@@ -149,7 +146,6 @@ export function PRDetailTemplate({
             </div>
           </div>
 
-          {/* Main Form Section */}
           <Card className="bg-white dark:bg-gray-800">
             <CardContent className="p-4">
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -199,127 +195,10 @@ export function PRDetailTemplate({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="col-span-2">
-                  <div className="grid grid-cols-2 w-full">
-                    {[
-                      {
-                        id: "requestor.name",
-                        label: "Requestor",
-                        icon: UserIcon,
-                      },
-                      {
-                        id: "department",
-                        label: "Department",
-                        icon: Building2Icon,
-                      },
-                    ].map(({ id, label, icon: Icon }) => (
-                      <div key={id} className="space-y-1">
-                        <Label
-                          htmlFor={id}
-                          className="text-[0.7rem] text-gray-500 flex items-center gap-2"
-                        >
-                          <Icon className="h-3 w-3" /> {label}
-                        </Label>
-                        <Input
-                          id={id}
-                          name={id}
-                          value={
-                            id.includes(".")
-                              ? (formData[
-                                  id.split(".")[0] as keyof PurchaseRequest
-                                ] as Requestor)[id.split(".")[1] as keyof Requestor]
-                              : String(formData[id as keyof PurchaseRequest])
-                          }
-                          onChange={onInputChange}
-                          disabled={mode === "view"}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="col-span-2 md:col-span-3">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      onFormDataChange({ description: e.target.value })
-                    }
-                    disabled={mode === "view"}
-                  />
-                </div>
-
-                <div className="col-span-2 bg-muted p-4 rounded-lg">
-                  <div className="flex justify-between items-start">
-                    {["currentWorkflowStage", "workflowStatus", "status"].map(
-                      (key) => (
-                        <div key={key} className="space-y-2 text-center">
-                          <label className="text-sm font-medium block">
-                            {key
-                              .replace(/([A-Z])/g, " $1")
-                              .replace(/^./, (str) => str.toUpperCase())}
-                          </label>
-                          <StatusBadge
-                            status={String(
-                              formData[key as keyof PurchaseRequest]
-                            )}
-                          />
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
         </CardHeader>
-
-        <CardContent className="pt-0">
-          {/* Tabs Section */}
-          {tabs.length > 0 && (
-            <Tabs defaultValue={tabs[0].label.toLowerCase()} className="w-full">
-              <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
-                {tabs.map(({ label }) => (
-                  <TabsTrigger
-                    key={label}
-                    value={label.toLowerCase()}
-                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                  >
-                    {label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              <ScrollArea className="h-[400px] w-full rounded-md border">
-                {tabs.map(({ label, content }) => (
-                  <TabsContent key={label} value={label.toLowerCase()}>
-                    {content}
-                  </TabsContent>
-                ))}
-              </ScrollArea>
-            </Tabs>
-          )}
-
-          {/* Summary Section */}
-          <Card className="mt-6 bg-white dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle>Transaction Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SummaryTotal prData={formData} />
-            </CardContent>
-          </Card>
-        </CardContent>
-
-        {/* Footer Actions */}
-        {mode !== "add" && actions && (
-          <CardFooter className="flex justify-end space-x-2">
-            {actions}
-          </CardFooter>
-        )}
-
-        {/* Additional Content */}
-        {children}
       </Card>
     </div>
   )

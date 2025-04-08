@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
@@ -16,10 +16,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import type { SpotCheckDetails } from "../types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "@/components/ui/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useUser } from "@/lib/context/user-context"
 import React from "react"
+import { toast } from "sonner"
 
 interface InventoryItem {
   id: string
@@ -284,6 +284,10 @@ export function NewSpotCheckForm({
     },
   })
 
+  const handleSelectChange = useCallback((field: keyof FormValues, value: string) => {
+    form.setValue(field, value)
+  }, [form])
+
   // Memoize fetchSelectedItems to prevent unnecessary recreations
   const fetchSelectedItems = React.useCallback(async (values: FormValues) => {
     // Simulate API delay
@@ -293,17 +297,42 @@ export function NewSpotCheckForm({
     return items
   }, [])
 
+  // Watch for form changes and update selected items
+  const watchedFields = useWatch({
+    control: form.control,
+    name: ["itemCount", "selectionType", "minimumPrice", "departmentId", "storeId"],
+  })
+
+  useEffect(() => {
+    const [itemCount, selectionType, , departmentId, storeId] = watchedFields
+    if (itemCount && selectionType && departmentId && storeId) {
+      void fetchSelectedItems(form.getValues())
+    }
+  }, [watchedFields, fetchSelectedItems, form])
+
+  // Set initial values from user context
+  useEffect(() => {
+    if (!user) return
+
+    const userFields = {
+      counterId: user.id,
+      departmentId: user.department,
+    }
+
+    Object.entries(userFields).forEach(([field, value]) => {
+      if (value && form.getValues(field as keyof FormValues) !== value) {
+        form.setValue(field as keyof FormValues, value)
+      }
+    })
+  }, [user, form])
+
   const handleSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true)
 
       // Validate required fields
       if (!values.counterId || !values.departmentId || !values.storeId) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Please fill in all required fields",
-        })
+        toast.error("Please fill in all required fields")
         return
       }
 
@@ -327,50 +356,22 @@ export function NewSpotCheckForm({
       }
 
       await onSubmit(details)
-    } catch (error) {
-      console.error("Form submission error:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to create spot check. Please try again.",
+
+      // Simulating API call success
+      toast.success("Spot check created", {
+        description: "The spot check has been created successfully."
       })
+      return true
+    } catch (error) {
+      console.error('Error creating spot check:', error)
+      toast.error("Error creating spot check", {
+        description: "There was a problem creating the spot check."
+      })
+      return false
     } finally {
       setIsSubmitting(false)
     }
   }
-
-  // Watch for form changes and update selected items
-  useEffect(() => {
-    const relevantFields = ["itemCount", "selectionType", "minimumPrice", "departmentId", "storeId"]
-    
-    const subscription = form.watch((value, { name }) => {
-      // Only fetch items if relevant fields change
-      if (relevantFields.includes(name || "")) {
-        const values = form.getValues()
-        if (values.itemCount && values.selectionType && values.departmentId && values.storeId) {
-          void fetchSelectedItems(values)
-        }
-      }
-    })
-    
-    return () => subscription.unsubscribe()
-  }, [form, fetchSelectedItems])
-
-  // Set initial values from user context
-  useEffect(() => {
-    if (!user) return
-
-    const userFields = {
-      counterId: user.id,
-      departmentId: user.department,
-    }
-
-    Object.entries(userFields).forEach(([field, value]) => {
-      if (value && form.getValues(field as keyof FormValues) !== value) {
-        form.setValue(field as keyof FormValues, value)
-      }
-    })
-  }, [user, form])
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
@@ -384,10 +385,14 @@ export function NewSpotCheckForm({
               <FormField
                 control={form.control}
                 name="counterId"
-                render={({ field }) => (
+                render={({ field: { value, onChange, ...field } }) => (
                   <FormItem>
                     <FormLabel>Counter</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      {...field}
+                      value={value}
+                      onValueChange={onChange}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a counter" />
@@ -409,10 +414,14 @@ export function NewSpotCheckForm({
               <FormField
                 control={form.control}
                 name="departmentId"
-                render={({ field }) => (
+                render={({ field: { value, onChange, ...field } }) => (
                   <FormItem>
                     <FormLabel>Department</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      {...field}
+                      value={value}
+                      onValueChange={onChange}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a department" />
@@ -434,10 +443,14 @@ export function NewSpotCheckForm({
               <FormField
                 control={form.control}
                 name="storeId"
-                render={({ field }) => (
+                render={({ field: { value, onChange, ...field } }) => (
                   <FormItem>
                     <FormLabel>Store Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      {...field}
+                      value={value}
+                      onValueChange={onChange}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a store" />

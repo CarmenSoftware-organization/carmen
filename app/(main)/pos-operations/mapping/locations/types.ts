@@ -1,5 +1,6 @@
 import { StatusType } from "../components"
 
+
 export interface LocationMapping {
   id: string
   locationCode: string

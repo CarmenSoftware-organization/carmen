@@ -1,6 +1,7 @@
-// File: tabs/ActivityTab.tsx
 import React from 'react'
 import { ActivityIcon } from 'lucide-react'
+
+// File: tabs/ActivityTab.tsx
 
 const activities = [
   { action: 'PR Created', date: '2023-07-15 09:00' },

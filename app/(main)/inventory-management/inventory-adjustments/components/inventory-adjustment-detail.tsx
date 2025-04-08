@@ -14,7 +14,6 @@ import {
   Edit,
   Trash,
 } from 'lucide-react'
-
 import { HeaderInformation } from "./header-information"
 import { HeaderActions } from "./header-actions"
 import { StockMovementTable } from "./stock-movement/stock-movement-table"
@@ -24,7 +23,7 @@ import StatusBadge from "@/components/ui/custom-status-badge"
 import type { JournalEntry, JournalHeader as JournalHeaderType } from "./types"
 
 interface InventoryAdjustmentDetailProps {
-  id: string
+  data: InventoryAdjustment
 }
 
 interface AdjustmentItem {
@@ -72,127 +71,6 @@ interface InventoryAdjustment {
   }
 }
 
-const mockAdjustment: InventoryAdjustment = {
-  id: "ADJ-2024-001",
-  date: "2024-01-15",
-  type: "IN",
-  status: "Posted",
-  location: "Main Warehouse",
-  locationCode: "WH-001",
-  department: "Warehouse",
-  reason: "Physical Count Variance",
-  description: "Adjustment based on monthly physical inventory count",
-  items: [
-    {
-      id: "ITEM-001",
-      productName: "Organic Quinoa",
-      sku: "GRN-QNA-001",
-      description: "Premium organic white quinoa, high in protein and gluten-free",
-      location: "Main Warehouse",
-      locationCode: "WH-001",
-      uom: "KG",
-      requiredQuantity: 25,
-      approvedQuantity: 25,
-      issuedQuantity: 25,
-      price: 45.50,
-      status: 'pending',
-      onHand: 50,
-      onOrder: 20,
-      lastPrice: 45.50,
-      lastVendor: 'Vendor A',
-      lots: [
-        {
-          id: "LOT-001",
-          lotNumber: "L240115-001",
-          quantity: 25,
-          uom: "KG"
-        },
-        {
-          id: "LOT-002",
-          lotNumber: "L240115-002",
-          quantity: -8,
-          uom: "KG"
-        }
-      ],
-      unitCost: 45.50,
-      totalCost: 772.50,
-    },
-    {
-      id: "ITEM-002",
-      productName: "Brown Rice",
-      sku: "GRN-RCE-002",
-      description: "Whole grain brown rice, rich in fiber and nutrients",
-      location: "Main Warehouse",
-      locationCode: "WH-001",
-      uom: "KG",
-      requiredQuantity: 50,
-      approvedQuantity: 50,
-      issuedQuantity: 50,
-      price: 28.75,
-      status: 'pending',
-      onHand: 70,
-      onOrder: 30,
-      lastPrice: 28.75,
-      lastVendor: 'Vendor B',
-      lots: [
-        {
-          id: "LOT-003",
-          lotNumber: "L240115-003",
-          quantity: 50,
-          uom: "KG"
-        },
-        {
-          id: "LOT-004",
-          lotNumber: "L240115-004",
-          quantity: -15,
-          uom: "KG"
-        }
-      ],
-      unitCost: 28.75,
-      totalCost: 1006.25,
-    },
-    {
-      id: "ITEM-003",
-      productName: "Chia Seeds",
-      sku: "GRN-CHA-003",
-      description: "Organic black chia seeds, high in omega-3 fatty acids",
-      location: "Main Warehouse",
-      locationCode: "WH-001",
-      uom: "KG",
-      requiredQuantity: 30,
-      approvedQuantity: 30,
-      issuedQuantity: 30,
-      price: 53.35,
-      status: 'pending',
-      onHand: 40,
-      onOrder: 10,
-      lastPrice: 53.35,
-      lastVendor: 'Vendor C',
-      lots: [
-        {
-          id: "LOT-005",
-          lotNumber: "L240115-005",
-          quantity: 30,
-          uom: "KG"
-        },
-        {
-          id: "LOT-006",
-          lotNumber: "L240115-006",
-          quantity: -10,
-          uom: "KG"
-        }
-      ],
-      unitCost: 53.35,
-      totalCost: 1066.75,
-    }
-  ],
-  totals: {
-    inQty: 105,
-    outQty: 33,
-    totalCost: 2845.50
-  }
-}
-
 const mockJournalEntries: {
   header: JournalHeaderType
   entries: JournalEntry[]
@@ -231,7 +109,7 @@ const mockJournalEntries: {
   ]
 }
 
-export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps) {
+export function InventoryAdjustmentDetail({ data }: InventoryAdjustmentDetailProps) {
   const [isEditMode, setIsEditMode] = useState(false)
 
   const handleHeaderUpdate = (field: string, value: string) => {
@@ -243,13 +121,13 @@ export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps
       <Card>
         <CardHeader className="flex flex-col gap-6">
           <HeaderActions
-            status={mockAdjustment.status}
+            status={data.status}
             isEditMode={isEditMode}
             setIsEditMode={setIsEditMode}
           />
 
           <HeaderInformation
-            data={mockAdjustment}
+            data={data}
             isEditMode={isEditMode}
             onUpdate={handleHeaderUpdate}
           />
@@ -272,7 +150,7 @@ export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps
 
             <TabsContent value="stock" className="mt-4">
               <StockMovementTable 
-                items={mockAdjustment.items.map(item => ({
+                items={data.items.map(item => ({
                   id: item.id,
                   productName: item.productName,
                   sku: item.sku,
@@ -324,7 +202,7 @@ export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockAdjustment.items.map((item) => (
+                  {data.items.map((item) => (
                     <>
                       <TableRow key={item.id} className="group">
                         <TableCell>

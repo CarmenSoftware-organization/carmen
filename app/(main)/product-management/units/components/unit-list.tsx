@@ -3,6 +3,12 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { CheckCircle, Download, Plus, Search, Trash2, XCircle } from "lucide-react"
+import { UnitTable } from "./unit-table"
+import { UnitForm } from "./unit-form"
+import { toast } from "sonner"
+import { AdvancedFilter } from "@/components/ui/advanced-filter"
+import { FilterType } from "@/lib/utils/filter-storage"
 import {
   Select,
   SelectContent,
@@ -10,19 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CheckCircle, Download, Plus, Search, Trash2, XCircle } from "lucide-react"
-import { UnitTable } from "./unit-table"
-import { UnitForm } from "./unit-form"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { mockUnits } from "../data/mock-units"
-import { AdvancedFilter } from "@/components/ui/advanced-filter"
-import { FilterType } from "@/lib/utils/filter-storage"
-import { toast } from "@/components/ui/use-toast"
 
 export interface Unit {
   id: string
@@ -34,6 +33,40 @@ export interface Unit {
   createdAt: Date
   updatedAt: Date
 }
+
+// Mock data
+const mockUnits: Unit[] = [
+  {
+    id: "1",
+    code: "KG",
+    name: "Kilogram",
+    description: "Standard unit of mass",
+    type: "INVENTORY",
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "2",
+    code: "L",
+    name: "Liter",
+    description: "Standard unit of volume",
+    type: "INVENTORY",
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "3",
+    code: "PC",
+    name: "Piece",
+    description: "Count unit",
+    type: "ORDER",
+    isActive: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+]
 
 export function UnitList() {
   const [search, setSearch] = useState("")
@@ -111,43 +144,52 @@ export function UnitList() {
   }
 
   const handleBulkDelete = () => {
-    console.log('Delete items:', selectedItems)
-    setSelectedItems([])
+    try {
+      console.log('Delete items:', selectedItems)
+      setSelectedItems([])
+      toast.success("Selected units deleted successfully")
+    } catch (error) {
+      toast.error("Failed to delete selected units")
+    }
   }
 
   const handleBulkStatusUpdate = (status: boolean) => {
-    console.log('Update status:', status, 'for items:', selectedItems)
-    setSelectedItems([])
+    try {
+      console.log('Update status:', status, 'for items:', selectedItems)
+      setSelectedItems([])
+      toast.success(`Units ${status ? 'activated' : 'deactivated'} successfully`)
+    } catch (error) {
+      toast.error(`Failed to ${status ? 'activate' : 'deactivate'} units`)
+    }
   }
 
   const handleBulkExport = () => {
-    console.log('Export items:', selectedItems)
+    try {
+      console.log('Export items:', selectedItems)
+      toast.success("Units exported successfully")
+    } catch (error) {
+      toast.error("Failed to export units")
+    }
   }
 
   const handleApplyFilters = (filters: FilterType<Unit>[]) => {
     try {
       setActiveFilters(filters);
       setCurrentPage(1);
+      toast.success("Filters applied successfully")
     } catch (error) {
       console.error('Error applying filters:', error);
-      toast({
-        title: "Error",
-        description: "There was a problem applying the filters.",
-        variant: "destructive"
-      });
+      toast.error("Failed to apply filters")
     }
   };
 
   const handleClearFilters = () => {
     try {
       setActiveFilters([]);
+      toast.success("Filters cleared successfully")
     } catch (error) {
       console.error('Error clearing filters:', error);
-      toast({
-        title: "Error",
-        description: "There was a problem clearing the filters.",
-        variant: "destructive"
-      });
+      toast.error("Failed to clear filters")
     }
   };
 
@@ -203,7 +245,8 @@ export function UnitList() {
               </SelectContent>
             </Select>
             
-            <AdvancedFilter
+            <AdvancedFilter<Unit>
+              moduleName="unit-list"
               onApplyFilters={handleApplyFilters}
               onClearFilters={handleClearFilters}
               filterFields={filterFields}
@@ -324,6 +367,7 @@ export function UnitList() {
             onSuccess={(data) => {
               console.log('Created:', data)
               setIsCreateDialogOpen(false)
+              toast.success("Unit created successfully")
             }}
             onCancel={() => setIsCreateDialogOpen(false)}
           />
@@ -341,6 +385,7 @@ export function UnitList() {
               onSuccess={(data) => {
                 console.log('Updated:', data)
                 setSelectedUnit(null)
+                toast.success("Unit updated successfully")
               }}
               onCancel={() => setSelectedUnit(null)}
             />

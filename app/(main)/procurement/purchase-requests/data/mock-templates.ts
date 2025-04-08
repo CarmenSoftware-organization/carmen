@@ -1,136 +1,91 @@
 import { PRTemplate, PRType } from "@/lib/types";
 
+
 /**
  * Mock data for PR templates
  * This data follows the PRTemplate interface defined in lib/types.ts
  */
 export const mockTemplates: PRTemplate[] = [
   {
-    id: "template1",
-    name: "Office Supplies",
-    description: "Standard template for ordering office supplies",
+    id: "template-001",
+    name: "Office Supplies Template",
+    description: "Standard template for office supplies purchases",
     type: PRType.GeneralPurchase,
-    category: "department",
+    category: "Office Supplies",
     department: "Administration",
-    createdBy: "John Doe",
-    createdAt: new Date("2023-10-15"),
-    updatedAt: new Date("2023-11-20"),
+    createdBy: "user-001",
+    createdAt: new Date("2023-01-01"),
+    updatedAt: new Date("2023-01-01"),
     isDefault: true,
-    isGlobal: false,
+    isGlobal: true,
     prData: {
-      vendor: "Office Depot",
-      vendorId: 1001,
-      description: "Monthly office supplies",
-      location: "HQ",
+      vendor: "Office Supplies Co.",
+      vendorId: 1,
+      description: "Standard office supplies purchase",
+      location: "Head Office",
       department: "Administration",
-      jobCode: "ADMIN-2023",
+      jobCode: "JOB-001",
       currency: "USD",
       items: [
         {
-          name: "Printer Paper",
+          name: "Office Paper",
           description: "A4 printer paper, 80gsm",
           unit: "Box",
-          location: "Main Storage",
-          vendor: "Office Depot",
+          quantityRequested: 10,
           price: 24.99,
-          taxRate: 7,
-          discountRate: 0
+          currency: "USD",
+          itemCategory: "Office Supplies",
+          itemSubcategory: "Paper",
+          accountCode: "ACC-001",
+          jobCode: "JOB-001",
         },
         {
-          name: "Ballpoint Pens",
-          description: "Blue ballpoint pens, pack of 12",
-          unit: "Pack",
-          location: "Main Storage",
-          vendor: "Office Depot",
-          price: 8.99,
-          taxRate: 7,
-          discountRate: 0
+          name: "Pens",
+          description: "Blue ballpoint pens",
+          unit: "Box",
+          quantityRequested: 5,
+          price: 12.99,
+          currency: "USD",
+          itemCategory: "Office Supplies",
+          itemSubcategory: "Writing Materials",
+          accountCode: "ACC-001",
+          jobCode: "JOB-001",
         }
       ]
     }
   },
   {
-    id: "template2",
-    name: "Kitchen Supplies",
-    description: "Template for kitchen and pantry items",
-    type: PRType.MarketList,
-    category: "global",
-    createdBy: "Jane Smith",
-    createdAt: new Date("2023-09-05"),
-    updatedAt: new Date("2023-11-10"),
+    id: "template-002",
+    name: "IT Equipment Template",
+    description: "Standard template for IT equipment purchases",
+    type: PRType.AssetPurchase,
+    category: "IT Equipment",
+    department: "IT",
+    createdBy: "user-002",
+    createdAt: new Date("2023-01-02"),
+    updatedAt: new Date("2023-01-02"),
     isDefault: false,
     isGlobal: true,
     prData: {
-      vendor: "Restaurant Supply Co.",
-      vendorId: 1002,
-      description: "Kitchen supplies restocking",
-      location: "Main Kitchen",
-      department: "F&B",
-      jobCode: "FB-2023",
-      currency: "USD",
-      items: [
-        {
-          name: "Dish Soap",
-          description: "Industrial dish soap, 5L",
-          unit: "Bottle",
-          location: "Kitchen Storage",
-          vendor: "Restaurant Supply Co.",
-          price: 18.50,
-          taxRate: 7,
-          discountRate: 0
-        },
-        {
-          name: "Paper Towels",
-          description: "Industrial paper towels, pack of 6",
-          unit: "Pack",
-          location: "Kitchen Storage",
-          vendor: "Restaurant Supply Co.",
-          price: 12.99,
-          taxRate: 7,
-          discountRate: 0
-        }
-      ]
-    }
-  },
-  {
-    id: "template3",
-    name: "IT Equipment",
-    description: "Template for standard IT equipment purchases",
-    type: PRType.AssetPurchase,
-    category: "my",
-    createdBy: "Current User",
-    createdAt: new Date("2023-11-01"),
-    updatedAt: new Date("2023-11-01"),
-    isDefault: false,
-    isGlobal: false,
-    prData: {
       vendor: "Tech Solutions Inc.",
-      vendorId: 1003,
-      description: "IT equipment for new hires",
-      location: "HQ",
+      vendorId: 2,
+      description: "Standard IT equipment purchase",
+      location: "Head Office",
       department: "IT",
-      jobCode: "IT-2023",
+      jobCode: "JOB-002",
       currency: "USD",
       items: [
         {
           name: "Laptop",
-          description: "Standard business laptop",
+          description: "Business laptop with standard specifications",
           unit: "Unit",
-          location: "IT Storage",
-          vendor: "Tech Solutions Inc.",
-          price: 899.99,
-          taxRate: 7,
-          discountRate: 0
-        },
-        {
-          name: "Monitor",
-          description: "24-inch LED monitor",
-          unit: "Unit",
-          location: "IT Storage",
-          vendor: "Tech Solutions Inc.",
-          price: 199.99,
-          taxRate: 7,
-          discountRate: 0
+          quantityRequested: 1,
+          price: 999.99,
+          currency: "USD",
+          itemCategory: "IT Equipment",
+          itemSubcategory: "Computers",
+          accountCode: "ACC-002",
+          jobCode: "JOB-002",
         }
       ]
     }
@@ -139,23 +94,37 @@ export const mockTemplates: PRTemplate[] = [
 
 /**
  * Function to get a template by ID
- * @param templateId The ID of the template to retrieve
+ * @param id The ID of the template to retrieve
  * @returns The template with the specified ID, or undefined if not found
  */
-export function getTemplateById(templateId: string): PRTemplate | undefined {
-  return mockTemplates.find(template => template.id === templateId);
+export function getTemplateById(id: string): PRTemplate | undefined {
+  return mockTemplates.find(template => template.id === id);
 }
 
 /**
  * Function to get templates by category
- * @param category The category to filter by (my, department, global, or all)
+ * @param category The category to filter by (Office Supplies, IT Equipment, etc.)
  * @returns An array of templates in the specified category
  */
 export function getTemplatesByCategory(category: string): PRTemplate[] {
-  if (category === 'all') {
-    return mockTemplates;
-  }
   return mockTemplates.filter(template => template.category === category);
+}
+
+/**
+ * Function to get templates by department
+ * @param department The department to filter by
+ * @returns An array of templates in the specified department
+ */
+export function getTemplatesByDepartment(department: string): PRTemplate[] {
+  return mockTemplates.filter(template => template.department === department);
+}
+
+/**
+ * Function to get the default template
+ * @returns The default template, or undefined if none exists
+ */
+export function getDefaultTemplate(): PRTemplate | undefined {
+  return mockTemplates.find(template => template.isDefault);
 }
 
 /**
@@ -165,13 +134,4 @@ export function getTemplatesByCategory(category: string): PRTemplate[] {
  */
 export function getTemplatesByType(type: PRType): PRTemplate[] {
   return mockTemplates.filter(template => template.type === type);
-}
-
-/**
- * Function to get the default template for a PR type
- * @param type The PR type to get the default template for
- * @returns The default template for the specified PR type, or undefined if none exists
- */
-export function getDefaultTemplateForType(type: PRType): PRTemplate | undefined {
-  return mockTemplates.find(template => template.type === type && template.isDefault);
 } 

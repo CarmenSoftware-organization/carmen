@@ -1,26 +1,22 @@
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
-import { useRouter } from 'next/navigation';
-import { Search, ArrowUpDown, AlertCircle } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote, Vendor } from '@/lib/types'
 import type { GoodsReceiveNoteItem } from '@/lib/types'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Progress } from '@/components/ui/progress'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
+import { Search, ArrowUpDown, AlertCircle, Table } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -35,10 +31,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   Select,
   SelectContent,
@@ -358,7 +350,11 @@ interface AmountOnlyCreditNote {
 
 type CreatedCreditNote = ItemBasedCreditNote | AmountOnlyCreditNote;
 
-export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNoteCreate?: (creditNote: CreatedCreditNote) => void }) {
+interface VendorSelectionProps {
+  onCreditNoteCreate?: (creditNote: CreatedCreditNote) => void
+}
+
+export function VendorSelection({ onCreditNoteCreate }: VendorSelectionProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
   const [selectedGRN, setSelectedGRN] = useState<GoodsReceiveNote | null>(null)
@@ -378,15 +374,12 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
   }, [])
 
   const sortedGRNs = useMemo(() => {
-    // Create a copy of the array
     const sortableGRNs = [...mockGoodsReceiveNotes];
-    
-    if (sortConfig.key !== null) {
+    if (sortConfig.key) {
       sortableGRNs.sort((a, b) => {
         const key = sortConfig.key as keyof GoodsReceiveNote;
-        // Convert values to strings for safe comparison
-        const aValue = String(a[key]);
-        const bValue = String(b[key]);
+        const aValue = String(a[key] ?? '');
+        const bValue = String(b[key] ?? '');
         
         if (aValue < bValue) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -398,7 +391,7 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
       });
     }
     return sortableGRNs;
-  }, [mockGoodsReceiveNotes, sortConfig.key, sortConfig.direction]);
+  }, [sortConfig.key, sortConfig.direction]);
 
   const filteredGRNs = useMemo(() => {
     return sortedGRNs.filter(grn => 
@@ -520,6 +513,8 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
   }
 
   const confirmCreateCreditNote = () => {
+    if (!onCreditNoteCreate) return
+
     if (creditNoteType === 'item-based') {
       onCreditNoteCreate({ 
         type: 'item-based',
@@ -537,7 +532,7 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
         reason: amountOnlyReason
       })
     }
-    router.push(`/procurement/credit-note/1`);
+    router.push(`/procurement/credit-note/1`)
   }
 
   const getProgressPercentage = () => {

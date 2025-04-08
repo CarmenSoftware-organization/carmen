@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+
 interface FormPageTemplateProps {
   title: string;
   children: ReactNode;

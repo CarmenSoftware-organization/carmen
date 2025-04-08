@@ -1,14 +1,13 @@
-'use client'
-
 import React, { useState } from 'react'
 import { Scale, Plus, Pencil, Save, X, AlertCircle, TrashIcon, ArrowLeftRight } from 'lucide-react'
-import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Table, TableHeader, TableHead, TableBody, TableCell, TableRow } from "@/components/ui/table"
-import { Card } from "@/components/ui/card"
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
+
+'use client'
+
 
 interface StockCountUnit {
   countUnit: string
@@ -22,7 +21,7 @@ export interface StockCountTabProps {
   isEditing: boolean
 }
 
-export function StockCountTab({ isEditing }: StockCountTabProps) {
+export function StockCountTab({ isEditing = false }: StockCountTabProps) {
   const [stockCountUnits, setStockCountUnits] = useState<StockCountUnit[]>([
     {
       countUnit: "KG",
@@ -64,10 +63,8 @@ export function StockCountTab({ isEditing }: StockCountTabProps) {
 
   const handleDeleteUnit = (unitCode: string) => {
     if (stockCountUnits.find(u => u.countUnit === unitCode)?.isDefault) {
-      toast({
-        title: "Cannot delete default unit",
-        description: "Please set another unit as default first",
-        variant: "destructive"
+      toast.error("Cannot delete default unit", {
+        description: "Please set another unit as default first"
       })
       return
     }
@@ -151,8 +148,7 @@ export function StockCountTab({ isEditing }: StockCountTabProps) {
 
     setStockCountUnits(units => [...units, newUnit])
     handleCancelAdd()
-    toast({
-      title: "Unit added successfully",
+    toast.success("Unit added successfully", {
       description: `${newUnit.countUnit} has been added to the stock count units.`
     })
   }

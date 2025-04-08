@@ -1,3 +1,8 @@
+"use client"
+
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import React, { ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
@@ -5,9 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/custom-dialog";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
-import React, { ReactNode } from "react";
 
 interface DialogPageTemplateProps {
   title: ReactNode;
@@ -31,22 +33,19 @@ const DialogPageTemplate: React.FC<DialogPageTemplateProps> = ({
   onClose,
 }) => {
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent
-          className={`sm:max-w-[80vw] max-w-[80vw] py-6 px-10 border-none bg-white flex flex-col justify-between ${
-            height ? height : ""
-          } ${width ? width : ""}`}
-        >
-          <DialogHeader>
-            
-
-            <DialogTitle className="w-full flex justify-between">
-              <div>
-                {" "}
-                <h3 className="text-xl font-bold">{title}</h3>
-              </div>
-              <div className="w-fit flex flex-col gap-2">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent
+        className={`sm:max-w-[80vw] max-w-[80vw] py-6 px-10 border-none bg-white flex flex-col justify-between ${
+          height ? height : ""
+        } ${width ? width : ""}`}
+      >
+        <DialogHeader>
+          <DialogTitle className="w-full flex justify-between">
+            <div>
+              {" "}
+              <h3 className="text-xl font-bold">{title}</h3>
+            </div>
+            <div className="w-fit flex flex-col gap-2">
               {/* <Button
                 variant="ghost"
                 size="icon"
@@ -59,16 +58,14 @@ const DialogPageTemplate: React.FC<DialogPageTemplateProps> = ({
 
               <div>{titleButtons}</div>
             </div>
+          </DialogTitle>
+        </DialogHeader>
 
-            </DialogTitle>
-          </DialogHeader>
+        <div className="">{content}</div>
 
-          <div className="">{content}</div>
-
-          {footerButtons && <DialogFooter>{footerButtons}</DialogFooter>}
-        </DialogContent>
-      </Dialog>
-    </>
+        {footerButtons && <DialogFooter>{footerButtons}</DialogFooter>}
+      </DialogContent>
+    </Dialog>
   );
 };
 

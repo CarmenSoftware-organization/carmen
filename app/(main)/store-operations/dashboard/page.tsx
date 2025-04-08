@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { DashboardTemplate } from "@/components/templates/DashboardTemplate";
 import { Store, TrendingDown, AlertCircle, Truck } from "lucide-react";

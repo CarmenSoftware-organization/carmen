@@ -1,9 +1,11 @@
+'use client'
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const DetailedJournalEntries = () => {
+export function DetailedJournalEntries() {
   const transaction = {
     id: 1,
     date: '2024-01-15',
@@ -213,6 +215,4 @@ const DetailedJournalEntries = () => {
       </Alert>
     </div>
   );
-};
-
-export default DetailedJournalEntries;
+}

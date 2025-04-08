@@ -1,5 +1,5 @@
-import { Vendor, Certification } from '../[id]/types'
-import { Address, Contact } from '@/lib/types'
+import { Vendor, Certification, Address, Contact } from '../[id]/types'
+
 
 // Define address types to match the library type
 const ADDRESS_TYPE = {

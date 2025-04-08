@@ -1,24 +1,18 @@
-"use client"
+'use client'
 
 import { useRouter } from "next/navigation"
-import { 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
   Clock, 
-  Layers, 
-  CheckCircle,
-  AlertTriangle,
-  Building2,
   User,
   Download,
-  Calendar,
   ArrowLeft,
   FileBarChart,
   FileText,
   Camera
 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import {
   Table,
   TableBody,

@@ -6,7 +6,7 @@ interface CountProgressProps {
   className?: string
 }
 
-export function CountProgress({ total, completed, className }: CountProgressProps) {
+export function CountProgress({ total, completed, className = '' }: CountProgressProps) {
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0
 
   return (

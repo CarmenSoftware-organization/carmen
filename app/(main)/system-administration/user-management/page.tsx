@@ -1,9 +1,15 @@
-"use client"
+'use client'
 
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
+import { BulkActions, BulkActionData } from "./components/bulk-actions"
+import { EnhancedFilter, FilterCondition, SavedFilter } from "./components/enhanced-filter"
+import { StatusBadge } from "./components/status-badge"
+import { UserCard } from "./components/user-card"
 import {
   Table,
   TableBody,
@@ -38,15 +44,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { BulkActions } from "./components/bulk-actions"
-import { EnhancedFilter, FilterCondition, SavedFilter } from "./components/enhanced-filter"
-import { StatusBadge } from "./components/status-badge"
-import { UserCard } from "./components/user-card"
-import { 
-  UserPlus, 
-  Search, 
+import {
+  UserPlus,
+  Search,
   Pencil,
   Trash2,
   MoreHorizontal,
@@ -54,7 +54,7 @@ import {
   LayoutList,
   Download,
   FileText,
-  FileSpreadsheet
+  FileSpreadsheet,
 } from "lucide-react"
 
 interface User {
@@ -218,25 +218,46 @@ export default function UserManagementPage() {
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleBulkAction = async (action: string, data: Record<string, string>) => {
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    console.log("Bulk action:", action, data, "for users:", selectedUsers)
-    
-    if (action === "delete") {
-      setUsers(users.filter(user => !selectedUsers.includes(user.id)))
-      setSelectedUsers([])
-    } else if (action === "status") {
-      setUsers(users.map(user => 
-        selectedUsers.includes(user.id) 
-          ? { ...user, accountStatus: data.status } 
-          : user
-      ))
+  const handleBulkAction = async <T extends keyof BulkActionData>(action: T, data?: BulkActionData[T]) => {
+    try {
+      setIsLoading(true)
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      switch (action) {
+        case "invite":
+          // Handle invite action
+          console.log("Inviting users:", data)
+          break
+        case "status":
+          if (data && "status" in data) {
+            setUsers(users.map(user => 
+              selectedUsers.includes(user.id) 
+                ? { ...user, accountStatus: String(data.status) } 
+                : user
+            ))
+          }
+          break
+        case "role":
+          // Handle role assignment
+          console.log("Assigning roles:", data)
+          break
+        case "department":
+          // Handle department assignment
+          console.log("Assigning department:", data)
+          break
+        case "delete":
+          setUsers(users.filter(user => !selectedUsers.includes(user.id)))
+          setSelectedUsers([])
+          break
+        default:
+          throw new Error(`Unsupported action: ${String(action)}`)
+      }
+    } catch (error) {
+      console.error("Error performing bulk action:", error)
+    } finally {
+      setIsLoading(false)
     }
-    
-    setIsLoading(false)
   }
 
   const applyFilters = (user: User) => {

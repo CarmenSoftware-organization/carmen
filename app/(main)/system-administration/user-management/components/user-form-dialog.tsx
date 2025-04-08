@@ -1,6 +1,13 @@
-"use client"
+'use client'
 
 import React, { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
+import { User, CheckCircle2, XCircle, Clock } from "lucide-react"
+import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
   DialogContent,
@@ -10,8 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -19,12 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { User } from "lucide-react"
-import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs"
-import { CheckCircle2, XCircle, Clock } from "lucide-react"
 
 // Define the departments object
 const departments: Record<string, string[]> = {
@@ -75,12 +74,13 @@ export function UserFormDialog({
       accountStatus: "active",
     }
   )
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       await onSubmit(formData)
+      setOpen(false)
     } catch (error) {
       console.error("Form submission failed:", error)
     }
@@ -112,200 +112,84 @@ export function UserFormDialog({
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{user ? "Edit User" : "Add New User"}</DialogTitle>
-          <DialogDescription>
-            {user
-              ? "Update user information and permissions."
-              : "Create a new user account with appropriate permissions."}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="px-6">
-          <Tabs defaultValue="basic" className="mt-2">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="basic">Basic Info</TabsTrigger>
-              <TabsTrigger value="access">Access Control</TabsTrigger>
-              <TabsTrigger value="status">Account Status</TabsTrigger>
-            </TabsList>
-            <TabsContent value="basic" className="space-y-4 mt-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="Enter full name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      placeholder="Enter email address"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="businessUnit">Business Unit</Label>
-                    <Select
-                      value={formData.businessUnit}
-                      onValueChange={(value) =>
-                        setFormData({
-                          ...formData,
-                          businessUnit: value,
-                          department: "",
-                        })
-                      }
-                    >
-                      <SelectTrigger id="businessUnit">
-                        <SelectValue placeholder="Select business unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="operations">Operations</SelectItem>
-                        <SelectItem value="finance">Finance</SelectItem>
-                        <SelectItem value="hr">HR</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="department">Department</Label>
-                    <Select
-                      value={formData.department}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, department: value })
-                      }
-                      disabled={!formData.businessUnit}
-                    >
-                      <SelectTrigger id="department">
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {formData.businessUnit &&
-                          departments[
-                            formData.businessUnit as keyof typeof departments
-                          ].map((dept) => (
-                            <SelectItem key={dept} value={dept}>
-                              {dept}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="access" className="space-y-4 mt-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="roles">Roles</Label>
-                  <Select
-                    onValueChange={(value) => handleMultiSelect("roles", value)}
-                  >
-                    <SelectTrigger id="roles">
-                      <SelectValue placeholder="Select roles" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {formData.roles.map((role) => (
-                      <Badge
-                        key={role}
-                        variant="secondary"
-                        className="cursor-pointer pr-1.5"
-                      >
-                        {role}
-                        <button
-                          onClick={() => removeItem("roles", role)}
-                          className="ml-1 hover:text-red-500"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="locations">Assigned Locations</Label>
-                  <Select
-                    onValueChange={(value) =>
-                      handleMultiSelect("locations", value)
-                    }
-                  >
-                    <SelectTrigger id="locations">
-                      <SelectValue placeholder="Select locations" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hq">Headquarters</SelectItem>
-                      <SelectItem value="branch1">Branch 1</SelectItem>
-                      <SelectItem value="branch2">Branch 2</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {formData.locations.map((location) => (
-                      <Badge
-                        key={location}
-                        variant="secondary"
-                        className="cursor-pointer pr-1.5"
-                      >
-                        {location}
-                        <button
-                          onClick={() => removeItem("locations", location)}
-                          className="ml-1 hover:text-red-500"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{user ? "Edit User" : "Add New User"}</DialogTitle>
+            <DialogDescription>
+              {user
+                ? "Update user information and permissions."
+                : "Create a new user account with appropriate permissions."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="px-6">
+            <Tabs defaultValue="basic" className="mt-2">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                <TabsTrigger value="access">Access Control</TabsTrigger>
+                <TabsTrigger value="status">Account Status</TabsTrigger>
+              </TabsList>
+              <TabsContent value="basic" className="space-y-4 mt-4">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="hodStatus">Head of Department</Label>
-                    <Switch
-                      id="hodStatus"
-                      checked={formData.hodStatus}
-                      onCheckedChange={(checked) => {
-                        setFormData({
-                          ...formData,
-                          hodStatus: checked,
-                          hodDepartments: checked
-                            ? formData.hodDepartments
-                            : [],
-                        });
-                      }}
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        placeholder="Enter full name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        placeholder="Enter email address"
+                      />
+                    </div>
                   </div>
 
-                  {formData.hodStatus && (
-                    <div className="space-y-2 ml-6">
-                      <Label htmlFor="hodDepartments">
-                        Department Head Of
-                      </Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="businessUnit">Business Unit</Label>
                       <Select
+                        value={formData.businessUnit}
                         onValueChange={(value) =>
-                          handleMultiSelect("hodDepartments", value)
+                          setFormData({
+                            ...formData,
+                            businessUnit: value,
+                            department: "",
+                          })
                         }
                       >
-                        <SelectTrigger id="hodDepartments">
-                          <SelectValue placeholder="Select departments" />
+                        <SelectTrigger id="businessUnit">
+                          <SelectValue placeholder="Select business unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="operations">Operations</SelectItem>
+                          <SelectItem value="finance">Finance</SelectItem>
+                          <SelectItem value="hr">HR</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="department">Department</Label>
+                      <Select
+                        value={formData.department}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, department: value })
+                        }
+                        disabled={!formData.businessUnit}
+                      >
+                        <SelectTrigger id="department">
+                          <SelectValue placeholder="Select department" />
                         </SelectTrigger>
                         <SelectContent>
                           {formData.businessUnit &&
@@ -318,19 +202,107 @@ export function UserFormDialog({
                             ))}
                         </SelectContent>
                       </Select>
-                      <div className="flex flex-wrap gap-2 mt-2">
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="access" className="space-y-4 mt-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Roles</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.roles.map((role) => (
+                        <Badge
+                          key={role}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          {role}
+                          <button
+                            type="button"
+                            onClick={() => removeItem("roles", role)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <XCircle className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Locations</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.locations.map((location) => (
+                        <Badge
+                          key={location}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          {location}
+                          <button
+                            type="button"
+                            onClick={() => removeItem("locations", location)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <XCircle className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Workflows</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.workflows.map((workflow) => (
+                        <Badge
+                          key={workflow}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          {workflow}
+                          <button
+                            type="button"
+                            onClick={() => removeItem("workflows", workflow)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <XCircle className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hodStatus"
+                      checked={formData.hodStatus}
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, hodStatus: checked })
+                      }
+                    />
+                    <Label htmlFor="hodStatus">Head of Department</Label>
+                  </div>
+
+                  {formData.hodStatus && (
+                    <div className="space-y-2">
+                      <Label>HOD Departments</Label>
+                      <div className="flex flex-wrap gap-2">
                         {formData.hodDepartments.map((dept) => (
                           <Badge
                             key={dept}
                             variant="secondary"
-                            className="cursor-pointer pr-1.5"
+                            className="flex items-center gap-1"
                           >
                             {dept}
                             <button
+                              type="button"
                               onClick={() => removeItem("hodDepartments", dept)}
-                              className="ml-1 hover:text-red-500"
+                              className="ml-1 hover:text-destructive"
                             >
-                              ×
+                              <XCircle className="h-3 w-3" />
                             </button>
                           </Badge>
                         ))}
@@ -338,76 +310,63 @@ export function UserFormDialog({
                     </div>
                   )}
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="status" className="space-y-4 mt-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="accountStatus">Account Status</Label>
-                  <Select
-                    value={formData.accountStatus}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, accountStatus: value })
-                    }
-                  >
-                    <SelectTrigger id="accountStatus">
-                      <SelectValue placeholder="Select account status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">
-                        <div className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Active
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="inactive">
-                        <div className="flex items-center">
-                          <XCircle className="h-4 w-4 mr-2 text-gray-500" />
-                          Inactive
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="suspended">
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-2 text-yellow-500" />
-                          Suspended
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="inviteStatus">Invite Status</Label>
-                  <Select
-                    value={formData.inviteStatus}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, inviteStatus: value })
-                    }
-                  >
-                    <SelectTrigger id="inviteStatus">
-                      <SelectValue placeholder="Select invite status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="sent">Sent</SelectItem>
-                      <SelectItem value="accepted">Accepted</SelectItem>
-                      <SelectItem value="expired">Expired</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+              <TabsContent value="status" className="space-y-4 mt-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="accountStatus">Account Status</Label>
+                    <Select
+                      value={formData.accountStatus}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, accountStatus: value })
+                      }
+                    >
+                      <SelectTrigger id="accountStatus">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">
+                          <div className="flex items-center">
+                            <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                            Active
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="inactive">
+                          <div className="flex items-center">
+                            <XCircle className="h-4 w-4 mr-2 text-gray-500" />
+                            Inactive
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="pending">
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 mr-2 text-yellow-500" />
+                            Pending
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-        <DialogFooter className="px-6 pb-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit}>
-            {user ? "Update User" : "Create User"}
-          </Button>
-        </DialogFooter>
+                  {user && user.lastLogin && (
+                    <div className="space-y-2">
+                      <Label>Last Login</Label>
+                      <p className="text-sm text-gray-500">{user.lastLogin}</p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          <DialogFooter className="mt-6">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              {user ? "Update User" : "Create User"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

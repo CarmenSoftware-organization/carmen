@@ -1,3 +1,7 @@
+'use client'
+
+import { PurchaseOrder } from "@/lib/types";
+
 import {
   Table,
   TableBody,
@@ -6,7 +10,6 @@ import {
   TableHead,
   TableHeader,
 } from "@/components/ui/table";
-import { PurchaseOrder } from "@/lib/types";
 
 interface ISummaryTotalProps {
   poData: PurchaseOrder;

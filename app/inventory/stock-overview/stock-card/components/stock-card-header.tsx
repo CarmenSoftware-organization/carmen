@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
 import { FilterCriteria } from "../types"
 import { QuickFilters } from "./quick-filters"
+
 
 interface StockCardHeaderProps {
   onFilterChange?: (filters: Partial<FilterCriteria>) => void

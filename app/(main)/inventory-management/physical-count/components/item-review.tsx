@@ -1,12 +1,10 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, ArrowUpDown } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -15,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import { mockProducts, getProductsByLocation, Product } from '@/lib/mock/inventory-data';
 import React from 'react';
 
@@ -27,9 +24,7 @@ interface FormData {
 
 interface ItemReviewProps {
   formData: FormData;
-  setFormData: (data: FormData) => void;
-  onNext: () => void;
-  onBack: () => void;
+  setFormData: (data: Partial<FormData>) => void;
 }
 
 // Get unique categories from mock products
@@ -44,38 +39,51 @@ const categories = [
 export function ItemReview({ formData, setFormData }: ItemReviewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<keyof Product | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const handleSort = (field: string) => {
+  const handleSort = useCallback((field: keyof Product) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
       setSortDirection('asc');
     }
-  };
+  }, [sortField]);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  const handleCategoryChange = useCallback((value: string) => {
+    setSelectedCategory(value);
+  }, []);
 
   // Get all products from selected locations and remove duplicates
   const uniqueProducts = React.useMemo(() => {
-    const locationProducts = formData.selectedLocations.flatMap(locationId => 
+    const locationProducts = formData.selectedLocations.flatMap((locationId: string) => 
       getProductsByLocation(locationId)
     );
-    return Array.from(new Map(locationProducts.map(item => [item.id, item])).values());
+    return Array.from(new Map(locationProducts.map((item: Product) => [item.id, item])).values());
   }, [formData.selectedLocations]);
 
-  // Update items in formData when unique products change
+  // Update items in formData when unique products change - Fix dependency array
   useEffect(() => {
-    if (formData.selectedLocations.length > 0 && formData.items !== uniqueProducts) {
-      setFormData({
-        ...formData,
-        items: uniqueProducts
-      });
+    if (formData.selectedLocations.length > 0) {
+      // Use a deep equality check to prevent unnecessary updates
+      const hasChanged = JSON.stringify(formData.items.map(i => i.id).sort()) !== 
+                         JSON.stringify(uniqueProducts.map(i => i.id).sort());
+      
+      if (hasChanged) {
+        setFormData({
+          items: uniqueProducts
+        });
+      }
     }
-  }, [formData, setFormData, uniqueProducts]);
+  }, [uniqueProducts, formData.selectedLocations.length]); // Simplified dependencies
 
   const filteredItems = React.useMemo(() => {
-    return uniqueProducts.filter((item) => {
+    return uniqueProducts.filter((item: Product) => {
       const matchesSearch =
         item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -88,9 +96,9 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
   const sortedItems = React.useMemo(() => {
     if (!sortField) return filteredItems;
     
-    return [...filteredItems].sort((a, b) => {
-      let aValue = a[sortField as keyof Product];
-      let bValue = b[sortField as keyof Product];
+    return [...filteredItems].sort((a: Product, b: Product) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
       
       // Handle dates
       if (sortField === 'lastCountDate') {
@@ -125,13 +133,13 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
               type="text"
               placeholder="Search items..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="pl-9"
             />
           </div>
           <Select
             value={selectedCategory}
-            onValueChange={setSelectedCategory}
+            onValueChange={handleCategoryChange}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select category" />
@@ -191,7 +199,7 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
                   </TableCell>
                 </TableRow>
               ) : (
-                sortedItems.map((item) => (
+                sortedItems.map((item: Product) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.code}</TableCell>
                     <TableCell>{item.name}</TableCell>

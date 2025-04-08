@@ -1,5 +1,6 @@
-"use client"
+'use client'
 
+import { useState } from "react"
 import {
   ColumnDef,
   flexRender,
@@ -11,7 +12,6 @@ import {
   ColumnFiltersState,
   getFilteredRowModel,
 } from "@tanstack/react-table"
-
 import {
   Table,
   TableBody,
@@ -20,10 +20,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -56,10 +54,10 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter..."
-          value={(table.getColumn("type")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter by name..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("type")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

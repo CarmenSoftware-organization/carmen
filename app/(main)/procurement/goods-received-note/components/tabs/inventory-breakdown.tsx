@@ -1,7 +1,7 @@
+
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import StatusBadge from "@/components/ui/custom-status-badge"
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import StatusBadge from "@/components/ui/custom-status-badge"
 
 // Sample data for inventory locations
 const inventoryData = [

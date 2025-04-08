@@ -1,7 +1,10 @@
-'use client';
+'use client'
 
 import React, { ChangeEvent } from 'react';
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, GripVertical, Plus, X } from "lucide-react";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import {
   Select,
   SelectContent,
@@ -21,9 +24,6 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, GripVertical, Plus, X } from "lucide-react";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 
 // Types
 export type FilterFieldType = 'text' | 'number' | 'date' | 'boolean' | 'dropdown' | 'lookup' | 'enum';
@@ -84,11 +84,10 @@ interface FilterBuilderProps {
 // Dynamic Value Field Component
 const ValueField: React.FC<{
   fieldType: FilterFieldType;
-  operator: FilterOperator;
   value: FilterValue;
   config?: FilterFieldConfig;
   onChange: (value: FilterValue) => void;
-}> = ({ fieldType, operator, value, config, onChange }) => {
+}> = ({ fieldType, value, config, onChange }) => {
   switch (fieldType) {
     case 'date':
       return (
@@ -395,7 +394,6 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                       <div className="flex-1">
                         <ValueField
                           fieldType={condition.fieldType}
-                          operator={condition.operator}
                           value={condition.value}
                           config={fields.find(f => f.name === condition.fieldName)?.config}
                           onChange={(value) => handleValueChange(index, value)}

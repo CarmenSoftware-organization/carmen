@@ -1,4 +1,3 @@
-import { BalanceReportParams } from "./types"
 
 export interface MovementRecord {
   id: string
@@ -51,7 +50,7 @@ const getRandomRecentDate = () => {
 }
 
 // Generate mock movement history data
-export const generateMockMovementHistory = (params: BalanceReportParams): MovementHistoryData => {
+export const generateMockMovementHistory = (): MovementHistoryData => {
   const records: MovementRecord[] = []
   
   // Reference types and their descriptions

@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+
 import './globals.css'
-import { Toaster } from "@/components/ui/sonner"
+import { Providers } from '@/components/providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Carmen - Restaurant Management System',
-  description: 'A comprehensive restaurant management system',
+  title: 'Carmen - Hospitality Supply Chain',
+  description: 'Supply Chain Management for Hospitality',
 }
 
 export default function RootLayout({
@@ -16,10 +17,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {children}
-        <Toaster />
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )

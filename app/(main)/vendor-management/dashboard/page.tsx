@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { DashboardTemplate } from "@/components/templates/DashboardTemplate";
 import { Users, Star, DollarSign, Clock } from "lucide-react";

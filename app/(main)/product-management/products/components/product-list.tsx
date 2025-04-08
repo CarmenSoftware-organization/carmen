@@ -1,17 +1,20 @@
-'use client'
+"use client"
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ListPageTemplate from '@/components/templates/ListPageTemplate';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowUpDown, Pencil, Eye, Plus, FileText, CheckCircle, XCircle, Download, Trash2, Upload, Edit } from "lucide-react"
+import { Search, ArrowUpDown, Plus, FileText, CheckCircle, XCircle, Download, Trash2, Upload, Edit, Filter } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge';
 import { AdvancedFilter } from '@/components/ui/advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { MoreVertical } from 'lucide-react'
 
 interface Product {
   id: string;
@@ -61,48 +64,8 @@ interface UnitConversion {
   unitType: "INVENTORY" | "ORDER" | "RECIPE";
 }
 
-export default function ProductList(): JSX.Element {
-  const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10;
-  const [sortField, setSortField] = useState<keyof Product | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [activeFilters, setActiveFilters] = useState<FilterType<Product>[]>([]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to first page when search query changes
-  };
-
-  const handleAddProduct = () => {
-    router.push('/product-management/products/new');
-  };
-
-  const handleImport = () => {
-    router.push('/product-management/products/import');
-  };
-
-  const handleGenerateReport = () => {
-    router.push('/product-management/reports/products');
-  };
-
-  const handleEditProduct = (id: string) => {
-    console.log('Navigating to edit page:', id);
-    router.push(`/product-management/products/${id}?edit`);
-  };
-
-  const handleViewProduct = (id: string) => {
-    router.push(`/product-management/products/${id}`);
-  };
-
-  const productList = {
+// Mock data
+const productList = {
     total: 8,
     products: [
       {
@@ -278,21 +241,52 @@ export default function ProductList(): JSX.Element {
     ]
   };
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const data = productList;
-        setProducts(data.products);
-      } catch (err) {
-        setError('Error fetching products');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+export default function ProductList(): JSX.Element {
+  const router = useRouter();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize] = useState(10);
+  const [sortField, setSortField] = useState<keyof Product | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [activeFilters, setActiveFilters] = useState<FilterType<Product>[]>([]);
 
-    fetchProducts();
+  useEffect(() => {
+    try {
+      setProducts(productList.products);
+      setIsLoading(false);
+    } catch (error) {
+      setError('Failed to load products');
+      setIsLoading(false);
+    }
   }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page when search query changes
+  };
+
+  const handleAddProduct = () => {
+    router.push('/product-management/products/new');
+  };
+
+  const handleImport = () => {
+    router.push('/product-management/products/import');
+  };
+
+  const handleGenerateReport = () => {
+    router.push('/product-management/reports/products');
+  };
+
+  const handleEditProduct = (id: string) => {
+    console.log('Navigating to edit page:', id);
+    router.push(`/product-management/products/${id}?edit`);
+  };
 
   const handleSort = (field: keyof Product) => {
     if (sortField === field) {
@@ -300,6 +294,71 @@ export default function ProductList(): JSX.Element {
     } else {
       setSortField(field);
       setSortDirection('asc');
+    }
+  };
+
+  const getCurrentPageData = () => {
+    return filteredProducts.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = getCurrentPageData().map(product => product.id);
+      setSelectedItems(allIds);
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleSelectItem = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedItems(prev => [...prev, id]);
+    } else {
+      setSelectedItems(prev => prev.filter(item => item !== id));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    // Implement bulk delete logic
+    console.log('Bulk delete:', selectedItems);
+  };
+
+  const handleBulkExport = () => {
+    // Implement bulk export logic
+    console.log('Bulk export:', selectedItems);
+  };
+
+  const handleDelete = (id: string) => {
+    // Implement delete logic
+    console.log('Deleting product:', id);
+    setProducts(products.filter(product => product.id !== id));
+    toast.success("Product deleted successfully");
+  };
+
+  const handleBulkStatusUpdate = (status: boolean) => {
+    // Implement bulk status update logic
+    console.log('Bulk status update:', selectedItems, status);
+  };
+
+  const handleApplyFilters = (filters: FilterType<Product>[]) => {
+    try {
+      setActiveFilters(filters);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      toast.error("There was a problem applying the filters");
+    }
+  };
+
+  const handleClearFilters = () => {
+    try {
+      setActiveFilters([]);
+    } catch (error) {
+      console.error('Error clearing filters:', error);
+      toast.error("There was a problem clearing the filters");
     }
   };
 
@@ -398,416 +457,165 @@ export default function ProductList(): JSX.Element {
     setTotalPages(Math.ceil(filtered.length / pageSize));
   }, [products, searchQuery, pageSize, sortField, sortDirection, activeFilters]);
 
-  const getCurrentPageData = () => {
-    return filteredProducts.slice(
-      (currentPage - 1) * pageSize,
-      currentPage * pageSize
-    );
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allIds = getCurrentPageData().map(product => product.id);
-      setSelectedItems(allIds);
-    } else {
-      setSelectedItems([]);
-    }
-  };
-
-  const handleSelectItem = (id: string, checked: boolean) => {
-    if (checked) {
-      setSelectedItems(prev => [...prev, id]);
-    } else {
-      setSelectedItems(prev => prev.filter(item => item !== id));
-    }
-  };
-
-  const handleBulkDelete = () => {
-    // Implement bulk delete logic
-    console.log('Bulk delete:', selectedItems);
-  };
-
-  const handleBulkExport = () => {
-    // Implement bulk export logic
-    console.log('Bulk export:', selectedItems);
-  };
-
-  const handleDelete = (id: string) => {
-    // Implement delete logic
-    console.log('Deleting product:', id);
-    setProducts(products.filter(product => product.id !== id));
-    toast({
-      title: "Product Deleted",
-      description: "The product has been successfully deleted.",
-    });
-  };
-
-  const handleBulkStatusUpdate = (status: boolean) => {
-    // Implement bulk status update logic
-    console.log('Bulk status update:', selectedItems, status);
-  };
-
-  const handleApplyFilters = (filters: FilterType<Product>[]) => {
-    try {
-      setActiveFilters(filters);
-      setCurrentPage(1);
-    } catch (error) {
-      console.error('Error applying filters:', error);
-      toast({
-        title: "Error",
-        description: "There was a problem applying the filters.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleClearFilters = () => {
-    try {
-      setActiveFilters([]);
-    } catch (error) {
-      console.error('Error clearing filters:', error);
-      toast({
-        title: "Error",
-        description: "There was a problem clearing the filters.",
-        variant: "destructive"
-      });
-    }
-  };
-
   // Define filter fields for the advanced filter
   const filterFields = [
     { value: 'productCode' as keyof Product, label: 'Product Code' },
-    { value: 'name' as keyof Product, label: 'Product Name' },
-    { value: 'description' as keyof Product, label: 'Description' },
-    { value: 'categoryId' as keyof Product, label: 'Category' },
-    { value: 'subCategoryId' as keyof Product, label: 'Subcategory' },
-    { value: 'itemGroup' as keyof Product, label: 'Item Group' },
-    { value: 'primaryInventoryUnitId' as keyof Product, label: 'Primary Unit' },
-    { value: 'isActive' as keyof Product, label: 'Active Status' },
-    { value: 'basePrice' as keyof Product, label: 'Base Price' },
-    { value: 'currency' as keyof Product, label: 'Currency' },
-    { value: 'isForSale' as keyof Product, label: 'For Sale' },
-    { value: 'isIngredient' as keyof Product, label: 'Is Ingredient' }
+    { value: 'name' as keyof Product, label: 'Name' },
+    { value: 'categoryName' as keyof Product, label: 'Category' },
+    { value: 'subCategoryName' as keyof Product, label: 'Sub Category' },
+    { value: 'itemGroupName' as keyof Product, label: 'Item Group' },
+    { value: 'isActive' as keyof Product, label: 'Status' },
   ];
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const actionButtons = (
-    <div className="flex flex-col sm:flex-row gap-2">
-      <Button className="w-full sm:w-auto" onClick={handleAddProduct}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add Product
-      </Button>
-      <Button variant="outline" className="w-full sm:w-auto" onClick={handleImport}>
-        <Upload className="mr-2 h-4 w-4" />
-        Import
-      </Button>
-      <Button variant="outline" className="w-full sm:w-auto" onClick={handleGenerateReport}>
-        <FileText className="mr-2 h-4 w-4" />
-        Report
-      </Button>
-    </div>
-  );
-
-  const filters = (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="w-full sm:w-1/2 flex space-x-2">
-          <Input
-            placeholder="Search products..."
-            className="w-full"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-          <Button variant="secondary" size="icon">
-            <Search className="h-4 w-4" />
+  return (
+    <ListPageTemplate
+      title="Products"
+      actionButtons={
+        <div className="flex gap-2">
+          <Button onClick={handleAddProduct}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Product
+          </Button>
+          <Button onClick={handleImport}>
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </Button>
+          <Button onClick={handleGenerateReport}>
+            <FileText className="h-4 w-4 mr-2" />
+            Generate Report
           </Button>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <AdvancedFilter 
+      }
+      filters={
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-2">
+            <Search className="h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-[300px]"
+            />
+          </div>
+          <AdvancedFilter<Product>
+            moduleName="product-list"
+            filterFields={filterFields}
             onApplyFilters={handleApplyFilters}
             onClearFilters={handleClearFilters}
-            filterFields={filterFields}
           />
         </div>
-      </div>
-      
-      {selectedItems.length > 0 && (
-        <div className="mb-4">
-          <div className="flex flex-wrap items-center gap-2 p-2 bg-muted rounded-lg">
-            <span className="text-sm text-muted-foreground ml-2">
-              {selectedItems.length} items selected
-            </span>
-            <div className="flex flex-wrap items-center gap-2 ml-0 sm:ml-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(true)}
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Set Active
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(false)}
-              >
-                <XCircle className="w-4 h-4 mr-2" />
-                Set Inactive
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBulkExport}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export Selected
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Selected
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const content = (
-    <div className="space-y-6">
-      {getCurrentPageData().length > 0 ? (
-        <div className="rounded-lg border bg-white">
-          <div className="overflow-x-auto">
+      }
+      content={
+        isLoading ? (
+          <div>Loading...</div>
+        ) : error ? (
+          <div>Error: {error}</div>
+        ) : (
+          <div className="space-y-4">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50/75">
-                  <TableHead className="w-[50px] py-3 font-medium text-gray-600">
-                    <Checkbox 
-                      checked={
-                        getCurrentPageData().length > 0 &&
-                        getCurrentPageData().every(product => 
-                          selectedItems.includes(product.id)
-                        )
-                      }
+                <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedItems.length === getCurrentPageData().length}
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
-                  <TableHead 
-                    className="py-3 font-medium text-gray-600 cursor-pointer"
-                    onClick={() => handleSort('name')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Name
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead onClick={() => handleSort('productCode')} className="cursor-pointer">
+                    Product Code
+                    <ArrowUpDown className="ml-2 h-4 w-4 inline" />
                   </TableHead>
-                  <TableHead 
-                    className="py-3 font-medium text-gray-600 cursor-pointer hidden sm:table-cell"
-                    onClick={() => handleSort('categoryId')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Category
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                    Name
+                    <ArrowUpDown className="ml-2 h-4 w-4 inline" />
                   </TableHead>
-                  <TableHead 
-                    className="py-3 font-medium text-gray-600 cursor-pointer hidden md:table-cell"
-                    onClick={() => handleSort('subCategoryId')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Subcategory
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead onClick={() => handleSort('categoryName')} className="cursor-pointer">
+                    Category
+                    <ArrowUpDown className="ml-2 h-4 w-4 inline" />
                   </TableHead>
-                  <TableHead 
-                    className="py-3 font-medium text-gray-600 cursor-pointer hidden lg:table-cell"
-                    onClick={() => handleSort('itemGroup')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Item Group
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead onClick={() => handleSort('isActive')} className="cursor-pointer">
+                    Status
+                    <ArrowUpDown className="ml-2 h-4 w-4 inline" />
                   </TableHead>
-                  <TableHead 
-                    className="py-3 font-medium text-gray-600 cursor-pointer"
-                    onClick={() => handleSort('isActive')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Status
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
-                  </TableHead>
-                  <TableHead className="py-3 font-medium text-gray-600 w-[120px]">Actions</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {getCurrentPageData().map((product) => (
-                  <TableRow 
-                    key={product.id}
-                    className="group hover:bg-gray-50/50 cursor-pointer"
-                    onClick={() => handleViewProduct(product.id)}
-                  >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox 
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <Checkbox
                         checked={selectedItems.includes(product.id)}
                         onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
                       />
                     </TableCell>
+                    <TableCell>{product.productCode}</TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.categoryName}</TableCell>
                     <TableCell>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{product.name}</span>
-                          <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
-                            {product.productCode}
-                          </Badge>
-                        </div>
-                        <span className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
-                          {product.description || 'No description available'}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">{product.categoryId}</TableCell>
-                    <TableCell className="hidden md:table-cell">{product.subCategoryId}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{product.itemGroup}</TableCell>
-                    <TableCell>
-                      <StatusBadge 
-                        status={product.isActive ? 'Active' : 'Inactive'}
-                      />
+                      <StatusBadge status={product.isActive ? 'active' : 'inactive'} />
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost" 
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewProduct(product.id);
-                          }}
-                          className="h-8 w-8"
-                        >
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost" 
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditProduct(product.id);
-                          }}
-                          className="h-8 w-8"
-                        >
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => handleEditProduct(product.id)}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost" 
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(product.id);
-                          }}
-                          className="h-8 w-8 hover:text-destructive"
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
                 ))}
-                {getCurrentPageData().length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-sm text-muted-foreground">No results found</p>
-                        <Button variant="outline" size="sm" onClick={handleAddProduct}>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Product
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
               </TableBody>
             </Table>
+            <div className="flex items-center justify-between mt-4">
+              <div className="text-sm text-gray-500">
+                Page {currentPage} of {totalPages}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center gap-4 py-8 border rounded-lg bg-gray-50/50">
-          <p className="text-sm text-muted-foreground">No products found</p>
-          <Button onClick={handleAddProduct}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Your First Product
-          </Button>
-        </div>
-      )}
-
-      {/* Pagination */}
-      {getCurrentPageData().length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-8">
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredProducts.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0} to {Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} results
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-              className="h-8 w-8 p-0"
-            >
-              <span className="sr-only">First page</span>
-              «
+        )
+      }
+      bulkActions={
+        selectedItems.length > 0 && (
+          <div className="flex gap-2">
+            <Button variant="destructive" onClick={handleBulkDelete}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="h-8 w-8 p-0"
-            >
-              <span className="sr-only">Previous page</span>
-              ‹
+            <Button onClick={handleBulkExport}>
+              <Download className="h-4 w-4 mr-2" />
+              Export Selected
             </Button>
-            <span className="text-sm font-medium">
-              Page {currentPage} of {totalPages || 1}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0"
-            >
-              <span className="sr-only">Next page</span>
-              ›
+            <Button onClick={() => handleBulkStatusUpdate(true)}>
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Set Active
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0"
-            >
-              <span className="sr-only">Last page</span>
-              »
+            <Button onClick={() => handleBulkStatusUpdate(false)}>
+              <XCircle className="h-4 w-4 mr-2" />
+              Set Inactive
             </Button>
           </div>
-        </div>
-      )}
-    </div>
-  );
-
-  return (
-    <ListPageTemplate
-      title="Products"
-      actionButtons={actionButtons}
-      filters={filters}
-      content={content}
+        )
+      }
     />
   );
 }

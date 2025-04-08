@@ -1,11 +1,19 @@
+import { ThemeProvider } from "next-themes"
+import { UserProvider } from "@/lib/context/user-context"
+import { ReactNode } from "react"
+
 "use client"
 
-import { ThemeProvider } from "next-themes"
+interface ProvidersProps {
+  children: ReactNode
+}
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      {children}
+      <UserProvider>
+        {children}
+      </UserProvider>
     </ThemeProvider>
   )
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import { PurchaseOrder } from '@/lib/types'
 
+
 interface VendorInfoTabProps {
   poData: PurchaseOrder;
 }

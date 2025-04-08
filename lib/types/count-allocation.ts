@@ -1,5 +1,6 @@
 import { HotelProduct } from "../mock/hotel-data";
 
+
 export interface CountAllocation {
   id: string;
   productId: string;

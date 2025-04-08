@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WorkflowHeader } from "./workflow-header"
@@ -37,8 +38,8 @@ export function WorkflowDetail({ workflowId }: WorkflowDetailProps) {
     setIsEditing(!isEditing)
   }
 
-  const handleSave = (updatedWorkflow: Workflow) => {
-    setWorkflow(updatedWorkflow)
+  const handleSave = (updatedWorkflow: Partial<Workflow>) => {
+    setWorkflow({ ...workflow, ...updatedWorkflow })
     setIsEditing(false)
   }
 
@@ -60,24 +61,24 @@ export function WorkflowDetail({ workflowId }: WorkflowDetailProps) {
           <TabsTrigger value="products">Products</TabsTrigger>
         </TabsList>
         <TabsContent value="general">
-          <WorkflowGeneral workflow={workflow} isEditing={isEditing} onSave={(updatedWorkflow) => handleSave({...workflow, ...updatedWorkflow})} />
+          <WorkflowGeneral workflow={workflow} isEditing={isEditing} onSave={handleSave} />
         </TabsContent>
         <TabsContent value="stages">
-          <WorkflowStages stages={workflow.stages} isEditing={isEditing} onSave={(stages) => handleSave({...workflow, stages})} />
+          <WorkflowStages stages={workflow.stages} isEditing={isEditing} onSave={(stages) => handleSave({ stages })} />
         </TabsContent>
         <TabsContent value="routing">
           <WorkflowRouting 
             rules={workflow.routingRules || []} 
             stages={stageNames} 
             isEditing={isEditing}
-            onSave={(routingRules) => handleSave({...workflow, routingRules})} 
+            onSave={(routingRules) => handleSave({ routingRules })} 
           />
         </TabsContent>
         <TabsContent value="products">
           <WorkflowProducts 
             products={workflow.products || []} 
             isEditing={isEditing}
-            onSave={(products) => handleSave({...workflow, products})} 
+            onSave={(products) => handleSave({ products })} 
           />
         </TabsContent>
       </Tabs>

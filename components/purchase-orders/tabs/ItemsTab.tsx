@@ -2,28 +2,140 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PurchaseOrderItem, PurchaseOrder } from '@/lib/types';
+import { PurchaseOrderItem, PurchaseOrder, PurchaseRequestItemStatus, PurchaseOrderStatus } from '@/lib/types';
+
 
 interface ItemsTabProps {
-  onUpdateItem: (updatedItem: PurchaseOrderItem) => void;
-  onDeleteItem: (itemId: string) => void;
-  onAddItem: (newItem: PurchaseOrderItem) => void;
-  poData: PurchaseOrder;
+  onUpdateItem?: (itemId: string, field: string, value: string | number | boolean) => void;
+  onDeleteItem?: (itemId: string) => void;
+  onAddItem?: () => void;
+  poData?: PurchaseOrder;
 }
 
-export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData }: ItemsTabProps) {
-   console.log("Items received in ItemsTab:", poData.items);
+// Mock data for when no props are provided
+const mockPurchaseOrder: PurchaseOrder = {
+  poId: "PO-12345",
+  number: "PO-12345-2023",
+  vendorId: 1,
+  vendorName: "Sample Vendor",
+  orderDate: new Date(),
+  status: PurchaseOrderStatus.Open,
+  currencyCode: "USD",
+  exchangeRate: 1,
+  email: "vendor@example.com",
+  buyer: "John Doe",
+  creditTerms: "Net 30",
+  description: "Office furniture purchase",
+  remarks: "Delivery to main office",
+  createdBy: 1,
+  baseCurrencyCode: "USD",
+  baseSubTotalPrice: 5099.70,
+  subTotalPrice: 5099.70,
+  baseNetAmount: 5099.70,
+  netAmount: 5099.70,
+  baseDiscAmount: 0,
+  discountAmount: 0,
+  baseTaxAmount: 0,
+  taxAmount: 0,
+  baseTotalAmount: 5099.70,
+  totalAmount: 5099.70,
+  items: [
+    {
+      id: "item-1",
+      name: "Office Desk",
+      description: "Standard office desk",
+      convRate: 1,
+      orderedQuantity: 10,
+      orderUnit: "pcs",
+      baseQuantity: 10,
+      baseUnit: "pcs",
+      baseReceivingQty: 5,
+      receivedQuantity: 5,
+      remainingQuantity: 5,
+      unitPrice: 249.99,
+      status: "Pending" as PurchaseRequestItemStatus,
+      isFOC: false,
+      taxRate: 0,
+      discountRate: 0,
+      baseSubTotalPrice: 2499.90,
+      subTotalPrice: 2499.90,
+      baseNetAmount: 2499.90,
+      netAmount: 2499.90,
+      baseDiscAmount: 0,
+      discountAmount: 0,
+      baseTaxAmount: 0,
+      taxAmount: 0,
+      baseTotalAmount: 2499.90,
+      totalAmount: 2499.90,
+      taxIncluded: false,
+      inventoryInfo: {
+        onHand: 20,
+        onOrdered: 10,
+        reorderLevel: 5,
+        restockLevel: 25,
+        averageMonthlyUsage: 8,
+        lastPrice: 245.99,
+        lastOrderDate: new Date(2023, 6, 10),
+        lastVendor: "Previous Supplier Inc."
+      }
+    },
+    {
+      id: "item-2",
+      name: "Office Chair",
+      description: "Ergonomic office chair",
+      convRate: 1,
+      orderedQuantity: 20,
+      orderUnit: "pcs",
+      baseQuantity: 20,
+      baseUnit: "pcs",
+      baseReceivingQty: 20,
+      receivedQuantity: 20,
+      remainingQuantity: 0,
+      unitPrice: 129.99,
+      status: "Accepted" as PurchaseRequestItemStatus,
+      isFOC: false,
+      taxRate: 0,
+      discountRate: 0,
+      baseSubTotalPrice: 2599.80,
+      subTotalPrice: 2599.80,
+      baseNetAmount: 2599.80,
+      netAmount: 2599.80,
+      baseDiscAmount: 0,
+      discountAmount: 0,
+      baseTaxAmount: 0,
+      taxAmount: 0,
+      baseTotalAmount: 2599.80,
+      totalAmount: 2599.80,
+      taxIncluded: false,
+      inventoryInfo: {
+        onHand: 15,
+        onOrdered: 20,
+        reorderLevel: 10,
+        restockLevel: 30,
+        averageMonthlyUsage: 12,
+        lastPrice: 125.99,
+        lastOrderDate: new Date(2023, 7, 15),
+        lastVendor: "Office Solutions Ltd."
+      }
+    }
+  ]
+};
 
-  if (!poData.items || poData.items.length === 0) {
-    return <p>No items found for this purchase order.</p>
-  }
+export default function ItemsTab({ poData, onDeleteItem, onAddItem }: ItemsTabProps) {
+  const data = poData || mockPurchaseOrder;
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: PurchaseRequestItemStatus) => {
     switch (status) {
-      case 'Not Received': return 'bg-red-100 text-red-800';
-      case 'Partially Received': return 'bg-yellow-100 text-yellow-800';
-      case 'Fully Received': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "Pending":
+        return "bg-yellow-500";
+      case "Accepted":
+        return "bg-green-500";
+      case "Rejected":
+        return "bg-red-500";
+      case "Review":
+        return "bg-blue-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
@@ -31,7 +143,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Purchase Order Items</h2>
-        <Button onClick={() => onAddItem({ id: 'new', name: 'New Item' } as PurchaseOrderItem)}>
+        <Button onClick={() => onAddItem?.()}>
           Add Item
         </Button>
       </div>
@@ -46,10 +158,11 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
             <TableHead>Unit Price</TableHead>
             <TableHead>Total Price</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {poData.items.map((item) => (
+          {data.items.map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.description}</TableCell>
@@ -58,9 +171,12 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
               <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
               <TableCell>${item.subTotalPrice.toFixed(2)}</TableCell>
               <TableCell>
-                <Badge className={getStatusColor(item.status)}>
+                <Badge className={getStatusColor(item.status as PurchaseRequestItemStatus)}>
                   {item.status}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                <Button variant="ghost" onClick={() => onDeleteItem?.(item.id)}>Delete</Button>
               </TableCell>
             </TableRow>
           ))}

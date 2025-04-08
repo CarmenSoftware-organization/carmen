@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { ArrowRight, Users, Workflow, Database, Settings, Cable, ShoppingCart } from "lucide-react";
 
+
 export default function SystemAdministrationPage() {
   return (
     <div className="container mx-auto py-6">

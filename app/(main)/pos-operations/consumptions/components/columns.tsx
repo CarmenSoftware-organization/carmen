@@ -1,12 +1,9 @@
+'use client'
+
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal } from "lucide-react"
 
 interface Consumption {
@@ -64,7 +61,7 @@ export const columns: ColumnDef<Consumption>[] = [
         <Badge
           variant={
             status === "posted"
-              ? "success"
+              ? "default"
               : status === "pending"
               ? "secondary"
               : "destructive"
@@ -77,8 +74,7 @@ export const columns: ColumnDef<Consumption>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const consumption = row.original
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

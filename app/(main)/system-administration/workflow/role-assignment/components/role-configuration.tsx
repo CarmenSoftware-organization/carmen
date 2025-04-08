@@ -1,4 +1,5 @@
 'use client'
+
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,15 +10,26 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { roles } from "../data/mockData"
 import { Role } from "../types/approver"
-import type { RoleConfiguration } from "../types/approver"
+import type { RoleConfiguration as RoleConfigType } from "../types/approver"
 import { Pencil, Save, X } from "lucide-react"
 
 interface RoleConfigurationProps {
   selectedRoleId: number | null
 }
 
+const initialRoleConfiguration: RoleConfigType = {
+  name: "",
+  description: "",
+  widgetAccess: {
+    myPR: true,
+    myApproval: false,
+    myOrder: false
+  },
+  visibilitySetting: 'location'
+}
+
 export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
-  const [configuration, setConfiguration] = useState<RoleConfiguration>(initialRoleConfiguration)
+  const [configuration, setConfiguration] = useState<RoleConfigType>(initialRoleConfiguration)
   const [isEditing, setIsEditing] = useState(false)
   const [selectedRole, setSelectedRole] = useState<Role | null>(null)
 
@@ -56,14 +68,14 @@ export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
     }
   }
 
-  const handleInputChange = (field: keyof RoleConfiguration, value: string) => {
+  const handleInputChange = (field: keyof RoleConfigType, value: string) => {
     setConfiguration(prev => ({
       ...prev,
       [field]: value
     }))
   }
 
-  const handleWidgetAccessChange = (widget: keyof RoleConfiguration['widgetAccess']) => {
+  const handleWidgetAccessChange = (widget: keyof RoleConfigType['widgetAccess']) => {
     setConfiguration(prev => ({
       ...prev,
       widgetAccess: {
@@ -198,18 +210,18 @@ export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
       <Card>
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold mb-4">Visibility Settings</h3>
-          <RadioGroup 
-            value={configuration.visibilitySetting} 
+          <RadioGroup
+            value={configuration.visibilitySetting}
             onValueChange={(value: 'location' | 'department' | 'full') => handleVisibilityChange(value)}
             disabled={!isEditing}
           >
-            <div className="flex items-center space-x-2 mb-2">
+            <div className="flex items-center space-x-2">
               <RadioGroupItem value="location" id="location" />
-              <Label htmlFor="location">Location Only</Label>
+              <Label htmlFor="location">Location-based</Label>
             </div>
-            <div className="flex items-center space-x-2 mb-2">
+            <div className="flex items-center space-x-2">
               <RadioGroupItem value="department" id="department" />
-              <Label htmlFor="department">Department Wide</Label>
+              <Label htmlFor="department">Department-based</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="full" id="full" />
@@ -220,16 +232,5 @@ export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
       </Card>
     </div>
   )
-}
-
-const initialRoleConfiguration: RoleConfiguration = {
-  name: "",
-  description: "",
-  widgetAccess: {
-    myPR: false,
-    myApproval: false,
-    myOrder: false
-  },
-  visibilitySetting: "location"
 }
 

@@ -1,5 +1,6 @@
-'use client'
+"use client"
 
+import React from 'react'
 import { Input } from '@/components/ui/input'
 import { Calendar, Hash } from 'lucide-react'
 
@@ -15,7 +16,11 @@ interface HeaderInfoProps {
   onHeaderUpdate: (field: string, value: string) => void
 }
 
-export function HeaderInfo({ requisition, isEditMode, onHeaderUpdate }: HeaderInfoProps) {
+export function HeaderInfo({ 
+  requisition,
+  isEditMode,
+  onHeaderUpdate 
+}: HeaderInfoProps): React.ReactElement {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
       {/* Reference Number */}

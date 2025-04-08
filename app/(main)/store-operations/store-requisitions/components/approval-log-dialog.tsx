@@ -1,14 +1,15 @@
 'use client'
 
-import {
+import React from 'react'
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Clock, UserCircle2 } from "lucide-react"
+import { 
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Clock, UserCircle2 } from "lucide-react"
 
 interface ApprovalLog {
   id: number
@@ -25,7 +26,12 @@ interface ApprovalLogDialogProps {
   logs: ApprovalLog[]
 }
 
-export function ApprovalLogDialog({ itemId, itemName, children, logs }: ApprovalLogDialogProps) {
+export function ApprovalLogDialog({ 
+  itemId, 
+  itemName, 
+  children, 
+  logs 
+}: ApprovalLogDialogProps): React.ReactElement {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -37,7 +43,7 @@ export function ApprovalLogDialog({ itemId, itemName, children, logs }: Approval
         </DialogHeader>
         <ScrollArea className="max-h-[400px] pr-4">
           <div className="space-y-4">
-            {logs.map((log) => (
+            {logs.map((log: ApprovalLog) => (
               <div key={log.id} className="relative pl-6 pb-4 border-l-2 border-gray-200 last:pb-0">
                 <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-gray-400" />
                 <div className="flex flex-col gap-1">

@@ -1,21 +1,22 @@
-'use client'
-
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Vendor, EnvironmentalImpact } from '../types'
+
+'use client'
+
 
 type EnvironmentalFieldPath = 
   | `environmentalImpact.${keyof EnvironmentalImpact}`
   | `environmentalImpact.${keyof EnvironmentalImpact}.value`
 
 interface EnvironmentalSectionProps {
-  vendor: Vendor
-  isEditing: boolean
-  onFieldChange: (name: EnvironmentalFieldPath, value: number | string) => void
+  vendor?: Vendor
+  isEditing?: boolean
+  onFieldChange?: (name: EnvironmentalFieldPath, value: number | string) => void
 }
 
-export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: EnvironmentalSectionProps) {
-  const environmentalData = vendor.environmentalImpact
+export function EnvironmentalSection({ vendor, isEditing = false, onFieldChange }: EnvironmentalSectionProps) {
+  const environmentalData = vendor?.environmentalImpact
 
   return (
     <div className="space-y-6">
@@ -27,7 +28,7 @@ export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: Envir
             name="carbonFootprint"
             type="number"
             value={environmentalData?.carbonFootprint?.value || ''}
-            onChange={(e) => onFieldChange('environmentalImpact.carbonFootprint.value', parseFloat(e.target.value))}
+            onChange={(e) => onFieldChange?.('environmentalImpact.carbonFootprint.value', parseFloat(e.target.value))}
             disabled={!isEditing}
             className="w-full"
             placeholder="Annual carbon emissions"
@@ -41,7 +42,7 @@ export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: Envir
             name="energyEfficiency"
             type="number"
             value={environmentalData?.energyEfficiency?.value || ''}
-            onChange={(e) => onFieldChange('environmentalImpact.energyEfficiency.value', parseFloat(e.target.value))}
+            onChange={(e) => onFieldChange?.('environmentalImpact.energyEfficiency.value', parseFloat(e.target.value))}
             disabled={!isEditing}
             className="w-full"
             placeholder="Energy efficiency rating"
@@ -57,7 +58,7 @@ export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: Envir
             min="0"
             max="100"
             value={environmentalData?.wasteReduction?.value || ''}
-            onChange={(e) => onFieldChange('environmentalImpact.wasteReduction.value', parseFloat(e.target.value))}
+            onChange={(e) => onFieldChange?.('environmentalImpact.wasteReduction.value', parseFloat(e.target.value))}
             disabled={!isEditing}
             className="w-full"
             placeholder="Annual reduction"
@@ -73,7 +74,7 @@ export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: Envir
             min="0"
             max="100"
             value={environmentalData?.complianceRate?.value || ''}
-            onChange={(e) => onFieldChange('environmentalImpact.complianceRate.value', parseFloat(e.target.value))}
+            onChange={(e) => onFieldChange?.('environmentalImpact.complianceRate.value', parseFloat(e.target.value))}
             disabled={!isEditing}
             className="w-full"
             placeholder="Compliance rate"
@@ -88,7 +89,7 @@ export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: Envir
             id="esgScore"
             name="esgScore"
             value={environmentalData?.esgScore || ''}
-            onChange={(e) => onFieldChange('environmentalImpact.esgScore', e.target.value)}
+            onChange={(e) => onFieldChange?.('environmentalImpact.esgScore', e.target.value)}
             disabled={!isEditing}
             className="w-full"
             placeholder="ESG Score"
@@ -102,7 +103,7 @@ export function EnvironmentalSection({ vendor, isEditing, onFieldChange }: Envir
             name="lastUpdated"
             type="date"
             value={environmentalData?.lastUpdated || ''}
-            onChange={(e) => onFieldChange('environmentalImpact.lastUpdated', e.target.value)}
+            onChange={(e) => onFieldChange?.('environmentalImpact.lastUpdated', e.target.value)}
             disabled={!isEditing}
             className="w-full"
           />

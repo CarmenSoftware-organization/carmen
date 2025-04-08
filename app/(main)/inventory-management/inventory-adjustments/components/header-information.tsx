@@ -1,4 +1,6 @@
-import { Building2, Calendar, FileText, Hash, Store, ArrowDownUp } from "lucide-react"
+'use client'
+
+import { Calendar, FileText, Hash, ArrowDownUp } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 interface HeaderInformationProps {

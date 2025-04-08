@@ -1,5 +1,6 @@
 import { CreditNote } from '@/lib/types/credit-note'
 
+
 export const staticCreditNotes: CreditNote[] = [
   {
     id: 1,

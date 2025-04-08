@@ -1,3 +1,8 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Edit2, Copy, Archive } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -6,9 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Edit2, Copy, Archive } from "lucide-react"
 
 interface Recipe {
   id: string

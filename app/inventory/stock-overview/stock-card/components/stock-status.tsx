@@ -1,3 +1,7 @@
+'use client'
+
+import { Progress } from "@/components/ui/progress"
+import { StockCard } from "@/app/(main)/inventory-management/stock-overview/stock-card/types"
 import {
   Card,
   CardContent,
@@ -5,17 +9,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Location, StockStatus as StockStatusType } from "@/app/(main)/inventory-management/stock-overview/types"
 
 interface StockStatusProps {
-  locations: Location[]
-  currentStock: StockStatusType
+  locations: StockCard['locations']
+  currentStock: StockCard['currentStock']
+  minStock: number
+  maxStock: number
+  reorderPoint?: number
 }
 
-export function StockStatus({ locations, currentStock }: StockStatusProps) {
-  const totalStock = locations.reduce((sum, loc) => sum + loc.stockOnHand, 0)
-  const maxStock = totalStock * 1.2
+export function StockStatus({ locations, currentStock, minStock, maxStock, reorderPoint }: StockStatusProps) {
+  const totalStock = currentStock.totalStock
+  const effectiveMaxStock = Math.max(totalStock * 1.2, maxStock)
 
   return (
     <div className="grid gap-6">
@@ -30,10 +35,10 @@ export function StockStatus({ locations, currentStock }: StockStatusProps) {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Current Stock</span>
                 <span className="text-sm text-muted-foreground">
-                  {totalStock} / {maxStock}
+                  {totalStock} / {effectiveMaxStock}
                 </span>
               </div>
-              <Progress value={(totalStock / maxStock) * 100} />
+              <Progress value={(totalStock / effectiveMaxStock) * 100} />
             </div>
             
             <div className="grid grid-cols-3 gap-4 pt-4">
@@ -42,7 +47,7 @@ export function StockStatus({ locations, currentStock }: StockStatusProps) {
                   Reorder Point
                 </span>
                 <p className="text-2xl font-bold">
-                  {'N/A'}
+                  {reorderPoint || 'N/A'}
                 </p>
               </div>
               <div className="space-y-1">
@@ -50,7 +55,7 @@ export function StockStatus({ locations, currentStock }: StockStatusProps) {
                   Min Stock
                 </span>
                 <p className="text-2xl font-bold">
-                  {'N/A'}
+                  {minStock || 'N/A'}
                 </p>
               </div>
               <div className="space-y-1">
@@ -58,7 +63,7 @@ export function StockStatus({ locations, currentStock }: StockStatusProps) {
                   Max Stock
                 </span>
                 <p className="text-2xl font-bold">
-                  {maxStock.toFixed(0) || 'N/A'}
+                  {maxStock || 'N/A'}
                 </p>
               </div>
             </div>

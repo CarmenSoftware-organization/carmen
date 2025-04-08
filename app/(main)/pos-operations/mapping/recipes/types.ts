@@ -1,5 +1,6 @@
 import { StatusType } from "../components"
 
+
 export interface RecipeMapping {
   id: string
   posItemCode: string

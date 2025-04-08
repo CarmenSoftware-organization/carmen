@@ -45,7 +45,6 @@ export function DepartmentList() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null)
   const [newHead, setNewHead] = useState("")
-  const [selectedHeads, setSelectedHeads] = useState<string[]>([])
 
   const filteredDepartments = departments.filter(
     (dept) =>
@@ -59,14 +58,12 @@ export function DepartmentList() {
     } else {
       setEditingDepartment({ code: "", name: "", heads: [], accountCode: "", active: true })
     }
-    setSelectedHeads([])
     setIsEditModalOpen(true)
   }
 
   const closeEditModal = () => {
     setIsEditModalOpen(false)
     setEditingDepartment(null)
-    setSelectedHeads([])
   }
 
   const handleSave = () => {
@@ -90,22 +87,6 @@ export function DepartmentList() {
       })
       setNewHead("")
     }
-  }
-
-  const removeSelectedHeads = () => {
-    if (editingDepartment) {
-      setEditingDepartment({
-        ...editingDepartment,
-        heads: editingDepartment.heads.filter((head) => !selectedHeads.includes(head)),
-      })
-      setSelectedHeads([])
-    }
-  }
-
-  const toggleHeadSelection = (head: string) => {
-    setSelectedHeads((prev) =>
-      prev.includes(head) ? prev.filter((h) => h !== head) : [...prev, head]
-    )
   }
 
   const handleDelete = (code: string) => {

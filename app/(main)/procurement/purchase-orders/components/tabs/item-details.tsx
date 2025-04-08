@@ -1,12 +1,18 @@
-"use client";
+"use client"
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PurchaseOrderItem } from "@/lib/types";
+import { PrItemsTable } from "./pr-items-table";
+import InventoryBreakdown from "./inventory-breakdown";
+import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
+import { GoodsReceiveNoteTable } from "./goods-receive-note-table";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import SummaryTable from "./Summary";
 import {
   Dialog,
   DialogContent,
@@ -19,13 +25,7 @@ import {
   XIcon,
   SaveIcon,
 } from "lucide-react";
-import { PurchaseOrderItem } from "@/lib/types";
-import { PrItemsTable } from "./pr-items-table";
-import InventoryBreakdown from "./inventory-breakdown";
-import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
-import { GoodsReceiveNoteTable } from "./goods-receive-note-table";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import SummaryTable from "./Summary";
+
 
 type Mode = "view" | "edit" | "add";
 

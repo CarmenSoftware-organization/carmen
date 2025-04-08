@@ -1,89 +1,136 @@
 import { Metadata } from "next"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle, CheckCircle2, Clock, RefreshCcw } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "POS Operations",
   description: "Manage POS operations, interface posting, consumptions, and mapping",
 }
 
-export default function POSOperationsPage() {
+export default function POSOperationsDashboard() {
   return (
-    <div className="flex-1 space-y-4 px-2 py-4 md:px-4 md:py-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">POS Operations</h2>
-      </div>
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Recent Activity</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Pending Interface Posts
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Unmapped Items
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Today's Transactions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Today's Consumptions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-              </CardContent>
-            </Card>
+    <div className="container mx-auto py-6 px-9">
+      <div className="space-y-8">
+        {/* Header Section */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">POS Operations</h1>
+            <p className="text-muted-foreground">Monitor and manage POS integration operations</p>
           </div>
-        </TabsContent>
-        <TabsContent value="activity" className="space-y-4">
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              <RefreshCcw className="h-4 w-4 mr-2" />
+              Refresh Status
+            </Button>
+          </div>
+        </div>
+
+        {/* System Status Section */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-500">Connection Status</p>
+                  <p className="text-2xl font-bold">Connected</p>
+                </div>
+                <CheckCircle2 className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-500">Pending Transactions</p>
+                  <p className="text-2xl font-bold">23</p>
+                </div>
+                <Clock className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-500">Failed Transactions</p>
+                  <p className="text-2xl font-bold">2</p>
+                </div>
+                <AlertCircle className="h-8 w-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-500">Unmapped Items</p>
+                  <p className="text-2xl font-bold">15</p>
+                </div>
+                <AlertCircle className="h-8 w-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Alerts Section */}
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>System Alert</AlertTitle>
+          <AlertDescription>
+            2 transactions failed in the last hour. Please check the transaction logs for details.
+          </AlertDescription>
+        </Alert>
+
+        {/* Quick Actions and Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                <RefreshCcw className="h-6 w-6 mb-2" />
+                Process Pending
+              </Button>
+              <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                <Clock className="h-6 w-6 mb-2" />
+                View Transactions
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Activity log will be displayed here</p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  <div>
+                    <p className="font-medium">Transaction processed successfully</p>
+                    <p className="text-sm text-muted-foreground">5 minutes ago</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <AlertCircle className="h-4 w-4 text-red-500" />
+                  <div>
+                    <p className="font-medium">Transaction failed</p>
+                    <p className="text-sm text-muted-foreground">15 minutes ago</p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Analytics data will be displayed here</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   )
 } 

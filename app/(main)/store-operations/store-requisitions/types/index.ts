@@ -1,3 +1,4 @@
+
 export interface FilterCondition {
   field: string
   operator: string

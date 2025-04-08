@@ -1,5 +1,9 @@
-"use client";
+"use client"
 
+import { useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -7,14 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { X } from "lucide-react";
-import { useEffect } from "react";
-import StatusBadge from "@/components/ui/custom-status-badge";
-import { DialogFooter } from "@/components/ui/custom-dialog";
+} from "@/components/ui/table"
 
 // Mock data for demonstration
 const poData = [
@@ -58,8 +55,9 @@ export function PendingPurchaseOrdersComponent() {
   const totalOnOrder = poData.reduce((total, po) => total + po.qtyToReceive, 0);
 
   useEffect(() => {
+    // Log initial poData once on mount
     console.log("poData", poData);
-  }, [poData]);
+  }, []); // Remove poData from dependencies since it's static mock data
 
   const handleClose = () => {
     // Implement close functionality here

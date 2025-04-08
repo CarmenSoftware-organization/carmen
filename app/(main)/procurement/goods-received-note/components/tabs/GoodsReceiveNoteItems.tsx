@@ -1,7 +1,13 @@
-"use client";
+'use client'
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Eye, Edit, Trash2, Plus } from "lucide-react";
+import { GoodsReceiveNoteMode, GoodsReceiveNoteItem } from "@/lib/types";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/custom-dialog";
+import ItemDetailForm from "./itemDetailForm";
+
 import {
   Table,
   TableBody,
@@ -10,11 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Eye, Edit, Trash2, Plus } from "lucide-react";
-import { GoodsReceiveNoteMode, GoodsReceiveNoteItem } from "@/lib/types";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/custom-dialog";
-import ItemDetailForm from "./itemDetailForm";
 
 interface GoodsReceiveNoteItemsProps {
   mode: GoodsReceiveNoteMode;

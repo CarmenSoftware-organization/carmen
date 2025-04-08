@@ -1,4 +1,6 @@
-'use client'
+"use client"
+
+import StatusBadge from "@/components/ui/custom-status-badge"
 
 import {
   Table,
@@ -8,9 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import StatusBadge from "@/components/ui/custom-status-badge"
 
 const mockGRNData = [
   {

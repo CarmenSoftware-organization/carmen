@@ -1,74 +1,61 @@
-"use client"
+'use client'
 
-import {
-  Edit,
-  Trash,
-  History,
-  MoreHorizontal,
-  Link as LinkIcon,
-  PlayCircle,
-} from "lucide-react"
-
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import { MoreHorizontal } from "lucide-react"
 
-export type ActionType = "edit" | "delete" | "history" | "link" | "test"
+export type ActionType = "edit" | "delete" | "view" | "history" | "test"
 
 interface RowActionsProps {
-  onAction: (action: ActionType) => void
+  onAction: (type: ActionType) => void
   availableActions?: ActionType[]
-  disabled?: boolean
 }
 
-export function RowActions({
-  onAction,
-  availableActions = ["edit", "delete", "history"],
-  disabled = false,
-}: RowActionsProps) {
-  const actionIcons = {
-    edit: <Edit className="mr-2 h-4 w-4" />,
-    delete: <Trash className="mr-2 h-4 w-4" />,
-    history: <History className="mr-2 h-4 w-4" />,
-    link: <LinkIcon className="mr-2 h-4 w-4" />,
-    test: <PlayCircle className="mr-2 h-4 w-4" />,
-  }
-
-  const actionLabels = {
+export function RowActions({ onAction, availableActions = ["view", "edit", "delete"] }: RowActionsProps) {
+  const actionLabels: Record<ActionType, string> = {
+    view: "View details",
     edit: "Edit",
     delete: "Delete",
     history: "View History",
-    link: "View Details",
-    test: "Test Mapping",
+    test: "Test Mapping"
+  }
+
+  const actionClasses: Record<ActionType, string> = {
+    view: "",
+    edit: "",
+    delete: "text-red-600",
+    history: "text-blue-600",
+    test: "text-green-600"
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="h-8 w-8 p-0"
-          disabled={disabled}
-        >
+        <Button variant="ghost" className="h-8 w-8 p-0">
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
         {availableActions.map((action, index) => (
-          <DropdownMenuItem
-            key={action}
-            onClick={() => onAction(action)}
-            className="cursor-pointer"
-          >
-            {actionIcons[action]}
-            {actionLabels[action]}
-          </DropdownMenuItem>
+          <>
+            {index > 0 && action === "delete" && <DropdownMenuSeparator />}
+            <DropdownMenuItem
+              key={action}
+              onClick={() => onAction(action)}
+              className={actionClasses[action]}
+            >
+              {actionLabels[action]}
+            </DropdownMenuItem>
+          </>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

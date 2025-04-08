@@ -1,3 +1,8 @@
+'use client'
+
+import { MovementRecord } from "@/app/(main)/inventory-management/stock-overview/stock-card/types"
+import { format } from "date-fns"
+import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableBody,
@@ -6,23 +11,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Movement } from "@/app/(main)/inventory-management/stock-overview/types"
-import { format } from "date-fns"
-import { Badge } from "@/components/ui/badge"
 
 interface MovementHistoryProps {
-  movements: Movement[]
+  movements: MovementRecord[]
 }
 
 export function MovementHistory({ movements }: MovementHistoryProps) {
-  const getMovementTypeColor = (type: string) => {
+  const getMovementTypeColor = (type: "IN" | "OUT" | "ADJUSTMENT") => {
     switch (type) {
-      case 'GRN':
+      case 'IN':
         return 'bg-green-500/10 text-green-500'
-      case 'ISSUE':
+      case 'OUT':
         return 'bg-red-500/10 text-red-500'
-      case 'TRANSFER':
-        return 'bg-blue-500/10 text-blue-500'
       case 'ADJUSTMENT':
         return 'bg-yellow-500/10 text-yellow-500'
       default:
@@ -54,25 +54,25 @@ export function MovementHistory({ movements }: MovementHistoryProps) {
               <TableCell>
                 <Badge 
                   variant="secondary" 
-                  className={getMovementTypeColor(movement.type)}
+                  className={getMovementTypeColor(movement.transactionType)}
                 >
-                  {movement.type}
+                  {movement.transactionType}
                 </Badge>
               </TableCell>
-              <TableCell>{movement.id}</TableCell>
               <TableCell>{movement.reference}</TableCell>
-              <TableCell>{movement.notes || '-'}</TableCell>
+              <TableCell>{movement.referenceType}</TableCell>
+              <TableCell>{movement.locationName}</TableCell>
               <TableCell className="text-right">
-                {movement.quantity > 0 ? '+' : ''}{movement.quantity} {movement.unit}
+                {movement.quantityChange > 0 ? '+' : ''}{movement.quantityChange}
               </TableCell>
               <TableCell className="text-right">
-                {(10).toLocaleString('en-US', {
+                {movement.unitCost.toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD'
                 })}
               </TableCell>
               <TableCell className="text-right">
-                {(movement.quantity * 10).toLocaleString('en-US', {
+                {movement.valueChange.toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD'
                 })}

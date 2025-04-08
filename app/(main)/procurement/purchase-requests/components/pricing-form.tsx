@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { SummaryPRTable } from "./tabs/Summary-pr-table";
+import { IBaseSummary, PurchaseRequestItem } from "@/lib/types";
+import { Package, XIcon } from "lucide-react";
+import { VendorComparison } from "./vendor-comparison";
 import {
   Select,
   SelectContent,
@@ -11,10 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import SummaryPRTable from "./tabs/Summary-pr-table";
-import { IBaseSummary, PurchaseRequestItem } from "@/lib/types";
-import { Package, XIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,8 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/custom-dialog";
-import VendorComparison from "./vendor-comparison";
+} from "@/components/ui/dialog";
 
 type FormMode = "add" | "edit" | "view";
 
@@ -391,15 +391,8 @@ export function PricingFormComponent({
         <div className="w-full md:w-1/2">
           <h2 className="text-lg font-semibold mb-4">Calculated Amounts</h2>
           <SummaryPRTable
-            item={{
-              ...summaryFooter,
-              currency: formData.currency || "USD",
-              currencyRate: formData.currencyRate || 1,
-              discountRate: formData.discountRate || 0,
-              taxRate: formData.taxRate || 0,
-            }}
-            currencyBase="THB"
-            currencyCurrent={formData.currency || "USD"}
+            calculatedAmounts={calculatedAmounts}
+            summaryFooter={summaryFooter}
           />
         </div>
 

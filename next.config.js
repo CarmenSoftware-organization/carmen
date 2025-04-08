@@ -5,6 +5,10 @@ const nextConfig = {
     // Don't ignore build errors
     ignoreBuildErrors: false
   },
+  // Add experimental flag to force SWC
+  experimental: {
+    forceSwcTransforms: true,
+  },
   async redirects() {
     return [
       {
@@ -16,4 +20,4 @@ const nextConfig = {
   }
 }
 
-module.exports = nextConfig
+export default nextConfig

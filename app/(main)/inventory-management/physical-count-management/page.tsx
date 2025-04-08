@@ -2,262 +2,109 @@
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Building, Plus, List, Grid, X } from 'lucide-react'
-import { CountListItem } from "@/app/(main)/inventory-management/physical-count-management/components/count-list-item"
-import { CountDetailCard } from "@/app/(main)/inventory-management/physical-count-management/components/count-detail-card"
-import { NewCountForm, NewCountData } from "@/app/(main)/inventory-management/physical-count-management/components/new-count-form"
-import { CountDetailForm } from "@/app/(main)/inventory-management/physical-count-management/components/count-detail-form"
-import { users, departments, storeLocations, itemsToCount } from '@/lib/mockData'
-
-interface CountData {
-  storeName: string
-  department: string
-  userName: string
-  date: string
-  status: "pending" | "completed" | "in-progress"
-  itemCount: number
-  lastCountDate: string
-  variance: number
-  notes: string
-  completedCount: number
-}
-
-interface CountDetailData {
-  items: {
-    id: string;
-    name: string;
-    sku: string;
-    description: string;
-    expectedQuantity: number;
-    actualQuantity: number;
-    unit: string;
-    isSubmitted: boolean;
-  }[];
-  notes: string;
-}
-
-const countData = [
-  {
-    storeName: "Main Kitchen Store",
-    department: "F&B",
-    userName: "John Doe",
-    date: "2024-04-20",
-    status: "pending" as const,
-    itemCount: 150,
-    lastCountDate: "2024-03-20",
-    variance: 5.2,
-    notes: "Discrepancies found in dry goods section",
-    completedCount: 75
-  },
-  {
-    storeName: "Dry Store",
-    department: "Housekeeping",
-    userName: "Jane Smith",
-    date: "2024-04-19",
-    status: "completed" as const,
-    itemCount: 75,
-    lastCountDate: "2024-03-19",
-    variance: -2.1,
-    notes: "All items accounted for",
-    completedCount: 75
-  },
-  {
-    storeName: "Cold Room",
-    department: "F&B",
-    userName: "Mike Johnson",
-    date: "2024-04-18",
-    status: "in-progress" as const,
-    itemCount: 200,
-    lastCountDate: "2024-03-18",
-    variance: 0,
-    notes: "Counting in progress, no variances reported yet",
-    completedCount: 0
-  },
-]
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { CountListItem } from "./components/count-list-item"
+import { CountDetailCard } from "./components/count-detail-card"
+import { NewCountForm, NewCountData } from "./components/new-count-form"
 
 export default function PhysicalCountManagement() {
-  const [view, setView] = useState<'list' | 'grid'>('list')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [locationFilter, setLocationFilter] = useState('all')
-  const [departmentFilter, setDepartmentFilter] = useState('all')
-  const [showLocationFilter, setShowLocationFilter] = useState(false)
   const [showNewCountForm, setShowNewCountForm] = useState(false)
   const [showCountDetailForm, setShowCountDetailForm] = useState(false)
-  const [counts, setCounts] = useState(countData)
 
-  const filteredData = counts.filter(item => 
-    (statusFilter === 'all' || item.status === statusFilter) &&
-    (locationFilter === 'all' || item.storeName === locationFilter) &&
-    (departmentFilter === 'all' || item.department === departmentFilter)
-  )
-
-  const handleNewCount = (data: NewCountData) => {
-    const newCount: CountData = {
-      storeName: data.storeName,
-      department: data.department,
-      userName: data.counter,
-      date: data.date,
-      status: 'pending' as const,
-      itemCount: 0,
-      lastCountDate: '-',
-      variance: 0,
-      notes: data.notes || '',
-      completedCount: 0
+  const counts = [
+    {
+      storeName: "Main Kitchen Store",
+      department: "F&B",
+      userName: "John Doe",
+      date: "2024-04-20",
+      status: "pending" as const,
+      itemCount: 150,
+      completedCount: 75,
+      lastCountDate: "2024-03-20",
+      variance: 5.2,
+      notes: "Discrepancies found in dry goods section"
     }
-    setCounts([newCount, ...counts])
-    setShowNewCountForm(false)
-  }
-
-  const handleCountDetailSubmit = (data: CountDetailData) => {
-    console.log('Count details submitted:', data)
-    setShowCountDetailForm(false)
-    // Here you would typically update the count status and other relevant data
-  }
-
-  const handleDeleteCount = (index: number) => {
-    setCounts(prevCounts => prevCounts.filter((_, i) => i !== index))
-  }
+  ]
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto max-w-7xl p-4 sm:p-6">
-        <header className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Physical Count Management</h1>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-muted-foreground mb-4 sm:mb-0">Manage and track inventory counts across locations</p>
-            <Button onClick={() => setShowNewCountForm(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              New Count
-            </Button>
-          </div>
-        </header>
+    <div className="container mx-auto py-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Physical Count Management</h1>
+          <p className="text-muted-foreground">Manage and track physical inventory counts</p>
+        </div>
+        <Button onClick={() => setShowNewCountForm(true)}>New Count</Button>
+      </div>
 
-        {showNewCountForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <NewCountForm 
-              onClose={() => setShowNewCountForm(false)}
-              onSubmit={handleNewCount}
-            />
-          </div>
-        )}
-
-        {showCountDetailForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <CountDetailForm 
-              onClose={() => setShowCountDetailForm(false)}
-              onSubmit={handleCountDetailSubmit}
-            />
-          </div>
-        )}
-
-        <Card className="mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr,auto,auto,auto] gap-4 items-center p-4">
-            <div className="relative w-full sm:w-64">
-              <Input className="pl-3" placeholder="Search counts..." />
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <Input placeholder="Search counts..." />
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="All Departments" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                {departments.map(dept => (
-                  <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex space-x-2 justify-end sm:justify-start">
-              <Button 
-                variant={showLocationFilter ? 'default' : 'outline'} 
-                size="icon"
-                onClick={() => setShowLocationFilter(!showLocationFilter)}
-              >
-                <Building className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant={view === 'list' ? 'default' : 'outline'} 
-                size="icon"
-                onClick={() => setView('list')}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant={view === 'grid' ? 'default' : 'outline'} 
-                size="icon"
-                onClick={() => setView('grid')}
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          {showLocationFilter && (
-            <div className="border-t p-4">
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="All Locations" />
+            <div className="flex gap-2">
+              <Select defaultValue="all">
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  <SelectItem value="fb">F&B</SelectItem>
+                  <SelectItem value="housekeeping">Housekeeping</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select defaultValue="all">
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Location" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
-                  {storeLocations.map(location => (
-                    <SelectItem key={location.id} value={location.name}>{location.name}</SelectItem>
-                  ))}
+                  <SelectItem value="kitchen">Kitchen</SelectItem>
+                  <SelectItem value="storage">Storage</SelectItem>
                 </SelectContent>
               </Select>
-              {locationFilter !== 'all' && (
-                <div className="mt-2 flex items-center">
-                  <span className="text-sm font-medium mr-2">Filtered by:</span>
-                  <Button 
-                    variant="secondary" 
-                    size="sm"
-                    onClick={() => setLocationFilter('all')}
-                  >
-                    {locationFilter}
-                    <X className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              )}
             </div>
-          )}
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {view === 'list' ? (
-          <div className="space-y-4">
-            {filteredData.map((item, index) => (
-              <CountListItem 
-                key={index} 
-                {...item} 
-                onStartCount={() => setShowCountDetailForm(true)}
-                onDelete={() => handleDeleteCount(index)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredData.map((item, index) => (
-              <CountDetailCard 
-                key={index} 
-                {...item} 
-                onStartCount={() => setShowCountDetailForm(true)}
-                onDelete={() => handleDeleteCount(index)}
-              />
-            ))}
-          </div>
-        )}
+      <div className="mt-6 space-y-4">
+        {counts.map((count, index) => (
+          <CountListItem
+            key={index}
+            {...count}
+            onStartCount={() => {/* handle start count */}}
+            onDelete={() => {/* handle delete */}}
+          />
+        ))}
       </div>
+
+      {showCountDetailForm && (
+        <Dialog open={showCountDetailForm} onOpenChange={setShowCountDetailForm}>
+          <DialogContent>
+            <CountDetailCard
+              {...counts[0]}
+              onStartCount={() => {/* handle start count */}}
+              onDelete={() => {/* handle delete */}}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      <Dialog open={showNewCountForm} onOpenChange={setShowNewCountForm}>
+        <DialogContent>
+          <NewCountForm 
+            onClose={() => setShowNewCountForm(false)} 
+            onSubmit={(data: NewCountData) => {
+              console.log('New count data:', data)
+              setShowNewCountForm(false)
+            }} 
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

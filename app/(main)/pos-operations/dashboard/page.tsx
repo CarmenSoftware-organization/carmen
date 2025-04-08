@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+
 export const metadata: Metadata = {
   title: "POS Operations Dashboard",
   description: "Overview of POS operations and activities",

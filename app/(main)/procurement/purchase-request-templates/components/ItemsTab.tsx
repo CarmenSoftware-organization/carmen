@@ -13,6 +13,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
 interface ItemsTabProps {
@@ -20,8 +21,8 @@ interface ItemsTabProps {
   mode: "view" | "edit" | "add"
 }
 
-export function ItemsTab({ items: initialItems, mode }: ItemsTabProps) {
-  const [items, setItems] = useState<TemplateItem[]>(initialItems)
+export function ItemsTab({ items, mode }: ItemsTabProps) {
+  const [itemsState, setItems] = useState<TemplateItem[]>(items)
   const [formOpen, setFormOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<TemplateItem | null>(null)
@@ -37,26 +38,26 @@ export function ItemsTab({ items: initialItems, mode }: ItemsTabProps) {
     setFormOpen(true)
   }
 
-  const handleDeleteItem = (itemId: string) => {
-    setItemToDelete(itemId)
+  const handleDeleteItem = (item: TemplateItem) => {
+    setItemToDelete(item.id)
     setDeleteDialogOpen(true)
   }
 
-  const handleFormSubmit = (data: Partial<TemplateItem>) => {
+  const handleFormSubmit = (data: TemplateItem) => {
     if (selectedItem) {
       // Edit existing item
-      setItems(items.map(item => 
-        item.id === selectedItem.id ? { ...item, ...data } : item
+      setItems(itemsState.map(item => 
+        item.id === selectedItem.id ? data : item
       ))
     } else {
       // Add new item
-      setItems([...items, data as TemplateItem])
+      setItems([...itemsState, data])
     }
   }
 
   const handleConfirmDelete = () => {
     if (itemToDelete) {
-      setItems(items.filter(item => item.id !== itemToDelete))
+      setItems(itemsState.filter(item => item.id !== itemToDelete))
       setDeleteDialogOpen(false)
       setItemToDelete(null)
     }
@@ -65,7 +66,7 @@ export function ItemsTab({ items: initialItems, mode }: ItemsTabProps) {
   return (
     <div className="p-4">
       <TemplateItemsTable
-        items={items}
+        items={itemsState}
         mode={mode}
         onAddItem={handleAddItem}
         onEditItem={handleEditItem}
@@ -73,10 +74,10 @@ export function ItemsTab({ items: initialItems, mode }: ItemsTabProps) {
       />
 
       <ItemFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        onSubmit={handleFormSubmit}
-        initialData={selectedItem || undefined}
+        isOpen={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSave={handleFormSubmit}
+        item={selectedItem || undefined}
         mode={selectedItem ? "edit" : "add"}
       />
 

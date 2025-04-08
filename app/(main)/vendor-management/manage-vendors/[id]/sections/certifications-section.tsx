@@ -3,24 +3,22 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-
-interface Certification {
-  id: string
-  name: string
-  issuer: string
-  validUntil: string
-  status: 'active' | 'expired' | 'pending'
-}
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Vendor, Certification } from '../types'
 
 interface CertificationsSectionProps {
   certifications: Certification[]
+  onUpdate?: (certifications: Certification[]) => void
   isEditing: boolean
-  onCertificationChange: (name: keyof Certification, value: Certification[keyof Certification]) => void
+  vendor?: Vendor
+  onCertificationChange: (name: keyof Certification, value: any) => void // eslint-disable-line @typescript-eslint/no-explicit-any
+  onFieldChange?: (field: keyof Vendor, value: Vendor[keyof Vendor]) => void
 }
 
-export function CertificationsSection({ certifications, isEditing, onCertificationChange }: CertificationsSectionProps) {
-  const getStatusColor = (status: Certification['status']) => {
-    switch (status) {
+export function CertificationsSection({ isEditing, vendor, certifications, onCertificationChange, onFieldChange }: CertificationsSectionProps) {
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
       case 'active':
         return 'bg-green-500'
       case 'expired':
@@ -49,7 +47,7 @@ export function CertificationsSection({ certifications, isEditing, onCertificati
             <TableRow key={cert.id}>
               <TableCell className="font-medium">{cert.name}</TableCell>
               <TableCell>{cert.issuer}</TableCell>
-              <TableCell>{new Date(cert.validUntil).toLocaleDateString()}</TableCell>
+              <TableCell>{cert.validUntil}</TableCell>
               <TableCell>
                 <Badge 
                   variant="secondary"

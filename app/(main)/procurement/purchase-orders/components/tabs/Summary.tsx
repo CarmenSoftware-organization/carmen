@@ -1,3 +1,5 @@
+
+import { PurchaseOrderItem } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -6,7 +8,6 @@ import {
   TableHead,
   TableHeader,
 } from "@/components/ui/table";
-import { PurchaseOrderItem } from "@/lib/types";
 
 interface ISummaryProps {
   item: PurchaseOrderItem;

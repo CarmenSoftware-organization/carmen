@@ -1,10 +1,11 @@
-'use client'
-
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Download, Printer, Search } from 'lucide-react'
 import { Card } from '@/components/ui/card'
+
+'use client'
+
 
 interface ListPageTemplateProps {
   title: string

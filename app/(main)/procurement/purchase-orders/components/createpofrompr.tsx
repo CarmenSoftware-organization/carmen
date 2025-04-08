@@ -1,6 +1,12 @@
-"use client";
+"use client"
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react"
+import { PRType } from "@/lib/types"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   CurrencyCode,
   DocumentStatus,
@@ -8,7 +14,6 @@ import {
   WorkflowStage,
   WorkflowStatus,
 } from "@/lib/types";
-import { PRType } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -17,11 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 
 // Updated mock data for Purchase Requests
 // Mock data for Purchase Requests
@@ -181,7 +183,8 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
   };
 
   return (
-    <>
+    <div>
+      <h1>Create PO from PR</h1>
       <div className="mb-4">
         <Input
           placeholder="Search PRs..."
@@ -256,6 +259,6 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
           </TableBody>
         </Table>
       </ScrollArea>
-    </>
+    </div>
   );
 }

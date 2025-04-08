@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+
 interface PrintOptionsSidepanelProps {
   isOpen: boolean;
   onClose: () => void;

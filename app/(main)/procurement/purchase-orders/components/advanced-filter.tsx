@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from 'react'
 import { Plus, X, Filter, Star, Search, Save, ChevronDown, History, Code } from 'lucide-react'
@@ -9,8 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { FilterType, SavedFilter, saveFilter, getSavedFilters, deleteFilter } from '@/lib/utils/filter-storage'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { PurchaseOrder } from '@/lib/types'
@@ -51,10 +50,8 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       const filters = await getSavedFilters<PurchaseOrder>("purchase-orders")
       setSavedFilters(filters)
     } catch (error) {
-      toast({
-        title: "Error loading filters",
-        description: "There was a problem loading your saved filters.",
-        variant: "destructive"
+      toast.error("Error loading filters", {
+        description: "There was a problem loading your saved filters."
       })
     }
   }
@@ -63,15 +60,12 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
     try {
       await deleteFilter(filterId, "purchase-orders")
       setSavedFilters(savedFilters.filter(f => f.id !== filterId))
-      toast({
-        title: "Filter deleted",
+      toast.success("Filter deleted", {
         description: "Your filter has been deleted successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error deleting filter",
-        description: "There was a problem deleting your filter.",
-        variant: "destructive"
+      toast.error("Error deleting filter", {
+        description: "There was a problem deleting your filter."
       })
     }
   }
@@ -86,10 +80,8 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
         f.id === filter.id ? { ...f, isDefault: !f.isDefault } : f
       ))
     } catch (error) {
-      toast({
-        title: "Error updating filter",
-        description: "There was a problem updating your filter.",
-        variant: "destructive"
+      toast.error("Error updating filter", {
+        description: "There was a problem updating your filter."
       })
     }
   }
@@ -164,15 +156,12 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       await saveFilter("purchase-orders", newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
-      toast({
-        title: "Filter saved",
+      toast.success("Filter saved", {
         description: "Your filter has been saved successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error saving filter",
-        description: "There was a problem saving your filter.",
-        variant: "destructive"
+      toast.error("Error saving filter", {
+        description: "There was a problem saving your filter."
       })
     }
   }

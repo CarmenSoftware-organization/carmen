@@ -1,3 +1,4 @@
+
 export interface Location {
   type: string
   code: string

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { DashboardTemplate } from "@/components/templates/DashboardTemplate";
 import { Package2, AlertTriangle, TrendingUp, History } from "lucide-react";

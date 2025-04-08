@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { Bell, CheckCircle, Clock, Eye, ShoppingCart, DollarSign, AlertCircle, Users, Calendar, ThumbsUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRouter } from "next/navigation"
 
 export function DashboardApproval() {
+  const router = useRouter()
 
-  const router = useRouter();
   const goto_purchase_request = (id: number) =>  {
     router.push(`/procurement/purchase-requests/${id}?mode=edit`)
   }

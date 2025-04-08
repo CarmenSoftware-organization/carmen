@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { InventoryAdjustmentList } from "./components/inventory-adjustment-list"
 import { Card, CardContent } from "@/components/ui/card"
 
+
 export default function InventoryAdjustmentsPage() {
   return (
     <div className="flex flex-col gap-4 p-4">

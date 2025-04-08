@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, BarChart, FileBarChart2, PieChart, GanttChart, RefreshCcw } from "lucide-react"

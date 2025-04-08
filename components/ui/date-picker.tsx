@@ -2,14 +2,15 @@
 
 import * as React from "react"
 import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
-
+import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+
 
 export interface DatePickerProps {
   date?: Date
@@ -64,7 +65,7 @@ export function DateRangePicker({
   className,
   showPresets = true,
 }: DateRangePickerProps) {
-  const [selectedPreset, setSelectedPreset] = React.useState<string>("last7Days");
+  const [selectedPreset, setSelectedPreset] = React.useState<string>("last7Days")
 
   const presets = [
     { label: "Today", value: "today" },
@@ -75,14 +76,7 @@ export function DateRangePicker({
     { label: "Custom range", value: "custom" },
   ]
 
-  // Set default date range (last 7 days)
-  React.useEffect(() => {
-    if (!dateRange?.from && !dateRange?.to) {
-      handlePresetChange("last7Days")
-    }
-  }, [dateRange])
-
-  const handlePresetChange = (value: string) => {
+  const handlePresetChange = React.useCallback((value: string) => {
     setSelectedPreset(value)
     
     if (value === "custom") {
@@ -117,7 +111,14 @@ export function DateRangePicker({
     if (setDateRange) {
       setDateRange({ from, to })
     }
-  }
+  }, [setDateRange])
+
+  // Set default date range (last 7 days)
+  React.useEffect(() => {
+    if (!dateRange?.from && !dateRange?.to) {
+      handlePresetChange("last7Days")
+    }
+  }, [dateRange, handlePresetChange])
 
   return (
     <div className={cn("grid gap-2", className)}>

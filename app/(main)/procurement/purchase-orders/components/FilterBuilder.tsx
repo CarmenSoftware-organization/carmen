@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { PlusCircle, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+
 
 interface FilterCondition {
   field: string;
@@ -46,7 +46,7 @@ const getInputType = (field: string, operator: string): 'text' | 'date' | 'numbe
   return 'text';
 };
 
-export function FilterBuilder({ onSave, initialFilters = [], fields, isOpen, onClose }: FilterBuilderProps) {
+export function FilterBuilder({ fields, isOpen, onClose, onSave, initialFilters = [] }: FilterBuilderProps) {
   // Ensure fields is an array, even if it's not provided
   const safeFields = Array.isArray(fields) ? fields : [];
   const [filters, setFilters] = useState<FilterGroup[]>(initialFilters.length > 0 ? initialFilters : [{ logic: 'AND', conditions: [{ field: '', operator: '', value: '' }] }]);

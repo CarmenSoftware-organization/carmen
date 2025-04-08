@@ -1,0 +1,922 @@
+
+/Users/peak/Documents/GitHub/carmen/app/(auth)/signin/page.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/components/advanced-filter/filter-builder.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/dashboard/page.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/finance/department-list/components/department-list.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/components/stock-in-detail.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/components/stock-in-list.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/filter-sort-options.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/header-actions.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/header-information.tsx
+  5:11  warning  'HeaderInformationProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/inventory-adjustment-detail.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/inventory-adjustment-list.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/journal-entries/journal-header.tsx
+  17:11  warning  'JournalHeaderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/journal-entries/journal-table.tsx
+  5:11  warning  'JournalTableProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/right-panel/right-panel.tsx
+  36:11  warning  'RightPanelProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/inventory-adjustments/components/stock-movement/stock-movement-table.tsx
+  5:11  warning  'StockMovementTableProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/layout.tsx
+  4:11  warning  'InventoryManagementLayoutProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/period-end/[id]/page.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/period-end/page.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count-management/components/count-detail-form.tsx
+  10:11  warning  'CountDetailFormProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count-management/components/count-progress.tsx
+  4:11  warning  'CountProgressProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count-management/components/new-count-form.tsx
+  10:11  warning  'NewCountFormProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count/active/[id]/page.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count/components/final-review.tsx
+  21:11  warning  'FinalReviewProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count/components/item-review.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count/components/location-selection.tsx
+  18:11  warning  'LocationSelectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count/components/setup.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/physical-count/dashboard/components/counts-table.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/active/[id]/page.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/active/page.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/completed/[id]/page.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/completed/page.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/components/count-progress.tsx
+  4:11  warning  'CountProgressProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/components/item-selection.tsx
+  14:11  warning  'ItemSelectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/components/location-selection.tsx
+  31:11  warning  'LocationSelectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/components/review.tsx
+  27:11  warning  'ReviewProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/components/setup.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/spot-check/dashboard/page.tsx
+  9:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/inventory-balance/components/BalanceTable.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/inventory-balance/components/FilterPanel.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/inventory-balance/components/MovementHistory.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/inventory-balance/page.tsx
+  11:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-card/components/StockCardGeneralInfo.tsx
+  8:11  warning  'StockCardGeneralInfoProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-card/components/StockCardLotInformation.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-card/components/StockCardMovementHistory.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-card/components/StockCardValuation.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-card/components/quick-filters.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-card/components/stock-card-list.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-card/page.tsx
+  9:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/inventory-management/stock-overview/stock-cards/page.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/operational-planning/recipe-management/recipes/[id]/edit/page.tsx
+  8:11  warning  'EditRecipePageProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/operational-planning/recipe-management/recipes/[id]/page.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/consumptions/components/columns.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/interface-posting/components/columns.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/layout.tsx
+  4:11  warning  'POSOperationsLayoutProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/components/data-table.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/components/filter-bar.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/components/row-actions.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/components/status-badge.tsx
+  16:11  warning  'StatusBadgeProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/locations/components/columns.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/locations/page.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/recipes/components/columns.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/recipes/page.tsx
+  9:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/units/components/columns.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/mapping/units/page.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/transactions/components/columns.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/pos-operations/transactions/page.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/StockMovementTab.tsx
+  6:11  warning  'StockMovementTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/cn-lot-application.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/credit-note-detail.tsx
+  5:11  warning  'CreditNoteDetailProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/credit-note-list.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/credit-note-management.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/credit-note.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/grn-selection.tsx
+  17:11  warning  'GRNSelectionProps' is defined but never used                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  40:6   warning  React Hook useEffect has an unnecessary dependency: 'vendorId'. Either exclude it or remove the dependency array. Outer scope values like 'vendorId' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/item-and-lot-selection.tsx
+  57:11  warning  'ItemAndLotSelectionProps' is defined but never used                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  73:6   warning  React Hook useEffect has an unnecessary dependency: 'isOpen'. Either exclude it or remove the dependency array. Outer scope values like 'isOpen' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/item-details-edit.tsx
+  29:11  warning  'ItemDetailsEditProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/lot-selection.tsx
+  16:11  warning  'LotSelectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/credit-note/components/vendor-selection.tsx
+  13:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/[id]/edit.tsx
+  11:16  warning  'setMode' is assigned a value but never used                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  27:6   warning  React Hook useEffect has an unnecessary dependency: 'params.id'. Either exclude it or remove the dependency array. Outer scope values like 'params.id' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/[id]/edit/page.tsx
+  27:6  warning  React Hook useEffect has an unnecessary dependency: 'params.id'. Either exclude it or remove the dependency array. Outer scope values like 'params.id' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/FilterBuilder.tsx
+  29:11  warning  'FilterBuilderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail.tsx
+  10:72  warning  'ExtraCost' is defined but never used                    @typescript-eslint/no-unused-vars
+  23:11  warning  'GoodsReceiveNoteDetailProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/SummaryTotal.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/advanced-filter.tsx
+  21:11  warning  'AdvancedFilterProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/goods-receive-note.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/ActivityLogTab.tsx
+   7:11  warning  'ActivityLogTabProps' is defined but never used                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  20:6   warning  React Hook useMemo has an unnecessary dependency: 'activityLog'. Either exclude it or remove the dependency array. Outer scope values like 'activityLog' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/AttachmentTab.tsx
+  10:11  warning  'AttachmentTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/BulkActions.tsx
+  5:11  warning  'BulkActionsProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/CommentTab.tsx
+  9:11  warning  'CommentTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/CommentsAttachmentsTab.tsx
+  18:11  warning  'CommentsAttachmentsTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/ExtraCostsTab.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/FinancialSummaryTab.tsx
+  8:11  warning  'FinancialSummaryTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/GoodsReceiveNoteItems.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/GoodsReceiveNoteItemsBulkActions.tsx
+  5:11  warning  'GoodsReceiveNoteItemsBulkActionsProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/StockMovementTab.tsx
+  5:11  warning  'StockMovementTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/TaxTab.tsx
+  40:3  warning  'currency' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/inventory-breakdown.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/components/tabs/itemDetailForm.tsx
+  11:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/goods-received-note/create/page.tsx
+  8:16  warning  'setMode' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/layout.tsx
+  4:11  warning  'ProcurementLayoutProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/ExportSidepanel.tsx
+  14:11  warning  'ExportSidepanelProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/FilterBuilder.tsx
+  23:11  warning  'FilterBuilderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/PODetailPage.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/PrintOptionsSidepanel.tsx
+  11:11  warning  'PrintOptionsSidepanelProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/PurchaseOrderList.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/SummaryTotal.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/advanced-filter.tsx
+   2:33  warning  'Search' is defined but never used               @typescript-eslint/no-unused-vars
+  21:11  warning  'AdvancedFilterProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/create-po-modal.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/createpofrompr.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/new-po-modal.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/po-item-form.tsx
+  14:11  warning  'ItemFormProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/ActivityLogTab.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/CommentsAttachmentsTab.tsx
+  19:11  warning  'CommentsAttachmentsTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/FinancialDetailsTab.tsx
+  5:10  warning  'PurchaseOrder' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/GeneralInfoTab.tsx
+  6:10  warning  'PurchaseOrder' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/GoodsReceiveNoteTab.tsx
+  17:11  warning  'GoodsReceiveNoteTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/InventoryStatusTab.tsx
+  6:10  warning  'PurchaseOrder' is defined but never used      @typescript-eslint/no-unused-vars
+  9:11  warning  'InventoryItemInfo' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/ItemsTab.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/RelatedDocumentsTab.tsx
+  21:11  warning  'RelatedDocumentsTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/Summary.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/VendorInfoTab.tsx
+  5:11  warning  'VendorInfoTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/goods-receive-note-table.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/inventory-breakdown.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/item-details.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/components/tabs/pr-items-table.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-orders/create/page.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-request-templates/components/ItemsTab.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-request-templates/components/item-form-dialog.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-request-templates/components/template-items-table.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-request-templates/components/templates/DialogPageTemplate.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-request-templates/components/templates/FormPageTemplate.tsx
+  2:10  warning  'Card' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-request-templates/components/templates/PRDetailTemplate.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-request-templates/page.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/PRDetailPage.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/SummaryTotal.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/advanced-filter.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/bulk-actions.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/dashboard-approval.tsx
+  1:41  warning  'ShoppingCart' is defined but never used  @typescript-eslint/no-unused-vars
+  1:87  warning  'Calendar' is defined but never used      @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/inventory-breakdown.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/item-details-edit-form.tsx
+  10:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/pending-purchase-orders.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/pricing-form.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/purchase-request-list.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/save-template-dialog.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/tabs/ItemsTab.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/tabs/Summary-pr-table.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/tabs/budget-tab.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/template-selection-modal.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/procurement/purchase-requests/components/vendor-comparison.tsx
+   3:23  warning  'Plus' is defined but never used                         @typescript-eslint/no-unused-vars
+   6:10  warning  'Select' is defined but never used                       @typescript-eslint/no-unused-vars
+   6:18  warning  'SelectContent' is defined but never used                @typescript-eslint/no-unused-vars
+   6:33  warning  'SelectItem' is defined but never used                   @typescript-eslint/no-unused-vars
+   6:45  warning  'SelectTrigger' is defined but never used                @typescript-eslint/no-unused-vars
+   6:60  warning  'SelectValue' is defined but never used                  @typescript-eslint/no-unused-vars
+  68:9   warning  'renderRating' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  86:9   warning  'handleAddNewVendor' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/categories/components/advanced-filter.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/categories/components/category-list.tsx
+  9:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/categories/page.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/layout.tsx
+  4:11  warning  'ProductManagementLayoutProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/products/[id]/edit/page.tsx
+  38:17  warning  'setError' is assigned a value but never used                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  47:6   warning  React Hook useEffect has an unnecessary dependency: 'params.id'. Either exclude it or remove the dependency array. Outer scope values like 'params.id' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/products/[id]/page.tsx
+  60:6  warning  React Hook useEffect has an unnecessary dependency: 'params.id'. Either exclude it or remove the dependency array. Outer scope values like 'params.id' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/products/components/ingredients.tsx
+  10:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/products/components/order-unit.tsx
+   2:10  warning  'Scale' is defined but never used                     @typescript-eslint/no-unused-vars
+   2:23  warning  'Pencil' is defined but never used                    @typescript-eslint/no-unused-vars
+   2:40  warning  'AlertCircle' is defined but never used               @typescript-eslint/no-unused-vars
+  60:10  warning  'selectedUnit' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  60:24  warning  'setSelectedUnit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  61:10  warning  'isLoading' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  61:21  warning  'setIsLoading' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  62:10  warning  'error' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  62:17  warning  'setError' is assigned a value but never used         @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/products/components/stock-count.tsx
+  2:10  warning  'Scale' is defined but never used        @typescript-eslint/no-unused-vars
+  2:23  warning  'Pencil' is defined but never used       @typescript-eslint/no-unused-vars
+  2:40  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/units/components/unit-form.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/units/components/unit-list.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/product-management/units/components/unit-table.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/recipe-management/recipes/components/recipe-list-view.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/components/stock-replenishment.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/components/store-requisition-list.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/components/wastage-reporting.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/layout.tsx
+  4:11  warning  'StoreOperationsLayoutProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/[id]/page.tsx
+  4:11  warning  'StoreRequisitionDetailPageProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/approval-log-dialog.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/filter-builder.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/header-actions.tsx
+  7:11  warning  'HeaderActionsProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/header-info.tsx
+  13:11  warning  'HeaderInfoProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/list-filters.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/list-header.tsx
+  8:11  warning  'ListHeaderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/stock-movement-sr.tsx
+  218:46  warning  'lotIndex' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/store-requisition-detail.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/store-operations/store-requisitions/components/tabs/journal-entries-tab.tsx
+   3:10  warning  'AlertCircle' is defined but never used             @typescript-eslint/no-unused-vars
+  60:11  warning  'JournalEntriesTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+  67:41  warning  'department' is defined but never used              @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/system-integration/page.tsx
+  4:32  warning  'RefreshCcw' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/system-integrations/page.tsx
+  4:32  warning  'RefreshCcw' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/[id]/page.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/components/advanced-filter.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/components/bulk-actions.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/components/enhanced-filter.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/components/status-badge.tsx
+  8:11  warning  'StatusBadgeProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/components/user-card.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/components/user-form-dialog.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/user-management/page.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/role-assignment/components/assigned-users.tsx
+   8:16  warning  'Role' is defined but never used                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  11:11  warning  'AssignedUsersProps' is defined but never used                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  46:6   warning  React Hook useEffect has an unnecessary dependency: 'selectedRoleId'. Either exclude it or remove the dependency array. Outer scope values like 'selectedRoleId' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/role-assignment/components/configuration-panel.tsx
+  9:11  warning  'ConfigurationPanelProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/role-assignment/components/role-configuration.tsx
+  16:11  warning  'RoleConfigurationProps' is defined but never used                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  46:6   warning  React Hook useEffect has an unnecessary dependency: 'selectedRoleId'. Either exclude it or remove the dependency array. Outer scope values like 'selectedRoleId' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/role-assignment/components/role-list.tsx
+  8:11  warning  'RoleListProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-detail.tsx
+  17:11  warning  'WorkflowDetailProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-general.tsx
+  20:11  warning  'WorkflowGeneralProps' is defined but never used                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  32:6   warning  React Hook useEffect has an unnecessary dependency: 'workflow'. Either exclude it or remove the dependency array. Outer scope values like 'workflow' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-header.tsx
+  8:11  warning  'WorkflowHeaderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-list.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-notifications.tsx
+   9:53  warning  'NotificationEventTrigger' is defined but never used      @typescript-eslint/no-unused-vars
+  13:11  warning  'WorkflowNotificationsProps' is defined but never used    @typescript-eslint/no-unused-vars
+  54:9   warning  'handleChannelToggle' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-products.tsx
+    6:18  warning  'Plus' is defined but never used                   @typescript-eslint/no-unused-vars
+  151:10  warning  'updateParentSelection' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-stages.tsx
+  8:53  warning  'MoreHorizontal' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/components/workflow-templates.tsx
+  10:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/system-administration/workflow/workflow-configuration/data/mockData.ts
+  3:3  warning  'ActionType' is defined but never used                @typescript-eslint/no-unused-vars
+  4:3  warning  'OperatorType' is defined but never used              @typescript-eslint/no-unused-vars
+  5:3  warning  'NotificationEventTrigger' is defined but never used  @typescript-eslint/no-unused-vars
+  6:3  warning  'NotificationChannel' is defined but never used       @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/layout.tsx
+  4:11  warning  'VendorManagementLayoutProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/components/addresses-tab.tsx
+  8:11  warning  'AddressesTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/components/basic-info-tab.tsx
+  9:11  warning  'BasicInfoTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/components/contacts-tab.tsx
+  8:11  warning  'ContactsTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/hooks/use-vendor.ts
+  5:18  warning  'EnvironmentalImpact' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/page.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/sections/addresses-section.tsx
+  8:11  warning  'AddressesSectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/sections/basic-info-section.tsx
+  12:11  warning  'BasicInfoSectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/sections/certifications-section.tsx
+  16:11  warning  'CertificationsSectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/sections/contacts-section.tsx
+  8:11  warning  'ContactsSectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/sections/environmental-profile.tsx
+    5:10  warning  'LineChart' is defined but never used                 @typescript-eslint/no-unused-vars
+    5:21  warning  'Line' is defined but never used                      @typescript-eslint/no-unused-vars
+    5:42  warning  'PieChart' is defined but never used                  @typescript-eslint/no-unused-vars
+    5:52  warning  'Pie' is defined but never used                       @typescript-eslint/no-unused-vars
+    5:57  warning  'Cell' is defined but never used                      @typescript-eslint/no-unused-vars
+    6:47  warning  'FileText' is defined but never used                  @typescript-eslint/no-unused-vars
+   74:11  warning  'VendorEnvironmentalProps' is defined but never used  @typescript-eslint/no-unused-vars
+  100:10  warning  'timeRange' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  100:21  warning  'setTimeRange' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/[id]/sections/environmental-section.tsx
+  12:11  warning  'EnvironmentalSectionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/data/mock.ts
+   1:18  warning  'Certification' is defined but never used                                @typescript-eslint/no-unused-vars
+   2:10  warning  'Address' is defined but never used                                      @typescript-eslint/no-unused-vars
+   2:19  warning  'Contact' is defined but never used                                      @typescript-eslint/no-unused-vars
+  13:7   warning  'CERTIFICATION_STATUS' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  19:7   warning  'ENVIRONMENTAL_CERTIFICATION_STATUS' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/manage-vendors/page.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/price-comparisons/page.tsx
+  2:29  warning  'CardHeader' is defined but never used  @typescript-eslint/no-unused-vars
+  2:41  warning  'CardTitle' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/(main)/vendor-management/price-lists/[id]/page.tsx
+    9:60  warning  'DialogTrigger' is defined but never used                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+    9:75  warning  'DialogFooter' is defined but never used                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  153:6   warning  React Hook useEffect has an unnecessary dependency: 'params.id'. Either exclude it or remove the dependency array. Outer scope values like 'params.id' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/app/components/templates/PRListTemplate.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/layout.tsx
+  4:11  warning  'InventoryLayoutProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/[id]/page.tsx
+  7:11  warning  'StockCardDetailPageProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/components/analytics.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/components/movement-history.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/components/quick-filters.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/components/stock-card-detail.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/components/stock-card-header.tsx
+  7:11  warning  'StockCardHeaderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/components/stock-card-list.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/app/inventory/stock-overview/stock-card/components/stock-status.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/BulkActions.tsx
+  5:11  warning  'BulkActionsProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/ComingSoon.tsx
+  2:11  warning  'ComingSoonProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/Sidebar.tsx
+    8:43  warning  'LayoutDashboard' is defined but never used      @typescript-eslint/no-unused-vars
+    8:60  warning  'Terminal' is defined but never used             @typescript-eslint/no-unused-vars
+    8:70  warning  'Settings' is defined but never used             @typescript-eslint/no-unused-vars
+  238:11  warning  'SidebarProps' is defined but never used         @typescript-eslint/no-unused-vars
+  286:11  warning  'SidebarContentProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/account-code-mapping.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/carmen-header.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/category-management.tsx
+  7:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/goods-receive-note-table.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/header.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/improved-goods-receive-note.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/item-details-edit-form.tsx
+   16:111  warning  'Plus' is defined but never used                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   63:6    warning  'ItemDetailsFormProps' is defined but never used                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   82:7    warning  'sampleItemData' is assigned a value but never used                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  136:6    warning  React Hook useEffect has an unnecessary dependency: 'initialData'. Either exclude it or remove the dependency array. Outer scope values like 'initialData' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+/Users/peak/Documents/GitHub/carmen/components/item-details.tsx
+  12:10  warning  'CalendarIcon' is defined but never used  @typescript-eslint/no-unused-vars
+  12:52  warning  'EyeIcon' is defined but never used       @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/page-header.tsx
+  2:11  warning  'PageHeaderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/page-wrapper.tsx
+  2:11  warning  'PageWrapperProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/pr-items-table.tsx
+  3:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/ExportSidepanel.tsx
+  14:11  warning  'ExportSidepanelProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/FilterBuilder.tsx
+  23:11  warning  'FilterBuilderProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/PrintOptionsSidepanel.tsx
+  11:11  warning  'PrintOptionsSidepanelProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/ActivityLogTab.tsx
+  16:11  warning  'PurchaseOrderData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/CommentsAttachmentsTab.tsx
+  20:11  warning  'PurchaseOrderData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/FinancialDetailsTab.tsx
+  7:11  warning  'PurchaseOrderFinancialData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/GeneralInfoTab.tsx
+  8:11  warning  'PurchaseOrderGeneralData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/GoodsReceiveNoteTab.tsx
+  4:10  warning  'GoodsReceiveNote' is defined but never used          @typescript-eslint/no-unused-vars
+  8:11  warning  'GoodsReceiveNoteTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/InventoryStatusTab.tsx
+  16:11  warning  'PurchaseOrderData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/ItemsTab.tsx
+  8:11  warning  'ItemsTabProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/RelatedDocumentsTab.tsx
+  14:11  warning  'PurchaseOrderData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/purchase-orders/tabs/purchase-order-item-form.tsx
+  16:11  warning  'ItemFormProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/quick-access-nav.tsx
+  6:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/sidebar-nav.tsx
+  9:11  warning  'SidebarNavProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/templates/DialogPageTemplate.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/templates/FormPageTemplate.tsx
+  2:10  warning  'Card' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/templates/PRDetailTemplate.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/templates/PRListTemplate.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/theme-provider.tsx
+  7:11  error  'NextThemesProvider' is not defined  react/jsx-no-undef
+
+/Users/peak/Documents/GitHub/carmen/components/ui/command.tsx
+   13:4  error  'CommandPrimitive' is not defined  react/jsx-no-undef
+   42:6  error  'CommandPrimitive' is not defined  react/jsx-no-undef
+   59:4  error  'CommandPrimitive' is not defined  react/jsx-no-undef
+   72:4  error  'CommandPrimitive' is not defined  react/jsx-no-undef
+   85:4  error  'CommandPrimitive' is not defined  react/jsx-no-undef
+  101:4  error  'CommandPrimitive' is not defined  react/jsx-no-undef
+  113:4  error  'CommandPrimitive' is not defined  react/jsx-no-undef
+
+/Users/peak/Documents/GitHub/carmen/components/ui/custom-status-badge.tsx
+  76:11  warning  'StatusBadgeProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/components/ui/data-table.tsx
+  2:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/ui/date-picker-with-range.tsx
+  9:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/ui/date-picker.tsx
+   38:12  error    'CalendarIcon' is not defined                                                                                                react/jsx-no-undef
+   83:6   warning  React Hook React.useEffect has a missing dependency: 'handlePresetChange'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  150:16  error    'CalendarIcon' is not defined                                                                                                react/jsx-no-undef
+
+/Users/peak/Documents/GitHub/carmen/components/ui/date-range-picker.tsx
+  9:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/ui/date-time-picker.tsx
+  12:11  warning  'DateTimePickerProps' is defined but never used  @typescript-eslint/no-unused-vars
+  51:14  error    'CalendarIcon' is not defined                    react/jsx-no-undef
+
+/Users/peak/Documents/GitHub/carmen/components/ui/form.tsx
+  5:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/ui/sonner.tsx
+  12:6  error  'Sonner' is not defined  react/jsx-no-undef
+
+/Users/peak/Documents/GitHub/carmen/components/ui/toaster.tsx
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/ui/tooltip-provider.tsx
+  6:6  error  'RadixTooltipProvider' is not defined  react/jsx-no-undef
+
+/Users/peak/Documents/GitHub/carmen/components/ui/use-toast copy.ts
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/ui/use-toast.ts
+  4:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/components/user-dashboard.tsx
+  8:0  error  Parsing error: Identifier expected
+
+/Users/peak/Documents/GitHub/carmen/lib/mock/inventory-data.ts
+  1:10  warning  'format' is defined but never used   @typescript-eslint/no-unused-vars
+  1:18  warning  'addDays' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/lib/mock/mock_purchaseOrder.tsx
+  1:46  warning  'PurchaseOrderItem' is defined but never used          @typescript-eslint/no-unused-vars
+  1:65  warning  'PurchaseRequestItemStatus' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/lib/sample-data.ts
+   1:10   warning  'GoodsReceiveNote' is defined but never used                  @typescript-eslint/no-unused-vars
+   1:28   warning  'GoodsReceiveNoteItem' is defined but never used              @typescript-eslint/no-unused-vars
+   1:50   warning  'StockMovement' is defined but never used                     @typescript-eslint/no-unused-vars
+   1:90   warning  'Comment' is defined but never used                           @typescript-eslint/no-unused-vars
+   1:99   warning  'Attachment' is defined but never used                        @typescript-eslint/no-unused-vars
+   1:111  warning  'ActivityLogEntry' is defined but never used                  @typescript-eslint/no-unused-vars
+  18:8    warning  'sampleGoodsReceiveNotes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/lib/store/use-count-store.ts
+  2:10  warning  'HotelLocation' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/lib/utils.ts
+  1:15  warning  'ClassValue' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/lib/utils/filter-storage.ts
+  34:7  warning  'STORAGE_KEY' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/peak/Documents/GitHub/carmen/scripts/analyze.ts
+  1:22  error  Require statement not part of import statement  @typescript-eslint/no-var-requires
+  2:12  error  Require statement not part of import statement  @typescript-eslint/no-var-requires
+  3:14  error  Require statement not part of import statement  @typescript-eslint/no-var-requires
+  9:19  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+/Users/peak/Documents/GitHub/carmen/scripts/batch-fix.ts
+  2:10  warning  'join' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 361 problems (161 errors, 200 warnings)
+

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { CountProgress } from "@/app/(main)/inventory-management/spot-check/components/count-progress"
 
+
 interface CountListItemProps {
   storeName: string
   department: string

@@ -1,12 +1,7 @@
-import React from 'react';
-import { TooltipProvider as RadixTooltipProvider } from '@radix-ui/react-tooltip';
+"use client"
 
-export const TooltipProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return (
-    <RadixTooltipProvider delayDuration={0}>
-      {children}
-    </RadixTooltipProvider>
-  );
-};
+import { TooltipProvider as RadixTooltipProvider } from "@radix-ui/react-tooltip"
 
-export { Tooltip, TooltipTrigger, TooltipContent } from '@radix-ui/react-tooltip';
+export function TooltipProvider({ children }: { children: React.ReactNode }) {
+  return <RadixTooltipProvider>{children}</RadixTooltipProvider>
+}

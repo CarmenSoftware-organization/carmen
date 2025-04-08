@@ -3,8 +3,9 @@
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Vendor } from '@/lib/types'
+import { Vendor } from '../types'
+
+
 
 interface BasicInfoTabProps {
   vendor: Vendor
@@ -32,7 +33,7 @@ export function BasicInfoTab({ vendor, isEditing, onFieldChange }: BasicInfoTabP
           <Input
             id="businessRegistrationNumber"
             name="businessRegistrationNumber"
-            value={vendor.businessRegistrationNumber}
+            value={vendor.businessRegistrationNumber || ''}
             onChange={(e) => onFieldChange('businessRegistrationNumber', e.target.value as Vendor[keyof Vendor])}
             disabled={!isEditing}
           />

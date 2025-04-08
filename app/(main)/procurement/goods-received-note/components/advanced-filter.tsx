@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from 'react'
 import { Plus, X, Filter, Star, Search, Save, ChevronDown, History, Code } from 'lucide-react'
@@ -9,8 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { toast } from '@/components/ui/use-toast'
+import { toast as sonnerToast } from 'sonner'
 import { FilterType, SavedFilter, saveFilter, getSavedFilters, deleteFilter } from '@/lib/utils/filter-storage'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { GoodsReceiveNote } from '@/lib/types'
@@ -40,7 +39,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
 
   // Load saved filters on mount
   useEffect(() => {
-    loadSavedFilters()
+    void loadSavedFilters()
   }, [])
 
   const loadSavedFilters = async () => {
@@ -48,10 +47,8 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       const filters = await getSavedFilters<GoodsReceiveNote>("goods-received-note")
       setSavedFilters(filters)
     } catch (error) {
-      toast({
-        title: "Error loading filters",
-        description: "There was a problem loading your saved filters.",
-        variant: "destructive"
+      sonnerToast.error("Error loading filters", {
+        description: "There was a problem loading your saved filters."
       })
     }
   }
@@ -60,15 +57,12 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
     try {
       await deleteFilter(filterId, "goods-received-note")
       setSavedFilters(savedFilters.filter(f => f.id !== filterId))
-      toast({
-        title: "Filter deleted",
+      sonnerToast.success("Filter deleted", {
         description: "Your filter has been deleted successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error deleting filter",
-        description: "There was a problem deleting your filter.",
-        variant: "destructive"
+      sonnerToast.error("Error deleting filter", {
+        description: "There was a problem deleting your filter."
       })
     }
   }
@@ -83,10 +77,8 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
         f.id === filter.id ? { ...f, isDefault: !f.isDefault } : f
       ))
     } catch (error) {
-      toast({
-        title: "Error updating filter",
-        description: "There was a problem updating your filter.",
-        variant: "destructive"
+      sonnerToast.error("Error updating filter", {
+        description: "There was a problem updating your filter."
       })
     }
   }
@@ -161,21 +153,24 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       await saveFilter("goods-received-note", newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
-      toast({
-        title: "Filter saved",
+      sonnerToast.success("Filter saved", {
         description: "Your filter has been saved successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error saving filter",
-        description: "There was a problem saving your filter.",
-        variant: "destructive"
+      sonnerToast.error("Error saving filter", {
+        description: "There was a problem saving your filter."
       })
     }
   }
 
   const handleApplyFilters = () => {
     onApplyFilters(activeFilters)
+    setIsOpen(false)
+  }
+
+  const handleClearFilters = () => {
+    setActiveFilters([])
+    onClearFilters()
     setIsOpen(false)
   }
 
@@ -425,7 +420,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
               </button>
             </Badge>
           ))}
-          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={onClearFilters}>
+          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={handleClearFilters}>
             Clear all
           </Button>
         </div>

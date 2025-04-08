@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Paperclip, Send } from 'lucide-react';
 import { PurchaseOrder } from '@/lib/types';
+
 
 interface Comment {
   id: string;
@@ -46,7 +46,7 @@ const mockComments: Comment[] = [
   },
 ];
 
-export default function CommentsAttachmentsTab({ poData }: CommentsAttachmentsTabProps) {
+export default function CommentsAttachmentsTab() {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(mockComments);
 

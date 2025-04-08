@@ -1,5 +1,9 @@
 import MainLayoutClient from './main-layout-client'
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+interface MainLayoutProps {
+  children: React.ReactNode
+}
+
+export default function MainLayout({ children }: MainLayoutProps) {
   return <MainLayoutClient>{children}</MainLayoutClient>
 }

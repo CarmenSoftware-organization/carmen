@@ -1,7 +1,6 @@
-'use client';
+'use client'
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +19,7 @@ import {
   Clock,
   Layers,
 } from 'lucide-react';
-import { mockCounts, mockProducts, mockLocations, Product, Count } from '@/lib/mock/inventory-data';
+import { mockCounts, mockProducts, mockLocations } from '@/lib/mock/inventory-data';
 
 interface PageProps {
   params: {
@@ -29,9 +28,6 @@ interface PageProps {
 }
 
 export default function PhysicalActiveCountPage({ params }: PageProps) {
-  const router = useRouter();
-  const [selectedItem, setSelectedItem] = useState<Product | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
   const [counts, setCounts] = useState<Record<string, { count: number; status: string }>>({});
   const [currentLocation, setCurrentLocation] = useState<string>('');
 
@@ -39,13 +35,14 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
   const countSession = mockCounts.find(count => count.id === params.id && count.type === 'physical') || 
     mockCounts.find(count => count.type === 'physical')!;
     
-  const countLocations = countSession.locations.map(locId => 
+  // Get locations for this count session
+  const locations = countSession.locations.map(locId => 
     mockLocations.find(loc => loc.id === locId)
   ).filter(loc => loc) as typeof mockLocations;
   
   // If no location is selected, use the first one
-  if (!currentLocation && countLocations.length > 0) {
-    setCurrentLocation(countLocations[0].id);
+  if (!currentLocation && locations.length > 0) {
+    setCurrentLocation(locations[0].id);
   }
 
   // Get products for current location
@@ -103,7 +100,7 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
     <div className="bg-gray-50 border-b">
       <div className="max-w-7xl mx-auto p-4">
         <div className="flex space-x-4">
-          {countLocations.map((loc) => (
+          {locations.map((loc) => (
             <div 
               key={loc.id}
               onClick={() => setCurrentLocation(loc.id)}
@@ -127,7 +124,7 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
       <div className="col-span-2">
         <Card>
           <CardHeader>
-            <CardTitle>Current Location: {mockLocations.find(loc => loc.id === currentLocation)?.name}</CardTitle>
+            <CardTitle>Current Location: {locations.find(loc => loc.id === currentLocation)?.name}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

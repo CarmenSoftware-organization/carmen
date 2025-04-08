@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { ArrowRight, Database, RefreshCcw, ShoppingCart, Cable } from "lucide-react";
 
+
 export default function SystemIntegrationsPage() {
   return (
     <div className="container mx-auto py-6">

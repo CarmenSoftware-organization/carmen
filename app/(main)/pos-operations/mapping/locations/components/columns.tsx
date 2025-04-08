@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { MoreHorizontal, History, Edit, Trash2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, History, Edit, Trash } from "lucide-react"
 
 interface LocationMapping {
   id: string
@@ -58,9 +58,7 @@ export const columns: ColumnDef<LocationMapping>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const mapping = row.original
-
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -81,7 +79,7 @@ export const columns: ColumnDef<LocationMapping>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive">
-              <Trash className="mr-2 h-4 w-4" />
+              <Trash2 className="mr-2 h-4 w-4" />
               Delete Mapping
             </DropdownMenuItem>
           </DropdownMenuContent>

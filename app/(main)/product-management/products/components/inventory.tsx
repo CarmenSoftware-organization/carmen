@@ -1,6 +1,7 @@
 import React from 'react';
 import { Package, AlertCircle } from 'lucide-react';
 
+
 // Mock data
 const inventoryData = {
   totalStock: {

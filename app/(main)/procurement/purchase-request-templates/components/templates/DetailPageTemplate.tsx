@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 interface DetailPageTemplateProps {
   title: React.ReactNode;
   subtitle?: string;

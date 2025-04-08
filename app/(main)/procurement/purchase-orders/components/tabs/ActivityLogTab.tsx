@@ -1,4 +1,9 @@
-import React, { Children } from "react";
+"use client"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import StatusBadge from "@/components/ui/custom-status-badge";
+import { PurchaseOrder } from '@/lib/types';
+
 import {
   Table,
   TableBody,
@@ -7,10 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import StatusBadge from "@/components/ui/custom-status-badge";
-import { PurchaseOrder } from '@/lib/types';
 
 interface ActivityLog {
   id: string;

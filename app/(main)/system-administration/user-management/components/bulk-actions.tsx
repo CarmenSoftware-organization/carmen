@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
 import React from "react"
 import { Button } from "@/components/ui/button"
-import { 
+import {
   UserPlus2,
   UserCog,
   UserX2,
@@ -10,7 +10,7 @@ import {
   Building2
 } from "lucide-react"
 
-type BulkActionData = {
+export type BulkActionData = {
   invite?: { emails: string[] }
   status?: { status: 'active' | 'inactive' | 'suspended' }
   role?: { roleIds: string[] }

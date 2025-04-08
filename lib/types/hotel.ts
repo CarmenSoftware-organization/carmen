@@ -1,3 +1,4 @@
+
 export type LocationType = 'storage' | 'kitchen' | 'restaurant' | 'bar' | 'maintenance' | 'housekeeping' | 'all';
 
 export interface HotelLocation {

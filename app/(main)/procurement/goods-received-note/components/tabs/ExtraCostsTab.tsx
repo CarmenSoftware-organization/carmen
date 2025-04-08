@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,8 +24,6 @@ import {
   CostType,
   CostDistributionMethod,
 } from "@/lib/types";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 
 interface ExtraCostsTabProps {
   mode: GoodsReceiveNoteMode;
@@ -44,7 +44,7 @@ export function ExtraCostsTab({
   const [newCostAmount, setNewCostAmount] = useState("");
   const [distributionMethod, setDistributionMethod] =
     useState<CostDistributionMethod>(CostDistributionMethod.NET_AMOUNT);
-  const [localCosts, setLocalCosts] = useState<ExtraCost[]>(initialCosts);
+  const [total, setTotal] = useState(0);
 
   const addCost = () => {
     if (newCostAmount) {
@@ -73,14 +73,11 @@ export function ExtraCostsTab({
   const totalExtraCost = costs.reduce((sum, cost) => sum + cost.amount, 0);
 
   useEffect(() => {
-    if (costs.length !== localCosts.length) {
-      setLocalCosts(costs);
-    }
-  }, [costs, localCosts.length]);
-
-  useEffect(() => {
+    // Calculate and update totals, then notify parent
+    const newTotal = costs.reduce((acc, cost) => acc + (cost.amount || 0), 0);
+    setTotal(newTotal);
     onCostsChange(costs, distributionMethod);
-  }, [distributionMethod]);
+  }, [costs, distributionMethod, onCostsChange]);
 
   return (
     <div>

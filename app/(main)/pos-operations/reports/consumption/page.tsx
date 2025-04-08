@@ -1,24 +1,17 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Download, Filter, RefreshCcw, ArrowLeft, BarChart2 } from 'lucide-react'
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
+import { Download, Filter, ArrowLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 // Types
-interface ConsumptionData {
-  day: string
-  theoretical: number
-  actual: number
-}
-
 interface CategoryData {
   name: string
   value: number
@@ -31,16 +24,6 @@ interface WasteItem {
   theoretical: number
   variance: number
   percent: number
-}
-
-interface PieLabelProps {
-  cx: number
-  cy: number
-  midAngle: number
-  innerRadius: number
-  outerRadius: number
-  percent: number
-  index: number
 }
 
 type DateRange = 'today' | 'week' | 'mtd' | 'ytd'
@@ -62,20 +45,6 @@ const DATE_RANGES: Record<DateRange, string> = {
   ytd: 'Year to Date'
 } as const
 
-// Mock data with proper typing
-const CONSUMPTION_DATA: ConsumptionData[] = [
-  { day: '01', theoretical: 4200, actual: 4500 },
-  { day: '02', theoretical: 4000, actual: 4100 },
-  { day: '03', theoretical: 4100, actual: 4300 },
-  { day: '04', theoretical: 3900, actual: 4000 },
-  { day: '05', theoretical: 4300, actual: 4600 },
-  { day: '06', theoretical: 4500, actual: 4800 },
-  { day: '07', theoretical: 3800, actual: 3900 },
-  { day: '08', theoretical: 4200, actual: 4400 },
-  { day: '09', theoretical: 4100, actual: 4300 },
-  { day: '10', theoretical: 4000, actual: 4200 }
-]
-
 const CATEGORY_DATA: CategoryData[] = [
   { name: 'Meat', value: 35, color: '#4f46e5' },
   { name: 'Produce', value: 25, color: '#10b981' },
@@ -95,31 +64,6 @@ const TOP_WASTE_ITEMS: WasteItem[] = [
 // Helper functions
 function formatNumber(value: number): string {
   return new Intl.NumberFormat().format(value)
-}
-
-function calculatePercentage(value: number, total: number): string {
-  return ((value / total) * 100).toFixed(1)
-}
-
-// Components
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelProps) => {
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.6
-  const x = cx + radius * Math.cos(-midAngle * Math.PI / 180)
-  const y = cy + radius * Math.sin(-midAngle * Math.PI / 180)
-
-  return (
-    <text 
-      x={x} 
-      y={y} 
-      fill="white" 
-      textAnchor={x > cx ? 'start' : 'end'} 
-      dominantBaseline="central"
-      fontSize={12}
-      fontWeight="bold"
-    >
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
-  )
 }
 
 export default function ConsumptionReportPage() {

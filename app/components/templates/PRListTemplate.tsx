@@ -2,17 +2,17 @@
 
 import React, { useState } from 'react'
 import { ArrowUpDown } from 'lucide-react'
+import { ListPageTemplate } from './ListPageTemplate'
+import StatusBadge from '@/components/ui/custom-status-badge'
+import { PurchaseRequest } from '@/lib/types'
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table"
-import { ListPageTemplate } from './ListPageTemplate'
-import StatusBadge from '@/components/ui/custom-status-badge'
-import { PurchaseRequest } from '@/lib/types'
 
 export interface PRListTemplateProps {
   data: PurchaseRequest[]

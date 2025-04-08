@@ -1,9 +1,8 @@
-"use client"
+'use client'
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Home, ChevronRight, Settings, Settings2 } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"

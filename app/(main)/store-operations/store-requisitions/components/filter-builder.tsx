@@ -1,7 +1,10 @@
-'use client'
+"use client"
 
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { X } from 'lucide-react'
+import { FilterCondition } from '../types/index'
 import {
   Select,
   SelectContent,
@@ -9,34 +12,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { X } from 'lucide-react'
-import { FilterCondition } from '../types/index'
+
+type FilterField = 'date' | 'refNo' | 'requestTo' | 'storeName' | 'description' | 'status' | 'processStatus'
+type FilterOperator = 'equals' | 'contains' | 'greater_than' | 'less_than'
 
 interface FilterBuilderProps {
   filters: FilterCondition[]
   setFilters: React.Dispatch<React.SetStateAction<FilterCondition[]>>
 }
 
-export function FilterBuilder({ filters, setFilters }: FilterBuilderProps) {
-  const addFilter = () => {
+export function FilterBuilder({ filters, setFilters }: FilterBuilderProps): React.ReactNode {
+  const addFilter = (): void => {
     setFilters([...filters, { field: 'date', operator: 'equals', value: '' }])
   }
 
-  const removeFilter = (index: number) => {
+  const removeFilter = (index: number): void => {
     setFilters(filters.filter((_, i) => i !== index))
   }
 
-  const updateFilter = (index: number, key: keyof FilterCondition, value: string) => {
+  const updateFilter = (index: number, key: keyof FilterCondition, value: string): void => {
     const newFilters = [...filters]
-    newFilters[index][key] = value
+    if (key === 'field') {
+      newFilters[index][key] = value as FilterField
+    } else if (key === 'operator') {
+      newFilters[index][key] = value as FilterOperator
+    } else {
+      newFilters[index][key] = value
+    }
     setFilters(newFilters)
+  }
+
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
+    updateFilter(index, 'value', e.target.value)
   }
 
   return (
     <div className="space-y-4">
       {filters.map((filter, index) => (
         <div key={index} className="flex items-center space-x-2">
-          <Select value={filter.field} onValueChange={(value) => updateFilter(index, 'field', value)}>
+          <Select 
+            value={filter.field} 
+            onValueChange={(value: string) => updateFilter(index, 'field', value)}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select field" />
             </SelectTrigger>
@@ -50,7 +67,10 @@ export function FilterBuilder({ filters, setFilters }: FilterBuilderProps) {
               <SelectItem value="processStatus">Process Status</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={filter.operator} onValueChange={(value) => updateFilter(index, 'operator', value)}>
+          <Select 
+            value={filter.operator} 
+            onValueChange={(value: string) => updateFilter(index, 'operator', value)}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select operator" />
             </SelectTrigger>
@@ -64,11 +84,15 @@ export function FilterBuilder({ filters, setFilters }: FilterBuilderProps) {
           <Input 
             type="text" 
             value={filter.value} 
-            onChange={(e) => updateFilter(index, 'value', e.target.value)}
+            onChange={(e) => handleValueChange(e, index)}
             placeholder="Enter value"
             className="flex-grow"
           />
-          <Button variant="outline" size="icon" onClick={() => removeFilter(index)}>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => removeFilter(index)}
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>

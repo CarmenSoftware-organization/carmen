@@ -1,65 +1,50 @@
-'use client';
+"use client"
 
-import { DashboardTemplate } from "@/components/templates/DashboardTemplate";
-import { Package, Tags, Archive, AlertTriangle } from "lucide-react";
+import { Package, Tags, Archive, AlertTriangle } from "lucide-react"
+import { DashboardTemplate } from "@/components/templates/DashboardTemplate"
 
 const stats = [
   {
     title: "Total Products",
     value: "1,234",
-    description: "+5 new this week",
-    icon: Package
+    icon: Package,
+    description: "Active products in catalog",
+    trend: "+12.3%",
+    trendDirection: "up"
   },
   {
     title: "Categories",
-    value: "45",
-    description: "Across 8 departments",
-    icon: Tags
+    value: "56",
+    icon: Tags,
+    description: "Product categories",
+    trend: "+2.4%",
+    trendDirection: "up"
   },
   {
-    title: "Active SKUs",
-    value: "892",
-    description: "78% of total products",
-    icon: Archive
+    title: "Low Stock",
+    value: "23",
+    icon: Archive,
+    description: "Items below threshold",
+    trend: "-5.2%",
+    trendDirection: "down"
   },
   {
-    title: "Low Stock Items",
-    value: "12",
-    description: "Below reorder point",
-    icon: AlertTriangle
+    title: "Out of Stock",
+    value: "8",
+    icon: AlertTriangle,
+    description: "Items needing restock",
+    trend: "-3.1%",
+    trendDirection: "down"
   }
-];
-
-const charts = [
-  {
-    type: 'bar' as const,
-    title: "Products by Category",
-    data: [
-      { name: "Food", value: 450 },
-      { name: "Beverages", value: 320 },
-      { name: "Equipment", value: 180 },
-      { name: "Supplies", value: 284 }
-    ]
-  },
-  {
-    type: 'pie' as const,
-    title: "Product Status Distribution",
-    data: [
-      { name: "Active", value: 75 },
-      { name: "Inactive", value: 15 },
-      { name: "Discontinued", value: 5 },
-      { name: "New", value: 5 }
-    ]
-  }
-];
+]
 
 export default function ProductManagementDashboard() {
   return (
-    <DashboardTemplate
-      title="Product Management Dashboard"
-      description="Overview of product catalog and inventory status"
-      stats={stats}
-      charts={charts}
-    />
-  );
+    <div className="container mx-auto py-6">
+      <DashboardTemplate 
+        title="Product Management Dashboard"
+        stats={stats}
+      />
+    </div>
+  )
 } 

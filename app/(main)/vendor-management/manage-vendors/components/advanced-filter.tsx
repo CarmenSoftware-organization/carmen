@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Plus, X, Filter, Star, Search, Save, ChevronDown, History, Code } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
@@ -9,8 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FilterType, SavedFilter, FilterOperator, LogicalOperator, saveFilter, deleteFilter, getSavedFilters } from '@/lib/utils/filter-storage'
 import { Vendor } from '../[id]/types'
@@ -119,15 +118,12 @@ export function AdvancedFilter({ onFilterChange }: AdvancedFilterProps) {
       await saveFilter('vendor-management', newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
-      toast({
-        title: "Filter saved",
+      toast.success("Filter saved", {
         description: "Your filter has been saved successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error saving filter",
-        description: "There was a problem saving your filter.",
-        variant: "destructive"
+      toast.error("Error saving filter", {
+        description: "There was a problem saving your filter."
       })
     }
   }
@@ -148,15 +144,12 @@ export function AdvancedFilter({ onFilterChange }: AdvancedFilterProps) {
     try {
       await deleteFilter(filterId, 'vendor-management')
       setSavedFilters(savedFilters.filter(f => f.id !== filterId))
-      toast({
-        title: "Filter deleted",
+      toast.success("Filter deleted", {
         description: "Your filter has been deleted successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error deleting filter",
-        description: "There was a problem deleting your filter.",
-        variant: "destructive"
+      toast.error("Error deleting filter", {
+        description: "There was a problem deleting your filter."
       })
     }
   }

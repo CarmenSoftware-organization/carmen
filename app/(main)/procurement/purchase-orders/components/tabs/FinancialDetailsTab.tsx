@@ -1,11 +1,14 @@
 import React from 'react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { PurchaseOrder } from '@/lib/types'
 
-export default function FinancialDetailsTab({ poData }: { poData: PurchaseOrder }) {
+interface FinancialDetailsTabProps {
+  poData: PurchaseOrder
+}
+
+export default function FinancialDetailsTab({ poData }: FinancialDetailsTabProps) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Financial Details</h2>

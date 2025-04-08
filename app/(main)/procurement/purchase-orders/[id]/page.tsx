@@ -1,5 +1,11 @@
 import { PODetailPage } from './../components/PODetailPage'
 
-export default function PurchaseOrderDetailPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function PurchaseOrderDetailPage({ params }: PageProps) {
   return <PODetailPage params={params} />
 }

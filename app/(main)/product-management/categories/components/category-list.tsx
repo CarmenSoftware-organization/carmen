@@ -1,24 +1,17 @@
 "use client"
 
-import React, { useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
-import { Search, ChevronRight, ChevronDown, Plus, Edit2, Trash2 } from 'lucide-react';
+import React, { useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { ChevronDown, ChevronRight, Edit2, Plus, Trash } from "lucide-react"
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuContent
+} from "@/components/ui/dropdown-menu"
 
 type CategoryType = 'CATEGORY' | 'SUBCATEGORY' | 'ITEM_GROUP';
 
@@ -106,60 +99,51 @@ const initialCategories: CategoryItem[] = [
   }
 ];
 
-const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEdit, onAdd }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [newName, setNewName] = useState(item.name);
-
+const TreeNode = ({ item, level = 0, onAdd, onEdit, onDelete, onMove }: TreeNodeProps) => {
   const [{ isDragging }, drag] = useDrag({
     type: 'CATEGORY',
-    item: { id: item.id, type: 'CATEGORY' },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+    item: { id: item.id, type: item.type },
+    collect: monitor => ({
+      isDragging: monitor.isDragging()
+    })
   });
 
-  const [, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: 'CATEGORY',
     drop: (draggedItem: { id: string }) => {
       if (draggedItem.id !== item.id) {
         onMove(draggedItem.id, item.id);
       }
-    }
+    },
+    collect: monitor => ({
+      isOver: monitor.isOver()
+    })
   });
-
-  const handleEdit = () => {
-    if (newName.trim() && newName !== item.name) {
-      onEdit(item.id, newName);
-    }
-    setIsEditing(false);
-  };
-
-  const getIndentStyle = (level: number) => {
-    return {
-      paddingLeft: `${level * 24 + 16}px`
-    }
-  }
 
   // Combine the refs correctly
   const dragDropRef = (node: HTMLDivElement | null) => {
     drag(drop(node));
   };
 
-  // Update the level-specific styling
-  const getLevelStyles = (type: CategoryType) => {
-    switch (type) {
-      case 'CATEGORY':
-        return 'border-l-4 border-primary bg-primary/5 font-medium'
-      case 'SUBCATEGORY':
-        return 'border-l-4 border-blue-400 bg-blue-50/50'
-      case 'ITEM_GROUP':
-        return 'border-l-4 border-green-400 bg-green-50/50'
+  const handleEdit = () => {
+    const newName = window.prompt('Enter new name:', item.name);
+    if (newName) onEdit(item.id, newName);
+  };
+
+  const getIndentStyle = (level: number) => ({
+    marginLeft: `${level * 24}px`
+  });
+
+  const getLevelStyles = (level: number) => {
+    switch (level) {
+      case 0:
+        return 'font-semibold text-primary';
+      case 1:
+        return 'font-medium text-muted-foreground';
       default:
-        return ''
+        return 'text-muted-foreground';
     }
-  }
+  };
 
   // Add level-specific add button logic
   const getNextLevelType = (currentType: CategoryType): CategoryType | null => {
@@ -174,149 +158,65 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
   }
 
   return (
-    <div 
-      ref={dragDropRef}
-      className={cn(
-        "transition-all duration-200",
-        isDragging && "opacity-50"
-      )}
-    >
-      <div 
-        style={getIndentStyle(level)}
+    <div>
+      <div
+        ref={dragDropRef}
         className={cn(
-          "flex items-center p-3 hover:bg-accent/50",
-          "group transition-colors duration-200",
-          getLevelStyles(item.type)
+          'group flex items-center justify-between py-2 px-4',
+          'hover:bg-muted/50 rounded-lg cursor-pointer',
+          isDragging && 'opacity-50',
+          isOver && 'bg-muted/50'
         )}
+        style={getIndentStyle(level)}
       >
-        {item.children && (
-          <button 
-            onClick={() => setIsExpanded(!isExpanded)} 
-            className="p-1 hover:bg-accent rounded-sm"
-          >
-            {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-          </button>
-        )}
-        
-        {isEditing ? (
-          <Input
-            type="text"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onBlur={handleEdit}
-            onKeyPress={(e) => e.key === 'Enter' && handleEdit()}
-            className="max-w-[200px] h-8"
-            autoFocus
-          />
-        ) : (
-          <div className="flex-grow flex items-center gap-2">
-            <span>{item.name}</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-              {CATEGORY_LEVELS[item.type]}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              ({item.itemCount} items)
-            </span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {item.children ? (
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          )}
+          <span className={getLevelStyles(level)}>{item.name}</span>
+          <span className="text-sm text-muted-foreground">({item.itemCount})</span>
+        </div>
         
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <TooltipProvider delayDuration={0}>
-            {getNextLevelType(item.type) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAdd(item.id);
-                    }}
-                    className="h-8 w-8 text-muted-foreground hover:text-primary"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Add {CATEGORY_LEVELS[getNextLevelType(item.type)!]}
-                </TooltipContent>
-              </Tooltip>
-            )}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsEditing(true);
-                  }}
-                  className="h-8 w-8 text-muted-foreground hover:text-primary"
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowDeleteDialog(true);
-                  }}
-                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {getNextLevelType(item.type) && (
+                <DropdownMenuItem onClick={() => onAdd(item.id)}>
+                  Add {getNextLevelType(item.type)?.toLowerCase()}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={handleEdit}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(item.id)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete {CATEGORY_LEVELS[item.type]}</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete &quot;{item.name}&quot;? This action cannot be undone.
-              {item.children && item.children.length > 0 && (
-                <p className="mt-2 text-destructive font-medium">
-                  Warning: This will also delete all child items!
-                </p>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                onDelete(item.id);
-                setShowDeleteDialog(false);
-              }}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {isExpanded && item.children && (
+      {item.children && (
         <div>
-          {item.children.map((child) => (
+          {item.children.map(child => (
             <TreeNode
               key={child.id}
               item={child}
               level={level + 1}
-              onMove={onMove}
-              onDelete={onDelete}
-              onEdit={onEdit}
               onAdd={onAdd}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onMove={onMove}
             />
           ))}
         </div>
@@ -328,7 +228,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
 interface FilterType {
   field: string
   operator: string
-  value: string | number | boolean | Date
+  value: string | number | boolean | Date | null
   logicalOperator?: 'AND' | 'OR'
 }
 
@@ -344,7 +244,6 @@ export interface ProductCategoryTreeRef {
 const ProductCategoryTree = forwardRef<ProductCategoryTreeRef, ProductCategoryTreeProps>(
   ({ searchQuery, filters = [] }, ref) => {
     const [categories, setCategories] = useState<CategoryItem[]>(initialCategories);
-    const containerRef = useRef<HTMLDivElement>(null);
 
     // Helper function to generate unique ID
     const generateId = useCallback(() => {
@@ -491,6 +390,7 @@ const ProductCategoryTree = forwardRef<ProductCategoryTreeRef, ProductCategoryTr
           const matchesFilters = activeFilters.length === 0 || activeFilters.every(filter => {
             const value = item[filter.field as keyof CategoryItem]
             if (!value) return false
+            if (filter.value === null) return !value
 
             switch (filter.operator) {
               case 'equals':
@@ -582,6 +482,44 @@ const ProductCategoryTree = forwardRef<ProductCategoryTreeRef, ProductCategoryTr
 ProductCategoryTree.displayName = "ProductCategoryTree";
 
 export default ProductCategoryTree;
+
+export function CategoryList() {
+  const [categories, setCategories] = useState<CategoryItem[]>(initialCategories);
+
+  const handleMove = (dragId: string, hoverId: string) => {
+    // ... existing move logic ...
+  };
+
+  const handleDelete = (id: string) => {
+    // ... existing delete logic ...
+  };
+
+  const handleEdit = (id: string, newName: string) => {
+    // ... existing edit logic ...
+  };
+
+  const handleAdd = (parentId: string) => {
+    // ... existing add logic ...
+  };
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div className="space-y-2">
+        {categories.map((item) => (
+          <TreeNode
+            key={item.id}
+            item={item}
+            level={0}
+            onMove={handleMove}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            onAdd={handleAdd}
+          />
+        ))}
+      </div>
+    </DndProvider>
+  );
+}
 
 
 

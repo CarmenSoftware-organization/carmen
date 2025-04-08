@@ -1,11 +1,11 @@
 "use client"
-
 import Link from "next/link"
 import { Recipe } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Edit, MoreVertical, Trash2, Check, CheckCircle2, XCircle } from "lucide-react"
+import { RecipeImage } from "./recipe-image"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +13,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import { useState } from "react"
-import { RecipeImage } from "./recipe-image"
 
 interface RecipeCardCompactProps {
   recipe: Recipe

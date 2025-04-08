@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -7,6 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { PricingFormComponent } from "@/components/pricing-form"
+import { useForm } from "react-hook-form"
+
 
 interface ReferenceLot {
   lotNumber: string;
@@ -62,14 +67,34 @@ interface ItemAndLotSelectionProps {
   creditNoteType: "return" | "discount"
 }
 
-export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumber, creditNoteType }: ItemAndLotSelectionProps) {
+export function ItemAndLotSelection({
+  isOpen,
+  onClose,
+  onSave,
+  grnItems,
+  grnNumber,
+  creditNoteType
+}: ItemAndLotSelectionProps) {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([])
   const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const [formData, setFormData] = useState({})
+  const [mode, setMode] = useState('edit')
+
+  const form = useForm({
+    defaultValues: {
+      // Add your form default values here
+    }
+  })
 
   useEffect(() => {
     setSelectedItems([])
     setExpandedItems([])
-  }, [isOpen])
+  }, [])
+
+  useEffect(() => {
+    // Reset form when dialog opens
+    form.reset()
+  }, [isOpen, form]) // Add form to dependency array
 
   const handleItemSelect = (item: GRNItem) => {
     const index = selectedItems.findIndex(i => i.id === item.id)
@@ -357,6 +382,11 @@ export function ItemAndLotSelection({ isOpen, onClose, onSave, grnItems, grnNumb
               </TableBody>
             </Table>
           </ScrollArea>
+          {/* Pricing Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Pricing Information</h3>
+            <PricingFormComponent />
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>

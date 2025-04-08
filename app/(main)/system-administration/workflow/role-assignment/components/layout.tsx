@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from "react"
 import { RoleList } from "./role-list"
 import { ConfigurationPanel } from "./configuration-panel"

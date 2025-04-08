@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { X } from 'lucide-react'
 import { users, departments, storeLocations } from '@/lib/mockData'
 
+
 interface NewCountFormProps {
   onClose: () => void;
   onSubmit: (data: NewCountData) => void;

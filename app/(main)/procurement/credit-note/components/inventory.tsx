@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { BarChart2, ArrowRight, Package, Layers, DollarSign, AlertCircle, ChevronDown } from 'lucide-react';
+import { BarChart2, Package, Layers, DollarSign, AlertCircle, ChevronDown } from 'lucide-react';
+
 
 // Mock Data
 const inventoryData = {

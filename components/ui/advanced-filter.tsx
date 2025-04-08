@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { FilterType, SavedFilter, saveFilter, getSavedFilters } from '@/lib/utils/filter-storage'
+
 
 interface AdvancedFilterProps<T> {
   moduleName: string;
@@ -23,11 +24,7 @@ export function AdvancedFilter<T>({ moduleName }: AdvancedFilterProps<T>) {
       setSavedFilters(filters)
     } catch (error) {
       console.error('Error loading filters:', error)
-      toast({
-        title: "Error loading filters",
-        description: "There was a problem loading your saved filters.",
-        variant: "destructive"
-      })
+      toast.error("There was a problem loading your saved filters.")
     }
   }, [moduleName])
 
@@ -54,17 +51,10 @@ export function AdvancedFilter<T>({ moduleName }: AdvancedFilterProps<T>) {
       await saveFilter(moduleName, newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
-      toast({
-        title: "Filter saved",
-        description: "Your filter has been saved successfully."
-      })
+      toast.success("Your filter has been saved successfully.")
     } catch (error) {
       console.error('Error saving filter:', error)
-      toast({
-        title: "Error saving filter",
-        description: "There was a problem saving your filter.",
-        variant: "destructive"
-      })
+      toast.error("There was a problem saving your filter.")
     }
   }
 

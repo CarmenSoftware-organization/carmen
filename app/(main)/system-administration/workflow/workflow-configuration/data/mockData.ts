@@ -1,4 +1,5 @@
 import { 
+
   ActionType, 
   OperatorType, 
   NotificationEventTrigger, 
@@ -8,7 +9,6 @@ import {
   Workflow,
   Product
 } from "../types/workflow"
-import { roles } from "../../role-assignment/data/mockData"
 
 const notificationTemplates: Template[] = [
   {

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { HotelLocation, HotelProduct } from "../mock/hotel-data";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
+
 
 export type CountStatus = 'pending' | 'in_progress' | 'completed' | 'discrepancy';
 

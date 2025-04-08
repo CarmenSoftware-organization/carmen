@@ -1,5 +1,16 @@
 "use client";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { CnLotApplication } from "./cn-lot-application";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import JournalEntries  from "./journal-entries"
+import TaxEntries  from "./tax-entries"
+import StockMovementContent from "./stock-movement";
+import StatusBadge from "@/components/ui/custom-status-badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -44,19 +55,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Button } from "@/components/ui/button";
-import { CnLotApplication } from "./cn-lot-application";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import JournalEntries  from "./journal-entries"
-import TaxEntries  from "./tax-entries"
-import StockMovementContent from "./stock-movement";
-import StatusBadge from "@/components/ui/custom-status-badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
@@ -312,36 +311,11 @@ function CreditNoteHeader({
 }
 
 interface CreditNoteItem {
-  id: number
-  location: {
-    code: string
-    name: string
-  }
-  product: {
-    code: string
-    name: string
-    description: string
-  }
-  quantity: {
-    primary: number
-    secondary: number
-  }
-  unit: {
-    primary: string
-    secondary: string
-  }
-  price: {
-    unit: number
-    secondary: number
-  }
-  amounts: {
-    net: number
-    tax: number
-    total: number
-    baseNet: number
-    baseTax: number
-    baseTotal: number
-  }
+  id: string
+  description: string
+  quantity: number
+  unitPrice: number
+  total: number
 }
 
 export function CreditNoteComponent() {
@@ -412,68 +386,18 @@ export function CreditNoteComponent() {
 
   const mockItems: CreditNoteItem[] = [
     {
-      id: 1,
-      location: {
-        code: 'WH-001',
-        name: 'Main Warehouse'
-      },
-      product: {
-        code: 'BEV-CM450-001',
-        name: 'Coffee mate 450 g.',
-        description: 'Non-dairy coffee creamer'
-      },
-      quantity: {
-        primary: 10,
-        secondary: 100
-      },
-      unit: {
-        primary: 'Box',
-        secondary: 'Bag'
-      },
-      price: {
-        unit: 1250.00,
-        secondary: 125.00
-      },
-      amounts: {
-        net: 12500.00,
-        tax: 875.00,
-        total: 13375.00,
-        baseNet: 437500.00,
-        baseTax: 30625.00,
-        baseTotal: 468125.00
-      }
+      id: '1',
+      description: 'Coffee mate 450 g.',
+      quantity: 10,
+      unitPrice: 1250.00,
+      total: 12500.00
     },
     {
-      id: 2,
-      location: {
-        code: 'WH-001',
-        name: 'Main Warehouse'
-      },
-      product: {
-        code: 'BEV-HB330-002',
-        name: 'Heineken Beer 330ml',
-        description: 'Premium lager beer'
-      },
-      quantity: {
-        primary: 5,
-        secondary: 120
-      },
-      unit: {
-        primary: 'Case',
-        secondary: 'Bottle'
-      },
-      price: {
-        unit: 2040.00,
-        secondary: 85.00
-      },
-      amounts: {
-        net: 10200.00,
-        tax: 714.00,
-        total: 10914.00,
-        baseNet: 357000.00,
-        baseTax: 24990.00,
-        baseTotal: 381990.00
-      }
+      id: '2',
+      description: 'Heineken Beer 330ml',
+      quantity: 5,
+      unitPrice: 2040.00,
+      total: 10200.00
     }
   ]
 
@@ -501,8 +425,76 @@ export function CreditNoteComponent() {
     }
   ];
 
+  const [activeTab, setActiveTab] = useState("details")
+  const [items, setItems] = useState<CreditNoteItem[]>([])
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <Card className="p-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="items">Items</TabsTrigger>
+            <TabsTrigger value="attachments">Attachments</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details">
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="vendor">Vendor</Label>
+                <Select>
+                  <option value="">Select Vendor</option>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="date">Date</Label>
+                <Input type="date" id="date" />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea id="notes" rows={4} />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="items">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Unit Price</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>{item.unitPrice}</TableCell>
+                    <TableCell>{item.total}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm">Remove</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TabsContent>
+
+          <TabsContent value="attachments">
+            {/* Attachments upload will go here */}
+          </TabsContent>
+        </Tabs>
+      </Card>
+
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline">Cancel</Button>
+        <Button>Save Credit Note</Button>
+      </div>
+
       <div className={`flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4`}>
         <div className={`flex-grow space-y-4 ${showPanel ? 'lg:w-3/4' : 'w-full'}`}>
           <CreditNoteHeader 
@@ -546,46 +538,28 @@ export function CreditNoteComponent() {
                       {mockItems.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell>
-                            <div>{item.location.name}</div>
-                            <div className="text-sm text-muted-foreground">{item.location.code}</div>
+                            <div>{item.description}</div>
                           </TableCell>
                           <TableCell className="font-medium">
-                            <div>{item.product.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {item.product.description}
-                            </div>
+                            <div>{item.description}</div>
                           </TableCell>
                           <TableCell>
-                            <div>{item.quantity.primary}</div>
-                            <div className="text-sm text-muted-foreground">{item.quantity.secondary}</div>
+                            <div>{item.quantity}</div>
                           </TableCell>
                           <TableCell>
-                            <div>{item.unit.primary}</div>
-                            <div className="text-sm text-muted-foreground">{item.unit.secondary}</div>
+                            <div>{item.description}</div>
                           </TableCell>
                           <TableCell>
-                            <div>{item.price.unit.toFixed(2)}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {item.price.secondary.toFixed(2)}
-                            </div>
+                            <div>{item.unitPrice.toFixed(2)}</div>
                           </TableCell>
                           <TableCell>
-                            <div>{item.amounts.net.toFixed(2)}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {item.amounts.baseNet.toFixed(2)}
-                            </div>
+                            <div>{item.total.toFixed(2)}</div>
                           </TableCell>
                           <TableCell>
-                            <div>{item.amounts.tax.toFixed(2)}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {item.amounts.baseTax.toFixed(2)}
-                            </div>
+                            <div>{item.total.toFixed(2)}</div>
                           </TableCell>
                           <TableCell>
-                            <div>{item.amounts.total.toFixed(2)}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {item.amounts.baseTotal.toFixed(2)}
-                            </div>
+                            <div>{item.total.toFixed(2)}</div>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end space-x-1">

@@ -1,3 +1,4 @@
+
 export interface HotelLocation {
   id: string;
   code: string;

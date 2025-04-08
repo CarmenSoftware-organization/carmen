@@ -1,6 +1,7 @@
+import { Vendor } from './[id]/types'
+
 'use server'
 
-import { Vendor } from './[id]/types'
 
 export async function updateVendor(vendor: Vendor) {
   try {

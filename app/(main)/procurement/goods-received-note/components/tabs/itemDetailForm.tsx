@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +7,8 @@ import { CalendarIcon, Package, TruckIcon, X, XIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import React from "react";
+import InventoryBreakdown from "./inventory-breakdown";
+import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 import {
     Dialog,
   DialogClose,
@@ -16,8 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/custom-dialog";
-import InventoryBreakdown from "./inventory-breakdown";
-import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 
 interface ItemDetailFormProps {
   item: GoodsReceiveNoteItem | null;

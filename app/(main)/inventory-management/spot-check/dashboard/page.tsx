@@ -113,13 +113,11 @@ export default function SpotCheckDashboard() {
   return (
     <PageWrapper>
       <div className="flex flex-col gap-8">
-        <PageHeader
-          title="Spot Check Dashboard"
-          description="Monitor active counts, review pending variances, and track spot check activities"
-        />
-
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Spot Check Dashboard</h1>
+          <PageHeader
+            title="Spot Check Dashboard"
+            description="Monitor active counts, review pending variances, and track spot check activities"
+          />
           <Link href="/inventory-management/spot-check/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />

@@ -1,10 +1,9 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Plus, X, Mail, ChevronDown } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -68,14 +67,16 @@ interface SeverityLevels {
   processingDelay: string
 }
 
+type InputValue = string | number | readonly string[]
+
 interface FormData {
   stockOutCreation: string
   approvalRequired: boolean
   approvalLevels: number
   emailNotifications: EmailNotification[]
-  notificationTypes: NotificationTypes
-  thresholds: Thresholds
-  severityLevels: SeverityLevels
+  notificationTypes: Record<string, boolean>
+  thresholds: Record<string, number>
+  severityLevels: Record<string, string>
 }
 
 interface UserRole {
@@ -173,67 +174,54 @@ export default function SystemSettingsPage() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isFormChanged, emailInput, router])
   
-  const handleInputChange = (category: keyof FormData, field: string, value: any) => {
-    if (category === 'thresholds') {
-      setFormData((prev) => ({
-        ...prev,
-        thresholds: {
-          ...prev.thresholds,
-          [field]: value
-        }
-      }))
-    } else if (category === 'severityLevels') {
-      setFormData((prev) => ({
-        ...prev,
-        severityLevels: {
-          ...prev.severityLevels,
-          [field]: value
-        }
-      }))
-    } else if (category === 'notificationTypes') {
-      setFormData((prev) => ({
-        ...prev,
-        notificationTypes: {
-          ...prev.notificationTypes,
-          [field]: value
-        }
-      }))
-    }
-  }
-  
-  const handleDirectChange = (field: keyof FormData, value: any) => {
-    setFormData((prev) => ({
+  const handleInputChange = (category: 'notificationTypes' | 'thresholds' | 'severityLevels', field: string, value: InputValue) => {
+    setFormData(prev => ({
       ...prev,
-      [field]: value
+      [category]: {
+        ...prev[category],
+        [field]: value
+      }
     }))
   }
   
-  const handleCheckboxChange = (category: keyof FormData, field: string, checked: boolean) => {
-    if (category === 'notificationTypes') {
-      setFormData((prev) => ({
+  const handleCheckboxChange = (field: string, checked: boolean | "indeterminate") => {
+    setFormData(prev => ({
+      ...prev,
+      notificationTypes: {
+        ...prev.notificationTypes,
+        [field]: checked === "indeterminate" ? false : checked
+      }
+    }))
+  }
+  
+  const handleNumberInput = (category: 'thresholds', field: string, value: string) => {
+    const numValue = parseInt(value, 10)
+    if (!isNaN(numValue)) {
+      setFormData(prev => ({
         ...prev,
-        notificationTypes: {
-          ...prev.notificationTypes,
-          [field]: checked
-        }
-      }))
-    } else if (category === 'thresholds') {
-      setFormData((prev) => ({
-        ...prev,
-        thresholds: {
-          ...prev.thresholds,
-          [field]: checked
-        }
-      }))
-    } else if (category === 'severityLevels') {
-      setFormData((prev) => ({
-        ...prev,
-        severityLevels: {
-          ...prev.severityLevels,
-          [field]: checked
+        [category]: {
+          ...prev[category],
+          [field]: numValue
         }
       }))
     }
+  }
+  
+  const handleSelectChange = (category: 'severityLevels', field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [field]: value
+      }
+    }))
+  }
+  
+  const handleDirectChange = (field: keyof Pick<FormData, 'stockOutCreation' | 'approvalRequired' | 'approvalLevels'>, value: string | number | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
   
   const addEmailNotification = () => {
@@ -260,9 +248,9 @@ export default function SystemSettingsPage() {
     }))
   }
   
-  const updateUserRole = (id: string, field: keyof UserRole, value: any) => {
-    setUserRoles((prev) =>
-      prev.map((role) =>
+  const updateUserRole = (id: string, field: keyof UserRole, value: string | boolean) => {
+    setUserRoles(prev => 
+      prev.map(role => 
         role.id === id ? { ...role, [field]: value } : role
       )
     )
@@ -497,7 +485,7 @@ export default function SystemSettingsPage() {
                       id="notify-unmapped" 
                       checked={formData.notificationTypes.newUnmappedItems}
                       onCheckedChange={(checked) => 
-                        handleCheckboxChange("notificationTypes", "newUnmappedItems", !!checked)
+                        handleCheckboxChange("newUnmappedItems", checked)
                       }
                     />
                     <Label htmlFor="notify-unmapped">New unmapped items</Label>
@@ -507,7 +495,7 @@ export default function SystemSettingsPage() {
                       id="notify-failed" 
                       checked={formData.notificationTypes.failedTransactions}
                       onCheckedChange={(checked) => 
-                        handleCheckboxChange("notificationTypes", "failedTransactions", !!checked)
+                        handleCheckboxChange("failedTransactions", checked)
                       }
                     />
                     <Label htmlFor="notify-failed">Failed transactions</Label>
@@ -517,7 +505,7 @@ export default function SystemSettingsPage() {
                       id="notify-approvals" 
                       checked={formData.notificationTypes.stockOutApprovals}
                       onCheckedChange={(checked) => 
-                        handleCheckboxChange("notificationTypes", "stockOutApprovals", !!checked)
+                        handleCheckboxChange("stockOutApprovals", checked)
                       }
                     />
                     <Label htmlFor="notify-approvals">Stock-out approvals</Label>
@@ -527,7 +515,7 @@ export default function SystemSettingsPage() {
                       id="notify-errors" 
                       checked={formData.notificationTypes.systemErrors}
                       onCheckedChange={(checked) => 
-                        handleCheckboxChange("notificationTypes", "systemErrors", !!checked)
+                        handleCheckboxChange("systemErrors", checked)
                       }
                     />
                     <Label htmlFor="notify-errors">System errors</Label>
@@ -550,15 +538,15 @@ export default function SystemSettingsPage() {
                       type="number"
                       min={1}
                       max={100}
-                      value={formData.thresholds.failureRate}
+                      value={formData.thresholds.failureRate.toString()}
                       onChange={(e) => 
-                        handleInputChange("thresholds", "failureRate", parseInt(e.target.value))
+                        handleNumberInput("thresholds", "failureRate", e.target.value)
                       }
                     />
                     <Select
                       value={formData.severityLevels.failureRate}
                       onValueChange={(value) => 
-                        handleInputChange("severityLevels", "failureRate", value)
+                        handleSelectChange("severityLevels", "failureRate", value)
                       }
                     >
                       <SelectTrigger className="w-[120px]">
@@ -579,15 +567,15 @@ export default function SystemSettingsPage() {
                       id="threshold-unmapped"
                       type="number"
                       min={1}
-                      value={formData.thresholds.unmappedCount}
+                      value={formData.thresholds.unmappedCount.toString()}
                       onChange={(e) => 
-                        handleInputChange("thresholds", "unmappedCount", parseInt(e.target.value))
+                        handleNumberInput("thresholds", "unmappedCount", e.target.value)
                       }
                     />
                     <Select
                       value={formData.severityLevels.unmappedCount}
                       onValueChange={(value) => 
-                        handleInputChange("severityLevels", "unmappedCount", value)
+                        handleSelectChange("severityLevels", "unmappedCount", value)
                       }
                     >
                       <SelectTrigger className="w-[120px]">
@@ -608,15 +596,15 @@ export default function SystemSettingsPage() {
                       id="threshold-delay"
                       type="number"
                       min={1}
-                      value={formData.thresholds.processingDelay}
+                      value={formData.thresholds.processingDelay.toString()}
                       onChange={(e) => 
-                        handleInputChange("thresholds", "processingDelay", parseInt(e.target.value))
+                        handleNumberInput("thresholds", "processingDelay", e.target.value)
                       }
                     />
                     <Select
                       value={formData.severityLevels.processingDelay}
                       onValueChange={(value) => 
-                        handleInputChange("severityLevels", "processingDelay", value)
+                        handleSelectChange("severityLevels", "processingDelay", value)
                       }
                     >
                       <SelectTrigger className="w-[120px]">

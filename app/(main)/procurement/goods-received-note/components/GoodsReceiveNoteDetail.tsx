@@ -1,5 +1,6 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+
+import React, { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,7 +14,6 @@ import { ExtraCostsTab } from './tabs/ExtraCostsTab'
 import { GoodsReceiveNoteItemsBulkActions } from './tabs/GoodsReceiveNoteItemsBulkActions'
 import { Card, CardContent } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
-import { StockMovementTab } from './tabs/StockMovementTab'
 import { ArrowLeft, Edit, Trash, Printer, Send, Save } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FinancialSummaryTab } from './tabs/FinancialSummaryTab'
@@ -21,7 +21,6 @@ import { ActivityLogTab } from './tabs/ActivityLogTab'
 import StockMovementContent from './tabs/stock-movement'
 
 interface GoodsReceiveNoteDetailProps {
-  id?: string
   mode?: GoodsReceiveNoteMode
   onModeChange?: (mode: GoodsReceiveNoteMode) => void
   initialData?: GoodsReceiveNote
@@ -66,24 +65,15 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   totalAmount: 0,
 };
 
-export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initialData }: GoodsReceiveNoteDetailProps) {
+export function GoodsReceiveNoteDetail({ mode = 'view', onModeChange, initialData }: GoodsReceiveNoteDetailProps) {
   const router = useRouter()
   const [formData, setFormData] = useState<GoodsReceiveNote>(initialData || emptyGoodsReceiveNote);
-  const [extraCosts, setExtraCosts] = useState<ExtraCost[]>([])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-const [expandedItems, setExpandedItems] = useState<string[]>([])
-  // useEffect(() => {
-  //   console.log('formData', initialData)
-  // }, [initialData]);
 
   const handleEditClick = () => {
     if (onModeChange) {
       onModeChange('edit');
     }
-  };
-
-  const handleExtraCostsChange = (costs: ExtraCost[]) => {
-    setExtraCosts(costs);
   };
 
   const handleItemSelection = (itemId: string, isSelected: boolean) => {
@@ -184,43 +174,6 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const handleItemsChange = (newItems: GoodsReceiveNoteItem[]) => {
     setFormData(prev => ({ ...prev, items: newItems }));
-  };
-
-  const handleEditComment = (id: string, text: string) => {
-    setFormData(prev => ({
-      ...prev,
-      comments: prev.comments.map(comment =>
-        comment.id === id ? { ...comment, text } : comment
-      )
-    }));
-  };
-
-  const handleDeleteComment = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      comments: prev.comments.filter(comment => comment.id !== id)
-    }));
-  };
-
-  const handleEditAttachment = (id: string, description: string, publicAccess: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      attachments: prev.attachments.map(attachment =>
-        attachment.id === id ? { ...attachment, description, publicAccess } : attachment
-      )
-    }));
-  };
-
-  const handleDeleteAttachment = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      attachments: prev.attachments.filter(attachment => attachment.id !== id)
-    }));
-  };
-
-  const handleDownloadAttachment = (id: string) => {
-    // Implement download logic here
-    console.log(`Downloading attachment with id: ${id}`);
   };
 
   return (

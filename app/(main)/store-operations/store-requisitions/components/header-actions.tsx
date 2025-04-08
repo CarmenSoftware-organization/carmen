@@ -1,5 +1,6 @@
-'use client'
+"use client"
 
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Edit2, Printer, XCircle } from 'lucide-react'
 
@@ -8,9 +9,18 @@ interface HeaderActionsProps {
   isEditMode: boolean
   setIsEditMode: (value: boolean) => void
   onBack: () => void
+  onPrint?: () => void
+  onVoid?: () => void
 }
 
-export function HeaderActions({ status, isEditMode, setIsEditMode, onBack }: HeaderActionsProps) {
+export function HeaderActions({ 
+  status,
+  isEditMode,
+  setIsEditMode,
+  onBack,
+  onPrint,
+  onVoid
+}: HeaderActionsProps): React.ReactElement {
   return (
     <div className="flex flex-row items-center justify-between">
       <div className="flex items-center gap-4">
@@ -38,7 +48,7 @@ export function HeaderActions({ status, isEditMode, setIsEditMode, onBack }: Hea
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
-            onClick={() => console.log('Print requisition')}
+            onClick={onPrint}
           >
             <Printer className="h-4 w-4" />
             Print
@@ -46,7 +56,7 @@ export function HeaderActions({ status, isEditMode, setIsEditMode, onBack }: Hea
           <Button 
             variant="outline" 
             className="flex items-center gap-2 text-red-600 hover:text-red-600"
-            onClick={() => console.log('Void requisition')}
+            onClick={onVoid}
           >
             <XCircle className="h-4 w-4" />
             Void

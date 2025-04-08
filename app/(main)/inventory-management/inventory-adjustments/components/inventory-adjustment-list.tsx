@@ -2,6 +2,11 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { MoreHorizontalIcon, SearchIcon } from "lucide-react"
+import { FilterSortOptions } from "./filter-sort-options"
+import StatusBadge from "@/components/ui/custom-status-badge"
 import {
   Table,
   TableBody,
@@ -10,17 +15,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { MoreHorizontalIcon, SearchIcon } from "lucide-react"
-import { FilterSortOptions } from "./filter-sort-options"
-import StatusBadge  from "@/components/ui/custom-status-badge"
 
 interface InventoryAdjustment {
   id: string;

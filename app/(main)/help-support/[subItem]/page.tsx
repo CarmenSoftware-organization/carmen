@@ -1,12 +1,20 @@
-import ComingSoon from '@/components/ComingSoon';
-import { notFound } from 'next/navigation';
+'use client'
 
-export default function HelpSupportSubItemPage({ params }: { params: { subItem: string } }) {
-  const title = params.subItem.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+import { notFound } from 'next/navigation'
+import ComingSoon from '@/components/ComingSoon'
+
+interface PageProps {
+  params: {
+    subItem: string
+  }
+}
+
+export default function HelpSupportSubItemPage({ params }: PageProps) {
+  const title = params.subItem.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
   
   if (!['user-manuals', 'video-tutorials', 'faqs', 'support-ticket-system', 'system-updates-and-release-notes'].includes(params.subItem)) {
-    notFound();
+    notFound()
   }
 
-  return <ComingSoon title={`Help & Support: ${title}`} />;
+  return <ComingSoon title={title} />
 }

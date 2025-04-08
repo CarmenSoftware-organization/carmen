@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,6 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/custom-dialog"
 import { CalendarIcon, Edit2Icon, PlusIcon, XIcon, EyeIcon, SaveIcon } from "lucide-react"
 import { PurchaseOrderItem } from "@/lib/types"
+
+'use client'
+
 
 type Mode = 'view' | 'edit' | 'add'
 

@@ -5,7 +5,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { PurchaseOrder } from '@/lib/types'
 
-export default function GeneralInfoTab({ poData }: { poData: PurchaseOrder }) {
+interface GeneralInfoTabProps {
+  poData: PurchaseOrder;
+}
+
+export default function GeneralInfoTab({ poData }: GeneralInfoTabProps) {
   const [isEditing, setIsEditing] = React.useState(false)
 
   const handleEdit = () => {

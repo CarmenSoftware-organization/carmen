@@ -1,9 +1,8 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import Link from "next/link"
 import { Settings, Settings2, X } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"

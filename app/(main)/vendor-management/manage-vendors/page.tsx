@@ -1,15 +1,8 @@
-"use client"
+'use client'
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList,
-  BreadcrumbSeparator 
-} from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Plus, FileUp, FileDown, FileText, Edit, Trash2, Copy, MoreHorizontal, Ban } from "lucide-react"
@@ -17,11 +10,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { AdvancedFilter } from './components/advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
 import { Vendor } from './[id]/types'
 import { MOCK_VENDORS } from './data/mock'
+import type { EnvironmentalImpact } from './[id]/types'
+import {
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList,
+  BreadcrumbSeparator 
+} from "@/components/ui/breadcrumb"
 import {
   Tooltip,
   TooltipContent,
@@ -34,7 +35,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { EnvironmentalImpact } from './[id]/types'
 
 type MetricValue = {
   value: number;
@@ -63,10 +63,8 @@ export default function VendorList(): JSX.Element {
         setFilteredVendors(data)
       } catch (err) {
         console.error('Fetch error:', err)
-        toast({
-          title: "Error fetching vendors",
-          description: "There was a problem loading the vendor list.",
-          variant: "destructive"
+        toast.error("Error fetching vendors", {
+          description: "There was a problem loading the vendor list."
         })
         setVendors([])
         setFilteredVendors([])
@@ -88,8 +86,8 @@ export default function VendorList(): JSX.Element {
         filtered = filtered.filter(
           vendor =>
             vendor.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            vendor.businessRegistrationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            vendor.addresses.some(a => a.addressLine.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (vendor.businessRegistrationNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+            vendor.addresses.some(a => a.addressLine?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
             vendor.contacts.some(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                                      c.phone.toLowerCase().includes(searchQuery.toLowerCase()))
         )
@@ -158,10 +156,8 @@ export default function VendorList(): JSX.Element {
       setFilteredVendors(filtered)
     } catch (error) {
       console.error('Error filtering vendors:', error)
-      toast({
-        title: "Error filtering vendors",
-        description: "There was a problem filtering the vendors.",
-        variant: "destructive"
+      toast.error("Error filtering vendors", {
+        description: "There was a problem filtering the vendors."
       })
     }
   }, [activeFilters, vendors, searchQuery])
@@ -183,9 +179,8 @@ export default function VendorList(): JSX.Element {
     const updatedVendors = vendors.filter(vendor => vendor.id !== id)
     setVendors(updatedVendors)
     setFilteredVendors(filteredVendors.filter(vendor => vendor.id !== id))
-    toast({
-      title: "Vendor deleted",
-      description: "The vendor has been deleted successfully.",
+    toast.success("Vendor deleted", {
+      description: "The vendor has been deleted successfully."
     })
   }
 
@@ -198,9 +193,8 @@ export default function VendorList(): JSX.Element {
     }
     setVendors([...vendors, newVendor])
     setFilteredVendors([...filteredVendors, newVendor])
-    toast({
-      title: "Vendor duplicated",
-      description: "The vendor has been duplicated successfully.",
+    toast.success("Vendor duplicated", {
+      description: "The vendor has been duplicated successfully."
     })
   }
 
@@ -210,9 +204,8 @@ export default function VendorList(): JSX.Element {
     const updatedVendors = vendors.map(v => v.id === vendor.id ? updatedVendor : v)
     setVendors(updatedVendors)
     setFilteredVendors(filteredVendors.map(v => v.id === vendor.id ? updatedVendor : v))
-    toast({
-      title: "Vendor status updated",
-      description: `Vendor is now ${updatedVendor.isActive ? 'active' : 'inactive'}.`,
+    toast.success("Vendor status updated", {
+      description: `Vendor is now ${updatedVendor.isActive ? 'active' : 'inactive'}.`
     })
   }
 

@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Check, Edit2, Printer, X, XCircle, PanelRightOpen } from "lucide-react"
 import StatusBadge from "@/components/ui/custom-status-badge"

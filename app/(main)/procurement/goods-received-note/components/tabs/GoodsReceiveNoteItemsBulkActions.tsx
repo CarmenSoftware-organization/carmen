@@ -6,9 +6,12 @@ interface GoodsReceiveNoteItemsBulkActionsProps {
   onBulkAction: (action: string) => void
 }
 
-export function GoodsReceiveNoteItemsBulkActions({ selectedItems, onBulkAction }: GoodsReceiveNoteItemsBulkActionsProps) {
+export function GoodsReceiveNoteItemsBulkActions({
+  selectedItems,
+  onBulkAction
+}: GoodsReceiveNoteItemsBulkActionsProps) {
   if (selectedItems.length === 0) {
-    return null;
+    return null
   }
 
   return (

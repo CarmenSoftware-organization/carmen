@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/custom-dialog"
 import { Label } from "@/components/ui/label"
+import { UserCircle, Users, UserCheck, UserX, Search, UserPlus, MoreVertical, Edit, Power, Send } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { UserCircle, Users, UserCheck, UserX, Search, UserPlus, MoreVertical, Edit, Power, Send } from 'lucide-react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 type User = {
   id: number

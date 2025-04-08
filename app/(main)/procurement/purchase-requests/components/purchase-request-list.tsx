@@ -1,10 +1,19 @@
 "use client";
-
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
+import ListPageTemplate from "@/components/templates/ListPageTemplate";
+import StatusBadge from "@/components/ui/custom-status-badge";
+import { AdvancedFilter } from '@/components/ui/advanced-filter'
+import { FilterType } from '@/lib/utils/filter-storage'
+import { PurchaseRequest, PRType, DocumentStatus } from '@/lib/types'
+import { PRTemplate } from "@/lib/types/pr-template"
+import { TemplateSelectionModal } from './template-selection-modal';
+import { mockPurchaseRequests } from '../data/mock-data';
 import {
+  
   Table,
   TableBody,
   TableCell,
@@ -33,14 +42,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import ListPageTemplate from "@/components/templates/ListPageTemplate";
-import StatusBadge from "@/components/ui/custom-status-badge";
-import { AdvancedFilter } from '@/components/ui/advanced-filter'
-import { FilterType } from '@/lib/utils/filter-storage'
-import { PurchaseRequest, PRType, DocumentStatus, PRTemplate } from '@/lib/types'
-import { TemplateSelectionModal } from './template-selection-modal';
-import { mockPurchaseRequests } from '../data/mock-data';
 import {
   Tooltip,
   TooltipContent,
@@ -203,17 +204,20 @@ export function PurchaseRequestList() {
     setIsTemplateModalOpen(true);
   };
 
-  const handleTemplateSelect = (template: PRTemplate | { type: "recent"; pr: Partial<PurchaseRequest> } | null) => {
+  const handleTemplateSelect = (template: PRTemplate | { type: "recent"; pr: PurchaseRequest } | null) => {
     setIsTemplateModalOpen(false);
     if (template) {
-      if ('type' in template && template.type === "recent") {
+      if ('type' in template && template.type === "recent" && 'pr' in template) {
         // Navigate with recent PR data
         const prId = template.pr.id || '';
         router.push(`/procurement/purchase-requests/new-pr?mode=add&fromPR=${prId}`);
-      } else {
+      } else if ('id' in template) {
         // Navigate with template data
-        const templateId = (template as PRTemplate).id;
+        const templateId = template.id;
         router.push(`/procurement/purchase-requests/new-pr?mode=add&templateId=${templateId}`);
+      } else {
+        // Navigate to blank form
+        router.push("/procurement/purchase-requests/new-pr?mode=add");
       }
     } else {
       // Navigate to blank form

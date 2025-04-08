@@ -5,6 +5,10 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { PurchaseOrder, PurchaseOrderItem } from '@/lib/types'
 
+interface InventoryStatusTabProps {
+  poData: PurchaseOrder;
+}
+
 interface InventoryItemInfo {
   currentStock: number;
   onOrder: number;
@@ -12,7 +16,7 @@ interface InventoryItemInfo {
   restockLevel: number;
 }
 
-export default function InventoryStatusTab({ poData }: { poData: PurchaseOrder }) {
+export default function InventoryStatusTab({ poData }: InventoryStatusTabProps) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Inventory Status</h2>

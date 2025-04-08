@@ -1,8 +1,10 @@
 'use client'
+
 import React, { useState } from 'react';
 import { Button } from '../../../../../components/ui/button';
 import { Input } from '../../../../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/select';
+import { Dispatch, SetStateAction } from 'react'
 
 const operators = [
   { value: '=', label: 'Equals' },
@@ -16,7 +18,6 @@ const operators = [
   { value: 'endsWith', label: 'Ends With' },
 ];
 
-import { Dispatch, SetStateAction } from 'react'
 
 interface Filter {
   field: string

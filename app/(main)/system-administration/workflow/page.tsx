@@ -1,5 +1,4 @@
-// app/(main)/system-administration/workflow/page.tsx
-"use client"
+'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WorkflowList } from "./workflow-configuration/components/workflow-list"
@@ -7,6 +6,8 @@ import RoleAssignmentLayout from "./role-assignment/components/layout"
 import { sampleWorkflows } from "./workflow-configuration/data/mockData"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+
+// app/(main)/system-administration/workflow/page.tsx
 
 export default function WorkflowPage() {
   return (

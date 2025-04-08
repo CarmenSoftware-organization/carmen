@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+
 interface ListPageTemplateProps {
   title: string;
   actionButtons?: ReactNode;

@@ -1,10 +1,13 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 import {
   Select,
   SelectContent,
@@ -29,8 +32,6 @@ import {
   Send,
   Trash2,
 } from "lucide-react"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Label } from "@/components/ui/label"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +39,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { toast } from "sonner"
 
 // Mock data
 const businessUnits = ["Sales", "Engineering", "Marketing", "Finance", "HR"]
@@ -216,7 +216,7 @@ export default function UserDetailPage({
             <Badge
               variant={
                 formData.accountStatus === "active"
-                  ? "success"
+                  ? "default"
                   : formData.accountStatus === "inactive"
                   ? "secondary"
                   : "destructive"

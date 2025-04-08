@@ -1,3 +1,4 @@
+
 // Consolidated types for inventory management stock overview
 
 // Movement Types

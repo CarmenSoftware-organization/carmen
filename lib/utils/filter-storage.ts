@@ -1,3 +1,4 @@
+
 export type FilterOperator = 
   | 'equals' 
   | 'contains' 

@@ -1,7 +1,13 @@
 import ComingSoon from '@/components/ComingSoon';
 import { notFound } from 'next/navigation';
 
-export default function SystemAdministrationSubItem({ params }: { params: { subItem: string } }) {
+interface PageProps {
+  params: {
+    subItem: string;
+  };
+}
+
+export default function SystemAdministrationSubItem({ params }: PageProps) {
   const subItem = params.subItem;
   
   // Skip ComingSoon for system-integrations path

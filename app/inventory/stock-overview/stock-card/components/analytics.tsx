@@ -1,3 +1,6 @@
+'use client'
+
+import { StockCard } from "@/app/(main)/inventory-management/stock-overview/stock-card/types"
 import {
   Card,
   CardContent,
@@ -5,13 +8,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { StockCard } from "@/app/(main)/inventory-management/stock-overview/types"
 
 interface AnalyticsProps {
   data: StockCard
 }
 
 export function Analytics({ data }: AnalyticsProps) {
+  // Calculate metrics
+  const turnoverRate = data.movements.length > 0 ? 
+    data.movements.filter(m => m.transactionType === "OUT").length / data.currentStock.totalStock : 0
+
+  const daysInStock = data.movements.length > 0 ? 
+    Math.round((new Date().getTime() - new Date(data.movements[0].date).getTime()) / (1000 * 60 * 60 * 24)) : 0
+
+  const stockAccuracy = 98 // This would be calculated based on actual vs expected stock levels
+
   return (
     <div className="grid gap-6">
       <Card>
@@ -63,19 +74,19 @@ export function Analytics({ data }: AnalyticsProps) {
               <span className="text-sm text-muted-foreground">
                 Turnover Rate
               </span>
-              <p className="text-2xl font-bold">2.5x</p>
+              <p className="text-2xl font-bold">{turnoverRate.toFixed(1)}x</p>
             </div>
             <div className="space-y-1">
               <span className="text-sm text-muted-foreground">
                 Days in Stock
               </span>
-              <p className="text-2xl font-bold">45</p>
+              <p className="text-2xl font-bold">{daysInStock}</p>
             </div>
             <div className="space-y-1">
               <span className="text-sm text-muted-foreground">
                 Stock Accuracy
               </span>
-              <p className="text-2xl font-bold">98%</p>
+              <p className="text-2xl font-bold">{stockAccuracy}%</p>
             </div>
           </div>
         </CardContent>

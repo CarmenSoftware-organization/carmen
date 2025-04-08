@@ -25,6 +25,14 @@ interface JournalGroup {
   entries: JournalEntry[]
 }
 
+interface JournalEntriesTabProps {
+  refNo: string
+  date: string
+  department: string
+  description: string
+  onRecalculate?: () => void
+}
+
 // Mock data for journal entries
 const mockJournalEntries: JournalGroup[] = [
   {
@@ -55,15 +63,13 @@ const mockJournalEntries: JournalGroup[] = [
   }
 ]
 
-// Add props interface to receive requisition data
-interface JournalEntriesTabProps {
-  refNo: string
-  date: string
-  department: string
-  description: string
-}
-
-export function JournalEntriesTab({ refNo, date, department, description }: JournalEntriesTabProps) {
+export function JournalEntriesTab({ 
+  refNo, 
+  date, 
+  department, 
+  description,
+  onRecalculate 
+}: JournalEntriesTabProps) {
   // Calculate totals
   const calculateTotals = () => {
     return mockJournalEntries.reduce((acc, group) => {
@@ -90,7 +96,7 @@ export function JournalEntriesTab({ refNo, date, department, description }: Jour
             {refNo}
           </div>
         </div>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
+        <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={onRecalculate}>
           <Calculator className="h-4 w-4" />
           Recalculate
         </Button>

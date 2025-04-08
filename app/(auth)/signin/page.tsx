@@ -3,6 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Icons } from "@/components/icons"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { toast } from "sonner"
 import {
   Card,
   CardContent,
@@ -11,12 +17,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Icons } from "@/components/icons"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import {
   Form,
   FormControl,
@@ -25,7 +25,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { toast } from "sonner"
 
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -49,6 +48,9 @@ export default function SignInPage() {
   async function onSubmit(data: SignInValues) {
     setIsLoading(true)
     try {
+      // Log the sign-in attempt for development
+      console.log('Attempting to sign in with:', data.email)
+      
       // In a real app, you would validate credentials here
       // For now, we'll simulate a delay and success
       await new Promise(resolve => setTimeout(resolve, 1000))

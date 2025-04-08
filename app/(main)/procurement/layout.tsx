@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 
+
 interface ProcurementLayoutProps {
   children: ReactNode
 }

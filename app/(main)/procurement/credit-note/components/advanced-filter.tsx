@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { SavedFilter, saveFilter, getSavedFilters, deleteFilter, BaseFilter } from '@/lib/utils/filter-storage'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -89,10 +89,8 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       const filters = await getSavedFilters<CreditNote>('credit-note')
       setSavedFilters(filters)
     } catch (error) {
-      toast({
-        title: "Error loading saved filters",
-        description: "There was an error loading your saved filters.",
-        variant: "destructive",
+      toast.error("Error loading saved filters", {
+        description: "There was an error loading your saved filters."
       })
     }
   }
@@ -101,15 +99,12 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
     try {
       await deleteFilter<CreditNote>(filterId, 'credit-note')
       setSavedFilters(savedFilters.filter(f => f.id !== filterId))
-      toast({
-        title: "Filter deleted",
+      toast.success("Filter deleted", {
         description: "Your filter has been deleted successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error deleting filter",
-        description: "There was a problem deleting your filter.",
-        variant: "destructive"
+      toast.error("Error deleting filter", {
+        description: "There was a problem deleting your filter."
       })
     }
   }
@@ -124,10 +119,8 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
         f.id === filter.id ? { ...f, isDefault: !f.isDefault } : f
       ))
     } catch (error) {
-      toast({
-        title: "Error updating filter",
-        description: "There was a problem updating your filter.",
-        variant: "destructive"
+      toast.error("Error updating filter", {
+        description: "There was a problem updating your filter."
       })
     }
   }
@@ -202,15 +195,12 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       await saveFilter('credit-note', newFilter)
       setSavedFilters([...savedFilters, newFilter])
       
-      toast({
-        title: "Filter saved",
+      toast.success("Filter saved", {
         description: "Your filter has been saved successfully."
       })
     } catch (error) {
-      toast({
-        title: "Error saving filter",
-        description: "There was a problem saving your filter.",
-        variant: "destructive"
+      toast.error("Error saving filter", {
+        description: "There was a problem saving your filter."
       })
     }
   }

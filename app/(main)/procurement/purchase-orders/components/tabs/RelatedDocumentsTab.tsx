@@ -6,6 +6,7 @@ import { Eye, Download, MessageSquare, Paperclip } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PurchaseOrder } from '@/lib/types';
 
+
 interface RelatedDocument {
   id: string;
   type: 'Purchase Order' | 'Goods Receive Note' | 'Credit Note';
@@ -74,7 +75,7 @@ const mockDocuments: RelatedDocument[] = [
   },
 ];
 
-export default function RelatedDocumentsTab({ poData }: RelatedDocumentsTabProps) {
+export function RelatedDocumentsTab({ poData }: RelatedDocumentsTabProps) {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Related Documents</h2>

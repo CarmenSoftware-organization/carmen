@@ -1,25 +1,29 @@
-import { ColumnDef } from "@tanstack/react-table"
+'use client'
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal } from "lucide-react"
+import { ColumnDef } from "@tanstack/react-table"
 
-interface InterfacePost {
+export type InterfacePosting = {
   id: string
   date: string
-  status: string
   type: string
   location: string
   items: number
   amount: number
+  status: "pending" | "completed" | "failed"
 }
 
-export const columns: ColumnDef<InterfacePost>[] = [
+export const columns: ColumnDef<InterfacePosting>[] = [
   {
     accessorKey: "date",
     header: "Date",
@@ -52,12 +56,12 @@ export const columns: ColumnDef<InterfacePost>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string
+      const status = row.getValue("status") as InterfacePosting["status"]
       return (
         <Badge
           variant={
             status === "completed"
-              ? "success"
+              ? "default"
               : status === "pending"
               ? "secondary"
               : "destructive"
@@ -71,7 +75,7 @@ export const columns: ColumnDef<InterfacePost>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const post = row.original
+      const posting = row.original
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -81,6 +85,13 @@ export const columns: ColumnDef<InterfacePost>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(posting.id)}
+            >
+              Copy posting ID
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem>View details</DropdownMenuItem>
             <DropdownMenuItem>Retry posting</DropdownMenuItem>
           </DropdownMenuContent>

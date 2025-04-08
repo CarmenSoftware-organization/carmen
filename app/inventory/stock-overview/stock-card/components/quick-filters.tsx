@@ -1,6 +1,11 @@
-"use client"
+'use client'
 
 import { Button } from "@/components/ui/button"
+import { FilterCriteria } from "../types"
+import { useState } from "react"
+import { Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
+
 import {
   Select,
   SelectContent,
@@ -8,10 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { FilterCriteria } from "../types"
-import { useState } from "react"
-import { Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
 
 interface QuickFiltersProps {
   onFilterChange?: (filters: Partial<FilterCriteria>) => void

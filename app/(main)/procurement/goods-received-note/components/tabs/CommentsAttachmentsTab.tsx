@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -46,7 +45,7 @@ const mockComments: Comment[] = [
   },
 ];
 
-export default function CommentsAttachmentsTab({ poData }: CommentsAttachmentsTabProps) {
+export function CommentsAttachmentsTab({ poData }: CommentsAttachmentsTabProps) {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(mockComments);
 

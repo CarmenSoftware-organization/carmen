@@ -4,6 +4,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Warehouse, Store } from 'lucide-react';
 
+
 interface StockMovement {
   id: number;
   lotNo: string;

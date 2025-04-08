@@ -1,10 +1,18 @@
-'use client'
-
+"use client"
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Search, Filter, Plus, Download, Printer, ChevronDown, Edit, ArrowUpDown, FileText, Star, History, Code, Save, X, Check } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import StatusBadge from '@/components/ui/custom-status-badge'
+import { CreditNote } from '@/lib/types/credit-note'
+import { staticCreditNotes } from '@/lib/mock/static-credit-notes'
+import ListPageTemplate from '@/components/templates/ListPageTemplate'
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
 import {
+
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,12 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
-import { Search, Filter, Plus, Download, Printer, ChevronDown, Edit, ArrowUpDown, FileText, Star, History, Code, Save, X, Check } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import StatusBadge from '@/components/ui/custom-status-badge'
-import { CreditNote } from '@/lib/types/credit-note'
-import { staticCreditNotes } from '@/lib/mock/static-credit-notes'
-import ListPageTemplate from '@/components/templates/ListPageTemplate'
 import {
   Table,
   TableBody,
@@ -45,8 +47,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,

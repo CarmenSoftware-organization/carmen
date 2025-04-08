@@ -1,7 +1,13 @@
 import { WorkflowDetail } from "../components/workflow-detail"
 import { sampleWorkflows } from "../data/mockData"
 
-export default function WorkflowDetailPage({ params }: { params: { id: string } }) {
+interface WorkflowDetailPageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) {
   const workflowId = params.id
   return <WorkflowDetail workflowId={workflowId} />
 }

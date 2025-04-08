@@ -9,48 +9,25 @@ import { Building, List, Grid, X, Plus } from 'lucide-react'
 import { CountListItem } from "./components/count-list-item"
 import { CountDetailCard } from "./components/count-detail-card"
 import { CountDetailForm } from "./components/count-detail-form"
-import { users, departments, storeLocations } from '@/lib/mockData'
+import { departments, storeLocations } from '@/lib/mockData'
 import { useRouter } from "next/navigation"
+import { Count, mockCounts } from '@/lib/mock/inventory-data'
 
-interface SpotCheckData {
-  storeName: string
-  department: string
-  userName: string
-  date: string
-  status: "pending" | "completed" | "in-progress"
-  itemCount: number
-  lastCountDate: string
-  variance: number
-  notes: string
-  completedCount: number
+type ComponentStatus = "pending" | "completed" | "in-progress"
+type MockStatus = "draft" | "in_progress" | "completed" | "cancelled"
+
+const mapStatus = (status: MockStatus): ComponentStatus => {
+  switch (status) {
+    case 'draft':
+      return 'pending'
+    case 'in_progress':
+      return 'in-progress'
+    case 'completed':
+      return 'completed'
+    case 'cancelled':
+      return 'pending'
+  }
 }
-
-const spotCheckData = [
-  {
-    storeName: "Main Kitchen Store",
-    department: "F&B",
-    userName: "John Doe",
-    date: "2024-04-20",
-    status: "pending" as const,
-    itemCount: 10, // Smaller count for spot checks
-    lastCountDate: "2024-03-20",
-    variance: 5.2,
-    notes: "Spot check of dry goods section",
-    completedCount: 5
-  },
-  {
-    storeName: "Cold Room",
-    department: "F&B",
-    userName: "Mike Johnson",
-    date: "2024-04-18",
-    status: "in-progress" as const,
-    itemCount: 8,
-    lastCountDate: "2024-03-18",
-    variance: 0,
-    notes: "Spot check in progress",
-    completedCount: 3
-  },
-]
 
 interface SpotCheckDetails {
   countId: string
@@ -68,28 +45,6 @@ interface SpotCheckDetails {
   }[]
 }
 
-interface CountDetailData {
-  items: {
-    id: string
-    name: string
-    code: string
-    description?: string
-    currentStock: number
-    actualCount: number
-    unit: string
-    status: 'good' | 'damaged' | 'missing' | 'expired'
-    isSubmitted: boolean
-    variance: number
-  }[]
-  notes: string
-}
-
-interface CountDetailCardProps {
-  countDetails?: Partial<SpotCheckDetails>
-  onStartCount: () => void
-  onDelete: () => void
-}
-
 export default function SpotCheck() {
   const router = useRouter()
   const [view, setView] = useState<'list' | 'grid'>('list')
@@ -98,12 +53,13 @@ export default function SpotCheck() {
   const [departmentFilter, setDepartmentFilter] = useState('all')
   const [showLocationFilter, setShowLocationFilter] = useState(false)
   const [showCountDetailForm, setShowCountDetailForm] = useState(false)
-  const [counts, setCounts] = useState(spotCheckData)
+  const [counts, setCounts] = useState<Count[]>(mockCounts.filter(count => count.type === 'spot'))
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentDetails, setCurrentDetails] = useState<SpotCheckDetails | null>(null)
 
-  const filteredData = counts.filter(item => 
+  const filteredData = counts.filter((item: Count) => 
     (statusFilter === 'all' || item.status === statusFilter) &&
-    (locationFilter === 'all' || item.storeName === locationFilter) &&
+    (locationFilter === 'all' || item.locations.includes(locationFilter)) &&
     (departmentFilter === 'all' || item.department === departmentFilter)
   )
 
@@ -115,7 +71,7 @@ export default function SpotCheck() {
   }
 
   const handleDeleteCount = (index: number) => {
-    setCounts(prevCounts => prevCounts.filter((_, i) => i !== index))
+    setCounts((prevCounts: Count[]) => prevCounts.filter((_: Count, i: number) => i !== index))
   }
 
   const handleNewSpotCheck = () => {
@@ -164,9 +120,10 @@ export default function SpotCheck() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
             <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
@@ -213,7 +170,7 @@ export default function SpotCheck() {
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
                   {storeLocations.map(location => (
-                    <SelectItem key={location.id} value={location.name}>{location.name}</SelectItem>
+                    <SelectItem key={location.id} value={location.id}>{location.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -236,41 +193,60 @@ export default function SpotCheck() {
 
         {view === 'list' ? (
           <div className="space-y-4">
-            {filteredData.map((item, index) => (
+            {filteredData.map((item: Count, index: number) => (
               <CountListItem 
                 key={index} 
-                {...item} 
-                onStartCount={() => setShowCountDetailForm(true)}
+                storeName={item.locations[0]}
+                department={item.department}
+                userName={item.counter}
+                date={item.startDate.toISOString()}
+                status={mapStatus(item.status)}
+                itemCount={item.itemCount}
+                completedCount={0}
+                onStartCount={() => {
+                  setCurrentDetails({
+                    countId: item.id,
+                    counter: item.counter,
+                    department: item.department,
+                    store: item.locations[0],
+                    date: item.startDate.toISOString(),
+                    selectedItems: []
+                  });
+                  setShowCountDetailForm(true);
+                }}
                 onDelete={() => handleDeleteCount(index)}
               />
             ))}
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredData.map((item, index) => {
-              const details: SpotCheckDetails = {
-                countId: `SC-${index}`,
-                counter: item.userName,
-                department: item.department,
-                store: item.storeName,
-                date: item.date,
-                selectedItems: [] 
-              }
-              return (
-                <CountDetailCard 
-                  key={index}
-                  countDetails={details}
-                  onStartCount={() => {
-                    setCurrentDetails(details)
-                    setShowCountDetailForm(true)
-                  }}
-                  onDelete={() => handleDeleteCount(index)}
-                />
-              )
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredData.map((item: Count, index: number) => (
+              <CountDetailCard 
+                key={index}
+                storeName={item.locations[0]}
+                department={item.department}
+                userName={item.counter}
+                date={item.startDate.toISOString()}
+                status={mapStatus(item.status)}
+                itemCount={item.itemCount}
+                completedCount={0}
+                onStartCount={() => {
+                  setCurrentDetails({
+                    countId: item.id,
+                    counter: item.counter,
+                    department: item.department,
+                    store: item.locations[0],
+                    date: item.startDate.toISOString(),
+                    selectedItems: []
+                  });
+                  setShowCountDetailForm(true);
+                }}
+                onDelete={() => handleDeleteCount(index)}
+              />
+            ))}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

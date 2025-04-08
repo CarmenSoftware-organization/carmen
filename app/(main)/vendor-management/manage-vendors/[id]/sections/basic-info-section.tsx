@@ -5,16 +5,19 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { Vendor } from '@/lib/types'
+import { Textarea } from "@/components/ui/textarea"
+import { Vendor, Address, Contact, Certification, EnvironmentalImpact } from "../types"
 import { BUSINESS_TYPES } from '../../data/mock'
+
+type VendorFieldValue = string | number | boolean | Date | Address[] | Contact[] | Certification[] | EnvironmentalImpact | undefined
 
 interface BasicInfoSectionProps {
   vendor: Vendor
   isEditing: boolean
-  onFieldChange: (name: keyof Vendor, value: Vendor[keyof Vendor]) => void
+  onFieldChange: (field: keyof Vendor, value: VendorFieldValue) => void
 }
 
-export function BasicInfoSection({ vendor, isEditing, onFieldChange }: BasicInfoSectionProps) {
+export function BasicInfoSection({ isEditing, vendor, onFieldChange }: BasicInfoSectionProps) {
   return (
     <div className="space-y-6">
       {/* Company Information */}

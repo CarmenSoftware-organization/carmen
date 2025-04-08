@@ -1,5 +1,6 @@
-// File: utils.ts
 import { WorkflowStage } from '@/lib/types'
+
+// File: utils.ts
 
 export const getBadgeVariant = (status: string): "default" | "destructive" | "outline" | "secondary" | "success" => {
   switch (status) {

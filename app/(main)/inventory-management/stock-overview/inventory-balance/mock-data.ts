@@ -1,5 +1,6 @@
 import { BalanceReport } from "./types"
 
+
 export const mockBalanceReport: BalanceReport = {
   locations: [
     {

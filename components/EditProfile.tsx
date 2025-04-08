@@ -1,12 +1,13 @@
-'use client'
-
 import { useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { CameraIcon } from 'lucide-react'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+
+'use client'
+
 
 export default function EditProfile() {
   const [formData, setFormData] = useState({
@@ -51,9 +52,8 @@ export default function EditProfile() {
     e.preventDefault()
     // Here you would typically send the formData to your backend
     console.log('Form submitted:', formData)
-    toast({
-      title: "Profile Updated",
-      description: "Your profile has been successfully updated.",
+    toast.success("Profile Updated", {
+      description: "Your profile has been successfully updated."
     })
   }
 

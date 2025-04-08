@@ -1,8 +1,7 @@
-"use client"
+'use client'
 
 import Link from "next/link"
 import { HelpCircle, ExternalLink, Keyboard } from "lucide-react"
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Accordion,
@@ -46,7 +45,7 @@ export function SettingsHelpSection({ pageName, shortcuts = [] }: SettingsHelpSe
               <div className="space-y-2 text-sm">
                 {shortcuts.length > 0 ? (
                   <ul className="space-y-2">
-                    {shortcuts.map((shortcut, index) => (
+                    {shortcuts.map((shortcut: KeyboardShortcut, index: number) => (
                       <li key={index} className="flex items-center justify-between">
                         <span>{shortcut.description}</span>
                         <kbd className="px-2 py-1 bg-background rounded border">{shortcut.key}</kbd>

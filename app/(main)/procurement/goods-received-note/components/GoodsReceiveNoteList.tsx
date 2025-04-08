@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -10,14 +11,14 @@ import { BulkActions } from './tabs/BulkActions'
 import StatusBadge from '@/components/ui/custom-status-badge'
 import ListPageTemplate from '@/components/templates/ListPageTemplate'
 import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import { AdvancedFilter } from './advanced-filter'
+import { FilterType } from '@/lib/utils/filter-storage'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { AdvancedFilter } from './advanced-filter'
-import { Filter as FilterType } from '@/lib/utils/filter-storage'
 import {
   Table,
   TableBody,
@@ -83,7 +84,7 @@ export function GoodsReceiveNoteList() {
               break
             case 'in':
               if (Array.isArray(filter.value)) {
-                matches = filter.value.some(val => val === fieldValue)
+                matches = filter.value.some((val: string | number | boolean | Date) => val === fieldValue)
               }
               break
             case 'between':

@@ -1,22 +1,19 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { notFound } from 'next/navigation'
-import { useRouter } from 'next/navigation'
+import { notFound, useRouter } from 'next/navigation'
 import DetailPageTemplate from '@/components/templates/DetailPageTemplate'
 import { Button } from "@/components/ui/button"
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, 
-         AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, 
-         AlertDialogAction } from "@/components/ui/alert-dialog"
-import { toast } from "@/components/ui/use-toast"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
+import { toast } from "sonner"
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Phone, Award, Calendar, FileText, ChevronLeft } from "lucide-react"
-import { Vendor } from './types'
 import { MOCK_VENDORS } from '../data/mock'
 import { updateVendor } from '../actions'
+import type { Vendor, Address, Contact } from './types'
 import { BasicInfoSection } from './sections/basic-info-section'
 import { AddressesSection } from './sections/addresses-section'
 import { ContactsSection } from './sections/contacts-section'
@@ -25,7 +22,13 @@ import { CertificationsSection } from './sections/certifications-section'
 import { PrimaryContactSection } from './sections/primary-contact-section'
 import { PrimaryAddressSection } from './sections/primary-address-section'
 
-export default function VendorDetailPage({ params }: { params: { id: string } }) {
+interface VendorDetailPageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function VendorDetailPage({ params }: VendorDetailPageProps) {
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="space-y-8">
@@ -37,7 +40,11 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
   )
 }
 
-function VendorDetail({ id }: { id: string }) {
+interface VendorDetailProps {
+  id: string
+}
+
+function VendorDetail({ id }: VendorDetailProps) {
   const router = useRouter()
   const [vendor, setVendor] = useState<Vendor | null>(MOCK_VENDORS[id] || null)
   const [isEditing, setIsEditing] = useState(false)
@@ -55,18 +62,11 @@ function VendorDetail({ id }: { id: string }) {
     const result = await updateVendor(vendor)
     
     if (result.error) {
-      toast({
-        title: "Error",
-        description: result.error,
-        variant: "destructive"
-      })
+      toast.error(result.error)
       return
     }
 
-    toast({
-      title: "Success",
-      description: "Vendor updated successfully"
-    })
+    toast.success("Vendor updated successfully")
     
     setIsEditing(false)
     router.refresh()
@@ -75,28 +75,77 @@ function VendorDetail({ id }: { id: string }) {
   const handleDelete = async () => {
     try {
       // Mock delete success
-      toast({
-        title: "Success",
-        description: "Vendor deleted successfully"
-      })
+      toast.success("Vendor deleted successfully")
       router.push('/vendor-management/manage-vendors')
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete vendor",
-        variant: "destructive"
-      })
+      toast.error("Failed to delete vendor")
     }
   }
 
-  type FieldValue = string | number | boolean | object | null
-  type FieldName = string
+  const handleUpdateField = (field: keyof Vendor, value: string | number | boolean | object | null) => {
+    if (!vendor) return
+    setVendor((prev: Vendor | null) => ({
+      ...prev!,
+      [field]: value
+    }))
+  }
 
-  const handleFieldChange = (name: FieldName, value: FieldValue) => {
-    setVendor(prev => {
-      if (!prev) return prev
-      return { ...prev, [name]: value }
-    })
+  const handleUpdateAddress = (index: number, field: string, value: string) => {
+    if (!vendor) return
+    const addresses = [...vendor.addresses]
+    addresses[index] = {
+      ...addresses[index],
+      [field]: value
+    }
+    handleUpdateField('addresses', addresses)
+  }
+
+  const handleUpdateContact = (index: number, field: string, value: string) => {
+    if (!vendor) return
+    const contacts = [...vendor.contacts]
+    contacts[index] = {
+      ...contacts[index],
+      [field]: value
+    }
+    handleUpdateField('contacts', contacts)
+  }
+
+  const handleAddAddress = () => {
+    if (!vendor) return
+    const addresses = [...vendor.addresses, {
+      id: Date.now().toString(),
+      type: 'billing',
+      street: '',
+      city: '',
+      state: '',
+      country: '',
+      postalCode: ''
+    }]
+    handleUpdateField('addresses', addresses)
+  }
+
+  const handleAddContact = () => {
+    if (!vendor) return
+    const contacts = [...vendor.contacts, {
+      id: Date.now().toString(),
+      name: '',
+      role: '',
+      email: '',
+      phone: ''
+    }]
+    handleUpdateField('contacts', contacts)
+  }
+
+  const handleRemoveAddress = (addr: Address) => {
+    if (!vendor) return
+    const addresses = vendor.addresses.filter((a: Address) => a.id !== addr.id)
+    handleUpdateField('addresses', addresses)
+  }
+
+  const handleRemoveContact = (contact: Contact) => {
+    if (!vendor) return
+    const contacts = vendor.contacts.filter((c: Contact) => c.id !== contact.id)
+    handleUpdateField('contacts', contacts)
   }
 
   const actionButtons = (
@@ -230,7 +279,7 @@ function VendorDetail({ id }: { id: string }) {
               <BasicInfoSection
                 vendor={vendor}
                 isEditing={isEditing}
-                onFieldChange={handleFieldChange}
+                onFieldChange={(name: keyof Vendor, value: any) => handleUpdateField(name, value)} // eslint-disable-line @typescript-eslint/no-explicit-any
               />
             </CardContent>
           </Card>
@@ -245,12 +294,11 @@ function VendorDetail({ id }: { id: string }) {
                 <PrimaryAddressSection
                   address={primaryAddress}
                   isEditing={isEditing}
-                  onFieldChange={(name, value) => {
-                    const updatedAddresses = vendor.addresses.map(addr => 
-                      addr.id === primaryAddress?.id ? { ...addr, [name]: value } : addr
-                    )
-                    handleFieldChange('addresses', updatedAddresses)
-                  }}
+                  onFieldChange={(name: string, value: string | number | boolean) => handleUpdateAddress(
+                    vendor.addresses.findIndex(a => a.id === primaryAddress?.id), 
+                    name, 
+                    String(value)
+                  )}
                 />
               </CardContent>
             </Card>
@@ -264,12 +312,11 @@ function VendorDetail({ id }: { id: string }) {
                 <PrimaryContactSection
                   contact={primaryContact}
                   isEditing={isEditing}
-                  onFieldChange={(name, value) => {
-                    const updatedContacts = vendor.contacts.map(contact => 
-                      contact.id === primaryContact?.id ? { ...contact, [name]: value } : contact
-                    )
-                    handleFieldChange('contacts', updatedContacts)
-                  }}
+                  onFieldChange={(name: string, value: string | number | boolean) => handleUpdateContact(
+                    vendor.contacts.findIndex(c => c.id === primaryContact?.id), 
+                    name, 
+                    String(value)
+                  )}
                 />
               </CardContent>
             </Card>
@@ -286,7 +333,7 @@ function VendorDetail({ id }: { id: string }) {
                   <CardDescription>All registered addresses for this vendor</CardDescription>
                 </div>
                 {isEditing && (
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" onClick={handleAddAddress}>
                     Add Address
                   </Button>
                 )}
@@ -296,7 +343,12 @@ function VendorDetail({ id }: { id: string }) {
               <AddressesSection
                 addresses={vendor.addresses}
                 isEditing={isEditing}
-                onAddressChange={handleFieldChange}
+                onAddressChange={(name: string, value: string | number | boolean) => handleUpdateAddress(
+                  vendor.addresses.findIndex(a => a.id === name), 
+                  name, 
+                  String(value)
+                )}
+                onRemoveAddress={handleRemoveAddress}
               />
             </CardContent>
           </Card>
@@ -309,7 +361,7 @@ function VendorDetail({ id }: { id: string }) {
                   <CardDescription>All contacts associated with this vendor</CardDescription>
                 </div>
                 {isEditing && (
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" onClick={handleAddContact}>
                     Add Contact
                   </Button>
                 )}
@@ -319,7 +371,12 @@ function VendorDetail({ id }: { id: string }) {
               <ContactsSection
                 contacts={vendor.contacts}
                 isEditing={isEditing}
-                onContactChange={handleFieldChange}
+                onContactChange={(name: any, value: any) => handleUpdateContact( // eslint-disable-line @typescript-eslint/no-explicit-any
+                  vendor.contacts.findIndex(c => c.id === name), 
+                  name, 
+                  String(value)
+                )}
+                onRemoveContact={handleRemoveContact}
               />
             </CardContent>
           </Card>
@@ -345,7 +402,7 @@ function VendorDetail({ id }: { id: string }) {
               <CertificationsSection
                 certifications={vendor.certifications}
                 isEditing={isEditing}
-                onCertificationChange={handleFieldChange}
+                onCertificationChange={(name: string, value: string | number | boolean) => handleUpdateField(name as keyof Vendor, value)}
               />
             </CardContent>
           </Card>
@@ -363,9 +420,17 @@ function VendorDetail({ id }: { id: string }) {
               </div>
             </CardHeader>
             <CardContent>
-              <EnvironmentalProfile 
+              <EnvironmentalProfile
                 vendorId={id}
-                environmentalData={vendor.environmentalImpact}
+                environmentalData={vendor.environmentalImpact || {
+                  carbonFootprint: { value: 0, unit: 'tons', trend: 0 },
+                  energyEfficiency: { value: 0, benchmark: 0, trend: 0 },
+                  wasteReduction: { value: 0, trend: 0 },
+                  complianceRate: { value: 0, trend: 0 },
+                  lastUpdated: new Date().toISOString(),
+                  esgScore: 'N/A',
+                  certifications: []
+                }}
               />
             </CardContent>
           </Card>

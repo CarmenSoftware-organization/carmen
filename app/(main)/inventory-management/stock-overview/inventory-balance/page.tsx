@@ -1,12 +1,11 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ReportHeader } from './components/ReportHeader'
 import { FilterPanel } from './components/FilterPanel'
 import { BalanceTable } from './components/BalanceTable'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react'
@@ -21,28 +20,21 @@ import { mockBalanceReport } from './mock-data'
 import { Skeleton } from '@/components/ui/skeleton'
 import { MovementHistory } from './components/MovementHistory'
 
+const initialParams: BalanceReportParams = {
+  asOfDate: new Date().toISOString().split('T')[0],
+  locationRange: { from: '', to: '' },
+  categoryRange: { from: '', to: '' },
+  productRange: { from: '', to: '' },
+  viewType: 'CATEGORY',
+  valuationMethod: 'WEIGHTED_AVERAGE',
+  showLots: false
+}
+
 export default function InventoryBalancePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
-  const [activeFilters, setActiveFilters] = useState<string[]>([])
-  
-  const [report, setReport] = useState<BalanceReport>({
-    locations: [],
-    totals: {
-      quantity: 0,
-      value: 0
-    }
-  })
-  
-  const [params, setParams] = useState<BalanceReportParams>({
-    asOfDate: new Date().toISOString().split('T')[0],
-    locationRange: { from: '', to: '' },
-    categoryRange: { from: '', to: '' },
-    productRange: { from: '', to: '' },
-    viewType: 'PRODUCT',
-    valuationMethod: 'FIFO',
-    showLots: false,
-  })
+  const [report, setReport] = useState<BalanceReport>(mockBalanceReport)
+  const [params, setParams] = useState<BalanceReportParams>(initialParams)
 
   // Load mock data with a simulated delay
   useEffect(() => {
@@ -67,51 +59,15 @@ export default function InventoryBalancePage() {
     setParams(prev => ({ ...prev, showLots }))
   }
 
-  const handleFilterChange = (filterUpdates: Partial<BalanceReportParams>) => {
-    // Simulate loading when filters change
+  const handleFilterChange = (updates: Partial<BalanceReportParams>) => {
     setIsLoading(true)
-    
-    setParams(prev => {
-      const newParams = { ...prev, ...filterUpdates }
-      
-      // Update active filters
-      const newActiveFilters: string[] = []
-      
-      if (newParams.locationRange.from || newParams.locationRange.to) 
-        newActiveFilters.push('location')
-      
-      if (newParams.categoryRange.from || newParams.categoryRange.to) 
-        newActiveFilters.push('category')
-      
-      if (newParams.productRange.from || newParams.productRange.to) 
-        newActiveFilters.push('product')
-      
-      setActiveFilters(newActiveFilters)
-      
-      // Simulate API call with delay
-      setTimeout(() => {
-        // In a real app, we would filter the data based on the params
-        // For this demo, we'll just use the mock data
-        setReport(mockBalanceReport)
-        setIsLoading(false)
-      }, 800)
-      
-      return newParams
-    })
-  }
+    setParams(prev => ({ ...prev, ...updates }))
 
-  const removeFilter = (filterType: string) => {
-    switch (filterType) {
-      case 'location':
-        handleFilterChange({ locationRange: { from: '', to: '' } })
-        break
-      case 'category':
-        handleFilterChange({ categoryRange: { from: '', to: '' } })
-        break
-      case 'product':
-        handleFilterChange({ productRange: { from: '', to: '' } })
-        break
-    }
+    // Simulate API call
+    setTimeout(() => {
+      setReport(mockBalanceReport)
+      setIsLoading(false)
+    }, 800)
   }
 
   // Format date for display
@@ -228,57 +184,13 @@ export default function InventoryBalancePage() {
                     )}
                   </Button>
                 </CollapsibleTrigger>
-                
-                {activeFilters.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {activeFilters.includes('location') && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        Location
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-4 w-4 p-0 ml-1" 
-                          onClick={() => removeFilter('location')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </Badge>
-                    )}
-                    {activeFilters.includes('category') && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        Category
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-4 w-4 p-0 ml-1" 
-                          onClick={() => removeFilter('category')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </Badge>
-                    )}
-                    {activeFilters.includes('product') && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        Product
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-4 w-4 p-0 ml-1" 
-                          onClick={() => removeFilter('product')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </Badge>
-                    )}
-                  </div>
-                )}
               </div>
-              
-              <CollapsibleContent className="mt-2">
+
+              <CollapsibleContent className="mt-4">
                 <Card>
                   <CardContent className="pt-6">
                     <FilterPanel 
-                      params={params} 
+                      params={params}
                       onFilterChange={handleFilterChange}
                       isLoading={isLoading}
                     />
@@ -289,29 +201,30 @@ export default function InventoryBalancePage() {
           </div>
         </div>
       </div>
-      
+
       {/* Main Content */}
       <Card>
         <CardContent className="pt-6">
-          <Tabs defaultValue="balance" className="w-full">
-            <TabsList>
-              <TabsTrigger value="balance">Balance Report</TabsTrigger>
-              <TabsTrigger value="movement">Movement History</TabsTrigger>
-            </TabsList>
-            <TabsContent value="balance">
-              <BalanceTable 
-                params={params}
-                report={report}
-                isLoading={isLoading}
-              />
-            </TabsContent>
-            <TabsContent value="movement">
-              <MovementHistory 
-                params={params}
-                isLoading={isLoading}
-              />
-            </TabsContent>
-          </Tabs>
+          <div className="space-y-4">
+            <Tabs defaultValue="balance" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="balance">Balance</TabsTrigger>
+                <TabsTrigger value="movement">Movement History</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="balance">
+                <BalanceTable 
+                  params={params}
+                  report={report}
+                  isLoading={isLoading}
+                />
+              </TabsContent>
+
+              <TabsContent value="movement">
+                <MovementHistory isLoading={isLoading} />
+              </TabsContent>
+            </Tabs>
+          </div>
         </CardContent>
       </Card>
     </div>

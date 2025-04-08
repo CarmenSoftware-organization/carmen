@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { PencilIcon, ChevronLeft, Save, ImageIcon } from 'lucide-react'
+import { PencilIcon, ChevronLeft, Save, ImageIcon, Archive } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 
 // Mock data (replace with actual data fetching)
 const productList = [
@@ -24,7 +24,11 @@ const productList = [
 ]
 
 // Status Badge Component
-function StatusBadge({ status }: { status: 'active' | 'inactive' }) {
+interface StatusBadgeProps {
+  status: string
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
   return (
     <Badge variant={status === 'active' ? 'default' : 'secondary'}>
       {status === 'active' ? 'Active' : 'Inactive'}
@@ -48,6 +52,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const isEditMode = searchParams.get('edit') === ''
   const [product, setProduct] = useState<Product | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'details')
 
   useEffect(() => {
     // Simulating API call
@@ -73,19 +78,17 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const handleSave = () => {
     try {
       // Save logic here
-      toast({
-        title: "Changes saved",
-        description: "Your changes have been saved successfully."
-      })
+      toast.success("Changes saved successfully")
       router.push(`/product-management/products/${params.id}`)
     } catch (err) {
       console.error('Save error:', err)
-      toast({
-        title: "Error",
-        description: "Could not save changes. Please try again.",
-        variant: "destructive"
-      })
+      toast.error("Could not save changes. Please try again.")
     }
+  }
+
+  const handleArchive = () => {
+    toast.success("Product archived successfully")
+    router.push('/product-management/products')
   }
 
   if (isLoading) {
@@ -129,10 +132,16 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </Button>
             </>
           ) : (
-            <Button onClick={handleEdit}>
-              <PencilIcon className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
+            <>
+              <Button variant="outline" onClick={handleArchive}>
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+              <Button onClick={handleEdit}>
+                <PencilIcon className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </>
           )}
         </div>
       </div>

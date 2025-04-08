@@ -2,6 +2,11 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { FileText, PlusCircle } from "lucide-react";
+import CreatePOFromPR from "./createpofrompr";
+import { PurchaseRequest } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +14,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { FileText, FileInput, PlusCircle } from "lucide-react";
-import CreatePOFromPR from "./createpofrompr";
-import { PurchaseRequest } from "@/lib/types";
 
 interface NewPOModalProps {
   isOpen: boolean;
@@ -36,12 +36,9 @@ export function NewPOModal({ isOpen, onClose }: NewPOModalProps) {
 
   const handleCreateFromPR = () => {
     if (selectedPRs.length === 0) {
-      // Show error or notification
       return;
     }
     
-    // In a real implementation, you would pass the selected PRs to the new PO page
-    // For now, we'll just navigate to the new PO page
     const prIds = selectedPRs.map(pr => pr.id).join(",");
     router.push(`/procurement/purchase-orders/new?prIds=${prIds}`);
     onClose();

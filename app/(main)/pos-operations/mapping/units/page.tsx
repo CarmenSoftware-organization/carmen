@@ -1,69 +1,25 @@
-"use client"
+'use client'
 
 import { useState, useMemo } from "react"
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
-import { columns } from "./components/columns"
-
 import { 
-  MappingHeader, 
-  FilterBar, 
   StatusBadge, 
   RowActions,
   FilterGroup,
   AppliedFilter,
   ActionType,
 } from "../components"
-
 import { UnitMapping, UnitType } from "./types"
 import { unitMappings, baseUnits } from "./data"
+import { columns } from "./components/columns"
 
 export default function UnitMappingPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([])
+  const [searchQuery] = useState("")
+  const [appliedFilters] = useState<AppliedFilter[]>([])
   
-  // Setup filter groups
-  const filterGroups: FilterGroup[] = [
-    {
-      id: "unitType",
-      label: "Unit Type",
-      type: "multiple",
-      options: [
-        { id: "recipe", label: "Recipe Units", value: "recipe" },
-        { id: "sales", label: "Sales Units", value: "sales" },
-        { id: "both", label: "Both", value: "both" },
-      ],
-    },
-    {
-      id: "status",
-      label: "Status",
-      type: "multiple",
-      options: [
-        { id: "active", label: "Active", value: "active" },
-        { id: "inactive", label: "Inactive", value: "inactive" },
-        { id: "custom", label: "Custom", value: "custom" },
-      ],
-    },
-    {
-      id: "baseUnit",
-      label: "Base Unit",
-      type: "multiple",
-      options: baseUnits.map(unit => ({
-        id: unit.id,
-        label: unit.name,
-        value: unit.name,
-      })),
-    },
-  ]
-
-  // Handle search
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
-
   // Handle row actions
   const handleRowAction = (action: ActionType, unit: UnitMapping) => {
     console.log(`${action} action on unit:`, unit)
@@ -187,76 +143,13 @@ export default function UnitMappingPage() {
     },
   ]
 
-  // Get row class based on status
-  const getRowClassName = (unit: UnitMapping) => {
-    if (unit.status === "inactive") {
-      return "bg-gray-50 dark:bg-gray-900/10"
-    }
-    if (unit.status === "custom") {
-      return "bg-indigo-50 dark:bg-indigo-900/10"
-    }
-    return ""
-  }
-
   return (
-    <div className="flex-1 space-y-4 px-2 py-4 md:px-4 md:py-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Unit Mapping</h2>
-        <div className="flex items-center space-x-2">
-          <Button>Map New Unit</Button>
-          <Button variant="secondary">Export</Button>
-        </div>
+    <div className="container mx-auto py-10">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Unit Mapping</h1>
+        <Button>Add New Mapping</Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Units
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Mapped Units
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">10</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Unmapped Units
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Last Sync
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">5m ago</div>
-          </CardContent>
-        </Card>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Unit Mappings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DataTable columns={columns} data={filteredData} />
-        </CardContent>
-      </Card>
+      <DataTable columns={columns} data={filteredData} />
     </div>
   )
 } 

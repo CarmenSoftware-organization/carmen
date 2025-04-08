@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, AlertCircle, Clock, Check } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mockLocations, getLocationsByDepartment, getProductsByLocation } from '@/lib/mock/inventory-data';
+import { mockLocations, getProductsByLocation, Location } from '@/lib/mock/inventory-data';
 
 interface CountItem {
   id: string;
@@ -26,8 +26,6 @@ interface FinalReviewProps {
     selectedLocations: string[];
     items: CountItem[];
   };
-  onNext: () => void;
-  onBack: () => void;
 }
 
 export function FinalReview({ formData }: FinalReviewProps) {
@@ -35,11 +33,11 @@ export function FinalReview({ formData }: FinalReviewProps) {
 
   // Get location details
   const selectedLocationDetails = formData.selectedLocations
-    .map(id => mockLocations.find(loc => loc.id === id))
+    .map((id: string) => mockLocations.find(loc => loc.id === id))
     .filter((loc): loc is NonNullable<typeof loc> => loc !== undefined);
 
   // Get all products from selected locations
-  const allProducts = formData.selectedLocations.flatMap(locationId => 
+  const allProducts = formData.selectedLocations.flatMap((locationId: string) => 
     getProductsByLocation(locationId)
   );
 
@@ -103,7 +101,7 @@ export function FinalReview({ formData }: FinalReviewProps) {
                 <div className="text-2xl font-bold">{totalLocations}</div>
                 <p className="text-sm text-muted-foreground">Locations</p>
                 <div className="mt-2 flex flex-wrap gap-1">
-                  {locationTypes.map(type => (
+                  {locationTypes.map((type) => (
                     <Badge key={type} variant="secondary">
                       {type}
                     </Badge>
@@ -138,16 +136,16 @@ export function FinalReview({ formData }: FinalReviewProps) {
         <div className="space-y-4">
           <h3 className="font-medium">Categories Breakdown</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {categories.map(category => {
+            {categories.map((category) => {
               const itemsInCategory = uniqueProducts.filter(p => p.category === category);
-              return (
+              return category ? (
                 <div key={category} className="p-3 rounded-lg border">
                   <div className="font-medium">{category}</div>
                   <div className="text-sm text-muted-foreground">
                     {itemsInCategory.length} items
                   </div>
                 </div>
-              );
+              ) : null;
             })}
           </div>
         </div>
@@ -172,7 +170,7 @@ export function FinalReview({ formData }: FinalReviewProps) {
                         {location.code} • {location.type}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Floor {location.floor} • {location.building}
+                        Floor {location.floor} • {location.building || 'N/A'}
                       </div>
                     </div>
                     <div className="text-right">

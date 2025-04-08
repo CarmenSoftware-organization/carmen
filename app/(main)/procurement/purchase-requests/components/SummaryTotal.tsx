@@ -1,3 +1,4 @@
+import { PurchaseRequest } from "@/lib/types"
 import {
   Table,
   TableBody,
@@ -6,7 +7,6 @@ import {
   TableHead,
   TableHeader,
 } from "@/components/ui/table"
-import { PurchaseRequest } from "@/lib/types"
 
 interface ISummaryTotalProps {
   prData: PurchaseRequest

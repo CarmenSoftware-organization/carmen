@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import PRDetailPage from '../components/PRDetailPage'
 import { Skeleton } from '@/components/ui/skeleton'
 
+
 // Loading fallback component
 function LoadingFallback() {
   return (

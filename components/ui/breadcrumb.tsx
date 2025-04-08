@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Slot } from "@radix-ui/react-slot"
 
+
 export interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
 }
 

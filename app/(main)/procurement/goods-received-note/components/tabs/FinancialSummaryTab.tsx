@@ -4,6 +4,7 @@ import { GoodsReceiveNoteMode, FinancialSummary } from '@/lib/types'
 import { Calculator } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+
 interface FinancialSummaryTabProps {
   mode: GoodsReceiveNoteMode
   summary: FinancialSummary | null

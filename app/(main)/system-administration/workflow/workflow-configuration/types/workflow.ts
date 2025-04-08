@@ -1,3 +1,4 @@
+
 export type OperatorType = "eq" | "lt" | "gt" | "lte" | "gte"
 export type ActionType = "SKIP_STAGE" | "NEXT_STAGE"
 export type NotificationChannel = "Email" | "System"

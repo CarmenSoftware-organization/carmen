@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Bell, Search, Menu as MenuIcon, X, Bookmark, Star, Clock, Settings, User, CreditCard, LogOut } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,9 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, Search, Menu as MenuIcon, X, Bookmark, Star, Clock, Settings, User, CreditCard, LogOut } from 'lucide-react'
 
 export function CarmenHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

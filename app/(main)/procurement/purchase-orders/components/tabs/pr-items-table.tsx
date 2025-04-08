@@ -1,4 +1,7 @@
+
 'use client'
+
+import { MessageSquareIcon } from "lucide-react"
 
 import {
   Table,
@@ -8,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { MessageSquareIcon } from "lucide-react"
 
 const mockRelatedPRItems = [
   {

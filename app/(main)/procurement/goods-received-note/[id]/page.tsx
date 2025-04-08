@@ -5,7 +5,13 @@ import { GoodsReceiveNoteComponent } from '../components/goods-receive-note'
 import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 
-export default function GoodsReceiveNotePage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function GoodsReceiveNotePage({ params }: PageProps) {
   const searchParams = useSearchParams()
   const mode = searchParams?.get('mode') as GoodsReceiveNoteMode || 'view'
   const id = decodeURIComponent(params.id)

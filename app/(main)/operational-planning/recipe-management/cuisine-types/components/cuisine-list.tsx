@@ -1,8 +1,16 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { RecipeCuisine, mockCuisines } from "../data/mock-cuisines"
+import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Table,
   TableBody,
@@ -11,8 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,8 +38,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -57,12 +61,8 @@ import {
   XCircle,
   LayoutGrid,
   LayoutList,
+  AlertCircle,
 } from "lucide-react"
-import { RecipeCuisine, mockCuisines } from "../data/mock-cuisines"
-import { cn } from "@/lib/utils"
-import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface FilterCondition {
   id: string

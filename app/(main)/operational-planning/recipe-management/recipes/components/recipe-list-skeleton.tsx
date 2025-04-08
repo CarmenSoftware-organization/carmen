@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card } from "@/components/ui/card"
 
+
 export function RecipeListSkeleton() {
   return (
     <div className="space-y-6">

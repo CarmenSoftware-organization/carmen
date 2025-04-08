@@ -1,3 +1,4 @@
+
 'use client';
 
 // Mock data for graphs

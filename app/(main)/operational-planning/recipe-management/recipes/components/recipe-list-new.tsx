@@ -1,8 +1,15 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Recipe, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { RecipeCardCompact } from "./recipe-card-compact"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+
 import {
   Table,
   TableBody,
@@ -11,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +29,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -50,11 +54,6 @@ import {
   LayoutList,
   Eye,
 } from "lucide-react"
-import { Recipe, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
-import { RecipeCardCompact } from "./recipe-card-compact"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
-import { Card } from "@/components/ui/card"
 
 interface FilterCondition {
   id: string

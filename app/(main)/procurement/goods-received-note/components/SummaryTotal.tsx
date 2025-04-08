@@ -1,3 +1,4 @@
+import { GoodsReceiveNote } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -6,13 +7,12 @@ import {
   TableHead,
   TableHeader,
 } from "@/components/ui/table";
-import { GoodsReceiveNote } from "@/lib/types";
 
-interface ISummaryTotalProps {
-    poData: GoodsReceiveNote;
+interface SummaryTotalProps {
+  poData: GoodsReceiveNote;
 }
 
-export default function SummaryTotal({ poData }: ISummaryTotalProps) {
+export function SummaryTotal({ poData }: SummaryTotalProps) {
   const data = [
     {
       Label: "Subtotal Amount",

@@ -23,7 +23,7 @@ const mockGRNs: GoodsReceiveNote[] = [
   { id: '3', number: 'GRN-003', date: '2023-08-25', status: 'Cancelled', receivedBy: 'Bob Johnson' },
 ];
 
-export default function GoodsReceiveNoteTab({ poData }: GoodsReceiveNoteTabProps) {
+export function GoodsReceiveNoteTab({ poData }: GoodsReceiveNoteTabProps) {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Goods Receive Notes</h2>

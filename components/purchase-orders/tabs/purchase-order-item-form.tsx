@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,11 +8,14 @@ import { X, Upload } from "lucide-react"
 import { PurchaseOrderItem } from '@/lib/types'
 import { GoodsReceiveNoteTable } from '@/app/(main)/procurement/purchase-orders/components/tabs/goods-receive-note-table'
 
+'use client'
+
+
 type FormMode = 'view' | 'edit' | 'add'
 
 interface ItemFormProps {
-  initialMode: FormMode
-  onClose: () => void
+  initialMode?: FormMode
+  onClose?: () => void
   initialData?: PurchaseOrderItem
 }
 
@@ -55,7 +56,11 @@ interface FormData {
   baseReceivingQty?: number;
 }
 
-export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, initialData }: ItemFormProps) {
+export function PurchaseOrderItemFormComponent({ 
+  initialMode = 'view' as FormMode, 
+  onClose = () => {}, 
+  initialData 
+}: ItemFormProps) {
   const [mode, setMode] = useState<FormMode>(initialMode)
   const [formData, setFormData] = useState<FormData>(() => {
     if (initialData) {

@@ -1,6 +1,11 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { 
   Table, 
   TableBody, 
@@ -9,12 +14,6 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Skeleton } from "@/components/ui/skeleton"
 import { 
   Select, 
   SelectContent, 
@@ -28,19 +27,17 @@ import {
   PopoverTrigger 
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Download, FileDown, Search } from "lucide-react"
+import { CalendarIcon, FileDown, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import { BalanceReportParams } from "../types"
-import { MovementHistoryData, MovementRecord, generateMockMovementHistory } from "../mock-movement-data"
+import { MovementHistoryData, generateMockMovementHistory } from "../mock-movement-data"
 import { formatCurrency, formatNumber } from "../utils"
 
 interface MovementHistoryProps {
-  params: BalanceReportParams
   isLoading: boolean
 }
 
-export function MovementHistory({ params, isLoading }: MovementHistoryProps) {
+export function MovementHistory({ isLoading }: MovementHistoryProps) {
   const [movementData, setMovementData] = useState<MovementHistoryData | null>(null)
   const [localLoading, setLocalLoading] = useState(true)
   const [dateRange, setDateRange] = useState<{
@@ -59,13 +56,13 @@ export function MovementHistory({ params, isLoading }: MovementHistoryProps) {
   useEffect(() => {
     setLocalLoading(true)
     const timer = setTimeout(() => {
-      const data = generateMockMovementHistory(params)
+      const data = generateMockMovementHistory()
       setMovementData(data)
       setLocalLoading(false)
     }, 1000)
     
     return () => clearTimeout(timer)
-  }, [params])
+  }, [])
 
   // Filter records based on search and filters
   const filteredRecords = movementData?.records.filter(record => {

@@ -1,7 +1,7 @@
 "use client"
-
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import StatusBadge from "@/components/ui/custom-status-badge"
+import { XIcon } from "lucide-react"
 import {
   Dialog,
   DialogClose,
@@ -17,8 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import StatusBadge from "@/components/ui/custom-status-badge"
-import { XIcon } from "lucide-react"
 
 // Sample data for inventory locations
 const inventoryData = [
@@ -51,21 +49,14 @@ const inventoryData = [
   },
 ]
 
-// Sample item data
-const itemData = {
-  name: "Organic Quinoa xxx",
-  description: "Premium organic white quinoa grains",
-  status: "Accepted",
-}
-
 interface InventoryBreakdownProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
   itemData: {
-    name: string;
-    description: string;
-    status: string;
-  };
+    name: string
+    description: string
+    status: string
+  }
 }
 
 export default function InventoryBreakdown({ isOpen, onClose, itemData }: InventoryBreakdownProps) {
@@ -74,13 +65,13 @@ export default function InventoryBreakdown({ isOpen, onClose, itemData }: Invent
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
         <DialogHeader>
           <div className="flex justify-between w-full items-center">
-          <DialogTitle>Inventory Breakdown</DialogTitle>
-          <DialogClose asChild>
-                  <Button variant="ghost" size="sm">
-                    <XIcon className="h-4 w-4" />
-                  </Button>
-                </DialogClose>
-                </div>
+            <DialogTitle>Inventory Breakdown</DialogTitle>
+            <DialogClose asChild>
+              <Button variant="ghost" size="sm">
+                <XIcon className="h-4 w-4" />
+              </Button>
+            </DialogClose>
+          </div>
         </DialogHeader>
         <div className="mb-6 bg-muted p-4 rounded-lg">
           <div className="flex justify-between items-center mb-2">
@@ -92,12 +83,12 @@ export default function InventoryBreakdown({ isOpen, onClose, itemData }: Invent
           <TableHeader>
             <TableRow className="text-nowrap">
               <TableHead className="w-[180px]">Location</TableHead>
-              <TableHead >Quantity On Hand</TableHead>
+              <TableHead>Quantity On Hand</TableHead>
               <TableHead>Inventory Units</TableHead>
-              <TableHead >Par</TableHead>
-              <TableHead >Reorder Point</TableHead>
-              <TableHead >Min Stock</TableHead>
-              <TableHead >Max Stock</TableHead>
+              <TableHead>Par</TableHead>
+              <TableHead>Reorder Point</TableHead>
+              <TableHead>Min Stock</TableHead>
+              <TableHead>Max Stock</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

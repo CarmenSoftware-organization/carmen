@@ -1,6 +1,7 @@
 import { GoodsReceiveNote } from "@/lib/types"
 import { mockGoodsReceiveNotes } from "@/lib/mock/mock_goodsReceiveNotes"
 
+
 export async function getGoodsReceiveNoteById(id: string): Promise<GoodsReceiveNote | null> {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500))

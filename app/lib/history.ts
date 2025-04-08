@@ -1,3 +1,4 @@
+
 export interface HistoryEntry {
   id: string;
   timestamp: string;

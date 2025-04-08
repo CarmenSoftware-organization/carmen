@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { PRDetailTemplate } from "../../components/templates/PRDetailTemplate"
 import { PurchaseRequest } from "@/lib/types"
+import { PRTemplate } from "@/lib/types/pr-template" // Corrected import path if needed, ensuring it's imported
 import { samplePRData } from "../../../purchase-requests/components/sampleData"
 import { mockTemplateItems } from "../../types/template-items"
 import { ItemsTab } from "../../components/ItemsTab"
@@ -79,21 +80,33 @@ export default function PRTemplateEditPage({
       <Button variant="outline" onClick={() => console.log("Clone Template")}>
         Clone Template
       </Button>
-    </>
-  )
-
-  return (
-    <PRDetailTemplate
-      mode="edit"
-      title={`Edit Template: ${formData.description}`}
-      formData={formData}
-      onModeChange={handleModeChange}
-      onSubmit={handleSubmit}
-      onInputChange={handleInputChange}
-      onFormDataChange={handleFormDataChange}
-      tabs={tabs}
-      actions={actions}
-      backUrl="/procurement/purchase-request-templates"
-    />
-  )
-} 
+     </>
+   )
+ 
+   // Adapt formData (PurchaseRequest) to fit PRTemplate structure
+   const templateForDetail: PRTemplate = {
+     id: formData.id,
+     name: formData.description || `Template ${params.id}`, // Use description or fallback for name
+     description: formData.description,
+     type: 'template', // Assuming 'template' type
+     items: [], // Placeholder, PRDetailTemplate doesn't render items directly
+     createdAt: formData.date || new Date(), // Use PR date or fallback
+     updatedAt: new Date(), // Placeholder
+     createdBy: formData.requestor?.id || 'system', // Use requestor ID or fallback
+     // Optional PRTemplate fields can be added here if needed
+   };
+ 
+   return (
+     <PRDetailTemplate
+       mode="edit"
+       template={templateForDetail} // Pass the adapted object
+       onSave={(updatedTemplate) => {
+         console.log("Saving template:", updatedTemplate);
+         // Update parent state based on changes in the template component
+         handleFormDataChange({ description: updatedTemplate.description });
+         // Potentially update other formData fields based on updatedTemplate
+         router.push(`/procurement/purchase-request-templates/${params.id}`); // Navigate after save
+       }}
+     />
+   )
+ }

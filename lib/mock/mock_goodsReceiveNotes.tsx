@@ -1,5 +1,6 @@
 import { GoodsReceiveNote, StockMovement, JournalEntryDetail, FinancialSummary } from "../types" // Removed GoodsReceiveNoteStatus, GoodsReceiveNoteItem
 
+
 // Common constants
 const MOCK_DATES = {
   current: new Date('2024-04-02'),

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { ReactNode } from "react"
 import { FloatingSettingsButton } from "./components/floating-settings-button"

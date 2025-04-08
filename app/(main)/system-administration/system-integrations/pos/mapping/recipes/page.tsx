@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
 import { useState, useMemo } from "react"
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
 import Link from "next/link"
 import { ExternalLink } from "lucide-react"
-
+import { RecipeMapping } from "./types"
+import { recipeMappings, categories, locations } from "./data"
 import { 
   MappingHeader, 
   FilterBar, 
@@ -16,9 +16,6 @@ import {
   AppliedFilter,
   ActionType,
 } from "../components"
-
-import { RecipeMapping } from "./types"
-import { recipeMappings, categories, locations } from "./data"
 
 export default function RecipeMappingPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -200,8 +197,8 @@ export default function RecipeMappingPage() {
     <div>
       <MappingHeader
         title="Recipe Mapping"
-        addButtonLabel="Add Recipe Mapping"
-        searchPlaceholder="Search by POS item code or recipe code"
+        addButtonLabel="Add Recipe"
+        searchPlaceholder="Search recipes by code or name"
         addRoute="/system-administration/system-integrations/pos/mapping/recipes/new"
         onSearch={handleSearch}
       />
