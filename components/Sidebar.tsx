@@ -66,6 +66,11 @@ const menuItems: MenuItem[] = [
         id: "vendor-comparison",
         label: "Vendor Comparison",
         href: "/procurement/vendor-comparison",
+      },
+      {
+        id: "pr-templates",
+        label: "PR Templates",
+        href: "/procurement/purchase-request-templates",
       }
     ],
   },
@@ -309,6 +314,11 @@ const menuItems: MenuItem[] = [
         id: "user-management",
         label: "User Management",
         href: "/system-administration/user-management",
+      },
+      {
+        id: "department-management",
+        label: "Department Management",
+        href: "/system-administration/departments",
       },
       {
         id: "workflow",

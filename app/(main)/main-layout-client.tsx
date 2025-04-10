@@ -35,10 +35,10 @@ export default function MainLayoutClient({
         businessUnit={businessUnit}
         setBusinessUnit={setBusinessUnit}
       />
-      <div className="flex min-h-[calc(100vh-64px)] pt-16">
+      <div className="flex min-h-[calc(100vh-64px)]">
         <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
         <main className="flex-1 overflow-y-auto bg-background lg:pl-[280px]">
-          <div className="mx-auto max-w-7xl px-2 md:px-4">
+          <div className="mx-auto py-0 px-0 md:px-9">
             {children}
           </div>
         </main>

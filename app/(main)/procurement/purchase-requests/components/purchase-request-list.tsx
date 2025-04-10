@@ -12,6 +12,7 @@ import { PurchaseRequest, PRType, DocumentStatus } from '@/lib/types'
 import { PRTemplate } from "@/lib/types/pr-template"
 import { TemplateSelectionModal } from './template-selection-modal';
 import { mockPurchaseRequests } from '../data/mock-data';
+import { format } from 'date-fns';
 import {
   
   Table,
@@ -431,7 +432,7 @@ export function PurchaseRequestList() {
                       />
                     </TableCell>
                     <TableCell className="py-4 font-medium">{pr.refNumber}</TableCell>
-                    <TableCell className="py-4">{pr.date.toLocaleDateString()}</TableCell>
+                    <TableCell className="py-4">{format(pr.date, 'MM/dd/yyyy')}</TableCell>
                     <TableCell className="py-4">{pr.type}</TableCell>
                     <TableCell className="py-4 hidden md:table-cell">{pr.description}</TableCell>
                     <TableCell className="py-4 hidden md:table-cell">{pr.requestor.name}</TableCell>

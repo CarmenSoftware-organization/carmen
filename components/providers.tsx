@@ -2,6 +2,7 @@
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { ReactNode } from 'react'
+import { Toaster } from '@/components/ui/sonner'
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function Providers({ children }: { children: ReactNode }) {
       disableTransitionOnChange
     >
       {children}
+      <Toaster />
     </NextThemesProvider>
   )
 } 

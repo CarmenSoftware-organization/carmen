@@ -10,20 +10,18 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-
-
-export interface DatePickerProps {
+interface DatePickerProps {
   date?: Date
-  setDate?: (date: Date | undefined) => void
-  className?: string
+  setDate: (date?: Date) => void
   placeholder?: string
+  className?: string
 }
 
-export function DatePicker({
-  date,
-  setDate,
-  className,
-  placeholder = "Pick a date",
+export function DatePicker({ 
+  date, 
+  setDate, 
+  placeholder = "Select date", 
+  className 
 }: DatePickerProps) {
   return (
     <Popover>
@@ -31,7 +29,7 @@ export function DatePicker({
         <Button
           variant={"outline"}
           className={cn(
-            "w-[240px] justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
             className
           )}

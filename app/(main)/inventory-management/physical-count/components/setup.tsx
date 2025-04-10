@@ -33,26 +33,24 @@ interface SetupProps {
 export function PhysicalCountSetup({ formData, setFormData, onNext }: SetupProps) {
   useEffect(() => {
     // Auto-fill counter name from user context
-    if (!formData.counterName) { // Only set if not already set
-      setFormData({
-        ...formData,
-        counterName: 'John Doe', // Replace with actual user name from context
-      })
-    }
-  }, [formData, setFormData]) // Add formData dependency
+    setFormData({
+      ...formData,
+      counterName: 'John Doe', // Replace with actual user name from context
+    })
+  }, []) // Remove dependencies to prevent unnecessary re-renders
 
   useEffect(() => {
     if (!formData.type) {
-      setFormData({ ...formData, type: 'full' }) // Restore spread
+      setFormData({ ...formData, type: 'full' })
     }
-  }, [formData, setFormData]) // Add formData dependency
+  }, []) // Remove dependencies to prevent unnecessary re-renders
 
   const handleInputChange = useCallback((field: keyof SetupFormData, value: string | Date) => {
     setFormData({
-      ...formData, // Restore spread
+      ...formData,
       [field]: value,
     })
-  }, [formData, setFormData]) // Restore formData dependency for useCallback
+  }, [formData, setFormData])
 
   const handleDateChange = useCallback((value: Date | undefined) => {
     if (value) {
