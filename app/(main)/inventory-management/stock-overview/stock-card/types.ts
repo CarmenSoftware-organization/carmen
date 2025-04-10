@@ -89,6 +89,7 @@ export interface ValuationRecord {
   runningAverageCost: number
 }
 
+<<<<<<< HEAD
 export interface FilterCriteria {
   search: string
   locations: string[]
@@ -126,6 +127,8 @@ export interface StockCard {
   movements: MovementRecord[]
 }
 
+=======
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
 export interface StockCardData {
   product: Product
   summary: StockSummary

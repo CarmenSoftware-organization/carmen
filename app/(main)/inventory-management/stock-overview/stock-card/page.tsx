@@ -1,6 +1,10 @@
 'use client'
 
+<<<<<<< HEAD
 import React, { useState, useEffect, Suspense } from "react"
+=======
+import { useState, useEffect } from "react"
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
 import { useSearchParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
@@ -27,7 +31,7 @@ import {
 import { StockCardData } from "../types"
 import { generateMockStockCardData } from "./mock-data"
 
-function StockCardContent() {
+export default function StockCardPage() {
   const searchParams = useSearchParams()
   const productId = searchParams.get("productId") || "unknown"
   const [isLoading, setIsLoading] = useState(true)
@@ -236,6 +240,7 @@ function StockCardContent() {
       </Tabs>
     </div>
   )
+<<<<<<< HEAD
 }
 
 export default function StockCardPage() {
@@ -244,4 +249,6 @@ export default function StockCardPage() {
       <StockCardContent />
     </Suspense>
   )
+=======
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
 } 

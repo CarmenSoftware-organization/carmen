@@ -9,6 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+<<<<<<< HEAD
+=======
+import { Progress } from "@/components/ui/progress"
+import { Location, StockStatus as StockStatusType } from "../types"
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
 
 interface StockStatusProps {
   locations: StockCard['locations']
@@ -18,9 +23,15 @@ interface StockStatusProps {
   reorderPoint?: number
 }
 
+<<<<<<< HEAD
 export function StockStatus({ locations, currentStock, minStock, maxStock, reorderPoint }: StockStatusProps) {
   const totalStock = currentStock.totalStock
   const effectiveMaxStock = Math.max(totalStock * 1.2, maxStock)
+=======
+export function StockStatus({ locations, currentStock }: StockStatusProps) {
+  const totalStock = locations.reduce((sum, loc) => sum + loc.stockOnHand, 0)
+  const maxStock = currentStock.maxStock || totalStock * 1.2
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
 
   return (
     <div className="grid gap-6">
@@ -47,7 +58,11 @@ export function StockStatus({ locations, currentStock, minStock, maxStock, reord
                   Reorder Point
                 </span>
                 <p className="text-2xl font-bold">
+<<<<<<< HEAD
                   {reorderPoint || 'N/A'}
+=======
+                  {currentStock.reorderPoint || 'N/A'}
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
                 </p>
               </div>
               <div className="space-y-1">
@@ -55,7 +70,11 @@ export function StockStatus({ locations, currentStock, minStock, maxStock, reord
                   Min Stock
                 </span>
                 <p className="text-2xl font-bold">
+<<<<<<< HEAD
                   {minStock || 'N/A'}
+=======
+                  {currentStock.minStock || 'N/A'}
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
                 </p>
               </div>
               <div className="space-y-1">
@@ -63,7 +82,11 @@ export function StockStatus({ locations, currentStock, minStock, maxStock, reord
                   Max Stock
                 </span>
                 <p className="text-2xl font-bold">
+<<<<<<< HEAD
                   {maxStock || 'N/A'}
+=======
+                  {currentStock.maxStock || 'N/A'}
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
                 </p>
               </div>
             </div>

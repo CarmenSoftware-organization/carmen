@@ -11,6 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+<<<<<<< HEAD
+=======
+import { Movement } from "../types"
+import { format } from "date-fns"
+import { Badge } from "@/components/ui/badge"
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
 
 interface MovementHistoryProps {
   movements: MovementRecord[]
@@ -47,7 +53,7 @@ export function MovementHistory({ movements }: MovementHistoryProps) {
         </TableHeader>
         <TableBody>
           {movements.map((movement) => (
-            <TableRow key={movement.id}>
+            <TableRow key={movement.transactionId}>
               <TableCell>
                 {format(new Date(movement.date), 'dd/MM/yyyy')}
               </TableCell>
@@ -59,11 +65,19 @@ export function MovementHistory({ movements }: MovementHistoryProps) {
                   {movement.transactionType}
                 </Badge>
               </TableCell>
+<<<<<<< HEAD
               <TableCell>{movement.reference}</TableCell>
               <TableCell>{movement.referenceType}</TableCell>
               <TableCell>{movement.locationName}</TableCell>
               <TableCell className="text-right">
                 {movement.quantityChange > 0 ? '+' : ''}{movement.quantityChange}
+=======
+              <TableCell>{movement.documentNo}</TableCell>
+              <TableCell>{movement.reference}</TableCell>
+              <TableCell>{movement.location}</TableCell>
+              <TableCell className="text-right">
+                {movement.quantity > 0 ? '+' : ''}{movement.quantity}
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
               </TableCell>
               <TableCell className="text-right">
                 {movement.unitCost.toLocaleString('en-US', {
@@ -72,7 +86,11 @@ export function MovementHistory({ movements }: MovementHistoryProps) {
                 })}
               </TableCell>
               <TableCell className="text-right">
+<<<<<<< HEAD
                 {movement.valueChange.toLocaleString('en-US', {
+=======
+                {movement.totalCost.toLocaleString('en-US', {
+>>>>>>> parent of 08bc5ce (feat: enhance stock card functionality with loading states and new types)
                   style: 'currency',
                   currency: 'USD'
                 })}
