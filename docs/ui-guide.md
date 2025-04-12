@@ -78,52 +78,371 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
 ## 3. List/Table Layouts
 
 ### Structure
-- **Container**: Often wrapped in a `<Card>` or div with `rounded-lg border bg-white`
-- **Header Section**: Contains filters, search, and action buttons
-- **Table Component**: Using the shadcn `<Table>` component with proper headers
-- **Pagination**: Positioned at the bottom of the table
+- **Container**: Wrapped in the `ListPageTemplate` component or a div with `container mx-auto py-6`
+- **Header Section**: Contains page title and action buttons (clearly separated)
+- **Filters Section**: Contains search input and filter controls with proper spacing
+- **Bulk Actions**: Conditionally displayed when items are selected
+- **Content Area**: Table or card-based list with consistent styling
+- **Pagination**: Positioned at the bottom with clear navigation controls
 
 ### Common Pattern
 ```tsx
-<div className="space-y-4">
-  <div className="flex justify-between items-center">
+<ListPageTemplate
+  title="List Title"
+  actionButtons={
     <div className="flex items-center gap-2">
-      {/* Search and filters */}
+      <Button onClick={handleCreateNew}>
+        <Plus className="mr-2 h-4 w-4" /> New Item
+      </Button>
+      <Button variant="outline">
+        <Download className="mr-2 h-4 w-4" /> Export
+      </Button>
+      <Button variant="outline">
+        <Printer className="mr-2 h-4 w-4" /> Print
+      </Button>
     </div>
-    <div className="flex gap-2">
-      {/* Action buttons */}
+  }
+  filters={
+    <div className="flex items-center justify-between">
+      <div className="flex flex-1 items-center justify-between">
+        <Input
+          placeholder="Search items..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="h-8 w-[150px] lg:w-[250px]"
+        />
+        <div className="flex items-center space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <Filter className="mr-2 h-4 w-4" />
+                Filter
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {/* Filter options */}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <AdvancedFilter
+            filterFields={filterFields}
+            onApplyFilters={handleApplyFilters}
+            onClearFilters={handleClearFilters}
+          />
+        </div>
+      </div>
     </div>
-  </div>
-  
-  <div className="rounded-lg border bg-white">
+  }
+  bulkActions={
+    selectedItems.length > 0 ? (
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline">Delete Selected</Button>
+        <Button variant="outline">Approve Selected</Button>
+      </div>
+    ) : null
+  }
+  content={
     <Table>
       <TableHeader>
-        <TableRow className="bg-gray-50/75">
-          <TableHead className="py-3 font-medium text-gray-600">Column 1</TableHead>
-          {/* More column headers */}
+        <TableRow>
+          <TableHead>Column 1</TableHead>
+          {/* More columns */}
         </TableRow>
       </TableHeader>
       <TableBody>
         {items.map((item) => (
-          <TableRow key={item.id} className="group hover:bg-gray-50/50 cursor-pointer">
+          <TableRow key={item.id}>
             <TableCell>{item.property}</TableCell>
             {/* More cells */}
           </TableRow>
         ))}
       </TableBody>
     </Table>
+  }
+/>
+```
+
+### Title and Page Actions Section
+- **Title**: Use `text-2xl font-bold` for consistent styling, left-aligned
+- **Action Buttons**: Group related actions with appropriate spacing, right-aligned
+- **Primary Actions**: Use primary button style for main actions (e.g., "New Item")
+- **Secondary Actions**: Use outline button style for secondary actions (e.g., "Export", "Print")
+- **Icons**: Include appropriate icons for visual clarity
+
+```tsx
+<div className="flex justify-between items-center mb-4">
+  <h1 className="text-2xl font-bold">{title}</h1>
+  <div className="flex items-center gap-2">
+    <Button onClick={handleCreateNew}>
+      <Plus className="mr-2 h-4 w-4" /> New Item
+    </Button>
+    <Button variant="outline">
+      <Download className="mr-2 h-4 w-4" /> Export
+    </Button>
+    <Button variant="outline">
+      <Printer className="mr-2 h-4 w-4" /> Print
+    </Button>
   </div>
-  
-  <Pagination />
 </div>
 ```
 
-### Best Practices
-- Use consistent styling for table headers (typically `bg-gray-50/75` with `py-3 font-medium text-gray-600`)
-- Implement hover states for rows (`hover:bg-gray-50/50`)
+### Search and Filters Section
+- **Layout**: Use `justify-between` to separate search and filters
+- **Search**: Left-aligned with appropriate placeholder text and responsive width
+- **Filters**: Right-aligned, grouped with appropriate spacing
+- **Simple Filters**: Use dropdown menus with clear labels
+- **Advanced Filters**: Include an advanced filter component for complex filtering
+- **Responsive**: Stack elements vertically on mobile, side-by-side on desktop
+
+```tsx
+<div className="flex items-center justify-between mb-4">
+  <div className="flex flex-1 items-center justify-between">
+    <Input
+      placeholder="Search items..."
+      value={searchTerm}
+      onChange={handleSearch}
+      className="h-8 w-[150px] lg:w-[250px]"
+    />
+    <div className="flex items-center space-x-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="h-8">
+            <Filter className="mr-2 h-4 w-4" />
+            Filter
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {/* Filter options */}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <AdvancedFilter
+        filterFields={filterFields}
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+      />
+    </div>
+  </div>
+</div>
+```
+
+### Table Best Practices
+- Use consistent styling for table headers (typically `bg-muted/50` with `font-medium`)
+- Implement hover states for rows (`hover:bg-muted/10` with `transition-colors`)
+- Use badges for status indicators with appropriate colors
 - Include appropriate actions in the last column
-- Ensure responsive behavior with horizontal scrolling for small screens
-- Use badges for status indicators
+- Implement sorting indicators on sortable columns
+- Use consistent alignment (left for text, right for numbers)
+- Ensure proper spacing within cells
+- Make rows clickable with `cursor-pointer` for better UX
+- Add subtle shadows to the table container with `shadow-sm`
+- Use primary text color for key identifiers (like reference numbers)
+
+### Row Actions Best Practices
+- Place action buttons in the last column, right-aligned
+- Use a consistent set of icon buttons for common actions:
+  - `<FileText />` icon for View actions
+  - `<Pencil />` or `<Edit />` icon for Edit actions
+  - `<Trash />` icon for Delete actions
+  - `<MoreVertical />` for additional actions via dropdown
+- Limit visible actions to 3-4 icons to prevent overcrowding
+- Use rounded icon buttons (`rounded-full`) for a more modern look
+- Use the following pattern for action buttons:
+
+```tsx
+<TableCell className="text-right">
+  <div className="flex justify-end space-x-1">
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => handleView(item.id)}
+      className="h-8 w-8 rounded-full"
+    >
+      <span className="sr-only">View</span>
+      <FileText className="h-4 w-4" />
+    </Button>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => handleEdit(item.id)}
+      className="h-8 w-8 rounded-full"
+    >
+      <span className="sr-only">Edit</span>
+      <Edit className="h-4 w-4" />
+    </Button>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => handleDelete(item.id)}
+      className="h-8 w-8 rounded-full"
+    >
+      <span className="sr-only">Delete</span>
+      <Trash className="h-4 w-4" />
+    </Button>
+    {/* For additional actions */}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+          <span className="sr-only">More options</span>
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => handleApprove(item.id)}>
+          Approve
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleReject(item.id)}>
+          Reject
+        </DropdownMenuItem>
+        {/* More actions */}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+</TableCell>
+```
+
+- Always include `sr-only` elements with descriptive text for accessibility
+- Use consistent spacing (`space-x-1`) between action buttons
+- Consider using tooltips for action buttons to improve clarity
+- For mobile layouts, consider collapsing all actions into a single "More" dropdown
+- When rows are clickable, use `e.stopPropagation()` in action button handlers
+
+### View Mode Toggle
+
+For list pages that support both table and card views, implement a toggle component:
+
+```tsx
+<div className="flex border rounded-md overflow-hidden mr-2">
+  <Button
+    variant={viewMode === 'table' ? 'default' : 'ghost'}
+    size="sm"
+    onClick={() => setViewMode('table')}
+    className="rounded-none h-8 px-2"
+  >
+    <List className="h-4 w-4" />
+    <span className="sr-only">Table View</span>
+  </Button>
+  <Button
+    variant={viewMode === 'card' ? 'default' : 'ghost'}
+    size="sm"
+    onClick={() => setViewMode('card')}
+    className="rounded-none h-8 px-2"
+  >
+    <LayoutGrid className="h-4 w-4" />
+    <span className="sr-only">Card View</span>
+  </Button>
+</div>
+```
+
+- Position the toggle in the filter section, aligned with other filter controls
+- Use a segmented control design with joined buttons
+- Visually indicate the active view with the `default` variant
+- Use the `ghost` variant for inactive options
+- Use clear icons that represent each view (`List` and `LayoutGrid`)
+- Include `sr-only` text for accessibility
+
+### Card View Pattern
+
+For a more visual and content-rich alternative to tables, implement a card view:
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+  {items.map((item) => (
+    <Card key={item.id} className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm">
+      <div className="flex flex-col h-full">
+        {/* Card Header */}
+        <div className="p-5 pb-3 bg-muted/30 border-b">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                checked={selectedItems.includes(item.id)}
+                onCheckedChange={() => handleSelectItem(item.id)}
+              />
+              <div>
+                <h3 className="text-lg font-semibold text-primary">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{formattedDate}</p>
+              </div>
+            </div>
+            <StatusBadge status={item.status} />
+          </div>
+        </div>
+        
+        {/* Card Content */}
+        <div className="p-5 flex-grow">
+          <div className="mb-3">
+            <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+            <p className="text-sm line-clamp-2">{item.description}</p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
+            {/* Field pairs */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Label</p>
+              <p className="text-sm font-medium">{value}</p>
+            </div>
+            {/* More field pairs */}
+          </div>
+          
+          <div className="flex justify-between items-center mt-4 pt-3 border-t border-border/50">
+            {/* Important metrics */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Amount</p>
+              <p className="text-base font-semibold">{formattedAmount}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Card Actions */}
+        <div className="flex justify-end px-4 py-3 bg-muted/20 border-t space-x-1">
+          {/* Action buttons - same as row actions */}
+        </div>
+      </div>
+    </Card>
+  ))}
+</div>
+```
+
+Card view best practices:
+- Use a responsive grid layout with appropriate breakpoints
+- Organize content with clear visual hierarchy
+- Use a subtle header section with background color
+- Group related information in sections with appropriate spacing
+- Use consistent typography and label styles
+- Highlight important information with proper font sizing and weight
+- Add subtle hover effects with `transition-colors`
+- Use a consistent action area at the bottom
+- Implement the same actions as in table view
+- Include checkboxes for selection when bulk actions are available
+- Use shadows and borders for visual definition
+- Limit text length with `line-clamp` for descriptions
+- Use a flexible layout with `flex-grow` to ensure consistent card heights
+
+### Pagination Best Practices
+- Position at the bottom of the list with proper spacing
+- Show current page information (e.g., "Showing 1-10 of 50 results")
+- Include navigation buttons for first, previous, next, and last pages
+- Disable pagination buttons when appropriate
+- Use consistent button sizing and spacing
+
+```tsx
+<div className="flex items-center justify-between space-x-2 py-4">
+  <div className="flex-1 text-sm text-muted-foreground">
+    Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} results
+  </div>
+  <div className="space-x-2">
+    <Button variant="outline" size="sm" onClick={() => handlePageChange(1)} disabled={currentPage === 1}>
+      <ChevronsLeft className="h-4 w-4" />
+    </Button>
+    <Button variant="outline" size="sm" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+      <ChevronLeft className="h-4 w-4" />
+    </Button>
+    <Button variant="outline" size="sm" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+      <ChevronRight className="h-4 w-4" />
+    </Button>
+    <Button variant="outline" size="sm" onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages}>
+      <ChevronsRight className="h-4 w-4" />
+    </Button>
+  </div>
+</div>
+```
 
 ## 4. Detail View Layouts
 

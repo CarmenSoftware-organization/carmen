@@ -18,6 +18,25 @@ Whenever you are using shadcn use this command only `npx shadcn@latest add <comp
 - If the user asks you to take an action while in plan mode you will remind them that you are in plan mode and that they need to approve the plan first.
 - When in plan mode always output the full updated plan in every response.
 
+## Project Patterns
+
+### List Component Patterns
+- Use a sortConfig object with field and direction properties instead of separate sortField and sortDirection variables
+- Always implement sort functionality with useMemo for performance
+- Keep search and filter controls visually separated from action buttons 
+- Use justify-between to create proper spacing in filter sections
+- Add type safety to all table implementations
+- Structure list components with a ListPageTemplate component for consistency
+
+### Sorting and Filtering Patterns
+- Sorting: Use a SortConfig interface with field and direction properties
+- Filtering: Support both simple filters and advanced filtering
+- Simple filtering should be accessible via dropdown menus
+- Advanced filtering should support multiple conditions with logical operators
+- Always implement filtering with useMemo for performance
+- Filter and sort operations should preserve pagination state
+- Clear filters functionality should be easily accessible
+
 ## TechStack
 
 ### Core Technologies

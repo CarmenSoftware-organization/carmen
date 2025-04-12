@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
+  CardDescription,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,6 +29,9 @@ import {
   RotateCcwIcon,
   CheckCircle,
   X,
+  CalendarIcon,
+  TagIcon,
+  ClipboardListIcon,
 } from "lucide-react";
 import { PRHeader } from "./PRHeader";
 import { ItemsTab } from "./tabs/ItemsTab";
@@ -63,6 +67,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import SummaryTotal from "./SummaryTotal";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { Separator } from "@/components/ui/separator";
 
 export default function PRDetailPage() {
   const router = useRouter();
@@ -75,8 +82,10 @@ export default function PRDetailPage() {
   const [formData, setFormData] = useState<PurchaseRequest>(
     isAddMode ? getEmptyPurchaseRequest() : samplePRData
   );
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     if (isAddMode) {
       setMode("add");
       setFormData(getEmptyPurchaseRequest());
@@ -136,16 +145,28 @@ export default function PRDetailPage() {
   };
 
   return (
-    <div className="container mx-auto py-0">
-      <Card className="mb-6 bg-white dark:bg-gray-800">
-        <CardHeader className="flex flex-col space-y-4 bg-white dark:bg-gray-800">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">
-              {mode === "add"
-                ? "Create New Purchase Request"
-                : "Purchase Request Details"}
-            </h1>
-            <div className="flex items-center gap-2">
+    <div className="container mx-auto py-6 space-y-6 pb-20">
+      {/* Header Card */}
+      <Card className="shadow-sm overflow-hidden">
+        <CardHeader className="pb-4 border-b bg-muted/10">
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-bold">
+                  {mode === "add"
+                    ? "Create New Purchase Request"
+                    : formData.refNumber || "Purchase Request Details"}
+                </h1>
+                {formData.refNumber && <StatusBadge status={formData.status} className="h-6" />}
+              </div>
+              {formData.refNumber && (
+                <CardDescription>
+                  Created on {isMounted ? format(formData.date, "dd MMM yyyy") : formData.date.toISOString().split('T')[0]} • 
+                  {formData.type} • {formData.description}
+                </CardDescription>
+              )}
+            </div>
+            <div className="flex items-center gap-2 flex-wrap justify-end">
               {/* Edit/Save/Cancel buttons */}
               {mode === "view" ? (
                 <Button onClick={() => handleModeChange("edit")}>
@@ -173,28 +194,38 @@ export default function PRDetailPage() {
               )}
               
               {/* Separator between edit/save buttons and action buttons */}
-              <div className="w-px h-6 bg-border mx-2" />
+              <div className="w-px h-6 bg-border mx-2 hidden md:block" />
               
               {/* Action buttons that are always visible */}
-              <Button variant="outline" size="sm">
-                <PrinterIcon className="mr-2 h-4 w-4" />
-                Print
-              </Button>
-              <Button variant="outline" size="sm">
-                <DownloadIcon className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm">
-                <ShareIcon className="mr-2 h-4 w-4" />
-                Share
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="h-9">
+                  <PrinterIcon className="mr-2 h-4 w-4" />
+                  Print
+                </Button>
+                <Button variant="outline" size="sm" className="h-9">
+                  <DownloadIcon className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+                <Button variant="outline" size="sm" className="h-9">
+                  <ShareIcon className="mr-2 h-4 w-4" />
+                  Share
+                </Button>
+              </div>
             </div>
           </div>
-          <Card className="bg-white dark:bg-gray-800">
-            <CardContent className="p-4">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div>
-                  <Label htmlFor="refNumber">Reference Number</Label>
+        </CardHeader>
+        
+        {/* Main Content */}
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            {/* Left side - Details */}
+            <div className="col-span-8 space-y-6">
+              {/* Main Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="refNumber" className="text-xs text-muted-foreground flex items-center gap-1">
+                    <HashIcon className="h-3 w-3" /> Reference Number
+                  </Label>
                   <Input
                     id="refNumber"
                     value={formData.refNumber}
@@ -202,10 +233,13 @@ export default function PRDetailPage() {
                       setFormData({ ...formData, refNumber: e.target.value })
                     }
                     disabled={mode === "view"}
+                    className={mode === "view" ? "bg-muted" : ""}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="date">Date</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="date" className="text-xs text-muted-foreground flex items-center gap-1">
+                    <CalendarIcon className="h-3 w-3" /> Date
+                  </Label>
                   <Input
                     id="date"
                     type="date"
@@ -217,10 +251,13 @@ export default function PRDetailPage() {
                       })
                     }
                     disabled={mode === "view"}
+                    className={mode === "view" ? "bg-muted" : ""}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="type">PR Type</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="type" className="text-xs text-muted-foreground flex items-center gap-1">
+                    <TagIcon className="h-3 w-3" /> PR Type
+                  </Label>
                   <Select
                     value={formData.type}
                     onValueChange={(value) =>
@@ -228,7 +265,7 @@ export default function PRDetailPage() {
                     }
                     disabled={mode === "view"}
                   >
-                    <SelectTrigger id="type">
+                    <SelectTrigger id="type" className={mode === "view" ? "bg-muted" : ""}>
                       <SelectValue placeholder="Select PR Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -240,173 +277,206 @@ export default function PRDetailPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                {/* <div>
-                  <Label htmlFor="estimatedTotal">Estimated Cost</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="requestor.name" className="text-xs text-muted-foreground flex items-center gap-1">
+                    <UserIcon className="h-3 w-3" /> Requestor
+                  </Label>
                   <Input
-                    id="estimatedTotal"
-                    type="number"
-                    value={formData.estimatedTotal}
-                    onChange={(e) => setFormData({...formData, estimatedTotal: parseFloat(e.target.value)})}
-                    disabled={mode === 'view'}
-                  />
-                </div> */}
-                <div className="col-span-2">
-                  <div className="grid grid-cols-2 w-full">
-                    {[
-                      {
-                        id: "requestor.name",
-                        label: "Requestor",
-                        icon: UserIcon,
-                      },
-                      {
-                        id: "department",
-                        label: "Department",
-                        icon: BuildingIcon,
-                      },
-                    ].map(({ id, label, icon: Icon }) => (
-                      <div key={id} className="space-y-1">
-                        <Label
-                          htmlFor={id}
-                          className="text-[0.7rem] text-gray-500 flex items-center gap-2"
-                        >
-                          <Icon className="h-3 w-3" /> {label}
-                        </Label>
-                        <Input
-                          id={id}
-                          name={id}
-                          value={
-                            typeof formData[id as keyof PurchaseRequest] ===
-                            "object"
-                              ? (
-                                  formData[
-                                    id as keyof PurchaseRequest
-                                  ] as Requestor
-                                )[id.split(".")[1] as keyof Requestor]
-                              : String(formData[id as keyof PurchaseRequest])
-                          }
-                          onChange={handleInputChange}
-                          disabled={mode === "view"}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="col-span-2 md:col-span-3">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
+                    id="requestor.name"
+                    name="requestor.name"
+                    value={formData.requestor.name}
+                    onChange={handleInputChange}
                     disabled={mode === "view"}
+                    className={mode === "view" ? "bg-muted" : ""}
                   />
-                </div>
-
-                <div className="col-span-2 bg-muted p-4 rounded-lg">
-                  <div className="flex justify-between items-start">
-                    {["currentWorkflowStage", "workflowStatus", "status"].map(
-                      (key) => (
-                        <div key={key} className="space-y-2 text-center">
-                          <label className="text-sm font-medium block">
-                            {key
-                              .replace(/([A-Z])/g, " $1")
-                              .replace(/^./, (str) => str.toUpperCase())}
-                          </label>
-                          <StatusBadge
-                            status={String(
-                              formData[key as keyof PurchaseRequest]
-                            )}
-                          />
-                        </div>
-                      )
-                    )}
-                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* <PRForm formData={formData} setFormData={setFormData} isDisabled={mode === 'view'} /> */}
-        </CardHeader>
-        <CardContent className="pt-0">
-          <Tabs defaultValue="items" className="w-full bg-white dark:bg-gray-800">
-            <TabsList className="grid w-full grid-cols-5">
+              
+              {/* Secondary Details */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="department" className="text-xs text-muted-foreground flex items-center gap-1">
+                    <BuildingIcon className="h-3 w-3" /> Department
+                  </Label>
+                  <Input
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                    disabled={mode === "view"}
+                    className={mode === "view" ? "bg-muted" : ""}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location" className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MapPinIcon className="h-3 w-3" /> Location
+                  </Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    disabled={mode === "view"}
+                    className={mode === "view" ? "bg-muted" : ""}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="jobCode" className="text-xs text-muted-foreground flex items-center gap-1">
+                    <ClipboardListIcon className="h-3 w-3" /> Job Code
+                  </Label>
+                  <Input
+                    id="jobCode"
+                    name="jobCode"
+                    value={formData.jobCode}
+                    onChange={handleInputChange}
+                    disabled={mode === "view"}
+                    className={mode === "view" ? "bg-muted" : ""}
+                  />
+                </div>
+              </div>
+              
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-xs text-muted-foreground">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  disabled={mode === "view"}
+                  className={`min-h-[100px] ${mode === "view" ? "bg-muted" : ""}`}
+                />
+              </div>
+            </div>
+            
+            {/* Right side - Status */}
+            <div className="col-span-4">
+              <Card className="shadow-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium">Status Information</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Current Stage:</span>
+                      <Badge variant="outline" className="font-normal">
+                        {formData.currentWorkflowStage.split(/(?=[A-Z])/).join(" ")}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Workflow Status:</span>
+                      <Badge 
+                        variant={formData.workflowStatus === WorkflowStatus.approved ? "default" : formData.workflowStatus === WorkflowStatus.rejected ? "destructive" : "secondary"} 
+                        className={`font-normal ${formData.workflowStatus === WorkflowStatus.approved ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900" : ""}`}
+                      >
+                        {formData.workflowStatus.charAt(0).toUpperCase() + formData.workflowStatus.slice(1)}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Document Status:</span>
+                      <StatusBadge status={formData.status} />
+                    </div>
+                    
+                    <Separator className="my-2" />
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Created:</span>
+                        <span className="text-sm">{isMounted ? format(formData.date, "dd MMM yyyy") : formData.date.toISOString().split('T')[0]}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Estimated Cost:</span>
+                        <span className="text-sm font-medium">{new Intl.NumberFormat('en-US', { style: 'currency', currency: formData.currency }).format(formData.estimatedTotal)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Tabs and Content */}
+      <Card className="shadow-sm">
+        <Tabs defaultValue="items" className="w-full">
+          <CardHeader className="pb-0 pt-4 px-4">
+            <TabsList className="w-full grid grid-cols-5">
               {["items", "budgets", "workflow", "attachments", "activity"].map(
                 (tab) => (
-                  <TabsTrigger key={tab} value={tab} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <TabsTrigger 
+                    key={tab} 
+                    value={tab} 
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
                   </TabsTrigger>
                 )
               )}
             </TabsList>
+          </CardHeader>
+          <CardContent className="p-0">
             <form onSubmit={handleSubmit}>
-              <ScrollArea className="h-[400px] w-full rounded-md border">
-                <TabsContent value="items">
-                  <ItemsTab />
-                </TabsContent>
-                <TabsContent value="budgets">
-                  <ResponsiveBudgetScreen />
-                </TabsContent>
-                <TabsContent value="workflow">
-                  <WorkflowTab />
-                </TabsContent>
-                <TabsContent value="attachments">
-                  <AttachmentsTab />
-                </TabsContent>
-                <TabsContent value="activity">
-                  <ActivityTab />
-                </TabsContent>
+              <ScrollArea className="h-[calc(100vh-600px)] min-h-[300px] w-full rounded-b-md border-t">
+                <div className="p-6">
+                  <TabsContent value="items" className="mt-0">
+                    <ItemsTab />
+                  </TabsContent>
+                  <TabsContent value="budgets" className="mt-0">
+                    <ResponsiveBudgetScreen />
+                  </TabsContent>
+                  <TabsContent value="workflow" className="mt-0">
+                    <WorkflowTab />
+                  </TabsContent>
+                  <TabsContent value="attachments" className="mt-0">
+                    <AttachmentsTab />
+                  </TabsContent>
+                  <TabsContent value="activity" className="mt-0">
+                    <ActivityTab />
+                  </TabsContent>
+                </div>
               </ScrollArea>
-              {/* {(mode === "edit" || mode === "add") && (
-                // <Button type="submit" className="mt-6">
-                //   {mode === "add" ? "Create Purchase Request" : "Update"}
-                // </Button>
-              )} */}
             </form>
-          </Tabs>
-          
-            {/* Add SummaryTotal component here */}
-          <Card className="mt-6 bg-white dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle>Transaction Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SummaryTotal prData={formData} />
-            </CardContent>
-          </Card>
-
+          </CardContent>
+        </Tabs>
+      </Card>
+      
+      {/* Transaction Summary */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Transaction Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SummaryTotal prData={formData} />
         </CardContent>
-        {mode !== "add" && (
-          <CardFooter className="flex justify-end space-x-2">
-            {mode === "view" && [
-              { action: "approve", icon: CheckCircleIcon, color: "green" },
-              { action: "reject", icon: XCircleIcon, color: "white" },
-              { action: "sendBack", icon: RotateCcwIcon, color: "white" },
-            ].map(({ action, icon: Icon, color }) => (
+      </Card>
+      
+      {/* Floating Workflow Actions */}
+      {mode !== "add" && mode === "view" && (
+        <div className="fixed bottom-6 right-6 flex space-x-3 z-50">
+          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 flex space-x-3">
+            {[
+              { action: "approve", icon: CheckCircleIcon, variant: "default" },
+              { action: "reject", icon: XCircleIcon, variant: "destructive" },
+              { action: "sendBack", icon: RotateCcwIcon, variant: "outline" },
+            ].map(({ action, icon: Icon, variant }) => (
               <Button
                 key={action}
                 onClick={() => handleWorkflowAction(action as WorkflowAction)}
-                variant={color === "green" ? "default" : "outline"}
-                size="sm"
-                className={`${
-                  color === "white"
-                    ? "bg-white hover:bg-gray-200 text-black"
-                    : color === "orange"
-                    ? "bg-orange-500 hover:bg-orange-600 text-white"
-                    : ""
-                }`}
+                variant={variant as "default" | "destructive" | "outline"}
               >
                 <Icon className="mr-2 h-4 w-4" />
                 {action.charAt(0).toUpperCase() + action.slice(1)}
               </Button>
             ))}
-          </CardFooter>
-        )}
-      </Card>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 function getEmptyPurchaseRequest(): PurchaseRequest {
   return {
     id: "",
