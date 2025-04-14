@@ -133,7 +133,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
 
   const getIndentStyle = (level: number) => {
     return {
-      paddingLeft: `${level * 24 + 16}px` // 24px indent per level, 16px base padding
+      paddingLeft: `${level * 7.2 + 4.8}px` // Reduced from 24px to 7.2px per level, and from 16px to 4.8px base padding
     }
   }
 
@@ -176,7 +176,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
       <div 
         style={getIndentStyle(level)}
         className={`
-          flex items-center p-2 hover:bg-gray-100 
+          flex items-center py-2 px-1.5 hover:bg-gray-100 
           ${getLevelStyles(item.type)}
           transition-all duration-200
         `}
@@ -443,43 +443,38 @@ export default function ProductCategoryTree() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div 
-        ref={containerRef}
-        className="w-full max-w-4xl mx-auto p-4"
-      >
-        <div className="flex justify-between items-center mb-4">
-          <div className="relative flex-1 mr-4">
-            <Search className="absolute left-3 top-3 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search categories..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg"
-            />
-          </div>
-          <button
-            onClick={handleAddTopLevel}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Category
-          </button>
+      <div className="flex justify-between items-center mb-4 w-full">
+        <div className="relative flex-1 mr-4">
+          <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border rounded-lg"
+          />
         </div>
+        <button
+          onClick={handleAddTopLevel}
+          className="flex items-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add Category
+        </button>
+      </div>
 
-        <div className="bg-white rounded-lg shadow">
-          {filteredCategories.map((category) => (
-            <TreeNode
-              key={category.id}
-              item={category}
-              level={0}
-              onMove={handleMove}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-              onAdd={handleAdd}
-            />
-          ))}
-        </div>
+      <div className="bg-white rounded-lg shadow w-full">
+        {filteredCategories.map((category) => (
+          <TreeNode
+            key={category.id}
+            item={category}
+            level={0}
+            onMove={handleMove}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            onAdd={handleAdd}
+          />
+        ))}
       </div>
     </DndProvider>
   );

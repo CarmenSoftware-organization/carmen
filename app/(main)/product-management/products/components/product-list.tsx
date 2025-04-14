@@ -7,13 +7,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowUpDown, Pencil, Eye, Plus, Printer, Upload, ArrowLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter } from "lucide-react"
+import { Search, ArrowUpDown, Pencil, Eye, Plus, Printer, Upload, ArrowLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter, LayoutGrid, List, MoreVertical, PencilLine } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { AdvancedFilter } from './advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
 import { toast } from '@/components/ui/use-toast'
+import { Card } from "@/components/ui/card"
 
 interface Product {
   id: string;
@@ -81,6 +82,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   const [sortField, setSortField] = useState<keyof Product | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [activeFilters, setActiveFilters] = useState<FilterType<Product>[]>([]);
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -502,192 +504,328 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
           <Search className="h-4 w-4" />
         </Button>
       </div>
-      <AdvancedFilter 
-        onApplyFilters={handleApplyFilters}
-        onClearFilters={handleClearFilters}
-      />
+      <div className="flex items-center space-x-2">
+        <AdvancedFilter 
+          onApplyFilters={handleApplyFilters}
+          onClearFilters={handleClearFilters}
+        />
+        <div className="flex border rounded-md overflow-hidden">
+          <Button
+            variant={viewMode === 'table' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('table')}
+            className="rounded-none h-8 px-2"
+          >
+            <List className="h-4 w-4" />
+            <span className="sr-only">Table View</span>
+          </Button>
+          <Button
+            variant={viewMode === 'card' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('card')}
+            className="rounded-none h-8 px-2"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span className="sr-only">Card View</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTableView = () => (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-gray-50/75">
+            <TableHead className="w-12 py-3">
+              <Checkbox 
+                className="ml-3"
+                checked={
+                  getCurrentPageData().length > 0 &&
+                  getCurrentPageData().every(product => 
+                    selectedItems.includes(product.id)
+                  )
+                }
+                onCheckedChange={handleSelectAll}
+              />
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium text-gray-600 cursor-pointer"
+              onClick={() => handleSort('name')}
+            >
+              <div className="flex items-center gap-1">
+                Name
+                {sortField === 'name' && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium text-gray-600 cursor-pointer"
+              onClick={() => handleSort('categoryId')}
+            >
+              <div className="flex items-center gap-1">
+                Category
+                {sortField === 'categoryId' && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium text-gray-600 cursor-pointer"
+              onClick={() => handleSort('subCategoryId')}
+            >
+              <div className="flex items-center gap-1">
+                Subcategory
+                {sortField === 'subCategoryId' && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium text-gray-600 cursor-pointer"
+              onClick={() => handleSort('itemGroup')}
+            >
+              <div className="flex items-center gap-1">
+                Item Group
+                {sortField === 'itemGroup' && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium text-gray-600 cursor-pointer"
+              onClick={() => handleSort('isActive')}
+            >
+              <div className="flex items-center gap-1">
+                Status
+                {sortField === 'isActive' && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead className="py-3 text-right font-medium text-gray-600">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {getCurrentPageData().map((product) => (
+            <TableRow 
+              key={product.id}
+              className="group hover:bg-gray-50/50 cursor-pointer border-b last:border-b-0"
+            >
+              <TableCell className="py-4 pl-4" onClick={(e) => e.stopPropagation()}>
+                <Checkbox 
+                  checked={selectedItems.includes(product.id)}
+                  onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
+                />
+              </TableCell>
+              <TableCell className="py-4">
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{product.name}</span>
+                    <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
+                      {product.productCode}
+                    </Badge>
+                  </div>
+                  <span className="text-sm text-gray-500 mt-0.5">
+                    {product.description || 'No description available'}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell className="py-4 text-gray-600">{product.categoryId}</TableCell>
+              <TableCell className="py-4 text-gray-600">{product.subCategoryId}</TableCell>
+              <TableCell className="py-4 text-gray-600">{product.itemGroup}</TableCell>
+              <TableCell className="py-4">
+                <StatusBadge 
+                  status={product.isActive ? 'Active' : 'Inactive'}
+                />
+              </TableCell>
+              <TableCell className="py-4 text-right">
+                <div className="flex justify-end items-center space-x-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleViewProduct(product.id)}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <FileText className="h-4 w-4" />
+                    <span className="sr-only">View Details</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEditProduct(product.id)}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <PencilLine className="h-4 w-4" />
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">More options</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleViewProduct(product.id)}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditProduct(product.id)}>
+                        <PencilLine className="h-4 w-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-red-600">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
+  const renderCardView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {getCurrentPageData().map((product) => (
+        <Card 
+          key={product.id} 
+          className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm"
+        >
+          <div className="flex flex-col h-full">
+            {/* Card Header */}
+            <div className="p-5 pb-3 bg-muted/30 border-b">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    checked={selectedItems.includes(product.id)}
+                    onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold text-primary">{product.name}</h3>
+                    <Badge variant="secondary" className="mt-1">
+                      {product.productCode}
+                    </Badge>
+                  </div>
+                </div>
+                <StatusBadge status={product.isActive ? 'Active' : 'Inactive'} />
+              </div>
+            </div>
+            
+            {/* Card Content */}
+            <div className="p-5 flex-grow">
+              <div className="mb-3">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+                <p className="text-sm line-clamp-2">{product.description || 'No description available'}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Category</p>
+                  <p className="text-sm font-medium">{product.categoryId}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Subcategory</p>
+                  <p className="text-sm font-medium">{product.subCategoryId}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Item Group</p>
+                  <p className="text-sm font-medium">{product.itemGroup}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Base Price</p>
+                  <p className="text-sm font-medium">{product.basePrice} {product.currency}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Card Actions */}
+            <div className="flex justify-end px-4 py-3 bg-muted/20 border-t space-x-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleViewProduct(product.id)}
+                className="h-8 w-8 rounded-full"
+              >
+                <FileText className="h-4 w-4" />
+                <span className="sr-only">View</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleEditProduct(product.id)}
+                className="h-8 w-8 rounded-full"
+              >
+                <PencilLine className="h-4 w-4" />
+                <span className="sr-only">Edit</span>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="sr-only">More options</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleViewProduct(product.id)}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleEditProduct(product.id)}>
+                    <PencilLine className="h-4 w-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 
   const content = (
     <div className="flex-1 space-y-4">
-      <div className="flex flex-col gap-4">
-        {/* Removing the redundant More Filters button */}
-      </div>
-
-      {selectedItems.length > 0 ? (
-        <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-          <span className="text-sm text-muted-foreground ml-2">
+      {selectedItems.length > 0 && (
+        <div className="flex items-center gap-2 p-4 bg-muted/50 rounded-lg">
+          <p className="text-sm text-muted-foreground">
             {selectedItems.length} items selected
-          </span>
-          <div className="flex items-center gap-2 ml-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleBulkStatusUpdate(true)}
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Set Active
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleBulkStatusUpdate(false)}
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Set Inactive
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBulkExport}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export Selected
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleBulkDelete}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Selected
-            </Button>
-          </div>
+          </p>
+          <div className="flex-1" />
+          <Button variant="outline" size="sm" onClick={handleBulkExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export Selected
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => handleBulkStatusUpdate(true)}>
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Set Active
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => handleBulkStatusUpdate(false)}>
+            <XCircle className="h-4 w-4 mr-2" />
+            Set Inactive
+          </Button>
+          <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete Selected
+          </Button>
         </div>
-      ) : null}
+      )}
 
       {getCurrentPageData().length > 0 ? (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50/75">
-                <TableHead className="w-12 py-3">
-                  <Checkbox 
-                    className="ml-3"
-                    checked={
-                      getCurrentPageData().length > 0 &&
-                      getCurrentPageData().every(product => 
-                        selectedItems.includes(product.id)
-                      )
-                    }
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('name')}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortField === 'name' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('categoryId')}
-                >
-                  <div className="flex items-center gap-1">
-                    Category
-                    {sortField === 'categoryId' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('subCategoryId')}
-                >
-                  <div className="flex items-center gap-1">
-                    Subcategory
-                    {sortField === 'subCategoryId' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('itemGroup')}
-                >
-                  <div className="flex items-center gap-1">
-                    Item Group
-                    {sortField === 'itemGroup' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="py-3 font-medium text-gray-600 cursor-pointer"
-                  onClick={() => handleSort('isActive')}
-                >
-                  <div className="flex items-center gap-1">
-                    Status
-                    {sortField === 'isActive' && (
-                      <ArrowUpDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead className="py-3 text-right font-medium text-gray-600">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {getCurrentPageData().map((product) => (
-                <TableRow 
-                  key={product.id}
-                  className="group hover:bg-gray-50/50 cursor-pointer border-b last:border-b-0"
-                >
-                  <TableCell className="py-4 pl-4" onClick={(e) => e.stopPropagation()}>
-                    <Checkbox 
-                      checked={selectedItems.includes(product.id)}
-                      onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
-                    />
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{product.name}</span>
-                        <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
-                          {product.productCode}
-                        </Badge>
-                      </div>
-                      <span className="text-sm text-gray-500 mt-0.5">
-                        {product.description || 'No description available'}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-4 text-gray-600">{product.categoryId}</TableCell>
-                  <TableCell className="py-4 text-gray-600">{product.subCategoryId}</TableCell>
-                  <TableCell className="py-4 text-gray-600">{product.itemGroup}</TableCell>
-                  <TableCell className="py-4">
-                    <StatusBadge 
-                      status={product.isActive ? 'Active' : 'Inactive'}
-                    />
-                  </TableCell>
-                  <TableCell className="py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewProduct(product.id)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditProduct(product.id)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        viewMode === 'table' ? renderTableView() : renderCardView()
       ) : (
         <div className="text-center py-10 border rounded-lg bg-gray-50">
           <p className="text-gray-600 mb-4">No products found</p>

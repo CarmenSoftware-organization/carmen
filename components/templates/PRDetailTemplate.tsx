@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
@@ -58,18 +58,19 @@ function SummaryTotal({ prData }: SummaryTotalProps) {
 
 interface PRDetailTemplateProps {
   mode: "view" | "edit" | "add"
-  title: string
+  title: ReactNode
   formData: PurchaseRequest
   onModeChange: (mode: "view" | "edit") => void
   onSubmit: (e: React.FormEvent) => void
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onFormDataChange: (data: Partial<PurchaseRequest>) => void
   children?: React.ReactNode
-  tabs?: {
+  tabs?: Array<{
+    value: string
     label: string
-    content: React.ReactNode
-  }[]
-  actions?: React.ReactNode
+    content: ReactNode
+  }>
+  actions?: ReactNode
   backUrl?: string
 }
 
@@ -93,19 +94,8 @@ export function PRDetailTemplate({
       <Card className="mb-6 bg-white dark:bg-gray-800">
         <CardHeader className="flex flex-col space-y-4 bg-white dark:bg-gray-800">
           <div className="flex flex-col space-y-4">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push(backUrl)}
-                className="mr-4"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to List
-              </Button>
-            </div>
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">{title}</h1>
+              {title}
               <div className="flex items-center gap-2">
                 {/* Edit/Save/Cancel buttons */}
                 {mode === "view" ? (
@@ -278,7 +268,7 @@ export function PRDetailTemplate({
         <CardContent className="pt-0">
           {/* Tabs Section */}
           {tabs.length > 0 && (
-            <Tabs defaultValue={tabs[0].label.toLowerCase()} className="w-full">
+            <Tabs defaultValue={tabs[0].value} className="w-full">
               <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
                 {tabs.map(({ label }) => (
                   <TabsTrigger
@@ -291,8 +281,8 @@ export function PRDetailTemplate({
                 ))}
               </TabsList>
               <ScrollArea className="h-[400px] w-full rounded-md border">
-                {tabs.map(({ label, content }) => (
-                  <TabsContent key={label} value={label.toLowerCase()}>
+                {tabs.map(({ value, content }) => (
+                  <TabsContent key={value} value={value.toLowerCase()}>
                     {content}
                   </TabsContent>
                 ))}

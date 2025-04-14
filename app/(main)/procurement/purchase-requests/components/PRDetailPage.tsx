@@ -32,6 +32,7 @@ import {
   CalendarIcon,
   TagIcon,
   ClipboardListIcon,
+  ChevronLeft,
 } from "lucide-react";
 import { PRHeader } from "./PRHeader";
 import { ItemsTab } from "./tabs/ItemsTab";
@@ -152,6 +153,15 @@ export default function PRDetailPage() {
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 rounded-full p-0 mr-1"
+                  onClick={() => router.back()}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                  <span className="sr-only">Back to Purchase Requests</span>
+                </Button>
                 <h1 className="text-2xl font-bold">
                   {mode === "add"
                     ? "Create New Purchase Request"

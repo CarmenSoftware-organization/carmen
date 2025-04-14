@@ -27,7 +27,7 @@ import { Package, AlertCircle } from 'lucide-react';
 import StatusBadge from '@/components/ui/custom-status-badge';
 import { OrderUnitTab } from '@/app/(main)/product-management/products/components/order-unit';
 import { IngredientUnitTab } from '@/app/(main)/product-management/products/components/ingredients';
-import { StockCountTab } from '@/app/(main)/product-management/products/components/stock-count';
+import { ChevronLeft } from 'lucide-react';
 
 const productList: Product[] = [
   {
@@ -467,6 +467,30 @@ function EditableTitle({
   );
 }
 
+function ProductImage({ src, alt }: { src: string; alt: string }) {
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative w-full aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors overflow-hidden">
+      {src && !error ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover rounded-lg"
+          onError={() => setError(true)}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/10">
+          <ImageIcon className="h-12 w-12 text-muted-foreground/25" />
+          <span className="mt-2 text-sm text-muted-foreground">No image available</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProductDetail({ 
   params,
   searchParams
@@ -793,285 +817,236 @@ export default function ProductDetail({
 
   const content = (
     <>
-      <Tabs defaultValue="basic">
+      <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
+          <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
-          <TabsTrigger value="order-unit">Order Unit</TabsTrigger>
-          <TabsTrigger value="ingredient-unit">Ingredient Unit</TabsTrigger>
-          <TabsTrigger value="stock-count">Stock Count</TabsTrigger>
+          <TabsTrigger value="order-units">Order Units</TabsTrigger>
+          <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
         </TabsList>
-        <TabsContent value="basic">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Product Attributes */}
-            <div className="space-y-6">
-              <Card>
+
+        <TabsContent value="general">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column - Product Details */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="shadow-sm">
                 <CardHeader>
-                  <CardTitle>Product Attributes</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Basic Information</CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Size</label>
-                      {isEditing ? (
-                        <Input
-                          value={editedProduct?.size || ''}
-                          onChange={(e) => handleInputChange('size', e.target.value)}
-                          className="mt-1"
-                        />
-                      ) : (
-                        <p className="text-sm mt-1">{product.size}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Color</label>
-                      {isEditing ? (
-                        <Input
-                          value={editedProduct?.color || ''}
-                          onChange={(e) => handleInputChange('color', e.target.value)}
-                          className="mt-1"
-                        />
-                      ) : (
-                        <p className="text-sm mt-1">{product.color}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Weight</label>
-                      {isEditing ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input
-                            type="number"
-                            value={editedProduct?.weight || 0}
-                            onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
-                            className="flex-1"
-                            min={0}
-                            step={0.1}
-                          />
-                          <span className="text-sm text-muted-foreground">kg</span>
-                        </div>
-                      ) : (
-                        <p className="text-sm mt-1">{product.weight} kg</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Shelf Life</label>
-                      {isEditing ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input
-                            type="number"
-                            value={editedProduct?.shelfLife || 0}
-                            onChange={(e) => handleInputChange('shelfLife', parseInt(e.target.value))}
-                            className="flex-1"
-                            min={0}
-                          />
-                          <span className="text-sm text-muted-foreground">days</span>
-                        </div>
-                      ) : (
-                        <p className="text-sm mt-1">{product.shelfLife} days</p>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Storage Instructions</label>
-                    {isEditing ? (
-                      <Textarea
-                        value={editedProduct?.storageInstructions || ''}
-                        onChange={(e) => handleInputChange('storageInstructions', e.target.value)}
-                        className="mt-1"
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Product Name</label>
+                      <Input
+                        disabled={!isEditing}
+                        value={editedProduct?.name || ''}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        className="h-9"
                       />
-                    ) : (
-                      <p className="text-sm mt-1">{product.storageInstructions}</p>
-                    )}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Local Name</label>
+                      <Input
+                        disabled={!isEditing}
+                        value={editedProduct?.localDescription || ''}
+                        onChange={(e) => handleInputChange('localDescription', e.target.value)}
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Category</label>
+                      <Select
+                        disabled={!isEditing}
+                        value={editedProduct?.categoryId}
+                        onValueChange={(value) => handleInputChange('categoryId', value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Add category options */}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Subcategory</label>
+                      <Select
+                        disabled={!isEditing}
+                        value={editedProduct?.subCategoryId}
+                        onValueChange={(value) => handleInputChange('subCategoryId', value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select subcategory" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Add subcategory options */}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Description</label>
+                      <Textarea
+                        disabled={!isEditing}
+                        value={editedProduct?.description || ''}
+                        onChange={(e) => handleInputChange('description', e.target.value)}
+                        className="min-h-[100px] resize-none"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="shadow-sm">
                 <CardHeader>
-                  <CardTitle>Pricing Information</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Pricing & Tax</CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <div className="space-y-2">
                       <label className="text-sm font-medium text-muted-foreground">Base Price</label>
-                      {isEditing ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input
-                            type="number"
-                            value={editedProduct?.basePrice || 0}
-                            onChange={(e) => handleInputChange('basePrice', parseFloat(e.target.value))}
-                            className="flex-1"
-                            min={0}
-                            step={0.01}
-                          />
-                          <span className="text-sm text-muted-foreground">{product.currency}</span>
-                        </div>
-                      ) : (
-                        <p className="text-sm mt-1">{product.basePrice} {product.currency}</p>
-                      )}
+                      <Input
+                        type="number"
+                        disabled={!isEditing}
+                        value={editedProduct?.basePrice || ''}
+                        onChange={(e) => handleInputChange('basePrice', parseFloat(e.target.value))}
+                        className="h-9"
+                      />
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Standard Cost</label>
-                      {isEditing ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input
-                            type="number"
-                            value={editedProduct?.standardCost || 0}
-                            onChange={(e) => handleInputChange('standardCost', parseFloat(e.target.value))}
-                            className="flex-1"
-                            min={0}
-                            step={0.01}
-                          />
-                          <span className="text-sm text-muted-foreground">{product.currency}</span>
-                        </div>
-                      ) : (
-                        <p className="text-sm mt-1">{product.standardCost} {product.currency}</p>
-                      )}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Currency</label>
+                      <Select
+                        disabled={!isEditing}
+                        value={editedProduct?.currency}
+                        onValueChange={(value) => handleInputChange('currency', value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="THB">THB</SelectItem>
+                          <SelectItem value="USD">USD</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
+                    <div className="space-y-2">
                       <label className="text-sm font-medium text-muted-foreground">Tax Type</label>
-                      {isEditing ? (
-                        <Select
-                          value={editedProduct?.taxType || ''}
-                          onValueChange={(value) => handleInputChange('taxType', value)}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Select tax type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="VAT">VAT</SelectItem>
-                            <SelectItem value="NON_VAT">Non-VAT</SelectItem>
-                            <SelectItem value="EXEMPT">Tax Exempt</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <p className="text-sm mt-1">{product.taxType}</p>
-                      )}
+                      <Select
+                        disabled={!isEditing}
+                        value={editedProduct?.taxType}
+                        onValueChange={(value) => handleInputChange('taxType', value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select tax type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="VAT">VAT</SelectItem>
+                          <SelectItem value="NON_VAT">Non-VAT</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Tax Rate</label>
-                      {isEditing ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input
-                            type="number"
-                            value={editedProduct?.taxRate || 0}
-                            onChange={(e) => handleInputChange('taxRate', parseFloat(e.target.value))}
-                            className="flex-1"
-                            min={0}
-                            max={100}
-                            step={0.1}
-                          />
-                          <span className="text-sm text-muted-foreground">%</span>
-                        </div>
-                      ) : (
-                        <p className="text-sm mt-1">{product.taxRate}%</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Price Deviation Limit</label>
-                      {isEditing ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input
-                            type="number"
-                            value={editedProduct?.priceDeviationLimit || 0}
-                            onChange={(e) => handleInputChange('priceDeviationLimit', parseFloat(e.target.value))}
-                            className="flex-1"
-                            min={0}
-                            max={100}
-                            step={1}
-                          />
-                          <span className="text-sm text-muted-foreground">%</span>
-                        </div>
-                      ) : (
-                        <p className="text-sm mt-1">{product.priceDeviationLimit}%</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Last Cost</label>
-                      {isEditing ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input
-                            type="number"
-                            value={editedProduct?.lastCost || 0}
-                            onChange={(e) => handleInputChange('lastCost', parseFloat(e.target.value))}
-                            className="flex-1"
-                            min={0}
-                            step={0.01}
-                          />
-                          <span className="text-sm text-muted-foreground">{product.currency}</span>
-                        </div>
-                      ) : (
-                        <p className="text-sm mt-1">{product.lastCost} {product.currency}</p>
-                      )}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Tax Rate (%)</label>
+                      <Input
+                        type="number"
+                        disabled={!isEditing}
+                        value={editedProduct?.taxRate || ''}
+                        onChange={(e) => handleInputChange('taxRate', parseFloat(e.target.value))}
+                        className="h-9"
+                      />
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Right Column - Product Image */}
+            {/* Right Column - Image Upload */}
             <div className="space-y-6">
-              <Card>
+              <Card className="shadow-sm">
                 <CardHeader>
-                  <CardTitle>Product Image</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Product Image</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
-                    {product.imagesUrl ? (
-                      <>
-                        <Image 
-                          src={product.imagesUrl}
-                          alt={product.name} 
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          size="icon"
-                          className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm hover:bg-background/90"
-                          onClick={handleDelete}
-                        >
-                          <XIcon className="h-4 w-4" />
-                        </Button>
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center">
-                          <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                          <p className="mt-2 text-sm text-muted-foreground">No image available</p>
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-full">
+                      <ProductImage
+                        src={editedProduct?.imagesUrl || ''}
+                        alt={editedProduct?.name || 'Product image'}
+                      />
+                      {isEditing && (
+                        <div className="mt-4">
+                          <label
+                            htmlFor="image-upload"
+                            className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg cursor-pointer border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors"
+                          >
+                            <div className="flex flex-col items-center space-y-2">
+                              <UploadIcon className="h-8 w-8 text-muted-foreground/50" />
+                              <span className="text-sm font-medium">Click to upload new image</span>
+                            </div>
+                            <input
+                              id="image-upload"
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                            />
+                          </label>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Recommended size: 800x800px. Max file size: 5MB.<br />
+                      Supported formats: JPG, PNG
+                    </p>
                   </div>
-                  <div className="mt-4">
-                    <div className="flex items-center justify-center w-full">
-                      <label htmlFor="image-upload" className="w-full">
-                        <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted">
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <UploadIcon className="w-8 h-8 mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground">
-                              <span className="font-semibold">Click to upload</span> or drag and drop
-                            </p>
-                            <p className="text-xs text-muted-foreground/70">PNG, JPG, GIF up to 10MB</p>
-                          </div>
-                          <Input
-                            id="image-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="hidden"
-                          />
-                        </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isActive"
+                        checked={editedProduct?.isActive}
+                        onCheckedChange={(checked) => handleInputChange('isActive', checked)}
+                        disabled={!isEditing}
+                      />
+                      <label
+                        htmlFor="isActive"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Active
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isForSale"
+                        checked={editedProduct?.isForSale}
+                        onCheckedChange={(checked) => handleInputChange('isForSale', checked)}
+                        disabled={!isEditing}
+                      />
+                      <label
+                        htmlFor="isForSale"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Available for Sale
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isIngredient"
+                        checked={editedProduct?.isIngredient}
+                        onCheckedChange={(checked) => handleInputChange('isIngredient', checked)}
+                        disabled={!isEditing}
+                      />
+                      <label
+                        htmlFor="isIngredient"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Can be used as Ingredient
                       </label>
                     </div>
                   </div>
@@ -1221,14 +1196,11 @@ export default function ProductDetail({
             </Card>
           </div>
         </TabsContent>
-        <TabsContent value="order-unit">
+        <TabsContent value="order-units">
           <OrderUnitTab isEditing={isEditing} />
         </TabsContent>
-        <TabsContent value="ingredient-unit">
+        <TabsContent value="ingredients">
           <IngredientUnitTab isEditing={isEditing} />
-        </TabsContent>
-        <TabsContent value="stock-count">
-          <StockCountTab isEditing={isEditing} />
         </TabsContent>
       </Tabs>
       <div className="mt-4 space-x-2">
@@ -1340,30 +1312,46 @@ export default function ProductDetail({
     <DetailPageTemplate
       title={
         <>
-          <div className="flex items-center gap-2">
-            <Link 
-              href="/product-management/products" 
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Back to Product Lists
-            </Link>
-          </div>
           {(isEditing || isAddMode) ? (
-            <EditableTitle 
-              value={editedProduct?.name || ''} 
-              code={editedProduct?.productCode || ''}
-              onNameChange={(value) => handleInputChange('name', value)}
-              onCodeChange={(value) => handleInputChange('productCode', value)} 
-            />
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Product Code</div>
-                <div className="text-lg font-semibold">{product?.productCode}</div>
+            <>
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => router.push('/product-management/products')}
+                  className="h-8 w-8"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="sr-only">Back</span>
+                </Button>
+                <EditableTitle 
+                  value={editedProduct?.name || ''} 
+                  code={editedProduct?.productCode || ''}
+                  onNameChange={(value) => handleInputChange('name', value)}
+                  onCodeChange={(value) => handleInputChange('productCode', value)} 
+                />
               </div>
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Product Name</div>
-                <div className="text-lg font-semibold">{product?.name}</div>
+            </>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => router.push('/product-management/products')}
+                className="h-8 w-8"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="sr-only">Back</span>
+              </Button>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Product Code</div>
+                  <div className="text-lg font-semibold">{product?.productCode}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Product Name</div>
+                  <div className="text-lg font-semibold">{product?.name}</div>
+                </div>
               </div>
             </div>
           )}

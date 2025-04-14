@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ChevronDown, ChevronRight, Menu, ChevronLeft } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
 interface MenuItem {
@@ -41,7 +41,44 @@ const menuItems: MenuItem[] = [
     title: "Dashboard",
     path: "/dashboard",
     icon: "LayoutDashboard",
-    subItems: [],
+    subItems: [
+      { 
+        name: "Overview", 
+        path: "/dashboard/overview",
+        icon: "LayoutDashboard",
+        description: "Hotel supply chain overview"
+      },
+      { 
+        name: "Performance Metrics", 
+        path: "/dashboard/performance",
+        icon: "LineChart",
+        description: "Real-time performance indicators"
+      },
+      { 
+        name: "Inventory Status", 
+        path: "/dashboard/inventory",
+        icon: "PackageCheck",
+        description: "Current stock levels and alerts"
+      },
+      { 
+        name: "Supplier Analytics", 
+        path: "/dashboard/suppliers",
+        icon: "Users",
+        description: "Supplier performance and ratings"
+      },
+      { 
+        name: "Cost Center", 
+        path: "/dashboard/costs",
+        icon: "DollarSign",
+        description: "Financial metrics and cost analysis"
+      },
+      { 
+        name: "Active Orders", 
+        path: "/dashboard/orders",
+        icon: "ShoppingCart",
+        description: "Ongoing orders and deliveries"
+      }
+    ],
   },
   {
     title: "Procurement",
@@ -267,23 +304,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         "lg:translate-x-0",
         isCollapsed ? "w-[60px]" : "w-[280px]"
       )}>
-        <div className="flex justify-end p-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden lg:flex"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            <ChevronLeft className={cn(
-              "h-4 w-4 transition-transform",
-              isCollapsed ? "rotate-180" : ""
-            )} />
-          </Button>
-        </div>
         <SidebarContent 
           menuItems={menuItems} 
           isCollapsed={isCollapsed}
+          onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         />
       </aside>
     </>
@@ -293,9 +317,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 interface SidebarContentProps {
   menuItems: MenuItem[];
   isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-function SidebarContent({ menuItems, isCollapsed }: SidebarContentProps) {
+function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarContentProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -321,7 +346,9 @@ function SidebarContent({ menuItems, isCollapsed }: SidebarContentProps) {
   };
 
   const handleItemClick = (item: MenuItem) => {
-    if (item.subItems?.length > 0) {
+    if (item.title === "Dashboard") {
+      onToggleCollapse?.();
+    } else if (item.subItems?.length > 0) {
       toggleExpand(item.title);
     } else {
       router.push(item.path);
@@ -335,12 +362,72 @@ function SidebarContent({ menuItems, isCollapsed }: SidebarContentProps) {
     }
   };
 
+  // Find and remove Dashboard from menuItems
+  const dashboardItem = menuItems.find(item => item.title === "Dashboard");
+  const otherItems = menuItems.filter(item => item.title !== "Dashboard");
+
   return (
     <ScrollArea className="h-full">
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <div className="space-y-1">
-            {menuItems.map((item, index) => {
+            {/* Dashboard as the first item */}
+            {dashboardItem && (
+              <div className="space-y-1">
+                <Button
+                  variant={pathname === dashboardItem.path ? "secondary" : "ghost"}
+                  className={cn("w-full justify-between", {
+                    "h-9": !isCollapsed,
+                    "h-9 w-9 p-0": isCollapsed,
+                  })}
+                  onClick={() => handleItemClick(dashboardItem)}
+                >
+                  <span className="flex items-center">
+                    <LucideIcons.LayoutDashboard className="h-4 w-4" />
+                    {!isCollapsed && <span className="ml-2">{dashboardItem.title}</span>}
+                  </span>
+                  {!isCollapsed && (
+                    isCollapsed ? (
+                      <PanelLeftOpen className="h-4 w-4" />
+                    ) : (
+                      <PanelLeftClose className="h-4 w-4" />
+                    )
+                  )}
+                </Button>
+
+                {/* Show sub-items when expanded and not collapsed */}
+                {!isCollapsed && isExpanded(dashboardItem.title) && dashboardItem.subItems?.length > 0 && (
+                  <div className="pl-6 space-y-1">
+                    {dashboardItem.subItems.map((subItem, subIndex) => {
+                      const SubIconComponent = subItem.icon ? (LucideIcons as any)[subItem.icon] : undefined;
+                      const isSubActive = pathname === subItem.path;
+
+                      return (
+                        <Button
+                          key={subIndex}
+                          variant={isSubActive ? "secondary" : "ghost"}
+                          className="w-full justify-start"
+                          asChild
+                        >
+                          <Link href={subItem.path} className="flex items-center">
+                            {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
+                            <div>
+                              <span>{subItem.name}</span>
+                              {subItem.description && (
+                                <p className="text-xs text-muted-foreground">{subItem.description}</p>
+                              )}
+                            </div>
+                          </Link>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Rest of the menu items */}
+            {otherItems.map((item, index) => {
               const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
               const isActive = pathname === item.path;
               const isItemExpanded = isExpanded(item.title);

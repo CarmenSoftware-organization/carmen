@@ -85,7 +85,7 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
             <div className="flex flex-col">
               <Link
                 href="/dashboard"
-                className="text-xl md:text-2xl font-bold text-foreground dark:text-gray-100"
+                className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground dark:text-gray-100"
               >
                 CARMEN
               </Link>

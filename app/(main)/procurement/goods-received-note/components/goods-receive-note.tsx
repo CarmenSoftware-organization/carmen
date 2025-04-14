@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, ChevronLeft, CalendarIcon } from "lucide-react";
+import { ArrowLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, ChevronLeft, CalendarIcon, PanelRightClose, PanelRightOpen } from "lucide-react";
 import {
   GoodsReceiveNote,
   GoodsReceiveNoteMode,
@@ -187,26 +187,6 @@ export function GoodsReceiveNoteComponent({
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleSidebar}
-          className="mb-2"
-        >
-          {isSidebarVisible ? (
-            <>
-              <ChevronRight className="mr-2 h-4 w-4" />
-              Hide Sidebar
-            </>
-          ) : (
-            <>
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Show Sidebar
-            </>
-          )}
-        </Button>
-      </div>
       <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
         <div className={`flex-grow space-y-4 ${isSidebarVisible ? 'lg:w-3/4' : 'w-full'}`}>
           <Card>
@@ -214,7 +194,7 @@ export function GoodsReceiveNoteComponent({
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
                   <Button variant="ghost" size="icon" onClick={handleGoBack}>
-                    <ArrowLeft className="h-4 w-4" />
+                    <ChevronLeft className="h-4 w-4" />
                     <span className="sr-only">Go back</span>
                   </Button>
                   <CardTitle className="text-xl font-bold">Goods Receive Note</CardTitle>
@@ -257,6 +237,28 @@ export function GoodsReceiveNoteComponent({
                     <CheckSquare className="mr-2 h-4 w-4" />
                     Commit
                   </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleSidebar}
+                          className="h-8 w-8"
+                        >
+                          {isSidebarVisible ? (
+                            <PanelRightClose className="h-4 w-4" />
+                          ) : (
+                            <PanelRightOpen className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">Toggle sidebar</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </CardHeader>

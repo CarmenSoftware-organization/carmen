@@ -14,11 +14,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
-import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, Eye, Edit, Trash2 } from 'lucide-react'
+import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, FileText, PencilLine, Trash2, LayoutGrid, List, ArrowUpDown, MoreVertical } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/custom-status-badge'
 import { CreditNote } from '@/lib/types/credit-note'
 import { staticCreditNotes } from '@/lib/mock/static-credit-notes'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 export function CreditNoteManagement() {
   const router = useRouter()
@@ -27,7 +35,17 @@ export function CreditNoteManagement() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedNotes, setSelectedNotes] = useState<number[]>([])
-  const itemsPerPage = 10
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('card')
+  const itemsPerPage = viewMode === 'card' ? 9 : 10 // Show 9 cards (3x3 grid) or 10 table rows
+
+  // Add sorting state
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof CreditNote | null
+    direction: 'asc' | 'desc'
+  }>({
+    key: null,
+    direction: 'asc'
+  })
 
   const handleCreateCreditNote = () => {
     console.log('Creating new credit note')
@@ -100,6 +118,29 @@ export function CreditNoteManagement() {
     currentPage * itemsPerPage
   )
 
+  // Sorting handler
+  const handleSort = (key: keyof CreditNote) => {
+    setSortConfig(current => ({
+      key,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+    }))
+  }
+
+  // Sort the filtered notes
+  const sortedNotes = React.useMemo(() => {
+    if (!sortConfig.key) return paginatedCreditNotes
+
+    return [...paginatedCreditNotes].sort((a, b) => {
+      if (a[sortConfig.key!] < b[sortConfig.key!]) {
+        return sortConfig.direction === 'asc' ? -1 : 1
+      }
+      if (a[sortConfig.key!] > b[sortConfig.key!]) {
+        return sortConfig.direction === 'asc' ? 1 : -1
+      }
+      return 0
+    })
+  }, [paginatedCreditNotes, sortConfig])
+
   return (
     <div className="mx-auto py-0">
       <Card className="p-0">
@@ -122,23 +163,28 @@ export function CreditNoteManagement() {
               />
               <Button variant="secondary" size="icon"><Search className="h-4 w-4" /></Button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    {filterStatus}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('All')}>All</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('Draft')}>Draft</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('Submitted')}>Submitted</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('Approved')}>Approved</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('Rejected')}>Rejected</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleFilterChange('Voided')}>Voided</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="flex items-center space-x-2">
+              {/* View Mode Toggle */}
+              <div className="flex border rounded-md overflow-hidden mr-2">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                  className="rounded-none h-8 px-2"
+                >
+                  <List className="h-4 w-4" />
+                  <span className="sr-only">Table View</span>
+                </Button>
+                <Button
+                  variant={viewMode === 'card' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('card')}
+                  className="rounded-none h-8 px-2"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  <span className="sr-only">Card View</span>
+                </Button>
+              </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -182,76 +228,275 @@ export function CreditNoteManagement() {
           )}
 
           {/* Credit note list */}
-          <div className="space-y-2">
-            {paginatedCreditNotes.map((note) => (
-              <Card key={note.id} className="overflow-hidden p-0 hover:bg-secondary">
-                <div className="py-2 px-4">
-                  <div className="flex justify-between items-center mb-0">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={selectedNotes.includes(note.id)}
-                        onCheckedChange={(checked) => handleSelectNote(note.id, checked as boolean)}
-                      />
-                      <StatusBadge status={note.status} />
-                      <h3 className="text-lg text-muted-foreground">{note.refNumber}</h3>
-                      <h3 className="text-lg md:text-lg font-semibold">{note.description}</h3>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button variant="ghost" size="icon" aria-label="View credit note" onClick={() => handleViewDetails(note.id)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" aria-label="Edit credit note" onClick={() => handleEdit(note.id)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" aria-label="Delete credit note" onClick={() => handleDelete(note.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-0 md:gap-2">
-                    {[
-                      { label: 'Date', value: new Date(note.createdDate).toLocaleDateString() },
-                      { label: 'Vendor', value: note.vendorName },
-                      { label: 'Doc.#', value: note.docNumber },
-                      { label: 'Doc. Date', value: new Date(note.docDate).toLocaleDateString() },
-                      { label: 'Net Amount', value: `$${note.netAmount.toFixed(2)}` },
-                      { label: 'Tax Amount', value: `$${note.taxAmount.toFixed(2)}` },
-                      { label: 'Total Amount', value: `$${note.totalAmount.toFixed(2)}` },
-                    ].map(({ label, value }) => (
-                      <div key={label}>
-                        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-                        <p className="text-sm">{value}</p>
+          {viewMode === 'card' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginatedCreditNotes.map((note) => (
+                <Card 
+                  key={note.id} 
+                  className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm"
+                >
+                  <CardContent className="p-0">
+                    {/* Card Header */}
+                    <div className="p-4 pb-3 bg-muted/30 border-b">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={selectedNotes.includes(note.id)}
+                            onCheckedChange={(checked) => handleSelectNote(note.id, checked as boolean)}
+                          />
+                          <div>
+                            <h3 className="text-lg font-semibold text-primary">{note.refNumber}</h3>
+                            <p className="text-sm text-muted-foreground">{new Date(note.createdDate).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <StatusBadge status={note.status} />
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="p-4">
+                      <div className="mb-3">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+                        <p className="text-sm line-clamp-2">{note.description}</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Vendor</p>
+                          <p className="text-sm font-medium">{note.vendorName}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Doc.#</p>
+                          <p className="text-sm font-medium">{note.docNumber}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Doc. Date</p>
+                          <p className="text-sm">{new Date(note.docDate).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Net Amount</p>
+                          <p className="text-sm">${note.netAmount.toFixed(2)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center mt-4 pt-3 border-t border-border/50">
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Total Amount</p>
+                          <p className="text-base font-semibold">${note.totalAmount.toFixed(2)}</p>
+                        </div>
+                        <div className="flex justify-end space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewDetails(note.id)}
+                            className="h-8 w-8 rounded-full hover:bg-secondary"
+                          >
+                            <span className="sr-only">View Details</span>
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(note.id)}
+                            className="h-8 w-8 rounded-full hover:bg-secondary"
+                          >
+                            <span className="sr-only">Edit</span>
+                            <PencilLine className="h-4 w-4" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-full hover:bg-secondary"
+                              >
+                                <span className="sr-only">More options</span>
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleViewDetails(note.id)}>
+                                <FileText className="h-4 w-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEdit(note.id)}>
+                                <PencilLine className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(note.id)}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={selectedNotes.length === paginatedCreditNotes.length}
+                        onCheckedChange={handleSelectAll}
+                      />
+                    </TableHead>
+                    <TableHead className="w-[120px]">
+                      <div className="flex items-center space-x-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="-ml-3 h-8 data-[state=selected]:bg-muted"
+                          onClick={() => handleSort('refNumber')}
+                        >
+                          Ref Number
+                          <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Vendor</TableHead>
+                    <TableHead>Doc. Number</TableHead>
+                    <TableHead>Doc. Date</TableHead>
+                    <TableHead className="text-right">Net Amount</TableHead>
+                    <TableHead className="text-right">Tax Amount</TableHead>
+                    <TableHead className="text-right">Total Amount</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedNotes.map((note) => (
+                    <TableRow key={note.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedNotes.includes(note.id)}
+                          onCheckedChange={(checked) => handleSelectNote(note.id, checked as boolean)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">{note.refNumber}</TableCell>
+                      <TableCell>
+                        <div className="max-w-[300px]">
+                          <p className="truncate">{note.description}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={note.status} />
+                      </TableCell>
+                      <TableCell>{note.vendorName}</TableCell>
+                      <TableCell>{note.docNumber}</TableCell>
+                      <TableCell>{new Date(note.docDate).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">${note.netAmount.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">${note.taxAmount.toFixed(2)}</TableCell>
+                      <TableCell className="text-right font-medium">${note.totalAmount.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <div className="flex justify-end space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewDetails(note.id)}
+                            className="h-8 w-8 rounded-full hover:bg-secondary"
+                          >
+                            <span className="sr-only">View Details</span>
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(note.id)}
+                            className="h-8 w-8 rounded-full hover:bg-secondary"
+                          >
+                            <span className="sr-only">Edit</span>
+                            <PencilLine className="h-4 w-4" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-full hover:bg-secondary"
+                              >
+                                <span className="sr-only">More options</span>
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleViewDetails(note.id)}>
+                                <FileText className="h-4 w-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEdit(note.id)}>
+                                <PencilLine className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(note.id)}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
 
           {/* Pagination */}
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
               Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredCreditNotes.length)} of {filteredCreditNotes.length} results
             </div>
-            <div className="space-x-2">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only">Previous page</span>
+                <ChevronLeft className="h-4 w-4 -ml-2" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                <span className="sr-only">Next page</span>
                 <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 -ml-2" />
               </Button>
             </div>
           </div>

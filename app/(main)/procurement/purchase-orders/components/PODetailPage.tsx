@@ -45,13 +45,13 @@ import { CreditNoteDetail } from "../../credit-note/components/credit-note-detai
 
 interface PODetailPageProps {
   params: { id: string }
-  backLink?: React.ReactElement | string
 }
 
-export function PODetailPage({ params, backLink: propBackLink }: PODetailPageProps) {
+export function PODetailPage({ params }: PODetailPageProps) {
   const router = useRouter();
   const [poData, setPOData] = useState<PurchaseOrder | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     const samplePO: PurchaseOrder | undefined = Mock_purchaseOrders.filter(
@@ -61,32 +61,25 @@ export function PODetailPage({ params, backLink: propBackLink }: PODetailPagePro
     setPOData(samplePO as PurchaseOrder);
   }, [params.id]);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
+  const handleEdit = () => setIsEditing(true);
+  const handleCancel = () => setIsEditing(false);
   const handleSave = () => {
-    // Implement save functionality
     setIsEditing(false);
+    // Implement save logic
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
-
-  const handleDelete = () => {
-    // Implement delete functionality
-    console.log("Delete PO:", params.id);
+  const handleDelete = () => setShowDeleteDialog(true);
+  const handleConfirmDelete = () => {
+    setShowDeleteDialog(false);
+    // Implement delete logic
   };
 
   const handlePrint = () => {
-    // Implement print functionality
-    console.log("Print PO:", params.id);
+    // Implement print logic
   };
 
   const handleEmail = () => {
-    // Implement email functionality
-    console.log("Email PO:", params.id);
+    // Implement email logic
   };
 
   const handleUpdateItem = (updatedItem: PurchaseOrderItem) => {
@@ -166,18 +159,6 @@ export function PODetailPage({ params, backLink: propBackLink }: PODetailPagePro
       )}
     </div>
   );
-
-  // Define the default backLink early
-  const defaultBackLink = (
-    <Button variant="ghost" size="icon" asChild className="mr-1">
-      <Link href="/procurement/purchase-orders">
-        <ArrowLeft className="h-4 w-4" />
-      </Link>
-    </Button>
-  )
-
-  // Use the provided backLink or default
-  const backLink = propBackLink || defaultBackLink
 
   const content = (
     <>
@@ -351,7 +332,6 @@ export function PODetailPage({ params, backLink: propBackLink }: PODetailPagePro
         title={title}
         actionButtons={actionButtons}
         content={content}
-        backLink={backLink}
       />
     </div>
   );

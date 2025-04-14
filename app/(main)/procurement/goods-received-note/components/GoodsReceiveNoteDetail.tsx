@@ -14,7 +14,7 @@ import { GoodsReceiveNoteItemsBulkActions } from './tabs/GoodsReceiveNoteItemsBu
 import { Card, CardContent } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
 import { StockMovementTab } from './tabs/StockMovementTab'
-import { ArrowLeft, Edit, Trash, Printer, Send, Save } from 'lucide-react'
+import { ArrowLeft, Edit, Trash, Printer, Send, Save, PanelRightClose, PanelRightOpen } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FinancialSummaryTab } from './tabs/FinancialSummaryTab'
 import { ActivityLogTab } from './tabs/ActivityLogTab'
@@ -223,6 +223,8 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
     console.log(`Downloading attachment with id: ${id}`);
   };
 
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -234,7 +236,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
             {mode === 'add' ? 'New Goods Receive Note' : `Goods Receive Note`}
           </h1>
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <TooltipProvider>
             {mode === 'view' && (
               <Tooltip>
@@ -450,9 +452,33 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
       </Tabs>
 
       {mode !== 'view' && (
-        <div className="flex justify-end space-x-4 mt-6">
-          <Button variant="outline" onClick={handleCancel}><ArrowLeft className="h-4 w-4 mr-2" /> Cancel</Button>
-          <Button onClick={handleSave}><Save className="h-4 w-4 mr-2" /> Save</Button>
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" onClick={handleCancel}>
+            <ArrowLeft className="h-4 w-4 mr-2" /> Cancel
+          </Button>
+          <Button onClick={handleSave}>
+            <Save className="h-4 w-4 mr-2" /> Save
+          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-9 w-9"
+                  onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
+                >
+                  {isRightPanelOpen ? (
+                    <PanelRightClose className="h-4 w-4" />
+                  ) : (
+                    <PanelRightOpen className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">Toggle right panel</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Toggle right panel</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
     </div>

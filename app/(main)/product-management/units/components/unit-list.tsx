@@ -10,7 +10,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CheckCircle, Download, Plus, Search, Trash2, XCircle } from "lucide-react"
+import { 
+  CheckCircle, 
+  Download, 
+  Plus, 
+  Search, 
+  Trash2, 
+  XCircle, 
+  FileText,
+  PencilLine,
+  MoreVertical,
+  List,
+  LayoutGrid
+} from "lucide-react"
 import { UnitTable } from "./unit-table"
 import { UnitForm } from "./unit-form"
 import {
@@ -20,6 +32,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { mockUnits } from "../data/mock-units"
+import ListPageTemplate from "@/components/templates/ListPageTemplate"
+import { Card } from "@/components/ui/card"
+import StatusBadge from "@/components/ui/custom-status-badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export interface Unit {
   id: string
@@ -38,6 +60,7 @@ export function UnitList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
   // Use mock data
   const units = mockUnits
@@ -71,91 +94,218 @@ export function UnitList() {
     console.log('Export items:', selectedItems)
   }
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Units</h1>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Unit
+  const actionButtons = (
+    <Button onClick={() => setIsCreateDialogOpen(true)}>
+      <Plus className="h-4 w-4 mr-2" />
+      Add Unit
+    </Button>
+  )
+
+  const filters = (
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="w-full sm:w-1/2 flex space-x-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search units..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        <Select
+          value={filterType}
+          onValueChange={setFilterType}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="INVENTORY">Inventory</SelectItem>
+            <SelectItem value="ORDER">Order</SelectItem>
+            <SelectItem value="RECIPE">Recipe</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex border rounded-md overflow-hidden">
+        <Button
+          variant={viewMode === 'table' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setViewMode('table')}
+          className="rounded-none h-8 px-2"
+        >
+          <List className="h-4 w-4" />
+          <span className="sr-only">Table View</span>
+        </Button>
+        <Button
+          variant={viewMode === 'card' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setViewMode('card')}
+          className="rounded-none h-8 px-2"
+        >
+          <LayoutGrid className="h-4 w-4" />
+          <span className="sr-only">Card View</span>
         </Button>
       </div>
+    </div>
+  )
 
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center space-x-2">
-          <div className="relative w-96">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search units..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          <Select
-            value={filterType}
-            onValueChange={setFilterType}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="INVENTORY">Inventory</SelectItem>
-              <SelectItem value="ORDER">Order</SelectItem>
-              <SelectItem value="RECIPE">Recipe</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {selectedItems.length > 0 && (
-          <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-            <span className="text-sm text-muted-foreground ml-2">
-              {selectedItems.length} items selected
-            </span>
-            <div className="flex items-center gap-2 ml-4">
+  const renderCardView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {filteredUnits.map((unit) => (
+        <Card 
+          key={unit.id} 
+          className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm"
+        >
+          <div className="flex flex-col h-full">
+            {/* Card Header */}
+            <div className="p-5 pb-3 bg-muted/30 border-b">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-primary">{unit.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{unit.code}</p>
+                  </div>
+                </div>
+                <StatusBadge status={unit.isActive ? "Active" : "Inactive"} />
+              </div>
+            </div>
+            
+            {/* Card Content */}
+            <div className="p-5 flex-grow">
+              <div className="mb-4">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+                <p className="text-sm line-clamp-2">{unit.description || 'No description available'}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Type</p>
+                  <p className="text-sm font-medium">{unit.type}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Last Updated</p>
+                  <p className="text-sm font-medium">
+                    {unit.updatedAt.toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Card Actions */}
+            <div className="flex justify-end px-4 py-3 bg-muted/20 border-t space-x-1">
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(true)}
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedUnit(unit)}
+                className="h-8 w-8 rounded-full"
               >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Set Active
+                <FileText className="h-4 w-4" />
+                <span className="sr-only">View Details</span>
               </Button>
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkStatusUpdate(false)}
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedUnit(unit)}
+                className="h-8 w-8 rounded-full"
               >
-                <XCircle className="h-4 w-4 mr-2" />
-                Set Inactive
+                <PencilLine className="h-4 w-4" />
+                <span className="sr-only">Edit</span>
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBulkExport}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export Selected
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Selected
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="sr-only">More options</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setSelectedUnit(unit)}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedUnit(unit)}>
+                    <PencilLine className="h-4 w-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-        )}
-      </div>
+        </Card>
+      ))}
+    </div>
+  )
 
-      <UnitTable
-        units={filteredUnits}
-        onEdit={setSelectedUnit}
-        selectedItems={selectedItems}
-        onSelectItems={handleSelectItems}
+  const content = (
+    <div className="space-y-4">
+      {selectedItems.length > 0 && (
+        <div className="flex items-center gap-2 p-4 bg-muted/50 rounded-lg">
+          <span className="text-sm text-muted-foreground">
+            {selectedItems.length} items selected
+          </span>
+          <div className="flex-1" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleBulkExport}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export Selected
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleBulkStatusUpdate(true)}
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Set Active
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleBulkStatusUpdate(false)}
+          >
+            <XCircle className="h-4 w-4 mr-2" />
+            Set Inactive
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleBulkDelete}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete Selected
+          </Button>
+        </div>
+      )}
+
+      {viewMode === 'table' ? (
+        <UnitTable
+          units={filteredUnits}
+          onEdit={setSelectedUnit}
+          selectedItems={selectedItems}
+          onSelectItems={handleSelectItems}
+        />
+      ) : (
+        renderCardView()
+      )}
+    </div>
+  )
+
+  return (
+    <>
+      <ListPageTemplate
+        title="Units"
+        actionButtons={actionButtons}
+        filters={filters}
+        content={content}
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -190,6 +340,6 @@ export function UnitList() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   )
 } 

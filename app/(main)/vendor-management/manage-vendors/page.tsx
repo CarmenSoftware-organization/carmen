@@ -6,12 +6,14 @@ import Link from 'next/link';
 import ListPageTemplate from '@/components/templates/ListPageTemplate';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Search, Plus, FileText, PencilLine, MoreVertical, Trash2, List, LayoutGrid } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AdvancedFilter } from './components/advanced-filter';
 import { FilterType } from '@/lib/utils/filter-storage';
 import { toast } from '@/components/ui/use-toast';
 import { Vendor } from './[id]/types';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Card } from "@/components/ui/card"
 
 // Define a simplified vendor interface for the list page
 interface VendorListItem {
@@ -103,6 +105,7 @@ export default function VendorList(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<FilterType<VendorListItem>[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
 
   useEffect(() => {
     async function fetchVendors() {
@@ -262,81 +265,219 @@ export default function VendorList(): JSX.Element {
     }
   };
 
-  const actionButtons = (
-    <Button onClick={handleAddVendor}>
-      Add Vendor
-    </Button>
-  );
-
-  const filters = (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div className="w-full sm:w-1/2 flex space-x-2">
-        <Input
-          placeholder="Search vendors..."
-          className="w-full"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-        <Button variant="secondary" size="icon">
-          <Search className="h-4 w-4" />
-        </Button>
-      </div>
-      <AdvancedFilter 
-        onApplyFilters={handleApplyFilters}
-        onClearFilters={handleClearFilters}
-      />
+  const renderCardView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {filteredVendors.map((vendor) => (
+        <Card 
+          key={vendor.id} 
+          className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm"
+        >
+          <div className="flex flex-col h-full">
+            {/* Card Header */}
+            <div className="p-5 pb-3 bg-muted/30 border-b">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold text-primary">{vendor.companyName}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{vendor.businessType?.name}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Card Content */}
+            <div className="p-5 flex-grow">
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Primary Address</p>
+                  <p className="text-sm">{vendor.addresses.find(a => a.isPrimary)?.addressLine || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Primary Contact</p>
+                  <p className="text-sm">{vendor.contacts.find(c => c.isPrimary)?.name || 'N/A'}</p>
+                  <p className="text-sm text-muted-foreground">{vendor.contacts.find(c => c.isPrimary)?.phone || 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Card Actions */}
+            <div className="flex justify-end px-4 py-3 bg-muted/20 border-t space-x-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}`)}
+                className="h-8 w-8 rounded-full"
+              >
+                <FileText className="h-4 w-4" />
+                <span className="sr-only">View Details</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}
+                className="h-8 w-8 rounded-full"
+              >
+                <PencilLine className="h-4 w-4" />
+                <span className="sr-only">Edit</span>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="sr-only">More options</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}`)}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}>
+                    <PencilLine className="h-4 w-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 
-  const content = (
-    <>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : filteredVendors.length > 0 ? (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Company Name</TableHead>
-              <TableHead>Business Type</TableHead>
-              <TableHead>Primary Address</TableHead>
-              <TableHead>Primary Contact</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredVendors.map((vendor) => (
-              <TableRow key={vendor.id}>
-                <TableCell>{vendor.companyName}</TableCell>
-                <TableCell>{vendor.businessType?.name}</TableCell>
-                <TableCell>
-                  {vendor.addresses.find(a => a.isPrimary)?.addressLine || 'N/A'}
-                </TableCell>
-                <TableCell>
-                  {vendor.contacts.find(c => c.isPrimary)?.name || 'N/A'}
-                  {' '}
-                  {vendor.contacts.find(c => c.isPrimary)?.phone || ''}
-                </TableCell>
-                <TableCell>
-                  <Link href={`/vendor-management/manage-vendors/${vendor.id}`}>
-                    <Button variant="outline" size="sm">View</Button>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ) : (
-        <p>No vendors found. Click "Add Vendor" to create one.</p>
-      )}
-    </>
-  );
-
   return (
-    <ListPageTemplate
-      title="Vendor Management"
-      actionButtons={actionButtons}
-      filters={filters}
-      content={content}
-    />
+    <div className="container mx-auto py-4 px-12">
+      <ListPageTemplate
+        title="Vendor Management"
+        actionButtons={
+          <Button onClick={handleAddVendor}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Vendor
+          </Button>
+        }
+        filters={
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search vendors..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="pl-8"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <AdvancedFilter
+                onApplyFilters={handleApplyFilters}
+                onClearFilters={handleClearFilters}
+              />
+              <div className="flex border rounded-md overflow-hidden">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                  className="rounded-none h-8 px-2"
+                >
+                  <List className="h-4 w-4" />
+                  <span className="sr-only">Table View</span>
+                </Button>
+                <Button
+                  variant={viewMode === 'card' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('card')}
+                  className="rounded-none h-8 px-2"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  <span className="sr-only">Card View</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+        }
+        content={
+          <div className="space-y-4">
+            {viewMode === 'table' ? (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Company Name</TableHead>
+                      <TableHead>Business Type</TableHead>
+                      <TableHead>Primary Address</TableHead>
+                      <TableHead>Primary Contact</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredVendors.map((vendor) => (
+                      <TableRow key={vendor.id}>
+                        <TableCell className="font-medium">{vendor.companyName}</TableCell>
+                        <TableCell>{vendor.businessType?.name}</TableCell>
+                        <TableCell>
+                          {vendor.addresses.find(a => a.isPrimary)?.addressLine || 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          {vendor.contacts.find(c => c.isPrimary)?.name || 'N/A'}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}`)}
+                              className="h-8 w-8 rounded-full"
+                            >
+                              <FileText className="h-4 w-4" />
+                              <span className="sr-only">View Details</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}
+                              className="h-8 w-8 rounded-full"
+                            >
+                              <PencilLine className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                  <MoreVertical className="h-4 w-4" />
+                                  <span className="sr-only">More options</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}`)}>
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  View Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}>
+                                  <PencilLine className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-red-600">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              renderCardView()
+            )}
+          </div>
+        }
+      />
+    </div>
   );
 }

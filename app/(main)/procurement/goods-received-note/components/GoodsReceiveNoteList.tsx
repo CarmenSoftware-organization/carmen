@@ -2,16 +2,24 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Search, Eye, Edit, Trash, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer } from 'lucide-react'
+import { Search, Eye, Edit, Trash, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer, LayoutGrid, List, FileText, MoreVertical, PanelRightClose, PanelRightOpen } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { BulkActions } from './tabs/BulkActions'
 import StatusBadge from '@/components/ui/custom-status-badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ListPageTemplate from '@/components/templates/ListPageTemplate'
 import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +29,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { AdvancedFilter } from './advanced-filter'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
+import { format } from 'date-fns'
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
@@ -31,8 +40,10 @@ export function GoodsReceiveNoteList() {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [sortField, setSortField] = useState<keyof GoodsReceiveNote | null>(null)
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
   const itemsPerPage = 7
   const [advancedFilters, setAdvancedFilters] = useState<FilterType<GoodsReceiveNote>[]>([])
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(false)
 
   const handleBulkAction = (action: string) => {
     console.log(`Bulk action: ${action} on items:`, selectedItems)
@@ -178,7 +189,7 @@ export function GoodsReceiveNoteList() {
 
   const title = 'Goods Receive Notes'
   const actionButtons = (
-    <div className="flex flex-col sm:flex-row ">
+    <div className="flex flex-col sm:flex-row gap-2">
       <Button className="w-full sm:w-auto" onClick={handleAddNewGoodsReceiveNote}>
         <Plus className="mr-2 h-4 w-4" />Goods Receive Note
       </Button>
@@ -187,6 +198,19 @@ export function GoodsReceiveNoteList() {
       </Button>
       <Button variant="outline" className="w-full sm:w-auto">
         <Printer className="mr-2 h-4 w-4" /> Print
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="w-8 h-8"
+        onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
+      >
+        {isRightPanelOpen ? (
+          <PanelRightClose className="h-4 w-4" />
+        ) : (
+          <PanelRightOpen className="h-4 w-4" />
+        )}
+        <span className="sr-only">Toggle right panel</span>
       </Button>
     </div>
   )
@@ -212,182 +236,232 @@ export function GoodsReceiveNoteList() {
   )
 
   const filters = (
-    <>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-        <div className="w-full sm:w-1/2 flex space-x-2">
-          <Input
-            placeholder="Search GRNs..."
-            className="w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Button variant="secondary" size="icon">
-            <Search className="h-4 w-4" />
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-2">
+        <Input
+          placeholder="Search GRNs..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="h-8 w-[150px] lg:w-[250px]"
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={() => setStatusFilter("")}>All Statuses</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setStatusFilter("Pending")}>Pending</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setStatusFilter("Received")}>Received</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setStatusFilter("Partial")}>Partial</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setStatusFilter("Cancelled")}>Cancelled</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setStatusFilter("Voided")}>Voided</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <AdvancedFilter
+          onApplyFilters={handleApplyAdvancedFilters}
+          onClearFilters={handleClearAdvancedFilters}
+        />
+        <div className="flex border rounded-md overflow-hidden">
+          <Button
+            variant={viewMode === 'table' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('table')}
+            className="rounded-none h-8 px-2"
+          >
+            <List className="h-4 w-4" />
+            <span className="sr-only">Table View</span>
+          </Button>
+          <Button
+            variant={viewMode === 'card' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('card')}
+            className="rounded-none h-8 px-2"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span className="sr-only">Card View</span>
           </Button>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                {statusFilter || "All Statuses"}
-                <ChevronLeft className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => setStatusFilter("")}>All Statuses</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Pending")}>Pending</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Received")}>Received</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Partial")}>Partial</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Cancelled")}>Cancelled</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setStatusFilter("Voided")}>Voided</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <AdvancedFilter 
-            onApplyFilters={handleApplyAdvancedFilters}
-            onClearFilters={handleClearAdvancedFilters}
-          />
-        </div>
       </div>
-    </>
+    </div>
   )
 
-  const content = (
-    <>
-      {bulkActions}
-      <div className="space-y-2">
-        {paginatedGRNs.map((grn) => (
-          <Card key={grn.id}>
-            <CardContent className="p-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                <div className="flex items-center space-x-3 mb-2 sm:mb-0">
-                  <Checkbox
-                    checked={selectedItems.includes(grn.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedItems([...selectedItems, grn.id])
-                      } else {
-                        setSelectedItems(selectedItems.filter(id => id !== grn.id))
-                      }
-                    }}
-                  />
-                  <StatusBadge status={grn.status} />
-                  <h3 className="text-muted-foreground text-lg">{grn.ref}</h3>
-                  <h3 className="font-semibold text-lg">{grn.description}</h3>
+  const renderRowActions = (grn: GoodsReceiveNote) => (
+    <div className="flex justify-end space-x-1">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}
+              className="h-8 w-8 rounded-full"
+            >
+              <span className="sr-only">View</span>
+              <FileText className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>View details</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleGoodsReceiveNoteAction(grn.id, 'edit')}
+              className="h-8 w-8 rounded-full"
+            >
+              <span className="sr-only">Edit</span>
+              <Edit className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Edit</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleBulkAction('delete')}
+              className="h-8 w-8 rounded-full text-destructive"
+            >
+              <span className="sr-only">Delete</span>
+              <Trash className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Delete</TooltipContent>
+        </Tooltip>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+              <span className="sr-only">More options</span>
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => console.log('Print GRN')}>
+              Print GRN
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => console.log('Download PDF')}>
+              Download PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => console.log('Copy Reference')}>
+              Copy Reference
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TooltipProvider>
+    </div>
+  )
+
+  const renderTableView = () => (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[40px]">
+              <Checkbox
+                checked={selectedItems.length === paginatedGRNs.length}
+                onCheckedChange={toggleSelectAll}
+              />
+            </TableHead>
+            <TableHead>Reference</TableHead>
+            <TableHead>Vendor</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Total Amount</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {paginatedGRNs.map((grn) => (
+            <TableRow key={grn.id} className="hover:bg-muted/50">
+              <TableCell>
+                <Checkbox
+                  checked={selectedItems.includes(grn.id)}
+                  onCheckedChange={(checked) => {
+                    setSelectedItems(prev =>
+                      checked
+                        ? [...prev, grn.id]
+                        : prev.filter(id => id !== grn.id)
+                    )
+                  }}
+                />
+              </TableCell>
+              <TableCell className="font-medium">{grn.ref}</TableCell>
+              <TableCell>{grn.vendor}</TableCell>
+              <TableCell>{format(new Date(grn.date), 'MMM dd, yyyy')}</TableCell>
+              <TableCell>
+                <StatusBadge status={grn.status} />
+              </TableCell>
+              <TableCell className="text-right">
+                ${calculateTotalAmount(grn).toLocaleString()}
+              </TableCell>
+              <TableCell>{renderRowActions(grn)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+
+  const renderCardView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {paginatedGRNs.map((grn) => (
+        <Card key={grn.id} className="hover:bg-secondary/10 transition-colors">
+          <CardHeader className="p-4 pb-2 bg-muted/30 border-b">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={selectedItems.includes(grn.id)}
+                  onCheckedChange={(checked) => {
+                    setSelectedItems(prev =>
+                      checked
+                        ? [...prev, grn.id]
+                        : prev.filter(id => id !== grn.id)
+                    )
+                  }}
+                />
+                <div>
+                  <CardTitle className="text-lg font-semibold text-primary">
+                    {grn.ref}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {format(new Date(grn.date), 'MMM dd, yyyy')}
+                  </p>
                 </div>
-                <TooltipProvider>
-                  <div className="flex space-x-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleGoodsReceiveNoteAction(grn.id, 'view')}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>View</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleGoodsReceiveNoteAction(grn.id, 'edit')}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Edit</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Delete</TooltipContent>
-                    </Tooltip>
-                  </div>
-                </TooltipProvider>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-7 gap-4 text-sm">
-                <div className="text-left">
-                  <span className="text-sm text-muted-foreground">Date</span>
-                  <p>{grn.date.toLocaleDateString()}</p>
-                </div>
-                <div className="text-left">
-                  <span className="text-sm text-muted-foreground">Invoice Date</span>
-                  <p>{grn.invoiceDate ? grn.invoiceDate.toLocaleDateString() : "N/A"}</p>
-                </div>
-                <div className="">
-                  <span className="text-sm text-muted-foreground">Currency</span>
-                  <p>{grn.currency}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm text-muted-foreground">Net Amount</span>
-                  <p>{grn.netAmount.toFixed(2)}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm text-muted-foreground">Tax Amount</span>
-                  <p>{grn.taxAmount.toFixed(2)}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm text-muted-foreground">Total Amount</span>
-                  <p>{grn.totalAmount.toFixed(2)}</p>
-                </div>
+              <StatusBadge status={grn.status} />
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Vendor</p>
+                <p className="text-sm font-medium">{grn.vendor}</p>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredGRNs.length)} of {filteredGRNs.length} results
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-          >
-            <span className="sr-only">First page</span>
-            «
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            <span className="sr-only">Previous page</span>
-            ‹
-          </Button>
-          <span className="text-sm font-medium">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            <span className="sr-only">Next page</span>
-            ›
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            <span className="sr-only">Last page</span>
-            »
-          </Button>
-        </div>
-      </div>
-    </>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Items</p>
+                <p className="text-sm font-medium">{grn.items.length} items</p>
+              </div>
+              <div className="pt-2 border-t">
+                <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
+                <p className="text-lg font-semibold">
+                  ${calculateTotalAmount(grn).toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end mt-4 pt-2 border-t">
+              {renderRowActions(grn)}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   )
 
   return (
@@ -395,7 +469,8 @@ export function GoodsReceiveNoteList() {
       title={title}
       actionButtons={actionButtons}
       filters={filters}
-      content={content}
+      bulkActions={bulkActions}
+      content={viewMode === 'table' ? renderTableView() : renderCardView()}
     />
   )
 }

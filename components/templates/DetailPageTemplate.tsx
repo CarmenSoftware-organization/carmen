@@ -25,8 +25,8 @@ const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
   backLink,
 }) => {
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex flex-col gap-6">
+    <div className="container mx-auto py-4">
+      <div className="space-y-4">
         <div className="px-6">
           <Card>
             <CardContent className="p-6">

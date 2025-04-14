@@ -22,12 +22,15 @@ import {
   PanelRightOpen,
   PanelRightClose,
   History,
-  ArrowLeft,
+  ChevronLeft,
   XIcon,
   Paperclip,
   Plus,
   Info,
   Package,
+  FileText,
+  PencilLine,
+  MoreVertical,
 } from "lucide-react";
 import {
   Select,
@@ -59,6 +62,13 @@ import { StockMovementTab } from "./StockMovementTab"
 import StockMovementContent from "./stock-movement";
 import StatusBadge from "@/components/ui/custom-status-badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type CreditNoteType = "QUANTITY_RETURN" | "AMOUNT_DISCOUNT";
 type CreditNoteStatus = "DRAFT" | "POSTED" | "VOID";
@@ -118,7 +128,7 @@ function CreditNoteHeader({
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" className="h-8 w-8">
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center space-x-2">
               <h2 className="text-lg font-semibold">Credit Note</h2>
@@ -361,7 +371,7 @@ interface CreditNoteItem {
 }
 
 export function CreditNoteComponent() {
-  const [showPanel, setShowPanel] = useState(true);
+  const [showPanel, setShowPanel] = useState(false);
   const [headerData, setHeaderData] = useState({
     creditNoteNumber: "CN-2024-001",
     date: "2024-03-20",
@@ -711,22 +721,52 @@ export function CreditNoteComponent() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleOpeninfo()}
-                            >
-                              <Info className="h-4 w-4" />
-                              <span className="sr-only">View</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4" />
-                              <span className="sr-only">Edit</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
+                            <div className="flex justify-end items-center space-x-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-full"
+                                onClick={() => handleOpeninfo()}
+                              >
+                                <FileText className="h-4 w-4" />
+                                <span className="sr-only">View Details</span>
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8 rounded-full"
+                              >
+                                <PencilLine className="h-4 w-4" />
+                                <span className="sr-only">Edit</span>
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    className="h-8 w-8 rounded-full"
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                    <span className="sr-only">More Options</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleOpeninfo()}>
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    View Details
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <PencilLine className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem className="text-red-600">
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

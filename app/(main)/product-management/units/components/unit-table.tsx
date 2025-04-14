@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Edit2, Trash2 } from "lucide-react"
+import { FileText, PencilLine, MoreVertical, ArrowUpDown, Trash2 } from "lucide-react"
 import { Unit } from "./unit-list"
 import StatusBadge from "@/components/ui/custom-status-badge"
 import {
@@ -24,6 +24,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface UnitTableProps {
   units: Unit[]
@@ -113,105 +120,160 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
   }, [isPartiallySelected])
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        {/* ... */}
-      </div>
-      <div className="border rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  ref={selectAllCheckboxRef}
-                  checked={isAllSelected}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Select all"
-                />
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort("code")}
-              >
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted/50">
+            <TableHead className="w-12 py-3">
+              <Checkbox 
+                ref={selectAllCheckboxRef}
+                checked={isAllSelected}
+                onCheckedChange={handleSelectAll}
+                aria-label="Select all"
+                className="ml-3"
+              />
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium cursor-pointer"
+              onClick={() => handleSort("code")}
+            >
+              <div className="flex items-center gap-1">
                 Code
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
+                {sortField === "code" && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium cursor-pointer"
+              onClick={() => handleSort("name")}
+            >
+              <div className="flex items-center gap-1">
                 Name
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort("type")}
-              >
+                {sortField === "name" && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium cursor-pointer"
+              onClick={() => handleSort("type")}
+            >
+              <div className="flex items-center gap-1">
                 Type
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort("isActive")}
-              >
+                {sortField === "type" && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium cursor-pointer"
+              onClick={() => handleSort("isActive")}
+            >
+              <div className="flex items-center gap-1">
                 Status
-              </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+                {sortField === "isActive" && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead className="py-3 text-right font-medium">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedUnits.map((unit) => (
+            <TableRow 
+              key={unit.id}
+              className="group hover:bg-muted/10 transition-colors cursor-pointer"
+            >
+              <TableCell className="py-4 pl-4">
+                <Checkbox 
+                  checked={selectedItems.includes(unit.id)}
+                  onCheckedChange={(checked) => handleSelectOne(checked as boolean, unit.id)}
+                  aria-label={`Select ${unit.name}`}
+                />
+              </TableCell>
+              <TableCell className="py-4 font-medium">{unit.code}</TableCell>
+              <TableCell className="py-4">
+                <div className="flex flex-col">
+                  <span>{unit.name}</span>
+                  {unit.description && (
+                    <span className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
+                      {unit.description}
+                    </span>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="py-4">{unit.type}</TableCell>
+              <TableCell className="py-4">
+                <StatusBadge status={unit.isActive ? "Active" : "Inactive"} />
+              </TableCell>
+              <TableCell className="py-4 text-right">
+                <div className="flex justify-end items-center space-x-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(unit)}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <FileText className="h-4 w-4" />
+                    <span className="sr-only">View Details</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(unit)}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <PencilLine className="h-4 w-4" />
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">More options</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onEdit(unit)}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit(unit)}>
+                        <PencilLine className="h-4 w-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        className="text-red-600"
+                        onClick={() => setUnitToDelete(unit)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedUnits.map((unit) => (
-              <TableRow key={unit.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedItems.includes(unit.id)}
-                    onCheckedChange={(checked) => handleSelectOne(checked as boolean, unit.id)}
-                    aria-label={`Select ${unit.name}`}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{unit.code}</TableCell>
-                <TableCell>{unit.name}</TableCell>
-                <TableCell>{unit.type}</TableCell>
-                <TableCell>
-                  <StatusBadge status={unit.isActive ? "Active" : "Inactive"} />
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEdit(unit)}
-                      className="hover:text-primary"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setUnitToDelete(unit)}
-                      className="hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+          ))}
+        </TableBody>
+      </Table>
 
       <AlertDialog open={!!unitToDelete} onOpenChange={() => setUnitToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the unit &quot;{unitToDelete?.name}&quot;. 
-              This action cannot be undone.
+              This will permanently delete the unit &quot;{unitToDelete?.name}&quot;. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => unitToDelete && handleDelete(unitToDelete)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => handleDelete(unitToDelete!)}
+              className="bg-red-600 hover:bg-red-700"
             >
               Delete
             </AlertDialogAction>
