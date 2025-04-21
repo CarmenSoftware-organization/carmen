@@ -16,7 +16,7 @@ const formSchema = z.object({
   packagingRecyclability: z.number().min(0).max(100, 'Recyclability must be between 0-100%'),
   biodegradabilityMonths: z.number().min(0, 'Biodegradability months must be a positive number'),
   energyEfficiencyRating: z.enum(['A', 'B', 'C', 'D', 'E', 'F']),
-  sustainableCertification: z.enum(['NONE', 'FSC', 'PEFC', 'RSPO', 'FAIRTRADE', 'ORGANIC', 'OTHER'])
+  sustainableCertification: z.enum(['NONE', 'ORGANIC', 'FAIRTRADE', 'RAINFOREST', 'MSC', 'FSC'])
 })
 
 interface EnvironmentalImpactTabProps {
@@ -153,7 +153,7 @@ export function EnvironmentalImpactTab({ product, onSave }: EnvironmentalImpactT
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {['NONE', 'FSC', 'PEFC', 'RSPO', 'FAIRTRADE', 'ORGANIC', 'OTHER'].map(cert => (
+                      {['NONE', 'ORGANIC', 'FAIRTRADE', 'RAINFOREST', 'MSC', 'FSC'].map(cert => (
                         <SelectItem key={cert} value={cert}>
                           {cert}
                         </SelectItem>
