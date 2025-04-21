@@ -64,13 +64,15 @@ The Product Management module consists of several key components:
 - **PRD_MST_002**: Products must be assigned to valid categories
 - **PRD_MST_003**: Primary inventory unit is mandatory
 - **PRD_MST_004**: Product status must be tracked (active/inactive)
-- **PRD_MST_005**: Environmental impact data must be maintained
+- **PRD_MST_005**: Price/quantity deviation limits
+- **PRD_MST_006**: Environmental impact data must be maintained
+- **PRD_MST_007**: Support Attribute 
+
 
 ### Category Management (PRD_CAT)
 - **PRD_CAT_001**: Three-level category hierarchy (Main/Sub/Group)
 - **PRD_CAT_002**: Categories must have unique codes
-- **PRD_CAT_003**: Tax accounts must be assigned to categories
-- **PRD_CAT_004**: Price/quantity deviation limits by category
+- **PRD_CAT_004**: Price/quantity deviation limits by Category/Sub/Item Group 
 - **PRD_CAT_005**: Category status tracking required
 
 ### Unit Management (PRD_UNT)
@@ -78,7 +80,6 @@ The Product Management module consists of several key components:
 - **PRD_UNT_002**: Unit conversion factors must be defined
 - **PRD_UNT_003**: Default units must be specified
 - **PRD_UNT_004**: Unit validation for transactions
-- **PRD_UNT_005**: Support for weight/dimension tracking
 
 ### Product Pricing (PRD_PRC)
 - **PRD_PRC_001**: Base price in specified currency
@@ -148,7 +149,6 @@ The Product Management module consists of several key components:
 
 - **PRD_063**: Validation rules:
   - **PRD_063.1**: Conversion rates must be validated for circular references
-  - **PRD_063.2**: Changes to conversion rates must be approved
   - **PRD_063.3**: Historical transactions must maintain original conversion rates
   - **PRD_063.4**: Future dated conversion rate changes must be supported
   - **PRD_063.5**: Conversion rate changes must be logged

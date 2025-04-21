@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { Paperclip, Send } from 'lucide-react';
 
 interface Comment {
@@ -72,10 +72,12 @@ export default function CommentsAttachmentsTab({ poData }: CommentsAttachmentsTa
           <Card key={comment.id}>
             <CardContent className="p-4">
               <div className="flex items-start space-x-4">
-                <Avatar>
-                  <AvatarImage src={comment.avatar} alt={comment.user} />
-                  <AvatarFallback>{comment.user.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <AvatarWithFallback
+                  src={comment.avatar}
+                  alt={comment.user}
+                  fallbackText={comment.user}
+                  size="md"
+                />
                 <div className="flex-1">
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold">{comment.user}</h3>

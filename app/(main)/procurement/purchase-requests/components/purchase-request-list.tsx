@@ -440,7 +440,7 @@ export function PurchaseRequestList() {
   };
 
   const handleCreateNewPR = () => {
-    router.push("/procurement/purchase-requests/new-pr?mode=add");
+    router.push("/procurement/purchase-requests/new-pr?mode=blank");
   };
 
   const handleViewPR = (id: string) => {
@@ -565,9 +565,32 @@ export function PurchaseRequestList() {
   const actionButtons = (
     <>
       <div className="flex flex-wrap gap-2">
-        <Button onClick={handleCreateNewPR} className="group">
-          <Plus className="mr-2 h-4 w-4" /> New Purchase Request
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="group">
+              <Plus className="mr-2 h-4 w-4" /> New Purchase Request
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => router.push("/procurement/purchase-requests/new-pr?mode=blank")}>
+              Create Blank PR
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>PR Templates</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => router.push("/procurement/purchase-requests/new-pr?mode=template&id=office-supplies")}>
+              Office Supplies
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/procurement/purchase-requests/new-pr?mode=template&id=it-equipment")}>
+              IT Equipment
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/procurement/purchase-requests/new-pr?mode=template&id=kitchen-supplies")}>
+              Kitchen Supplies
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/procurement/purchase-requests/new-pr?mode=template&id=maintenance")}>
+              Maintenance
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button variant="outline" className="group">
           <Download className="mr-2 h-4 w-4" /> Export
         </Button>

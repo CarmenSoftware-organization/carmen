@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowUpDown, Pencil, Eye, Plus, Printer, Upload, ArrowLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter, LayoutGrid, List, MoreVertical, PencilLine } from "lucide-react"
+import { Search, ArrowUpDown, Pencil, Eye, Plus, Printer, Upload, ArrowLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter, LayoutGrid, List, MoreVertical, PencilLine, ImageIcon } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
@@ -15,6 +15,7 @@ import { AdvancedFilter } from './advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
 import { toast } from '@/components/ui/use-toast'
 import { Card } from "@/components/ui/card"
+import Image from 'next/image';
 
 interface Product {
   id: string;
@@ -51,7 +52,7 @@ interface Product {
   shelfLife?: number;
   storageInstructions?: string;
   unitConversions?: UnitConversion[];
-  imagesUrl?: string;
+  imagesUrl?: string; // URL to the product image
 }
 
 interface UnitConversion {
@@ -107,6 +108,35 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
 
   const handleViewProduct = (id: string) => {
     router.push(`/product-management/products/${id}`);
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    // Show confirmation dialog
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        // Delete product logic would go here (API call)
+        console.log("Deleting product:", id);
+        
+        // Show toast notification
+        toast({
+          title: "Product deleted",
+          description: "The product has been successfully deleted.",
+          variant: "default"
+        });
+        
+        // Refresh products list
+        // Since fetchProducts is inside a useEffect, we need to trigger a re-render
+        // We can do this by setting isLoading to true which will trigger the useEffect
+        setIsLoading(true);
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        toast({
+          title: "Error",
+          description: "There was a problem deleting the product.",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const productList = {
@@ -222,65 +252,90 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
         productCode: 'ELEC-002',
         name: 'Dell UltraSharp Monitor',
         description: 'A high-resolution monitor with a 4K display',
-        categoryId: 'Electronics',
-        subCategoryId: 'Monitors',
-        itemGroup: 'Computing Devices',
+        categoryId: 'CAT-004',
+        categoryName: 'Electronics',
+        subCategoryId: 'SCAT-004',
+        subCategoryName: 'Monitors',
+        itemGroupId: 'GRP-004',
+        itemGroupName: 'Computing Devices',
         basePrice: 499.99,
         currency: 'USD',
         isActive: true,
-        primaryInventoryUnitId: 'UNIT004'
+        primaryInventoryUnitId: 'UNIT-005',
+        primaryUnitName: 'PC',
+        imagesUrl: '/images/products/monitor.jpg'
       },
       {
         id: 'PRD005',
         productCode: 'OFF-002',
         name: 'Standing Desk',
         description: 'A standing desk to promote better posture',
-        categoryId: 'Office Furniture',
-        subCategoryId: 'Desks',
-        itemGroup: 'Furniture',
+        categoryId: 'CAT-005',
+        categoryName: 'Office Furniture',
+        subCategoryId: 'SCAT-005',
+        subCategoryName: 'Desks',
+        itemGroupId: 'GRP-005',
+        itemGroupName: 'Furniture',
         basePrice: 699.99,
         currency: 'USD',
         isActive: false,
-        primaryInventoryUnitId: 'UNIT005'
+        primaryInventoryUnitId: 'UNIT-005',
+        primaryUnitName: 'PC',
+        imagesUrl: '/images/products/standing-desk.jpg'
       },
       {
         id: 'PRD006',
         productCode: 'TECH-001',
         name: 'Wireless Mouse',
         description: 'A wireless mouse for easy navigation',
-        categoryId: 'Electronics',
-        subCategoryId: 'Accessories',
-        itemGroup: 'Computing Devices',
+        categoryId: 'CAT-004',
+        categoryName: 'Electronics',
+        subCategoryId: 'SCAT-006',
+        subCategoryName: 'Accessories',
+        itemGroupId: 'GRP-004',
+        itemGroupName: 'Computing Devices',
         basePrice: 79.99,
         currency: 'USD',
         isActive: true,
-        primaryInventoryUnitId: 'UNIT006'
+        primaryInventoryUnitId: 'UNIT-005',
+        primaryUnitName: 'PC',
+        imagesUrl: '/images/products/wireless-mouse.jpg'
       },
       {
         id: 'PRD007',
         productCode: 'STAT-002',
         name: 'Filing Cabinet',
         description: 'A large filing cabinet for storage',
-        categoryId: 'Office Furniture',
-        subCategoryId: 'Storage',
-        itemGroup: 'Office Supplies',
+        categoryId: 'CAT-005',
+        categoryName: 'Office Furniture',
+        subCategoryId: 'SCAT-007',
+        subCategoryName: 'Storage',
+        itemGroupId: 'GRP-006',
+        itemGroupName: 'Office Supplies',
         basePrice: 199.99,
         currency: 'USD',
         isActive: true,
-        primaryInventoryUnitId: 'UNIT007'
+        primaryInventoryUnitId: 'UNIT-005',
+        primaryUnitName: 'PC',
+        imagesUrl: '/images/products/filing-cabinet.jpg'
       },
       {
         id: 'PRD008',
         productCode: 'TECH-002',
         name: 'Mechanical Keyboard',
         description: 'A mechanical keyboard for typing',
-        categoryId: 'Electronics',
-        subCategoryId: 'Accessories',
-        itemGroup: 'Computing Devices',
+        categoryId: 'CAT-004',
+        categoryName: 'Electronics',
+        subCategoryId: 'SCAT-006',
+        subCategoryName: 'Accessories',
+        itemGroupId: 'GRP-004',
+        itemGroupName: 'Computing Devices',
         basePrice: 149.99,
         currency: 'USD',
         isActive: false,
-        primaryInventoryUnitId: 'UNIT008'
+        primaryInventoryUnitId: 'UNIT-005',
+        primaryUnitName: 'PC',
+        imagesUrl: '/images/products/mechanical-keyboard.jpg'
       }
     ]
   };
@@ -497,36 +552,35 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
         <Input
           placeholder="Search products..."
           className="w-full"
-          value={searchQuery}
           onChange={handleSearchChange}
+          value={searchQuery}
         />
         <Button variant="secondary" size="icon">
           <Search className="h-4 w-4" />
         </Button>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-wrap items-center gap-2">
         <AdvancedFilter 
           onApplyFilters={handleApplyFilters}
           onClearFilters={handleClearFilters}
         />
-        <div className="flex border rounded-md overflow-hidden">
+        
+        <div className="flex items-center border rounded-md ml-2">
           <Button
             variant={viewMode === 'table' ? 'default' : 'ghost'}
             size="sm"
+            className="rounded-r-none"
             onClick={() => setViewMode('table')}
-            className="rounded-none h-8 px-2"
           >
             <List className="h-4 w-4" />
-            <span className="sr-only">Table View</span>
           </Button>
           <Button
             variant={viewMode === 'card' ? 'default' : 'ghost'}
             size="sm"
+            className="rounded-l-none"
             onClick={() => setViewMode('card')}
-            className="rounded-none h-8 px-2"
           >
             <LayoutGrid className="h-4 w-4" />
-            <span className="sr-only">Card View</span>
           </Button>
         </div>
       </div>
@@ -563,33 +617,55 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
             </TableHead>
             <TableHead 
               className="py-3 font-medium text-gray-600 cursor-pointer"
-              onClick={() => handleSort('categoryId')}
+              onClick={() => handleSort('categoryName')}
             >
               <div className="flex items-center gap-1">
                 Category
-                {sortField === 'categoryId' && (
+                {sortField === 'categoryName' && (
                   <ArrowUpDown className="h-4 w-4" />
                 )}
               </div>
             </TableHead>
             <TableHead 
               className="py-3 font-medium text-gray-600 cursor-pointer"
-              onClick={() => handleSort('subCategoryId')}
+              onClick={() => handleSort('subCategoryName')}
             >
               <div className="flex items-center gap-1">
                 Subcategory
-                {sortField === 'subCategoryId' && (
+                {sortField === 'subCategoryName' && (
                   <ArrowUpDown className="h-4 w-4" />
                 )}
               </div>
             </TableHead>
             <TableHead 
               className="py-3 font-medium text-gray-600 cursor-pointer"
-              onClick={() => handleSort('itemGroup')}
+              onClick={() => handleSort('itemGroupName')}
             >
               <div className="flex items-center gap-1">
                 Item Group
-                {sortField === 'itemGroup' && (
+                {sortField === 'itemGroupName' && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium text-gray-600 cursor-pointer"
+              onClick={() => handleSort('primaryUnitName')}
+            >
+              <div className="flex items-center gap-1">
+                Inventory Unit
+                {sortField === 'primaryUnitName' && (
+                  <ArrowUpDown className="h-4 w-4" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="py-3 font-medium text-gray-600 cursor-pointer"
+              onClick={() => handleSort('basePrice')}
+            >
+              <div className="flex items-center gap-1">
+                Base Price
+                {sortField === 'basePrice' && (
                   <ArrowUpDown className="h-4 w-4" />
                 )}
               </div>
@@ -633,57 +709,44 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="py-4 text-gray-600">{product.categoryId}</TableCell>
-              <TableCell className="py-4 text-gray-600">{product.subCategoryId}</TableCell>
-              <TableCell className="py-4 text-gray-600">{product.itemGroup}</TableCell>
+              <TableCell className="py-4 text-gray-600">{product.categoryName || product.categoryId}</TableCell>
+              <TableCell className="py-4 text-gray-600">{product.subCategoryName || product.subCategoryId}</TableCell>
+              <TableCell className="py-4 text-gray-600">{product.itemGroupName || product.itemGroupId}</TableCell>
+              <TableCell className="py-4 text-gray-600">{product.primaryUnitName || '-'}</TableCell>
+              <TableCell className="py-4 text-gray-600">
+                {product.basePrice ? `${product.basePrice} ${product.currency || ''}` : '-'}
+              </TableCell>
               <TableCell className="py-4">
                 <StatusBadge 
                   status={product.isActive ? 'Active' : 'Inactive'}
                 />
               </TableCell>
               <TableCell className="py-4 text-right">
-                <div className="flex justify-end items-center space-x-1">
+                <div className="flex items-center space-x-1">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleViewProduct(product.id)}
-                    className="h-8 w-8 rounded-full"
+                    title="View Product"
                   >
-                    <FileText className="h-4 w-4" />
-                    <span className="sr-only">View Details</span>
+                    <FileText className="h-4 w-4 text-muted-foreground" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleEditProduct(product.id)}
-                    className="h-8 w-8 rounded-full"
+                    title="Edit Product"
                   >
-                    <PencilLine className="h-4 w-4" />
-                    <span className="sr-only">Edit</span>
+                    <Pencil className="h-4 w-4 text-muted-foreground" />
                   </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                        <MoreVertical className="h-4 w-4" />
-                        <span className="sr-only">More options</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleViewProduct(product.id)}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEditProduct(product.id)}>
-                        <PencilLine className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteProduct(product.id)}
+                    title="Delete Product"
+                  >
+                    <Trash2 className="h-4 w-4 text-muted-foreground" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -701,6 +764,32 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
           className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm"
         >
           <div className="flex flex-col h-full">
+            {/* Image Area */}
+            <div className="relative w-full h-48 bg-muted/30">
+              {product.imagesUrl ? (
+                <div className="relative w-full h-full">
+                  <img
+                    src={product.imagesUrl}
+                    alt={product.name}
+                    className="object-cover w-full h-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/placeholder-product.svg';
+                      target.onerror = null; // Prevent infinite loop if placeholder also fails
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="relative w-full h-full">
+                  <img
+                    src="/images/placeholder-product.svg"
+                    alt="No product image"
+                    className="object-contain w-full h-full"
+                  />
+                </div>
+              )}
+            </div>
+
             {/* Card Header */}
             <div className="p-5 pb-3 bg-muted/30 border-b">
               <div className="flex justify-between items-center">
@@ -730,20 +819,36 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
               <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Category</p>
-                  <p className="text-sm font-medium">{product.categoryId}</p>
+                  <p className="text-sm font-medium">{product.categoryName || product.categoryId}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Subcategory</p>
-                  <p className="text-sm font-medium">{product.subCategoryId}</p>
+                  <p className="text-sm font-medium">{product.subCategoryName || product.subCategoryId}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Item Group</p>
-                  <p className="text-sm font-medium">{product.itemGroup}</p>
+                  <p className="text-sm font-medium">{product.itemGroupName || product.itemGroupId}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Inventory Unit</p>
+                  <p className="text-sm font-medium">{product.primaryUnitName || '-'}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Base Price</p>
-                  <p className="text-sm font-medium">{product.basePrice} {product.currency}</p>
+                  <p className="text-sm font-medium">{product.basePrice ? `${product.basePrice} ${product.currency || ''}` : '-'}</p>
                 </div>
+                {product.taxType && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Tax Type</p>
+                  <p className="text-sm font-medium">{product.taxType}</p>
+                </div>
+                )}
+                {product.barcode && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Barcode</p>
+                  <p className="text-sm font-medium">{product.barcode}</p>
+                </div>
+                )}
               </div>
             </div>
             
@@ -764,32 +869,18 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 onClick={() => handleEditProduct(product.id)}
                 className="h-8 w-8 rounded-full"
               >
-                <PencilLine className="h-4 w-4" />
+                <Pencil className="h-4 w-4" />
                 <span className="sr-only">Edit</span>
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                    <MoreVertical className="h-4 w-4" />
-                    <span className="sr-only">More options</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleViewProduct(product.id)}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    View Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleEditProduct(product.id)}>
-                    <PencilLine className="h-4 w-4 mr-2" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleDeleteProduct(product.id)}
+                className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Delete</span>
+              </Button>
             </div>
           </div>
         </Card>

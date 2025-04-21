@@ -8,349 +8,25 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PencilIcon, TrashIcon, PlusIcon, XIcon } from 'lucide-react'
+import { PencilIcon, TrashIcon, PlusIcon, XIcon, ImageIcon, ChevronLeft } from 'lucide-react'
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Product, UnitConversion } from '@/lib/types';
-import { ImageIcon, UploadIcon } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Package, AlertCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import StatusBadge from '@/components/ui/custom-status-badge';
-import { OrderUnitTab } from '@/app/(main)/product-management/products/components/order-unit';
-import { IngredientUnitTab } from '@/app/(main)/product-management/products/components/ingredients';
-import { ChevronLeft } from 'lucide-react';
-
-const productList: Product[] = [
-  {
-    id: 'PRD001',
-    productCode: 'PRD-001',
-    name: 'Organic Jasmine Rice',
-    description: 'Premium quality organic jasmine rice sourced from certified organic farms. Known for its fragrant aroma and soft, sticky texture when cooked.',
-    localDescription: 'ข้าวหอมะลิอินทรีย์',
-    categoryId: 'CAT-001',
-    categoryName: 'Rice & Grains',
-    subCategoryId: 'SCAT-001',
-    subCategoryName: 'Rice',
-    itemGroupId: 'GRP-001',
-    itemGroupName: 'Organic Products',
-    primaryInventoryUnitId: 'UNIT-001',
-    primaryUnitName: 'EACH',
-    size: '1',
-    color: 'White',
-    barcode: '8851234567890',
-    isActive: true,
-    basePrice: 35.50,
-    currency: 'THB',
-    taxType: 'VAT',
-    taxRate: 7,
-    standardCost: 28.40,
-    lastCost: 29.75,
-    priceDeviationLimit: 10,
-    quantityDeviationLimit: 5,
-    minStockLevel: 100,
-    maxStockLevel: 1000,
-    isForSale: true,
-    isIngredient: true,
-    weight: 1,
-    shelfLife: 365,
-    storageInstructions: 'Store in a cool, dry place away from direct sunlight',
-    imagesUrl: '/images/products/jasmine-rice.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-001',
-        unitId: 'UNIT-001',
-        unitName: 'Kilogram',
-        conversionFactor: 1,
-        fromUnit: 'UNIT-001',
-        toUnit: 'UNIT-001',
-        unitType: 'INVENTORY'
-      },
-      {
-        id: 'CONV-002',
-        unitId: 'UNIT-002',
-        unitName: 'Bag (5kg)',
-        conversionFactor: 5,
-        fromUnit: 'UNIT-002',
-        toUnit: 'UNIT-001',
-        unitType: 'ORDER'
-      },
-      {
-        id: 'CONV-003',
-        unitId: 'UNIT-003',
-        unitName: 'Sack (25kg)',
-        conversionFactor: 25,
-        fromUnit: 'UNIT-003',
-        toUnit: 'UNIT-001',
-        unitType: 'ORDER'
-      }
-    ]
-  },
-  {
-    id: 'PRD002',
-    productCode: 'PRD-002',
-    name: 'Palm Sugar',
-    description: 'Traditional Thai palm sugar made from coconut palm sap. Natural sweetener with caramel notes.',
-    localDescription: 'น้ำตาลมะพร้าว',
-    categoryId: 'CAT-002',
-    categoryName: 'Sweeteners',
-    subCategoryId: 'SCAT-002',
-    subCategoryName: 'Natural Sweeteners',
-    itemGroupId: 'GRP-002',
-    itemGroupName: 'Traditional Products',
-    primaryInventoryUnitId: 'UNIT-004',
-    primaryUnitName: 'KG',
-    size: '500g',
-    color: 'Brown',
-    barcode: '8851234567891',
-    isActive: true,
-    basePrice: 85.00,
-    currency: 'THB',
-    taxType: 'VAT',
-    taxRate: 7,
-    standardCost: 65.00,
-    lastCost: 68.50,
-    priceDeviationLimit: 15,
-    quantityDeviationLimit: 10,
-    minStockLevel: 50,
-    maxStockLevel: 500,
-    isForSale: true,
-    isIngredient: true,
-    weight: 0.5,
-    shelfLife: 180,
-    storageInstructions: 'Keep in airtight container in cool, dry place',
-    imagesUrl: '/images/products/palm-sugar.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-004',
-        unitId: 'UNIT-004',
-        unitName: 'Kilogram',
-        conversionFactor: 1,
-        fromUnit: 'UNIT-004',
-        toUnit: 'UNIT-001',
-        unitType: 'INVENTORY'
-      },
-      {
-        id: 'CONV-005',
-        unitId: 'UNIT-005',
-        unitName: 'Pack (500g)',
-        conversionFactor: 0.5,
-        fromUnit: 'UNIT-005',
-        toUnit: 'UNIT-004',
-        unitType: 'ORDER'
-      },
-      {
-        id: 'CONV-006',
-        unitId: 'UNIT-006',
-        unitName: 'Box (10kg)',
-        conversionFactor: 10,
-        fromUnit: 'UNIT-006',
-        toUnit: 'UNIT-004',
-        unitType: 'ORDER'
-      }
-    ]
-  },
-  {
-    id: 'PRD003',
-    productCode: 'PRD-003',
-    name: 'Fish Sauce Premium Grade',
-    description: 'High-quality fish sauce made from premium anchovies. Essential Thai cooking ingredient with rich umami flavor.',
-    localDescription: 'น้ำปลาชั้นเยี่ยม',
-    categoryId: 'CAT-003',
-    categoryName: 'Condiments',
-    subCategoryId: 'SCAT-003',
-    subCategoryName: 'Sauces',
-    itemGroupId: 'GRP-003',
-    itemGroupName: 'Thai Essentials',
-    primaryInventoryUnitId: 'UNIT-003',
-    primaryUnitName: 'L',
-    size: '700ml',
-    color: 'Amber',
-    barcode: '8851234567892',
-    isActive: true,
-    basePrice: 95.00,
-    currency: 'THB',
-    taxType: 'VAT',
-    taxRate: 7,
-    standardCost: 75.00,
-    lastCost: 78.50,
-    priceDeviationLimit: 12,
-    quantityDeviationLimit: 8,
-    minStockLevel: 75,
-    maxStockLevel: 750,
-    isForSale: true,
-    isIngredient: true,
-    weight: 0.7,
-    shelfLife: 730,
-    storageInstructions: 'Store at room temperature. Keep bottle tightly sealed.',
-    imagesUrl: '/images/products/fish-sauce.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-007',
-        unitId: 'UNIT-007',
-        unitName: 'Liter',
-        conversionFactor: 1,
-        fromUnit: 'UNIT-007',
-        toUnit: 'UNIT-003',
-        unitType: 'INVENTORY'
-      },
-      {
-        id: 'CONV-008',
-        unitId: 'UNIT-008',
-        unitName: 'Bottle (700ml)',
-        conversionFactor: 0.7,
-        fromUnit: 'UNIT-008',
-        toUnit: 'UNIT-003',
-        unitType: 'ORDER'
-      },
-      {
-        id: 'CONV-009',
-        unitId: 'UNIT-009',
-        unitName: 'Case (12x700ml)',
-        conversionFactor: 8.4,
-        fromUnit: 'UNIT-009',
-        toUnit: 'UNIT-003',
-        unitType: 'ORDER'
-      }
-    ]
-  },
-  {
-    id: 'PRD004',
-    productCode: 'PRD-004',
-    name: 'Coconut Cream',
-    description: 'Rich and creamy first-pressed coconut cream. Perfect for curries, desserts, and traditional Thai dishes.',
-    localDescription: 'หัวกะทิ',
-    categoryId: 'CAT-004',
-    categoryName: 'Dairy & Alternatives',
-    subCategoryId: 'SCAT-004',
-    subCategoryName: 'Coconut Products',
-    itemGroupId: 'GRP-004',
-    itemGroupName: 'Thai Ingredients',
-    primaryInventoryUnitId: 'UNIT-003',
-    primaryUnitName: 'L',
-    size: '1L',
-    color: 'White',
-    barcode: '8851234567893',
-    isActive: true,
-    basePrice: 125.00,
-    currency: 'THB',
-    taxType: 'VAT',
-    taxRate: 7,
-    standardCost: 95.00,
-    lastCost: 98.50,
-    priceDeviationLimit: 10,
-    quantityDeviationLimit: 5,
-    minStockLevel: 100,
-    maxStockLevel: 1000,
-    isForSale: true,
-    isIngredient: true,
-    weight: 1.05,
-    shelfLife: 365,
-    storageInstructions: 'Store in refrigerator after opening. Use within 5 days.',
-    imagesUrl: '/images/products/coconut-cream.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-010',
-        unitId: 'UNIT-010',
-        unitName: 'Liter',
-        conversionFactor: 1,
-        fromUnit: 'UNIT-010',
-        toUnit: 'UNIT-003',
-        unitType: 'INVENTORY'
-      },
-      {
-        id: 'CONV-011',
-        unitId: 'UNIT-011',
-        unitName: 'Can (1L)',
-        conversionFactor: 1,
-        fromUnit: 'UNIT-011',
-        toUnit: 'UNIT-003',
-        unitType: 'ORDER'
-      },
-      {
-        id: 'CONV-012',
-        unitId: 'UNIT-012',
-        unitName: 'Case (12x1L)',
-        conversionFactor: 12,
-        fromUnit: 'UNIT-012',
-        toUnit: 'UNIT-003',
-        unitType: 'ORDER'
-      }
-    ]
-  },
-  {
-    id: 'PRD005',
-    productCode: 'PRD-005',
-    name: 'Kaffir Lime Leaves',
-    description: 'Fresh kaffir lime leaves, essential for authentic Thai curries and soups. Adds distinctive citrus aroma.',
-    localDescription: 'ใบมะกรูด',
-    categoryId: 'CAT-005',
-    categoryName: 'Fresh Produce',
-    subCategoryId: 'SCAT-005',
-    subCategoryName: 'Herbs',
-    itemGroupId: 'GRP-005',
-    itemGroupName: 'Fresh Herbs',
-    primaryInventoryUnitId: 'UNIT-001',
-    primaryUnitName: 'KG',
-    size: '100g',
-    color: 'Green',
-    barcode: '8851234567894',
-    isActive: true,
-    basePrice: 180.00,
-    currency: 'THB',
-    taxType: 'NON_VAT',
-    taxRate: 0,
-    standardCost: 150.00,
-    lastCost: 155.00,
-    priceDeviationLimit: 20,
-    quantityDeviationLimit: 15,
-    minStockLevel: 2,
-    maxStockLevel: 10,
-    isForSale: true,
-    isIngredient: true,
-    weight: 0.1,
-    shelfLife: 7,
-    storageInstructions: 'Keep refrigerated in sealed container. Best used fresh.',
-    imagesUrl: '/images/products/kaffir-leaves.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-013',
-        unitId: 'UNIT-013',
-        unitName: 'Kilogram',
-        conversionFactor: 1,
-        fromUnit: 'UNIT-013',
-        toUnit: 'UNIT-001',
-        unitType: 'INVENTORY'
-      },
-      {
-        id: 'CONV-014',
-        unitId: 'UNIT-014',
-        unitName: 'Pack (100g)',
-        conversionFactor: 0.1,
-        fromUnit: 'UNIT-014',
-        toUnit: 'UNIT-001',
-        unitType: 'ORDER'
-      },
-      {
-        id: 'CONV-015',
-        unitId: 'UNIT-015',
-        unitName: 'Box (1kg)',
-        conversionFactor: 1,
-        fromUnit: 'UNIT-015',
-        toUnit: 'UNIT-001',
-        unitType: 'ORDER'
-      }
-    ]
-  }
-];
+import { OrderUnitTab } from '../components/order-unit';
+import { IngredientUnitTab } from '../components/ingredients';
+import { LocationsTab } from '../components/locations-tab';
+import { ProductForm } from './components/ProductForm'
+import { ActivityLog } from './components/ActivityLog'
+import { StoreAssignment } from './components/StoreAssignment'
+import { ProductInformation } from './components/ProductInformation'
+import { LatestPurchaseDialog } from './components/LatestPurchaseDialog'
+import InventoryTab from '../components/inventory'
+import { Label } from "@/components/ui/label"
 
 const inventoryUnits = [
   { id: 'UNIT-001', name: 'Kilogram', code: 'KG' },
@@ -358,6 +34,8 @@ const inventoryUnits = [
   { id: 'UNIT-003', name: 'Liter', code: 'L' },
   { id: 'UNIT-004', name: 'Milliliter', code: 'ML' },
   { id: 'UNIT-005', name: 'Piece', code: 'PC' },
+  { id: 'UNIT-006', name: 'Bag', code: 'BAG' },
+  { id: 'UNIT-007', name: 'Case', code: 'CS' },
 ];
 
 const inventoryData = {
@@ -430,17 +108,94 @@ const inventoryData = {
   }
 };
 
-function EditableTitle({ 
-  value, 
-  code,
-  onNameChange,
-  onCodeChange 
-}: { 
-  value: string,
-  code: string,
-  onNameChange: (value: string) => void,
+// Mock data - Replace with actual API calls
+const mockCategories = [
+  {
+    id: 'CAT-001',
+    name: 'Rice & Grains',
+    subCategories: [
+      { id: 'SCAT-001', name: 'Rice' },
+      { id: 'SCAT-002', name: 'Noodles' }
+    ]
+  },
+  {
+    id: 'CAT-002',
+    name: 'Condiments',
+    subCategories: [
+      { id: 'SCAT-003', name: 'Sauces' },
+      { id: 'SCAT-004', name: 'Spices' }
+    ]
+  },
+  {
+    id: 'CAT-003',
+    name: 'Sauces & Condiments',
+    subCategories: [
+      { id: 'SCAT-005', name: 'Fish Sauce' },
+      { id: 'SCAT-006', name: 'Soy Sauce' }
+    ]
+  },
+  {
+    id: 'CAT-004',
+    name: 'Electronics',
+    subCategories: [
+      { id: 'SCAT-007', name: 'Monitors' },
+      { id: 'SCAT-008', name: 'Accessories' }
+    ]
+  },
+  {
+    id: 'CAT-005',
+    name: 'Office Furniture',
+    subCategories: [
+      { id: 'SCAT-009', name: 'Desks' },
+      { id: 'SCAT-010', name: 'Storage' }
+    ]
+  }
+]
+
+const mockItemGroups = [
+  { id: 'GRP-001', name: 'Organic Products' },
+  { id: 'GRP-002', name: 'Thai Essentials' },
+  { id: 'GRP-003', name: 'Premium Products' },
+  { id: 'GRP-004', name: 'Computing Devices' },
+  { id: 'GRP-005', name: 'Furniture' },
+  { id: 'GRP-006', name: 'Office Supplies' }
+]
+
+const mockStores = [
+  { id: 'STR-001', code: 'BKK-001', name: 'Bangkok Central' },
+  { id: 'STR-002', code: 'BKK-002', name: 'Bangkok North' },
+  { id: 'STR-003', code: 'CNX-001', name: 'Chiang Mai Central' }
+]
+
+const mockUsers = [
+  { id: 'USR-001', name: 'John Doe' },
+  { id: 'USR-002', name: 'Jane Smith' }
+]
+
+const mockUnits = [
+  { id: 'UNIT-001', name: 'Kilogram (kg)' },
+  { id: 'UNIT-002', name: 'Gram (g)' },
+  { id: 'UNIT-003', name: 'Liter (L)' },
+  { id: 'UNIT-004', name: 'Milliliter (ml)' },
+  { id: 'UNIT-005', name: 'Each (ea)' },
+  { id: 'UNIT-006', name: 'Box' },
+  { id: 'UNIT-007', name: 'Case' }
+]
+
+const mockTaxTypes = [
+  { id: 'ADDED', name: 'Added Tax' },
+  { id: 'INCLUDED', name: 'Include Tax' },
+  { id: 'NONE', name: 'None' }
+]
+
+interface EditableTitleProps {
+  value: string
+  code: string
+  onNameChange: (value: string) => void
   onCodeChange: (value: string) => void 
-}) {
+}
+
+function EditableTitle({ value, code, onNameChange, onCodeChange }: EditableTitleProps) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -464,11 +219,16 @@ function EditableTitle({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-function ProductImage({ src, alt }: { src: string; alt: string }) {
-  const [error, setError] = useState(false);
+interface ProductImageProps {
+  src: string
+  alt: string
+}
+
+function ProductImage({ src, alt }: ProductImageProps) {
+  const [error, setError] = useState(false)
 
   return (
     <div className="relative w-full aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors overflow-hidden">
@@ -488,23 +248,268 @@ function ProductImage({ src, alt }: { src: string; alt: string }) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default function ProductDetail({ 
-  params,
-  searchParams
-}: { 
+interface LocationAssignment {
+  id: string
+  locationId: string
+  locationName: string
+  locationCode: string
+  minQuantity: number
+  maxQuantity: number
+  reorderPoint: number
+  parLevel: number
+}
+
+interface ProductDetailProps {
   params: { id: string }
   searchParams?: { [key: string]: string | string[] | undefined }
-}) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [product, setProduct] = useState<Product | null>(null);
-  const [editedProduct, setEditedProduct] = useState<Product | null>(null);
-  const [isEditing, setIsEditing] = useState(Boolean(searchParams?.edit));
-  const isAddMode = params.id === 'new';
+}
+
+// Define product list as a named constant to avoid linter errors
+const mockProductList = [
+  {
+    id: 'PRD001',
+    productCode: 'PRD-001',
+    name: 'Organic Jasmine Rice',
+    description: 'Premium quality organic jasmine rice sourced from certified organic farms. Known for its fragrant aroma and soft, sticky texture when cooked.',
+    localDescription: 'ข้าวหอมะลิอินทรีย์',
+    categoryId: 'CAT-001',
+    categoryName: 'Rice & Grains',
+    subCategoryId: 'SCAT-001',
+    subCategoryName: 'Rice',
+    itemGroupId: 'GRP-001',
+    itemGroupName: 'Organic Products',
+    primaryInventoryUnitId: 'UNIT-001',
+    primaryUnitName: 'KG',
+    size: '1 kg',
+    color: 'White',
+    barcode: '8851234567890',
+    isActive: true,
+    basePrice: 35.50,
+    currency: 'THB',
+    taxType: 'ADDED',
+    taxRate: 7,
+    standardCost: 28.40,
+    lastCost: 29.15,
+    priceDeviationLimit: 10,
+    quantityDeviationLimit: 5,
+    minStockLevel: 100,
+    maxStockLevel: 1000,
+    isForSale: true,
+    isIngredient: true,
+    weight: 1,
+    shelfLife: 365,
+    storageInstructions: 'Store in a cool, dry place',
+    imagesUrl: '/images/products/jasmine-rice.jpg',
+    unitConversions: [
+      {
+        id: 'CONV-001',
+        unitId: 'UNIT-001',
+        fromUnit: 'KG',
+        toUnit: 'G',
+        unitName: 'Gram',
+        conversionFactor: 1000,
+        unitType: "INVENTORY" as const
+      },
+      {
+        id: 'CONV-002',
+        unitId: 'UNIT-006',
+        fromUnit: 'KG',
+        toUnit: 'BAG',
+        unitName: 'Bag',
+        conversionFactor: 0.2,
+        unitType: "ORDER" as const
+      }
+    ],
+    // Environmental Impact Fields
+    carbonFootprint: 2.5,
+    waterUsage: 2500,
+    packagingRecyclability: 85,
+    biodegradabilityMonths: 6,
+    energyEfficiencyRating: 'A',
+    sustainableCertification: 'ORGANIC'
+  },
+  {
+    id: 'PRD002',
+    productCode: 'PRD-002',
+    name: 'Palm Sugar',
+    description: 'Traditional palm sugar made from coconut palm sap. Natural sweetener with rich caramel notes.',
+    localDescription: 'น้ำตาลมะพร้าว',
+    categoryId: 'CAT-002',
+    categoryName: 'Condiments',
+    subCategoryId: 'SCAT-004',
+    subCategoryName: 'Spices',
+    itemGroupId: 'GRP-002',
+    itemGroupName: 'Thai Essentials',
+    primaryInventoryUnitId: 'UNIT-001',
+    primaryUnitName: 'KG',
+    size: '500g',
+    color: 'Brown',
+    barcode: '8851234567891',
+    isActive: true,
+    basePrice: 45.00,
+    currency: 'THB',
+    taxType: 'INCLUDED',
+    taxRate: 7,
+    standardCost: 36.00,
+    lastCost: 37.50,
+    priceDeviationLimit: 10,
+    quantityDeviationLimit: 5,
+    minStockLevel: 50,
+    maxStockLevel: 500,
+    isForSale: true,
+    isIngredient: true,
+    weight: 0.5,
+    shelfLife: 180,
+    storageInstructions: 'Store in airtight container',
+    imagesUrl: '/images/products/palm-sugar.jpg',
+    unitConversions: [
+      {
+        id: 'CONV-003',
+        unitId: 'UNIT-001',
+        fromUnit: 'KG',
+        toUnit: 'G',
+        unitName: 'Gram',
+        conversionFactor: 1000,
+        unitType: "INVENTORY" as const
+      },
+      {
+        id: 'CONV-004',
+        unitId: 'UNIT-007',
+        fromUnit: 'KG',
+        toUnit: 'CS',
+        unitName: 'Case',
+        conversionFactor: 0.1,
+        unitType: "ORDER" as const
+      }
+    ],
+    // Environmental Impact Fields
+    carbonFootprint: 1.8,
+    waterUsage: 1200,
+    packagingRecyclability: 70,
+    biodegradabilityMonths: 4,
+    energyEfficiencyRating: 'B',
+    sustainableCertification: 'FAIRTRADE'
+  },
+  {
+    id: 'PRD003',
+    productCode: 'PRD-003',
+    name: 'Fish Sauce Premium Grade',
+    description: 'Premium fish sauce made from anchovies, featuring a rich umami flavor perfect for Thai cuisine.',
+    localDescription: 'น้ำปลาชั้นดี',
+    categoryId: 'CAT-003',
+    categoryName: 'Sauces & Condiments',
+    subCategoryId: 'SCAT-005',
+    subCategoryName: 'Fish Sauce',
+    itemGroupId: 'GRP-003',
+    itemGroupName: 'Premium Products',
+    primaryInventoryUnitId: 'UNIT-003',
+    primaryUnitName: 'L',
+    size: '700ml',
+    color: 'Amber',
+    barcode: '8851234567892',
+    isActive: true,
+    basePrice: 65.00,
+    currency: 'THB',
+    taxType: 'ADDED',
+    taxRate: 7,
+    standardCost: 52.00,
+    lastCost: 54.00,
+    priceDeviationLimit: 10,
+    quantityDeviationLimit: 5,
+    minStockLevel: 100,
+    maxStockLevel: 800,
+    isForSale: true,
+    isIngredient: true,
+    weight: 0.7,
+    shelfLife: 730,
+    storageInstructions: 'Store in a cool, dark place',
+    imagesUrl: '/images/products/fish-sauce.jpg',
+    unitConversions: [
+      {
+        id: 'CONV-005',
+        unitId: 'UNIT-003',
+        fromUnit: 'L',
+        toUnit: 'ML',
+        unitName: 'Milliliter',
+        conversionFactor: 1000,
+        unitType: "INVENTORY" as const
+      },
+      {
+        id: 'CONV-006',
+        unitId: 'UNIT-005',
+        fromUnit: 'L',
+        toUnit: 'BTL',
+        unitName: 'Bottle',
+        conversionFactor: 1,
+        unitType: "ORDER" as const
+      }
+    ],
+    // Environmental Impact Fields
+    carbonFootprint: 3.2,
+    waterUsage: 1800,
+    packagingRecyclability: 90,
+    biodegradabilityMonths: 8,
+    energyEfficiencyRating: 'A',
+    sustainableCertification: 'MSC'
+  },
+  {
+    id: 'PRD004',
+    productCode: 'ELEC-002',
+    name: 'Dell UltraSharp Monitor',
+    description: 'A high-resolution monitor with a 4K display for professional use.',
+    localDescription: 'จอมอนิเตอร์ Dell UltraSharp ความละเอียดสูง',
+    categoryId: 'CAT-004',
+    categoryName: 'Electronics',
+    subCategoryId: 'SCAT-007',
+    subCategoryName: 'Monitors',
+    itemGroupId: 'GRP-004',
+    itemGroupName: 'Computing Devices',
+    primaryInventoryUnitId: 'UNIT-005',
+    primaryUnitName: 'PC',
+    size: '27 inch',
+    color: 'Black',
+    barcode: '5901234123457',
+    isActive: true,
+    basePrice: 499.99,
+    currency: 'USD',
+    taxType: 'ADDED',
+    taxRate: 7,
+    standardCost: 420.00,
+    lastCost: 425.50,
+    priceDeviationLimit: 5,
+    quantityDeviationLimit: 2,
+    minStockLevel: 5,
+    maxStockLevel: 20,
+    isForSale: true,
+    isIngredient: false,
+    weight: 6.5,
+    shelfLife: 0,
+    storageInstructions: 'Store in dry area, avoid direct sunlight',
+    imagesUrl: '/images/products/monitor.jpg',
+    unitConversions: [],
+    // Environmental Impact Fields
+    carbonFootprint: 85.5,
+    waterUsage: 3500,
+    packagingRecyclability: 80,
+    biodegradabilityMonths: 0,
+    energyEfficiencyRating: 'B',
+    sustainableCertification: 'NONE'
+  }
+] as Product[];
+
+export default function ProductDetail({ params, searchParams }: ProductDetailProps) {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [product, setProduct] = useState<Product | null>(null)
+  const [editedProduct, setEditedProduct] = useState<Product | null>(null)
+  const [isEditing, setIsEditing] = useState(Boolean(searchParams?.edit))
+  const isAddMode = params.id === 'new'
+  const [showPurchaseHistory, setShowPurchaseHistory] = useState(false)
+  const [locationAssignments, setLocationAssignments] = useState<LocationAssignment[]>([])
 
   useEffect(() => {
     async function fetchProduct() {
@@ -531,127 +536,111 @@ export default function ProductDetail({
           basePrice: 0,
           currency: 'THB',
           taxType: 'VAT',
-          taxRate: 7,
+          taxRate: 0,
           standardCost: 0,
           lastCost: 0,
           priceDeviationLimit: 0,
           quantityDeviationLimit: 0,
           minStockLevel: 0,
           maxStockLevel: 0,
-          isForSale: true,
+          isForSale: false,
           isIngredient: false,
           weight: 0,
           shelfLife: 0,
           storageInstructions: '',
           imagesUrl: '',
-          unitConversions: []
-        };
-        setProduct(emptyProduct);
-        setEditedProduct(emptyProduct);
-        setIsEditing(true);
-        setIsLoading(false);
-        return;
+          unitConversions: [],
+          // Environmental Impact Fields
+          carbonFootprint: 0,
+          waterUsage: 0,
+          packagingRecyclability: 0,
+          biodegradabilityMonths: 0,
+          energyEfficiencyRating: 'A',
+          sustainableCertification: 'NONE'
+        }
+        setProduct(emptyProduct)
+        setEditedProduct(emptyProduct)
+        setIsLoading(false)
+        return
       }
 
       try {
-        // Case-insensitive product lookup
-        const data = productList.find(p => p.id.toLowerCase() === params.id.toLowerCase());
-        if (!data) throw new Error('Product not found');
+        // In a real app, fetch from API
+        const fetchedProduct = mockProductList.find((p: Product) => p.id === params.id)
+        if (!fetchedProduct) throw new Error('Product not found')
         
-        setProduct(data);
-        setEditedProduct(data);
-        setIsLoading(false);
+        setProduct(fetchedProduct)
+        setEditedProduct(fetchedProduct)
+        setIsLoading(false)
       } catch (err) {
-        console.error('Error fetching product:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch product');
-        setIsLoading(false);
+        setError(err instanceof Error ? err.message : 'Failed to fetch product')
+        setIsLoading(false)
       }
     }
 
-    fetchProduct();
-  }, [params.id, isAddMode]);
+    fetchProduct()
+  }, [params.id, isAddMode])
+
+  const handleInputChange = (field: keyof Product, value: any) => {
+    setEditedProduct(prev => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        [field]: value
+      }
+    })
+  }
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
-  const handleSave = async () => {
-    if (!editedProduct) return;
-
+  const handleSave = async (formData: any) => {
     try {
-      if (isAddMode) {
-        // Create new product
-        // const response = await fetch('/api/products', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(editedProduct),
-        // });
-        
-        // if (!response.ok) throw new Error('Failed to create product');
-        // const newProduct = await response.json();
-        
-        toast({
-          title: "Success",
-          description: "Product created successfully",
-        });
-        router.push('/product-management/products');
-      } else {
-        // Update existing product
-        // const response = await fetch(`/api/products/${params.id}`, {
-        //   method: 'PUT',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(editedProduct),
-        // });
-
-        // if (!response.ok) throw new Error('Failed to update product');
-        
-        setProduct(editedProduct);
-        setIsEditing(false);
+      // Save changes to API
+      setProduct(prev => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          ...formData
+        }
+      })
+      setIsEditing(false)
         toast({
           title: "Success",
           description: "Product updated successfully",
-        });
-      }
+      })
     } catch (error) {
-      console.error('Error saving product:', error);
       toast({
         title: "Error",
-        description: isAddMode ? "Failed to create product" : "Failed to update product",
-        variant: "destructive",
-      });
+        description: "Failed to update product",
+        variant: "destructive"
+      })
     }
   };
 
   const handleCancel = () => {
-    if (isAddMode) {
-      router.push('/product-management/products');
-    } else {
-      setEditedProduct(product);
-      setIsEditing(false);
-    }
-  };
-
-  const handleInputChange = (field: keyof Product, value: any) => {
-    if (!editedProduct) return;
-    setEditedProduct({ ...editedProduct, [field]: value });
+    setIsEditing(false)
+    // Reset changes
+    const originalProduct = mockProductList.find((p: Product) => p.id === params.id) || null
+    setProduct(originalProduct)
+    setEditedProduct(originalProduct)
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      // try {
-      //   const response = await fetch(`/api/products/${params.id}`, {
-      //     method: 'DELETE',
-      //   });
-
-      //   if (!response.ok) {
-      //     throw new Error('Failed to delete product');
-      //   }
-
-      //   router.push('/products');
-      // } catch (error) {
-      //   console.error('Error deleting product:', error);
-      // }
-      alert("delete success");
+    try {
+      // Delete product via API
+      router.push('/product-management/products')
+      toast({
+        title: "Success",
+        description: "Product deleted successfully",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete product",
+        variant: "destructive"
+      })
     }
   };
 
@@ -769,31 +758,35 @@ export default function ProductDetail({
     }
   }
 
-  //       const response = await fetch(`/api/products/${product?.id}/conversions`, {
-  //         method: 'PUT',
-  //         headers: { 'Content-Type': 'application/json' },
-  //         body: JSON.stringify(product?.unitConversions),
-  //       });
-
-  //       if (!response.ok) throw new Error('Failed to save conversions');
-  //     if (!response.ok) {
-  //       console.error('Failed to save conversions')
-  //       toast({ title: "Error", description: "Failed to save conversions", variant: "destructive" })
-  //       return
-  //     }
-  //     if (response.ok) toast({ title: "Conversions saved successfully" })
-  //   } catch (error) {
-  //     console.error('Error saving conversions:', error)
-  //     toast({ title: "Error", description: "Failed to save conversions", variant: "destructive" })
-  //   }
-  // }
-
   const handleDeleteLocation = (locationCode: string) => {
     if (window.confirm('Are you sure you want to delete this location?')) {
       // Here you would make an API call to delete the location
       console.log(`Deleting location: ${locationCode}`);
     }
   };
+
+  // Add these handlers for location management
+  const handleAddLocation = (location: LocationAssignment) => {
+    setLocationAssignments(prev => [...prev, location])
+    toast({
+      title: "Success",
+      description: "Location assigned successfully",
+    })
+  }
+
+  const handleUpdateLocation = (id: string, updates: Partial<LocationAssignment>) => {
+    setLocationAssignments(prev => 
+      prev.map(loc => loc.id === id ? { ...loc, ...updates } : loc)
+    )
+  }
+
+  const handleRemoveLocation = (id: string) => {
+    setLocationAssignments(prev => prev.filter(loc => loc.id !== id))
+    toast({
+      title: "Success",
+      description: "Location removed successfully",
+    })
+  }
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -822,385 +815,326 @@ export default function ProductDetail({
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
           <TabsTrigger value="order-units">Order Units</TabsTrigger>
-          <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
+          <TabsTrigger value="ingredient-units">Ingredient Units</TabsTrigger>
+          <TabsTrigger value="locations">Location Assignment</TabsTrigger>
+          <TabsTrigger value="environmental-impact">Environmental Impact</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Product Details */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Basic Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Product Name</label>
-                      <Input
-                        disabled={!isEditing}
-                        value={editedProduct?.name || ''}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Local Name</label>
-                      <Input
-                        disabled={!isEditing}
-                        value={editedProduct?.localDescription || ''}
-                        onChange={(e) => handleInputChange('localDescription', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Category</label>
-                      <Select
-                        disabled={!isEditing}
-                        value={editedProduct?.categoryId}
-                        onValueChange={(value) => handleInputChange('categoryId', value)}
-                      >
-                        <SelectTrigger className="h-9">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {/* Add category options */}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Subcategory</label>
-                      <Select
-                        disabled={!isEditing}
-                        value={editedProduct?.subCategoryId}
-                        onValueChange={(value) => handleInputChange('subCategoryId', value)}
-                      >
-                        <SelectTrigger className="h-9">
-                          <SelectValue placeholder="Select subcategory" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {/* Add subcategory options */}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="col-span-2 space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Description</label>
-                      <Textarea
-                        disabled={!isEditing}
-                        value={editedProduct?.description || ''}
-                        onChange={(e) => handleInputChange('description', e.target.value)}
-                        className="min-h-[100px] resize-none"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Pricing & Tax</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Base Price</label>
-                      <Input
-                        type="number"
-                        disabled={!isEditing}
-                        value={editedProduct?.basePrice || ''}
-                        onChange={(e) => handleInputChange('basePrice', parseFloat(e.target.value))}
-                        className="h-9"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Currency</label>
-                      <Select
-                        disabled={!isEditing}
-                        value={editedProduct?.currency}
-                        onValueChange={(value) => handleInputChange('currency', value)}
-                      >
-                        <SelectTrigger className="h-9">
-                          <SelectValue placeholder="Select currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="THB">THB</SelectItem>
-                          <SelectItem value="USD">USD</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Tax Type</label>
-                      <Select
-                        disabled={!isEditing}
-                        value={editedProduct?.taxType}
-                        onValueChange={(value) => handleInputChange('taxType', value)}
-                      >
-                        <SelectTrigger className="h-9">
-                          <SelectValue placeholder="Select tax type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="VAT">VAT</SelectItem>
-                          <SelectItem value="NON_VAT">Non-VAT</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Tax Rate (%)</label>
-                      <Input
-                        type="number"
-                        disabled={!isEditing}
-                        value={editedProduct?.taxRate || ''}
-                        onChange={(e) => handleInputChange('taxRate', parseFloat(e.target.value))}
-                        className="h-9"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column - Image Upload */}
-            <div className="space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Product Image</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col items-center space-y-4">
-                    <div className="w-full">
-                      <ProductImage
-                        src={editedProduct?.imagesUrl || ''}
-                        alt={editedProduct?.name || 'Product image'}
-                      />
-                      {isEditing && (
-                        <div className="mt-4">
-                          <label
-                            htmlFor="image-upload"
-                            className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg cursor-pointer border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors"
-                          >
-                            <div className="flex flex-col items-center space-y-2">
-                              <UploadIcon className="h-8 w-8 text-muted-foreground/50" />
-                              <span className="text-sm font-medium">Click to upload new image</span>
-                            </div>
-                            <input
-                              id="image-upload"
-                              type="file"
-                              className="hidden"
-                              accept="image/*"
-                              onChange={handleImageUpload}
-                            />
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Recommended size: 800x800px. Max file size: 5MB.<br />
-                      Supported formats: JPG, PNG
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Status</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="isActive"
-                        checked={editedProduct?.isActive}
-                        onCheckedChange={(checked) => handleInputChange('isActive', checked)}
-                        disabled={!isEditing}
-                      />
-                      <label
-                        htmlFor="isActive"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Active
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="isForSale"
-                        checked={editedProduct?.isForSale}
-                        onCheckedChange={(checked) => handleInputChange('isForSale', checked)}
-                        disabled={!isEditing}
-                      />
-                      <label
-                        htmlFor="isForSale"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Available for Sale
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="isIngredient"
-                        checked={editedProduct?.isIngredient}
-                        onCheckedChange={(checked) => handleInputChange('isIngredient', checked)}
-                        disabled={!isEditing}
-                      />
-                      <label
-                        htmlFor="isIngredient"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Can be used as Ingredient
-                      </label>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="inventory">
           <div className="space-y-6">
-            {/* Total Stock Summary */}
             <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2 mb-4 border-b pb-4">
-                  <Package className="w-5 h-5 text-muted-foreground" />
-                  <h2 className="text-sm font-medium">Total Stock Position</h2>
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-xs text-muted-foreground block text-right">On Hand</label>
-                    <div className="mt-1 text-2xl font-semibold tabular-nums text-right">
-                      {inventoryData.totalStock.onHand.toLocaleString()}
+                <CardHeader>
+                <CardTitle>Pricing & Tax</CardTitle>
+                </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-2">
+                    <Label>Base Price</Label>
+                    <Input type="number" placeholder="Enter base price" />
                     </div>
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground block text-right">On Order</label>
-                    <div className="mt-1 text-2xl font-semibold tabular-nums text-right">
-                      {inventoryData.totalStock.onOrder.toLocaleString()}
+                    <div className="space-y-2">
+                    <Label>Tax Type</Label>
+                    <Select 
+                      defaultValue={product?.taxType}
+                      disabled={!isEditing}
+                      onValueChange={(value) => handleInputChange('taxType', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select tax type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ADDED">Added Tax</SelectItem>
+                        <SelectItem value="INCLUDED">Include Tax</SelectItem>
+                        <SelectItem value="NONE">None</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      Select how tax should be applied to this product
+                    </p>
                     </div>
-                  </div>
+                    <div className="space-y-2">
+                    <Label>Tax Rate (%)</Label>
+                    <Input type="number" placeholder="Enter tax rate" />
+                    </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Location Details */}
             <Card>
               <CardHeader>
-                <CardTitle>Stock by Location</CardTitle>
+                <CardTitle>Cost Information</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Location</TableHead>
-                      <TableHead className="text-right">On Hand</TableHead>
-                      <TableHead className="text-right">On Order</TableHead>
-                      <TableHead className="text-right">Minimum</TableHead>
-                      <TableHead className="text-right">Maximum</TableHead>
-                      <TableHead className="text-right">Reorder</TableHead>
-                      <TableHead className="text-right">PAR</TableHead>
-                      <TableHead className="text-center">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {inventoryData.locations.map((location) => {
-                      const isLow = location.onHand < location.minimum;
-                      const isHigh = location.onHand > location.maximum;
-                      const needsReorder = location.onHand < location.reorderPoint;
-                      
-                      return (
-                        <TableRow key={location.code}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{location.name}</div>
-                              <div className="text-xs text-muted-foreground">{location.code}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">
-                            {location.onHand.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">
-                            {location.onOrder.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">
-                            {location.minimum.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">
-                            {location.maximum.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">
-                            {location.reorderPoint.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">
-                            {location.parLevel.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <StatusBadge status={isLow ? 'below-min' : needsReorder ? 'reorder' : isHigh ? 'over-max' : 'normal'} />
-                          </TableCell>
-                        </TableRow>
-                      )})}
-                    {/* Totals Row */}
-                    <TableRow className="font-medium bg-muted/50">
-                      <TableCell>Total All Locations</TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {inventoryData.totalStock.onHand.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {inventoryData.totalStock.onOrder.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {inventoryData.aggregateSettings.minimum.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {inventoryData.aggregateSettings.maximum.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {inventoryData.aggregateSettings.reorderPoint.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {inventoryData.aggregateSettings.parLevel.toLocaleString()}
-                      </TableCell>
-                      <TableCell />
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-
-            {/* Legend */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start space-x-2">
-                  <AlertCircle className="w-5 h-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <h4 className="font-medium">Status Indicators</h4>
-                    <div className="mt-2 grid grid-cols-2 gap-4">
-                      <div className="flex items-center text-sm">
-                        <div className="w-2 h-2 bg-destructive rounded-full mr-2" />
-                        <span className="text-muted-foreground">Below Minimum Level</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2" />
-                        <span className="text-muted-foreground">Reorder Point Reached</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-2" />
-                        <span className="text-muted-foreground">Exceeds Maximum Level</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                        <span className="text-muted-foreground">Normal Stock Level</span>
-                      </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Standard Cost</Label>
+                    <Input type="number" placeholder="Enter standard cost" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Last Cost</Label>
+                    <Input type="number" placeholder="Enter last cost" disabled />
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+            <Card>
+                <CardHeader>
+                <CardTitle>Deviations & Thresholds</CardTitle>
+                </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-2">
+                    <Label>Price Deviation Limit (%)</Label>
+                      <Input
+                        type="number"
+                      placeholder="Enter limit" 
+                      min={0}
+                      max={100}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Maximum allowed deviation from standard price
+                    </p>
+                    </div>
+                    <div className="space-y-2">
+                    <Label>Quantity Deviation Limit (%)</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter limit"
+                      min={0}
+                      max={100}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Maximum allowed deviation from ordered quantity
+                    </p>
+                    </div>
+                    <div className="space-y-2">
+                    <Label>Minimum Stock Level</Label>
+                    <Input type="number" placeholder="Enter minimum level" />
+                    </div>
+                    <div className="space-y-2">
+                    <Label>Maximum Stock Level</Label>
+                    <Input type="number" placeholder="Enter maximum level" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+            <Card>
+                <CardHeader>
+                <CardTitle>Additional Attribute(s)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                <div className="grid gap-4">
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Weight</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter weight in kg"
+                      defaultValue={product?.weight || 0}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('weight', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Shelf Life</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter shelf life in days"
+                      defaultValue={product?.shelfLife || 0}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('shelfLife', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Storage Instructions</Label>
+                    <Textarea 
+                      placeholder="Enter storage instructions"
+                      defaultValue={product?.storageInstructions || ''}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('storageInstructions', e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Barcode</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Enter barcode"
+                      defaultValue={product?.barcode || ''}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('barcode', e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Size</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Enter size"
+                      defaultValue={product?.size || ''}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('size', e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Color</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Enter color"
+                      defaultValue={product?.color || ''}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('color', e.target.value)}
+                    />
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
           </div>
         </TabsContent>
+
+        <TabsContent value="inventory">
+          <InventoryTab isEditing={isEditing} />
+        </TabsContent>
+
         <TabsContent value="order-units">
           <OrderUnitTab isEditing={isEditing} />
         </TabsContent>
-        <TabsContent value="ingredients">
+
+        <TabsContent value="ingredient-units">
           <IngredientUnitTab isEditing={isEditing} />
+        </TabsContent>
+
+        <TabsContent value="locations">
+          <LocationsTab 
+            isEditing={isEditing}
+            locations={locationAssignments}
+            onAddLocation={handleAddLocation}
+            onUpdateLocation={handleUpdateLocation}
+            onRemoveLocation={handleRemoveLocation}
+          />
+        </TabsContent>
+
+        <TabsContent value="environmental-impact">
+          <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                <CardTitle>Environmental Impact Metrics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label>Carbon Footprint (kg CO2e)</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter CO2 equivalent"
+                      defaultValue={product.carbonFootprint}
+                        disabled={!isEditing}
+                      />
+                    <p className="text-sm text-muted-foreground">
+                      Carbon emissions per unit produced
+                    </p>
+                    </div>
+                  <div className="space-y-2">
+                    <Label>Water Usage (Liters)</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter water usage"
+                      defaultValue={product.waterUsage}
+                        disabled={!isEditing}
+                      />
+                    <p className="text-sm text-muted-foreground">
+                      Water consumption per unit
+                    </p>
+                    </div>
+                  <div className="space-y-2">
+                    <Label>Packaging Recyclability (%)</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter recyclability percentage"
+                      min={0}
+                      max={100}
+                      defaultValue={product.packagingRecyclability}
+                        disabled={!isEditing}
+                      />
+                    <p className="text-sm text-muted-foreground">
+                      Percentage of packaging that can be recycled
+                    </p>
+                    </div>
+                  <div className="space-y-2">
+                    <Label>Biodegradability (Months)</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter months to biodegrade"
+                      defaultValue={product.biodegradabilityMonths}
+                      disabled={!isEditing}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Time taken for natural decomposition
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Energy Efficiency Rating</Label>
+                    <Select 
+                      defaultValue={product.energyEfficiencyRating}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select rating" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="A">A (Most Efficient)</SelectItem>
+                        <SelectItem value="B">B</SelectItem>
+                        <SelectItem value="C">C</SelectItem>
+                        <SelectItem value="D">D</SelectItem>
+                        <SelectItem value="E">E</SelectItem>
+                        <SelectItem value="F">F (Least Efficient)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      Product energy efficiency classification
+                    </p>
+            </div>
+                  <div className="space-y-2">
+                    <Label>Sustainable Certification</Label>
+                    <Select 
+                      defaultValue={product.sustainableCertification}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select certification" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NONE">None</SelectItem>
+                        <SelectItem value="ORGANIC">Organic Certified</SelectItem>
+                        <SelectItem value="FAIRTRADE">Fair Trade</SelectItem>
+                        <SelectItem value="RAINFOREST">Rainforest Alliance</SelectItem>
+                        <SelectItem value="MSC">Marine Stewardship Council</SelectItem>
+                        <SelectItem value="FSC">Forest Stewardship Council</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      Environmental or sustainability certifications
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Environmental Notes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label>Additional Environmental Information</Label>
+                  <Textarea 
+                    placeholder="Enter any additional environmental impact information"
+                    className="min-h-[100px]"
+                    disabled={!isEditing}
+                  />
+                            </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
       <div className="mt-4 space-x-2">

@@ -1,7 +1,8 @@
 # Product Management Module - Product Requirements Document (PRD)
 
-**Document Status:** Draft  
-**Last Updated:** March 27, 2024
+**Document Status:** Approved  
+**Last Updated:** April 18, 2025  
+**Previous Version:** March 27, 2024
 
 ## Table of Contents
 
@@ -15,6 +16,7 @@
 8. [Security Requirements](#8-security-requirements)
 9. [Acceptance Criteria](#9-acceptance-criteria)
 10. [Future Enhancements](#10-future-enhancements)
+11. [Change Log](#11-change-log)
 
 ## 1. Introduction
 
@@ -34,6 +36,8 @@ The Product Management module encompasses the following key areas:
 - Product lifecycle management
 - Integration with other modules
 - Reporting and analytics
+- Barcode and QR code generation
+- Product sustainability tracking
 
 ### 1.3 Audience
 
@@ -44,6 +48,7 @@ The Product Management module encompasses the following key areas:
 - Project Managers
 - Stakeholders
 - End Users
+- Third-party Integration Partners
 
 ### 1.4 Definitions
 
@@ -53,14 +58,19 @@ The Product Management module encompasses the following key areas:
 - **Attribute**: A characteristic or property of a product
 - **Variant**: A specific version of a product with unique attributes
 - **Media**: Images, documents, or videos associated with a product
+- **SKU**: Stock Keeping Unit - a unique identifier for a product
+- **Carbon Footprint**: The amount of carbon dioxide emissions associated with a product
+- **Product Lineage**: The history and relationship of a product with other products
 
 ### 1.5 References
 
-1. Business Requirements Document
-2. System Architecture Document
-3. UI/UX Style Guide
-4. API Standards Document
-5. Security Standards Document
+1. Business Requirements Document v3.2
+2. System Architecture Document v2.5
+3. UI/UX Style Guide v4.0
+4. API Standards Document v2.1
+5. Security Standards Document v3.0
+6. Data Privacy Compliance Framework v1.2
+7. Sustainability Tracking Guidelines v1.0
 
 ## 2. User Stories
 
@@ -74,6 +84,8 @@ The Product Management module encompasses the following key areas:
 - **US-PM-006**: As a Product Manager, I want to import and export product data so that I can efficiently manage large product catalogs.
 - **US-PM-007**: As a Product Manager, I want to search and filter products so that I can quickly find specific items.
 - **US-PM-008**: As a Product Manager, I want to view product history so that I can track changes over time.
+- **US-PM-009**: As a Product Manager, I want to generate and manage product barcodes and QR codes so that products can be easily scanned and identified.
+- **US-PM-010**: As a Product Manager, I want to track and report on product sustainability metrics so that I can monitor environmental impact.
 
 ### 2.2 Category Manager
 
@@ -82,6 +94,8 @@ The Product Management module encompasses the following key areas:
 - **US-CM-003**: As a Category Manager, I want to reorganize the category hierarchy so that I can adapt to changing business needs.
 - **US-CM-004**: As a Category Manager, I want to view products by category so that I can analyze category performance.
 - **US-CM-005**: As a Category Manager, I want to bulk assign products to categories so that I can efficiently organize the product catalog.
+- **US-CM-006**: As a Category Manager, I want to analyze category performance metrics so that I can optimize the category structure.
+- **US-CM-007**: As a Category Manager, I want to apply category-level business rules so that I can enforce consistent practices within categories.
 
 ### 2.3 Inventory Manager
 
@@ -90,6 +104,8 @@ The Product Management module encompasses the following key areas:
 - **US-IM-003**: As an Inventory Manager, I want to specify inventory tracking methods for products so that inventory can be managed appropriately.
 - **US-IM-004**: As an Inventory Manager, I want to view product inventory information so that I can monitor stock levels.
 - **US-IM-005**: As an Inventory Manager, I want to generate inventory reports by product and category so that I can analyze inventory performance.
+- **US-IM-006**: As an Inventory Manager, I want to set up automated alerts for low stock and expiring products so that I can proactively manage inventory.
+- **US-IM-007**: As an Inventory Manager, I want to scan product barcodes for inventory operations so that I can efficiently track inventory movements.
 
 ### 2.4 Finance Team
 
@@ -98,6 +114,8 @@ The Product Management module encompasses the following key areas:
 - **US-FT-003**: As a Finance Team member, I want to view margin and markup calculations so that I can analyze product profitability.
 - **US-FT-004**: As a Finance Team member, I want to assign tax categories to products so that correct taxes are applied.
 - **US-FT-005**: As a Finance Team member, I want to generate financial reports by product and category so that I can analyze financial performance.
+- **US-FT-006**: As a Finance Team member, I want to apply bulk price changes based on business rules so that I can efficiently update prices.
+- **US-FT-007**: As a Finance Team member, I want to track cost history and trends so that I can analyze cost variations over time.
 
 ### 2.5 Operations Team
 
@@ -106,6 +124,8 @@ The Product Management module encompasses the following key areas:
 - **US-OT-003**: As an Operations Team member, I want to export product lists so that I can use the data in other systems.
 - **US-OT-004**: As an Operations Team member, I want to view product media so that I can identify products visually.
 - **US-OT-005**: As an Operations Team member, I want to access product documentation so that I can understand product handling requirements.
+- **US-OT-006**: As an Operations Team member, I want to scan product barcodes and QR codes so that I can quickly access product information.
+- **US-OT-007**: As an Operations Team member, I want to view product sustainability information so that I can support sustainable operations.
 
 ### 2.6 System Administrator
 
@@ -114,6 +134,16 @@ The Product Management module encompasses the following key areas:
 - **US-SA-003**: As a System Administrator, I want to configure system settings for product management so that the module behaves according to business requirements.
 - **US-SA-004**: As a System Administrator, I want to monitor system performance so that I can identify and address issues.
 - **US-SA-005**: As a System Administrator, I want to manage data imports and exports so that data integrity is maintained.
+- **US-SA-006**: As a System Administrator, I want to configure integration settings with third-party systems so that data flows correctly between systems.
+- **US-SA-007**: As a System Administrator, I want to manage audit logs and data retention policies so that compliance requirements are met.
+
+### 2.7 Sustainability Officer
+
+- **US-SO-001**: As a Sustainability Officer, I want to track product carbon footprint so that I can monitor environmental impact.
+- **US-SO-002**: As a Sustainability Officer, I want to generate sustainability reports by product and category so that I can analyze environmental performance.
+- **US-SO-003**: As a Sustainability Officer, I want to assign sustainability ratings to products so that users can identify environmentally friendly options.
+- **US-SO-004**: As a Sustainability Officer, I want to track product packaging information so that I can monitor packaging waste.
+- **US-SO-005**: As a Sustainability Officer, I want to monitor compliance with sustainability regulations so that the organization meets its obligations.
 
 ## 3. Feature Requirements
 
@@ -129,50 +159,82 @@ The Product Management module encompasses the following key areas:
 - **FR-PRD-006**: The system shall support bulk creation and editing of products.
 - **FR-PRD-007**: The system shall allow duplication of existing products as a starting point for new products.
 - **FR-PRD-008**: The system shall support product templates for consistent product creation.
+- **FR-PRD-009**: The system shall support product creation from mobile devices with simplified forms.
+- **FR-PRD-010**: The system shall allow scheduling of product information changes to take effect on specific dates.
 
 #### 3.1.2 Product Attributes
 
-- **FR-PRD-009**: The system shall support different attribute types (text, number, boolean, date, select, multi-select).
-- **FR-PRD-010**: The system shall allow assignment of attributes to products.
-- **FR-PRD-011**: The system shall support required and optional attributes.
-- **FR-PRD-012**: The system shall validate attribute values according to their type and constraints.
-- **FR-PRD-013**: The system shall support attribute inheritance from categories.
-- **FR-PRD-014**: The system shall allow filtering and searching by attribute values.
-- **FR-PRD-015**: The system shall support custom attribute validation rules.
-- **FR-PRD-016**: The system shall allow bulk update of attribute values.
+- **FR-PRD-011**: The system shall support different attribute types (text, number, boolean, date, select, multi-select, rich text).
+- **FR-PRD-012**: The system shall allow assignment of attributes to products.
+- **FR-PRD-013**: The system shall support required and optional attributes.
+- **FR-PRD-014**: The system shall validate attribute values according to their type and constraints.
+- **FR-PRD-015**: The system shall support attribute inheritance from categories.
+- **FR-PRD-016**: The system shall allow filtering and searching by attribute values.
+- **FR-PRD-017**: The system shall support custom attribute validation rules.
+- **FR-PRD-018**: The system shall allow bulk update of attribute values.
+- **FR-PRD-019**: The system shall support multilingual attribute values for internationalization.
+- **FR-PRD-020**: The system shall provide attribute comparison views for similar products.
 
 #### 3.1.3 Product Variants
 
-- **FR-PRD-017**: The system shall support creation of product variants based on attribute combinations.
-- **FR-PRD-018**: The system shall generate unique variant codes.
-- **FR-PRD-019**: The system shall allow specific pricing and costing for variants.
-- **FR-PRD-020**: The system shall support variant-specific media.
-- **FR-PRD-021**: The system shall allow bulk creation of variants based on attribute matrices.
-- **FR-PRD-022**: The system shall support variant status management.
-- **FR-PRD-023**: The system shall allow filtering and searching for variants.
-- **FR-PRD-024**: The system shall support variant-specific inventory tracking.
+- **FR-PRD-021**: The system shall support creation of product variants based on attribute combinations.
+- **FR-PRD-022**: The system shall generate unique variant codes.
+- **FR-PRD-023**: The system shall allow specific pricing and costing for variants.
+- **FR-PRD-024**: The system shall support variant-specific media.
+- **FR-PRD-025**: The system shall allow bulk creation of variants based on attribute matrices.
+- **FR-PRD-026**: The system shall support variant status management.
+- **FR-PRD-027**: The system shall allow filtering and searching for variants.
+- **FR-PRD-028**: The system shall support variant-specific inventory tracking.
+- **FR-PRD-029**: The system shall provide a visual variant matrix for easy management.
+- **FR-PRD-030**: The system shall support variant-specific sustainability information.
 
 #### 3.1.4 Product Media
 
-- **FR-PRD-025**: The system shall support upload of multiple media types (images, documents, videos).
-- **FR-PRD-026**: The system shall validate media file types, sizes, and dimensions.
-- **FR-PRD-027**: The system shall generate thumbnails for images.
-- **FR-PRD-028**: The system shall allow designation of primary media.
-- **FR-PRD-029**: The system shall support media tagging and categorization.
-- **FR-PRD-030**: The system shall allow ordering of media items.
-- **FR-PRD-031**: The system shall support bulk media upload.
-- **FR-PRD-032**: The system shall provide media preview capabilities.
+- **FR-PRD-031**: The system shall support upload of multiple media types (images, documents, videos, 3D models).
+- **FR-PRD-032**: The system shall validate media file types, sizes, and dimensions.
+- **FR-PRD-033**: The system shall generate thumbnails for images.
+- **FR-PRD-034**: The system shall allow designation of primary media.
+- **FR-PRD-035**: The system shall support media tagging and categorization.
+- **FR-PRD-036**: The system shall allow ordering of media items.
+- **FR-PRD-037**: The system shall support bulk media upload.
+- **FR-PRD-038**: The system shall provide media preview capabilities.
+- **FR-PRD-039**: The system shall support AI-powered automated image tagging and classification.
+- **FR-PRD-040**: The system shall optimize media for different viewing devices and bandwidth conditions.
 
 #### 3.1.5 Product Lifecycle Management
 
-- **FR-PRD-033**: The system shall support product status changes with appropriate validations.
-- **FR-PRD-034**: The system shall track product status history.
-- **FR-PRD-035**: The system shall enforce business rules for status transitions.
-- **FR-PRD-036**: The system shall support scheduled status changes.
-- **FR-PRD-037**: The system shall notify relevant users of status changes.
-- **FR-PRD-038**: The system shall support bulk status updates.
-- **FR-PRD-039**: The system shall allow filtering and reporting by status.
-- **FR-PRD-040**: The system shall support status-based visibility controls.
+- **FR-PRD-041**: The system shall support product status changes with appropriate validations.
+- **FR-PRD-042**: The system shall track product status history.
+- **FR-PRD-043**: The system shall enforce business rules for status transitions.
+- **FR-PRD-044**: The system shall support scheduled status changes.
+- **FR-PRD-045**: The system shall notify relevant users of status changes.
+- **FR-PRD-046**: The system shall support bulk status updates.
+- **FR-PRD-047**: The system shall allow filtering and reporting by status.
+- **FR-PRD-048**: The system shall support status-based visibility controls.
+- **FR-PRD-049**: The system shall provide lifecycle visualizations showing product progression through statuses.
+- **FR-PRD-050**: The system shall support automated lifecycle transitions based on configurable business rules.
+
+#### 3.1.6 Barcode and QR Code Management
+
+- **FR-PRD-051**: The system shall generate and manage barcodes and QR codes for products.
+- **FR-PRD-052**: The system shall support multiple barcode formats (UPC, EAN, CODE128, etc.).
+- **FR-PRD-053**: The system shall allow printing of barcode labels.
+- **FR-PRD-054**: The system shall support scanning of barcodes for product lookup.
+- **FR-PRD-055**: The system shall validate barcode uniqueness and integrity.
+- **FR-PRD-056**: The system shall allow bulk generation of barcodes.
+- **FR-PRD-057**: The system shall support QR codes with embedded product information.
+- **FR-PRD-058**: The system shall provide a barcode and QR code scanning interface for mobile devices.
+
+#### 3.1.7 Sustainability Tracking
+
+- **FR-PRD-059**: The system shall track and report on product sustainability metrics.
+- **FR-PRD-060**: The system shall calculate and display product carbon footprints.
+- **FR-PRD-061**: The system shall support sustainability ratings and certifications.
+- **FR-PRD-062**: The system shall track product packaging information.
+- **FR-PRD-063**: The system shall support sustainability-based filtering and reporting.
+- **FR-PRD-064**: The system shall allow definition of sustainability goals and tracking of progress.
+- **FR-PRD-065**: The system shall provide sustainability comparisons between similar products.
+- **FR-PRD-066**: The system shall integrate with third-party sustainability databases and services.
 
 ### 3.2 Category Management
 
@@ -186,28 +248,34 @@ The Product Management module encompasses the following key areas:
 - **FR-CAT-006**: The system shall support bulk creation and editing of categories.
 - **FR-CAT-007**: The system shall allow duplication of existing categories as a starting point for new categories.
 - **FR-CAT-008**: The system shall support category templates for consistent category creation.
+- **FR-CAT-009**: The system shall support category creation and editing from mobile devices.
+- **FR-CAT-010**: The system shall allow scheduling of category changes to take effect on specific dates.
 
 #### 3.2.2 Category Hierarchy
 
-- **FR-CAT-009**: The system shall support hierarchical category structures up to 5 levels deep.
-- **FR-CAT-010**: The system shall validate hierarchy integrity to prevent cycles.
-- **FR-CAT-011**: The system shall allow moving categories within the hierarchy.
-- **FR-CAT-012**: The system shall support category path generation and display.
-- **FR-CAT-013**: The system shall maintain product assignments when reorganizing categories.
-- **FR-CAT-014**: The system shall support category expansion and collapse in the UI.
-- **FR-CAT-015**: The system shall allow filtering and searching within the hierarchy.
-- **FR-CAT-016**: The system shall support drag-and-drop hierarchy management.
+- **FR-CAT-011**: The system shall support hierarchical category structures up to 5 levels deep.
+- **FR-CAT-012**: The system shall validate hierarchy integrity to prevent cycles.
+- **FR-CAT-013**: The system shall allow moving categories within the hierarchy.
+- **FR-CAT-014**: The system shall support category path generation and display.
+- **FR-CAT-015**: The system shall maintain product assignments when reorganizing categories.
+- **FR-CAT-016**: The system shall support category expansion and collapse in the UI.
+- **FR-CAT-017**: The system shall allow filtering and searching within the hierarchy.
+- **FR-CAT-018**: The system shall support drag-and-drop hierarchy management.
+- **FR-CAT-019**: The system shall provide visual indicators of category size and usage.
+- **FR-CAT-020**: The system shall support alternative category views (grid, list, tree) for different use cases.
 
 #### 3.2.3 Category Attributes
 
-- **FR-CAT-017**: The system shall allow definition of attributes at the category level.
-- **FR-CAT-018**: The system shall support inheritance of attributes by subcategories.
-- **FR-CAT-019**: The system shall allow specification of required attributes for products in a category.
-- **FR-CAT-020**: The system shall support default values for category attributes.
-- **FR-CAT-021**: The system shall validate attribute assignments according to business rules.
-- **FR-CAT-022**: The system shall allow bulk update of category attributes.
-- **FR-CAT-023**: The system shall support attribute override at subcategory levels.
-- **FR-CAT-024**: The system shall provide attribute inheritance visualization.
+- **FR-CAT-021**: The system shall allow definition of attributes at the category level.
+- **FR-CAT-022**: The system shall support inheritance of attributes by subcategories.
+- **FR-CAT-023**: The system shall allow specification of required attributes for products in a category.
+- **FR-CAT-024**: The system shall support default values for category attributes.
+- **FR-CAT-025**: The system shall validate attribute assignments according to business rules.
+- **FR-CAT-026**: The system shall allow bulk update of category attributes.
+- **FR-CAT-027**: The system shall support attribute override at subcategory levels.
+- **FR-CAT-028**: The system shall provide attribute inheritance visualization.
+- **FR-CAT-029**: The system shall support category-specific attribute validation rules.
+- **FR-CAT-030**: The system shall allow attribute mapping between categories for product migration.
 
 ### 3.3 Unit Management
 
@@ -221,17 +289,21 @@ The Product Management module encompasses the following key areas:
 - **FR-UNT-006**: The system shall support bulk creation and editing of units.
 - **FR-UNT-007**: The system shall allow duplication of existing units as a starting point for new units.
 - **FR-UNT-008**: The system shall support unit templates for consistent unit creation.
+- **FR-UNT-009**: The system shall support localized unit names and symbols for internationalization.
+- **FR-UNT-010**: The system shall allow grouping of units by type and function.
 
 #### 3.3.2 Unit Conversion
 
-- **FR-UNT-009**: The system shall support definition of conversion factors between units.
-- **FR-UNT-010**: The system shall validate conversion factor integrity to ensure consistency.
-- **FR-UNT-011**: The system shall support automatic conversion between related units.
-- **FR-UNT-012**: The system shall allow specification of base units for each unit type.
-- **FR-UNT-013**: The system shall support bidirectional conversions.
-- **FR-UNT-014**: The system shall provide a conversion calculator utility.
-- **FR-UNT-015**: The system shall support bulk update of conversion factors.
-- **FR-UNT-016**: The system shall validate circular conversions for consistency.
+- **FR-UNT-011**: The system shall support definition of conversion factors between units.
+- **FR-UNT-012**: The system shall validate conversion factor integrity to ensure consistency.
+- **FR-UNT-013**: The system shall support automatic conversion between related units.
+- **FR-UNT-014**: The system shall allow specification of base units for each unit type.
+- **FR-UNT-015**: The system shall support bidirectional conversions.
+- **FR-UNT-016**: The system shall provide a conversion calculator utility.
+- **FR-UNT-017**: The system shall support bulk update of conversion factors.
+- **FR-UNT-018**: The system shall validate circular conversions for consistency.
+- **FR-UNT-019**: The system shall support complex conversions involving multiple unit types.
+- **FR-UNT-020**: The system shall provide visual indicators for units with inconsistent conversions.
 
 ## 4. UI Requirements
 
@@ -247,28 +319,34 @@ The Product Management module encompasses the following key areas:
 - **UI-PRD-006**: The product list shall use color coding to indicate product status.
 - **UI-PRD-007**: The product list shall support bulk actions for selected products.
 - **UI-PRD-008**: The product list shall support keyboard navigation and shortcuts.
+- **UI-PRD-009**: The product list shall support saved views and custom column configurations.
+- **UI-PRD-010**: The product list shall provide visual indicators for sustainability ratings.
 
 #### 4.1.2 Product Detail View
 
-- **UI-PRD-009**: The product detail view shall be organized into logical sections with tabs.
-- **UI-PRD-010**: The product detail view shall display all product attributes.
-- **UI-PRD-011**: The product detail view shall include a media gallery.
-- **UI-PRD-012**: The product detail view shall display variant information in a tabular format.
-- **UI-PRD-013**: The product detail view shall include inventory information.
-- **UI-PRD-014**: The product detail view shall display costing and pricing information.
-- **UI-PRD-015**: The product detail view shall include category assignments.
-- **UI-PRD-016**: The product detail view shall display related products.
+- **UI-PRD-011**: The product detail view shall be organized into logical sections with tabs.
+- **UI-PRD-012**: The product detail view shall display all product attributes.
+- **UI-PRD-013**: The product detail view shall include a media gallery.
+- **UI-PRD-014**: The product detail view shall display variant information in a tabular format.
+- **UI-PRD-015**: The product detail view shall include inventory information.
+- **UI-PRD-016**: The product detail view shall display costing and pricing information.
+- **UI-PRD-017**: The product detail view shall include category assignments.
+- **UI-PRD-018**: The product detail view shall display related products.
+- **UI-PRD-019**: The product detail view shall include sustainability information and metrics.
+- **UI-PRD-020**: The product detail view shall support viewing and printing of barcode and QR code labels.
 
 #### 4.1.3 Product Creation/Edit Form
 
-- **UI-PRD-017**: The product form shall validate input in real-time with clear error messages.
-- **UI-PRD-018**: The product form shall support autosave functionality.
-- **UI-PRD-019**: The product form shall include a media upload area with drag-drop support.
-- **UI-PRD-020**: The product form shall dynamically adjust based on product type and category.
-- **UI-PRD-021**: The product form shall include a variant matrix generator.
-- **UI-PRD-022**: The product form shall support keyboard navigation and shortcuts.
-- **UI-PRD-023**: The product form shall include a preview mode.
-- **UI-PRD-024**: The product form shall support form section collapse/expand.
+- **UI-PRD-021**: The product form shall validate input in real-time with clear error messages.
+- **UI-PRD-022**: The product form shall support autosave functionality.
+- **UI-PRD-023**: The product form shall include a media upload area with drag-drop support.
+- **UI-PRD-024**: The product form shall dynamically adjust based on product type and category.
+- **UI-PRD-025**: The product form shall include a variant matrix generator.
+- **UI-PRD-026**: The product form shall support keyboard navigation and shortcuts.
+- **UI-PRD-027**: The product form shall include a preview mode.
+- **UI-PRD-028**: The product form shall support form section collapse/expand.
+- **UI-PRD-029**: The product form shall provide AI-assisted field completion suggestions.
+- **UI-PRD-030**: The product form shall support mobile-responsive design for field entry.
 
 ### 4.2 Category Management UI
 
@@ -282,17 +360,21 @@ The Product Management module encompasses the following key areas:
 - **UI-CAT-006**: The category tree shall include search and filter capabilities.
 - **UI-CAT-007**: The category tree shall support context menus for common actions.
 - **UI-CAT-008**: The category tree shall support keyboard navigation and shortcuts.
+- **UI-CAT-009**: The category tree shall provide visual indicators for categories with inheritance conflicts.
+- **UI-CAT-010**: The category tree shall support alternative visualization modes (grid, list, tree).
 
 #### 4.2.2 Category Detail View
 
-- **UI-CAT-009**: The category detail view shall display all category attributes.
-- **UI-CAT-010**: The category detail view shall show the category path.
-- **UI-CAT-011**: The category detail view shall list subcategories.
-- **UI-CAT-012**: The category detail view shall list products assigned to the category.
-- **UI-CAT-013**: The category detail view shall display attribute inheritance information.
-- **UI-CAT-014**: The category detail view shall include usage statistics.
-- **UI-CAT-015**: The category detail view shall show related categories.
-- **UI-CAT-016**: The category detail view shall include audit information.
+- **UI-CAT-011**: The category detail view shall display all category attributes.
+- **UI-CAT-012**: The category detail view shall show the category path.
+- **UI-CAT-013**: The category detail view shall list subcategories.
+- **UI-CAT-014**: The category detail view shall list products assigned to the category.
+- **UI-CAT-015**: The category detail view shall display attribute inheritance information.
+- **UI-CAT-016**: The category detail view shall include usage statistics.
+- **UI-CAT-017**: The category detail view shall show related categories.
+- **UI-CAT-018**: The category detail view shall include audit information.
+- **UI-CAT-019**: The category detail view shall provide visualization of category performance metrics.
+- **UI-CAT-020**: The category detail view shall support comparison with other categories.
 
 ### 4.3 Unit Management UI
 
@@ -306,17 +388,21 @@ The Product Management module encompasses the following key areas:
 - **UI-UNT-006**: The unit list shall use color coding to indicate unit status.
 - **UI-UNT-007**: The unit list shall support bulk actions for selected units.
 - **UI-UNT-008**: The unit list shall support keyboard navigation and shortcuts.
+- **UI-UNT-009**: The unit list shall provide visual indicators for units with conversion issues.
+- **UI-UNT-010**: The unit list shall support saved views and custom column configurations.
 
 #### 4.3.2 Unit Conversion Matrix
 
-- **UI-UNT-009**: The conversion matrix shall display conversion factors between units.
-- **UI-UNT-010**: The conversion matrix shall highlight inconsistent conversions.
-- **UI-UNT-011**: The conversion matrix shall support inline editing of conversion factors.
-- **UI-UNT-012**: The conversion matrix shall include a conversion calculator.
-- **UI-UNT-013**: The conversion matrix shall group units by type.
-- **UI-UNT-014**: The conversion matrix shall support filtering to show specific unit types.
-- **UI-UNT-015**: The conversion matrix shall include visual indicators for base units.
-- **UI-UNT-016**: The conversion matrix shall support export to spreadsheet.
+- **UI-UNT-011**: The conversion matrix shall display conversion factors between units.
+- **UI-UNT-012**: The conversion matrix shall highlight inconsistent conversions.
+- **UI-UNT-013**: The conversion matrix shall support inline editing of conversion factors.
+- **UI-UNT-014**: The conversion matrix shall include a conversion calculator.
+- **UI-UNT-015**: The conversion matrix shall group units by type.
+- **UI-UNT-016**: The conversion matrix shall support filtering to show specific unit types.
+- **UI-UNT-017**: The conversion matrix shall include visual indicators for base units.
+- **UI-UNT-018**: The conversion matrix shall support export to spreadsheet.
+- **UI-UNT-019**: The conversion matrix shall provide visual validation of conversion consistency.
+- **UI-UNT-020**: The conversion matrix shall support bulk update of conversion factors.
 
 ## 5. Technical Requirements
 
@@ -330,6 +416,8 @@ The Product Management module encompasses the following key areas:
 - **TR-ARCH-006**: The module shall implement the specification pattern for complex queries.
 - **TR-ARCH-007**: The module shall use the factory pattern for object creation.
 - **TR-ARCH-008**: The module shall implement the strategy pattern for variable behaviors.
+- **TR-ARCH-009**: The module shall support containerization for scalable deployment.
+- **TR-ARCH-010**: The module shall implement a service mesh for resilient communication.
 
 ### 5.2 API
 
@@ -341,6 +429,8 @@ The Product Management module encompasses the following key areas:
 - **TR-API-006**: The APIs shall support bulk operations where appropriate.
 - **TR-API-007**: The APIs shall implement rate limiting and throttling.
 - **TR-API-008**: The APIs shall provide comprehensive documentation.
+- **TR-API-009**: The APIs shall support versioning for backward compatibility.
+- **TR-API-010**: The APIs shall implement GraphQL for complex data queries.
 
 ### 5.3 Database
 
@@ -352,6 +442,8 @@ The Product Management module encompasses the following key areas:
 - **TR-DB-006**: The module shall implement proper concurrency control.
 - **TR-DB-007**: The module shall use database views for complex reporting queries.
 - **TR-DB-008**: The module shall implement proper database security.
+- **TR-DB-009**: The module shall support database sharding for scalability.
+- **TR-DB-010**: The module shall implement entity-specific audit tables.
 
 ### 5.4 Caching
 
@@ -363,6 +455,8 @@ The Product Management module encompasses the following key areas:
 - **TR-CACHE-006**: The module shall use cache compression for efficiency.
 - **TR-CACHE-007**: The module shall implement cache monitoring and metrics.
 - **TR-CACHE-008**: The module shall use cache partitioning for isolation.
+- **TR-CACHE-009**: The module shall support TTL-based caching for volatile data.
+- **TR-CACHE-010**: The module shall implement write-through caching for critical updates.
 
 ### 5.5 Search
 
@@ -374,6 +468,8 @@ The Product Management module encompasses the following key areas:
 - **TR-SEARCH-006**: The module shall support search result ranking and sorting.
 - **TR-SEARCH-007**: The module shall implement search suggestions and autocomplete.
 - **TR-SEARCH-008**: The module shall support search across multiple languages.
+- **TR-SEARCH-009**: The module shall implement semantic search capabilities.
+- **TR-SEARCH-010**: The module shall support image-based search for products.
 
 ## 6. Integration Requirements
 
@@ -387,6 +483,8 @@ The Product Management module encompasses the following key areas:
 - **IR-INV-006**: The module shall receive inventory movement data for reporting.
 - **IR-INV-007**: The module shall support inventory location management.
 - **IR-INV-008**: The module shall provide product status information for inventory control.
+- **IR-INV-009**: The module shall support lot and batch tracking integration.
+- **IR-INV-010**: The module shall provide barcode and QR code data for inventory operations.
 
 ### 6.2 Procurement Integration
 
@@ -398,6 +496,8 @@ The Product Management module encompasses the following key areas:
 - **IR-PROC-006**: The module shall receive procurement history data for reporting.
 - **IR-PROC-007**: The module shall support procurement planning integration.
 - **IR-PROC-008**: The module shall provide product status information for procurement control.
+- **IR-PROC-009**: The module shall support preferred vendor assignments for products.
+- **IR-PROC-010**: The module shall integrate with vendor catalogs for product synchronization.
 
 ### 6.3 Recipe Management Integration
 
@@ -409,6 +509,8 @@ The Product Management module encompasses the following key areas:
 - **IR-REC-006**: The module shall receive recipe usage data for reporting.
 - **IR-REC-007**: The module shall support recipe planning integration.
 - **IR-REC-008**: The module shall provide product status information for recipe control.
+- **IR-REC-009**: The module shall support allergen and nutritional information integration.
+- **IR-REC-010**: The module shall provide ingredient substitution suggestions.
 
 ### 6.4 Financial Management Integration
 
@@ -420,6 +522,8 @@ The Product Management module encompasses the following key areas:
 - **IR-FIN-006**: The module shall receive financial history data for reporting.
 - **IR-FIN-007**: The module shall support financial planning integration.
 - **IR-FIN-008**: The module shall provide product status information for financial control.
+- **IR-FIN-009**: The module shall support product cost allocation rules.
+- **IR-FIN-010**: The module shall integrate with financial forecasting systems.
 
 ### 6.5 Reporting System Integration
 
@@ -431,77 +535,31 @@ The Product Management module encompasses the following key areas:
 - **IR-REP-006**: The module shall support export to various formats.
 - **IR-REP-007**: The module shall provide data for KPI calculations.
 - **IR-REP-008**: The module shall support drill-down reporting.
+- **IR-REP-009**: The module shall provide real-time reporting capabilities.
+- **IR-REP-010**: The module shall support advanced analytics integration.
 
-## 7. Performance Requirements
+### 6.6 Sustainability System Integration
 
-- **PR-001**: The product list shall load within 2 seconds for up to 1,000 products.
-- **PR-002**: The category tree shall load within 1 second for up to 500 categories.
-- **PR-003**: The unit list shall load within 1 second for up to 100 units.
-- **PR-004**: Product search shall return results within 1 second for simple queries.
-- **PR-005**: Product creation shall complete within 3 seconds.
-- **PR-006**: Bulk operations shall process at least 100 items per second.
-- **PR-007**: The system shall support at least 100 concurrent users.
-- **PR-008**: API response times shall be under 500ms for 95% of requests.
-- **PR-009**: Database queries shall execute in under 100ms for 95% of queries.
-- **PR-010**: The system shall maintain performance with up to 100,000 products.
+- **IR-SUS-001**: The module shall provide product data to the Sustainability System.
+- **IR-SUS-002**: The module shall receive sustainability metrics from external systems.
+- **IR-SUS-003**: The module shall support carbon footprint calculation integration.
+- **IR-SUS-004**: The module shall provide packaging data for waste analysis.
+- **IR-SUS-005**: The module shall support sustainability reporting integration.
+- **IR-SUS-006**: The module shall receive sustainability certification updates.
+- **IR-SUS-007**: The module shall support sustainability goal tracking.
+- **IR-SUS-008**: The module shall provide product lifecycle data for environmental impact analysis.
+- **IR-SUS-009**: The module shall integrate with third-party sustainability databases.
+- **IR-SUS-010**: The module shall support regulatory compliance tracking for sustainability.
 
-## 8. Security Requirements
+### 6.7 Mobile Application Integration
 
-- **SR-001**: The module shall implement role-based access control.
-- **SR-002**: The module shall support field-level security for sensitive data.
-- **SR-003**: The module shall implement proper input validation to prevent injection attacks.
-- **SR-004**: The module shall use secure communication protocols.
-- **SR-005**: The module shall implement proper authentication and authorization.
-- **SR-006**: The module shall maintain an audit trail of all changes.
-- **SR-007**: The module shall implement proper error handling to prevent information disclosure.
-- **SR-008**: The module shall support data encryption for sensitive information.
-- **SR-009**: The module shall implement proper session management.
-- **SR-010**: The module shall comply with relevant security standards and regulations.
-
-## 9. Acceptance Criteria
-
-### 9.1 Product Management
-
-- **AC-PRD-001**: Users can create, edit, and view products with all required attributes.
-- **AC-PRD-002**: Users can categorize products and manage product hierarchies.
-- **AC-PRD-003**: Users can upload and manage product media.
-- **AC-PRD-004**: Users can create and manage product variants.
-- **AC-PRD-005**: Users can manage product lifecycle through status changes.
-- **AC-PRD-006**: Users can search and filter products by various criteria.
-- **AC-PRD-007**: Users can import and export product data.
-- **AC-PRD-008**: Users can view product history and audit trail.
-
-### 9.2 Category Management
-
-- **AC-CAT-001**: Users can create, edit, and view categories with all required attributes.
-- **AC-CAT-002**: Users can manage category hierarchies up to 5 levels deep.
-- **AC-CAT-003**: Users can define category attributes and inheritance rules.
-- **AC-CAT-004**: Users can assign products to categories.
-- **AC-CAT-005**: Users can reorganize the category structure.
-- **AC-CAT-006**: Users can search and filter categories by various criteria.
-- **AC-CAT-007**: Users can import and export category data.
-- **AC-CAT-008**: Users can view category history and audit trail.
-
-### 9.3 Unit Management
-
-- **AC-UNT-001**: Users can create, edit, and view units with all required attributes.
-- **AC-UNT-002**: Users can define unit conversions between related units.
-- **AC-UNT-003**: Users can assign units to products.
-- **AC-UNT-004**: Users can use the unit conversion calculator.
-- **AC-UNT-005**: Users can manage unit types and groupings.
-- **AC-UNT-006**: Users can search and filter units by various criteria.
-- **AC-UNT-007**: Users can import and export unit data.
-- **AC-UNT-008**: Users can view unit history and audit trail.
-
-## 10. Future Enhancements
-
-- **FE-001**: Advanced product bundling and kitting
-- **FE-002**: AI-powered product categorization
-- **FE-003**: Automated product attribute extraction from documents
-- **FE-004**: Enhanced product recommendation engine
-- **FE-005**: Advanced product comparison features
-- **FE-006**: 3D product visualization
-- **FE-007**: Voice-based product search
-- **FE-008**: Blockchain-based product traceability
-- **FE-009**: Augmented reality product visualization
-- **FE-010**: Machine learning for product demand forecasting 
+- **IR-MOB-001**: The module shall provide product data to the Mobile Application.
+- **IR-MOB-002**: The module shall support barcode and QR code scanning from mobile devices.
+- **IR-MOB-003**: The module shall receive product updates from mobile devices.
+- **IR-MOB-004**: The module shall support offline data synchronization.
+- **IR-MOB-005**: The module shall provide optimized media for mobile viewing.
+- **IR-MOB-006**: The module shall support mobile-specific workflows.
+- **IR-MOB-007**: The module shall provide simplified product forms for mobile entry.
+- **IR-MOB-008**: The module shall support push notifications for product changes.
+- **IR-MOB-009**: The module shall provide location-aware product information.
+- **IR-MOB-010**: The module shall support mobile-based product verification.

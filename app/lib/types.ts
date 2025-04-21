@@ -7,6 +7,11 @@ export interface Address {
   provinceId: string
   postalCode: string
   isPrimary: boolean
+  street: string
+  city: string
+  state: string
+  country: string
+  type: 'BILLING' | 'SHIPPING'
 }
 
 export interface Contact {
@@ -17,6 +22,7 @@ export interface Contact {
   email: string
   department: string
   isPrimary: boolean
+  role: string
 }
 
 export interface EnvironmentalImpact {
@@ -37,6 +43,8 @@ export interface Certification {
 
 export interface Vendor {
   id: string
+  name: string
+  code: string
   companyName: string
   businessRegistrationNumber: string
   taxId: string
@@ -107,4 +115,65 @@ export interface PurchaseRequestItem {
   baseDiscAmount: number
   baseTaxAmount: number
   baseTotalAmount: number
-} 
+}
+
+export interface Money {
+  amount: number
+  currency: Currency
+}
+
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY'
+
+export type ProductStatus = 'ACTIVE' | 'INACTIVE' | 'DISCONTINUED'
+
+export type TaxType = 'STANDARD' | 'REDUCED' | 'ZERO' | 'EXEMPT'
+
+export type UnitType = 'PIECE' | 'WEIGHT' | 'VOLUME' | 'LENGTH'
+
+export type StockStatus = 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK'
+
+export interface InventoryUnit {
+  id: string
+  name: string
+  code: string
+  type: UnitType
+}
+
+export interface UnitConversion {
+  fromUnit: InventoryUnit
+  toUnit: InventoryUnit
+  factor: number
+}
+
+export interface Product {
+  id: string
+  productCode: string
+  name: string
+  localName?: string
+  description?: string
+  categoryId: string
+  itemGroupId: string
+  basePrice: Money
+  standardCost?: Money
+  lastCost?: Money
+  priceDeviationLimit?: number
+  quantityDeviationLimit?: number
+  minStockLevel?: number
+  maxStockLevel?: number
+  weight?: number
+  shelfLife?: number
+  storageInstructions?: string
+  status: ProductStatus
+  taxType: TaxType
+  unitType: UnitType
+  stockStatus: StockStatus
+  inventoryUnits: InventoryUnit[]
+  unitConversions: UnitConversion[]
+  vendors: Vendor[]
+  carbonFootprint?: number
+  waterUsage?: number
+  packagingRecyclability?: number
+  biodegradabilityMonths?: number
+  energyEfficiencyRating?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+  sustainableCertification?: 'NONE' | 'FSC' | 'PEFC' | 'RSPO' | 'FAIRTRADE' | 'ORGANIC' | 'OTHER'
+}

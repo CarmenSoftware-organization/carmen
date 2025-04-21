@@ -9,6 +9,19 @@ import { samplePRData } from "../purchase-requests/components/sampleData"
 import { AdvancedFilter } from "@/components/ui/advanced-filter"
 import { FilterType } from "@/lib/utils/filter-storage"
 import { toast } from "@/components/ui/use-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { LayoutGrid, List, FileText, PencilLine, Trash2, ChevronDown } from "lucide-react"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +32,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 
 // Create an array of sample templates based on the sample PR data
 const templateData: PurchaseRequest[] = [
@@ -31,6 +52,7 @@ const templateData: PurchaseRequest[] = [
 
 export default function PRTemplatesPage() {
   const router = useRouter()
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
@@ -217,6 +239,192 @@ export default function PRTemplatesPage() {
     { value: 'totalAmount' as keyof PurchaseRequest, label: 'Total Amount' }
   ]
 
+  const renderCardView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {templates.map((template) => (
+        <Card key={template.id} className="overflow-hidden hover:bg-secondary/10 transition-colors">
+          <CardHeader className="p-5 pb-3 bg-muted/30 border-b">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(template.id)}
+                  onChange={() => handleSelectItem(template.id)}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <div>
+                  <h3 className="text-lg font-semibold text-primary">{template.description}</h3>
+                  <p className="text-sm text-muted-foreground">{template.refNumber}</p>
+                </div>
+              </div>
+              <Badge variant="outline">{template.type}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-5">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Department</p>
+                <p className="text-sm font-medium">{template.department}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Requestor</p>
+                <p className="text-sm font-medium">{template.requestor.name}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Total Amount</p>
+                <p className="text-sm font-medium">${template.totalAmount.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Workflow Stage</p>
+                <p className="text-sm font-medium">{template.currentWorkflowStage}</p>
+              </div>
+            </div>
+            <div className="flex justify-end mt-4 pt-3 border-t border-border/50 space-x-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleView(template.id)}
+                className="h-8 w-8 rounded-full"
+              >
+                <span className="sr-only">View</span>
+                <FileText className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleEdit(template.id)}
+                className="h-8 w-8 rounded-full"
+              >
+                <span className="sr-only">Edit</span>
+                <PencilLine className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleDelete(template.id)}
+                className="h-8 w-8 rounded-full"
+              >
+                <span className="sr-only">Delete</span>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+
+  const renderTableView = () => (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[50px]">
+              <Checkbox
+                checked={selectedItems.length === templates.length}
+                onCheckedChange={handleSelectAll}
+              />
+            </TableHead>
+            <TableHead>Template</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Department</TableHead>
+            <TableHead>Requestor</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="w-[100px]">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {templates.map((template) => (
+            <TableRow key={template.id}>
+              <TableCell>
+                <Checkbox
+                  checked={selectedItems.includes(template.id)}
+                  onCheckedChange={() => handleSelectItem(template.id)}
+                />
+              </TableCell>
+              <TableCell>
+                <div>
+                  <p className="font-medium">{template.description}</p>
+                  <p className="text-sm text-muted-foreground">{template.refNumber}</p>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">{template.type}</Badge>
+              </TableCell>
+              <TableCell>{template.department}</TableCell>
+              <TableCell>{template.requestor.name}</TableCell>
+              <TableCell className="text-right font-medium">
+                ${template.totalAmount.toFixed(2)}
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">{template.status}</Badge>
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-end space-x-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleView(template.id)}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <span className="sr-only">View</span>
+                    <FileText className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEdit(template.id)}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <span className="sr-only">Edit</span>
+                    <PencilLine className="h-4 w-4" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                        <span className="sr-only">More options</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleDelete(template.id)} className="text-destructive">
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+
+  const viewToggle = (
+    <div className="flex border rounded-md overflow-hidden">
+      <Button
+        variant={viewMode === 'table' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setViewMode('table')}
+        className="rounded-none h-8 px-2"
+      >
+        <List className="h-4 w-4" />
+        <span className="sr-only">Table View</span>
+      </Button>
+      <Button
+        variant={viewMode === 'card' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setViewMode('card')}
+        className="rounded-none h-8 px-2"
+      >
+        <LayoutGrid className="h-4 w-4" />
+        <span className="sr-only">Card View</span>
+      </Button>
+    </div>
+  )
+
   return (
     <>
       <PRListTemplate
@@ -224,21 +432,21 @@ export default function PRTemplatesPage() {
         data={templates}
         selectedItems={selectedItems}
         currentPage={currentPage}
-        itemsPerPage={7}
+        itemsPerPage={10}
         onPageChange={setCurrentPage}
         onSearch={handleSearch}
-        onTypeChange={handleTypeChange}
-        onStatusChange={handleStatusChange}
         onSelectItem={handleSelectItem}
         onSelectAll={handleSelectAll}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onCreateNew={handleCreateNew}
+        customActions={customActions}
         typeOptions={typeOptions}
         statusOptions={statusOptions}
+        onTypeChange={handleTypeChange}
+        onStatusChange={handleStatusChange}
         fieldConfigs={fieldConfigs}
-        customActions={customActions}
         advancedFilter={
           <AdvancedFilter 
             onApplyFilters={handleApplyFilters}
@@ -246,6 +454,10 @@ export default function PRTemplatesPage() {
             filterFields={filterFields}
           />
         }
+        viewToggle={viewToggle}
+        viewMode={viewMode}
+        tableView={renderTableView()}
+        cardView={renderCardView()}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

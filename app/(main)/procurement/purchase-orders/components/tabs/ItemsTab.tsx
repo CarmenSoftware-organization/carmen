@@ -36,11 +36,11 @@ import {
   ChevronRight,
   MoreHorizontal,
   Plus,
-  Eye,
+  FileText,
   Edit,
   MessageSquare,
   Split,
-  X,
+  Trash,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
@@ -74,7 +74,7 @@ interface ItemsTabProps {
   poData: PurchaseOrder;
 }
 
-export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabProps) {
+export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState<Partial<PurchaseOrderItem>>({
@@ -259,171 +259,167 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem }: ItemsTabPr
           <ItemDetailsComponent
             initialMode="view"
             onClose={() => setViewingItem(null)}
+            onSubmit={() => {}}
             isOpen={!!viewingItem}
             initialData={viewingItem}
           />
         )}
 
-        {selectedItems.length > 0 && (
-          <div className="flex space-x-2 mb-4">
-            <Button onClick={() => handleBulkAction("setFullyReceived")}>
-              Set Fully Received
-            </Button>
-            <Button onClick={() => handleBulkAction("delete")}>
-              Delete Selected
-            </Button>
+        {selectedItemsCount > 0 && (
+          <div className="bg-secondary/10 p-3 rounded-md mb-4 flex justify-between items-center">
+            <span className="text-sm font-medium">
+              {selectedItemsCount} item{selectedItemsCount !== 1 ? "s" : ""}{" "}
+              selected
+            </span>
+            <div className="flex space-x-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkAction("accept")}
+              >
+                Accept All
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkAction("reject")}
+              >
+                Reject All
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkAction("review")}
+              >
+                Review All
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkAction("split")}
+              >
+                Split All
+              </Button>
+            </div>
           </div>
         )}
 
-        <div className="w-full overflow-auto">
-          {poData.items.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table className="w-full min-w-[1400px]">
-                <TableHeader>
-                  <TableRow className="h-8">
-                    <TableHead className="w-[50px]">
-                      <Checkbox
-                        checked={selectedItems.length === poData.items.length}
-                        // onCheckedChange={toggleAllSelection}
-                      />
-                    </TableHead>
-                    <TableHead className="min-w-[200px]">Product Name</TableHead>
-                    <TableHead className="min-w-[120px]">Order Qty</TableHead>
-                    <TableHead className="min-w-[120px]">Received Qty</TableHead>
-                    <TableHead className="min-w-[120px]">Remaining Qty</TableHead>
-                    <TableHead className="min-w-[80px]">Unit</TableHead>
-                    <TableHead className="min-w-[100px]">Price</TableHead>
-                    <TableHead className="min-w-[120px]">Net Amount</TableHead>
-                    <TableHead className="min-w-[120px]">Tax Amount</TableHead>
-                    <TableHead className="min-w-[120px]">Total Amount</TableHead>
-                    <TableHead className="min-w-[150px]">Receiving Status</TableHead>
-                    <TableHead className="min-w-[120px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {poData.items.map((item) => (
-                    <TableRow key={item.id} className="h-10">
-                      <TableCell className="py-1">
-                        <Checkbox
-                          checked={selectedItems.includes(item.id)}
-                          onCheckedChange={() => toggleItemSelection(item.id)}
-                        />
-                      </TableCell>
-                      <TableCell className="py-1">
-                        <div className="flex items-center">
-                          <div>
-                            <div>{item.name}</div>
-                            <div className="text-xs text-gray-500">{item.description}</div>
-                          </div>
-                          {item.isFOC && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Gift
-                                  className="inline-block ml-2 text-blue-500"
-                                  size={14}
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent>Free of Charge</TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">
-                          {item.orderedQuantity.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {item.baseQuantity.toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">
-                          {item.receivedQuantity.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {item.baseReceivingQty.toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">
-                          {item.remainingQuantity.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {(item.remainingQuantity * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">{item.orderUnit}</div>
-                        <div className="text-xs text-gray-500">{item.baseUnit}</div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">
-                          ${item.unitPrice.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          ${(item.unitPrice * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">
-                          ${(item.subTotalPrice - item.taxAmount).toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          ${((item.subTotalPrice - item.taxAmount) * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">
-                          ${item.taxAmount.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          ${(item.taxAmount * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <div className="text-sm">
-                          ${item.subTotalPrice.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          ${(item.subTotalPrice * (item.baseQuantity / item.orderedQuantity)).toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1">
-                        <StatusBadge status={item.status} />
-                      </TableCell>
-                      <TableCell className="py-1">
-                        <div className="flex space-x-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewDetails(item)}
-                          >
-                            <Eye className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditItem(item)}
-                          >
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCancelItem(item)}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <p>No items available.</p>
-          )}
+        <div className="rounded-md border overflow-hidden">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead className="w-[40px]">
+                  <Checkbox
+                    checked={
+                      selectedItems.length === poData.items.length &&
+                      poData.items.length > 0
+                    }
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedItems(
+                          poData.items.map((item) => item.id)
+                        );
+                      } else {
+                        setSelectedItems([]);
+                      }
+                    }}
+                  />
+                </TableHead>
+                <TableHead className="w-[100px]">PO Item</TableHead>
+                <TableHead className="w-[200px]">Item Name</TableHead>
+                <TableHead className="w-[200px]">Description</TableHead>
+                <TableHead className="w-[100px] text-right">Order Qty</TableHead>
+                <TableHead className="w-[100px]">Unit</TableHead>
+                <TableHead className="w-[120px] text-right">Unit Price</TableHead>
+                <TableHead className="w-[120px] text-right">Tax</TableHead>
+                <TableHead className="w-[120px] text-right">Discount</TableHead>
+                <TableHead className="w-[120px] text-right">Amount</TableHead>
+                <TableHead className="w-[120px] text-center">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {poData?.items.map((item, index) => (
+                <TableRow
+                  key={item.id}
+                  className={
+                    selectedItems.includes(item.id) ? "bg-secondary/10" : ""
+                  }
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedItems.includes(item.id)}
+                      onCheckedChange={() => toggleItemSelection(item.id)}
+                    />
+                  </TableCell>
+                  <TableCell>{item.id.substring(0, 6)}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell className="max-w-[200px] truncate">
+                    {item.description}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.orderedQuantity}
+                  </TableCell>
+                  <TableCell>{item.orderUnit}</TableCell>
+                  <TableCell className="text-right">
+                    {item.unitPrice?.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.taxAmount?.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.discountAmount?.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {(
+                      item.orderedQuantity * item.unitPrice -
+                      (item.discountAmount || 0) +
+                      (item.taxAmount || 0)
+                    ).toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleViewDetails(item)}
+                        className="h-8 w-8 rounded-full"
+                      >
+                        <span className="sr-only">View details</span>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditItem(item)}
+                        className="h-8 w-8 rounded-full"
+                      >
+                        <span className="sr-only">Edit item</span>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleCancelItem(item)}
+                        className="h-8 w-8 rounded-full"
+                      >
+                        <span className="sr-only">Delete item</span>
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleAddNote(item)}
+                        className="h-8 w-8 rounded-full"
+                      >
+                        <span className="sr-only">Add note</span>
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </TooltipProvider>

@@ -157,6 +157,10 @@ export interface PurchaseOrder {
   creditTerms: string;
   description: string;
   remarks: string;
+  purchaseRequisitionIds?: string[];
+  purchaseRequisitionNumbers?: string[];
+  shippingAddress?: Address;
+  deliveryPoint?: string;
   items: PurchaseOrderItem[];
   baseCurrencyCode: string;
   baseSubTotalPrice: number;
@@ -169,6 +173,7 @@ export interface PurchaseOrder {
   taxAmount: number;
   baseTotalAmount: number;
   totalAmount: number;
+  activityLog?: ActivityLogEntry[];
 }
 
 export interface PurchaseOrderItem {
@@ -909,6 +914,13 @@ export interface Product {
   storageInstructions: string;
   unitConversions: UnitConversion[];
   imagesUrl: string;
+  // Environmental Impact Fields
+  carbonFootprint?: number; // Carbon dioxide equivalent per unit (kg CO2e)
+  waterUsage?: number; // Water consumption per unit (liters)
+  packagingRecyclability?: number; // Percentage of packaging that is recyclable (0-100%)
+  biodegradabilityMonths?: number; // Time to naturally decompose (months)
+  energyEfficiencyRating?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'; // Energy consumption rating
+  sustainableCertification?: 'ORGANIC' | 'FAIRTRADE' | 'RAINFOREST' | 'MSC' | 'FSC' | 'NONE'; // Environmental certification status
 }
 
 export interface UnitConversion {

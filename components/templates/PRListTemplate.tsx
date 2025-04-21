@@ -61,6 +61,10 @@ interface PRListTemplateProps {
   fieldConfigs: FieldConfig[]
   advancedFilter?: React.ReactNode
   customActions?: React.ReactNode
+  viewToggle?: React.ReactNode
+  viewMode: 'table' | 'card'
+  tableView?: React.ReactNode
+  cardView?: React.ReactNode
 }
 
 export function PRListTemplate({
@@ -84,6 +88,10 @@ export function PRListTemplate({
   fieldConfigs,
   advancedFilter,
   customActions,
+  viewToggle,
+  viewMode,
+  tableView,
+  cardView,
 }: PRListTemplateProps) {
   const router = useRouter()
   const totalPages = Math.ceil(data.length / itemsPerPage)
@@ -121,7 +129,7 @@ export function PRListTemplate({
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -161,6 +169,7 @@ export function PRListTemplate({
           </DropdownMenu>
 
           {advancedFilter}
+          {viewToggle}
         </div>
       </div>
 
@@ -172,73 +181,16 @@ export function PRListTemplate({
       )}
 
       {/* List Content */}
-      <div className="space-y-2">
-        {currentData.map((item) => (
-          <Card key={item.id} className="overflow-hidden p-2 hover:bg-secondary dark:hover:bg-gray-700 bg-white dark:bg-gray-800">
-            <div className="py-2 px-4">
-              <div className="flex justify-between items-center mb-0">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={selectedItems.includes(item.id)}
-                    onCheckedChange={() => onSelectItem(item.id)}
-                  />
-                  <StatusBadge status={item.status} />
-                  <span className="text-lg text-muted-foreground">
-                    {item.id}
-                  </span>
-                  <h3 className="text-lg md:text-lg font-semibold">
-                    {item.description}
-                  </h3>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onView(item.id)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(item.id)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onDelete(item.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 md:gap-2">
-                {fieldConfigs.map(({ label, field, format }) => (
-                  <div key={field}>
-                    <p className="font-medium text-muted-foreground text-sm">
-                      {label}
-                    </p>
-                    <p className="text-sm">
-                      {format 
-                        ? format(field === 'requestor.name' ? item : item[field as keyof PurchaseRequest])
-                        : String(field === 'requestor.name' ? item.requestor.name : item[field as keyof PurchaseRequest])
-                      }
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+      {viewMode === 'table' ? (
+        tableView
+      ) : (
+        cardView
+      )}
 
       {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of{" "}
-          {data.length} results
+          Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} results
         </div>
         <div className="space-x-2">
           <Button
@@ -248,7 +200,6 @@ export function PRListTemplate({
             disabled={currentPage === 1}
           >
             <ChevronsLeft className="h-4 w-4" />
-            <span className="sr-only">First page</span>
           </Button>
           <Button
             variant="outline"
@@ -257,7 +208,6 @@ export function PRListTemplate({
             disabled={currentPage === 1}
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Previous page</span>
           </Button>
           <Button
             variant="outline"
@@ -266,7 +216,6 @@ export function PRListTemplate({
             disabled={currentPage === totalPages}
           >
             <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Next page</span>
           </Button>
           <Button
             variant="outline"
@@ -275,7 +224,6 @@ export function PRListTemplate({
             disabled={currentPage === totalPages}
           >
             <ChevronsRight className="h-4 w-4" />
-            <span className="sr-only">Last page</span>
           </Button>
         </div>
       </div>

@@ -1,5 +1,11 @@
 import React from 'react';
 import { Package, AlertCircle } from 'lucide-react';
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+
+interface ProductInventoryTabProps {
+  isEditing: boolean
+}
 
 // Mock data
 const inventoryData = {
@@ -50,7 +56,7 @@ const inventoryData = {
   }
 };
 
-export default function ProductInventoryTab() {
+export default function ProductInventoryTab({ isEditing }: ProductInventoryTabProps) {
   return (
     <div className="space-y-6">
       {/* Total Stock Summary */}
@@ -118,16 +124,48 @@ export default function ProductInventoryTab() {
                         {location.onOrder.toLocaleString()}
                       </td>
                       <td className="px-4 py-3 text-sm tabular-nums text-right">
-                        {location.minimum.toLocaleString()}
+                        {isEditing ? (
+                          <Input
+                            type="number"
+                            defaultValue={location.minimum}
+                            className="w-24 ml-auto text-right"
+                          />
+                        ) : (
+                          location.minimum.toLocaleString()
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm tabular-nums text-right">
-                        {location.maximum.toLocaleString()}
+                        {isEditing ? (
+                          <Input
+                            type="number"
+                            defaultValue={location.maximum}
+                            className="w-24 ml-auto text-right"
+                          />
+                        ) : (
+                          location.maximum.toLocaleString()
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm tabular-nums text-right">
-                        {location.reorderPoint.toLocaleString()}
+                        {isEditing ? (
+                          <Input
+                            type="number"
+                            defaultValue={location.reorderPoint}
+                            className="w-24 ml-auto text-right"
+                          />
+                        ) : (
+                          location.reorderPoint.toLocaleString()
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm tabular-nums text-right">
-                        {location.parLevel.toLocaleString()}
+                        {isEditing ? (
+                          <Input
+                            type="number"
+                            defaultValue={location.parLevel}
+                            className="w-24 ml-auto text-right"
+                          />
+                        ) : (
+                          location.parLevel.toLocaleString()
+                        )}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {isLow && (
@@ -164,16 +202,48 @@ export default function ProductInventoryTab() {
                     {inventoryData.totalStock.onOrder.toLocaleString()}
                   </td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right">
-                    {inventoryData.aggregateSettings.minimum.toLocaleString()}
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        defaultValue={inventoryData.aggregateSettings.minimum}
+                        className="w-24 ml-auto text-right"
+                      />
+                    ) : (
+                      inventoryData.aggregateSettings.minimum.toLocaleString()
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right">
-                    {inventoryData.aggregateSettings.maximum.toLocaleString()}
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        defaultValue={inventoryData.aggregateSettings.maximum}
+                        className="w-24 ml-auto text-right"
+                      />
+                    ) : (
+                      inventoryData.aggregateSettings.maximum.toLocaleString()
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right">
-                    {inventoryData.aggregateSettings.reorderPoint.toLocaleString()}
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        defaultValue={inventoryData.aggregateSettings.reorderPoint}
+                        className="w-24 ml-auto text-right"
+                      />
+                    ) : (
+                      inventoryData.aggregateSettings.reorderPoint.toLocaleString()
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right">
-                    {inventoryData.aggregateSettings.parLevel.toLocaleString()}
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        defaultValue={inventoryData.aggregateSettings.parLevel}
+                        className="w-24 ml-auto text-right"
+                      />
+                    ) : (
+                      inventoryData.aggregateSettings.parLevel.toLocaleString()
+                    )}
                   </td>
                   <td className="px-4 py-3"></td>
                 </tr>

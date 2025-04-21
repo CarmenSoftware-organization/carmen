@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback"
 import { Bell, Search, Menu as MenuIcon, X, Bookmark, Star, Clock, Settings, User, CreditCard, LogOut } from 'lucide-react'
 
 export function CarmenHeader() {
@@ -74,10 +74,12 @@ export function CarmenHeader() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="@johndoe" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
+                  <AvatarWithFallback
+                    src="/avatars/placeholder.svg"
+                    alt="@johndoe"
+                    fallbackText="John Doe"
+                    size="sm"
+                  />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -145,10 +147,12 @@ export function CarmenHeader() {
           <div className="pt-4 pb-3 border-t border-gray-200">
             <div className="flex items-center px-5">
               <div className="flex-shrink-0">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src="/placeholder.svg?height=40&width=40" alt="@johndoe" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
+                <AvatarWithFallback
+                  src="/avatars/placeholder.svg"
+                  alt="@johndoe"
+                  fallbackText="John Doe"
+                  size="md"
+                />
               </div>
               <div className="ml-3">
                 <div className="text-base font-medium text-gray-800">John Doe</div>

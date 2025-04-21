@@ -23,6 +23,19 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
     creditTerms: "Net 45",
     description: "General office supplies",
     remarks: "Please deliver to reception",
+    purchaseRequisitionIds: ["PR-001", "PR-002"],
+    purchaseRequisitionNumbers: ["PR-2023-001", "PR-2023-002"],
+    shippingAddress: {
+      id: "addr-001",
+      addressType: "SHIPPING",
+      addressLine: "123 Corporate Plaza, Suite 500",
+      subDistrictId: "subdistrict-001",
+      districtId: "district-001",
+      provinceId: "province-001",
+      postalCode: "10110",
+      isPrimary: true
+    },
+    deliveryPoint: "Main Reception Desk, Building A",
     items: [
       {
         id: "POI-003",
@@ -134,6 +147,19 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
     creditTerms: "Net 60",
     description: "New laptops and accessories",
     remarks: "Please schedule installation",
+    purchaseRequisitionIds: ["PR-003"],
+    purchaseRequisitionNumbers: ["PR-2023-003"],
+    shippingAddress: {
+      id: "addr-002",
+      addressType: "SHIPPING",
+      addressLine: "456 Technology Park, Building C",
+      subDistrictId: "subdistrict-002",
+      districtId: "district-002",
+      provinceId: "province-002",
+      postalCode: "20220",
+      isPrimary: true
+    },
+    deliveryPoint: "IT Department, 3rd Floor",
     items: [
       {
         id: "POI-005",
@@ -198,6 +224,19 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
     baseCurrencyCode: "USD",
     exchangeRate: 1,
     notes: "Weekly produce order",
+    purchaseRequisitionIds: ["PR-004"],
+    purchaseRequisitionNumbers: ["PR-2023-004"],
+    shippingAddress: {
+      id: "addr-003",
+      addressType: "SHIPPING",
+      addressLine: "789 Restaurant Road",
+      subDistrictId: "subdistrict-003",
+      districtId: "district-003",
+      provinceId: "province-003",
+      postalCode: "30330",
+      isPrimary: true
+    },
+    deliveryPoint: "Kitchen Receiving Area, Rear Entrance",
     createdBy: 104,
     approvedBy: 205,
     approvalDate: new Date("2023-06-15"),

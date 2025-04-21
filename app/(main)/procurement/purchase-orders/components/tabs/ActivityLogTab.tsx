@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import StatusBadge from "@/components/ui/custom-status-badge";
 
 interface ActivityLog {
@@ -116,10 +116,12 @@ export default function ActivityLogTab({ poData }: ActivityLogTabProps) {
           {mockActivityLogs.map((log) => (
             <TableRow key={log.id}>
               <TableCell>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={log.user.avatar} alt={log.user.name} />
-                  <AvatarFallback>{log.user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <AvatarWithFallback
+                  src={log.user.avatar}
+                  alt={log.user.name}
+                  fallbackText={log.user.name}
+                  size="sm"
+                />
               </TableCell>
               <TableCell>
                 <StatusBadge
