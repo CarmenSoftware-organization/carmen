@@ -86,6 +86,18 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 - Support partial deliveries with appropriate tracking of remaining quantities
 - Enable adding extra costs related to the receipt (shipping, handling, etc.)
 
+#### 3.2.3 Multiple PO Selection
+- Allow users to select multiple Purchase Orders to include in a single GRN
+- Support multi-select functionality in the PO selection interface
+- Implement vendor validation to ensure all selected POs are from the same vendor
+- Consolidate line items from multiple POs into a single GRN
+- Automatically link each GRN item back to its source PO for traceability
+- Display source PO reference for each line item
+- Update remaining quantities for all source POs when GRN is created or committed
+- Allow filtering and searching of POs by various criteria (date, vendor, items, etc.)
+- Support different views of POs (list view, grid view) for efficient selection
+- Provide summary information of selected POs before GRN creation
+
 ### 3.3 Create Manual GRN Feature
 
 #### 3.3.1 Workflow
@@ -119,6 +131,7 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 - Receiver
 - Vendor
 - Consignment checkbox
+- Cash checkbox
 - Delivery Point
 - Extra Cost indicator
 - Currency information
@@ -142,6 +155,7 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 - Ordered quantities (from PO if applicable)
 - Received quantities
 - Free of Charge (FOC) quantities
+- FOC Unit (configurable unit of measure for FOC items)
 - Price
 - Extra Cost
 - Total Amount
@@ -163,8 +177,7 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
   - On Hand
   - On Order
   - Reorder Threshold
-  - Restock Level
-- Purchase Order Information
+  - Purchase Order Information
   - PO Reference Number
   - Last Price
   - Last Vendor
@@ -179,6 +192,154 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
     - Stock Out
     - Amount
     - Reference
+
+#### 3.4.5.1 Item Detail Form UI Structure
+The Item Detail form is organized into the following logical sections:
+
+- **Header Bar**
+  - Title (Edit Item/View Item/Add New Item based on mode)
+  - Action buttons (Edit/Save/Cancel) that change based on current mode
+  - Close button
+
+- **Basic Information Section**
+  - Location (required field)
+  - Product Name
+  - Description
+  - PO Reference
+  - Job Code
+
+- **Quantity and Delivery Section**
+  - Order Unit with conversion information
+  - Order Quantity with base unit calculation
+  - Receiving Quantity with base unit calculation
+  - FOC (Free of Charge) checkbox
+  - FOC Unit selection with conversion rate display
+  - Delivery Point
+  - Quick access buttons for inventory information:
+    - On Hand button (opens dialog)
+    - On Order button (opens dialog)
+  - Inventory summary display (On Hand, On Order, Reorder Level)
+
+- **Pricing Section**
+  - Currency
+  - Exchange Rate
+  - Unit Price
+  - Tax Included checkbox
+  - Discount adjustment with rate and override options
+  - Tax adjustment with rate and override options
+  - Procurement history (Last Price, Last Order Date, Last Vendor)
+
+- **Calculated Amounts Section**
+  - Dual-currency display (transaction currency and base currency)
+  - Subtotal Amount
+  - Discount Amount
+  - Net Amount
+  - Tax Amount
+  - Total Amount
+
+#### 3.4.5.2 Item Detail View Modes
+The Item Detail interface supports three distinct modes:
+
+- **View Mode**
+  - All fields are read-only
+  - Only Edit button is displayed
+  - Close button to exit the detail view
+
+- **Edit Mode**
+  - All fields are editable
+  - Save and Cancel buttons are displayed
+  - Save button updates the existing item
+  - Cancel button returns to View mode
+
+- **Add Mode**
+  - All fields are editable with default values
+  - Save and Cancel buttons are displayed
+  - Save button creates a new item
+  - Cancel button closes the form
+
+#### 3.4.5.3 Inventory Information Dialogs
+
+- **On Hand Dialog**
+  - Displays current inventory levels across locations
+  - Shows detailed inventory breakdown by location
+  - Provides visibility into available quantities for reference during receiving
+  - On Hand, On Order, Par, Reorder, Min, Max  
+
+- **On Order Dialog**
+  - Shows pending purchase orders for the item
+  - Displays outstanding orders not yet received
+  - Helps receiving staff coordinate with existing procurement activities
+
+#### 3.4.5.4 Multi-currency Handling
+- Support for transaction in foreign currencies with automatic conversion
+- Exchange rate field for manual adjustment
+- Dual display of all monetary values:
+  - Transaction amount in document currency
+  - Base amount in system base currency (e.g., USD)
+- All calculations performed in both currencies
+
+#### 3.4.5.5 Pricing and Amount Calculations
+- Unit price entry with support for tax-inclusive pricing
+- Automatic calculation of subtotal based on receiving quantity × unit price
+- Adjustable discount rate with override option for discount amount
+- Adjustable tax rate with override option for tax amount
+- Automatic recalculation of:
+  - Subtotal Amount = Receiving Quantity × Unit Price
+  - Discount Amount = Subtotal × Discount Rate (or manual override)
+  - Net Amount = Subtotal - Discount
+  - Tax Amount = Net Amount × Tax Rate (or manual override)
+  - Total Amount = Net Amount + Tax Amount
+
+**Detailed Calculation Logic:**
+
+The system performs calculations based on whether the price entered is tax-inclusive or tax-exclusive.
+
+**1. Tax Inclusive Pricing (e.g., VAT is included in the Unit Price)**
+
+-   **Price**: The unit price entered by the user (includes tax).
+-   **Subtotal**: `Price * Received Quantity (excluding FOC)`
+-   **Discount Amount**: Calculated based on Discount Rate or manual override.
+-   **Tax Amount**: `round((Subtotal - Discount Amount) * Tax Rate / (100 + Tax Rate), 2)`
+-   **Net Amount**: `Subtotal - Discount Amount - Tax Amount`
+-   **Total Amount**: `Net Amount + Tax Amount` (Should equal Subtotal - Discount Amount)
+-   **Last Price**: `Net Amount / Received Quantity (excluding FOC)`
+-   **Last Cost**: `(Net Amount + Extra Costs) / (Received Quantity + FOC Quantity)`
+
+*Example: Coke 2 cans at 25 THB each (includes 7% VAT), with a 5 THB discount.*
+
+-   *Price = 25*
+-   *Subtotal = 25 * 2 = 50*
+-   *Discount Amount = 5*
+-   *Tax Amount = round((50 - 5) * 7 / 107, 2) = round(45 * 7 / 107, 2) = round(2.9439..., 2) = 2.94*
+-   *Net Amount = 50 - 5 - 2.94 = 42.06*
+-   *Total Amount = 42.06 + 2.94 = 45*
+-   *Last Price = 42.06 / 2 = 21.03*
+
+**2. Tax Exclusive Pricing (e.g., VAT is added to the Unit Price)**
+
+-   **Price**: The unit price entered by the user (excludes tax).
+-   **Subtotal**: `Price * Received Quantity (excluding FOC)`
+-   **Discount Amount**: Calculated based on Discount Rate or manual override.
+-   **Net Amount**: `Subtotal - Discount Amount`
+-   **Tax Amount**: `round(Net Amount * Tax Rate / 100, 2)`
+-   **Total Amount**: `Net Amount + Tax Amount`
+-   **Last Price**: `Net Amount / Received Quantity (excluding FOC)`
+-   **Last Cost**: `(Net Amount + Extra Costs) / (Received Quantity + FOC Quantity)`
+
+*Example: Coke 2 cans at 25 THB each (add 7% VAT), with a 5 THB discount.*
+
+-   *Price = 25*
+-   *Subtotal = 25 * 2 = 50*
+-   *Discount Amount = 5*
+-   *Net Amount = 50 - 5 = 45*
+-   *Tax Amount = round(45 * 7 / 100, 2) = round(3.15, 2) = 3.15*
+-   *Total Amount = 45 + 3.15 = 48.15*
+-   *Last Price = 45 / 2 = 22.50*
+
+**Handling Free of Charge (FOC) Items:**
+
+-   FOC items do not contribute to the Subtotal calculation.
+-   The quantity of FOC items is included when calculating the `Last Cost` but excluded for `Last Price`.
 
 #### 3.4.6 Extra Cost Detail Section
 - Item (service provider or cost type)
@@ -286,6 +447,7 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 - Extra cost section with appropriate controls
 - Financial summary section at the bottom
 - Tabbed interface for related information
+- Use FileText icon instead of eye icon for row action view in Item Tab
 
 ### 4.3 Create/Edit Screen
 - Form layout with logical grouping of fields
@@ -329,7 +491,6 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 ### 5.4 Validation Rules
 - Received quantities cannot exceed ordered quantities minus already received and canceled quantities
 - Invoice information (number, date) required before committing
-- Items requiring lot numbers must have them assigned before committing
 - Extra costs must be allocated before committing
 
 ## 6. Development Phases and Milestones
@@ -370,6 +531,9 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 - Endpoints for committing GRNs and updating inventory
 - Search and filter capabilities
 - Batch processing endpoints
+- Multi-PO selection and validation API endpoints
+- APIs to retrieve compatible POs for selection (same vendor, currency, etc.)
+- APIs to update multiple source POs when a GRN is created or committed
 
 ### 7.3 Security Considerations
 - Authentication for all API calls
@@ -394,6 +558,16 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 ### 8.4 Concurrent Processing
 - **Challenge**: Handling multiple users working on the same GRNs
 - **Solution**: Implement optimistic concurrency control and appropriate locking mechanisms
+
+### 8.5 Multi-PO Consolidation
+- **Challenge**: Consolidating items from multiple POs that may have different terms, conditions, or pricing
+- **Solution**: Implement smart validation rules that prevent incompatible POs from being selected together while allowing reasonable grouping
+- **Challenge**: Maintaining accurate traceability when items from multiple POs are combined
+- **Solution**: Create a robust linking mechanism that preserves the relationship between each GRN line item and its source PO line item
+- **Challenge**: Handling partial receipts across multiple POs
+- **Solution**: Implement a system that tracks remaining quantities for each source PO independently
+- **Challenge**: User interface complexity when managing multiple PO selections
+- **Solution**: Develop an intuitive UI with clear visual cues and validation feedback to guide users through the multi-PO selection process
 
 ## 9. Future Expansion Possibilities
 
@@ -424,6 +598,13 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 - Must correctly load PO information
 - Must allow quantity adjustments for partial deliveries
 - Must handle extra costs appropriately
+- Must support selection of multiple POs from the same vendor
+- Must properly merge and consolidate items from multiple POs
+- Must maintain accurate traceability to source POs for each item
+- Must validate that all selected POs belong to the same vendor
+- Must update all selected source POs with appropriate remaining quantities
+- Must prevent selection of incompatible POs (different currencies, terms, etc.)
+- Must provide clear feedback about selection constraints and validation errors
 
 ### 10.3 Manual GRN Creation
 - Must allow creation of GRNs without reference to POs
@@ -469,3 +650,67 @@ The Good Receive Note (GRN) Module is a web-based component within the larger pr
 - Database schema and relationships
 - Integration points with other system components
 - Lot number generation algorithm
+
+### 3.10 Inventory Information Dialogs
+
+#### 3.10.1 On Hand Information Dialog
+
+The On Hand dialog provides detailed visibility into current inventory levels for an item across all storage locations.
+
+##### 3.10.1.1 Access Points
+- Available from the Item Detail form via the "On Hand" button
+- Available from the GRN item list via expandable row details
+- Accessible in all GRN modes (view, edit, create)
+
+##### 3.10.1.2 Functionality
+- Displays a modal dialog with real-time inventory information
+- Shows a breakdown of inventory by location using the `InventoryBreakdown` component
+- Provides a tabular view with the following information:
+  - Location/Store name
+  - Current on-hand quantity
+  - Reserved quantity
+  - Available quantity (on-hand minus reserved)
+  - Unit of measure
+  - Last movement date
+- Supports closing via an X button or clicking outside the dialog
+
+##### 3.10.1.3 Purpose
+- Enables receiving staff to verify current stock levels before receiving
+- Aids in decision-making for allocating received items to appropriate locations
+- Provides context for inventory management during the receiving process
+
+#### 3.10.2 On Order Information Dialog
+
+The On Order dialog shows all pending purchase orders for the item to provide visibility into the procurement pipeline.
+
+##### 3.10.2.1 Access Points
+- Available from the Item Detail form via the "On Order" button
+- Available from the GRN item list via expandable row details
+- Accessible in all GRN modes (view, edit, create)
+
+##### 3.10.2.2 Functionality
+- Displays a modal dialog showing all pending purchase orders
+- Implemented using the `PendingPurchaseOrdersComponent`
+- Shows a tabular view with the following information:
+  - Purchase Order reference number
+  - Order date
+  - Vendor information
+  - Ordered quantity
+  - Already received quantity
+  - Remaining quantity
+  - Expected delivery date
+  - Order status
+- Supports close via X button or clicking outside the dialog
+
+##### 3.10.2.3 Purpose
+- Provides visibility into the procurement pipeline for the item
+- Helps receiving staff coordinate the current receipt with other expected deliveries
+- Enables verification of ordered quantities against the original purchase orders
+- Assists in identifying partial deliveries from the same purchase order
+
+#### 3.10.3 Technical Implementation
+- Both dialogs use the same Dialog component from the UI library
+- Dialogs are implemented with proper accessibility features
+- State management for dialog visibility using React useState hooks
+- Responsive design ensures usability on different screen sizes
+- Data is fetched on-demand when dialogs are opened to ensure up-to-date information

@@ -177,3 +177,26 @@ export interface Product {
   energyEfficiencyRating?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
   sustainableCertification?: 'NONE' | 'FSC' | 'PEFC' | 'RSPO' | 'FAIRTRADE' | 'ORGANIC' | 'OTHER'
 }
+
+export interface GoodsReceiveNoteItem {
+  id: string
+  name: string
+  description?: string
+  location: string
+  lotNumber?: string
+  orderedQuantity: number
+  receivedQuantity: number
+  focQuantity?: number
+  focUnit?: string
+  focConversionRate?: number
+  unit: string
+  baseUnit: string
+  conversionRate: number
+  unitPrice: number
+  subTotalAmount: number
+  discountRate?: number
+  taxRate?: number
+  isConsignment?: boolean
+  isTaxInclusive?: boolean
+  isFreeOfCharge?: boolean
+}

@@ -521,6 +521,11 @@ export interface GoodsReceiveNoteItem {
     lotNumber: string;
     expiryDate: Date;
   }[];
+  focQuantity?: number;
+  focUnit?: string;
+  focConversionRate?: number;
+  isConsignment?: boolean;
+  isTaxInclusive?: boolean;
 }
 
 export interface LocationInfo {

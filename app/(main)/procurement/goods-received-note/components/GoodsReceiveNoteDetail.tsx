@@ -223,6 +223,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
     console.log(`Downloading attachment with id: ${id}`);
   };
 
+  // Right panel is collapsed by default
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
 
   return (
@@ -414,6 +415,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
             onItemSelect={handleItemSelection}
             exchangeRate={formData.exchangeRate}
             baseCurrency={formData.baseCurrency}
+            currency={formData.currency}
           />
         </TabsContent>
         <TabsContent value="extra-costs">

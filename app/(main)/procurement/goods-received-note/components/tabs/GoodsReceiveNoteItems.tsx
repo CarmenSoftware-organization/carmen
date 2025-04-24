@@ -11,10 +11,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Eye, Edit, Trash2, Plus } from "lucide-react";
+import { FileText, Edit, Trash2, Plus } from "lucide-react";
 import { GoodsReceiveNoteMode, GoodsReceiveNoteItem } from "@/lib/types";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/custom-dialog";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipTrigger,
+  TooltipProvider 
+} from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ItemDetailForm from "./itemDetailForm";
+import { formatCurrency } from "@/lib/utils";
 
 interface GoodsReceiveNoteItemsProps {
   mode: GoodsReceiveNoteMode;
@@ -24,6 +33,7 @@ interface GoodsReceiveNoteItemsProps {
   onItemSelect: (itemId: string, isSelected: boolean) => void;
   exchangeRate: number;
   baseCurrency: string;
+  currency: string;
 }
 
 export function GoodsReceiveNoteItems({
@@ -34,6 +44,7 @@ export function GoodsReceiveNoteItems({
   onItemSelect,
   exchangeRate,
   baseCurrency,
+  currency,
 }: GoodsReceiveNoteItemsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<GoodsReceiveNoteItem | null>(null);
@@ -84,11 +95,36 @@ export function GoodsReceiveNoteItems({
 
   const allSelected = items.length > 0 && selectedItems.length === items.length;
 
+  // Format amount without currency symbol
+  const formatAmount = (amount: number) => {
+    return amount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
+  // Format base amount without currency symbol
   const formatBaseAmount = (amount: number) => {
-    return `${baseCurrency} ${(amount * exchangeRate).toFixed(2)}`;
+    return (amount * exchangeRate).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
+  const calculateNetAmount = (item: GoodsReceiveNoteItem) => {
+    const subtotal = item.unitPrice * item.receivedQuantity;
+    return subtotal - (subtotal * (item.discountRate || 0) / 100);
+  };
+
+  const calculateTaxAmount = (item: GoodsReceiveNoteItem) => {
+    const netAmount = calculateNetAmount(item);
+    return netAmount * (item.taxRate || 0) / 100;
   };
 
   const numberCellClass = "text-right";
+
+  // Available units for FOC
+  const unitOptions = ["PC", "Box", "Case", "Kg", "g", "L", "mL"];
 
   if (items.length === 0) {
     return <div>No items available.</div>;
@@ -130,11 +166,13 @@ export function GoodsReceiveNoteItems({
             </TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Product Name</TableHead>
-            <TableHead>Lot Number</TableHead>
             <TableHead className={numberCellClass}>Ordered Qty</TableHead>
             <TableHead className={numberCellClass}>Received Qty</TableHead>
             <TableHead>Unit</TableHead>
+            <TableHead className={numberCellClass}>FOC Qty</TableHead>
+            <TableHead>FOC Unit</TableHead>
             <TableHead className={numberCellClass}>Price</TableHead>
+            <TableHead className={numberCellClass}>Discount</TableHead>
             <TableHead className={numberCellClass}>Net Amount</TableHead>
             <TableHead className={numberCellClass}>Tax Amount</TableHead>
             <TableHead className={numberCellClass}>Total Amount</TableHead>
@@ -155,31 +193,25 @@ export function GoodsReceiveNoteItems({
               </TableCell>
               <TableCell>{item.location || "N/A"}</TableCell>
               <TableCell>
-                {item.name}
-                <div className="text-xs text-muted-foreground">
-                  {item.description || "No description available"}
+                <div className="flex items-center space-x-2">
+                  <div>
+                    {item.name}
+                    <div className="text-xs text-muted-foreground">
+                      {item.description || "No description available"}
+                    </div>
+                  </div>
+                  {item.isConsignment && (
+                    <Badge variant="outline">Consignment</Badge>
+                  )}
+                  {item.isTaxInclusive && (
+                    <Badge variant="outline">Tax Inclusive</Badge>
+                  )}
                 </div>
-              </TableCell>
-              <TableCell>
-                <Input
-                  type="text"
-                  value={item.lotNumber || ""}
-                  onChange={(e) =>
-                    handleItemChange(
-                      item.id,
-                      "lotNumber",
-                      e.target.value
-                    )
-                  }
-                  readOnly={mode === "view"}
-                  className="w-full"
-                  placeholder="Enter lot number"
-                />
               </TableCell>
               <TableCell className={numberCellClass}>
                 {item.orderedQuantity}
                 <div className="text-xs text-muted-foreground">
-                  {item.baseQuantity} 
+                  Base: {(item.orderedQuantity * item.conversionRate).toFixed(2)}
                 </div>
               </TableCell>
               <TableCell className={numberCellClass}>
@@ -197,43 +229,84 @@ export function GoodsReceiveNoteItems({
                   className="text-right"
                 />
                 <div className="text-xs text-muted-foreground">
-                  {(item.receivedQuantity * item.conversionRate).toFixed(2)}
+                  Base: {(item.receivedQuantity * item.conversionRate).toFixed(2)}
                 </div>
               </TableCell>
               <TableCell>
                 {item.unit}
                 <div className="text-xs text-muted-foreground">
-                  1 {item.unit} = {item.conversionRate}
+                  1 {item.unit} = {item.conversionRate} {item.baseUnit}
                 </div>
               </TableCell>
               <TableCell className={numberCellClass}>
-                {item.unitPrice.toFixed(2)}
+                <Input
+                  type="number"
+                  value={item.focQuantity || 0}
+                  onChange={(e) =>
+                    handleItemChange(
+                      item.id,
+                      "focQuantity",
+                      parseFloat(e.target.value)
+                    )
+                  }
+                  readOnly={mode === "view"}
+                  className="text-right"
+                />
+                <div className="text-xs text-muted-foreground">
+                  Base: {((item.focQuantity || 0) * (item.focConversionRate || item.conversionRate)).toFixed(2)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <select
+                  value={item.focUnit || item.unit}
+                  onChange={(e) =>
+                    handleItemChange(
+                      item.id,
+                      "focUnit",
+                      e.target.value
+                    )
+                  }
+                  disabled={mode === "view"}
+                  className="w-full border rounded h-9 px-2 text-sm"
+                >
+                  <option value={item.unit}>{item.unit}</option>
+                  <option value={item.baseUnit}>{item.baseUnit}</option>
+                  {unitOptions.map((unit) => (
+                    <option key={unit} value={unit}>{unit}</option>
+                  ))}
+                </select>
+              </TableCell>
+              <TableCell className={numberCellClass}>
+                {formatAmount(item.unitPrice)}
                 <div className="text-xs text-muted-foreground">
                   {formatBaseAmount(item.unitPrice)}
                 </div>
               </TableCell>
               <TableCell className={numberCellClass}>
-                {(item.unitPrice * item.receivedQuantity).toFixed(2)}
+                {item.discountRate ? `${item.discountRate}%` : '-'}
+              </TableCell>
+              <TableCell className={numberCellClass}>
+                {formatAmount(calculateNetAmount(item))}
                 <div className="text-xs text-muted-foreground">
-                  {formatBaseAmount(item.unitPrice * item.receivedQuantity)}
+                  {formatBaseAmount(calculateNetAmount(item))}
                 </div>
               </TableCell>
               <TableCell className={numberCellClass}>
-                {(item.subTotalAmount - (item.unitPrice * item.receivedQuantity)).toFixed(2)}
+                {formatAmount(calculateTaxAmount(item))}
                 <div className="text-xs text-muted-foreground">
-                  {formatBaseAmount(item.subTotalAmount - (item.unitPrice * item.receivedQuantity))}
+                  {formatBaseAmount(calculateTaxAmount(item))}
                 </div>
               </TableCell>
               <TableCell className={numberCellClass}>
-                {item.subTotalAmount.toFixed(2)}
+                {formatAmount(calculateNetAmount(item) + calculateTaxAmount(item))}
                 <div className="text-xs text-muted-foreground">
-                  {formatBaseAmount(item.subTotalAmount)}
+                  {formatBaseAmount(calculateNetAmount(item) + calculateTaxAmount(item))}
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button variant="ghost" size="sm" onClick={() => handleOpenItemDetail(item)}>
-                    <Eye className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="ghost" 

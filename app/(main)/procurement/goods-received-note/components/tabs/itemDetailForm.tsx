@@ -98,14 +98,6 @@ export default function ItemDetailForm({
 
   const [isOnHandOpen, setIsOnHandOpen] = useState(false);
 
-  const handleOnHandClick = () => {
-    setIsOnHandOpen(true);
-  };
-
-  const handleOnOrderClick = () => {
-    setIsOnOrderOpen(true);
-  };
-
   const handleEdit = () => {
     setMode("edit");
   };
@@ -131,7 +123,95 @@ export default function ItemDetailForm({
     field: keyof GoodsReceiveNoteItem,
     value: string | number | boolean
   ) => {
-    setItem((prev) => ({ ...prev, [field]: value }));
+    setItem((prev) => {
+      const updated = { ...prev, [field]: value };
+      
+      // Recalculate amounts when relevant fields change
+      if (
+        [
+          "receivedQuantity",
+          "baseUnitPrice",
+          "taxIncluded",
+          "discountRate",
+          "discountAmount",
+          "taxRate",
+          "adjustments",
+          "exchangeRate",
+          "focQuantity"
+        ].includes(field)
+      ) {
+        // Quantity calculations
+        const quantity = updated.receivedQuantity || 0;
+        const price = updated.baseUnitPrice || 0;
+        const discountRate = updated.discountRate || 0;
+        const taxRate = updated.taxRate || 0;
+        const exchangeRate = updated.exchangeRate || 1;
+        const isTaxIncluded = updated.taxIncluded || false;
+        
+        // Calculate subtotal (price * quantity)
+        const subTotal = price * quantity;
+        updated.subTotalAmount = subTotal;
+        
+        // Calculate discount amount (if not manually overridden)
+        let discountAmount = 0;
+        if (field !== "discountAmount" || !updated.discountAmount) {
+          discountAmount = (subTotal * discountRate) / 100;
+          updated.discountAmount = parseFloat(discountAmount.toFixed(2));
+        } else {
+          discountAmount = updated.discountAmount;
+        }
+        
+        // Calculate net amount (subtotal - discount)
+        const netBeforeTax = subTotal - discountAmount;
+        
+        // Calculate tax amount
+        let taxAmount = 0;
+        if (field !== "taxAmount" || !updated.taxAmount) {
+          if (isTaxIncluded) {
+            // Tax inclusive calculation: amount * taxRate / (100 + taxRate)
+            taxAmount = parseFloat(((netBeforeTax * taxRate) / (100 + taxRate)).toFixed(2));
+          } else {
+            // Tax exclusive calculation: amount * taxRate / 100
+            taxAmount = parseFloat(((netBeforeTax * taxRate) / 100).toFixed(2));
+          }
+          updated.taxAmount = taxAmount;
+        } else {
+          taxAmount = updated.taxAmount;
+        }
+        
+        // Final calculations
+        if (isTaxIncluded) {
+          // For tax inclusive: net amount = subtotal - discount - tax
+          updated.netAmount = parseFloat((netBeforeTax - taxAmount).toFixed(2));
+          updated.totalAmount = parseFloat(netBeforeTax.toFixed(2));
+        } else {
+          // For tax exclusive: net amount = subtotal - discount
+          updated.netAmount = parseFloat(netBeforeTax.toFixed(2));
+          updated.totalAmount = parseFloat((netBeforeTax + taxAmount).toFixed(2));
+        }
+        
+        // Calculate base currency values
+        updated.baseSubTotalAmount = parseFloat((updated.subTotalAmount * exchangeRate).toFixed(2));
+        updated.baseDiscountAmount = parseFloat((updated.discountAmount * exchangeRate).toFixed(2));
+        updated.baseNetAmount = parseFloat((updated.netAmount * exchangeRate).toFixed(2));
+        updated.baseTaxAmount = parseFloat((updated.taxAmount * exchangeRate).toFixed(2));
+        updated.baseTotalAmount = parseFloat((updated.totalAmount * exchangeRate).toFixed(2));
+        
+        // Calculate Last Price (net amount / quantity excluding FOC)
+        if (quantity > 0) {
+          updated.lastPurchasePrice = parseFloat((updated.netAmount / quantity).toFixed(2));
+        }
+        
+        // Calculate Last Cost (net amount / total quantity including FOC)
+        const totalQuantity = quantity + (updated.focQuantity || 0);
+        if (totalQuantity > 0) {
+          // This would be stored in a separate field if needed
+        }
+      }
+      
+      return updated;
+    });
+    
     if (handleItemChange && item.id) {
       handleItemChange(item.id, field, value);
     }
@@ -255,13 +335,53 @@ export default function ItemDetailForm({
                   Quantity and Delivery
                 </h3>
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => handleOnHandClick()}>
-                    On Hand
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleOnOrderClick()}>
-                    On Order
-                  </Button>
-                
+                  <Dialog open={isOnHandOpen} onOpenChange={setIsOnHandOpen}>
+                    <DialogTrigger asChild>
+                      <Button type="button" variant="outline" size="sm">
+                        <Package className="mr-2 h-4 w-4" />
+                        On Hand
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[60vw] w-[80vw] overflow-y-auto [&>button]:hidden">
+                      <DialogHeader>
+                        <div className="flex justify-between w-full items-center">
+                          <DialogTitle>On Hand by Location</DialogTitle>
+                          <DialogClose asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setIsOnHandOpen(false)}
+                            >
+                              <XIcon className="h-4 w-4" />
+                            </Button>
+                          </DialogClose>
+                        </div>
+                      </DialogHeader>
+                      <InventoryBreakdown />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
+                    <DialogTrigger asChild>
+                      <Button type="button" variant="outline" size="sm">
+                        <TruckIcon className="mr-2 h-4 w-4" />
+                        On Order
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[60vw] overflow-y-auto [&>button]:hidden">
+                      <DialogHeader>
+                        <div className="flex justify-between w-full items-center">
+                          <DialogTitle>Pending Purchase Order</DialogTitle>
+                          <DialogClose asChild>
+                            <Button variant="ghost" size="sm" onClick={() => setIsOnOrderOpen(false)}>
+                              <XIcon className="h-4 w-4" />
+                            </Button>
+                          </DialogClose>
+                        </div>
+                      </DialogHeader>
+                      <PendingPurchaseOrdersComponent />
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
               <div className="grid grid-cols-12 gap-4">
@@ -322,53 +442,70 @@ export default function ItemDetailForm({
                     {item.baseUnit}
                   </div>
                 </div>
-                <div className="col-span-1">
-                  <Label htmlFor={`isFoc-${item.id}`}>FOC</Label>
-                  <div className="flex items-center space-x-2 pt-2">
-                    <Input
-                      id={`isFoc-${item.id}`}
-                      type="checkbox"
-                      checked={item.isFreeOfCharge}
-                      onChange={(e) =>
-                        handleChange("isFreeOfCharge", e.target.checked)
-                      }
-                      readOnly={mode === "view"}
-                      className="w-4 h-4"
-                    />
-                  </div>
-                </div>
                 <div className="col-span-2">
-                  <Label htmlFor={`lotNumber-${item.id}`}>Lot Number</Label>
+                  <Label htmlFor={`unit-${item.id}`}>Unit</Label>
                   <Input
-                    id={`lotNumber-${item.id}`}
-                    value={item.lotNumber}
-                    onChange={(e) => handleChange("lotNumber", e.target.value)}
+                    id={`unit-${item.id}`}
+                    value={item.unit}
+                    onChange={(e) =>
+                      handleChange("unit", e.target.value)
+                    }
                     readOnly={mode === "view"}
                     className="h-8 text-sm"
                   />
+                  <div className="text-xs text-gray-500 mt-1">
+                    1 {item.unit} = {item.conversionRate} {item.baseUnit}
+                  </div>
                 </div>
-                {/* <div className="col-span-2">
-                  <Label htmlFor={`deliveryDate-${item.id}`}>
-                    Delivery Date*
-                  </Label>
-                  <div className="relative">
+                <div className="col-span-1">
+                  <Label htmlFor={`focQuantity-${item.id}`}>FOC Qty</Label>
+                  <Input
+                    id={`focQuantity-${item.id}`}
+                    type="number"
+                    value={item.focQuantity || 0}
+                    onChange={(e) =>
+                      handleChange(
+                        "focQuantity",
+                        parseFloat(e.target.value)
+                      )
+                    }
+                    readOnly={mode === "view"}
+                    className="h-8 text-sm"
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    {((item.focQuantity || 0) * (item.focConversionRate || item.conversionRate)).toFixed(2)}{" "}
+                    {item.baseUnit}
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor={`focUnit-${item.id}`}>FOC Unit</Label>
+                  <div className="flex items-center space-x-2">
                     <Input
-                      id={`deliveryDate-${item.id}`}
-                      type="date"
-                      value={
-                        item.deliveryDate
-                          ? item.deliveryDate.toISOString().split("T")[0]
-                          : ""
-                      }
+                      id={`focUnit-${item.id}`}
+                      value={item.focUnit || item.unit}
                       onChange={(e) =>
-                        handleChange("deliveryDate", e.target.value)
+                        handleChange("focUnit", e.target.value)
                       }
                       readOnly={mode === "view"}
                       className="h-8 text-sm"
                     />
-                    <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <select 
+                      className="h-8 border rounded text-sm"
+                      value={item.focUnit || item.unit}
+                      onChange={(e) => handleChange("focUnit", e.target.value)}
+                      disabled={mode === "view"}
+                    >
+                      <option value={item.unit}>{item.unit}</option>
+                      <option value={item.baseUnit}>{item.baseUnit}</option>
+                      <option value="PC">PC</option>
+                      <option value="Box">Box</option>
+                      <option value="Case">Case</option>
+                    </select>
                   </div>
-                </div> */}
+                  <div className="text-xs text-gray-500 mt-1">
+                    1 {item.focUnit || item.unit} = {item.focConversionRate || item.conversionRate} {item.baseUnit}
+                  </div>
+                </div>
                 <div className="col-span-2">
                   <Label htmlFor={`deliveryPoint-${item.id}`}>
                     Delivery Point
@@ -633,58 +770,6 @@ export default function ItemDetailForm({
                 </div>
               </div>
             </div>
-
-            <Dialog
-                  open={isOnHandOpen}
-                  onOpenChange={setIsOnHandOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      <Package className="mr-2 h-4 w-4" />
-                      On Hand
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[60vw] w-[80vw] overflow-y-auto [&>button]:hidden">
-                    <DialogHeader>
-                      <div className="flex justify-between w-full items-center">
-                        <DialogTitle>On Hand by Location</DialogTitle>
-                        <DialogClose asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setIsOnHandOpen(false)}
-                          >
-                            <XIcon className="h-4 w-4" />
-                          </Button>
-                        </DialogClose>
-                      </div>
-                    </DialogHeader>
-                    <InventoryBreakdown />
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      <TruckIcon className="mr-2 h-4 w-4" />
-                      On Order
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[60vw] overflow-y-auto [&>button]:hidden">
-                    <DialogHeader>
-                      <div className="flex justify-between w-full items-center">
-                        <DialogTitle>Pending Purchase Order</DialogTitle>
-                        <DialogClose asChild>
-                          <Button variant="ghost" size="sm" onClick={() => setIsOnOrderOpen(false)}>
-                            <XIcon className="h-4 w-4" />
-                          </Button>
-                        </DialogClose>
-                      </div>
-                    </DialogHeader>
-                    <PendingPurchaseOrdersComponent />
-                  </DialogContent>
-                </Dialog>
-                
           </div>
         </div>
       </div>
