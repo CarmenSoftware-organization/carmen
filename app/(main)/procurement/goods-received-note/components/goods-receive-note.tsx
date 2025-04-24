@@ -538,6 +538,7 @@ export function GoodsReceiveNoteComponent({
                     selectedItems={selectedItems}
                     exchangeRate={formData.exchangeRate}
                     baseCurrency={formData.baseCurrency}
+                    currency={formData.currency}
                   />
                 </TabsContent>
                 <TabsContent value="extra-costs">
