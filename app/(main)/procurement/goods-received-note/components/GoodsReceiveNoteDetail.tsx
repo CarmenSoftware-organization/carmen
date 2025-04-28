@@ -14,17 +14,21 @@ import { GoodsReceiveNoteItemsBulkActions } from './tabs/GoodsReceiveNoteItemsBu
 import { Card, CardContent } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
 import { StockMovementTab } from './tabs/StockMovementTab'
-import { ArrowLeft, Edit, Trash, Printer, Send, Save, PanelRightClose, PanelRightOpen } from 'lucide-react'
+import { ArrowLeft, Edit, Trash, Printer, Send, Save, PanelRightClose, PanelRightOpen, CheckCheck, PencilRuler } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FinancialSummaryTab } from './tabs/FinancialSummaryTab'
 import { ActivityLogTab } from './tabs/ActivityLogTab'
 import StockMovementContent from './tabs/stock-movement'
+import { format } from 'date-fns'
+
+// Extend GoodsReceiveNoteMode to include 'confirm'
+export type GRNDetailMode = GoodsReceiveNoteMode | 'confirm';
 
 interface GoodsReceiveNoteDetailProps {
   id?: string
-  mode?: GoodsReceiveNoteMode
-  onModeChange?: (mode: GoodsReceiveNoteMode) => void
-  initialData?: GoodsReceiveNote
+  mode?: GRNDetailMode
+  onModeChange?: (mode: GRNDetailMode) => void
+  initialData: GoodsReceiveNote
 }
 
 // Define a default empty GoodsReceiveNote object
@@ -41,7 +45,7 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   vendorId: '',
   location: '',
   currency: '',
-  status: 'Pending',
+  status: 'Received',
   cashBook: '',
   items: [],
   stockMovements: [],
@@ -68,26 +72,51 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
 
 export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initialData }: GoodsReceiveNoteDetailProps) {
   const router = useRouter()
-  const [formData, setFormData] = useState<GoodsReceiveNote>(initialData || emptyGoodsReceiveNote);
-  const [extraCosts, setExtraCosts] = useState<ExtraCost[]>([])
+  const [formData, setFormData] = useState<GoodsReceiveNote>(initialData);
+  const [currentMode, setCurrentMode] = useState<GRNDetailMode>(mode);
+  const [extraCosts, setExtraCosts] = useState<ExtraCost[]>(initialData.extraCosts || [])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-const [expandedItems, setExpandedItems] = useState<string[]>([])
-  // useEffect(() => {
-  //   console.log('formData', initialData)
-  // }, [initialData]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
+
+  useEffect(() => {
+    setFormData(initialData);
+    setExtraCosts(initialData.extraCosts || []);
+    setSelectedItems([]);
+    setExpandedItems([]);
+    setCurrentMode(mode);
+  }, [initialData, mode]);
+
+  const isReadOnly = currentMode === 'view' || currentMode === 'confirm';
+
+  const handleModeChange = (newMode: GRNDetailMode) => {
+    setCurrentMode(newMode);
+    if (onModeChange) {
+      onModeChange(newMode);
+    }
+  }
 
   const handleEditClick = () => {
-    if (onModeChange) {
-      onModeChange('edit');
-    }
+    handleModeChange('edit');
   };
+
+  const handleConfirmAndSave = () => {
+    console.log('Confirming and Saving GRN:', formData);
+    const realId = `GRN-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+    alert(`GRN Saved! Real ID: ${realId}`);
+    router.push(`/procurement/goods-received-note/${realId}?mode=view`);
+  };
+
+  const handleEditFurther = () => {
+    handleModeChange('edit');
+  }
 
   const handleExtraCostsChange = (costs: ExtraCost[]) => {
     setExtraCosts(costs);
+    setFormData(prev => ({ ...prev, extraCosts: costs }));
   };
 
   const handleItemSelection = (itemId: string, isSelected: boolean) => {
-    if (itemId === "") { // -1 indicates select all/deselect all
+    if (itemId === "") {
       if (isSelected) {
         setSelectedItems(formData.items.map(item => item.id))
       } else {
@@ -104,46 +133,42 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const handleBulkAction = (action: string) => {
     console.log(`Applying ${action} to items:`, selectedItems)
-    // Implement bulk action logic here
-    // For example:
     if (action === 'delete') {
       setFormData(prev => ({
         ...prev,
         items: prev.items.filter(item => !selectedItems.includes(item.id))
       }))
     }
-    // Implement other actions (changeQuantity, changePrice) as needed
     setSelectedItems([])
   }
 
   const handleSave = () => {
-    // Implement save logic here
-    console.log('Saving GRN:', formData)
-    if (onModeChange) {
-      onModeChange('view')
-    }
+    console.log('Saving GRN (edit mode):', formData)
+    handleModeChange('view');
   }
 
-  const handleCancel = () => {
-    // Navigate back to the list page
-    router.push('/procurement/goods-received-note')
+  const handleCancelEdit = () => {
+    setFormData(initialData);
+    handleModeChange('view');
   }
 
   const handleBack = () => {
-    router.push('/procurement/goods-received-note')
+    if (currentMode === 'confirm' || currentMode === 'add') {
+      router.back();
+    } else {
+      router.push('/procurement/goods-received-note');
+    }
   }
 
   const calculateFinancialSummary = (): FinancialSummary => {
     const netAmount = formData.items.reduce((sum, item) => sum + item.netAmount, 0);
     const taxAmount = formData.items.reduce((sum, item) => sum + item.taxAmount, 0);
     const totalAmount = netAmount + taxAmount;
-
-    // For this example, we'll assume a fixed exchange rate. In a real application,
-    // you'd probably want to fetch this from an API or store it in the formData.
-    const exchangeRate = 1.2; // Example: 1 USD = 1.2 Base Currency
+    const exchangeRate = formData.exchangeRate || 1.2;
+    const baseCurrency = formData.baseCurrency || 'USD';
 
     return {
-      id: '1',  
+      id: formData.financialSummary?.id || 'temp-summary-1',
       netAmount,
       taxAmount,
       totalAmount,
@@ -151,39 +176,28 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
       baseNetAmount: netAmount * exchangeRate,
       baseTaxAmount: taxAmount * exchangeRate,
       baseTotalAmount: totalAmount * exchangeRate,
-      baseCurrency: 'USD', // Assuming USD is the base currency
-      jvType: 'GRN', // You might want to determine this based on some logic
-      jvNumber: `JV-${formData.ref}`, // Generate based on GRN reference
-      jvDate: formData.date, // Use the GRN date
+      baseCurrency: baseCurrency,
+      jvType: 'GRN',
+      jvNumber: `JV-${formData.ref}`,
+      jvDate: formData.date,
       jvDescription: formData.description,
-      jvStatus: 'Pending', // You might want to determine this based on some logic
+      jvStatus: 'Pending',
       jvReference: formData.ref,
-      jvDetail: [
-        {
-          department: { id: 'DEPT-001', name: 'Default Department' }, // You should replace this with actual data
-          accountCode: { id: 'ACC-001', code: '1000', name: 'Inventory' }, // You should replace this with actual data
-          accountName: 'Inventory',
-          currency: formData.currency,
-          debit: netAmount,
-          credit: 0,
-          baseCurrency: 'USD',
-          baseDebit: netAmount * exchangeRate,
-          baseCredit: 0
-        },
-        // Add more journal entries as needed
-      ],
+      jvDetail: [],
       jvTotal: {
         debit: totalAmount,
         credit: totalAmount,
         baseDebit: totalAmount * exchangeRate,
         baseCredit: totalAmount * exchangeRate,
-        baseCurrency: 'USD'
+        baseCurrency: baseCurrency
       }
     };
   };
 
   const handleItemsChange = (newItems: GoodsReceiveNoteItem[]) => {
-    setFormData(prev => ({ ...prev, items: newItems }));
+    if (!isReadOnly) {
+      setFormData(prev => ({ ...prev, items: newItems }));
+    }
   };
 
   const handleEditComment = (id: string, text: string) => {
@@ -219,11 +233,9 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
   };
 
   const handleDownloadAttachment = (id: string) => {
-    // Implement download logic here
     console.log(`Downloading attachment with id: ${id}`);
   };
 
-  // Right panel is collapsed by default
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
 
   return (
@@ -234,12 +246,14 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
             <ArrowLeft className="mr-2 h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">
-            {mode === 'add' ? 'New Goods Receive Note' : `Goods Receive Note`}
+            {currentMode === 'confirm' ? `Confirm New GRN (${formData.ref})` : 
+              currentMode === 'add' ? 'New Goods Receive Note' : 
+              `Goods Receive Note (${formData.ref})`}
           </h1>
         </div>
         <div className="flex items-center space-x-2">
           <TooltipProvider>
-            {mode === 'view' && (
+            {currentMode === 'view' && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button onClick={handleEditClick}><Edit className="h-4 w-4 mr-2" /> Edit</Button>
@@ -247,23 +261,51 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
                 <TooltipContent>Edit this GRN</TooltipContent>
               </Tooltip>
             )}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline"><Trash className="h-4 w-4 mr-2" /> Delete</Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete this GRN</TooltipContent>
-            </Tooltip>
+            {currentMode === 'confirm' && (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="secondary" onClick={handleEditFurther}><PencilRuler className="h-4 w-4 mr-2" /> Edit Further</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Make changes before saving</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={handleConfirmAndSave}><CheckCheck className="h-4 w-4 mr-2" /> Confirm & Save GRN</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Confirm and save this new GRN</TooltipContent>
+                </Tooltip>
+              </>
+            )}
+            {currentMode === 'edit' && (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" onClick={handleCancelEdit}><ArrowLeft className="h-4 w-4 mr-2" /> Cancel</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Discard changes</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={handleSave}><Save className="h-4 w-4 mr-2" /> Save Changes</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Save changes to this GRN</TooltipContent>
+                </Tooltip>
+              </>
+            )}
+            {currentMode !== 'confirm' && currentMode !== 'edit' && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline"><Trash className="h-4 w-4 mr-2" /> Delete</Button>
+                </TooltipTrigger>
+                <TooltipContent>Delete this GRN</TooltipContent>
+              </Tooltip>
+            )}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline"><Printer className="h-4 w-4 mr-2" /> Print</Button>
               </TooltipTrigger>
               <TooltipContent>Print this GRN</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline"><Send className="h-4 w-4 mr-2" /> Send</Button>
-              </TooltipTrigger>
-              <TooltipContent>Send this GRN</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
@@ -274,35 +316,35 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
           <div className="grid grid-cols-6 gap-6">
             <div className="space-y-2 col-span-1">
               <Label htmlFor="ref">Ref#</Label>
-              <Input id="ref" readOnly={mode === 'view'} value={formData.ref} />
+              <Input id="ref" readOnly value={formData.ref} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="date">Date</Label>
-              <Input id="date" type="date" readOnly={mode === 'view'} value={formData.date.toISOString().split('T')[0]} />
+              <Input id="date" type="date" readOnly={isReadOnly} value={formData.date ? format(new Date(formData.date), 'yyyy-MM-dd') : ''} onChange={e => setFormData({...formData, date: new Date(e.target.value)})} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="invoiceDate">Invoice Date</Label>
-              <Input id="invoiceDate" type="date" readOnly={mode === 'view'} value={formData.invoiceDate.toISOString().split('T')[0]} />
+              <Input id="invoiceDate" type="date" readOnly={isReadOnly} value={formData.invoiceDate ? format(new Date(formData.invoiceDate), 'yyyy-MM-dd') : ''} onChange={e => setFormData({...formData, invoiceDate: new Date(e.target.value)})} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="invoiceNumber">Invoice#</Label>
-              <Input id="invoiceNumber" readOnly={mode === 'view'} value={formData.invoiceNumber} />
+              <Input id="invoiceNumber" readOnly={isReadOnly} value={formData.invoiceNumber} onChange={e => setFormData({...formData, invoiceNumber: e.target.value})} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="taxInvoiceDate">Tax Invoice Date</Label>
-              <Input id="taxInvoiceDate" type="date" readOnly={mode === 'view'} />
+              <Input id="taxInvoiceDate" type="date" readOnly={isReadOnly} value={formData.taxInvoiceDate ? format(new Date(formData.taxInvoiceDate), 'yyyy-MM-dd') : ''} onChange={e => setFormData({...formData, taxInvoiceDate: new Date(e.target.value)})}/>
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="taxInvoiceNumber">Tax Invoice#</Label>
-              <Input id="taxInvoiceNumber" readOnly={mode === 'view'} />
+              <Input id="taxInvoiceNumber" readOnly={isReadOnly} value={formData.taxInvoiceNumber || ''} onChange={e => setFormData({...formData, taxInvoiceNumber: e.target.value})} />
             </div>
             <div className="space-y-2 col-span-3">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" readOnly={mode === 'view'} value={formData.description} />
+              <Textarea id="description" readOnly={isReadOnly} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="receiver">Receiver</Label>
-              <Select disabled={mode === 'view'} value={formData.receiver} onValueChange={(value) => setFormData(prev => ({ ...prev, receiver: value }))}>
+              <Select disabled={isReadOnly} value={formData.receiver} onValueChange={(value) => setFormData(prev => ({ ...prev, receiver: value }))}>
                 <SelectTrigger id="receiver">
                   <SelectValue placeholder="Select receiver" />
                 </SelectTrigger>
@@ -316,55 +358,48 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="vendor">Vendor</Label>
-              <Select disabled={mode === 'view'} value={formData.vendor} onValueChange={(value) => setFormData(prev => ({ ...prev, vendor: value }))}>
-                <SelectTrigger id="vendor">
-                  <SelectValue placeholder="Select vendor" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="global_fb">Global F&B Suppliers</SelectItem>
-                  <SelectItem value="fresh_produce">Fresh Produce Co.</SelectItem>
-                  <SelectItem value="quality_meats">Quality Meats Inc.</SelectItem>
-                  <SelectItem value="beverage_world">Beverage World Ltd.</SelectItem>
-                </SelectContent>
-              </Select>
+              {isReadOnly ? (
+                <Input readOnly value={formData.vendor} />
+              ) : (
+                <Select value={formData.vendor} onValueChange={(value) => setFormData(prev => ({ ...prev, vendor: value }))}>
+                  <SelectTrigger id="vendor">
+                    <SelectValue placeholder="Select vendor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="global_fb">Global F&B Suppliers</SelectItem>
+                    <SelectItem value="fresh_produce">Fresh Produce Co.</SelectItem>
+                    <SelectItem value="quality_meats">Quality Meats Inc.</SelectItem>
+                    <SelectItem value="beverage_world">Beverage World Ltd.</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             
             <div className="space-y-2 col-span-1">
               <Label htmlFor="currency">Currency</Label>
-              <Select disabled={mode === 'view'} value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
-                <SelectTrigger id="currency">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="usd">USD</SelectItem>
-                  <SelectItem value="eur">EUR</SelectItem>
-                  <SelectItem value="gbp">GBP</SelectItem>
-                  <SelectItem value="jpy">JPY</SelectItem>
-                </SelectContent>
-              </Select>
+              {isReadOnly ? (
+                <Input readOnly value={formData.currency} />
+              ) : (
+                <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="usd">USD</SelectItem>
+                    <SelectItem value="eur">EUR</SelectItem>
+                    <SelectItem value="gbp">GBP</SelectItem>
+                    <SelectItem value="jpy">JPY</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="status">Status</Label>
-              <Select 
-                disabled={mode === 'view'} 
-                value={formData.status} 
-                onValueChange={(value: GoodsReceiveNoteStatus) => setFormData(prev => ({ ...prev, status: value }))}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="received">Received</SelectItem>
-                  <SelectItem value="partially_received">Partially Received</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                  <SelectItem value="void">Void</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input readOnly value={formData.status} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="cashBook">Cash Book</Label>
-              <Select disabled={mode === 'view'} value={formData.cashBook} onValueChange={(value) => setFormData(prev => ({ ...prev, cashBook: value }))}>
+              <Select disabled={isReadOnly} value={formData.cashBook} onValueChange={(value) => setFormData(prev => ({ ...prev, cashBook: value }))}>
                 <SelectTrigger id="cashBook">
                   <SelectValue placeholder="Select cash book" />
                 </SelectTrigger>
@@ -377,11 +412,11 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
               </Select>
             </div>
             <div className="flex items-center space-x-2 col-span-1">
-              <Checkbox id="consignment" disabled={mode === 'view'} />
+              <Checkbox id="consignment" disabled={isReadOnly} checked={formData.isConsignment} onCheckedChange={(checked) => setFormData({...formData, isConsignment: !!checked})} />
               <Label htmlFor="consignment">Consignment</Label>
             </div>
             <div className="flex items-center space-x-2 col-span-1">
-              <Checkbox id="cash" disabled={mode === 'view'} />
+              <Checkbox id="cash" disabled={isReadOnly} checked={formData.isCash} onCheckedChange={(checked) => setFormData({...formData, isCash: !!checked})}/>
               <Label htmlFor="cash">Cash</Label>
             </div>
           </div>
@@ -391,7 +426,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
       <Tabs defaultValue="items">
         <TabsList>
           <TabsTrigger value="items">Items</TabsTrigger>
-          <TabsTrigger value="extra-costs" className="bg bg-red-500">Extra Costs</TabsTrigger>
+          <TabsTrigger value="extra-costs">Extra Costs</TabsTrigger>
           <TabsTrigger value="stock-movement">Stock Movement</TabsTrigger>
           <TabsTrigger value="financial-summary">Financial Summary</TabsTrigger>
           <TabsTrigger value="comments">Comments</TabsTrigger>
@@ -399,7 +434,7 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
           <TabsTrigger value="activity-log">Activity Log</TabsTrigger>
         </TabsList>
         <TabsContent value="items">
-          {mode !== 'view' && selectedItems.length > 0 && (
+          {!isReadOnly && selectedItems.length > 0 && (
             <div className="mb-4">
               <GoodsReceiveNoteItemsBulkActions
                 selectedItems={selectedItems}
@@ -407,8 +442,8 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
               />
             </div>
           )}
-          <GoodsReceiveNoteItems 
-            mode={mode} 
+          <GoodsReceiveNoteItems
+            mode={currentMode === 'confirm' ? 'view' : currentMode}
             items={formData.items}
             onItemsChange={handleItemsChange}
             selectedItems={selectedItems}
@@ -419,70 +454,32 @@ const [expandedItems, setExpandedItems] = useState<string[]>([])
           />
         </TabsContent>
         <TabsContent value="extra-costs">
-          <ExtraCostsTab 
-            mode={mode} 
+          <ExtraCostsTab
+            mode={currentMode === 'confirm' ? 'view' : currentMode}
             initialCosts={formData.extraCosts}
-            onCostsChange={(newCosts) => {
-              setFormData(prev => ({
-                ...prev,
-                extraCosts: newCosts
-              }))
-            }}
+            onCostsChange={handleExtraCostsChange}
           />
         </TabsContent>
         <TabsContent value="stock-movement">
-          <StockMovementContent 
+          <StockMovementContent
           />
         </TabsContent>
         <TabsContent value="financial-summary">
-          <FinancialSummaryTab 
-            mode={mode}
+          <FinancialSummaryTab
+            mode={currentMode === 'confirm' ? 'view' : currentMode}
             summary={formData.financialSummary || calculateFinancialSummary()}
             currency={formData.currency}
             baseCurrency={formData.baseCurrency}
           />
         </TabsContent>
         <TabsContent value="comments">
-          
         </TabsContent>
         <TabsContent value="attachments">
-        
         </TabsContent>
         <TabsContent value="activity-log">
           <ActivityLogTab activityLog={formData.activityLog} />
         </TabsContent>
       </Tabs>
-
-      {mode !== 'view' && (
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={handleCancel}>
-            <ArrowLeft className="h-4 w-4 mr-2" /> Cancel
-          </Button>
-          <Button onClick={handleSave}>
-            <Save className="h-4 w-4 mr-2" /> Save
-          </Button>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-9 w-9"
-                  onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
-                >
-                  {isRightPanelOpen ? (
-                    <PanelRightClose className="h-4 w-4" />
-                  ) : (
-                    <PanelRightOpen className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Toggle right panel</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Toggle right panel</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      )}
     </div>
   )
 }

@@ -7,7 +7,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Carmen - Food Service ERP',
+  title: 'Carmen-HSC',
   description: 'Enterprise resource planning system for food service operations',
 }
 

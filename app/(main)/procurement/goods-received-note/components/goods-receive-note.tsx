@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,24 +43,42 @@ import { FinancialSummaryTab } from "./tabs/FinancialSummaryTab";
 import { ActivityLogTab } from "./tabs/ActivityLogTab";
 import { BulkActions } from "./tabs/BulkActions";
 import StatusBadge from "@/components/ui/custom-status-badge";
-import { useState } from "react";
+import { useState, FC } from "react";
 import SummaryTotal from "./SummaryTotal";
 import ItemDetailForm  from "./tabs/itemDetailForm";
 import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import { TaxTab } from "./tabs/TaxTab";
 import StockMovementContent from "./tabs/stock-movement";
+import { GoodsReceiveNoteDetail, GRNDetailMode } from "./GoodsReceiveNoteDetail";
 
 interface GoodsReceiveNoteComponentProps {
   initialData: GoodsReceiveNote;
-  mode: GoodsReceiveNoteMode;
 }
 
 export function GoodsReceiveNoteComponent({
   initialData,
-  mode: initialMode,
 }: GoodsReceiveNoteComponentProps) {
+  console.log('[GRNComponent] *** Component Render/Mount ***');
   const router = useRouter();
-  const [mode, setMode] = React.useState<GoodsReceiveNoteMode>(initialMode);
+  const searchParams = useSearchParams();
+  const params = useParams();
+  
+  const id = params.id as string;
+  const modeParam = searchParams?.get('mode') as GRNDetailMode | null;
+
+  const determineInitialMode = (): GRNDetailMode => {
+    if (id?.startsWith('new-')) {
+        console.log('[GRNComponent] Detected new ID, setting initial mode to add');
+        return 'add';
+    }
+    const validMode = modeParam && ['view', 'edit', 'add'].includes(modeParam) ? modeParam : 'view';
+    console.log('[GRNComponent] Determined initial mode from modeParam:', validMode);
+    return validMode;
+  };
+
+  const [internalMode, setInternalMode] = React.useState<GRNDetailMode>(determineInitialMode);
+  console.log('[GRNComponent] Initialized internal mode state:', internalMode);
+  
   const [formData, setFormData] = React.useState<GoodsReceiveNote>(() => ({
     ...initialData,
     date: new Date(initialData.date),
@@ -72,7 +90,7 @@ export function GoodsReceiveNoteComponent({
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false)
   const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -96,15 +114,18 @@ export function GoodsReceiveNoteComponent({
 
   const handleSave = () => {
     console.log("Saving data:", formData);
-    setMode("view");
+    setInternalMode("view");
   };
 
   const handleCancel = () => {
     setFormData(initialData);
-    setMode("view");
+    setInternalMode("view");
   };
 
-  const isEditable = mode === "edit" || mode === "add";
+  const isEditable = internalMode === "edit" || internalMode === "add";
+  console.log('[GRNComponent] Calculated isEditable:', isEditable, '(based on internalMode:', internalMode, ')');
+  const isConfirming = internalMode === "confirm";
+  const isViewing = internalMode === "view";
 
   const handleItemsChange = (updatedItems: GoodsReceiveNoteItem[]) => {
     setFormData((prev) => ({ ...prev, items: updatedItems }));
@@ -118,15 +139,12 @@ export function GoodsReceiveNoteComponent({
 
   const handleBulkAction = (action: string) => {
     console.log(`Applying ${action} to items:`, selectedItems);
-    // Implement bulk action logic here
-    // For example:
     if (action === "delete") {
       setFormData((prev) => ({
         ...prev,
         items: prev.items.filter((item) => !selectedItems.includes(item.id)),
       }));
     }
-    // Implement other actions as needed
     setSelectedItems([]);
   };
 
@@ -185,6 +203,8 @@ export function GoodsReceiveNoteComponent({
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  const childMode: GoodsReceiveNoteMode = internalMode as GoodsReceiveNoteMode;
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
@@ -201,12 +221,12 @@ export function GoodsReceiveNoteComponent({
                   <StatusBadge status={formData.status} />
                 </div>
                 <div className="flex gap-2">
-                  {mode === "view" && (
+                  {internalMode === "view" && (
                     <>
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => setMode("edit")}
+                        onClick={() => setInternalMode("edit")}
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
@@ -313,7 +333,6 @@ export function GoodsReceiveNoteComponent({
                       ) : (
                         <SelectItem value="no-vendor">No vendor selected</SelectItem>
                       )}
-                      {/* Add more vendor options here */}
                     </SelectContent>
                   </Select>
                 </div>
@@ -379,7 +398,6 @@ export function GoodsReceiveNoteComponent({
                       ) : (
                         <SelectItem value="no-currency">No currency selected</SelectItem>
                       )}
-                      {/* Add more currency options here */}
                     </SelectContent>
                   </Select>
                 </div>
@@ -467,11 +485,9 @@ export function GoodsReceiveNoteComponent({
                       ) : (
                         <SelectItem value="no-cashbook">No cash book selected</SelectItem>
                       )}
-                      {/* Add more cash book options here */}
                     </SelectContent>
                   </Select>
                 </div>
-                               {/* Add these new fields */}
                                <div className="space-y-2">
                   <Label htmlFor="creditTerms" className="text-sm font-medium">Credit Terms</Label>
                   <Select 
@@ -531,7 +547,7 @@ export function GoodsReceiveNoteComponent({
                     )}
                   </div>
                   <GoodsReceiveNoteItems
-                    mode={mode}
+                    mode={childMode}
                     items={formData.items}
                     onItemsChange={handleItemsChange}
                     onItemSelect={handleItemSelect}
@@ -543,7 +559,7 @@ export function GoodsReceiveNoteComponent({
                 </TabsContent>
                 <TabsContent value="extra-costs">
                   <ExtraCostsTab
-                    mode={mode}
+                    mode={childMode}
                     initialCosts={formData.extraCosts}
                     onCostsChange={(newCosts) => {
                       setFormData((prev) => ({
@@ -559,7 +575,7 @@ export function GoodsReceiveNoteComponent({
                 
                 <TabsContent value="journal-entries">
                   <FinancialSummaryTab
-                    mode={mode}
+                    mode={childMode}
                     summary={formData.financialSummary || null}
                     currency={formData.currency}
                     baseCurrency={formData.baseCurrency}
@@ -567,7 +583,7 @@ export function GoodsReceiveNoteComponent({
                 </TabsContent>
                 <TabsContent value="tax">
                   <TaxTab
-                    mode={mode}
+                    mode={childMode}
                     taxInvoiceNumber={formData.taxInvoiceNumber}
                     taxInvoiceDate={formData.taxInvoiceDate}
                     onTaxInvoiceChange={(field, value) => {

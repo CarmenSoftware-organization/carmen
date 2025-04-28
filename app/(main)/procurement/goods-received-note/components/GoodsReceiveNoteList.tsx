@@ -2,9 +2,10 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Search, Eye, Edit, Trash, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer, LayoutGrid, List, FileText, MoreVertical, PanelRightClose, PanelRightOpen } from 'lucide-react'
+import { Search, Eye, Edit, Trash, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer, LayoutGrid, List, FileText, MoreVertical, PanelRightClose, PanelRightOpen, PackagePlus, FilePlus } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
+import { v4 as uuidv4 } from 'uuid'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { BulkActions } from './tabs/BulkActions'
@@ -26,10 +27,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogTrigger } from "@/components/ui/dialog"
 import { AdvancedFilter } from './advanced-filter'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
 import { format } from 'date-fns'
+import { useGRNCreationStore } from '@/lib/store/grn-creation.store'
 
 export function GoodsReceiveNoteList() {
   const router = useRouter()
@@ -44,6 +46,8 @@ export function GoodsReceiveNoteList() {
   const itemsPerPage = 7
   const [advancedFilters, setAdvancedFilters] = useState<FilterType<GoodsReceiveNote>[]>([])
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false)
+  const [isSelectionDialogOpen, setIsSelectionDialogOpen] = useState(false)
+  const { setProcessType, setNewlyCreatedGRNData } = useGRNCreationStore()
 
   const handleBulkAction = (action: string) => {
     console.log(`Bulk action: ${action} on items:`, selectedItems)
@@ -177,8 +181,78 @@ export function GoodsReceiveNoteList() {
     router.push(`/procurement/goods-received-note/${id}?mode=${mode}`)
   }
 
-  const handleAddNewGoodsReceiveNote = () => {
-    router.push('/procurement/goods-received-note/0?mode=create')
+  // Specific handler for the manual creation button click
+  const handleManualCreateClick = () => {
+    console.log('[handleManualCreateClick] Button clicked'); 
+    handleProcessSelection('manual');
+  }
+
+  // Function to handle process selection and navigation
+  const handleProcessSelection = (type: 'po' | 'manual') => {
+    console.log('[handleProcessSelection] Called with type:', type);
+    setProcessType(type);
+    let nextRoute = '';
+    if (type === 'po') {
+      nextRoute = '/procurement/goods-received-note/new/vendor-selection';
+      router.push(nextRoute);
+    } else { // Manual creation
+      const tempId = `new-${uuidv4()}`;
+      console.log('[handleProcessSelection] Generated tempId:', tempId);
+
+      // Create placeholder data for the store
+      const placeholderData: GoodsReceiveNote = {
+        id: tempId, // Use the generated temp ID
+        ref: 'NEW GRN',
+        date: new Date(),
+        invoiceDate: new Date(),
+        invoiceNumber: '',
+        taxInvoiceDate: undefined,
+        taxInvoiceNumber: '',
+        description: '',
+        receiver: '', // Should get from user context later
+        vendor: '',
+        vendorId: '',
+        location: '', // Should get from user/unit context later
+        currency: 'USD', // Default or get from settings
+        exchangeRate: 1,
+        baseCurrency: 'USD', // Default or get from settings
+        status: 'Received', // Use 'Received' as the default valid status
+        isConsignment: false,
+        isCash: false,
+        cashBook: '',
+        items: [],
+        selectedItems: [],
+        stockMovements: [],
+        extraCosts: [],
+        comments: [],
+        attachments: [],
+        activityLog: [], // Initialize as empty array 
+        baseSubTotalPrice: 0,
+        subTotalPrice: 0,
+        baseNetAmount: 0,
+        netAmount: 0,
+        baseDiscAmount: 0,
+        discountAmount: 0,
+        baseTaxAmount: 0,
+        taxAmount: 0,
+        baseTotalAmount: 0,
+        totalAmount: 0,
+      };
+
+      console.log('[handleProcessSelection] Setting placeholder data in store:', placeholderData);
+      setNewlyCreatedGRNData(placeholderData); // Set data in Zustand store
+
+      nextRoute = `/procurement/goods-received-note/${tempId}?mode=confirm`;
+      console.log('[handleProcessSelection] Calculated nextRoute:', nextRoute);
+      setIsSelectionDialogOpen(false);
+      try {
+        console.log('[handleProcessSelection] Attempting router.push...');
+        router.push(nextRoute);
+        console.log('[handleProcessSelection] router.push apparently succeeded.');
+      } catch (error) {
+        console.error('[handleProcessSelection] Error during router.push:', error);
+      }
+    }
   }
 
   const totalPages = Math.ceil(filteredGRNs.length / itemsPerPage)
@@ -190,9 +264,31 @@ export function GoodsReceiveNoteList() {
   const title = 'Goods Receive Notes'
   const actionButtons = (
     <div className="flex flex-col sm:flex-row gap-2">
-      <Button className="w-full sm:w-auto" onClick={handleAddNewGoodsReceiveNote}>
-        <Plus className="mr-2 h-4 w-4" />Goods Receive Note
-      </Button>
+      <Dialog open={isSelectionDialogOpen} onOpenChange={setIsSelectionDialogOpen}>
+        <DialogTrigger asChild>
+          <Button className="w-full sm:w-auto">
+            <Plus className="mr-2 h-4 w-4" />Goods Receive Note
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Goods Receive Note</DialogTitle>
+            <DialogDescription>
+              Choose how you want to create the GRN.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Button variant="outline" onClick={() => handleProcessSelection('po')} className="justify-start">
+              <PackagePlus className="mr-2 h-4 w-4" />
+              Create from Purchase Order
+            </Button>
+            <Button variant="outline" onClick={handleManualCreateClick} className="justify-start">
+              <FilePlus className="mr-2 h-4 w-4" />
+              Create Manually
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Button variant="outline" className="w-full sm:w-auto">
         <Download className="mr-2 h-4 w-4" /> Export
       </Button>
@@ -225,13 +321,6 @@ export function GoodsReceiveNoteList() {
           />
         </div>
       )}
-      <div className="mb-4 flex items-center">
-        <Checkbox
-          checked={selectedItems.length === paginatedGRNs.length && paginatedGRNs.length > 0}
-          onCheckedChange={toggleSelectAll}
-        />
-        <span className="ml-2">Select All</span>
-      </div>
     </>
   )
 
@@ -255,11 +344,12 @@ export function GoodsReceiveNoteList() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onSelect={() => setStatusFilter("")}>All Statuses</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setStatusFilter("Pending")}>Pending</DropdownMenuItem>
+            {/* <DropdownMenuItem onSelect={() => setStatusFilter("Pending")}>Pending</DropdownMenuItem> */}
             <DropdownMenuItem onSelect={() => setStatusFilter("Received")}>Received</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setStatusFilter("Partial")}>Partial</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setStatusFilter("Cancelled")}>Cancelled</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setStatusFilter("Voided")}>Voided</DropdownMenuItem>
+            {/* <DropdownMenuItem onSelect={() => setStatusFilter("Partial")}>Partial</DropdownMenuItem> */}
+            {/* <DropdownMenuItem onSelect={() => setStatusFilter("Cancelled")}>Cancelled</DropdownMenuItem> */}
+            {/* <DropdownMenuItem onSelect={() => setStatusFilter("Voided")}>Voided</DropdownMenuItem> */}
+            <DropdownMenuItem onSelect={() => setStatusFilter("Committed")}>Committed</DropdownMenuItem> 
           </DropdownMenuContent>
         </DropdownMenu>
         <AdvancedFilter
@@ -464,13 +554,16 @@ export function GoodsReceiveNoteList() {
     </div>
   )
 
+  // Restore original return with ListPageTemplate and actual content
   return (
     <ListPageTemplate
       title={title}
       actionButtons={actionButtons}
       filters={filters}
       bulkActions={bulkActions}
-      content={viewMode === 'table' ? renderTableView() : renderCardView()}
+      content={ // Restore table/card view
+        viewMode === 'table' ? renderTableView() : renderCardView()
+      }
     />
   )
 }

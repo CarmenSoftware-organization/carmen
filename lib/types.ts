@@ -567,12 +567,7 @@ export interface ExtraCost {
 }
 export type GoodsReceiveNoteMode = "view" | "edit" | "add";
 
-export type GoodsReceiveNoteStatus =
-  | "Pending"
-  | "Received"
-  | "Partial"
-  | "Cancelled"
-  | "Voided";
+export type GoodsReceiveNoteStatus = 'Received' | 'Committed';
 
 export type CostType = "shipping" | "handling" | "insurance" | "other";
 
