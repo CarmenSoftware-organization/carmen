@@ -12,16 +12,36 @@ import { Badge } from "@/components/ui/badge"
 import { Search, ArrowLeft } from 'lucide-react';
 import { PurchaseOrder, PurchaseOrderItem, GoodsReceiveNoteItem, GoodsReceiveNote } from '@/lib/types';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
-// Helper to flatten PO items and add PO reference
-const flattenPOItems = (pos: PurchaseOrder[]): (PurchaseOrderItem & { poNumber: string, location?: string, isSelected?: boolean, receivingQuantity?: number })[] => {
+// Helper to flatten PO items and add PO reference, currency, rate
+const flattenPOItems = (pos: PurchaseOrder[]): (PurchaseOrderItem & { 
+    poNumber: string, 
+    poCurrencyCode: string, 
+    poExchangeRate: number, 
+    poBaseCurrencyCode: string, 
+    location: string, 
+    isSelected?: boolean, 
+    receivingQuantity?: number 
+})[] => {
   return pos.flatMap(po =>
-    po.items.map(item => ({
-      ...item,
-      poNumber: po.number, // Add PO number reference
-      location: item.inventoryInfo?.lastVendor || 'Default Location' // Placeholder for location logic
-    }))
+    po.items.map((item, index) => {
+      // Assign more diverse mock locations based on PO number or index
+      let mockLocation = 'Main Warehouse';
+      if (po.number === 'PO-002') mockLocation = 'Store Room A';
+      else if (po.number === 'PO-003') mockLocation = 'Kitchen Prep Area';
+      else if (index % 2 === 0 && po.number === 'PO-001') mockLocation = 'Receiving Bay'; // Example for variety within a PO
+
+      return {
+        ...item,
+        poNumber: po.number,
+        poCurrencyCode: po.currencyCode,
+        poExchangeRate: po.exchangeRate, // Add Exchange Rate from PO
+        poBaseCurrencyCode: po.baseCurrencyCode, // Add Base Currency Code from PO
+        location: mockLocation 
+      };
+    })
   );
 };
 
@@ -42,7 +62,8 @@ export default function ItemLocationSelectionPage() {
   const [selectedLocations, setSelectedLocations] = useState<Set<string>>(new Set());
   const [displayItems, setDisplayItems] = useState<typeof allPOItems>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
-  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({}); // { [itemId]: receivingQuantity }
+  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
+  const [itemReceivingUnits, setItemReceivingUnits] = useState<Record<string, string>>({});
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -66,6 +87,13 @@ export default function ItemLocationSelectionPage() {
     // existingSelectedGRNItems.forEach(grnItem => { ... });
     setSelectedItemIds(initialSelectedIds);
     setItemQuantities(initialQuantities);
+
+    // Initialize receiving units state
+    const initialUnits: Record<string, string> = {};
+    allPOItems.forEach(item => {
+        initialUnits[item.id] = item.orderUnit; // Default to order unit
+    });
+    setItemReceivingUnits(initialUnits);
 
   }, [selectedVendor, selectedPOs, router, allPOItems/*, existingSelectedGRNItems */]); // Remove dependency if not used
 
@@ -172,6 +200,15 @@ export default function ItemLocationSelectionPage() {
       }
   };
 
+  const handleUnitChange = (itemId: string, unit: string) => {
+    setItemReceivingUnits(prev => ({
+      ...prev,
+      [itemId]: unit
+    }));
+    // TODO: Future enhancement - recalculate base quantities/amounts if conversion factors are available for the new unit
+    console.log(`Changed unit for item ${itemId} to ${unit}. Recalculation needed if factors differ.`);
+  };
+
   const handleNext = () => {
     const itemsToSave: GoodsReceiveNoteItem[] = [];
     Array.from(selectedItemIds).forEach(id => {
@@ -182,10 +219,10 @@ export default function ItemLocationSelectionPage() {
         itemsToSave.push({
           id: `temp-grnitem-${crypto.randomUUID()}`, // Temporary unique ID for GRN item
           purchaseOrderRef: poItem.poNumber,
-          // poLineId: poItem.id, // Link to original PO item ID
           name: poItem.name,
           description: poItem.description,
           orderedQuantity: poItem.orderedQuantity,
+          orderUnit: poItem.orderUnit,
           receivedQuantity: receivingQty,
           unit: poItem.orderUnit,
           unitPrice: poItem.unitPrice,
@@ -249,35 +286,36 @@ export default function ItemLocationSelectionPage() {
         date: new Date(),
         invoiceDate: new Date(), // Default or TBD
         invoiceNumber: '', // TBD
-        description: `GRN for PO(s): ${selectedPOs.map(p => p.number).join(', ')}`,
-        receiver: 'Current User', // Get current user
+        description: `GRN created from PO(s): ${selectedPOs.map(p => p.number).join(', ')}`,
+        receiver: '', // TODO: Get from user context
         vendor: selectedVendor?.companyName || '',
         vendorId: selectedVendor?.id || '',
-        location: 'Main Warehouse', // Default or TBD
-        currency: selectedPOs[0]?.currencyCode || 'USD',
-        status: 'Pending', // Initial status before confirmation
-        items: itemsToSave,
-        stockMovements: [],
-        isConsignment: false, // Default
-        isCash: false, // Default
-        extraCosts: [],
-        comments: [],
-        attachments: [],
-        activityLog: [],
-        financialSummary: null, // Will be calculated on detail page or backend
+        location: '', // TODO: Determine primary location or leave blank?
+        currency: selectedPOs[0]?.currencyCode || 'USD', // Assume first PO's currency for now
         exchangeRate: selectedPOs[0]?.exchangeRate || 1,
         baseCurrency: selectedPOs[0]?.baseCurrencyCode || 'USD',
-        // Aggregate financial totals (simplified - recalculate properly later)
-        baseSubTotalPrice: itemsToSave.reduce((sum, item) => sum + item.baseSubTotalAmount, 0),
-        subTotalPrice: itemsToSave.reduce((sum, item) => sum + item.subTotalAmount, 0),
-        baseNetAmount: itemsToSave.reduce((sum, item) => sum + item.baseNetAmount, 0),
-        netAmount: itemsToSave.reduce((sum, item) => sum + item.netAmount, 0),
-        baseDiscAmount: itemsToSave.reduce((sum, item) => sum + item.baseDiscountAmount, 0),
-        discountAmount: itemsToSave.reduce((sum, item) => sum + item.discountAmount, 0),
-        baseTaxAmount: itemsToSave.reduce((sum, item) => sum + item.baseTaxAmount, 0),
-        taxAmount: itemsToSave.reduce((sum, item) => sum + item.taxAmount, 0),
-        baseTotalAmount: itemsToSave.reduce((sum, item) => sum + item.baseTotalAmount, 0),
-        totalAmount: itemsToSave.reduce((sum, item) => sum + item.totalAmount, 0),
+        status: 'Received', // Use 'Received' instead of 'Pending'
+        isConsignment: false, // Default
+        isCash: false, // Default
+        cashBook: '',
+        items: itemsToSave,
+        stockMovements: [], // To be generated later
+        extraCosts: [], // Add later if needed
+        comments: [],
+        attachments: [],
+        activityLog: [], // Add initial entry later
+        financialSummary: null, // To be generated later
+        // Default totals
+        baseSubTotalPrice: 0, // Calculate based on itemsToSave
+        subTotalPrice: 0,
+        baseNetAmount: 0,
+        netAmount: 0,
+        baseDiscAmount: 0,
+        discountAmount: 0,
+        baseTaxAmount: 0,
+        taxAmount: 0,
+        baseTotalAmount: 0,
+        totalAmount: 0,
     };
 
     console.log("Constructed GRN Data:", newGRNData);
@@ -358,57 +396,103 @@ export default function ItemLocationSelectionPage() {
                        aria-label="Select all items"
                     />
                   </TableHead>
-                  <TableHead>Item Name</TableHead>
-                  <TableHead>Description</TableHead>
+                  <TableHead>Item</TableHead>
+                  <TableHead>PO #</TableHead>
                   <TableHead>Location</TableHead>
-                  <TableHead>PO Num</TableHead>
-                  <TableHead>Ordered</TableHead>
-                  <TableHead>Received</TableHead>
-                  <TableHead>Remaining</TableHead>
-                  <TableHead className="w-[120px]">Receive Qty</TableHead>
-                  <TableHead>Unit</TableHead>
+                  <TableHead className="text-right">Ordered</TableHead>
+                  <TableHead className="text-right">Remaining</TableHead>
+                  <TableHead className="w-[200px] text-right">Receiving Qty / Unit</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {displayItems.length > 0 ? (
-                  displayItems.map((item) => (
-                    <TableRow
-                      key={`${item.poNumber}-${item.id}`} // Unique key per PO line
-                      data-state={selectedItemIds.has(item.id) ? "selected" : undefined}
-                    >
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedItemIds.has(item.id)}
-                          onCheckedChange={() => handleToggleSelectItem(item.id)}
-                          aria-label={`Select item ${item.name}`}
-                        />
-                      </TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.description}</TableCell>
-                      <TableCell>{item.location}</TableCell>
-                      <TableCell>{item.poNumber}</TableCell>
-                      <TableCell>{item.orderedQuantity}</TableCell>
-                      <TableCell>{item.receivedQuantity}</TableCell>
-                      <TableCell className="font-medium">{item.remainingQuantity}</TableCell>
-                       <TableCell>
-                         <Input
-                            type="number"
-                            value={itemQuantities[item.id] || ''}
-                            onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                            onFocus={() => !selectedItemIds.has(item.id) && handleToggleSelectItem(item.id)} // Select on focus if not selected
-                            min="0"
-                            max={item.remainingQuantity} // Set max based on remaining
-                            disabled={item.remainingQuantity <= 0} // Disable if nothing remaining
-                            className="h-8 text-sm text-right"
+                  displayItems.map((item) => {
+                    const receivingQty = itemQuantities[item.id] ?? 0;
+                    const amount = receivingQty * item.unitPrice;
+                    const baseAmount = amount * (item.poExchangeRate || 1);
+                    const remainingBaseQty = item.remainingQuantity * item.convRate;
+                    const currentReceivingUnit = itemReceivingUnits[item.id] || item.orderUnit;
+                    const baseReceivingQty = receivingQty * item.convRate; // Calculation assumes convRate is based on orderUnit, needs adjustment if unit changes
+
+                    // Placeholder units - replace with dynamic ones if available
+                    const availableUnits = [item.orderUnit, 'Kg', 'Pcs', 'Box', 'Pack'].filter((v, i, a) => a.indexOf(v) === i); 
+
+                    return (
+                      <TableRow key={item.id} data-state={selectedItemIds.has(item.id) ? "selected" : undefined}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedItemIds.has(item.id)}
+                            onCheckedChange={() => handleToggleSelectItem(item.id)}
+                            aria-label={`Select item ${item.name}`}
                           />
-                       </TableCell>
-                      <TableCell>{item.orderUnit}</TableCell>
-                    </TableRow>
-                  ))
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium">{item.name}</div>
+                          <div className="text-xs text-muted-foreground">{item.description}</div>
+                        </TableCell>
+                        <TableCell>{item.poNumber}</TableCell>
+                        <TableCell>{item.location}</TableCell>
+                        <TableCell className="text-right">
+                          {item.orderedQuantity} {item.orderUnit}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div>{item.remainingQuantity} {item.orderUnit}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Base: {remainingBaseQty.toFixed(2)} {item.baseUnit || 'N/A'}
+                          </div>
+                        </TableCell>
+                        {/* Receiving Qty & Unit Cell */}
+                        <TableCell className="text-right">
+                           <div className="flex items-center justify-end space-x-1">
+                             <Input
+                                type="number"
+                                value={itemQuantities[item.id] ?? ''}
+                                onChange={(e) => handleQuantityChange(item.id, e.target.value)}
+                                onFocus={(e) => e.target.select()}
+                                className="h-8 w-[60px] text-right" // Adjust width
+                                max={item.remainingQuantity}
+                                min={0}
+                                step="any"
+                                disabled={!selectedItemIds.has(item.id)}
+                             />
+                             <Select 
+                               value={currentReceivingUnit}
+                               onValueChange={(value) => handleUnitChange(item.id, value)}
+                               disabled={!selectedItemIds.has(item.id)}
+                             >
+                               <SelectTrigger className="h-8 w-[80px]"> {/* Adjust width */}
+                                 <SelectValue placeholder="Unit" />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 {availableUnits.map(unit => (
+                                    <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
+                           </div>
+                          {/* Display Base Receiving Qty */}
+                          <div className="text-xs text-muted-foreground mt-1 text-right">
+                            {/* Note: Base calc might be inaccurate if unit changes without factor update */}
+                            Base: {baseReceivingQty.toFixed(2)} {item.baseUnit || 'N/A'}
+                          </div>
+                        </TableCell>
+                        {/* Amount Cell (incl. Base Amount) */}
+                        <TableCell className="text-right">
+                           <div>{amount.toFixed(2)}</div>
+                           <div className="text-xs text-muted-foreground">{item.poCurrencyCode || 'N/A'}</div>
+                           {/* Base Amount Below */}
+                           <div className="text-xs text-muted-foreground mt-1">
+                             Base: {baseAmount.toFixed(2)} {item.poBaseCurrencyCode || 'N/A'}
+                           </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center">
-                      No items found matching your criteria.
+                    <TableCell colSpan={8} className="text-center"> {/* Updated colspan */}
+                      No items found for the selected criteria.
                     </TableCell>
                   </TableRow>
                 )}

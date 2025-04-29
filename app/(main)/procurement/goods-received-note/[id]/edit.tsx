@@ -44,7 +44,6 @@ export default function EditGoodsReceiveNote({ params }: { params: { id: string 
 
   return (
     <GoodsReceiveNoteComponent 
-      mode={mode} 
       initialData={grnData}
     />
   )

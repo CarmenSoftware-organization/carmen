@@ -50,6 +50,7 @@ import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import { TaxTab } from "./tabs/TaxTab";
 import StockMovementContent from "./tabs/stock-movement";
 import { GoodsReceiveNoteDetail, GRNDetailMode } from "./GoodsReceiveNoteDetail";
+import { RelatedPOList } from "./tabs/RelatedPOList";
 
 interface GoodsReceiveNoteComponentProps {
   initialData: GoodsReceiveNote;
@@ -91,6 +92,15 @@ export function GoodsReceiveNoteComponent({
   const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false)
   const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+
+  // Extract unique Purchase Order References from items
+  const relatedPurchaseOrderRefs = React.useMemo(() => {
+      if (!formData?.items) return [];
+      const refs = formData.items
+          .map(item => item.purchaseOrderRef)
+          .filter((ref, index, self) => ref && self.indexOf(ref) === index); // Filter out empty/null and get unique
+      return refs;
+  }, [formData?.items]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -530,68 +540,69 @@ export function GoodsReceiveNoteComponent({
           <Card>
             <CardContent>
               <Tabs defaultValue="items" className="w-full">
-                <TabsList className="w-full flex flex-wrap">
-                  <TabsTrigger value="items" className="flex-1">Items</TabsTrigger>
-                  <TabsTrigger value="extra-costs" className="flex-1">Extra Costs</TabsTrigger>
-                  <TabsTrigger value="stock-movement" className="flex-1">Stock Movement</TabsTrigger>
-                  <TabsTrigger value="journal-entries" className="flex-1">Journal Entries</TabsTrigger>
-                  <TabsTrigger value="tax" className="flex-1">Tax Entries</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-6">
+                  <TabsTrigger value="items">Items</TabsTrigger>
+                  <TabsTrigger value="stock-movements">Stock Movements</TabsTrigger>
+                  <TabsTrigger value="extra-costs">Extra Costs</TabsTrigger>
+                  <TabsTrigger value="related-po">Related POs</TabsTrigger>
+                  <TabsTrigger value="financials">Financials</TabsTrigger>
+                  <TabsTrigger value="activity">Activity</TabsTrigger>
                 </TabsList>
-                <TabsContent value="items">
-                  <div className="mb-4 space-y-4">
-                    {isEditable && selectedItems.length > 0 && (
-                      <BulkActions
-                        selectedItems={selectedItems}
-                        onAction={handleBulkAction}
-                      />
-                    )}
-                  </div>
+                <TabsContent value="items" className="mt-4">
                   <GoodsReceiveNoteItems
                     mode={childMode}
-                    items={formData.items}
+                    items={formData.items || []}
                     onItemsChange={handleItemsChange}
-                    onItemSelect={handleItemSelect}
                     selectedItems={selectedItems}
-                    exchangeRate={formData.exchangeRate}
-                    baseCurrency={formData.baseCurrency}
-                    currency={formData.currency}
+                    onItemSelect={handleItemSelect}
+                    exchangeRate={formData.exchangeRate || 1}
+                    baseCurrency={formData.baseCurrency || ''}
+                    currency={formData.currency || ''}
                   />
                 </TabsContent>
-                <TabsContent value="extra-costs">
-                  <ExtraCostsTab
-                    mode={childMode}
-                    initialCosts={formData.extraCosts}
-                    onCostsChange={(newCosts) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        extraCosts: newCosts,
-                      }));
-                    }}
-                  />
-                </TabsContent>
-                <TabsContent value="stock-movement">
+                <TabsContent value="stock-movements" className="mt-4">
                   <StockMovementContent/>
                 </TabsContent>
-                
-                <TabsContent value="journal-entries">
+                <TabsContent value="extra-costs" className="mt-4">
+                  <ExtraCostsTab
+                     mode={childMode}
+                     initialCosts={formData.extraCosts || []}
+                     onCostsChange={(newCosts) => {
+                       setFormData((prev) => ({
+                         ...prev,
+                         extraCosts: newCosts,
+                       }));
+                     }}
+                 />
+                </TabsContent>
+                <TabsContent value="related-po" className="mt-4">
+                  <RelatedPOList poRefs={relatedPurchaseOrderRefs} />
+                </TabsContent>
+                <TabsContent value="financials" className="mt-4">
                   <FinancialSummaryTab
                     mode={childMode}
                     summary={formData.financialSummary || null}
                     currency={formData.currency}
                     baseCurrency={formData.baseCurrency}
                   />
-                </TabsContent>
-                <TabsContent value="tax">
                   <TaxTab
-                    mode={childMode}
-                    taxInvoiceNumber={formData.taxInvoiceNumber}
-                    taxInvoiceDate={formData.taxInvoiceDate}
-                    onTaxInvoiceChange={(field, value) => {
-                      setFormData(prev => ({ ...prev, [field]: value }));
-                    }}
-                    documentTotals={documentTotals}
-                    currency={formData.currency}
-                    baseCurrency={formData.baseCurrency}
+                     mode={childMode}
+                     taxInvoiceNumber={formData.taxInvoiceNumber}
+                     taxInvoiceDate={formData.taxInvoiceDate}
+                     onTaxInvoiceChange={(field, value) => {
+                       setFormData(prev => ({ ...prev, [field]: value }));
+                     }}
+                     documentTotals={documentTotals}
+                     currency={formData.currency}
+                     baseCurrency={formData.baseCurrency}
+                   />
+                </TabsContent>
+                <TabsContent value="activity" className="mt-4">
+                  <CommentsAttachmentsTab 
+                      poData={formData}
+                  />
+                  <ActivityLogTab 
+                      activityLog={formData.activityLog || []}
                   />
                 </TabsContent>
               </Tabs>

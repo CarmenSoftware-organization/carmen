@@ -471,6 +471,7 @@ export interface GoodsReceiveNoteItem {
   description: string;
   jobCode: string;
   orderedQuantity: number;
+  orderUnit: string;
   receivedQuantity: number;
   unit: string;
   unitPrice: number;
@@ -526,6 +527,9 @@ export interface GoodsReceiveNoteItem {
   focConversionRate?: number;
   isConsignment?: boolean;
   isTaxInclusive?: boolean;
+  taxSystem?: 'GST' | 'VAT';
+  projectCode?: string;
+  marketSegment?: string;
 }
 
 export interface LocationInfo {

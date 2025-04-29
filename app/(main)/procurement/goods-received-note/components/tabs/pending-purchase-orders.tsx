@@ -66,10 +66,11 @@ export function PendingPurchaseOrdersComponent() {
                 <TableHead className="min-w-[120px]">Remaining Qty</TableHead>
                 <TableHead className="min-w-[80px]">Inventory Units</TableHead>
                 <TableHead className="min-w-[200px]">Locations Ordered</TableHead>
+                <TableHead>Currency</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {poData.map((po) => (
+              {poData.map((po: any) => (
                 <TableRow key={po.poNumber}>
                   <TableCell className="font-medium">{po.poNumber}</TableCell>
                   <TableCell>{po.vendor}</TableCell>
@@ -77,6 +78,7 @@ export function PendingPurchaseOrdersComponent() {
                   <TableCell>{po.qtyToReceive}</TableCell>
                   <TableCell>{po.units}</TableCell>
                   <TableCell>{po.locationsOrdered.join(", ")}</TableCell>
+                  <TableCell>{po.currencyCode || 'N/A'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

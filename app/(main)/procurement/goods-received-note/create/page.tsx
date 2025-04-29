@@ -1,55 +1,56 @@
 'use client'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { GoodsReceiveNoteComponent } from '../components/goods-receive-note'
-import { GoodsReceiveNoteMode } from '@/lib/types'
+import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 
 export default function CreateGoodsReceiveNote() {
-  const [mode, setMode] = useState<GoodsReceiveNoteMode>('add')
+  const [initialGrnData] = useState<GoodsReceiveNote>(() => ({
+    id: `new-${crypto.randomUUID()}`,
+    ref: '',
+    date: new Date(),
+    invoiceDate: new Date(),
+    invoiceNumber: '',
+    taxInvoiceDate: undefined,
+    taxInvoiceNumber: '',
+    description: '',
+    receiver: '',
+    vendor: '',
+    vendorId: '',
+    location: '',
+    currency: 'USD',
+    exchangeRate: 1,
+    baseCurrency: 'USD',
+    status: 'Received',
+    isConsignment: false,
+    isCash: false,
+    cashBook: '',
+    items: [],
+    selectedItems: [],
+    stockMovements: [],
+    extraCosts: [],
+    comments: [],
+    attachments: [],
+    activityLog: [],
+    financialSummary: null,
+    baseSubTotalPrice: 0,
+    subTotalPrice: 0,
+    baseNetAmount: 0,
+    netAmount: 0,
+    baseDiscAmount: 0,
+    discountAmount: 0,
+    baseTaxAmount: 0,
+    taxAmount: 0,
+    baseTotalAmount: 0,
+    totalAmount: 0
+  }));
 
   return (
     <div className="container mx-auto p-6">
-      <GoodsReceiveNoteComponent 
-        mode={mode}  
-        initialData={{
-          id: '0',
-          ref: '',
-          date: new Date(),
-          invoiceDate: new Date(),
-          invoiceNumber: '',
-          taxInvoiceDate: undefined,
-          taxInvoiceNumber: '',
-          description: '',
-          receiver: '',
-          vendor: '',
-          vendorId: '',
-          location: '',
-          currency: '',
-          exchangeRate: 1,
-          baseCurrency: '',
-          status: 'Pending',
-          isConsignment: false,
-          isCash: false,
-          cashBook: '',
-          items: [],
-          selectedItems: [],
-          stockMovements: [],
-          extraCosts: [],
-          comments: [],
-          attachments: [],
-          activityLog: [],
-          financialSummary: null,
-          baseSubTotalPrice: 0,
-          subTotalPrice: 0,
-          baseNetAmount: 0,
-          netAmount: 0,
-          baseDiscAmount: 0,
-          discountAmount: 0,
-          baseTaxAmount: 0,
-          taxAmount: 0,
-          baseTotalAmount: 0,
-          totalAmount: 0
-        }}
-      />
+      <Suspense fallback={<div>Loading GRN Form...</div>}>
+        <GoodsReceiveNoteComponent 
+          initialData={initialGrnData}
+        />
+      </Suspense>
     </div>
   )
 }

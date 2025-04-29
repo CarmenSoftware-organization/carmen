@@ -1,777 +1,758 @@
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GoodsReceiveNoteItem, GoodsReceiveNoteMode } from "@/lib/types";
+import { GoodsReceiveNoteItem, GoodsReceiveNoteMode, UnitConversion } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Package, TruckIcon, X, XIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
-import React from "react";
-import {
-    Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/custom-dialog";
-import InventoryBreakdown from "./inventory-breakdown";
-import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { DialogHeader, DialogTitle } from "@/components/ui/custom-dialog"; // Keep custom dialog parts if needed by parent
+import { format } from 'date-fns';
+import { formatCurrency } from "@/lib/utils"; // Assuming this utility exists
+import { getDynamicFieldsForCategory, getFieldLabel } from "@/lib/constants/categoryFields"; // Import helpers
+
+// Define an empty item for adding new items
+const emptyItem: GoodsReceiveNoteItem = {
+  id: crypto.randomUUID(), // Use crypto for unique ID
+  location: '',
+  name: '',
+  description: '',
+  baseUnit: 'Kg', // Default base unit
+  orderedQuantity: 0,
+  orderUnit: '', // Add missing orderUnit
+  receivedQuantity: 0,
+  isFreeOfCharge: false,
+  deliveryDate: new Date(),
+  currency: 'USD',
+  exchangeRate: 1,
+  unitPrice: 0,
+  subTotalAmount: 0,
+  totalAmount: 0,
+  taxRate: 0,
+  taxAmount: 0,
+  discountRate: 0,
+  discountAmount: 0,
+  netAmount: 0,
+  baseCurrency: 'USD',
+  baseQuantity: 0,
+  baseUnitPrice: 0, // Use baseUnitPrice for calculations
+  baseSubTotalAmount: 0,
+  baseNetAmount: 0,
+  baseTotalAmount: 0,
+  baseTaxRate: 0,
+  baseTaxAmount: 0,
+  baseDiscountRate: 0,
+  baseDiscountAmount: 0,
+  conversionRate: 1,
+  focConversionRate: 1, // Add focConversionRate
+  extraCost: 0,
+  inventoryOnHand: 0,
+  inventoryOnOrder: 0,
+  inventoryReorderThreshold: 0,
+  inventoryRestockLevel: 0,
+  purchaseOrderRef: '',
+  lastPurchasePrice: 0,
+  lastOrderDate: new Date(),
+  lastVendor: '',
+  lotNumber: '',
+  deliveryPoint: '',
+  taxIncluded: false,
+  taxSystem: 'GST', // Default tax system to GST, adjust if needed
+  adjustments: { discount: false, tax: false },
+  unit: 'Kg', // Default unit
+  jobCode: '',
+  focQuantity: 0, // Add focQuantity
+  focUnit: 'Kg', // Add focUnit
+  isConsignment: false, // Add isConsignment
+  isTaxInclusive: false, // Add isTaxInclusive - alias for taxIncluded? Use one.
+  expiryDate: undefined, // Add expiryDate
+  serialNumber: undefined, // Add serialNumber
+  notes: undefined, // Add notes
+  projectCode: undefined, // Initialize added field
+  marketSegment: undefined, // Initialize added field
+};
+
+// --- Placeholder Options for Dropdowns ---
+// Replace with fetched data in a real app
+const MOCK_PROJECT_CODES = [
+  { value: "ALPHA-001", label: "Project Alpha (ALPHA-001)" },
+  { value: "BETA-002", label: "Project Beta (BETA-002)" },
+  { value: "GAMMA-003", label: "Project Gamma (GAMMA-003)" },
+];
+const MOCK_JOB_CODES = [
+  { value: "JOB-2023-006", label: "Kitchen Reno (JOB-2023-006)" },
+  { value: "JOB-2024-001", label: "Lobby Upgrade (JOB-2024-001)" },
+];
+const MOCK_MARKET_SEGMENTS = [
+  { value: "Commercial Construction", label: "Commercial Construction" },
+  { value: "Residential", label: "Residential" },
+  { value: "Hospitality", label: "Hospitality" },
+];
+const ADD_NEW_VALUE = "__add_new__";
+// --- End Placeholders ---
 
 interface ItemDetailFormProps {
   item: GoodsReceiveNoteItem | null;
   mode: GoodsReceiveNoteMode | "add";
-  handleItemChange?: (
-    id: string,
-    field: keyof GoodsReceiveNoteItem,
-    value: string | number | boolean
-  ) => void;
+  categoryId?: string;
+  productCode?: string;
+  locationCode?: string;
+  unitConversions?: UnitConversion[];
+  onAddNewRecord?: (fieldType: 'projectCode' | 'jobCode' | 'marketSegment') => void;
+  onRequestEdit?: () => void;
   onClose: () => void;
   onSave: (item: GoodsReceiveNoteItem) => void;
 }
 
+// Helper for formatting currency without symbol, adjust as needed
+const formatAmountOnly = (amount: number) => {
+    // Fallback for safety
+    if (typeof amount !== 'number' || isNaN(amount)) {
+        return '0.00'; 
+    }
+    return amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+};
+
+// Helper function to get the combined tax type string value
+function getTaxTypeValue(taxSystem?: 'GST' | 'VAT', taxIncluded?: boolean): string {
+    const system = taxSystem === 'VAT' ? 'vat' : 'gst'; // Default to gst if undefined
+    const type = taxIncluded ? 'include' : 'add';
+    return `${system}_${type}`;
+}
+
 export default function ItemDetailForm({
   item: initialItem,
-  mode: initialMode,
-  handleItemChange,
+  mode: currentMode,
+  categoryId,
+  productCode,
+  locationCode,
+  unitConversions,
+  onAddNewRecord,
+  onRequestEdit,
   onClose,
   onSave,
 }: ItemDetailFormProps) {
-  const [mode, setMode] = useState<GoodsReceiveNoteMode | "add">(initialMode);
-  const [item, setItem] = useState<GoodsReceiveNoteItem>(
-    initialItem || {
-      id: Date.now().toString(), // Generate a temporary ID for new ite
-      location: "",
-      name: "",
-      description: "",
-      baseUnit: "",
-      orderedQuantity: 0,
-      receivedQuantity: 0,
-      isFreeOfCharge: false,
-      deliveryDate: new Date(),
-      currency: "USD",
-      exchangeRate: 1,
-      baseUnitPrice: 0,
-      baseCurrency: "USD",
-      baseQuantity: 0,
-      baseSubTotalAmount: 0,
-      baseNetAmount: 0,
-      baseTaxAmount: 0,
-      baseTotalAmount: 0,
-      baseDiscountAmount: 0,
-      baseDiscountRate: 0,
-      baseTaxRate: 0,
-      conversionRate: 1,
-      extraCost: 0,
-      inventoryRestockLevel: 0,
-      purchaseOrderRef: "",
-      lotNumber: "",
-      deliveryPoint: "",
-      taxIncluded: false,
-      discountRate: 0,
-      taxRate: 0,
-      subTotalAmount: 0,
-      discountAmount: 0,
-      taxAmount: 0,
-      totalAmount: 0,
-      adjustments: {
-        discount: false,
-        tax: false,
-      },
-      jobCode: "",
-      unit: "",
-      unitPrice: 0,
-      netAmount: 0,
-      inventoryOnHand: 0,
-      inventoryOnOrder: 0,
-      inventoryReorderThreshold: 0,
-      lastPurchasePrice: 0,
-      lastOrderDate: new Date(),
-      lastVendor: "",
+  const [item, setItem] = useState<GoodsReceiveNoteItem>(initialItem ? { ...initialItem } : { ...emptyItem });
 
-      // Add other required fields with default values
-    }
-  );
-  const [isOnOrderOpen, setIsOnOrderOpen] =
-  useState(false);
+  // Update local item state if initialItem prop changes
+  useEffect(() => {
+    setItem(initialItem ? { ...initialItem } : { ...emptyItem });
+  }, [initialItem]);
 
-  const [isOnHandOpen, setIsOnHandOpen] = useState(false);
+  const isReadOnly = currentMode === "view";
+  const dynamicFieldsToShow = getDynamicFieldsForCategory(categoryId);
 
-  const handleEdit = () => {
-    setMode("edit");
-  };
+  // --- Recalculation Logic (extracted for clarity) ---
+  const recalculateAmounts = useCallback((currentItem: GoodsReceiveNoteItem): GoodsReceiveNoteItem => {
+    const updated = { ...currentItem };
 
-  const handleCancel = () => {
-    if (mode === "add") {
-      onClose();
+    // --- Base Quantity Recalculation ---
+    // DEPENDENCY: Requires Product.unitConversions and Product.baseUnit
+    // Needs logic to find the correct conversionFactor based on selected unit/focUnit and baseUnit
+
+    // Placeholder: Assume conversion rate is already correctly set on the item by handleChange
+    // In a real implementation, this function might need access to unitConversions
+    // or fetch them if not available.
+    const itemConversionRate = updated.conversionRate || 1; // Renamed variable
+    const quantity = updated.receivedQuantity || 0;
+    updated.baseQuantity = parseFloat((quantity * itemConversionRate).toFixed(2)); // Use renamed variable
+
+    // Placeholder: FOC Base Quantity Calculation
+    const itemFocConversionRate = updated.focConversionRate || itemConversionRate; // Renamed variable, default to item's main rate
+    const itemFocQuantity = updated.focQuantity || 0; // Renamed variable
+    // TODO: Add a baseFocQuantity field to GoodsReceiveNoteItem if needed for tracking?
+    // updated.baseFocQuantity = parseFloat((itemFocQuantity * itemFocConversionRate).toFixed(2)); // Use renamed variables
+
+    // --- Other Calculations (Price, Tax, Discount, Totals) --- 
+    const price = updated.baseUnitPrice || 0; // Use baseUnitPrice from item state
+    const discountRate = updated.discountRate || 0;
+    const taxRate = updated.taxRate || 0;
+    const exchangeRate = updated.exchangeRate || 1;
+    const isTaxIncluded = updated.taxIncluded || false; // Consistent flag name
+    const overrideDiscount = updated.adjustments?.discount || false;
+    const overrideTax = updated.adjustments?.tax || false;
+    const manualDiscountAmount = updated.discountAmount || 0;
+    const manualTaxAmount = updated.taxAmount || 0;
+
+    // Calculate subtotal (price * quantity)
+    const subTotal = price * quantity;
+    updated.subTotalAmount = parseFloat(subTotal.toFixed(2));
+
+    // Calculate discount amount
+    let discountAmount = 0;
+    if (overrideDiscount) {
+      discountAmount = manualDiscountAmount;
+      // Recalculate rate if amount is overridden and subTotal is not zero
+      updated.discountRate = subTotal > 0 ? parseFloat(((discountAmount / subTotal) * 100).toFixed(2)) : 0;
     } else {
-      setMode("view");
+      discountAmount = (subTotal * discountRate) / 100;
     }
-  };
+    updated.discountAmount = parseFloat(discountAmount.toFixed(2));
 
-  const handleSave = () => {
-    onSave(item);
-    if (mode === "add") {
-      onClose();
+    // Calculate net amount (subtotal - discount)
+    const netBeforeTax = subTotal - discountAmount;
+
+    // Calculate tax amount
+    let taxAmount = 0;
+    if (overrideTax) {
+        taxAmount = manualTaxAmount;
+         // Recalculate rate if amount is overridden
+        if (isTaxIncluded && (netBeforeTax - taxAmount) !== 0) {
+            updated.taxRate = parseFloat(((taxAmount / (netBeforeTax - taxAmount)) * 100).toFixed(2));
+        } else if (!isTaxIncluded && netBeforeTax !== 0) {
+            updated.taxRate = parseFloat(((taxAmount / netBeforeTax) * 100).toFixed(2));
+        } else {
+            updated.taxRate = 0;
+        }
     } else {
-      setMode("view");
-    }
-  };
-
-  const handleChange = (
-    field: keyof GoodsReceiveNoteItem,
-    value: string | number | boolean
-  ) => {
-    setItem((prev) => {
-      const updated = { ...prev, [field]: value };
-      
-      // Recalculate amounts when relevant fields change
-      if (
-        [
-          "receivedQuantity",
-          "baseUnitPrice",
-          "taxIncluded",
-          "discountRate",
-          "discountAmount",
-          "taxRate",
-          "adjustments",
-          "exchangeRate",
-          "focQuantity"
-        ].includes(field)
-      ) {
-        // Quantity calculations
-        const quantity = updated.receivedQuantity || 0;
-        const price = updated.baseUnitPrice || 0;
-        const discountRate = updated.discountRate || 0;
-        const taxRate = updated.taxRate || 0;
-        const exchangeRate = updated.exchangeRate || 1;
-        const isTaxIncluded = updated.taxIncluded || false;
-        
-        // Calculate subtotal (price * quantity)
-        const subTotal = price * quantity;
-        updated.subTotalAmount = subTotal;
-        
-        // Calculate discount amount (if not manually overridden)
-        let discountAmount = 0;
-        if (field !== "discountAmount" || !updated.discountAmount) {
-          discountAmount = (subTotal * discountRate) / 100;
-          updated.discountAmount = parseFloat(discountAmount.toFixed(2));
-        } else {
-          discountAmount = updated.discountAmount;
-        }
-        
-        // Calculate net amount (subtotal - discount)
-        const netBeforeTax = subTotal - discountAmount;
-        
-        // Calculate tax amount
-        let taxAmount = 0;
-        if (field !== "taxAmount" || !updated.taxAmount) {
-          if (isTaxIncluded) {
-            // Tax inclusive calculation: amount * taxRate / (100 + taxRate)
-            taxAmount = parseFloat(((netBeforeTax * taxRate) / (100 + taxRate)).toFixed(2));
-          } else {
-            // Tax exclusive calculation: amount * taxRate / 100
-            taxAmount = parseFloat(((netBeforeTax * taxRate) / 100).toFixed(2));
-          }
-          updated.taxAmount = taxAmount;
-        } else {
-          taxAmount = updated.taxAmount;
-        }
-        
-        // Final calculations
         if (isTaxIncluded) {
-          // For tax inclusive: net amount = subtotal - discount - tax
-          updated.netAmount = parseFloat((netBeforeTax - taxAmount).toFixed(2));
-          updated.totalAmount = parseFloat(netBeforeTax.toFixed(2));
+            taxAmount = (netBeforeTax * taxRate) / (100 + taxRate);
         } else {
-          // For tax exclusive: net amount = subtotal - discount
-          updated.netAmount = parseFloat(netBeforeTax.toFixed(2));
-          updated.totalAmount = parseFloat((netBeforeTax + taxAmount).toFixed(2));
+            taxAmount = (netBeforeTax * taxRate) / 100;
         }
-        
-        // Calculate base currency values
-        updated.baseSubTotalAmount = parseFloat((updated.subTotalAmount * exchangeRate).toFixed(2));
-        updated.baseDiscountAmount = parseFloat((updated.discountAmount * exchangeRate).toFixed(2));
-        updated.baseNetAmount = parseFloat((updated.netAmount * exchangeRate).toFixed(2));
-        updated.baseTaxAmount = parseFloat((updated.taxAmount * exchangeRate).toFixed(2));
-        updated.baseTotalAmount = parseFloat((updated.totalAmount * exchangeRate).toFixed(2));
-        
-        // Calculate Last Price (net amount / quantity excluding FOC)
-        if (quantity > 0) {
-          updated.lastPurchasePrice = parseFloat((updated.netAmount / quantity).toFixed(2));
-        }
-        
-        // Calculate Last Cost (net amount / total quantity including FOC)
-        const totalQuantity = quantity + (updated.focQuantity || 0);
-        if (totalQuantity > 0) {
-          // This would be stored in a separate field if needed
-        }
-      }
-      
-      return updated;
-    });
-    
-    if (handleItemChange && item.id) {
-      handleItemChange(item.id, field, value);
     }
+    updated.taxAmount = parseFloat(taxAmount.toFixed(2));
+
+    // Final calculations based on tax inclusion
+    if (isTaxIncluded) {
+      // Tax inclusive: net = (subtotal - discount) - tax
+      updated.netAmount = parseFloat((netBeforeTax - taxAmount).toFixed(2));
+      // Total = net + tax = (subtotal - discount)
+      updated.totalAmount = parseFloat(netBeforeTax.toFixed(2));
+    } else {
+      // Tax exclusive: net = subtotal - discount
+      updated.netAmount = parseFloat(netBeforeTax.toFixed(2));
+      // Total = net + tax
+      updated.totalAmount = parseFloat((netBeforeTax + taxAmount).toFixed(2));
+    }
+
+    // Calculate base currency values
+    updated.baseSubTotalAmount = parseFloat((updated.subTotalAmount * exchangeRate).toFixed(2));
+    updated.baseDiscountAmount = parseFloat((updated.discountAmount * exchangeRate).toFixed(2));
+    updated.baseNetAmount = parseFloat((updated.netAmount * exchangeRate).toFixed(2));
+    updated.baseTaxAmount = parseFloat((updated.taxAmount * exchangeRate).toFixed(2));
+    updated.baseTotalAmount = parseFloat((updated.totalAmount * exchangeRate).toFixed(2));
+
+    // Base quantity calculation moved earlier
+
+    return updated;
+  }, []); // Add unitConversions to dependency array if passed as prop
+
+
+  // --- Local handleChange ---
+  const handleChange = (field: keyof GoodsReceiveNoteItem | 'taxTypeCombined', value: any) => { // Allow combined type
+    setItem(prev => {
+      // --- Handle Combined Tax Type --- 
+      if (field === 'taxTypeCombined') {
+          const selectedValue = value as string;
+          const newTaxSystem: 'GST' | 'VAT' = selectedValue.startsWith('vat') ? 'VAT' : 'GST';
+          const newTaxIncluded = selectedValue.endsWith('include');
+          
+          const updatedItem = { 
+              ...prev, 
+              taxSystem: newTaxSystem,
+              taxIncluded: newTaxIncluded
+          };
+          // Tax type change always triggers recalculation
+          return recalculateAmounts(updatedItem);
+      }
+
+      // --- Handle Individual Fields (existing logic) ---
+      let updatedValue: string | number | boolean | Date | undefined | { discount: boolean; tax: boolean; }; 
+
+      // Define field groups for type checking
+      const numberFields: Array<keyof GoodsReceiveNoteItem> = [
+          'orderedQuantity', 'receivedQuantity', 'focQuantity', 'unitPrice', 
+          'exchangeRate', 'taxRate', 'discountRate', 'discountAmount', 
+          'taxAmount', 'conversionRate', 'focConversionRate', 'baseUnitPrice', 
+          'subTotalAmount', 'totalAmount', 'netAmount', 'baseQuantity', 
+          'baseSubTotalAmount', 'baseNetAmount', 'baseTotalAmount', 
+          'baseTaxRate', 'baseTaxAmount', 'baseDiscountRate', 'baseDiscountAmount', 
+          'extraCost', 'inventoryOnHand', 'inventoryOnOrder', 
+          'inventoryReorderThreshold', 'inventoryRestockLevel', 'lastPurchasePrice'
+      ];
+      const dateFields: Array<keyof GoodsReceiveNoteItem> = ['deliveryDate', 'expiryDate', 'lastOrderDate'];
+      const booleanFields: Array<keyof GoodsReceiveNoteItem> = ['taxIncluded', 'isFreeOfCharge', 'isConsignment', 'isTaxInclusive'];
+      const adjustmentFields: Array<keyof GoodsReceiveNoteItem> = ['adjustments'];
+
+      // --- Parse/Convert based on field type --- 
+      if (numberFields.includes(field as keyof GoodsReceiveNoteItem)) {
+          updatedValue = parseFloat(value) || 0;
+      } else if (dateFields.includes(field as keyof GoodsReceiveNoteItem)) {
+          updatedValue = value instanceof Date ? value : (value ? new Date(value) : undefined);
+      } else if (booleanFields.includes(field as keyof GoodsReceiveNoteItem)) {
+          updatedValue = value === true;
+      } else {
+          updatedValue = value; 
+      }
+
+      // Create the updated item object safely 
+      const updatedItemIntermediate = { 
+          ...prev, 
+          [field]: updatedValue as typeof prev[typeof field] 
+      }; 
+
+      // --- Handle Unit Changes and Conversion Rate Updates --- 
+      // DEPENDENCY: Requires Product.unitConversions and Product.baseUnit 
+      let needsRecalc = false;
+      const fieldsTriggeringRecalc: (keyof GoodsReceiveNoteItem)[] = [
+        "receivedQuantity", "baseUnitPrice", "taxIncluded", "discountRate",
+        "discountAmount", "taxRate", "adjustments", "exchangeRate", "focQuantity"
+        // unit and focUnit trigger recalc below
+      ];
+
+      if (fieldsTriggeringRecalc.includes(field as keyof GoodsReceiveNoteItem)) {
+          needsRecalc = true;
+      }
+
+      if (field === 'unit' || field === 'focUnit') {
+           needsRecalc = true;
+           const targetUnit = updatedItemIntermediate[field] as string;
+           const baseUnit = updatedItemIntermediate.baseUnit;
+           
+           // --- Conversion Factor Lookup Logic --- 
+           let factor = 1; // Default if no conversion found
+           if (unitConversions && baseUnit && targetUnit) {
+               const conversion = unitConversions.find(
+                   (uc) => uc.fromUnit === targetUnit && uc.toUnit === baseUnit
+               );
+               if (conversion) {
+                   factor = conversion.conversionFactor;
+               } else {
+                   // Handle case where direct conversion isn't found (maybe log error or use default?)
+                   console.warn(`Conversion from ${targetUnit} to ${baseUnit} not found in provided unitConversions. Using default factor 1.`);
+               }
+           } else {
+                console.warn('Missing unitConversions, baseUnit, or targetUnit for conversion lookup.');
+           }
+           // --- End Lookup Logic --- 
+
+           console.log(`${field} changed to ${targetUnit}. Found conversion factor: ${factor}. Recalculation needed.`);
+
+           if (field === 'unit') {
+               updatedItemIntermediate.conversionRate = factor;
+           } else { // focUnit
+               updatedItemIntermediate.focConversionRate = factor;
+           }
+       }
+
+      // --- Recalculate if a relevant field changed ---
+      if (needsRecalc) {
+        return recalculateAmounts(updatedItemIntermediate);
+      }
+
+      return updatedItemIntermediate; // Return intermediate if no recalc needed
+    });
   };
 
+  // Handle checkbox changes for adjustments specifically
+  const handleAdjustmentChange = (field: 'discount' | 'tax', checked: boolean | string) => {
+       const isChecked = checked === true;
+       setItem(prev => {
+           const updatedAdjustments = { ...prev.adjustments, [field]: isChecked };
+           const updatedItem = { ...prev, adjustments: updatedAdjustments };
+           return recalculateAmounts(updatedItem);
+       });
+   };
 
+  // --- Component State Handling ---
+  const handleCancel = () => {
+    if (currentMode === "add") {
+      onClose();
+    } else {
+      setItem(initialItem || emptyItem);
+      onClose();
+    }
+  };
+  const handleSave = () => {
+    const finalItem = recalculateAmounts(item);
+    onSave(finalItem);
+  };
+
+  // Placeholder unit options - TODO: Fetch these based on item/system config
+  const unitOptions = ["Kg", "Pcs", "Box", "Pack", "L", "mL", "Set", "Unit"];
+
+  // --- Dropdown Change Handler ---
+  const handleDynamicSelectChange = (field: 'projectCode' | 'jobCode' | 'marketSegment', value: string) => {
+    if (value === ADD_NEW_VALUE) {
+        onAddNewRecord?.(field);
+        console.log(`Add new for field: ${field}`);
+    } else {
+        handleChange(field, value);
+    }
+  };
 
   return (
     <>
       <DialogHeader>
-        <div className="flex justify-between w-full items-center">
-          <div className="flex justify-between w-full items-center">
-            <DialogTitle>
-              {mode === "edit"
-                ? "Edit Item"
-                : mode === "view"
-                ? "View Item"
-                : "Add New Item"}
-            </DialogTitle>
-
-            <div>
-              {mode === "view" && (
-                <Button size="sm" onClick={handleEdit}>
-                  Edit
+        <div className="flex justify-between items-center">
+           {/* Title */}
+          <DialogTitle>
+            {currentMode === "edit"
+              ? "Edit Item"
+              : currentMode === "view"
+              ? "View Item Details"
+              : "Add New Item"}
+          </DialogTitle>
+           {/* Action Buttons */}
+          <div>
+            {currentMode === "view" && onRequestEdit && (
+              <Button size="sm" onClick={onRequestEdit}>
+                Edit
+              </Button>
+            )}
+            {(currentMode === "edit" || currentMode === "add") && (
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" size="sm" onClick={handleCancel}>
+                  Cancel
                 </Button>
-              )}
-              {(mode === "edit" || mode === "add") && (
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" size="sm" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  <Button size="sm" onClick={handleSave}>
-                    Save
-                  </Button>
-                </div>
-              )}
-            </div>
+                <Button size="sm" onClick={handleSave}>
+                  Save
+                </Button>
+              </div>
+            )}
           </div>
-          <DialogClose asChild>
-            <Button variant="ghost" size="sm">
-              <XIcon className="h-4 w-4" />
-            </Button>
-          </DialogClose>
         </div>
       </DialogHeader>
 
-      <div className="text-sm">
-        <div className="flex flex-col justify-start gap-2">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-base font-semibold mb-2">
-                Basic Information
-              </h3>
-              <div className="grid grid-cols-6 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor={`location-${item.id}`}>Location*</Label>
-                  <Input
-                    id={`location-${item.id}`}
-                    value={item.location}
-                    onChange={(e) => handleChange("location", e.target.value)}
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
+      {/* Form Content */}
+      <div className="py-4 space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+        {/* Basic Information */}
+        <Card>
+            <CardHeader>
+                <CardTitle>Basic Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <Label htmlFor="location">Location</Label>
+                        <Input id="location" value={item.location || ''} onChange={(e) => handleChange('location', e.target.value)} readOnly={isReadOnly} />
+                        <p className="text-sm text-gray-500 mt-1">{locationCode || '\u00A0'}</p>
+                    </div>
+                    <div>
+                        <Label htmlFor="productName">Product Name</Label>
+                        <Input id="productName" value={item.name || ''} onChange={(e) => handleChange('name', e.target.value)} readOnly={isReadOnly} />
+                        <p className="text-sm text-gray-500 mt-1">{productCode || '\u00A0'}</p>
+                    </div>
+                    <div>
+                        <Label htmlFor="description">Description</Label>
+                        <Input id="description" value={item.description || ''} onChange={(e) => handleChange('description', e.target.value)} readOnly={isReadOnly} />
+                    </div>
+                     <div>
+                        <Label htmlFor="purchaseOrderRef">PO Reference</Label>
+                        <Input id="purchaseOrderRef" value={item.purchaseOrderRef || ''} onChange={(e) => handleChange('purchaseOrderRef', e.target.value)} readOnly={isReadOnly} />
+                    </div>
                 </div>
-                <div className="col-span-1">
-                  <Label htmlFor={`name-${item.id}`}>Product Name</Label>
-                  <Input
-                    id={`name-${item.id}`}
-                    value={item.notes}
-                    onChange={(e) => handleChange("name", e.target.value)}
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor={`description-${item.id}`}>Description</Label>
-                  <Input
-                    id={`description-${item.id}`}
-                    value={item.description}
-                    onChange={(e) =>
-                      handleChange("description", e.target.value)
-                    }
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                 </div>
+                 <div>
+                    <Label htmlFor="notes">Notes</Label>
+                    <Input id="notes" value={item.notes || ''} onChange={(e) => handleChange('notes', e.target.value)} readOnly={isReadOnly} />
+                 </div>
+            </CardContent>
+        </Card>
 
-                <div className="col-span-1">
-                  <Label htmlFor={`poReference-${item.id}`}>
-                    PO Reference
-                  </Label>
-                  <Input
-                    id={`poReference-${item.id}`}
-                    value={item.purchaseOrderRef}
-                    onChange={(e) => handleChange("purchaseOrderRef", e.target.value)}
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
+        {/* Dynamic Fields Section */}
+        {dynamicFieldsToShow.length > 0 && (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Additional Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {dynamicFieldsToShow.map((field) => {
+                            // Now we allow jobCode, lotNumber, serialNumber, expiryDate to render here
+                            // if they are included in dynamicFieldsToShow for the category.
+
+                            // Exception: We keep Lot Number in Basic Info as well for now, so filter it out here.
+                            // Decide if Lot Number should *only* be dynamic or always shown.
+                            if (field === 'lotNumber') {
+                                return null;
+                            }
+
+                            const label = getFieldLabel(field);
+                            const isDropdownField = ['projectCode', 'jobCode', 'marketSegment'].includes(field);
+
+                            return (
+                                <div key={field}>
+                                    <Label htmlFor={field}>{label}</Label>
+                                    {isDropdownField ? (
+                                        <Select
+                                            // @ts-ignore - Allow indexing for dynamic fields
+                                            value={item[field] || ""} 
+                                            onValueChange={(value) => handleDynamicSelectChange(field as 'projectCode' | 'jobCode' | 'marketSegment', value)}
+                                            disabled={isReadOnly}
+                                        >
+                                            <SelectTrigger id={field} className="mt-1">
+                                                <SelectValue placeholder={`Select ${label}...`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {/* Populate options based on field */}
+                                                {(field === 'projectCode' ? MOCK_PROJECT_CODES :
+                                                  field === 'jobCode' ? MOCK_JOB_CODES :
+                                                  MOCK_MARKET_SEGMENTS
+                                                 ).map(option => (
+                                                    <SelectItem key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                                <SelectItem value={ADD_NEW_VALUE} className="text-blue-600 italic">
+                                                    Add New {label}...
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    ) : field.toLowerCase().includes('date') ? (
+                                        // Date Input (existing)
+                                        <Input
+                                          id={field}
+                                          type="date"
+                                          // @ts-ignore 
+                                          value={item[field] ? format(new Date(item[field]), 'yyyy-MM-dd') : ''}
+                                          onChange={(e) => handleChange(field, e.target.value)}
+                                          readOnly={isReadOnly}
+                                          className="mt-1"
+                                        />
+                                    ) : (
+                                        // Text Input (existing for other dynamic fields)
+                                        <Input 
+                                            id={field} 
+                                            type="text" 
+                                            // @ts-ignore 
+                                            value={item[field] || ''} 
+                                            onChange={(e) => handleChange(field, e.target.value)} 
+                                            readOnly={isReadOnly} 
+                                            className="mt-1"
+                                        />
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </CardContent>
+            </Card>
+        )}
+
+        {/* Quantity and Delivery */}
+        <Card>
+             <CardHeader>
+                <CardTitle>Quantity and Delivery</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                    <div>
+                        <Label htmlFor="orderedQuantity">Ordered Qty</Label>
+                        <Input id="orderedQuantity" type="number" value={item.orderedQuantity} readOnly className="bg-gray-100"/>
+                        <p className="text-sm text-gray-500 mt-1">Base: {formatAmountOnly(item.orderedQuantity * item.conversionRate)} {item.baseUnit}</p>
+                    </div>
+                    <div>
+                        <Label htmlFor="orderUnit">Ordered Unit</Label>
+                        <Input id="orderUnit" value={item.orderUnit || ''} readOnly className="bg-gray-100" />
+                         <p className="text-sm text-gray-500 mt-1">&nbsp;</p> {/* Spacer */}
+                    </div>
+                    <div>
+                        <Label htmlFor="receivedQuantity">Receiving Qty</Label>
+                        <Input id="receivedQuantity" type="number" value={item.receivedQuantity} onChange={(e) => handleChange('receivedQuantity', e.target.value)} readOnly={isReadOnly} />
+                         <p className="text-sm text-gray-500 mt-1">Base: {formatAmountOnly(item.baseQuantity)} {item.baseUnit}</p>
+                    </div>
+                    <div>
+                        <Label htmlFor="unit">Unit</Label>
+                        <Select value={item.unit || ''} onValueChange={(value) => handleChange('unit', value)} disabled={isReadOnly}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                {unitOptions.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-sm text-gray-500 mt-1">1 {item.unit} = {item.conversionRate} {item.baseUnit}</p>
+                    </div>
+                    <div>
+                        <Label htmlFor="focQuantity">FOC Qty</Label>
+                        <Input id="focQuantity" type="number" value={item.focQuantity || 0} onChange={(e) => handleChange('focQuantity', e.target.value)} readOnly={isReadOnly} />
+                         {/* TODO: Display Base FOC Qty */}
+                        <p className="text-sm text-gray-500 mt-1">Base: {/* Calculate Base FOC Qty */} {item.baseUnit}</p>
+                    </div>
+                     <div>
+                        <Label htmlFor="focUnit">FOC Unit</Label>
+                        <Select value={item.focUnit || ''} onValueChange={(value) => handleChange('focUnit', value)} disabled={isReadOnly}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                {unitOptions.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                         {/* TODO: Display FOC Conversion Rate */}
+                        <p className="text-sm text-gray-500 mt-1">1 {item.focUnit} = {item.focConversionRate} {item.baseUnit}</p>
+                    </div>
+                    <div>
+                        <Label htmlFor="deliveryPoint">Delivery Point</Label>
+                        <Select value={item.deliveryPoint || ''} onValueChange={(value) => handleChange('deliveryPoint', value)} disabled={isReadOnly}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                {/* TODO: Populate options dynamically */}
+                                <SelectItem value="kitchen">Kitchen Receiving</SelectItem>
+                                <SelectItem value="warehouse">Warehouse</SelectItem>
+                                <SelectItem value="frontdesk">Front Desk</SelectItem>
+                             </SelectContent>
+                        </Select>
+                         <p className="text-sm text-gray-500 mt-1">&nbsp;</p> {/* Spacer */}
+                    </div>
                 </div>
+            </CardContent>
+        </Card>
 
-                <div className="col-span-1">
-                  <Label htmlFor={`jobCode-${item.id}`}>
-                    Job Code
-                  </Label>
-                  <Input
-                    id={`jobCode-${item.id}`}
-                    value={item.jobCode}
-                    onChange={(e) => handleChange("jobCode", e.target.value)}
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                </div>
-              </div>
-            </div>
+        {/* Pricing & Calculations */}
+         <Card>
+            <CardHeader>
+                <CardTitle>Pricing & Calculation</CardTitle>
+            </CardHeader>
+            <CardContent>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Left Side - Inputs */}
+                    <div className="space-y-4">
+                         <h3 className="text-lg font-semibold mb-2">Pricing</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="currency">Currency</Label>
+                                <Select value={item.currency || ''} onValueChange={(value) => handleChange('currency', value)} disabled={isReadOnly}>
+                                    <SelectTrigger><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {/* TODO: Populate options dynamically */}
+                                        <SelectItem value="USD">USD</SelectItem>
+                                        <SelectItem value="EUR">EUR</SelectItem>
+                                        <SelectItem value="GBP">GBP</SelectItem>
+                                        <SelectItem value="THB">THB</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label htmlFor="exchangeRate">Exch. Rate</Label>
+                                <Input id="exchangeRate" type="number" value={item.exchangeRate} onChange={(e) => handleChange('exchangeRate', e.target.value)} readOnly={isReadOnly} />
+                            </div>
+                         </div>
+                         <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="baseUnitPrice">Price (Base Unit)</Label>
+                                <Input id="baseUnitPrice" type="number" value={item.baseUnitPrice} onChange={(e) => handleChange('baseUnitPrice', e.target.value)} readOnly={isReadOnly}/>
+                            </div>
+                             <div>
+                                <Label htmlFor="taxType">Tax Type</Label>
+                                <Select 
+                                    value={getTaxTypeValue(item.taxSystem, item.taxIncluded)} 
+                                    onValueChange={(value) => handleChange('taxTypeCombined', value)} // Use combined handler
+                                    disabled={isReadOnly}
+                                >
+                                    <SelectTrigger id="taxType"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="gst_add">GST Add</SelectItem>
+                                        <SelectItem value="gst_include">GST Include</SelectItem>
+                                        <SelectItem value="vat_add">VAT Add</SelectItem>
+                                        <SelectItem value="vat_include">VAT Include</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                         </div>
 
-            <Separator className="my-3" />
+                         <Separator className="my-4" />
+                          <h3 className="text-lg font-semibold mb-2">Adjustments</h3>
 
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-base font-semibold">
-                  Quantity and Delivery
-                </h3>
-                <div className="flex space-x-2">
-                  <Dialog open={isOnHandOpen} onOpenChange={setIsOnHandOpen}>
-                    <DialogTrigger asChild>
-                      <Button type="button" variant="outline" size="sm">
-                        <Package className="mr-2 h-4 w-4" />
-                        On Hand
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[60vw] w-[80vw] overflow-y-auto [&>button]:hidden">
-                      <DialogHeader>
-                        <div className="flex justify-between w-full items-center">
-                          <DialogTitle>On Hand by Location</DialogTitle>
-                          <DialogClose asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setIsOnHandOpen(false)}
-                            >
-                              <XIcon className="h-4 w-4" />
-                            </Button>
-                          </DialogClose>
+                         <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="discountRate">Disc. Rate (%)</Label>
+                                <Input id="discountRate" type="number" value={item.discountRate} onChange={(e) => handleChange('discountRate', e.target.value)} readOnly={isReadOnly || !!item.adjustments?.discount} className={item.adjustments?.discount ? 'bg-gray-100' : ''}/>
+                            </div>
+                             <div>
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <Checkbox id="adjDiscount" checked={item.adjustments?.discount} onCheckedChange={(checked) => handleAdjustmentChange('discount', checked)} disabled={isReadOnly} />
+                                    <Label htmlFor="adjDiscount">Override Discount Amount</Label>
+                                </div>
+                                <Input id="discountAmount" type="number" value={item.discountAmount} onChange={(e) => handleChange('discountAmount', e.target.value)} readOnly={isReadOnly || !item.adjustments?.discount} className={!item.adjustments?.discount ? 'bg-gray-100' : ''}/>
+                            </div>
+                         </div>
+                         <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="taxRate">Tax Rate (%)</Label>
+                                <Input id="taxRate" type="number" value={item.taxRate} onChange={(e) => handleChange('taxRate', e.target.value)} readOnly={isReadOnly || !!item.adjustments?.tax} className={item.adjustments?.tax ? 'bg-gray-100' : ''}/>
+                            </div>
+                             <div>
+                                <div className="flex items-center space-x-2 mb-2">
+                                     <Checkbox id="adjTax" checked={item.adjustments?.tax} onCheckedChange={(checked) => handleAdjustmentChange('tax', checked)} disabled={isReadOnly} />
+                                    <Label htmlFor="adjTax">Override Tax Amount</Label>
+                                </div>
+                                <Input id="taxAmount" type="number" value={item.taxAmount} onChange={(e) => handleChange('taxAmount', e.target.value)} readOnly={isReadOnly || !item.adjustments?.tax} className={!item.adjustments?.tax ? 'bg-gray-100' : ''}/>
+                             </div>
+                         </div>
+
+                    </div>
+
+                    {/* Right Side - Calculated Amounts */}
+                    <div className="space-y-2">
+                         <h3 className="text-lg font-semibold mb-2">Calculated Amounts</h3>
+                        <div className="grid grid-cols-3 gap-4 items-center py-1">
+                            <p className="text-sm text-gray-500">Description</p>
+                            <p className="text-sm text-gray-500 text-right">Amount ({item.currency})</p>
+                            <p className="text-sm text-gray-500 text-right">Base Amount ({item.baseCurrency})</p>
                         </div>
-                      </DialogHeader>
-                      <InventoryBreakdown />
-                    </DialogContent>
-                  </Dialog>
-
-                  <Dialog open={isOnOrderOpen} onOpenChange={setIsOnOrderOpen}>
-                    <DialogTrigger asChild>
-                      <Button type="button" variant="outline" size="sm">
-                        <TruckIcon className="mr-2 h-4 w-4" />
-                        On Order
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[60vw] overflow-y-auto [&>button]:hidden">
-                      <DialogHeader>
-                        <div className="flex justify-between w-full items-center">
-                          <DialogTitle>Pending Purchase Order</DialogTitle>
-                          <DialogClose asChild>
-                            <Button variant="ghost" size="sm" onClick={() => setIsOnOrderOpen(false)}>
-                              <XIcon className="h-4 w-4" />
-                            </Button>
-                          </DialogClose>
+                        <Separator />
+                         <div className="grid grid-cols-3 gap-4 items-center py-1">
+                            <p className="font-medium">Subtotal</p>
+                            <p className="font-medium text-right">{formatAmountOnly(item.subTotalAmount)}</p>
+                            <p className="text-gray-600 text-right">{formatAmountOnly(item.baseSubTotalAmount)}</p>
+                         </div>
+                         <div className="grid grid-cols-3 gap-4 items-center py-1">
+                            <p className="font-medium">Discount</p>
+                            <p className="font-medium text-right">{formatAmountOnly(item.discountAmount)}</p>
+                            <p className="text-gray-600 text-right">{formatAmountOnly(item.baseDiscountAmount)}</p>
+                         </div>
+                         <div className="grid grid-cols-3 gap-4 items-center py-1">
+                            <p className="font-medium">Net Amount</p>
+                            <p className="font-medium text-right">{formatAmountOnly(item.netAmount)}</p>
+                            <p className="text-gray-600 text-right">{formatAmountOnly(item.baseNetAmount)}</p>
+                         </div>
+                         <div className="grid grid-cols-3 gap-4 items-center py-1">
+                             <p className="font-medium">Tax</p>
+                            <p className="font-medium text-right">{formatAmountOnly(item.taxAmount)}</p>
+                            <p className="text-gray-600 text-right">{formatAmountOnly(item.baseTaxAmount)}</p>
+                         </div>
+                         <Separator />
+                         <div className="grid grid-cols-3 gap-4 items-center py-1">
+                             <p className="font-bold">Total Amount</p>
+                            <p className="font-bold text-right">{formatAmountOnly(item.totalAmount)}</p>
+                            <p className="font-bold text-right">{formatAmountOnly(item.baseTotalAmount)}</p>
                         </div>
-                      </DialogHeader>
-                      <PendingPurchaseOrdersComponent />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor={`baseUnit-${item.id}`}>Ord. Unit</Label>
-                  <Input
-                    id={`baseUnit-${item.id}`}
-                    value={item.baseUnit}
-                    onChange={(e) => handleChange("baseUnit", e.target.value)}
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                  <div className="text-sm text-gray-500 mt-1">
-                  Kg | 1 Bag = 0.5 Kg
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor={`orderedQuantity-${item.id}`}>
-                    Order Quantity
-                  </Label>
-                  <Input
-                    id={`orderedQuantity-${item.id}`}
-                    type="number"
-                    value={item.orderedQuantity || ""}
-                    onChange={(e) =>
-                      handleChange(
-                        "orderedQuantity",
-                        parseFloat(e.target.value)
-                      )
-                    }
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                  <div className="text-xs text-gray-500 mt-1">
-                    {(item.orderedQuantity * item.conversionRate).toFixed(2)}{" "}
-                    {item.baseUnit}
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor={`receivedQuantity-${item.id}`}>
-                    Receiving Quantity
-                  </Label>
-                  <Input
-                    id={`receivedQuantity-${item.id}`}
-                    type="number"
-                    value={item.receivedQuantity || ""}
-                    onChange={(e) =>
-                      handleChange(
-                        "receivedQuantity",
-                        parseFloat(e.target.value)
-                      )
-                    }
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                  <div className="text-xs text-gray-500 mt-1">
-                    {(item.receivedQuantity * item.conversionRate).toFixed(2)}{" "}
-                    {item.baseUnit}
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor={`unit-${item.id}`}>Unit</Label>
-                  <Input
-                    id={`unit-${item.id}`}
-                    value={item.unit}
-                    onChange={(e) =>
-                      handleChange("unit", e.target.value)
-                    }
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                  <div className="text-xs text-gray-500 mt-1">
-                    1 {item.unit} = {item.conversionRate} {item.baseUnit}
-                  </div>
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor={`focQuantity-${item.id}`}>FOC Qty</Label>
-                  <Input
-                    id={`focQuantity-${item.id}`}
-                    type="number"
-                    value={item.focQuantity || 0}
-                    onChange={(e) =>
-                      handleChange(
-                        "focQuantity",
-                        parseFloat(e.target.value)
-                      )
-                    }
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                  <div className="text-xs text-gray-500 mt-1">
-                    {((item.focQuantity || 0) * (item.focConversionRate || item.conversionRate)).toFixed(2)}{" "}
-                    {item.baseUnit}
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor={`focUnit-${item.id}`}>FOC Unit</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id={`focUnit-${item.id}`}
-                      value={item.focUnit || item.unit}
-                      onChange={(e) =>
-                        handleChange("focUnit", e.target.value)
-                      }
-                      readOnly={mode === "view"}
-                      className="h-8 text-sm"
-                    />
-                    <select 
-                      className="h-8 border rounded text-sm"
-                      value={item.focUnit || item.unit}
-                      onChange={(e) => handleChange("focUnit", e.target.value)}
-                      disabled={mode === "view"}
-                    >
-                      <option value={item.unit}>{item.unit}</option>
-                      <option value={item.baseUnit}>{item.baseUnit}</option>
-                      <option value="PC">PC</option>
-                      <option value="Box">Box</option>
-                      <option value="Case">Case</option>
-                    </select>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    1 {item.focUnit || item.unit} = {item.focConversionRate || item.conversionRate} {item.baseUnit}
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor={`deliveryPoint-${item.id}`}>
-                    Delivery Point
-                  </Label>
-                  <Input
-                    id={`deliveryPoint-${item.id}`}
-                    value={item.deliveryPoint}
-                    onChange={(e) =>
-                      handleChange("deliveryPoint", e.target.value)
-                    }
-                    readOnly={mode === "view"}
-                    className="h-8 text-sm"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 mt-2 bg-gray-100 p-2 text-sm">
-                <div>
-                  <Label className="text-xs">On Hand</Label>
-                  <div className="text-sm">{item.inventoryOnHand} Kg</div>
-                </div>
-                <div>
-                  <Label className="text-xs">On Ordered</Label>
-                  <div className="text-sm">{item.inventoryOnOrder} Kg</div>
-                </div>
-                <div>
-                  <Label className="text-xs">Reorder Level</Label>
-                  <div className="text-sm">
-                    {item.inventoryReorderThreshold} Kg
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <Separator className="my-3" />
+                         {/* Item Status Section (Example) */}
+                         {currentMode !== 'add' && (
+                            <div className="mt-6 bg-blue-50 p-4 rounded-md border border-blue-200">
+                                <h3 className="font-medium text-blue-800 mb-2">Item Info</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-sm text-gray-600">Inventory On Hand</p>
+                                        <p className="text-sm">{item.inventoryOnHand} {item.baseUnit}</p>
+                                    </div>
+                                    <div>
+                                         <p className="text-sm text-gray-600">Last Purchase Price</p>
+                                         {/* Ensure formatCurrency handles potential non-numeric values gracefully or check item.lastPurchasePrice */} 
+                                        <p className="text-sm">{formatCurrency(item.lastPurchasePrice || 0)}</p>
+                                    </div>
+                                     <div>
+                                        <p className="text-sm text-gray-600">Last Order Date</p>
+                                        <p className="text-sm">{item.lastOrderDate ? format(new Date(item.lastOrderDate), 'PP') : 'N/A'}</p> {/* Ensure Date object */} 
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Last Vendor</p>
+                                        <p className="text-sm">{item.lastVendor || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                         )}
+                    </div>
+                 </div>
+            </CardContent>
+         </Card>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="text-base font-semibold mb-2">Pricing</h3>
-                <div className="grid grid-cols-4 gap-4">
-                  <div>
-                    <Label htmlFor={`currency-${item.id}`}>Currency</Label>
-                    <Input
-                      id={`currency-${item.id}`}
-                      value={item.currency || "USD"}
-                      onChange={(e) => handleChange("currency", e.target.value)}
-                      readOnly={mode === "view"}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={`exchangeRate-${item.id}`}>
-                      Exch. Rate
-                    </Label>
-                    <Input
-                      id={`exchangeRate-${item.id}`}
-                      type="number"
-                      value={item.exchangeRate || 1}
-                      onChange={(e) =>
-                        handleChange("exchangeRate", parseFloat(e.target.value))
-                      }
-                      readOnly={mode === "view"}
-                      className="h-8 text-sm text-right"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={`baseUnitPrice-${item.id}`}>Price</Label>
-                    <Input
-                      id={`baseUnitPrice-${item.id}`}
-                      type="number"
-                      value={item.baseUnitPrice}
-                      onChange={(e) =>
-                        handleChange(
-                          "baseUnitPrice",
-                          parseFloat(e.target.value)
-                        )
-                      }
-                      readOnly={mode === "view"}
-                      className="h-8 text-sm text-right"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={`taxIncluded-${item.id}`}>Tax Incl.</Label>
-                    <div className="flex items-center h-[38px]">
-                      <Checkbox
-                        id={`taxIncluded-${item.id}`}
-                        checked={item.taxIncluded}
-                        onCheckedChange={(checked) =>
-                          handleChange("taxIncluded", checked as boolean)
-                        }
-                        disabled={mode === "view"}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <Label htmlFor={`discountAdjustment-${item.id}`}>
-                      Adj. Disc. Rate (%)
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`discountAdjustment-${item.id}`}
-                        checked={item.adjustments?.discount}
-                        onCheckedChange={(checked) =>
-                          handleChange("adjustments", checked)
-                        }
-                        disabled={mode === "view"}
-                      />
-                      <Input
-                        id={`discountRate-${item.id}`}
-                        type="number"
-                        value={item.discountRate || 0}
-                        onChange={(e) =>
-                          handleChange(
-                            "discountRate",
-                            parseFloat(e.target.value)
-                          )
-                        }
-                        readOnly={mode === "view"}
-                        className="h-8 text-sm text-right"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor={`overrideDiscount-${item.id}`}>
-                      Override Discount Amount
-                    </Label>
-                    <Input
-                      id={`overrideDiscount-${item.id}`}
-                      type="number"
-                      placeholder="Enter to override"
-                      value={item.discountAmount || ""}
-                      onChange={(e) =>
-                        handleChange(
-                          "discountAmount",
-                          parseFloat(e.target.value)
-                        )
-                      }
-                      readOnly={mode === "view"}
-                      className="h-8 text-sm text-right"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <Label htmlFor={`taxAdjustment-${item.id}`}>
-                      Adj. Tax Rate (%)
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`taxAdjustment-${item.id}`}
-                        checked={item.adjustments?.tax}
-                        onCheckedChange={(checked) =>
-                          handleChange("adjustments", checked)
-                        }
-                        disabled={mode === "view"}
-                      />
-                      <Input
-                        id={`taxRate-${item.id}`}
-                        type="number"
-                        value={item.taxRate || 0}
-                        onChange={(e) =>
-                          handleChange("taxRate", parseFloat(e.target.value))
-                        }
-                        readOnly={mode === "view"}
-                        className="h-8 text-sm text-right"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor={`taxAmount-${item.id}`}>
-                      Override Tax Amount
-                    </Label>
-                    <Input
-                      id={`taxAmount-${item.id}`}
-                      type="number"
-                      placeholder="Enter to override"
-                      value={item.taxAmount || ""}
-                      onChange={(e) =>
-                        handleChange("taxAmount", parseFloat(e.target.value))
-                      }
-                      readOnly={mode === "view"}
-                      className="h-8 text-sm text-right"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-4 mt-4 bg-gray-100 p-2 text-sm text-muted-foreground">
-                  <div>
-                    <Label className="text-xs">Last Price</Label>
-                    <div className="text-sm">
-                      {item.lastPurchasePrice?.toFixed(2) || "0.00"} per Kg
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Last Order Date</Label>
-                    <div className="text-sm">
-                      {item.lastOrderDate
-                        ? new Date(item.lastOrderDate).toLocaleDateString()
-                        : "N/A"}
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Last Vendor</Label>
-                    <div className="text-sm">{item.lastVendor || "N/A"}</div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-base font-semibold mb-2">
-                  Calculated Amounts
-                </h3>
-                <div className="space-y-2">
-                  <div className="grid grid-cols-3 gap-4 font-semibold text-muted-foreground mb-2 text-sm">
-                    <div>Description</div>
-                    <div className="text-right">
-                      Total Amount ({item.currency})
-                    </div>
-                    <div className="text-right text-xs">
-                      Base Amount ({item.baseCurrency})
-                    </div>
-                  </div>
-                  {[
-                    {
-                      label: "Subtotal Amount",
-                      total: item.subTotalAmount,
-                      base: item.baseSubTotalAmount,
-                    },
-                    {
-                      label: "Discount Amount",
-                      total: item.discountAmount,
-                      base: item.baseDiscountAmount,
-                    },
-                    {
-                      label: "Net Amount",
-                      total: item.netAmount,
-                      base: item.baseNetAmount,
-                    },
-                    {
-                      label: "Tax Amount",
-                      total: item.taxAmount,
-                      base: item.baseTaxAmount,
-                    },
-                    {
-                      label: "Total Amount",
-                      total: item.totalAmount,
-                      base: item.baseTotalAmount,
-                    },
-                  ].map((row, index) => (
-                    <React.Fragment key={row.label}>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div>{row.label}</div>
-                        <div className="text-right">
-                          {row.total?.toFixed(2) || "0.00"}
-                        </div>
-                        <div className="text-right text-muted-foreground text-xs">
-                          {row.base?.toFixed(2) || "0.00"}
-                        </div>
-                      </div>
-                      {index < 4 && <Separator className="my-1" />}
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </>
   );

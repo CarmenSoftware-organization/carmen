@@ -43,7 +43,7 @@ const mockItemsReceived: GoodsReceiveNoteItem[] = [
     id: "GRN002", 
     ref: "GRN-2023-002",
     date: new Date("2023-05-20"), 
-    status: "Partial", 
+    status: "Committed", 
     receivedQuantity: 30, 
     remarks: "Some items backordered",
     unit: "unit"
@@ -52,7 +52,7 @@ const mockItemsReceived: GoodsReceiveNoteItem[] = [
     id: "GRN003", 
     ref: "GRN-2023-003",
     date: new Date("2023-05-25"), 
-    status: "Pending", 
+    status: "Committed", 
     receivedQuantity: 0, 
     remarks: "Awaiting delivery",
     unit: "unit"

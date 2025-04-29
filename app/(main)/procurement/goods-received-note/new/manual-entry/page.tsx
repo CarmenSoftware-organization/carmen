@@ -150,7 +150,7 @@ export default function ManualEntryPage() {
         vendorId: MOCK_VENDORS.find(v => v.companyName === localDetails.vendor)?.id || '', // Get ID from mock data
         location: 'Main Warehouse', // Default or TBD
         currency: 'USD', // Default
-        status: 'Pending', // Initial status
+        status: 'Received', // Initial status
         items: finalItems,
         stockMovements: [],
         isConsignment: false, // Default

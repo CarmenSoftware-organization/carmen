@@ -167,38 +167,55 @@ export default function POSelectionPage() {
                     />
                   </TableHead>
                   <TableHead>PO Number</TableHead>
-                  <TableHead>PR Reference(s)</TableHead> {/* Adjust header */}
-                  <TableHead>Order Date</TableHead> {/* Adjust header */}
+                  <TableHead>PR Reference(s)</TableHead>
+                  <TableHead>Order Date</TableHead>
                   <TableHead>Items</TableHead>
                    <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Total Amount</TableHead> {/* Adjust header */}
+                   <TableHead>Currency</TableHead>
+                  <TableHead className="text-right">Total Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredPOs.length > 0 ? (
                   filteredPOs.map((po) => (
-                    <TableRow
-                      key={po.poId} // Use poId
-                      data-state={selectedPOIds.has(po.poId) ? "selected" : undefined}
-                    >
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedPOIds.has(po.poId)}
-                          onCheckedChange={() => handleToggleSelectPO(po.poId)}
-                          aria-label={`Select PO ${po.number}`}
-                        />
-                      </TableCell>
-                      <TableCell>{po.number}</TableCell>
-                      <TableCell>{po.purchaseRequisitionNumbers?.join(', ') || 'N/A'}</TableCell> {/* Adjust display */}
-                      <TableCell>{format(po.orderDate, 'yyyy-MM-dd')}</TableCell> {/* Use orderDate */}
-                      <TableCell>{po.items?.length || 0}</TableCell>
-                       <TableCell>{po.status}</TableCell>
-                      <TableCell className="text-right">{po.totalAmount?.toFixed(2)}</TableCell> {/* Use totalAmount */}
-                    </TableRow>
+                    <React.Fragment key={po.poId}>
+                      <TableRow data-state={selectedPOIds.has(po.poId) ? "selected" : undefined}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedPOIds.has(po.poId)}
+                            onCheckedChange={() => handleToggleSelectPO(po.poId)}
+                            aria-label={`Select PO ${po.number}`}
+                          />
+                        </TableCell>
+                        <TableCell>{po.number}</TableCell>
+                        <TableCell>{po.purchaseRequisitionNumbers?.join(', ') || 'N/A'}</TableCell>
+                        <TableCell>{format(po.orderDate, 'yyyy-MM-dd')}</TableCell>
+                        <TableCell>{po.items?.length || 0}</TableCell>
+                        <TableCell>{po.status}</TableCell>
+                        <TableCell>{po.currencyCode}</TableCell>
+                        <TableCell className="text-right">{po.totalAmount?.toFixed(2)}</TableCell>
+                      </TableRow>
+                      <TableRow key={`${po.poId}-details`} className="bg-muted/50 hover:bg-muted/60">
+                        <TableCell colSpan={8} className="p-2 pl-12">
+                           <div className="text-xs text-muted-foreground space-y-1">
+                             <span className="font-semibold">Items:</span>
+                             {po.items && po.items.length > 0 ? (
+                               po.items.map((item) => (
+                                 <div key={item.id}>
+                                   - {item.name} (Base Unit: {item.baseUnit || 'N/A'}, Currency: {po.currencyCode || 'N/A'})
+                                 </div>
+                               ))
+                             ) : (
+                               <div>No items found for this PO.</div>
+                             )}
+                           </div>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">
+                    <TableCell colSpan={8} className="text-center">
                       No open or partial purchase orders found for this vendor.
                     </TableCell>
                   </TableRow>
