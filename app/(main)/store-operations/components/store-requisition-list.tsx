@@ -24,14 +24,13 @@ import {
   ChevronDown,
   ArrowUpDown,
   X,
-  Eye,
-  Pencil,
+  FileText,
+  Edit,
   Trash2,
   Calendar,
   Hash,
   Building2,
   Store,
-  FileText,
   Tags,
   Filter,
   DollarSign
@@ -461,7 +460,7 @@ export function StoreRequisitionListComponent() {
                                     handleViewClick(req.refNo)
                                   }}
                                 >
-                                  <Eye className="h-4 w-4" />
+                                  <FileText className="h-4 w-4" />
                                   <span className="sr-only">View</span>
                                 </Button>
                               </TooltipTrigger>
@@ -472,7 +471,7 @@ export function StoreRequisitionListComponent() {
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button variant="ghost" size="icon">
-                                  <Pencil className="h-4 w-4" />
+                                  <Edit className="h-4 w-4" />
                                   <span className="sr-only">Edit</span>
                                 </Button>
                               </TooltipTrigger>

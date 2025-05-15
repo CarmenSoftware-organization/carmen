@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Pencil, Plus, Save, X, Trash2 } from 'lucide-react'
+import { Edit, Plus, Save, X, Trash2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -204,7 +204,7 @@ export function WorkflowTemplates({
                 Delete Template
               </Button>
               <Button variant="outline" size="sm" onClick={() => setIsTemplateEditing(true)}>
-                <Pencil className="h-4 w-4 mr-2" />
+                <Edit className="h-4 w-4 mr-2" />
                 Edit Template
               </Button>
             </div>

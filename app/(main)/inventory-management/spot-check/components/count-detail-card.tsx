@@ -1,4 +1,4 @@
-import { Building, Calendar, User, Package, Trash } from 'lucide-react'
+import { Building, Calendar, User, Package, Trash2 } from 'lucide-react'
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -153,7 +153,7 @@ export function CountDetailCard({
         </Button>
         {(currentStatus === 'pending' || currentStatus === 'in-progress') && (
           <Button variant="ghost" size="icon" onClick={onDelete}>
-            <Trash className="h-4 w-4 text-red-600" />
+            <Trash2 className="h-4 w-4 text-red-600" />
           </Button>
         )}
       </CardFooter>

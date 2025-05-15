@@ -6,7 +6,7 @@ import Link from 'next/link';
 import ListPageTemplate from '@/components/templates/ListPageTemplate';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, FileText, PencilLine, MoreVertical, Trash2, List, LayoutGrid } from "lucide-react"
+import { Search, Plus, FileText, Edit, MoreVertical, Trash2, List, LayoutGrid } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AdvancedFilter } from './components/advanced-filter';
 import { FilterType } from '@/lib/utils/filter-storage';
@@ -315,7 +315,7 @@ export default function VendorList(): JSX.Element {
                 onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}
                 className="h-8 w-8 rounded-full"
               >
-                <PencilLine className="h-4 w-4" />
+                <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit</span>
               </Button>
               <DropdownMenu>
@@ -331,7 +331,7 @@ export default function VendorList(): JSX.Element {
                     View Details
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}>
-                    <PencilLine className="h-4 w-4 mr-2" />
+                    <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -439,7 +439,7 @@ export default function VendorList(): JSX.Element {
                               onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}
                               className="h-8 w-8 rounded-full"
                             >
-                              <PencilLine className="h-4 w-4" />
+                              <Edit className="h-4 w-4" />
                               <span className="sr-only">Edit</span>
                             </Button>
                             <DropdownMenu>
@@ -455,7 +455,7 @@ export default function VendorList(): JSX.Element {
                                   View Details
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}>
-                                  <PencilLine className="h-4 w-4 mr-2" />
+                                  <Edit className="h-4 w-4 mr-2" />
                                   Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />

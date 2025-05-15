@@ -11,7 +11,7 @@ import { FilterType } from "@/lib/utils/filter-storage"
 import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { LayoutGrid, List, FileText, PencilLine, Trash2, ChevronDown } from "lucide-react"
+import { LayoutGrid, List, FileText, Edit, Trash2, ChevronDown } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -296,7 +296,7 @@ export default function PRTemplatesPage() {
                 className="h-8 w-8 rounded-full"
               >
                 <span className="sr-only">Edit</span>
-                <PencilLine className="h-4 w-4" />
+                <Edit className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
@@ -378,7 +378,7 @@ export default function PRTemplatesPage() {
                     className="h-8 w-8 rounded-full"
                   >
                     <span className="sr-only">Edit</span>
-                    <PencilLine className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

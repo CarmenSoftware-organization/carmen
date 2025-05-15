@@ -145,7 +145,7 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
     } else {
       setSelectedPRIds(selectedPRIds.filter((prId) => prId !== id));
     }
-    updateSelectedPRs([...selectedPRIds, id]);
+    // Removed problematic updateSelectedPRs call that was closing the dialog
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -154,17 +154,9 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
     } else {
       setSelectedPRIds([]);
     }
-    updateSelectedPRs(
-      checked ? filteredAndSortedPurchaseRequests.map((pr) => pr.id) : []
-    );
+    // Removed problematic updateSelectedPRs call that was closing the dialog
   };
 
-  const updateSelectedPRs = (selectedIds: string[]) => {
-    const selectedPRs = purchaseRequests.filter((pr) =>
-      selectedIds.includes(pr.id)
-    );
-    onSelectPRs(selectedPRs);
-  };
 
   const handleSort = (key: keyof PurchaseRequest) => {
     setSortConfig((prevConfig) => ({
@@ -252,6 +244,18 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
           </TableBody>
         </Table>
       </ScrollArea>
+      <div className="flex justify-end mt-4">
+        <Button
+          type="button"
+          onClick={() => {
+            const selectedPRs = filteredAndSortedPurchaseRequests.filter(pr => selectedPRIds.includes(pr.id));
+            onSelectPRs(selectedPRs);
+          }}
+          disabled={selectedPRIds.length === 0}
+        >
+          Create PO
+        </Button>
+      </div>
     </>
   );
 }

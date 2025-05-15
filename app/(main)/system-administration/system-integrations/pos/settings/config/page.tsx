@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Check, Eye, EyeOff, RefreshCw, Loader2 } from "lucide-react"
+import { ArrowLeft, Check, FileText, EyeOff, RefreshCw, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -328,7 +328,7 @@ export default function POSConfigPage() {
                     className="absolute right-0 top-0 h-full px-3"
                     onClick={() => setShowToken(!showToken)}
                   >
-                    {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showToken ? <EyeOff className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">

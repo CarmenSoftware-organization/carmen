@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Pencil, Copy, Trash2, Save, X } from 'lucide-react'
+import { Edit, Copy, Trash2, Save, X } from 'lucide-react'
 import { Workflow } from "../types/workflow"
 
 interface WorkflowHeaderProps {
@@ -28,7 +28,7 @@ export function WorkflowHeader({ workflow, isEditing, onEditToggle, onSave }: Wo
           {!isEditing ? (
             <>
               <Button variant="default" onClick={onEditToggle}>
-                <Pencil className="mr-2 h-4 w-4" />
+                <Edit className="mr-2 h-4 w-4" />
                 Edit
               </Button>
               <Button variant="outline">

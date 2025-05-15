@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, ChevronLeft, CalendarIcon, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { ChevronLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, CalendarIcon, PanelRightClose, PanelRightOpen } from "lucide-react";
 import {
   GoodsReceiveNote,
   GoodsReceiveNoteMode,

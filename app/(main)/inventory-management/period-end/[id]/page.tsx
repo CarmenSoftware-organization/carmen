@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
-import { ArrowLeft, Calendar, CheckCircle2, ClipboardList } from "lucide-react"
+import { ChevronLeft, Calendar, CheckCircle2, ClipboardList } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -140,7 +140,7 @@ export default function PeriodEndDetailPage({
               className="h-8 w-8 p-0"
               onClick={() => router.push('/inventory-management/period-end')}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <h2 className="text-3xl font-bold tracking-tight">
               Period End - {mockPeriodEndDetail.period}

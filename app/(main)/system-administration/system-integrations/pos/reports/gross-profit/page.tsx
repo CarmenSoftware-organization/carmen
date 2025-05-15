@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Download, Share2, RefreshCcw, TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react'
+import { Download, Share2, RefreshCcw, TrendingUp, TrendingDown,ChevronLeft } from 'lucide-react'
 
 export default function GrossProfitDashboard() {
   const [dateRange, setDateRange] = useState('today')
@@ -29,7 +29,7 @@ export default function GrossProfitDashboard() {
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
             <Link href="/system-administration/system-integrations/pos/reports">
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
               <span className="sr-only">Back to Reports</span>
             </Link>
           </Button>

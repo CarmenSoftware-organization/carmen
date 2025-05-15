@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
-  ArrowLeft, 
+  ChevronLeft, 
   Printer, 
   Edit2, 
   XCircle,
@@ -26,7 +26,8 @@ import {
   AlertCircle,
   Split,
   X,
-  Calculator
+  Calculator,
+  ArrowLeft
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
@@ -531,7 +532,7 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
               size="icon"
               onClick={() => router.back()}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-3">
               <CardTitle>Store Requisition Details</CardTitle>

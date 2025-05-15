@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
-  ArrowLeft,
+  ChevronLeft,
   Clock,
   Edit,
   FileDown,
@@ -76,7 +76,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
             </p>
             <Link href="/operational-planning/recipe-management/recipes">
               <Button>
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ChevronLeft className="h-4 w-4 mr-2" />
                 Back to Recipes
               </Button>
             </Link>
@@ -94,7 +94,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
           <div className="flex items-center gap-2">
             <Link href="/operational-planning/recipe-management/recipes">
               <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ChevronLeft className="h-4 w-4 mr-2" />
                 Back to Recipes
               </Button>
             </Link>

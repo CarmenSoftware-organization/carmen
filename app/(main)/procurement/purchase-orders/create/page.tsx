@@ -1,4 +1,4 @@
-import { PODetailPage } from '../components/PODetailPage'
+import PODetailPage  from '../components/PODetailPage'
 
 export default function CreatePurchaseOrderPage() {
   return <PODetailPage params={{ id: 'new' }} />

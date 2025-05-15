@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from "@/components/ui/checkbox"
-import { Search, ArrowLeft } from 'lucide-react';
+import { Search, ChevronLeft } from 'lucide-react';
 import { PurchaseOrder, PurchaseOrderItem, PurchaseOrderStatus } from '@/lib/types'; // Import correct types
 import { Vendor } from '@/app/(main)/vendor-management/manage-vendors/[id]/types'; // Keep Vendor for selectedVendor prop type
 import { format } from 'date-fns';
@@ -133,7 +133,7 @@ export default function POSelectionPage() {
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={handleBack}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Vendor Selection
+            <ChevronLeft className="mr-2 h-4 w-4" /> Back to Vendor Selection
           </Button>
         </div>
       </CardHeader>

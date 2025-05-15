@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 
 interface Store {
   id: string
@@ -177,7 +177,7 @@ export function StoreAssignment({
                         size="icon"
                         onClick={() => onRemove(assignment.id)}
                       >
-                        <Trash className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   )}

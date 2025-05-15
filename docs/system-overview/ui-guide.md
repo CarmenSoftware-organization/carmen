@@ -240,8 +240,8 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
 - Place action buttons in the last column, right-aligned
 - Use a consistent set of icon buttons for common actions:
   - `<FileText />` icon for View actions
-  - `<Pencil />` or `<Edit />` icon for Edit actions
-  - `<Trash />` icon for Delete actions
+  - `<Edit />` icon for Edit actions
+  - `<Trash2 />` icon for Delete actions
   - `<MoreVertical />` for additional actions via dropdown
 - Limit visible actions to 3-4 icons to prevent overcrowding
 - Use rounded icon buttons (`rounded-full`) for a more modern look
@@ -275,7 +275,7 @@ This guide provides a comprehensive overview of UI layout patterns and best prac
       className="h-8 w-8 rounded-full"
     >
       <span className="sr-only">Delete</span>
-      <Trash className="h-4 w-4" />
+      <Trash2 className="h-4 w-4" />
     </Button>
     {/* For additional actions */}
     <DropdownMenu>

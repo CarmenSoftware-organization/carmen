@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Recipe, mockIngredients, mockBaseRecipes } from '@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes'
-import { Plus, Trash2, UploadCloud, Clock, ArrowLeft, History, Share2, Printer, Download, Search, Info, X } from 'lucide-react'
+import { Plus, Trash2, UploadCloud, Clock, ChevronLeft, History, Share2, Printer, Download, Search, Info, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from "@/components/ui/badge"

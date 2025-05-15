@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { 
-  ArrowLeft, 
+  ChevronLeft, 
   ArrowRight, 
   BarChart, 
   Cable, 
@@ -15,7 +15,6 @@ import {
   ShoppingCart,
   Settings2,
   ChevronDown,
-  Eye,
   AlertTriangle,
   CheckCircle2,
   XCircle,
@@ -55,7 +54,7 @@ export default function POSIntegrationPage() {
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
             <Link href="/system-administration/system-integrations">
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
               <span className="sr-only">Back to System Integrations</span>
             </Link>
           </Button>
@@ -87,7 +86,7 @@ export default function POSIntegrationPage() {
           
           <Button size="sm" asChild>
             <Link href="/system-administration/system-integrations/pos/transactions">
-              <Eye className="h-4 w-4 mr-2" />
+              <FileText className="h-4 w-4 mr-2" />
               View Transactions
             </Link>
           </Button>

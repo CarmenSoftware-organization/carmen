@@ -122,7 +122,7 @@ export function PurchaseRequestList() {
                     size="icon"
                     onClick={() => handleViewPR(pr.id)}
                   >
-                    <Eye className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -249,7 +249,7 @@ export default function PRDetailPage() {
             <div className="flex items-center gap-2">
               {mode === "view" ? (
                 <Button onClick={() => handleModeChange("edit")}>
-                  <PencilIcon className="mr-2 h-4 w-4" />
+                  <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
               ) : (
@@ -470,7 +470,7 @@ export function ItemsTab() {
                   size="icon"
                   onClick={() => openItemForm(item, "view")}
                 >
-                  <Eye className="h-4 w-4" />
+                  <FileText className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"

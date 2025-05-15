@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { roles } from "../data/mockData"
 import { Role } from "../types/approver"
 import type { RoleConfiguration } from "../types/approver"
-import { Pencil, Save, X } from "lucide-react"
+import { Edit, Save, X } from "lucide-react"
 
 interface RoleConfigurationProps {
   selectedRoleId: number | null
@@ -115,7 +115,7 @@ export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
         </div>
         {!isEditing ? (
           <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-            <Pencil className="w-4 h-4 mr-2" />
+            <Edit className="w-4 h-4 mr-2" />
             Edit Role
           </Button>
         ) : (

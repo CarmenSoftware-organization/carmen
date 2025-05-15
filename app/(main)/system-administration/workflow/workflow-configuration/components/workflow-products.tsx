@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Pencil, Plus, Save, X, ChevronRight, ChevronDown, Package, Folder } from 'lucide-react'
+import { Edit, Plus, Save, X, ChevronRight, ChevronDown, Package, Folder } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 
@@ -281,7 +281,7 @@ export function WorkflowProducts({
           <CardTitle>Assign Products</CardTitle>
           {parentIsEditing && !isProductEditing && (
             <Button variant="default" size="sm" onClick={() => setIsProductEditing(true)}>
-              <Pencil className="h-4 w-4 mr-2" />
+              <Edit className="h-4 w-4 mr-2" />
               Edit Products
             </Button>
           )}

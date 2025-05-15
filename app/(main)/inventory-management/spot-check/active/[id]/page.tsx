@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { 
   CheckCircle, 
   PauseCircle,
-  ArrowLeft,
+  ChevronLeft,
   User,
   Calendar,
   Store,
@@ -72,7 +72,7 @@ export default function ActiveCountPage({ params }: PageProps) {
               className="flex items-center gap-2"
               onClick={handleClose}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
               Back to Spot Checks
             </Button>
             <div className="flex items-center space-x-2">

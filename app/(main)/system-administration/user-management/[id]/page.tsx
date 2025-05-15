@@ -36,7 +36,7 @@ import {
   Building,
   UserCircle,
   ScrollText,
-  Pencil
+  Edit
 } from "lucide-react"
 
 // Mock data
@@ -184,7 +184,7 @@ export default function UserDetailPage({
           <div className="flex gap-2">
             {isViewMode ? (
               <Button onClick={() => router.push(`/system-administration/user-management/${params.id}?mode=edit`)}>
-                <Pencil className="h-4 w-4 mr-2" />
+                <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
             ) : (

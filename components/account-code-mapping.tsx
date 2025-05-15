@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ScanIcon, DownloadIcon, PencilIcon, PrinterIcon } from "lucide-react"
+import { ScanIcon, DownloadIcon, Edit, PrinterIcon } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -36,7 +36,7 @@ export function AccountCodeMapping() {
             Import/Export
           </Button>
           <Button variant="outline" size="sm">
-            <PencilIcon className="w-4 h-4 mr-2" />
+            <Edit className="w-4 h-4 mr-2" />
             Edit
           </Button>
           <Button variant="outline" size="sm">

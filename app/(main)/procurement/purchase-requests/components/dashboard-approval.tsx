@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, CheckCircle, Clock, Eye, ShoppingCart, DollarSign, AlertCircle, Users, Calendar, ThumbsUp } from "lucide-react"
+import { Bell, CheckCircle, Clock, FileText, ShoppingCart, DollarSign, AlertCircle, Users, Calendar, ThumbsUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -59,7 +59,7 @@ export function DashboardApproval() {
                           </Badge>
                           <div className="space-x-2">
                             <Button size="sm" variant="outline" onClick={() => goto_purchase_request(request.id)}>
-                              <Eye className="w-4 h-4 mr-2" />
+                              <FileText className="w-4 h-4 mr-2" />
                               Details
                             </Button>
                             <Button size="sm">
@@ -102,7 +102,7 @@ export function DashboardApproval() {
                           </div>
                           <div className="space-x-2">
                             <Button size="sm" variant="outline">
-                              <Eye className="w-4 h-4 mr-2" />
+                              <FileText className="w-4 h-4 mr-2" />
                               Details
                             </Button>
                             <Button size="sm" variant="secondary">

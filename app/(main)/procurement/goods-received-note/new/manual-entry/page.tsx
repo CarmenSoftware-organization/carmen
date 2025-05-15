@@ -16,7 +16,7 @@ import { Vendor } from '@/app/(main)/vendor-management/manage-vendors/[id]/types
 import { GoodsReceiveNoteItem, GoodsReceiveNote } from '@/lib/types';
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import { CalendarIcon, Trash2, PlusCircle, ArrowLeft } from 'lucide-react'
+import { CalendarIcon, Trash2, PlusCircle, ChevronLeft } from 'lucide-react'
 
 // Mock data - replace with actual API calls
 const MOCK_VENDORS: Vendor[] = [
@@ -197,7 +197,7 @@ export default function ManualEntryPage() {
                 <CardDescription>Enter GRN details and received items manually.</CardDescription>
             </div>
              <Button variant="outline" size="sm" onClick={handleBack}>
-                 <ArrowLeft className="mr-2 h-4 w-4" /> Cancel / Back to List
+                 <ChevronLeft className="mr-2 h-4 w-4" /> Cancel / Back to List
              </Button>
         </div>
       </CardHeader>

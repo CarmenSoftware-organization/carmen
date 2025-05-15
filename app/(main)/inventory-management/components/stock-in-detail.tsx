@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { 
-  ArrowLeft,
+  ChevronLeft,
   Save,
   Lock,
   FileText,
@@ -14,7 +14,7 @@ import {
   Plus,
   Trash2,
   Search,
-  Pencil
+  Edit
 } from 'lucide-react'
 import {
   Select,
@@ -200,7 +200,7 @@ export function StockInDetail({ mode, onClose, data }: StockInDetailProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onClose}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
             <h1 className="text-2xl font-bold">
@@ -447,7 +447,7 @@ export function StockInDetail({ mode, onClose, data }: StockInDetailProps) {
                                     className="h-8 w-8"
                                     title="Edit Item"
                                   >
-                                    <Pencil className="h-4 w-4" />
+                                    <Edit className="h-4 w-4" />
                                   </Button>
                                   <Button 
                                     variant="ghost" 

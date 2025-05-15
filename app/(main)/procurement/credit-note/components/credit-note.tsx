@@ -29,7 +29,6 @@ import {
   Info,
   Package,
   FileText,
-  PencilLine,
   MoreVertical,
 } from "lucide-react";
 import {
@@ -736,7 +735,7 @@ export function CreditNoteComponent() {
                                 size="icon"
                                 className="h-8 w-8 rounded-full"
                               >
-                                <PencilLine className="h-4 w-4" />
+                                <Edit className="h-4 w-4" />
                                 <span className="sr-only">Edit</span>
                               </Button>
                               <DropdownMenu>
@@ -756,7 +755,7 @@ export function CreditNoteComponent() {
                                     View Details
                                   </DropdownMenuItem>
                                   <DropdownMenuItem>
-                                    <PencilLine className="h-4 w-4 mr-2" />
+                                    <Edit className="h-4 w-4 mr-2" />
                                     Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />

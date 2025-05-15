@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useCallback, useRef } from 'react';
-import { Search, ChevronRight, ChevronDown, Plus, Edit2, Trash2, AlertCircle } from 'lucide-react';
+import { Search, ChevronRight, ChevronDown, Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { 
@@ -213,7 +213,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
             onClick={() => setIsEditing(true)}
             className="p-1 hover:text-blue-600"
           >
-            <Edit2 size={16} />
+            <Edit size={16} />
           </button>
           <button
             onClick={() => setShowDeleteDialog(true)}

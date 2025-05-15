@@ -18,7 +18,7 @@ import {
   Trash2, 
   XCircle, 
   FileText,
-  PencilLine,
+  Edit,
   MoreVertical,
   List,
   LayoutGrid
@@ -210,7 +210,7 @@ export function UnitList() {
                 onClick={() => setSelectedUnit(unit)}
                 className="h-8 w-8 rounded-full"
               >
-                <PencilLine className="h-4 w-4" />
+                <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit</span>
               </Button>
               <DropdownMenu>
@@ -226,7 +226,7 @@ export function UnitList() {
                     View Details
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setSelectedUnit(unit)}>
-                    <PencilLine className="h-4 w-4 mr-2" />
+                    <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { PlusCircle, Import, Printer, Search, ChevronDown, ChevronRight, MoreVertical, Edit, Trash, FolderTree } from 'lucide-react'
+import { PlusCircle, Import, Printer, Search, ChevronDown, ChevronRight, MoreVertical, Edit, Trash2, FolderTree } from 'lucide-react'
 
 type CategoryType = 'Main' | 'Sub' | 'Group'
 
@@ -275,7 +275,7 @@ export function CategoryManagement() {
                   <span>Edit</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleDelete(category.id)}>
-                  <Trash className="mr-2 h-4 w-4" />
+                  <Trash2 className="mr-2 h-4 w-4" />
                   <span>Delete</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleRecategorize(category.id)}>

@@ -2,7 +2,7 @@
 
 import {
   Edit,
-  Trash,
+  Trash2,
   History,
   MoreHorizontal,
   Link as LinkIcon,
@@ -33,7 +33,7 @@ export function RowActions({
 }: RowActionsProps) {
   const actionIcons = {
     edit: <Edit className="mr-2 h-4 w-4" />,
-    delete: <Trash className="mr-2 h-4 w-4" />,
+    delete: <Trash2 className="mr-2 h-4 w-4" />,
     history: <History className="mr-2 h-4 w-4" />,
     link: <LinkIcon className="mr-2 h-4 w-4" />,
     test: <PlayCircle className="mr-2 h-4 w-4" />,

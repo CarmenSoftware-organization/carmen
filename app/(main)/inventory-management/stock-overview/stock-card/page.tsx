@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
 import { 
-  ArrowLeft, 
+  ChevronLeft, 
   Calendar, 
   Edit, 
   FileDown, 
@@ -98,7 +98,7 @@ function StockCardContent() {
             </p>
             <Button asChild>
               <a href="/inventory-management/stock-overview/stock-cards">
-                <ArrowLeft className="mr-2 h-4 w-4" />
+                <ChevronLeft className="mr-2 h-4 w-4" />
                 Back to Stock Cards
               </a>
             </Button>
@@ -118,7 +118,7 @@ function StockCardContent() {
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild className="p-0">
               <a href="/inventory-management/stock-overview/stock-cards">
-                <ArrowLeft className="h-4 w-4 mr-1" />
+                <ChevronLeft className="h-4 w-4 mr-1" />
                 Back to Stock Cards
               </a>
             </Button>

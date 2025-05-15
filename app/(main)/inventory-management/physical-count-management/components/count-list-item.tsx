@@ -1,4 +1,4 @@
-import { Building, Calendar, User, Trash } from 'lucide-react'
+import { Building, Calendar, User, Trash2 } from 'lucide-react'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -77,7 +77,7 @@ export function CountListItem({
             </Button>
             {(status === 'pending' || status === 'in-progress') && (
               <Button variant="ghost" size="icon" onClick={onDelete}>
-                <Trash className="h-4 w-4 text-red-600" />
+                <Trash2 className="h-4 w-4 text-red-600" />
               </Button>
             )}
           </div>

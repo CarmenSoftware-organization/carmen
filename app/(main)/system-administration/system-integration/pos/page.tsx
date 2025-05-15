@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Settings, FileText, Map, BarChart, ArrowLeft } from 'lucide-react';
+import { Settings, FileText, Map, BarChart, ChevronLeft} from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -28,7 +28,7 @@ export default function POSIntegrationPage() {
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
               <Link href="/system-administration/system-integration">
-                <ArrowLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" />
                 <span className="sr-only">Back</span>
               </Link>
             </Button>

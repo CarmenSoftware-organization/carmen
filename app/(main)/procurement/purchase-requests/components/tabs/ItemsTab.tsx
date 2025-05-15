@@ -34,7 +34,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 
-import { Eye, Edit, X } from "lucide-react";
+import { FileText, Edit, X } from "lucide-react";
 import { ItemDetailsEditForm } from "../item-details-edit-form";
 import {
   Dialog,
@@ -510,7 +510,7 @@ export function ItemsTab() {
                                     className="h-8 w-8 rounded-full"
                                     onClick={() => openItemForm(item, "view")}
                                   >
-                                    <Eye className="h-4 w-4" />
+                                    <FileText className="h-4 w-4" />
                                   </Button>
                                   <Button
                                     variant="ghost"

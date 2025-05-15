@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Filter, ArrowUpDown, Pencil, MoreVertical, FileSpreadsheet, Upload, Plus, Printer } from "lucide-react"
+import { Search, Filter, ArrowUpDown, Edit, MoreVertical, FileSpreadsheet, Upload, Plus, Printer } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge'
 
@@ -237,7 +237,7 @@ export default function PricelistList(): JSX.Element {
                       >
                         <Link href={`/vendor-management/price-lists/${pricelist.id}/edit`}>
                           <span className="sr-only">Edit</span>
-                          <Pencil className="h-4 w-4" />
+                          <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
                       <Button 

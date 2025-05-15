@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PencilIcon, TrashIcon, PlusIcon, XIcon, ImageIcon, ChevronLeft } from 'lucide-react'
+import { Edit, TrashIcon, PlusIcon, XIcon, ImageIcon, ChevronLeft } from 'lucide-react'
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

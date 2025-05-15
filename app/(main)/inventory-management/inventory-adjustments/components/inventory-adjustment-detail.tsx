@@ -12,21 +12,12 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   FileText,
-  Hash,
-  Check,
   X,
   Calculator,
   Package,
   Plus,
   Edit,
-  Trash,
-  ArrowLeft, 
-  Printer, 
-  Edit2, 
-  XCircle,
-  Calendar,
-  Building2,
-  Store,
+  Trash2,
 } from 'lucide-react'
 
 import { HeaderInformation } from "./header-information"
@@ -399,7 +390,7 @@ export function InventoryAdjustmentDetail({ id }: InventoryAdjustmentDetailProps
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon">
-                              <Trash className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4 text-red-500" />
                             </Button>
                           </div>
                         </TableCell>

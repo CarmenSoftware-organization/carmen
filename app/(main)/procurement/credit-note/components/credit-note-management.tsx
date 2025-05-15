@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
-import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, ChevronDown, FileText, PencilLine, Trash2, LayoutGrid, List, ArrowUpDown, MoreVertical } from 'lucide-react'
+import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, FileText,  Trash2, LayoutGrid, List, ArrowUpDown, MoreVertical, Edit } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/custom-status-badge'
 import { CreditNote } from '@/lib/types/credit-note'
@@ -301,7 +301,7 @@ export function CreditNoteManagement() {
                             className="h-8 w-8 rounded-full hover:bg-secondary"
                           >
                             <span className="sr-only">Edit</span>
-                            <PencilLine className="h-4 w-4" />
+                            <Edit className="h-4 w-4" />
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -320,7 +320,7 @@ export function CreditNoteManagement() {
                                 View Details
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleEdit(note.id)}>
-                                <PencilLine className="h-4 w-4 mr-2" />
+                                <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
@@ -417,7 +417,7 @@ export function CreditNoteManagement() {
                             className="h-8 w-8 rounded-full hover:bg-secondary"
                           >
                             <span className="sr-only">Edit</span>
-                            <PencilLine className="h-4 w-4" />
+                            <Edit className="h-4 w-4" />
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -436,7 +436,7 @@ export function CreditNoteManagement() {
                                 View Details
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleEdit(note.id)}>
-                                <PencilLine className="h-4 w-4 mr-2" />
+                                <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />

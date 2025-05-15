@@ -1,8 +1,6 @@
 'use client'
 
-import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { InventoryAdjustmentDetail } from "../components/inventory-adjustment-detail"
 
 export default function InventoryAdjustmentDetailPage({

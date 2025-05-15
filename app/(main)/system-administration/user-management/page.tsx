@@ -36,9 +36,10 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  Pencil,
+  Edit,
   Trash2,
-  MoreHorizontal
+  MoreHorizontal,
+  FileText
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -46,6 +47,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface FilterCondition {
   id: string
@@ -358,115 +362,61 @@ export default function UserManagementPage() {
         </div>
       </div>
 
-      <div className="border rounded-lg">
+      <Card className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <input
-                  type="checkbox"
-                  checked={
-                    filteredUsers.length > 0 &&
-                    filteredUsers.every((user) =>
-                      selectedUsers.includes(user.id)
-                    )
-                  }
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedUsers(filteredUsers.map((user) => user.id))
-                    } else {
-                      setSelectedUsers([])
-                    }
-                  }}
-                  className="h-4 w-4"
-                />
-              </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Business Unit</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Last Login</TableHead>
-              <TableHead className="w-24">Actions</TableHead>
+            <TableRow className="bg-muted">
+              <TableHead className="font-bold text-base py-3">Username</TableHead>
+              <TableHead className="font-bold text-base py-3">Email</TableHead>
+              <TableHead className="font-bold text-base py-3">Role</TableHead>
+              <TableHead className="font-bold text-base py-3">Status</TableHead>
+              <TableHead className="font-bold text-base py-3 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selectedUsers.includes(user.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedUsers([...selectedUsers, user.id])
-                      } else {
-                        setSelectedUsers(
-                          selectedUsers.filter((id) => id !== user.id)
-                        )
-                      }
-                    }}
-                    className="h-4 w-4"
-                  />
-                </TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.businessUnit}</TableCell>
-                <TableCell>{user.department}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {user.accountStatus === "active" && (
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    )}
-                    {user.accountStatus === "inactive" && (
-                      <XCircle className="h-4 w-4 text-gray-500" />
-                    )}
-                    {user.accountStatus === "suspended" && (
-                      <AlertCircle className="h-4 w-4 text-yellow-500" />
-                    )}
+            {filteredUsers.map((user, idx) => (
+              <TableRow key={user.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-muted/50'}>
+                <TableCell className="font-semibold text-primary py-3 align-middle">{user.name}</TableCell>
+                <TableCell className="py-3 align-middle">{user.email}</TableCell>
+                <TableCell className="py-3 align-middle">{user.roles.join(', ')}</TableCell>
+                <TableCell className="py-3 align-middle">
+                  <Badge className={`bg-${user.accountStatus === 'active' ? 'green' : user.accountStatus === 'inactive' ? 'gray' : 'yellow'}-100 text-${user.accountStatus === 'active' ? 'green-800' : user.accountStatus === 'inactive' ? 'gray-600' : 'yellow-800'} border-${user.accountStatus === 'active' ? 'green-200' : user.accountStatus === 'inactive' ? 'gray-200' : 'yellow-200'}`}>
                     {user.accountStatus.charAt(0).toUpperCase() + user.accountStatus.slice(1)}
-                  </div>
+                  </Badge>
                 </TableCell>
-                <TableCell>
-                  {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleDateString()
-                    : "Never"}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleView(user.id)}>
-                        <Search className="h-4 w-4 mr-2" />
-                        View
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(user.id)}>
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleDelete(user.id)}
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <TableCell className="flex items-center gap-1 py-3 align-middle justify-end">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" aria-label="View" onClick={() => handleView(user.id)}>
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>View</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" aria-label="Edit" onClick={() => handleEdit(user.id)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" aria-label="Delete" onClick={() => handleDelete(user.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </div>
+      </Card>
     </div>
   )
 } 

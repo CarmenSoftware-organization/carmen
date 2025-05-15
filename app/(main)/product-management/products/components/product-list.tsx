@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowUpDown, Pencil, Eye, Plus, Printer, Upload, ArrowLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter, LayoutGrid, List, MoreVertical, PencilLine, ImageIcon } from "lucide-react"
+import { Search, ArrowUpDown, Edit, Eye, Plus, Printer, Upload, ChevronLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter, LayoutGrid, List, MoreVertical, ImageIcon } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
@@ -737,7 +737,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                     onClick={() => handleEditProduct(product.id)}
                     title="Edit Product"
                   >
-                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                    <Edit className="h-4 w-4 text-muted-foreground" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -869,7 +869,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 onClick={() => handleEditProduct(product.id)}
                 className="h-8 w-8 rounded-full"
               >
-                <Pencil className="h-4 w-4" />
+                <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit</span>
               </Button>
               <Button

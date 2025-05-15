@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scale, Plus, Pencil, Save, X, AlertCircle, TrashIcon, ArrowLeftRight } from 'lucide-react';
+import { Scale, Plus, Edit, Save, X, AlertCircle, TrashIcon, ArrowLeftRight } from 'lucide-react';
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

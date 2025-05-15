@@ -10,7 +10,7 @@ import {
   User,
   Download,
   Calendar,
-  ArrowLeft,
+  ChevronLeft,
   FileBarChart,
   FileText,
   Camera
@@ -104,7 +104,7 @@ export default function CompletedCountDetailsPage({ params }: PageProps) {
               size="icon"
               onClick={() => router.back()}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <h1 className="text-2xl font-bold">Count Details</h1>
           </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Download, MessageSquare, Paperclip } from 'lucide-react';
+import { FileText, Download, MessageSquare, Paperclip } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface RelatedDocument {
@@ -147,7 +147,7 @@ export default function RelatedDocumentsTab({ poData }: RelatedDocumentsTabProps
               <TableCell>
                 <div className="flex space-x-2">
                   <Button variant="ghost" size="icon">
-                    <Eye className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="icon">
                     <Download className="h-4 w-4" />

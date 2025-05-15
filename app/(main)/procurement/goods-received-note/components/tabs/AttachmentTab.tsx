@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { GoodsReceiveNoteMode, Attachment } from '@/lib/types'
-import { Edit, Trash, Download } from 'lucide-react'
+import { Edit, Trash2, Download } from 'lucide-react'
 
 interface AttachmentTabProps {
   mode: GoodsReceiveNoteMode
@@ -106,7 +106,7 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" onClick={() => onDeleteAttachment(attachment.id)}>
-                        <Trash className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </>
                   )}

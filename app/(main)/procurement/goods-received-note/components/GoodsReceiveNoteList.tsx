@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Search, Eye, Edit, Trash, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer, LayoutGrid, List, FileText, MoreVertical, PanelRightClose, PanelRightOpen, PackagePlus, FilePlus } from 'lucide-react'
+import { Search, Eye, Edit, Trash2, ChevronLeft, ChevronRight, Plus, Filter, Download, Printer, LayoutGrid, List, FileText, MoreVertical, PanelRightClose, PanelRightOpen, PackagePlus, FilePlus } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
 import { v4 as uuidv4 } from 'uuid'
@@ -420,7 +420,7 @@ export function GoodsReceiveNoteList() {
               className="h-8 w-8 rounded-full text-destructive"
             >
               <span className="sr-only">Delete</span>
-              <Trash className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Delete</TooltipContent>

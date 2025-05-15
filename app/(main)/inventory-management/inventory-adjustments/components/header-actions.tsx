@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Check, Edit2, Printer, X, XCircle, PanelRightOpen } from "lucide-react"
+import { ChevronLeft, Check, Edit2, Printer, X, XCircle, PanelRightOpen } from "lucide-react"
 import StatusBadge from "@/components/ui/custom-status-badge"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -30,7 +30,7 @@ export function HeaderActions({ status, isEditMode, setIsEditMode }: HeaderActio
             size="icon"
             onClick={() => router.back()}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold">Inventory Adjustment</h1>

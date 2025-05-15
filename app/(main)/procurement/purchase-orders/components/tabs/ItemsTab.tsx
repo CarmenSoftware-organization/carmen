@@ -40,7 +40,7 @@ import {
   Edit,
   MessageSquare,
   Split,
-  Trash,
+  Trash2,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
@@ -403,7 +403,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
                         className="h-8 w-8 rounded-full"
                       >
                         <span className="sr-only">Delete item</span>
-                        <Trash className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"

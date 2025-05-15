@@ -2,7 +2,7 @@
 import React from 'react'
 import { CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PencilIcon, PrinterIcon, DownloadIcon, ShareIcon } from 'lucide-react'
+import { Edit, PrinterIcon, DownloadIcon, ShareIcon } from 'lucide-react'
 
 interface PRHeaderProps {
   title: string
@@ -16,7 +16,7 @@ export const PRHeader: React.FC<PRHeaderProps> = ({ title, mode, onModeChange, o
     <CardTitle className="text-2xl font-bold">{title}</CardTitle>
     <div className="flex space-x-2">
       <Button onClick={() => onModeChange('edit')} variant={mode === 'edit' ? 'default' : 'outline'} size="sm">
-        <PencilIcon className="mr-2 h-4 w-4" />
+        <Edit className="mr-2 h-4 w-4" />
         Edit
       </Button>
       {['print', 'download', 'share'].map(action => (

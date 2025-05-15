@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface GoodsReceiveNote {
   id: string;
@@ -53,7 +53,7 @@ export default function GoodsReceiveNoteTab({ poData }: GoodsReceiveNoteTabProps
               <TableCell>{grn.receivedBy}</TableCell>
               <TableCell>
                 <Button variant="ghost" size="icon">
-                  <Eye className="h-4 w-4" />
+                  <FileText className="h-4 w-4" />
                 </Button>
               </TableCell>
             </TableRow>

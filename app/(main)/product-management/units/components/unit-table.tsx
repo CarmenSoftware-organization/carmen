@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { FileText, PencilLine, MoreVertical, ArrowUpDown, Trash2 } from "lucide-react"
+import { FileText, Edit, MoreVertical, ArrowUpDown, Trash2 } from "lucide-react"
 import { Unit } from "./unit-list"
 import StatusBadge from "@/components/ui/custom-status-badge"
 import {
@@ -225,7 +225,7 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
                     onClick={() => onEdit(unit)}
                     className="h-8 w-8 rounded-full"
                   >
-                    <PencilLine className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                     <span className="sr-only">Edit</span>
                   </Button>
                   <DropdownMenu>
@@ -241,7 +241,7 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
                         View Details
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(unit)}>
-                        <PencilLine className="h-4 w-4 mr-2" />
+                        <Edit className="h-4 w-4 mr-2" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

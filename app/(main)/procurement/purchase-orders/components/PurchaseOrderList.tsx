@@ -50,7 +50,6 @@ import {
   List,
   LayoutGrid,
   Edit,
-  Pencil,
   Trash,
 } from "lucide-react";
 import {
@@ -64,6 +63,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";  
 import StatusBadge from "@/components/ui/custom-status-badge";
+import CreatePOFromPR from "./createpofrompr";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { randomUUID } from "crypto";
 import { AdvancedFilter } from './advanced-filter'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
@@ -463,7 +464,7 @@ export function PurchaseOrderList() {
                         className="h-8 w-8 rounded-full"
                       >
                         <span className="sr-only">Edit</span>
-                        <Pencil className="h-4 w-4" />
+                        <Edit className="h-4 w-4" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -603,7 +604,7 @@ export function PurchaseOrderList() {
                   className="h-8 w-8 rounded-full"
                 >
                   <span className="sr-only">Edit</span>
-                  <Pencil className="h-4 w-4" />
+                  <Edit className="h-4 w-4" />
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -678,11 +679,32 @@ export function PurchaseOrderList() {
     </div>
   );
 
+  const [showCreateFromPRDialog, setShowCreateFromPRDialog] = useState(false);
+  
+  const handleSelectPRs = (selectedPRs: PurchaseRequest[]) => {
+    setShowCreateFromPRDialog(false);
+    
+    if (selectedPRs.length > 0) {
+      // Store selected PRs in localStorage or state management solution
+      // Using try-catch to handle cases where localStorage might not be available
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('selectedPurchaseRequests', JSON.stringify(selectedPRs));
+        }
+      } catch (error) {
+        console.error('Error storing selected PRs:', error);
+      }
+      
+      // Navigate to the new PO page in add mode
+      router.push('/procurement/purchase-orders/new?mode=add&fromPR=true');
+    }
+  };
+
   // Action buttons
   const actionButtons = (
     <>
       <Button 
-        onClick={handleCreateNew}
+        onClick={() => setShowCreateFromPRDialog(true)}
         className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
       >
         <Plus className="mr-2 h-4 w-4" /> New Purchase Order
@@ -699,13 +721,40 @@ export function PurchaseOrderList() {
   );
 
   return (
-    <ListPageTemplate
-      title="Purchase Orders"
-      actionButtons={actionButtons}
-      filters={filters}
-      bulkActions={bulkActions}
-      content={content}
-    />
+    <>
+      <ListPageTemplate
+        title="Purchase Orders"
+        actionButtons={actionButtons}
+        filters={filters}
+        bulkActions={bulkActions}
+        content={content}
+      />
+      <Dialog 
+        open={showCreateFromPRDialog} 
+        onOpenChange={(open) => {
+          // Only allow the dialog to be closed, not opened via this handler
+          if (!open) setShowCreateFromPRDialog(false);
+        }}
+      >
+        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Create PO from Purchase Requests</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <CreatePOFromPR onSelectPRs={handleSelectPRs} />
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCreateFromPRDialog(false)}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

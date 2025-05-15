@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { MappingNav } from "./components"
@@ -15,7 +15,7 @@ export default function MappingLayout({ children }: MappingLayoutProps) {
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
           <Link href="/system-administration/system-integrations/pos">
-            <ArrowLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Back</span>
           </Link>
         </Button>

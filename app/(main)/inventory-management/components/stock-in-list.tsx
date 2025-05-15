@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  Pencil, 
-  Eye, 
+  Edit, 
+  FileText, 
   Trash2, 
   Printer, 
   Plus, 
@@ -866,7 +866,7 @@ export const StockInListing = () => {
                                     title="Edit"
                                     onClick={() => handleActionClick('edit', transaction)}
                                   >
-                                    <Pencil className="h-4 w-4" />
+                                    <Edit className="h-4 w-4" />
                                   </Button>
                                   <Button 
                                     variant="ghost" 
@@ -875,7 +875,7 @@ export const StockInListing = () => {
                                     title="View"
                                     onClick={() => handleActionClick('view', transaction)}
                                   >
-                                    <Eye className="h-4 w-4" />
+                                    <FileText className="h-4 w-4" />
                                   </Button>
                                   <Button 
                                     variant="ghost" 

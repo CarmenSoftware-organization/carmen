@@ -10,9 +10,9 @@ import {
   Filter, 
   MoreHorizontal, 
   Search, 
-  Trash,
+  Trash2,
   RefreshCcw,
-  Eye 
+  FileText
 } from "lucide-react"
 import { DateRange } from "react-day-picker"
 
@@ -363,11 +363,11 @@ export default function TransactionsPage() {
           <span className="text-sm font-medium">Selected: {selectedRows.length}</span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
-              <Eye className="mr-1 h-4 w-4" />
+              <FileText className="mr-1 h-4 w-4" />
               View
             </Button>
             <Button variant="outline" size="sm">
-              <Trash className="mr-1 h-4 w-4" />
+              <Trash2 className="mr-1 h-4 w-4" />
               Void
             </Button>
             <Button variant="outline" size="sm">
@@ -458,12 +458,12 @@ export default function TransactionsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" /> View details
+                          <FileText className="mr-2 h-4 w-4" /> View details
                         </DropdownMenuItem>
                         
                         {transaction.status !== "voided" && transaction.status !== "processing" && (
                           <DropdownMenuItem>
-                            <Trash className="mr-2 h-4 w-4" /> Void transaction
+                            <Trash2 className="mr-2 h-4 w-4" /> Void transaction
                           </DropdownMenuItem>
                         )}
                         

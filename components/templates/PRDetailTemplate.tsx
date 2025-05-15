@@ -16,7 +16,7 @@ import {
   PrinterIcon,
   DownloadIcon,
   ShareIcon,
-  PencilIcon,
+  Edit,
   CheckCircle,
   X,
   ArrowLeft,
@@ -100,7 +100,7 @@ export function PRDetailTemplate({
                 {/* Edit/Save/Cancel buttons */}
                 {mode === "view" ? (
                   <Button onClick={() => onModeChange("edit")}>
-                    <PencilIcon className="mr-2 h-4 w-4" />
+                    <Edit className="mr-2 h-4 w-4" />
                     Edit
                   </Button>
                 ) : (

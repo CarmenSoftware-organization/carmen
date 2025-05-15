@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ArrowLeft,
   Edit,
   Trash2,
   X,
@@ -68,13 +67,12 @@ import {
 import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import SummaryTotal from "./SummaryTotal";
-import CreatePOFromPR from "./createpofrompr";
 
 interface PODetailPageProps {
   params: { id: string }
 }
 
-export function PODetailPage({ params }: PODetailPageProps) {
+export default function PODetailPage({ params }: PODetailPageProps) {
   const router = useRouter();
   const [poData, setPOData] = useState<PurchaseOrder | null>(null);
   const [isEditing, setIsEditing] = useState(params.id === 'new');
@@ -91,12 +89,16 @@ export function PODetailPage({ params }: PODetailPageProps) {
     "items",
     "financialSummary"
   ]);
-  const [showCreateFromPRDialog, setShowCreateFromPRDialog] = useState(false);
+
 
   useEffect(() => {
     if (params.id === 'new') {
+      // Check if we're creating a PO from PRs
+      const searchParams = new URLSearchParams(window.location.search);
+      const fromPR = searchParams.get('fromPR') === 'true';
+      
       // Initialize new PO
-      setPOData({
+      const newPO = {
         poId: 'new',
         number: 'New PO',
         vendorId: 0,
@@ -124,7 +126,9 @@ export function PODetailPage({ params }: PODetailPageProps) {
         baseTotalAmount: 0,
         totalAmount: 0,
         activityLog: []
-      });
+      };
+      
+      setPOData(newPO);
       setStatusHistory([]);
     } else {
       // Fetch existing PO
@@ -305,27 +309,6 @@ export function PODetailPage({ params }: PODetailPageProps) {
     );
   };
 
-  const handleCreatePOFromPR = () => {
-    setShowCreateFromPRDialog(true);
-  };
-
-  const handleSelectPRs = (selectedPRs: any[]) => {
-    console.log("Selected PRs for new PO:", selectedPRs);
-    // In a real app, you would create a new PO based on the selected PRs
-    // and either navigate to that PO or update the current page
-    if (selectedPRs.length > 0) {
-      // Example: Create a new PO with the selected PRs
-      console.log(`Creating new PO from ${selectedPRs.length} PRs`);
-      
-      // Close the dialog and potentially navigate to the new PO
-      setShowCreateFromPRDialog(false);
-      
-      // Navigate to the new PO page or update current page
-      // This is just an example, you would typically create the PO first
-      // router.push('/procurement/purchase-orders/new');
-    }
-  };
-
   if (!poData) {
     return <div>Loading... (Data not found)</div>;
   }
@@ -380,10 +363,7 @@ export function PODetailPage({ params }: PODetailPageProps) {
             <FileDown className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button variant="outline" onClick={handleCreatePOFromPR}>
-            <Plus className="mr-2 h-4 w-4" />
-            New PO from PR
-          </Button>
+
         </>
       )}
     </div>
@@ -862,37 +842,7 @@ export function PODetailPage({ params }: PODetailPageProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Create PO from PR Dialog */}
-      <Dialog open={showCreateFromPRDialog} onOpenChange={setShowCreateFromPRDialog}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle>Create PO from Purchase Requests</DialogTitle>
-            <DialogDescription>
-              Select the purchase requests you want to use to create a new purchase order.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <CreatePOFromPR onSelectPRs={handleSelectPRs} />
-          </div>
-          
-          <DialogFooter className="sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowCreateFromPRDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={() => handleSelectPRs([])}
-            >
-              Create PO
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
     </TooltipProvider>
   );
 }

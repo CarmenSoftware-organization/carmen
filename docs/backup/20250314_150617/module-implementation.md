@@ -109,7 +109,7 @@ const filterFields = [
   number={formData.refNumber}
   date={formData.date}
   actions={[
-    { label: "Edit", icon: PencilIcon },
+    { label: "Edit", icon: Edit },
     { label: "Print", icon: PrinterIcon },
     { label: "Download", icon: DownloadIcon }
   ]}

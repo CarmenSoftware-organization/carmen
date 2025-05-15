@@ -23,7 +23,7 @@ import {
   MapPinIcon,
   UserIcon,
   ShareIcon,
-  PencilIcon,
+  Edit,
   CheckCircleIcon,
   XCircleIcon,
   RotateCcwIcon,
@@ -180,7 +180,7 @@ export default function PRDetailPage() {
               {/* Edit/Save/Cancel buttons */}
               {mode === "view" ? (
                 <Button onClick={() => handleModeChange("edit")}>
-                  <PencilIcon className="mr-2 h-4 w-4" />
+                  <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
               ) : (

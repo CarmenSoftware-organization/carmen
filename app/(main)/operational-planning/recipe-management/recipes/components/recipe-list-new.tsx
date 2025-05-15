@@ -47,8 +47,8 @@ import {
   CheckCircle2,
   XCircle,
   LayoutGrid,
-  LayoutList,
-  Eye,
+  LayoutList,  
+  FileText,
 } from "lucide-react"
 import { Recipe, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
 import { RecipeCardCompact } from "./recipe-card-compact"
@@ -519,7 +519,7 @@ export default function RecipeList() {
                     <div className="flex gap-2">
                       <Link href={`/operational-planning/recipe-management/recipes/${recipe.id}`}>
                         <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-2" />
+                          <FileText className="h-4 w-4 mr-2" />
                           View
                         </Button>
                       </Link>

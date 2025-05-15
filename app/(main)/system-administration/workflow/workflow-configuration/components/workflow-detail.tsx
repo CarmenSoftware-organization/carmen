@@ -7,7 +7,7 @@ import { WorkflowStages } from "./workflow-stages"
 import { WorkflowRouting } from "./workflow-routing"
 import { sampleWorkflows } from "../data/mockData"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, ArrowLeft } from 'lucide-react'
+import { AlertCircle,ChevronLeft } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Workflow } from "../types/workflow"
@@ -48,7 +48,7 @@ export function WorkflowDetail({ workflowId }: WorkflowDetailProps) {
     <div className="container mx-auto py-6">
       <Button variant="ghost" asChild className="mb-4">
         <Link href="/system-administration/workflow/workflow-configuration">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Workflows
+          <ChevronLeft className="mr-2 h-4 w-4" /> Back to Workflows
         </Link>
       </Button>
       <WorkflowHeader workflow={workflow} isEditing={isEditing} onEditToggle={handleEditToggle} onSave={handleSave} />

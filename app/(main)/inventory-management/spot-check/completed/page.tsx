@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   Building2,
   User,
-  Eye,
+  FileText,
   Download,
   Calendar,
   Search
@@ -139,7 +139,7 @@ export default function CompletedCountsPage() {
                       onClick={() => router.push(`/inventory-management/spot-check/completed/${count.id}`)}
                       className="flex items-center gap-2"
                     >
-                      <Eye className="h-4 w-4" />
+                      <FileText className="h-4 w-4" />
                       View Details
                     </Button>
                     <Button 

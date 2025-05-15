@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { GoodsReceiveNoteMode, Comment } from '@/lib/types'
-import { Edit, Trash } from 'lucide-react'
+import { Edit, Trash2 } from 'lucide-react'
 
 interface CommentTabProps {
   mode: GoodsReceiveNoteMode
@@ -82,7 +82,7 @@ export function CommentTab({ mode, comments, onAddComment, onEditComment, onDele
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" onClick={() => onDeleteComment(comment.id)}>
-                        <Trash className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </>
                   )}

@@ -84,7 +84,7 @@ A comprehensive mobile solution for hotel supply chain management, designed to s
   - Price history comparison
   - Discounts and tax application
   - Multiple unit support and conversion
-  - FileText icon (instead of eye icon) for row action view in Item Tab
+  - FileText icon for row action view in Item Tab
 - **Inventory Information Access**:
   - On Hand dialog showing current inventory across locations
   - On Order dialog displaying pending purchase orders

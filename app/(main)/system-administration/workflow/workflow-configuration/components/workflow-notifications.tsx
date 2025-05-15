@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Pencil, Plus } from 'lucide-react'
+import { Edit, Plus } from 'lucide-react'
 import { WorkflowNotification, NotificationChannel, NotificationEventTrigger } from "../types/workflow"
 
 interface WorkflowNotificationsProps {
@@ -114,7 +114,7 @@ export function WorkflowNotifications({ notifications: initialNotifications = []
                     handleNotificationSelect(notification.id)
                   }}
                 >
-                  <Pencil className="h-4 w-4" />
+                  <Edit className="h-4 w-4" />
                 </Button>
               </li>
             ))}

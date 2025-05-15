@@ -447,7 +447,7 @@ The system performs calculations based on whether the price entered is tax-inclu
 - Extra cost section with appropriate controls
 - Financial summary section at the bottom
 - Tabbed interface for related information
-- Use FileText icon instead of eye icon for row action view in Item Tab
+- Use FileText icon for row action view in Item Tab
 
 ### 4.3 Create/Edit Screen
 - Form layout with logical grouping of fields

@@ -14,7 +14,7 @@ import { GoodsReceiveNoteItemsBulkActions } from './tabs/GoodsReceiveNoteItemsBu
 import { Card, CardContent } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
 import { StockMovementTab } from './tabs/StockMovementTab'
-import { ArrowLeft, Edit, Trash, Printer, Send, Save, PanelRightClose, PanelRightOpen, CheckCheck, PencilRuler } from 'lucide-react'
+import { ChevronLeft, Edit, Trash2, Printer, Send, Save, PanelRightClose, PanelRightOpen, CheckCheck, PencilRuler } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FinancialSummaryTab } from './tabs/FinancialSummaryTab'
 import { ActivityLogTab } from './tabs/ActivityLogTab'
@@ -243,7 +243,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" onClick={handleBack}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ChevronLeft className="mr-2 h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">
             {currentMode === 'confirm' ? `Confirm New GRN (${formData.ref})` : 
@@ -281,7 +281,9 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" onClick={handleCancelEdit}><ArrowLeft className="h-4 w-4 mr-2" /> Cancel</Button>
+                    <Button variant="outline" onClick={handleCancelEdit}>
+                      <ChevronLeft className="h-4 w-4 mr-2" /> Cancel
+                    </Button>
                   </TooltipTrigger>
                   <TooltipContent>Discard changes</TooltipContent>
                 </Tooltip>
@@ -296,7 +298,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             {currentMode !== 'confirm' && currentMode !== 'edit' && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline"><Trash className="h-4 w-4 mr-2" /> Delete</Button>
+                  <Button variant="outline"><Trash2 className="h-4 w-4 mr-2" /> Delete</Button>
                 </TooltipTrigger>
                 <TooltipContent>Delete this GRN</TooltipContent>
               </Tooltip>

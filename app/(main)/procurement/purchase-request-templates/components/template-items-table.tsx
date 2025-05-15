@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, FileText, PencilLine, Trash2, MoreVertical } from "lucide-react"
+import { PlusCircle, FileText, Edit, Trash2, MoreVertical } from "lucide-react"
 import { TemplateItem } from "../types/template-items"
 import {
   DropdownMenu,
@@ -94,7 +94,7 @@ export function TemplateItemsTable({
                         className="h-8 w-8 rounded-full"
                       >
                         <span className="sr-only">Edit</span>
-                        <PencilLine className="h-4 w-4" />
+                        <Edit className="h-4 w-4" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

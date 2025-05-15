@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Edit2, Printer, XCircle } from 'lucide-react'
+import { ChevronLeft, Edit2, Printer, XCircle } from 'lucide-react'
 
 interface HeaderActionsProps {
   status: string
@@ -19,7 +19,7 @@ export function HeaderActions({ status, isEditMode, setIsEditMode, onBack }: Hea
           size="icon"
           onClick={onBack}
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </Button>
         <h2 className="text-2xl font-semibold">Store Requisition Details</h2>
       </div>
