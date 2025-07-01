@@ -17,9 +17,9 @@
 ### Main Grid/Table View
 | Code | Location Name | Delivery Point | EOP | Location Type | Active |
 |------|--------------|----------------|-----|--------------|--------|
-| AGS  | A&G - Security | Default | Default Zero | Direct | ✓ |
+| AGS  | A&G - Security | Default | Consumption-Based | Direct | ✓ |
 | INV1 | Main Warehouse | Dock 1 | Enter Counted Stock | Inventory with option to Count | ✓ |
-| CON3 | Supplier Items | Zone B | Default System | Consignment | ✓ |
+| CON3 | Supplier Items | Zone B | Issuing Balance | Consignment | ✓ |
 | *additional rows...* |
 
 ### Status Bar (Bottom)
@@ -37,9 +37,9 @@
 - **Location Name**: Text field (e.g., "A&G - Security")
 - **Location Type**: Dropdown (Direct, Inventory with option to Count, Consignment)
 - **EOP**: Dropdown showing appropriate option based on location type:
-  - Default Zero (for Direct)
+  - Consumption-Based (for Direct)
   - Enter Counted Stock (for Inventory with option to Count)
-  - Default System (for Consignment)
+  - Issuing Balance (for Consignment)
 - **Active**: Checkbox
 - **Delivery Point**: Text field/dropdown (e.g., "Default")
 - **Department Name**: Text field/dropdown (e.g., "Engineering")

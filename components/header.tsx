@@ -141,7 +141,7 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
                 >
                   <Avatar className="h-8 w-8 text-foreground dark:text-gray-100">
                     <AvatarImage
-                      src="/placeholder.svg?height=32&width=32"
+                      src="/avatars/placeholder.svg?height=32&width=32"
                       alt="@johndoe"
                     />
                     <AvatarFallback>JD</AvatarFallback>

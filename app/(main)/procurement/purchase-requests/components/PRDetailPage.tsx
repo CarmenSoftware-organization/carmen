@@ -134,15 +134,8 @@ export default function PRDetailPage() {
     }));
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      requestor: name.startsWith("requestor.")
-        ? { ...prev.requestor, [name.split(".")[1]]: value }
-        : prev.requestor,
-    }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   };
 
   return (
@@ -234,14 +227,12 @@ export default function PRDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="refNumber" className="text-xs text-muted-foreground flex items-center gap-1">
-                    <HashIcon className="h-3 w-3" /> Reference Number
+                    PR #
                   </Label>
                   <Input
                     id="refNumber"
                     value={formData.refNumber}
-                    onChange={(e) =>
-                      setFormData({ ...formData, refNumber: e.target.value })
-                    }
+                    onChange={handleInputChange}
                     disabled={mode === "view"}
                     className={mode === "view" ? "bg-muted" : ""}
                   />
@@ -254,12 +245,7 @@ export default function PRDetailPage() {
                     id="date"
                     type="date"
                     value={formData.date.toISOString().split("T")[0]}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        date: new Date(e.target.value),
-                      })
-                    }
+                    onChange={handleInputChange}
                     disabled={mode === "view"}
                     className={mode === "view" ? "bg-muted" : ""}
                   />
@@ -303,11 +289,9 @@ export default function PRDetailPage() {
               </div>
               
               {/* Secondary Details */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="department" className="text-xs text-muted-foreground flex items-center gap-1">
-                    <BuildingIcon className="h-3 w-3" /> Department
-                  </Label>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="space-y-2 col-span-1">
+                  <Label htmlFor="department" className="text-xs text-muted-foreground">Department</Label>
                   <Input
                     id="department"
                     name="department"
@@ -317,46 +301,17 @@ export default function PRDetailPage() {
                     className={mode === "view" ? "bg-muted" : ""}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location" className="text-xs text-muted-foreground flex items-center gap-1">
-                    <MapPinIcon className="h-3 w-3" /> Location
-                  </Label>
-                  <Input
-                    id="location"
-                    name="location"
-                    value={formData.location}
+                <div className="space-y-2 col-span-3">
+                  <Label htmlFor="description" className="text-xs text-muted-foreground">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
                     onChange={handleInputChange}
                     disabled={mode === "view"}
-                    className={mode === "view" ? "bg-muted" : ""}
+                    className={`min-h-[100px] ${mode === "view" ? "bg-muted" : ""}`}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="jobCode" className="text-xs text-muted-foreground flex items-center gap-1">
-                    <ClipboardListIcon className="h-3 w-3" /> Job Code
-                  </Label>
-                  <Input
-                    id="jobCode"
-                    name="jobCode"
-                    value={formData.jobCode}
-                    onChange={handleInputChange}
-                    disabled={mode === "view"}
-                    className={mode === "view" ? "bg-muted" : ""}
-                  />
-                </div>
-              </div>
-              
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-xs text-muted-foreground">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  disabled={mode === "view"}
-                  className={`min-h-[100px] ${mode === "view" ? "bg-muted" : ""}`}
-                />
               </div>
             </div>
             
@@ -367,7 +322,7 @@ export default function PRDetailPage() {
                   <CardTitle className="text-base font-medium">Status Information</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Current Stage:</span>
                       <Badge variant="outline" className="font-normal">

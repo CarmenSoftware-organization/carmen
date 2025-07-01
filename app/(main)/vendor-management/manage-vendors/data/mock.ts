@@ -88,7 +88,10 @@ export const MOCK_VENDORS: Record<string, Vendor> = {
           expiry: '2024-12-31'
         }
       ]
-    }
+    },
+    taxProfile: 'standard',
+    taxRate: 10,
+    taxType: 'add',
   }
 }
 

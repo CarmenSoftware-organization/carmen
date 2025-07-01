@@ -46,6 +46,8 @@ import {
 import { PurchaseRequestItem } from "@/lib/types";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import { Card, CardContent } from "@/components/ui/card";
+import EnhancedOrderCard from "../../../../../docs/item component/order-management-card/components/enhanced-order-card"
+import type { User } from "@/lib/types/user"
 
 const itemDetails: PurchaseRequestItem[] = [
   {
@@ -215,15 +217,21 @@ const itemDetails: PurchaseRequestItem[] = [
   },
 ];
 
-export function ItemsTab() {
+interface ItemsTabProps {
+  items: PurchaseRequestItem[];
+  currentUser: User;
+  onOrderUpdate: (orderId: string, updates: Partial<PurchaseRequestItem>) => void;
+}
+
+export function ItemsTab({ items, currentUser, onOrderUpdate, ...props }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [items, setItems] = useState<PurchaseRequestItem[]>(itemDetails);
   const [selectedItem, setSelectedItem] = useState<PurchaseRequestItem | null>(
     null
   );
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"view" | "edit" | "add">("view");
   const [searchTerm, setSearchTerm] = useState("");
+  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
   function handleSelectItem(itemId: string) {
     setSelectedItems((prev) =>
@@ -257,15 +265,6 @@ export function ItemsTab() {
   function handleSave(formData: PurchaseRequestItem) {
     console.log("Saving item:", formData);
     closeItemForm();
-    setItems(prevItems => {
-      if (formData.id) {
-        // Update existing item
-        return prevItems.map(item => item.id === formData.id ? formData : item);
-      } else {
-        // Add new item
-        return [...prevItems, { ...formData, id: Date.now().toString() }];
-      }
-    });
   }
 
   function handleModeChange(newMode: "view" | "edit" | "add") {
@@ -274,11 +273,6 @@ export function ItemsTab() {
 
   function handleBulkAction(action: "Accepted" | "Rejected" | "Review") {
     console.log(`Bulk ${action} for items:`, selectedItems);
-    const updatedItems = items.map((item) =>
-      selectedItems.includes(item.id ?? "") ? { ...item, status: action } : item
-    );
-    setItems(updatedItems);
-    setSelectedItems([]);
   }
 
   function handleSplitItems() {
@@ -360,182 +354,19 @@ export function ItemsTab() {
             {/* Table */}
             <div className="rounded-lg border overflow-hidden">
               <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/30">
-                      <TableHead className="w-[40px] h-fit align-center">
-                        <Checkbox
-                          checked={selectedItems.length === items.length}
-                          onCheckedChange={handleSelectAllItems}
-                        />
-                      </TableHead>
-                      <TableHead className="align-center font-semibold">Location</TableHead>
-                      <TableHead className="align-center font-semibold">Product</TableHead>
-                      <TableHead className="text-xs font-semibold text-center">
-                        Order Unit / Inv. Unit
-                      </TableHead>
-                      <TableHead className="text-xs font-semibold text-center">
-                        Request / On Order
-                      </TableHead>
-                      <TableHead className="text-xs font-semibold text-center">
-                        Approve / On Hand
-                      </TableHead>
-                      <TableHead className="text-xs font-semibold text-center">
-                        Currency / Base
-                      </TableHead>
-                      <TableHead className="text-xs font-semibold text-center">
-                        Price / Last Price
-                      </TableHead>
-                      <TableHead className="font-semibold text-center">Total</TableHead>
-                      <TableHead className="font-semibold text-center">Status</TableHead>
-                      <TableHead className="text-right align-center">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-
-                  <TableBody>
-                    {filteredItems.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={11} className="h-24 text-center">
-                          <div className="flex flex-col items-center justify-center text-muted-foreground">
-                            <Search className="h-8 w-8 mb-2 opacity-50" />
-                            <p>No items match your search</p>
-                            {searchTerm && (
-                              <Button 
-                                variant="link" 
-                                onClick={() => setSearchTerm("")}
-                                className="mt-2"
-                              >
-                                Clear search
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredItems.map((item) => (
-                        <TableRow 
-                          key={item.id}
-                          className="hover:bg-muted/20 group transition-colors"
-                        >
-                          <TableCell>
-                            <Checkbox
-                              checked={selectedItems.includes(item.id ?? "")}
-                              onCheckedChange={() => handleSelectItem(item.id ?? "")}
-                            />
-                          </TableCell>
-                          <TableCell className="font-medium">{item.location}</TableCell>
-                          <TableCell>
-                            <div className="font-medium">{item.name}</div>
-                            <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                              {item.description}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center align-top">
-                            <div className="font-medium">{item.unit}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.inventoryInfo?.inventoryUnit || item.unit}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center align-top">
-                            <div className="font-medium">{item.quantityRequested.toLocaleString()}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.inventoryInfo.onOrdered.toLocaleString()}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center align-top">
-                            <div className="font-medium">{item.quantityApproved.toLocaleString()}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.inventoryInfo.onHand.toLocaleString()}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center align-top">
-                            <div className="font-medium">{item.currency}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.currency || "THB"}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center align-top">
-                            <div className="font-medium">{item.price.toFixed(2)}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.inventoryInfo.lastPrice.toFixed(2)}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center align-top">
-                            <div className="font-medium">
-                              {item.totalAmount.toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.baseTotalAmount.toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex justify-center">
-                              <StatusBadge status={item.status ?? ""} />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex justify-end space-x-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                              {formMode === 'edit' && selectedItem?.id === item.id ? (
-                                <>
-                                  <Button
-                                    variant="default"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full"
-                                    onClick={() => {
-                                      if (selectedItem) handleSave(selectedItem)
-                                    }}
-                                  >
-                                    <CheckCircle className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full"
-                                    onClick={closeItemForm}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full"
-                                    onClick={() => openItemForm(item, "view")}
-                                  >
-                                    <FileText className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full"
-                                    onClick={() => openItemForm(item, "edit")}
-                                  >
-                                    <Edit2Icon className="h-4 w-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full text-destructive hover:text-destructive"
-                                  >
-                                    <Trash2Icon className="h-4 w-4" />
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                <div className="flex flex-col gap-4">
+                  {filteredItems.map((item) => (
+                    <EnhancedOrderCard
+                      key={item.id}
+                      order={item}
+                      currentUser={currentUser}
+                      onOrderUpdate={onOrderUpdate}
+                      isExpanded={expandedItemId === item.id}
+                      onToggleExpand={() => setExpandedItemId(expandedItemId === item.id ? null : item.id || null)}
+                      isEditMode={formMode === 'edit' && selectedItem?.id === item.id}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>

@@ -53,6 +53,7 @@ import { FilterType } from '@/lib/utils/filter-storage'
 import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, CurrencyCode } from '@/lib/types'
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FieldConfig {
   label: string;
@@ -250,6 +251,24 @@ const columns = (router: ReturnType<typeof useRouter>): ColumnDef[] => [
     header: "Type",
   },
   {
+    accessorKey: "currentWorkflowStage",
+    header: "Stage",
+    cell: ({ row }) => {
+      const stage = String(row.getValue("currentWorkflowStage"));
+      let color = "bg-gray-200 text-gray-800";
+      if (stage === "requester") color = "bg-blue-100 text-blue-800";
+      else if (stage === "departmentHeadApproval") color = "bg-yellow-100 text-yellow-800";
+      else if (stage === "completed") color = "bg-green-100 text-green-800";
+      else if (stage === "financeApproval") color = "bg-purple-100 text-purple-800";
+      else if (stage === "rejected") color = "bg-red-100 text-red-800";
+      return (
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${color}`}>
+          {stage.replace(/([A-Z])/g, ' $1').trim()}
+        </span>
+      );
+    },
+  },
+  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
@@ -356,9 +375,27 @@ export function PurchaseRequestList() {
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<'table' | 'card'>('table');
-  
+  const [toggleMode, setToggleMode] = useState<'myPending' | 'allDocument'>('myPending');
+  const [selectedRequestor, setSelectedRequestor] = React.useState<string>('');
+  const [selectedWorkflowStage, setSelectedWorkflowStage] = useState('all');
+  const currentUserId = 'user-001'; // mock current user
+
   React.useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Get unique requestors for dropdown
+  const requestorOptions = useMemo(() => {
+    const unique = new Set<string>();
+    sampleData.forEach(pr => {
+      if (pr.requestorId && pr.requestorId.trim() !== '') {
+        unique.add(pr.requestorId);
+      }
+    });
+    return Array.from(unique).map(id => {
+      const pr = sampleData.find(pr => pr.requestorId === id);
+      return { value: id, label: pr ? pr.requestor.name : id };
+    });
   }, []);
 
   const handleApplyAdvancedFilters = (filters: FilterType<PurchaseRequest>[]) => {
@@ -466,21 +503,27 @@ export function PurchaseRequestList() {
   };
 
   const sortedAndFilteredData = useMemo(() => {
-    let result = filteredData;
-
+    let result = sampleData;
+    if (toggleMode === 'myPending') {
+      result = result.filter(pr =>
+        pr.requestorId === currentUserId &&
+        (pr.status === DocumentStatus.Draft || pr.status === DocumentStatus.InProgress)
+      );
+    }
+    if (selectedWorkflowStage && selectedWorkflowStage !== 'all') {
+      result = result.filter(pr => pr.currentWorkflowStage === selectedWorkflowStage);
+    }
     if (sortConfig.field) {
       result = [...result].sort((a, b) => {
         const aValue = a[sortConfig.field];
         const bValue = b[sortConfig.field];
-
         if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       });
     }
-
     return result;
-  }, [filteredData, sortConfig]);
+  }, [toggleMode, sampleData, currentUserId, selectedWorkflowStage, sortConfig]);
 
   const totalPages = Math.ceil(sortedAndFilteredData.length / itemsPerPage);
 
@@ -499,44 +542,83 @@ export function PurchaseRequestList() {
       </div>
     ) : null;
 
+  // Define workflow stages for the dropdown
+  const workflowStages = [
+    { value: 'all', label: 'All Stages' },
+    { value: 'requester', label: 'Requester' },
+    { value: 'departmentHeadApproval', label: 'Department Head Approval' },
+    { value: 'financeApproval', label: 'Finance Approval' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'rejected', label: 'Rejected' }
+  ]
+
+  const documentStatuses = [
+    { value: 'all', label: 'All Status' },
+    { value: 'inProgress', label: 'In Progress' },
+    { value: 'complete', label: 'Complete' },
+    { value: 'reject', label: 'Reject' }
+  ]
+
   const filters = (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center justify-between">
+    <div>
+      <div className="flex flex-1 items-center justify-between gap-2">
         <Input
+          type="search"
           placeholder="Search purchase requests..."
           value={searchTerm}
           onChange={handleSearch}
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="h-8 w-[220px] text-xs"
         />
+        <div className="inline-flex rounded-md shadow-sm border">
+          <Button
+            variant={toggleMode === 'myPending' ? 'default' : 'ghost'}
+            size="sm"
+            className="rounded-none h-8 px-4"
+            onClick={() => {
+              setToggleMode('myPending');
+              setSelectedWorkflowStage('all');
+            }}
+          >
+            My Pending
+          </Button>
+          <Button
+            variant={toggleMode === 'allDocument' ? 'default' : 'ghost'}
+            size="sm"
+            className="rounded-none h-8 px-4"
+            onClick={() => {
+              setToggleMode('allDocument');
+              setSelectedWorkflowStage('all');
+            }}
+          >
+            All Documents
+          </Button>
+        </div>
+        <div className="flex w-full justify-center my-2">
+          <Select
+            value={selectedWorkflowStage}
+            onValueChange={value => setSelectedWorkflowStage(value)}
+          >
+            <SelectTrigger className="rounded h-8 px-3 w-[180px] text-xs">
+              <SelectValue placeholder={toggleMode === 'myPending' ? 'All Stages' : 'All Status'} />
+            </SelectTrigger>
+            <SelectContent>
+              {toggleMode === 'myPending'
+                ? workflowStages.map(stage => (
+                    <SelectItem key={stage.value} value={stage.value}>{stage.label}</SelectItem>
+                  ))
+                : documentStatuses.map(status => (
+                    <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
+                  ))
+              }
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex items-center space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 w-[70px]">
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[200px]">
-              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {Object.values(DocumentStatus).map((status) => (
-                <DropdownMenuCheckboxItem
-                  key={status}
-                  checked={filterStatus === status}
-                  onCheckedChange={() => setFilterStatus(status)}
-                >
-                  {status}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
           <AdvancedFilter<PurchaseRequest>
             filterFields={filterFields}
             onApplyFilters={handleApplyAdvancedFilters}
             onClearFilters={handleClearAdvancedFilters}
           />
-          
           <div className="flex border rounded-md overflow-hidden">
             <Button
               variant={viewMode === 'table' ? 'default' : 'ghost'}
@@ -558,6 +640,21 @@ export function PurchaseRequestList() {
             </Button>
           </div>
         </div>
+      </div>
+      <div className="w-full bg-muted px-2 py-0.5 rounded text-[10px] font-normal flex items-center mt-2">
+        <span>
+          Filter: {toggleMode === 'myPending' ? 'My Pending' : 'All Documents'}
+          {' '}(
+          {toggleMode === 'myPending'
+            ? (selectedWorkflowStage === 'draft' ? 'Draft' : selectedWorkflowStage === 'inProgress' ? 'In Progress' : selectedWorkflowStage)
+            : (selectedWorkflowStage === 'all' ? 'All Status' : selectedWorkflowStage === 'inProgress' ? 'In Progress' : selectedWorkflowStage === 'complete' ? 'Complete' : selectedWorkflowStage === 'reject' ? 'Reject' : selectedWorkflowStage)
+          }
+          )
+        </span>
+        <Button size="icon" variant="ghost" onClick={() => {
+          setToggleMode('myPending');
+          setSelectedWorkflowStage('all');
+        }}>×</Button>
       </div>
     </div>
   );
@@ -793,6 +890,7 @@ export function PurchaseRequestList() {
                 <TableHead className="w-[120px] font-medium">PR Number</TableHead>
                 <TableHead className="font-medium">Date</TableHead>
                 <TableHead className="font-medium">Type</TableHead>
+                <TableHead className="font-medium">Stage</TableHead>
                 <TableHead className="font-medium">Status</TableHead>
                 <TableHead className="font-medium">Requestor</TableHead>
                 <TableHead className="font-medium">Department</TableHead>
@@ -822,6 +920,11 @@ export function PurchaseRequestList() {
                   <TableCell>
                     <span className="inline-flex items-center text-sm">
                       {pr.type}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center text-sm">
+                      {pr.currentWorkflowStage}
                     </span>
                   </TableCell>
                   <TableCell>

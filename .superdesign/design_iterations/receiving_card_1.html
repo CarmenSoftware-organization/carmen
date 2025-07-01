@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receiving Item Card - Quick Entry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    spacing: {
+                        '1': '4px',
+                        '2': '8px',
+                        '3': '12px',
+                        '4': '16px',
+                        '6': '24px',
+                        '8': '32px',
+                        '12': '48px',
+                        '16': '64px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .field-complete {
+            @apply bg-green-50 border-green-200;
+        }
+        .field-pending {
+            @apply bg-orange-50 border-orange-200;
+        }
+        .field-error {
+            @apply bg-red-50 border-red-200;
+        }
+        .quick-edit {
+            @apply cursor-pointer hover:bg-gray-50 transition-colors duration-150;
+        }
+        .quick-edit:focus-within {
+            @apply bg-blue-50 ring-2 ring-blue-200;
+        }
+        .floating-label {
+            @apply absolute text-xs text-gray-500 transition-all duration-200;
+            top: -6px;
+            left: 12px;
+            background: white;
+            padding: 0 4px;
+        }
+        .input-field {
+            @apply w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-150;
+        }
+        .btn-primary {
+            @apply bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors duration-150;
+        }
+        .btn-secondary {
+            @apply bg-gray-100 text-gray-700 px-3 py-1.5 rounded text-sm font-medium hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 transition-colors duration-150;
+        }
+        .btn-success {
+            @apply bg-green-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-colors duration-150;
+        }
+        .status-indicator {
+            @apply w-2 h-2 rounded-full;
+        }
+        .kbd {
+            @apply inline-block bg-gray-100 border border-gray-300 rounded px-1 py-0.5 text-xs font-mono text-gray-600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-4 font-sans">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header with shortcuts info -->
+        <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <h1 class="text-lg font-semibold text-gray-900 mb-1">Receiving Item Entry</h1>
+            <div class="text-xs text-gray-600 space-x-4">
+                <span><span class="kbd">Tab</span> Next field</span>
+                <span><span class="kbd">Enter</span> Save</span>
+                <span><span class="kbd">Ctrl+S</span> Quick save</span>
+                <span><span class="kbd">Esc</span> Cancel edit</span>
+            </div>
+        </div>
+
+        <!-- Main Receiving Card -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6" id="receivingCard">
+            <!-- Status Bar -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-2">
+                    <div class="status-indicator bg-orange-400" id="statusIndicator"></div>
+                    <span class="text-sm font-medium text-gray-700" id="statusText">In Progress</span>
+                    <span class="text-xs text-gray-500" id="progressText">(3/8 fields complete)</span>
+                </div>
+                <div class="text-xs text-gray-500">
+                    Auto-save: <span class="text-green-600">On</span>
+                </div>
+            </div>
+
+            <!-- Quick Entry Form -->
+            <form id="receivingForm" class="space-y-4">
+                <!-- Row 1: Item Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Item Code/Name -->
+                    <div class="relative">
+                        <label class="floating-label">Item Code/Name</label>
+                        <input 
+                            type="text" 
+                            id="itemCode"
+                            class="input-field field-pending" 
+                            placeholder="Scan barcode or type..."
+                            autocomplete="off"
+                            tabindex="1"
+                        >
+                        <div class="absolute right-2 top-2">
+                            <button type="button" class="text-gray-400 hover:text-gray-600" title="Scan barcode">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 16h4m-4 0h2m-6 0h-2m2 0v4"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Received -->
+                    <div class="relative">
+                        <label class="floating-label">Quantity Received</label>
+                        <input 
+                            type="number" 
+                            id="quantity"
+                            class="input-field field-pending" 
+                            placeholder="0"
+                            min="0"
+                            step="1"
+                            tabindex="2"
+                        >
+                        <div class="absolute right-2 top-2 flex items-center space-x-1">
+                            <button type="button" class="text-gray-400 hover:text-gray-600 text-xs px-1" onclick="adjustQuantity(-1)">-</button>
+                            <button type="button" class="text-gray-400 hover:text-gray-600 text-xs px-1" onclick="adjustQuantity(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Price and Condition -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Unit Price -->
+                    <div class="relative">
+                        <label class="floating-label">Unit Price</label>
+                        <input 
+                            type="number" 
+                            id="unitPrice"
+                            class="input-field field-pending" 
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            tabindex="3"
+                        >
+                        <div class="absolute left-3 top-2 text-gray-400 text-sm">$</div>
+                    </div>
+
+                    <!-- Condition -->
+                    <div class="relative">
+                        <label class="floating-label">Condition</label>
+                        <select 
+                            id="condition"
+                            class="input-field field-pending" 
+                            tabindex="4"
+                        >
+                            <option value="">Select condition...</option>
+                            <option value="new">New</option>
+                            <option value="good">Good</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 3: Batch and Expiry -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Batch/Lot Number -->
+                    <div class="relative">
+                        <label class="floating-label">Batch/Lot Number</label>
+                        <input 
+                            type="text" 
+                            id="batchNumber"
+                            class="input-field field-pending" 
+                            placeholder="Optional"
+                            tabindex="5"
+                        >
+                    </div>
+
+                    <!-- Expiry Date -->
+                    <div class="relative">
+                        <label class="floating-label">Expiry Date</label>
+                        <input 
+                            type="date" 
+                            id="expiryDate"
+                            class="input-field field-pending" 
+                            tabindex="6"
+                        >
+                        <div class="absolute right-8 top-2">
+                            <button type="button" class="text-gray-400 hover:text-gray-600 text-xs" onclick="setQuickDate(30)" title="30 days from now">30d</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes (Expandable) -->
+                <div class="relative">
+                    <label class="floating-label">Notes</label>
+                    <textarea 
+                        id="notes"
+                        class="input-field field-pending resize-none" 
+                        rows="2"
+                        placeholder="Additional notes..."
+                        tabindex="7"
+                    ></textarea>
+                    <div class="absolute right-2 bottom-2">
+                        <button type="button" class="text-gray-400 hover:text-gray-600 text-xs" onclick="toggleNotesSize()">⇕</button>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="flex flex-wrap items-center justify-between pt-4 border-t border-gray-200">
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="btn-secondary" onclick="fillDefaults()">
+                            Fill Defaults
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="duplicateItem()">
+                            Duplicate Item
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="clearForm()">
+                            Clear All
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-2 mt-2 md:mt-0">
+                        <button type="button" class="btn-secondary" onclick="saveDraft()">
+                            Save Draft
+                        </button>
+                        <button type="submit" class="btn-success" tabindex="8">
+                            Complete Entry →
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Quick Stats -->
+            <div class="mt-6 pt-4 border-t border-gray-100">
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-lg font-semibold text-gray-900" id="totalValue">$0.00</div>
+                        <div class="text-xs text-gray-500">Total Value</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-semibold text-gray-900" id="itemCount">0</div>
+                        <div class="text-xs text-gray-500">Items</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-semibold text-gray-900" id="completionTime">--:--</div>
+                        <div class="text-xs text-gray-500">Entry Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Touch-friendly mobile controls -->
+        <div class="md:hidden mt-4 bg-white border border-gray-200 rounded-lg p-4">
+            <div class="text-sm font-medium text-gray-700 mb-2">Quick Actions</div>
+            <div class="grid grid-cols-2 gap-2">
+                <button class="btn-secondary text-center py-3" onclick="focusNextEmpty()">
+                    Next Empty Field
+                </button>
+                <button class="btn-secondary text-center py-3" onclick="validateAndHighlight()">
+                    Validate Entry
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let startTime = Date.now();
+        let autoSaveTimer;
+        
+        // Field tracking
+        const requiredFields = ['itemCode', 'quantity', 'unitPrice', 'condition'];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            startTimer();
+            setupAutoSave();
+            setupKeyboardShortcuts();
+            
+            // Focus first field
+            document.getElementById('itemCode').focus();
+        });
+
+        // Progress tracking
+        function updateProgress() {
+            let completed = 0;
+            let total = 8;
+            
+            const fields = document.querySelectorAll('.input-field');
+            fields.forEach(field => {
+                if (field.value.trim() !== '') {
+                    completed++;
+                    field.classList.remove('field-pending', 'field-error');
+                    field.classList.add('field-complete');
+                } else if (requiredFields.includes(field.id)) {
+                    field.classList.remove('field-complete', 'field-error');
+                    field.classList.add('field-pending');
+                }
+            });
+            
+            document.getElementById('progressText').textContent = `(${completed}/${total} fields complete)`;
+            
+            // Update status
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            if (completed === total) {
+                statusIndicator.className = 'status-indicator bg-green-500';
+                statusText.textContent = 'Complete';
+            } else if (completed >= 4) {
+                statusIndicator.className = 'status-indicator bg-blue-500';
+                statusText.textContent = 'Nearly Complete';
+            } else {
+                statusIndicator.className = 'status-indicator bg-orange-400';
+                statusText.textContent = 'In Progress';
+            }
+            
+            updateTotalValue();
+        }
+
+        // Auto-save functionality
+        function setupAutoSave() {
+            const form = document.getElementById('receivingForm');
+            form.addEventListener('input', function() {
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(saveDraft, 2000);
+                updateProgress();
+            });
+        }
+
+        // Keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveDraft();
+                }
+                if (e.key === 'Escape') {
+                    document.activeElement.blur();
+                }
+                if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    const form = document.getElementById('receivingForm');
+                    if (validateForm()) {
+                        completeEntry();
+                    } else {
+                        focusNextEmpty();
+                    }
+                }
+            });
+        }
+
+        // Utility functions
+        function adjustQuantity(delta) {
+            const field = document.getElementById('quantity');
+            const current = parseInt(field.value) || 0;
+            field.value = Math.max(0, current + delta);
+            updateProgress();
+        }
+
+        function setQuickDate(days) {
+            const date = new Date();
+            date.setDate(date.getDate() + days);
+            document.getElementById('expiryDate').value = date.toISOString().split('T')[0];
+            updateProgress();
+        }
+
+        function toggleNotesSize() {
+            const textarea = document.getElementById('notes');
+            textarea.rows = textarea.rows === 2 ? 4 : 2;
+        }
+
+        function fillDefaults() {
+            document.getElementById('condition').value = 'new';
+            setQuickDate(30);
+            updateProgress();
+        }
+
+        function duplicateItem() {
+            const formData = new FormData(document.getElementById('receivingForm'));
+            // Reset quantity and batch number for new item
+            document.getElementById('quantity').value = '';
+            document.getElementById('batchNumber').value = '';
+            document.getElementById('quantity').focus();
+            updateProgress();
+        }
+
+        function clearForm() {
+            if (confirm('Clear all fields?')) {
+                document.getElementById('receivingForm').reset();
+                document.getElementById('itemCode').focus();
+                updateProgress();
+            }
+        }
+
+        function saveDraft() {
+            // Simulate save
+            console.log('Draft saved');
+            showToast('Draft saved automatically');
+        }
+
+        function focusNextEmpty() {
+            const fields = document.querySelectorAll('.input-field');
+            for (let field of fields) {
+                if (field.value.trim() === '') {
+                    field.focus();
+                    break;
+                }
+            }
+        }
+
+        function validateAndHighlight() {
+            let hasErrors = false;
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.classList.add('field-error');
+                    hasErrors = true;
+                } else {
+                    field.classList.remove('field-error');
+                }
+            });
+            
+            if (hasErrors) {
+                showToast('Please fill all required fields');
+                focusNextEmpty();
+            } else {
+                showToast('All required fields completed!');
+            }
+        }
+
+        function validateForm() {
+            return requiredFields.every(fieldId => 
+                document.getElementById(fieldId).value.trim() !== ''
+            );
+        }
+
+        function completeEntry() {
+            if (validateForm()) {
+                showToast('Item received successfully!');
+                // Reset form for next item
+                setTimeout(() => {
+                    clearForm();
+                    startTime = Date.now();
+                }, 1000);
+            } else {
+                validateAndHighlight();
+            }
+        }
+
+        function updateTotalValue() {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const total = quantity * price;
+            document.getElementById('totalValue').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('itemCount').textContent = quantity.toString();
+        }
+
+        function startTimer() {
+            setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                document.getElementById('completionTime').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm z-50';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Form submission
+        document.getElementById('receivingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            completeEntry();
+        });
+    </script>
+</body>
+</html>

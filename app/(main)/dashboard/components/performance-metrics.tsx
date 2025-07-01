@@ -43,15 +43,15 @@ const data = [
 
 export function PerformanceMetrics() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-2 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <Card>
         <CardHeader>
-          <CardTitle>Order Fulfillment Rate</CardTitle>
+          <CardTitle className="text-sm sm:text-base">Order Fulfillment Rate</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">98.5%</div>
+          <div className="text-xl sm:text-2xl font-bold">98.5%</div>
           <p className="text-xs text-muted-foreground">+2.1% from last week</p>
-          <div className="h-[80px]">
+          <div className="h-[60px] sm:h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
                 <Line
@@ -67,12 +67,12 @@ export function PerformanceMetrics() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Supplier On-Time Delivery</CardTitle>
+          <CardTitle className="text-sm sm:text-base">Supplier On-Time Delivery</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">92.3%</div>
+          <div className="text-xl sm:text-2xl font-bold">92.3%</div>
           <p className="text-xs text-muted-foreground">-0.4% from last week</p>
-          <div className="h-[80px]">
+          <div className="h-[60px] sm:h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
                 <Line
@@ -88,12 +88,12 @@ export function PerformanceMetrics() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Order Accuracy</CardTitle>
+          <CardTitle className="text-sm sm:text-base">Order Accuracy</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">99.1%</div>
+          <div className="text-xl sm:text-2xl font-bold">99.1%</div>
           <p className="text-xs text-muted-foreground">+0.2% from last week</p>
-          <div className="h-[80px]">
+          <div className="h-[60px] sm:h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
                 <Line

@@ -55,4 +55,8 @@ export interface Vendor {
   contacts: LibContact[]
   certifications: Certification[]
   environmentalImpact?: EnvironmentalImpact
+  // Tax configuration fields
+  taxProfile?: string
+  taxRate?: number
+  taxType?: string
 } 

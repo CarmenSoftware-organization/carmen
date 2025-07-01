@@ -112,7 +112,7 @@ export function MobileNav() {
             </SheetContent>
           </Sheet>
           <div className="ml-4">
-            <img src="/placeholder.svg?height=30&width=100" alt="Carmen Siftware" className="h-8" />
+            <img src="/avatars/placeholder.svg?height=30&width=100" alt="Carmen Siftware" className="h-8" />
           </div>
         </div>
         <Link href="/profile">

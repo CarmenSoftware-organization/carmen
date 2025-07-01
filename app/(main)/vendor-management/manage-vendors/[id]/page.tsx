@@ -22,6 +22,8 @@ import { AddressesSection } from './sections/addresses-section'
 import { ContactsSection } from './sections/contacts-section'
 import { EnvironmentalProfile } from './sections/environmental-profile'
 import { CertificationsSection } from './sections/certifications-section'
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function VendorDetailPage({ params }: { params: { id: string } }) {
   return (
@@ -234,7 +236,70 @@ function VendorDetail({ id }: { id: string }) {
               />
             </CardContent>
           </Card>
-          
+
+          {/* Tax configuration section */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Tax configuration</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tax Id</label>
+                  <Input
+                    placeholder="Enter Tax Id"
+                    value={vendor.taxId || ''}
+                    onChange={e => isEditing && handleFieldChange('taxId', e.target.value)}
+                    disabled={!isEditing}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Profile</label>
+                  <Select
+                    value={vendor.taxProfile || 'standard'}
+                    onValueChange={val => isEditing && handleFieldChange('taxProfile', val)}
+                    disabled={!isEditing}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select profile" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="reduced">Reduced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Rate (%)</label>
+                  <Input
+                    type="number"
+                    placeholder="Enter rate"
+                    value={vendor.taxRate ?? 10}
+                    onChange={e => isEditing && handleFieldChange('taxRate', Number(e.target.value))}
+                    disabled={!isEditing}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Type</label>
+                  <Select
+                    value={vendor.taxType || 'add'}
+                    onValueChange={val => isEditing && handleFieldChange('taxType', val)}
+                    disabled={!isEditing}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="add">Add</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="include">Include</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-3">

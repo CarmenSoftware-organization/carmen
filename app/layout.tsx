@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { UserProvider } from '@/lib/context/user-context'
 import { Providers } from './providers'
+import { StagewiseDevToolbar } from '@/components/stagewise-dev-toolbar'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -24,6 +25,7 @@ export default function RootLayout({
             {children}
           </UserProvider>
         </Providers>
+        <StagewiseDevToolbar />
       </body>
     </html>
   )

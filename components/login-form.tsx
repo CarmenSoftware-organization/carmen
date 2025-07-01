@@ -40,7 +40,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
         <div className="flex justify-center mb-4">
-          <img src="/placeholder.svg?height=60&width=200" alt="Carmen Siftware Logo" className="h-15" />
+          <img src="/avatars/placeholder.svg?height=60&width=200" alt="Carmen Siftware Logo" className="h-15" />
         </div>
         <CardTitle className="text-2xl font-bold text-center">Supply Chain App</CardTitle>
         <CardDescription className="text-center">Enter your credentials to access your account</CardDescription>

@@ -48,7 +48,7 @@ export function ActivityLog({
                 <SelectValue placeholder="All users" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All users</SelectItem>
+                <SelectItem value="all">All users</SelectItem>
                 {users.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.name}
@@ -65,7 +65,7 @@ export function ActivityLog({
                 <SelectValue placeholder="All activities" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All activities</SelectItem>
+                <SelectItem value="all">All activities</SelectItem>
                 <SelectItem value="CREATE">Create</SelectItem>
                 <SelectItem value="UPDATE">Update</SelectItem>
                 <SelectItem value="DELETE">Delete</SelectItem>

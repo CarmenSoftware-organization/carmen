@@ -312,7 +312,7 @@ export default function VendorList(): JSX.Element {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}
+                onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}?edit=1`)}
                 className="h-8 w-8 rounded-full"
               >
                 <Edit className="h-4 w-4" />
@@ -330,7 +330,7 @@ export default function VendorList(): JSX.Element {
                     <FileText className="h-4 w-4 mr-2" />
                     View Details
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}>
+                  <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}?edit=1`)}>
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
@@ -436,7 +436,7 @@ export default function VendorList(): JSX.Element {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}
+                              onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}?edit=1`)}
                               className="h-8 w-8 rounded-full"
                             >
                               <Edit className="h-4 w-4" />
@@ -454,7 +454,7 @@ export default function VendorList(): JSX.Element {
                                   <FileText className="h-4 w-4 mr-2" />
                                   View Details
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}/edit`)}>
+                                <DropdownMenuItem onClick={() => router.push(`/vendor-management/manage-vendors/${vendor.id}?edit=1`)}>
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit
                                 </DropdownMenuItem>
