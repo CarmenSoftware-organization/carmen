@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useMemo, ChangeEvent } from "react";
+import React, { useState, useMemo, ChangeEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
+import { PRRBACService } from "../services/rbac-service";
+import { useUser } from "@/lib/context/user-context";
 import {
   Table,
   TableBody,
@@ -375,14 +377,46 @@ export function PurchaseRequestList() {
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<'table' | 'card'>('table');
-  const [toggleMode, setToggleMode] = useState<'myPending' | 'allDocument'>('myPending');
+  const [toggleMode, setToggleMode] = useState<'myPR' | 'myApproval' | 'myOrder' | 'allDocument'>('myPR');
   const [selectedRequestor, setSelectedRequestor] = React.useState<string>('');
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState('all');
-  const currentUserId = 'user-001'; // mock current user
+  const { user } = useUser(); // Get current user from context
+  const currentUserId = user?.id || 'user-001'; // Use actual user ID from context
+  
+  // RBAC state
+  const [availableWidgets, setAvailableWidgets] = useState<string[]>([]);
+  const [roleConfig, setRoleConfig] = useState<any>(null);
 
   React.useEffect(() => {
     setIsMounted(true);
   }, []);
+  
+  // Load RBAC configuration and available widgets
+  useEffect(() => {
+    if (user) {
+      // Get role configuration from RBAC service
+      const config = PRRBACService.getRoleConfiguration(user.role);
+      setRoleConfig(config);
+      
+      // Determine available widgets based on role configuration
+      const widgets = [];
+      if (config.widgetAccess.myPR) widgets.push('myPR');
+      if (config.widgetAccess.myApproval) widgets.push('myApproval');
+      if (config.widgetAccess.myOrder) widgets.push('myOrder');
+      
+      // Always add allDocument for admins or users with full visibility
+      if (user.role === 'System Administrator' || config.visibilitySetting === 'full') {
+        widgets.push('allDocument');
+      }
+      
+      setAvailableWidgets(widgets);
+      
+      // Set default toggle to first available widget
+      if (widgets.length > 0 && !widgets.includes(toggleMode)) {
+        setToggleMode(widgets[0] as any);
+      }
+    }
+  }, [user, toggleMode]);
 
   // Get unique requestors for dropdown
   const requestorOptions = useMemo(() => {
@@ -504,15 +538,42 @@ export function PurchaseRequestList() {
 
   const sortedAndFilteredData = useMemo(() => {
     let result = sampleData;
-    if (toggleMode === 'myPending') {
-      result = result.filter(pr =>
-        pr.requestorId === currentUserId &&
-        (pr.status === DocumentStatus.Draft || pr.status === DocumentStatus.InProgress)
-      );
+    
+    // Apply widget-specific filters based on RBAC
+    switch (toggleMode) {
+      case 'myPR':
+        // Show ALL PRs created by the user (all statuses)
+        result = result.filter(pr => pr.requestorId === currentUserId);
+        break;
+        
+      case 'myApproval':
+        // Show PRs pending user's approval at assigned workflow stages
+        const userAssignedStages = user?.assignedWorkflowStages || [];
+        result = result.filter(pr => 
+          userAssignedStages.includes(pr.currentWorkflowStage) && 
+          [DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status)
+        );
+        break;
+        
+      case 'myOrder':
+        // Show approved PRs ready for purchase order creation
+        result = result.filter(pr => 
+          pr.status === DocumentStatus.Approved && 
+          pr.currentWorkflowStage === WorkflowStage.Completed
+        );
+        break;
+        
+      case 'allDocument':
+        // No filtering - show all documents (already the default)
+        break;
     }
+    
+    // Apply secondary filters (workflow stage)
     if (selectedWorkflowStage && selectedWorkflowStage !== 'all') {
       result = result.filter(pr => pr.currentWorkflowStage === selectedWorkflowStage);
     }
+    
+    // Apply sorting
     if (sortConfig.field) {
       result = [...result].sort((a, b) => {
         const aValue = a[sortConfig.field];
@@ -522,8 +583,9 @@ export function PurchaseRequestList() {
         return 0;
       });
     }
+    
     return result;
-  }, [toggleMode, sampleData, currentUserId, selectedWorkflowStage, sortConfig]);
+  }, [toggleMode, sampleData, currentUserId, selectedWorkflowStage, sortConfig, user?.assignedWorkflowStages]);
 
   const totalPages = Math.ceil(sortedAndFilteredData.length / itemsPerPage);
 
@@ -542,15 +604,50 @@ export function PurchaseRequestList() {
       </div>
     ) : null;
 
-  // Define workflow stages for the dropdown
-  const workflowStages = [
-    { value: 'all', label: 'All Stages' },
-    { value: 'requester', label: 'Requester' },
-    { value: 'departmentHeadApproval', label: 'Department Head Approval' },
-    { value: 'financeApproval', label: 'Finance Approval' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'rejected', label: 'Rejected' }
-  ]
+  // Define secondary filters based on selected widget
+  const getSecondaryFilters = useMemo(() => {
+    switch (toggleMode) {
+      case 'myPR':
+        return [
+          { value: 'all', label: 'All Status' },
+          { value: 'draft', label: 'Draft' },
+          { value: 'submitted', label: 'Submitted' },
+          { value: 'inProgress', label: 'In Progress' },
+          { value: 'approved', label: 'Approved' },
+          { value: 'rejected', label: 'Rejected' }
+        ];
+      
+      case 'myApproval':
+        // Get workflow stages assigned to the user
+        const userAssignedStages = user?.assignedWorkflowStages || [];
+        return [
+          { value: 'all', label: 'All Stages' },
+          ...userAssignedStages.map(stage => ({
+            value: stage,
+            label: stage.replace(/([A-Z])/g, ' $1').trim() // Convert camelCase to spaces
+          }))
+        ];
+      
+      case 'myOrder':
+        return [
+          { value: 'all', label: 'All Approved' },
+          { value: 'pending', label: 'Pending PO Creation' },
+          { value: 'inProgress', label: 'PO In Progress' },
+          { value: 'completed', label: 'PO Created' }
+        ];
+      
+      case 'allDocument':
+      default:
+        return [
+          { value: 'all', label: 'All Stages' },
+          { value: 'requester', label: 'Requester' },
+          { value: 'departmentHeadApproval', label: 'Department Head Approval' },
+          { value: 'financeApproval', label: 'Finance Approval' },
+          { value: 'completed', label: 'Completed' },
+          { value: 'rejected', label: 'Rejected' }
+        ];
+    }
+  }, [toggleMode, user?.assignedWorkflowStages]);
 
   const documentStatuses = [
     { value: 'all', label: 'All Status' },
@@ -569,29 +666,64 @@ export function PurchaseRequestList() {
           onChange={handleSearch}
           className="h-8 w-[220px] text-xs"
         />
+        {/* RBAC-controlled widget toggles */}
         <div className="inline-flex rounded-md shadow-sm border">
-          <Button
-            variant={toggleMode === 'myPending' ? 'default' : 'ghost'}
-            size="sm"
-            className="rounded-none h-8 px-4"
-            onClick={() => {
-              setToggleMode('myPending');
-              setSelectedWorkflowStage('all');
-            }}
-          >
-            My Pending
-          </Button>
-          <Button
-            variant={toggleMode === 'allDocument' ? 'default' : 'ghost'}
-            size="sm"
-            className="rounded-none h-8 px-4"
-            onClick={() => {
-              setToggleMode('allDocument');
-              setSelectedWorkflowStage('all');
-            }}
-          >
-            All Documents
-          </Button>
+          {/* Only show widgets the user has access to */}
+          {availableWidgets.includes('myPR') && (
+            <Button
+              variant={toggleMode === 'myPR' ? 'default' : 'ghost'}
+              size="sm"
+              className="rounded-none h-8 px-4"
+              onClick={() => {
+                setToggleMode('myPR');
+                setSelectedWorkflowStage('all');
+              }}
+            >
+              My PR
+            </Button>
+          )}
+          
+          {availableWidgets.includes('myApproval') && (
+            <Button
+              variant={toggleMode === 'myApproval' ? 'default' : 'ghost'}
+              size="sm"
+              className="rounded-none h-8 px-4"
+              onClick={() => {
+                setToggleMode('myApproval');
+                setSelectedWorkflowStage('all');
+              }}
+            >
+              My Approvals
+            </Button>
+          )}
+          
+          {availableWidgets.includes('myOrder') && (
+            <Button
+              variant={toggleMode === 'myOrder' ? 'default' : 'ghost'}
+              size="sm"
+              className="rounded-none h-8 px-4"
+              onClick={() => {
+                setToggleMode('myOrder');
+                setSelectedWorkflowStage('all');
+              }}
+            >
+              Ready for PO
+            </Button>
+          )}
+          
+          {availableWidgets.includes('allDocument') && (
+            <Button
+              variant={toggleMode === 'allDocument' ? 'default' : 'ghost'}
+              size="sm"
+              className="rounded-none h-8 px-4"
+              onClick={() => {
+                setToggleMode('allDocument');
+                setSelectedWorkflowStage('all');
+              }}
+            >
+              All Documents
+            </Button>
+          )}
         </div>
         <div className="flex w-full justify-center my-2">
           <Select
@@ -599,17 +731,15 @@ export function PurchaseRequestList() {
             onValueChange={value => setSelectedWorkflowStage(value)}
           >
             <SelectTrigger className="rounded h-8 px-3 w-[180px] text-xs">
-              <SelectValue placeholder={toggleMode === 'myPending' ? 'All Stages' : 'All Status'} />
+              <SelectValue placeholder="Select filter" />
             </SelectTrigger>
             <SelectContent>
-              {toggleMode === 'myPending'
-                ? workflowStages.map(stage => (
-                    <SelectItem key={stage.value} value={stage.value}>{stage.label}</SelectItem>
-                  ))
-                : documentStatuses.map(status => (
-                    <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
-                  ))
-              }
+              {/* Dynamic secondary filters based on selected widget */}
+              {getSecondaryFilters.map(filter => (
+                <SelectItem key={filter.value} value={filter.value}>
+                  {filter.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

@@ -35,6 +35,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { QuickAccessNav } from "@/components/quick-access-nav";
+import { UserContextSwitcher } from "@/components/user-context-switcher";
+import { useUser } from "@/lib/context/user-context";
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -46,6 +48,7 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { user } = useUser();
 
   useEffect(() => {
     setMounted(true);
@@ -148,15 +151,42 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-background dark:bg-gray-700" align="end" forceMount>
+              <DropdownMenuContent className="w-72 bg-background dark:bg-gray-700" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none text-foreground dark:text-gray-100">John Doe</p>
-                    <p className="text-xs leading-none text-muted-foreground dark:text-gray-400">
-                      john@example.com
-                    </p>
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none text-foreground dark:text-gray-100">
+                        {user?.name || "John Doe"}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground dark:text-gray-400">
+                        {user?.email || "john@example.com"}
+                      </p>
+                    </div>
+                    {user && (
+                      <div className="flex flex-col space-y-1">
+                        <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                          <span className="font-medium">Role:</span>
+                          <span>{user.context.currentRole.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                          <span className="font-medium">Department:</span>
+                          <span>{user.context.currentDepartment.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                          <span className="font-medium">Location:</span>
+                          <span>{user.context.currentLocation.name}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                {/* User Context Switcher */}
+                <div className="p-1">
+                  <UserContextSwitcher />
+                </div>
+                
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleEditProfile} className="text-foreground dark:text-gray-100">
                   <User className="mr-2 h-4 w-4" />

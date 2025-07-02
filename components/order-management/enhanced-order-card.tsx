@@ -12,7 +12,48 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { ChevronDown, MapPin, Calendar, Hash, Building2, MessageSquare, Save, Ban } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
-import type { User, OrderItem } from "../types/roles"
+// Local type definitions
+interface User {
+  id: string;
+  name: string;
+  email?: string;
+  role: string;
+  department?: string;
+}
+
+interface OrderItem {
+  id: string;
+  location: string;
+  product: string;
+  productDescription: string;
+  sku: string;
+  orderUnit: string;
+  invUnit: string;
+  requestQuantity: number;
+  onOrderQuantity: number;
+  onOrderInvUnit: number;
+  approvedQuantity: number;
+  onHandQuantity: number;
+  onHandInvUnit: number;
+  currency: string;
+  baseCurrency: string;
+  price: number;
+  lastPrice: number;
+  baseCurrencyPrice: number;
+  baseCurrencyLastPrice: number;
+  total: number;
+  baseCurrencyTotal: number;
+  conversionRate: number;
+  status: "pending" | "approved" | "rejected" | "Review";
+  requestorId: string;
+  requestorName: string;
+  department: string;
+  requestDate: string;
+  expectedDeliveryDate?: string;
+  vendor: string;
+  lastVendor?: string;
+  comment?: string;
+}
 
 interface EnhancedOrderCardProps {
   order: OrderItem
@@ -21,6 +62,8 @@ interface EnhancedOrderCardProps {
   isExpanded?: boolean
   onToggleExpand?: () => void
   isEditMode?: boolean
+  isSelected?: boolean
+  onSelect?: () => void
 }
 
 const getStatusConfig = (status: string) => {
@@ -136,6 +179,8 @@ export default function EnhancedOrderCard({
   isExpanded = false,
   onToggleExpand,
   isEditMode = false,
+  isSelected = false,
+  onSelect,
 }: EnhancedOrderCardProps) {
   const [editedOrder, setEditedOrder] = useState<OrderItem>(order)
 
@@ -145,13 +190,13 @@ export default function EnhancedOrderCard({
         const { role } = currentUser
         const { status } = order
 
-        if (role === "requestor" && status === "pending") {
+        if (role === "Requestor" && status === "pending") {
           return ["location", "product", "comment", "requestQuantity", "orderUnit", "requestDate"].includes(fieldName)
         }
-        if (role === "department-manager" && (status === "pending" || status === "Review")) {
+        if (role === "Department Manager" && (status === "pending" || status === "Review")) {
           return ["comment", "approvedQuantity"].includes(fieldName)
         }
-        if (role === "purchasing-staff" && status === "approved") {
+        if (role === "Purchasing Staff" && status === "approved") {
           return ["comment", "approvedQuantity", "vendor", "price"].includes(fieldName)
         }
         return false
@@ -181,8 +226,8 @@ export default function EnhancedOrderCard({
   }, [isEditMode, order])
 
   const statusConfig = getStatusConfig(order.status)
-  const canSeePrices = currentUser.role !== "requestor"
-  const canSeeVendor = currentUser.role !== "requestor"
+  const canSeePrices = currentUser.role !== "Requestor"
+  const canSeeVendor = currentUser.role !== "Requestor"
 
   const conversionFactor = useMemo(() => {
     if (order.onHandQuantity > 0 && order.onHandInvUnit > 0) {
@@ -245,7 +290,11 @@ export default function EnhancedOrderCard({
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-start gap-3 flex-1">
-              <Checkbox className="mt-1" />
+              <Checkbox 
+                className="mt-1" 
+                checked={isSelected}
+                onCheckedChange={onSelect}
+              />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
                   <MapPin className="h-3 w-3" />

@@ -40,9 +40,9 @@ import { ResponsiveBudgetScreen } from "./tabs/budget-tab";
 import { WorkflowTab } from "./tabs/WorkflowTab";
 import { AttachmentsTab } from "./tabs/AttachmentsTab";
 import { ActivityTab } from "./tabs/ActivityTab";
+import { PRRBACService, type WorkflowAction } from "../services/rbac-service";
 import {
   PurchaseRequest,
-  WorkflowAction,
   PRType,
   DocumentStatus,
   WorkflowStatus,
@@ -55,7 +55,8 @@ import {
   getNextWorkflowStage,
   getPreviousWorkflowStage,
 } from "./utils";
-import { samplePRData } from "./sampleData";
+import { samplePRData, samplePRItems } from "./sampleData";
+import { useUser } from "@/lib/context/user-context";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -71,6 +72,7 @@ import SummaryTotal from "./SummaryTotal";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
+import { canEditField } from "@/lib/utils/field-permissions";
 
 export default function PRDetailPage() {
   const router = useRouter();
@@ -83,7 +85,11 @@ export default function PRDetailPage() {
   const [formData, setFormData] = useState<PurchaseRequest>(
     isAddMode ? getEmptyPurchaseRequest() : samplePRData
   );
+  
+  // RBAC state
+  const [availableActions, setAvailableActions] = useState<WorkflowAction[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const { user } = useUser(); // Get current user from context
 
   useEffect(() => {
     setIsMounted(true);
@@ -93,7 +99,98 @@ export default function PRDetailPage() {
     }
   }, [isAddMode]);
 
+  // Update available actions when user or formData changes
+  useEffect(() => {
+    if (user && formData) {
+      const actions = PRRBACService.getAvailableActions(user, formData);
+      setAvailableActions(actions);
+    }
+  }, [user, formData]);
+
   const handleModeChange = (newMode: "view" | "edit") => setMode(newMode);
+
+  // RBAC-controlled workflow action handlers
+  const handleWorkflowAction = (action: WorkflowAction) => {
+    if (!user || !PRRBACService.canPerformAction(user, formData, action)) {
+      console.warn(`User ${user?.name} cannot perform action: ${action}`);
+      return;
+    }
+
+    switch (action) {
+      case 'approve':
+        handleApprove();
+        break;
+      case 'reject':
+        handleReject();
+        break;
+      case 'sendBack':
+        handleSendBack();
+        break;
+      case 'edit':
+        setMode('edit');
+        break;
+      case 'delete':
+        handleDelete();
+        break;
+      case 'submit':
+        handleSubmitForApproval();
+        break;
+      default:
+        console.warn(`Unknown action: ${action}`);
+    }
+  };
+
+  const handleApprove = () => {
+    const nextStage = getNextWorkflowStage(formData.workflowStage);
+    const updatedData = {
+      ...formData,
+      status: nextStage === WorkflowStage.Completed ? DocumentStatus.Approved : DocumentStatus.InProgress,
+      workflowStage: nextStage,
+      lastModified: new Date().toISOString(),
+    };
+    setFormData(updatedData);
+    console.log('PR Approved:', updatedData);
+  };
+
+  const handleReject = () => {
+    const updatedData = {
+      ...formData,
+      status: DocumentStatus.Rejected,
+      lastModified: new Date().toISOString(),
+    };
+    setFormData(updatedData);
+    console.log('PR Rejected:', updatedData);
+  };
+
+  const handleSendBack = () => {
+    const previousStage = getPreviousWorkflowStage(formData.workflowStage);
+    const updatedData = {
+      ...formData,
+      status: DocumentStatus.InProgress,
+      workflowStage: previousStage,
+      lastModified: new Date().toISOString(),
+    };
+    setFormData(updatedData);
+    console.log('PR Sent Back:', updatedData);
+  };
+
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to delete this purchase request?')) {
+      console.log('PR Deleted:', formData.id);
+      router.push('/procurement/purchase-requests');
+    }
+  };
+
+  const handleSubmitForApproval = () => {
+    const updatedData = {
+      ...formData,
+      status: DocumentStatus.Submitted,
+      workflowStage: WorkflowStage.DepartmentApproval,
+      lastModified: new Date().toISOString(),
+    };
+    setFormData(updatedData);
+    console.log('PR Submitted for Approval:', updatedData);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,6 +235,11 @@ export default function PRDetailPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   };
 
+  const handleOrderUpdate = (orderId: string, updates: any) => {
+    console.log("Updating order:", orderId, updates);
+    // Handle item updates here
+  };
+
   return (
     <div className="container mx-auto py-6 space-y-6 pb-20">
       {/* Header Card */}
@@ -172,10 +274,12 @@ export default function PRDetailPage() {
             <div className="flex items-center gap-2 flex-wrap justify-end">
               {/* Edit/Save/Cancel buttons */}
               {mode === "view" ? (
-                <Button onClick={() => handleModeChange("edit")}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </Button>
+                (user?.context.currentRole.name === "Requestor" || isAddMode) && (
+                  <Button onClick={() => handleModeChange("edit")}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </Button>
+                )
               ) : (
                 <>
                   <Button variant="default" onClick={handleSubmit}>
@@ -196,10 +300,41 @@ export default function PRDetailPage() {
                 </>
               )}
               
-              {/* Separator between edit/save buttons and action buttons */}
+              {/* RBAC-controlled workflow actions */}
+              {user && availableActions.length > 0 && (
+                <>
+                  <div className="w-px h-6 bg-border mx-2 hidden md:block" />
+                  <div className="flex items-center gap-2">
+                    {PRRBACService.getWorkflowActionButtons(user, formData).map((actionBtn) => {
+                      const IconComponent = actionBtn.icon === 'CheckCircle' ? CheckCircle :
+                                           actionBtn.icon === 'XCircle' ? XCircleIcon :
+                                           actionBtn.icon === 'RotateCcw' ? RotateCcwIcon :
+                                           actionBtn.icon === 'Edit' ? Edit :
+                                           actionBtn.icon === 'Trash' ? X :
+                                           actionBtn.icon === 'Send' ? CheckCircle : CheckCircle;
+                      
+                      return (
+                        <Button 
+                          key={actionBtn.action}
+                          onClick={() => handleWorkflowAction(actionBtn.action as WorkflowAction)} 
+                          variant={actionBtn.variant} 
+                          size="sm"
+                          className="h-9"
+                          title={actionBtn.description}
+                        >
+                          <IconComponent className="mr-2 h-4 w-4" />
+                          {actionBtn.label}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {/* Separator between workflow actions and document actions */}
               <div className="w-px h-6 bg-border mx-2 hidden md:block" />
               
-              {/* Action buttons that are always visible */}
+              {/* Document action buttons that are always visible */}
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" className="h-9">
                   <PrinterIcon className="mr-2 h-4 w-4" />
@@ -231,10 +366,11 @@ export default function PRDetailPage() {
                   </Label>
                   <Input
                     id="refNumber"
+                    name="refNumber"
                     value={formData.refNumber}
                     onChange={handleInputChange}
-                    disabled={mode === "view"}
-                    className={mode === "view" ? "bg-muted" : ""}
+                    disabled={mode === "view" || !canEditField("refNumber", user?.context.currentRole.name || "")}
+                    className={mode === "view" || !canEditField("refNumber", user?.context.currentRole.name || "") ? "bg-muted" : ""}
                   />
                 </div>
                 <div className="space-y-2">
@@ -243,11 +379,12 @@ export default function PRDetailPage() {
                   </Label>
                   <Input
                     id="date"
+                    name="date"
                     type="date"
                     value={formData.date.toISOString().split("T")[0]}
                     onChange={handleInputChange}
-                    disabled={mode === "view"}
-                    className={mode === "view" ? "bg-muted" : ""}
+                    disabled={mode === "view" || !canEditField("date", user?.context.currentRole.name || "")}
+                    className={mode === "view" || !canEditField("date", user?.context.currentRole.name || "") ? "bg-muted" : ""}
                   />
                 </div>
                 <div className="space-y-2">
@@ -259,9 +396,9 @@ export default function PRDetailPage() {
                     onValueChange={(value) =>
                       setFormData({ ...formData, type: value as PRType })
                     }
-                    disabled={mode === "view"}
+                    disabled={mode === "view" || !canEditField("type", user?.context.currentRole.name || "")}
                   >
-                    <SelectTrigger id="type" className={mode === "view" ? "bg-muted" : ""}>
+                    <SelectTrigger id="type" className={mode === "view" || !canEditField("type", user?.context.currentRole.name || "") ? "bg-muted" : ""}>
                       <SelectValue placeholder="Select PR Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -282,8 +419,8 @@ export default function PRDetailPage() {
                     name="requestor.name"
                     value={formData.requestor.name}
                     onChange={handleInputChange}
-                    disabled={mode === "view"}
-                    className={mode === "view" ? "bg-muted" : ""}
+                    disabled={mode === "view" || !canEditField("requestor", user?.context.currentRole.name || "")}
+                    className={mode === "view" || !canEditField("requestor", user?.context.currentRole.name || "") ? "bg-muted" : ""}
                   />
                 </div>
               </div>
@@ -297,8 +434,8 @@ export default function PRDetailPage() {
                     name="department"
                     value={formData.department}
                     onChange={handleInputChange}
-                    disabled={mode === "view"}
-                    className={mode === "view" ? "bg-muted" : ""}
+                    disabled={mode === "view" || !canEditField("department", user?.context.currentRole.name || "")}
+                    className={mode === "view" || !canEditField("department", user?.context.currentRole.name || "") ? "bg-muted" : ""}
                   />
                 </div>
                 <div className="space-y-2 col-span-3">
@@ -308,8 +445,8 @@ export default function PRDetailPage() {
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    disabled={mode === "view"}
-                    className={`min-h-[100px] ${mode === "view" ? "bg-muted" : ""}`}
+                    disabled={mode === "view" || !canEditField("description", user?.context.currentRole.name || "")}
+                    className={`min-h-[100px] ${mode === "view" || !canEditField("description", user?.context.currentRole.name || "") ? "bg-muted" : ""}`}
                   />
                 </div>
               </div>
@@ -383,10 +520,16 @@ export default function PRDetailPage() {
           </CardHeader>
           <CardContent className="p-0">
             <form onSubmit={handleSubmit}>
-              <ScrollArea className="h-[calc(100vh-600px)] min-h-[300px] w-full rounded-b-md border-t">
+              <div className="w-full rounded-b-md border-t overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                 <div className="p-6">
                   <TabsContent value="items" className="mt-0">
-                    <ItemsTab />
+                    {user && (
+                      <ItemsTab 
+                        items={samplePRItems}
+                        currentUser={user}
+                        onOrderUpdate={handleOrderUpdate}
+                      />
+                    )}
                   </TabsContent>
                   <TabsContent value="budgets" className="mt-0">
                     <ResponsiveBudgetScreen />
@@ -401,7 +544,7 @@ export default function PRDetailPage() {
                     <ActivityTab />
                   </TabsContent>
                 </div>
-              </ScrollArea>
+              </div>
             </form>
           </CardContent>
         </Tabs>

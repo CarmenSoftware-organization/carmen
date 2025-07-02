@@ -665,7 +665,7 @@ export enum WorkflowStatus {
 }
 
 export enum WorkflowStage {
-  requester = "Requester",
+  requester = "Requestor",
   departmentHeadApproval = "DepartmentHeadApproval",
   purchaseCoordinatorReview = "PurchaseCoordinatorReview",
   financeManagerApproval = "FinanceManagerApproval",
