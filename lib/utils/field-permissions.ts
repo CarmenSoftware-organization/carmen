@@ -40,6 +40,7 @@ export function getFieldPermissions(userRole: string): FieldPermissions {
 
   switch (userRole) {
     case 'Requestor':
+    case 'Staff':
       return {
         ...permissions,
         location: true,
@@ -84,4 +85,10 @@ export function getFieldPermissions(userRole: string): FieldPermissions {
 export function canEditField(fieldName: keyof FieldPermissions, userRole: string): boolean {
   const permissions = getFieldPermissions(userRole);
   return permissions[fieldName];
+}
+
+// Function to check if user can view financial information (pricing, totals, transaction summary)
+export function canViewFinancialInfo(userRole: string): boolean {
+  const restrictedRoles = ['Requestor', 'Staff'];
+  return !restrictedRoles.includes(userRole);
 }

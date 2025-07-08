@@ -49,7 +49,7 @@ const initialVendors = [
 const itemData = {
   name: "Organic Quinoa",
   description: "Premium organic white quinoa grains",
-  status: "Accepted",
+  status: "Approved",
   requestedQuantity: 500,
   approvedQuantity: 450,
   unit: "Kg"

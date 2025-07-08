@@ -40,6 +40,8 @@ export interface User extends UserProfile {
   role: string;
   department: string;
   location?: string;
+  // Workflow stages this user can approve
+  assignedWorkflowStages?: string[];
   context: UserContext;
 }
 

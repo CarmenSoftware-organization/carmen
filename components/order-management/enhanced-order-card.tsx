@@ -268,7 +268,7 @@ export default function EnhancedOrderCard({
         vendor: selectedProduct.vendor,
         vendorCode: `${selectedProduct.vendor.split(" ")[0].toUpperCase()}-001`,
         vendorContact: `orders@${selectedProduct.vendor.toLowerCase().replace(/\s+/g, "")}.com`,
-      })
+      } as any)
     }
   }
 
@@ -528,11 +528,11 @@ export default function EnhancedOrderCard({
                 )}
 
                 {/* History */}
-                {editedOrder.approvedBy && (
+                {(editedOrder as any).approvedBy && (
                   <div className="col-span-2">
                     <span className="text-gray-500">Approved by</span>
                     <div className="mt-1 font-medium">
-                      {editedOrder.approvedBy} on {editedOrder.approvalDate}
+                      {(editedOrder as any).approvedBy} on {(editedOrder as any).approvalDate}
                     </div>
                   </div>
                 )}

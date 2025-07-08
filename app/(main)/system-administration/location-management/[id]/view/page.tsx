@@ -56,12 +56,8 @@ export default function LocationViewPage({ params }: LocationViewPageProps) {
               )}
             </div>
           </div>
-          {/* Group 2: Department, Delivery Point */}
+          {/* Group 2: Delivery Point */}
           <div>
-            <div className="mb-2">
-              <span className="font-medium">Department:</span>
-              <span className="ml-2 text-muted-foreground">{location.department}</span>
-            </div>
             <div className="mb-2">
               <span className="font-medium">Delivery Point:</span>
               <span className="ml-2 text-muted-foreground">{location.deliveryPoint}</span>

@@ -33,6 +33,8 @@ import {
   TagIcon,
   ClipboardListIcon,
   ChevronLeft,
+  PanelRightClose,
+  PanelRightOpen,
 } from "lucide-react";
 import { PRHeader } from "./PRHeader";
 import { ItemsTab } from "./tabs/ItemsTab";
@@ -40,9 +42,11 @@ import { ResponsiveBudgetScreen } from "./tabs/budget-tab";
 import { WorkflowTab } from "./tabs/WorkflowTab";
 import { AttachmentsTab } from "./tabs/AttachmentsTab";
 import { ActivityTab } from "./tabs/ActivityTab";
+import PRCommentsAttachmentsTab from "./tabs/PRCommentsAttachmentsTab";
 import { PRRBACService, type WorkflowAction } from "../services/rbac-service";
 import {
   PurchaseRequest,
+  PurchaseRequestItem,
   PRType,
   DocumentStatus,
   WorkflowStatus,
@@ -56,6 +60,7 @@ import {
   getPreviousWorkflowStage,
 } from "./utils";
 import { samplePRData, samplePRItems } from "./sampleData";
+import { mockPRListData } from "./mockPRListData";
 import { useUser } from "@/lib/context/user-context";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -72,24 +77,47 @@ import SummaryTotal from "./SummaryTotal";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
-import { canEditField } from "@/lib/utils/field-permissions";
+import { canEditField, getFieldPermissions, canViewFinancialInfo } from "@/lib/utils/field-permissions";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function PRDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isAddMode = searchParams?.get("mode") === "add";
+  const prId = searchParams?.get("id");
 
   const [mode, setMode] = useState<"view" | "edit" | "add">(
     isAddMode ? "add" : "view"
   );
-  const [formData, setFormData] = useState<PurchaseRequest>(
-    isAddMode ? getEmptyPurchaseRequest() : samplePRData
+
+  // Get PR data from mockup list or fallback to sample data
+  const getPRData = () => {
+    if (isAddMode) return getEmptyPurchaseRequest();
+    if (prId) {
+      const foundPR = mockPRListData.find(pr => pr.id === prId);
+      if (foundPR) return foundPR;
+    }
+    return samplePRData;
+  };
+
+  const [formData, setFormData] = useState<PurchaseRequest>(getPRData());
+  
+  // Items state management for proper form button updates
+  const [currentItems, setCurrentItems] = useState<PurchaseRequestItem[]>(
+    formData.items && formData.items.length > 0 ? formData.items : samplePRItems
   );
   
   // RBAC state
   const [availableActions, setAvailableActions] = useState<WorkflowAction[]>([]);
   const [isMounted, setIsMounted] = useState(false);
-  const { user } = useUser(); // Get current user from context
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const { user } = useUser(); // Get current user from context</invoke>
 
   useEffect(() => {
     setIsMounted(true);
@@ -98,6 +126,18 @@ export default function PRDetailPage() {
       setFormData(getEmptyPurchaseRequest());
     }
   }, [isAddMode]);
+
+  // Update data when PR ID changes (for navigation from PR list)
+  useEffect(() => {
+    if (prId && !isAddMode) {
+      const foundPR = mockPRListData.find(pr => pr.id === prId);
+      if (foundPR) {
+        setFormData(foundPR);
+        setCurrentItems(foundPR.items && foundPR.items.length > 0 ? foundPR.items : samplePRItems);
+        setMode("view");
+      }
+    }
+  }, [prId, isAddMode]);
 
   // Update available actions when user or formData changes
   useEffect(() => {
@@ -141,10 +181,10 @@ export default function PRDetailPage() {
   };
 
   const handleApprove = () => {
-    const nextStage = getNextWorkflowStage(formData.workflowStage);
+    const nextStage = getNextWorkflowStage(formData.currentWorkflowStage);
     const updatedData = {
       ...formData,
-      status: nextStage === WorkflowStage.Completed ? DocumentStatus.Approved : DocumentStatus.InProgress,
+      status: nextStage === WorkflowStage.completed ? DocumentStatus.Completed : DocumentStatus.InProgress,
       workflowStage: nextStage,
       lastModified: new Date().toISOString(),
     };
@@ -163,7 +203,7 @@ export default function PRDetailPage() {
   };
 
   const handleSendBack = () => {
-    const previousStage = getPreviousWorkflowStage(formData.workflowStage);
+    const previousStage = getPreviousWorkflowStage(formData.currentWorkflowStage);
     const updatedData = {
       ...formData,
       status: DocumentStatus.InProgress,
@@ -185,7 +225,7 @@ export default function PRDetailPage() {
     const updatedData = {
       ...formData,
       status: DocumentStatus.Submitted,
-      workflowStage: WorkflowStage.DepartmentApproval,
+      workflowStage: WorkflowStage.departmentHeadApproval,
       lastModified: new Date().toISOString(),
     };
     setFormData(updatedData);
@@ -204,32 +244,6 @@ export default function PRDetailPage() {
     }
   };
 
-  const handleWorkflowAction = (action: WorkflowAction) => {
-    console.log(`Workflow action: ${action}`);
-    setFormData((prev) => ({
-      ...prev,
-      status:
-        action === "approve"
-          ? DocumentStatus.InProgress
-          : action === "reject"
-          ? DocumentStatus.Rejected
-          : prev.status,
-      workflowStatus:
-        action === "approve"
-          ? WorkflowStatus.approved
-          : action === "reject"
-          ? WorkflowStatus.rejected
-          : WorkflowStatus.pending,
-      currentWorkflowStage:
-        action === "approve"
-          ? getNextWorkflowStage(prev.currentWorkflowStage)
-          : action === "reject"
-          ? WorkflowStage.requester
-          : action === "sendBack"
-          ? getPreviousWorkflowStage(prev.currentWorkflowStage)
-          : prev.currentWorkflowStage,
-    }));
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -237,52 +251,68 @@ export default function PRDetailPage() {
 
   const handleOrderUpdate = (orderId: string, updates: any) => {
     console.log("Updating order:", orderId, updates);
-    // Handle item updates here
+    
+    // Update the items state to trigger form button updates
+    setCurrentItems(prevItems => 
+      prevItems.map(item => 
+        item.id === orderId 
+          ? { ...item, ...updates }
+          : item
+      )
+    );
+  };
+
+  // Check if user has any edit permissions
+  const hasEditPermissions = (userRole: string): boolean => {
+    const permissions = getFieldPermissions(userRole);
+    return Object.values(permissions).some(permission => permission === true);
+  };
+
+  // Toggle sidebar visibility
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6 pb-20">
-      {/* Header Card */}
-      <Card className="shadow-sm overflow-hidden">
-        <CardHeader className="pb-4 border-b bg-muted/10">
-          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 w-8 rounded-full p-0 mr-1"
-                  onClick={() => router.back()}
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                  <span className="sr-only">Back to Purchase Requests</span>
-                </Button>
-                <h1 className="text-2xl font-bold">
-                  {mode === "add"
-                    ? "Create New Purchase Request"
-                    : formData.refNumber || "Purchase Request Details"}
-                </h1>
-                {formData.refNumber && <StatusBadge status={formData.status} className="h-6" />}
-              </div>
-              {formData.refNumber && (
-                <CardDescription>
-                  Created on {isMounted ? format(formData.date, "dd MMM yyyy") : formData.date.toISOString().split('T')[0]} • 
-                  {formData.type} • {formData.description}
-                </CardDescription>
-              )}
-            </div>
-            <div className="flex items-center gap-2 flex-wrap justify-end">
-              {/* Edit/Save/Cancel buttons */}
-              {mode === "view" ? (
-                (user?.context.currentRole.name === "Requestor" || isAddMode) && (
-                  <Button onClick={() => handleModeChange("edit")}>
+    <div className="container mx-auto py-6 pb-32">
+      <div className="flex flex-col lg:flex-row space-y-6 lg:space-y-0 lg:space-x-6">
+        {/* Main Content */}
+        <div className={`flex-grow space-y-6 ${isSidebarVisible ? 'lg:w-3/4' : 'w-full'}`}>
+          {/* Header Card */}
+          <Card className="shadow-sm overflow-hidden">
+            <CardHeader className="pb-4 border-b bg-muted/10">
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                  <div className="space-y-1">
+                      <div className="flex items-center gap-3">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 rounded-full p-0 mr-1"
+                          onClick={() => router.back()}
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                          <span className="sr-only">Back to Purchase Requests</span>
+                        </Button>
+                        <h1 className="text-2xl font-bold">
+                          {mode === "add"
+                            ? "Create New Purchase Request"
+                            : formData.refNumber || "Purchase Request Details"}
+                        </h1>
+                        {formData.refNumber && <StatusBadge status={formData.status} className="h-6" />}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {/* All action buttons in one consistent group */}
+                      {mode === "view" ? (
+                        (user && hasEditPermissions(user.role) || isAddMode) && (
+                          <Button onClick={() => handleModeChange("edit")} size="sm" className="h-9">
                     <Edit className="mr-2 h-4 w-4" />
                     Edit
                   </Button>
                 )
               ) : (
                 <>
-                  <Button variant="default" onClick={handleSubmit}>
+                  <Button variant="default" onClick={handleSubmit} size="sm" className="h-9">
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Save
                   </Button>
@@ -293,6 +323,8 @@ export default function PRDetailPage() {
                       // Reset form data to original if needed
                       if (!isAddMode) setFormData(samplePRData);
                     }}
+                    size="sm" 
+                    className="h-9"
                   >
                     <X className="mr-2 h-4 w-4" />
                     Cancel
@@ -300,55 +332,40 @@ export default function PRDetailPage() {
                 </>
               )}
               
-              {/* RBAC-controlled workflow actions */}
-              {user && availableActions.length > 0 && (
-                <>
-                  <div className="w-px h-6 bg-border mx-2 hidden md:block" />
-                  <div className="flex items-center gap-2">
-                    {PRRBACService.getWorkflowActionButtons(user, formData).map((actionBtn) => {
-                      const IconComponent = actionBtn.icon === 'CheckCircle' ? CheckCircle :
-                                           actionBtn.icon === 'XCircle' ? XCircleIcon :
-                                           actionBtn.icon === 'RotateCcw' ? RotateCcwIcon :
-                                           actionBtn.icon === 'Edit' ? Edit :
-                                           actionBtn.icon === 'Trash' ? X :
-                                           actionBtn.icon === 'Send' ? CheckCircle : CheckCircle;
-                      
-                      return (
-                        <Button 
-                          key={actionBtn.action}
-                          onClick={() => handleWorkflowAction(actionBtn.action as WorkflowAction)} 
-                          variant={actionBtn.variant} 
-                          size="sm"
-                          className="h-9"
-                          title={actionBtn.description}
-                        >
-                          <IconComponent className="mr-2 h-4 w-4" />
-                          {actionBtn.label}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-
-              {/* Separator between workflow actions and document actions */}
-              <div className="w-px h-6 bg-border mx-2 hidden md:block" />
-              
-              {/* Document action buttons that are always visible */}
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="h-9">
-                  <PrinterIcon className="mr-2 h-4 w-4" />
-                  Print
-                </Button>
-                <Button variant="outline" size="sm" className="h-9">
-                  <DownloadIcon className="mr-2 h-4 w-4" />
-                  Export
-                </Button>
-                <Button variant="outline" size="sm" className="h-9">
-                  <ShareIcon className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" className="h-9">
+                <PrinterIcon className="mr-2 h-4 w-4" />
+                Print
+              </Button>
+              <Button variant="outline" size="sm" className="h-9">
+                <DownloadIcon className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              <Button variant="outline" size="sm" className="h-9">
+                <ShareIcon className="mr-2 h-4 w-4" />
+                Share
+              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleSidebar}
+                      className="h-9 w-9 p-0"
+                    >
+                      {isSidebarVisible ? (
+                        <PanelRightClose className="h-4 w-4" />
+                      ) : (
+                        <PanelRightOpen className="h-4 w-4" />
+                      )}
+                      <span className="sr-only">Toggle sidebar</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </CardHeader>
@@ -504,8 +521,8 @@ export default function PRDetailPage() {
       <Card className="shadow-sm">
         <Tabs defaultValue="items" className="w-full">
           <CardHeader className="pb-0 pt-4 px-4">
-            <TabsList className="w-full grid grid-cols-5">
-              {["items", "budgets", "workflow", "attachments", "activity"].map(
+            <TabsList className="w-full grid grid-cols-3">
+              {["items", "budgets", "workflow"].map(
                 (tab) => (
                   <TabsTrigger 
                     key={tab} 
@@ -520,14 +537,15 @@ export default function PRDetailPage() {
           </CardHeader>
           <CardContent className="p-0">
             <form onSubmit={handleSubmit}>
-              <div className="w-full rounded-b-md border-t overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <div className="w-full rounded-b-md border-t">
                 <div className="p-6">
                   <TabsContent value="items" className="mt-0">
                     {user && (
                       <ItemsTab 
-                        items={samplePRItems}
+                        items={currentItems}
                         currentUser={user}
                         onOrderUpdate={handleOrderUpdate}
+                        formMode={mode}
                       />
                     )}
                   </TabsContent>
@@ -537,12 +555,6 @@ export default function PRDetailPage() {
                   <TabsContent value="workflow" className="mt-0">
                     <WorkflowTab />
                   </TabsContent>
-                  <TabsContent value="attachments" className="mt-0">
-                    <AttachmentsTab />
-                  </TabsContent>
-                  <TabsContent value="activity" className="mt-0">
-                    <ActivityTab />
-                  </TabsContent>
                 </div>
               </div>
             </form>
@@ -550,34 +562,138 @@ export default function PRDetailPage() {
         </Tabs>
       </Card>
       
-      {/* Transaction Summary */}
-      <Card className="shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Transaction Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SummaryTotal prData={formData} />
-        </CardContent>
-      </Card>
+          {/* Transaction Summary - Hidden from Requestors */}
+          {user && canViewFinancialInfo(user.role) && (
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Transaction Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-6">
+                <SummaryTotal prData={formData} />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div className={`space-y-6 ${isSidebarVisible ? 'lg:w-1/4' : 'w-0 opacity-0 overflow-hidden'} transition-all duration-300`}>
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Comments & Attachments</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <PRCommentsAttachmentsTab prData={formData} />
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Activity Log</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <ActivityTab activityLog={formData.activityLog} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
       
-      {/* Floating Workflow Actions */}
-      {mode !== "add" && mode === "view" && (
+      {/* Floating Action Menu - Role-based workflow actions */}
+      {mode === "view" && user && (
         <div className="fixed bottom-6 right-6 flex space-x-3 z-50">
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 flex space-x-3">
-            {[
-              { action: "approve", icon: CheckCircleIcon, variant: "default" },
-              { action: "reject", icon: XCircleIcon, variant: "destructive" },
-              { action: "sendBack", icon: RotateCcwIcon, variant: "outline" },
-            ].map(({ action, icon: Icon, variant }) => (
-              <Button
-                key={action}
-                onClick={() => handleWorkflowAction(action as WorkflowAction)}
-                variant={variant as "default" | "destructive" | "outline"}
-              >
-                <Icon className="mr-2 h-4 w-4" />
-                {action.charAt(0).toUpperCase() + action.slice(1)}
-              </Button>
-            ))}
+          <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-4 flex space-x-3 border border-gray-200 dark:border-gray-700">
+            {(() => {
+              const userRole = user.role;
+              
+              // For Requestors - show Delete and Submit buttons
+              if (['Staff', 'Requestor'].includes(userRole)) {
+                return (
+                  <>
+                    <Button
+                      onClick={handleDelete}
+                      variant="destructive"
+                      size="sm"
+                      className="h-9"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Delete
+                    </Button>
+                    <Button
+                      onClick={handleSubmitForApproval}
+                      variant="default"
+                      size="sm"
+                      className="h-9"
+                    >
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Submit
+                    </Button>
+                  </>
+                );
+              }
+              
+              // For Approvers - show workflow buttons (Approve, Reject, Send Back)
+              if (['Department Manager', 'Financial Manager'].includes(userRole)) {
+                return (
+                  <>
+                    <Button
+                      onClick={handleReject}
+                      variant="destructive"
+                      size="sm"
+                      className="h-9"
+                    >
+                      <XCircleIcon className="mr-2 h-4 w-4" />
+                      Reject
+                    </Button>
+                    <Button
+                      onClick={handleSendBack}
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                    >
+                      <RotateCcwIcon className="mr-2 h-4 w-4" />
+                      Return
+                    </Button>
+                    <Button
+                      onClick={handleApprove}
+                      variant="default"
+                      size="sm"
+                      className="h-9 bg-green-600 hover:bg-green-700"
+                    >
+                      <CheckCircleIcon className="mr-2 h-4 w-4" />
+                      Approve
+                    </Button>
+                  </>
+                );
+              }
+              
+              // For Purchasing Staff - show workflow buttons
+              if (['Purchasing Staff'].includes(userRole)) {
+                return (
+                  <>
+                    <Button
+                      onClick={handleSendBack}
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                    >
+                      <RotateCcwIcon className="mr-2 h-4 w-4" />
+                      Return
+                    </Button>
+                    <Button
+                      onClick={handleSubmitForApproval}
+                      variant="default"
+                      size="sm"
+                      className="h-9"
+                    >
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Submit
+                    </Button>
+                  </>
+                );
+              }
+              
+              // For other roles - no floating actions
+              return null;
+            })()}
           </div>
         </div>
       )}

@@ -260,9 +260,10 @@ const menuItems: MenuItem[] = [
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onCollapseToggle?: (collapsed: boolean) => void;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, onCollapseToggle }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
@@ -307,7 +308,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <SidebarContent 
           menuItems={menuItems} 
           isCollapsed={isCollapsed}
-          onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+          onToggleCollapse={() => {
+            const newCollapsedState = !isCollapsed;
+            setIsCollapsed(newCollapsedState);
+            onCollapseToggle?.(newCollapsedState);
+          }}
         />
       </aside>
     </>

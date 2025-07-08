@@ -38,19 +38,32 @@ const initialFormData: Partial<PurchaseRequestItem> = {
   taxIncluded: false,
   discountRate: 5,
   taxRate: 7,
+  taxType: "VAT",
+  discountType: "Percentage",
 };
 
 export function PricingFormComponent({
   data,
   initialMode,
+  pricePermission = true,
 }: {
   data?: Partial<PurchaseRequestItem>;
   initialMode: FormMode;
+  pricePermission?: boolean;
 }) {
   const [formData, setFormData] = useState<Partial<PurchaseRequestItem>>(
     data || initialFormData
   );
   const [mode, setMode] = useState<FormMode>(initialMode);
+
+  // Update form data when parent data prop changes
+  useEffect(() => {
+    if (data) {
+      setFormData({ ...initialFormData, ...data });
+    } else {
+      setFormData(initialFormData);
+    }
+  }, [data]);
   const [calculatedAmounts, setCalculatedAmounts] = useState({
     baseAmount: 0,
     discountAmount: 0,
@@ -223,6 +236,9 @@ export function PricingFormComponent({
                   className="text-xs text-muted-foreground"
                 >
                   Price
+                  {isViewMode === false && !pricePermission && (
+                    <span className="ml-1 text-xs text-amber-600 font-medium">(Read-only)</span>
+                  )}
                 </Label>
                 <Input
                   type="number"
@@ -230,140 +246,65 @@ export function PricingFormComponent({
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  disabled={isViewMode}
+                  disabled={isViewMode || !pricePermission}
                   className="h-8 text-sm"
                 />
               </div>
-              <div className="flex items-center flex-col pb-2">
-
-              <Label
-                htmlFor="tax-included"
-                className="space-y-1 text-xs text-muted-foreground"
-              >
-                Tax Incl.
-              </Label>
-              <div className="flex items-center h-7 pt-2">
-              <Checkbox
-                id="tax-included"
-                name="tax-included"
-                checked={formData.taxIncluded}
-                onCheckedChange={(checked) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    adjustment: checked as boolean,
-                  }))
-                }
-                disabled={isViewMode}
-                className="text-sm"
-              />
-              </div>
-            </div>
-            </div>
-
-
-            <div className="grid grid-cols-4 space-x-4">
-
-              <div className="col-span-2 lg:col-span-1 flex gap-2 items-center w-full">
-                <div className="flex flex-col">
-                  <Label
-                    htmlFor="enable-disc-adjustment"
-                    className="space-y-1 text-xs"
-                  >
-                    Adj.
-                  </Label>
-                  <div className="flex items-center h-7 pt-2">
-                    <Checkbox
-                      id="enable-disc-adjustment"
-                      value={formData.adjustments?.discount?.toString()}
-                      className="text-sm"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1 w-full">
-                  <Label htmlFor="discountRate" className="text-xs">
-                    Disc. Rate (%)
-                  </Label>
-                  <Input
-                    type="number"
-                    id="discountRate"
-                    name="discountRate"
-                    value={formData.discountRate}
-                    onChange={handleInputChange}
-                    disabled={isViewMode}
-                    className="h-7 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="col-span-2 lg:col-span-3">
+              <div className="w-1/4">
                 <Label
-                  htmlFor="discountAmount"
+                  htmlFor="taxType"
                   className="text-xs text-muted-foreground"
                 >
-                  Override Discount
+                  Tax Type
+                </Label>
+                <Select
+                  value={formData.taxType || "VAT"}
+                  onValueChange={(value) =>
+                    handleSelectChange("taxType", value)
+                  }
+                  disabled={isViewMode}
+                >
+                  <SelectTrigger id="taxType" className="h-8 text-sm">
+                    <SelectValue placeholder="Select tax type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="VAT">VAT</SelectItem>
+                    <SelectItem value="GST">GST</SelectItem>
+                    <SelectItem value="SST">SST</SelectItem>
+                    <SelectItem value="None">None</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+
+            {/* Basic Tax and Discount Rates */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="discountRate" className="text-xs text-muted-foreground">
+                  Discount Rate (%)
                 </Label>
                 <Input
                   type="number"
-                  id="discountAmount"
-                  name="discountAmount"
-                  value={formData.discountAmount ?? ""}
+                  id="discountRate"
+                  name="discountRate"
+                  value={formData.discountRate}
                   onChange={handleInputChange}
-                  placeholder="Enter to override"
                   disabled={isViewMode}
                   className="h-8 text-sm"
                 />
               </div>
 
-            </div>
-
-            <div className="grid grid-cols-4 space-x-4">
-            
-              <div className="col-span-2 lg:col-span-1 flex gap-2 items-center w-full">
-                <div className="flex flex-col">
-                  <Label
-                    htmlFor="enable-tax-adjustment"
-                    className="space-y-1 text-xs"
-                  >
-                    Adj.
-                  </Label>
-                  <div className="flex items-center h-7 pt-2">
-                    <Checkbox
-                      id="enable-tax-adjustment"
-                      value={formData.adjustments?.tax.toString()}
-                      className="text-sm"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1 w-full">
-                  <Label htmlFor="taxRate" className="text-xs">
-                    Tax Rate (%)
-                  </Label>
-                  <Input
-                    type="number"
-                    id="taxRate"
-                    name="taxRate"
-                    value={formData.taxRate}
-                    onChange={handleInputChange}
-                    disabled={isViewMode}
-                    className="h-7 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="col-span-2 lg:col-span-3">
-                <Label
-                  htmlFor="taxAmount"
-                  className="text-xs text-muted-foreground"
-                >
-                  Override Tax
+              <div>
+                <Label htmlFor="taxRate" className="text-xs text-muted-foreground">
+                  Tax Rate (%)
                 </Label>
                 <Input
                   type="number"
-                  id="taxAmount"
-                  name="taxAmount"
-                  value={formData.taxAmount ?? ""}
+                  id="taxRate"
+                  name="taxRate"
+                  value={formData.taxRate}
                   onChange={handleInputChange}
-                  placeholder="Enter to override"
                   disabled={isViewMode}
                   className="h-8 text-sm"
                 />

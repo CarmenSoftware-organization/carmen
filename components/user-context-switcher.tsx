@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, Building2, MapPin, UserCog } from "lucide-react";
+import { Check, ChevronDown, Building2, MapPin, UserCog, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,10 +16,86 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/lib/context/user-context";
-import type { Role, Department, Location } from "@/lib/types/user";
+import type { Role, Department, Location, User } from "@/lib/types/user";
+
+// Demo users based on PR mock data requestorIds
+const demoUsers = [
+  {
+    id: 'user-chef-001',
+    name: 'Chef Maria Rodriguez',
+    email: 'maria.rodriguez@example.com',
+    department: 'Food & Beverage',
+    role: 'Chef',
+    avatar: '👨‍🍳'
+  },
+  {
+    id: 'user-maint-001',
+    name: 'David Thompson',
+    email: 'david.thompson@example.com',
+    department: 'Maintenance',
+    role: 'Staff',
+    avatar: '🔧'
+  },
+  {
+    id: 'user-hk-001',
+    name: 'Sarah Chen',
+    email: 'sarah.chen@example.com',
+    department: 'Housekeeping',
+    role: 'Staff',
+    avatar: '🧹'
+  },
+  {
+    id: 'user-bar-001',
+    name: 'James Mitchell',
+    email: 'james.mitchell@example.com',
+    department: 'Food & Beverage',
+    role: 'Staff',
+    avatar: '🍸'
+  },
+  {
+    id: 'user-fo-001',
+    name: 'Emily Davis',
+    email: 'emily.davis@example.com',
+    department: 'Front Office',
+    role: 'Staff',
+    avatar: '🏨'
+  },
+  {
+    id: 'user-eng-001',
+    name: 'Robert Martinez',
+    email: 'robert.martinez@example.com',
+    department: 'Maintenance',
+    role: 'Staff',
+    avatar: '⚡'
+  },
+  {
+    id: 'demo-manager',
+    name: 'Demo Manager',
+    email: 'manager@example.com',
+    department: 'Administration',
+    role: 'Department Manager',
+    avatar: '👔'
+  },
+  {
+    id: 'demo-finance',
+    name: 'Demo Finance Manager',
+    email: 'finance@example.com',
+    department: 'Administration',
+    role: 'Financial Manager',
+    avatar: '💰'
+  },
+  {
+    id: 'demo-purchasing',
+    name: 'Demo Purchasing Staff',
+    email: 'purchasing@example.com',
+    department: 'Administration',
+    role: 'Purchasing Staff',
+    avatar: '📦'
+  }
+];
 
 export function UserContextSwitcher() {
-  const { user, updateUserContext } = useUser();
+  const { user, setUser, updateUserContext } = useUser();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;
@@ -36,6 +112,30 @@ export function UserContextSwitcher() {
 
   const handleLocationChange = (location: Location) => {
     updateUserContext({ currentLocation: location });
+    setIsOpen(false);
+  };
+
+  const handleDemoUserSwitch = (demoUser: typeof demoUsers[0]) => {
+    // Create a new user object with the demo user's properties
+    // but keep the same available roles, departments, and locations
+    if (!user) return;
+    
+    const updatedUser: User = {
+      ...user,
+      id: demoUser.id,
+      name: demoUser.name,
+      email: demoUser.email,
+      department: demoUser.department,
+      role: demoUser.role,
+      // Update current role to match the demo user's role
+      context: {
+        ...user.context,
+        currentRole: user.availableRoles.find(r => r.name === demoUser.role) || user.context.currentRole,
+        currentDepartment: user.availableDepartments.find(d => d.name === demoUser.department) || user.context.currentDepartment,
+      }
+    };
+    
+    setUser(updatedUser);
     setIsOpen(false);
   };
 
@@ -192,6 +292,45 @@ export function UserContextSwitcher() {
                   )}
                 </div>
                 {user.context.currentLocation.id === location.id && (
+                  <Check className="h-4 w-4 text-primary" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+
+        <DropdownMenuSeparator />
+
+        {/* Demo User Switcher */}
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Users className="mr-2 h-4 w-4" />
+            <span>Switch to Demo User</span>
+            <Badge variant="outline" className="ml-auto">
+              Demo
+            </Badge>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="w-80">
+            <DropdownMenuLabel>Available Demo Users</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {demoUsers.map((demoUser) => (
+              <DropdownMenuItem
+                key={demoUser.id}
+                onClick={() => handleDemoUserSwitch(demoUser)}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-lg">{demoUser.avatar}</span>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{demoUser.name}</span>
+                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                      <span>{demoUser.role}</span>
+                      <span>•</span>
+                      <span>{demoUser.department}</span>
+                    </div>
+                  </div>
+                </div>
+                {user.id === demoUser.id && (
                   <Check className="h-4 w-4 text-primary" />
                 )}
               </DropdownMenuItem>

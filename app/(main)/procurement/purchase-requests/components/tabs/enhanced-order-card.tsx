@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { ChevronDown, MapPin, Calendar, Hash, Building2, MessageSquare, Save, Ban, CheckCircle, XCircle, RotateCcw } from "lucide-react"
+import { ChevronDown, MapPin, Calendar, Hash, Building2, MessageSquare, Save, Ban, CheckCircle, XCircle, RotateCcw, Edit } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import type { User, OrderItem } from "./types"
 import { PRRBACService } from "../../services/rbac-service"
@@ -22,6 +22,7 @@ interface EnhancedOrderCardProps {
   isExpanded?: boolean
   onToggleExpand?: () => void
   onViewDetails?: () => void
+  onEdit?: () => void
   isEditMode?: boolean
   isSelected?: boolean
   onSelect?: () => void
@@ -152,6 +153,7 @@ export default function EnhancedOrderCard({
   isExpanded = false,
   onToggleExpand,
   onViewDetails,
+  onEdit,
   isEditMode = false,
   isSelected = false,
   onSelect,
@@ -177,7 +179,7 @@ export default function EnhancedOrderCard({
           return ["comment", "approvedQuantity"].includes(fieldName)
         }
         // Role Purchase (Purchasing Staff) can edit comment, approved quantity, vendor, and price
-        if (roleName === "Purchasing Staff" && (status === "Approved" || status === "Review")) {
+        if (roleName === "Purchasing Staff" && (status === "approved" || status === "Review")) {
           return ["comment", "approvedQuantity", "vendor", "price"].includes(fieldName)
         }
         return false
@@ -251,13 +253,13 @@ export default function EnhancedOrderCard({
   }
 
   const handleApprove = () => {
-    const updatedOrder = { ...editedOrder, status: "Approved" as const }
+    const updatedOrder = { ...editedOrder, status: "approved" as const }
     setEditedOrder(updatedOrder)
     onOrderUpdate(order.id, updatedOrder)
   }
 
   const handleReject = () => {
-    const updatedOrder = { ...editedOrder, status: "Rejected" as const }
+    const updatedOrder = { ...editedOrder, status: "rejected" as const }
     setEditedOrder(updatedOrder)
     onOrderUpdate(order.id, updatedOrder)
   }
@@ -444,6 +446,12 @@ export default function EnhancedOrderCard({
               <Button variant="outline" size="sm" onClick={onViewDetails}>
                 Details
               </Button>
+              {onEdit && (
+                <Button variant="outline" size="sm" onClick={onEdit}>
+                  <Edit className="mr-1 h-4 w-4" />
+                  Edit
+                </Button>
+              )}
               {onToggleExpand && (
                 <Button variant="ghost" size="sm" onClick={onToggleExpand}>
                   <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />

@@ -685,30 +685,71 @@ export function PurchaseOrderList() {
     setShowCreateFromPRDialog(false);
     
     if (selectedPRs.length > 0) {
-      // Store selected PRs in localStorage or state management solution
-      // Using try-catch to handle cases where localStorage might not be available
+      // Group PRs by vendor and currency - each group becomes a separate PO
+      const groupedPRs = selectedPRs.reduce((groups, pr) => {
+        const key = `${pr.vendor}-${pr.currency}`;
+        if (!groups[key]) {
+          groups[key] = {
+            vendor: pr.vendor,
+            vendorId: pr.vendorId,
+            currency: pr.currency,
+            prs: [],
+            totalAmount: 0
+          };
+        }
+        groups[key].prs.push(pr);
+        groups[key].totalAmount += pr.totalAmount;
+        return groups;
+      }, {} as Record<string, { 
+        vendor: string; 
+        vendorId: number; 
+        currency: string; 
+        prs: PurchaseRequest[]; 
+        totalAmount: number 
+      }>);
+
+      // Store grouped PRs for PO creation
       try {
         if (typeof window !== 'undefined') {
-          localStorage.setItem('selectedPurchaseRequests', JSON.stringify(selectedPRs));
+          localStorage.setItem('groupedPurchaseRequests', JSON.stringify(groupedPRs));
+          localStorage.setItem('selectedPurchaseRequests', JSON.stringify(selectedPRs)); // Keep for compatibility
         }
       } catch (error) {
-        console.error('Error storing selected PRs:', error);
+        console.error('Error storing grouped PRs:', error);
       }
       
-      // Navigate to the new PO page in add mode
-      router.push('/procurement/purchase-orders/new?mode=add&fromPR=true');
+      // Navigate to PO creation page with grouped data
+      const groupCount = Object.keys(groupedPRs).length;
+      if (groupCount === 1) {
+        // Single PO - go directly to creation page
+        router.push('/procurement/purchase-orders/create?mode=fromPR&grouped=true');
+      } else {
+        // Multiple POs - go to bulk creation page or show summary
+        router.push('/procurement/purchase-orders/create?mode=fromPR&grouped=true&bulk=true');
+      }
     }
   };
 
   // Action buttons
   const actionButtons = (
     <>
-      <Button 
-        onClick={() => setShowCreateFromPRDialog(true)}
-        className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
-      >
-        <Plus className="mr-2 h-4 w-4" /> New Purchase Order
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
+            <Plus className="mr-2 h-4 w-4" /> New Purchase Order
+            <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => router.push("/procurement/purchase-orders/create")}>
+            Create Blank PO
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowCreateFromPRDialog(true)}>
+            Create from Purchase Requests
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Button variant="outline">
         <FileDown className="mr-2 h-4 w-4" />
         Export
@@ -732,15 +773,14 @@ export function PurchaseOrderList() {
       <Dialog 
         open={showCreateFromPRDialog} 
         onOpenChange={(open) => {
-          // Only allow the dialog to be closed, not opened via this handler
           if (!open) setShowCreateFromPRDialog(false);
         }}
       >
-        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Create PO from Purchase Requests</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 flex-1 min-h-0 overflow-auto">
             <CreatePOFromPR onSelectPRs={handleSelectPRs} />
           </div>
           <DialogFooter className="sm:justify-end">

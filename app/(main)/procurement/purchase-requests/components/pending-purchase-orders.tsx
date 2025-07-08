@@ -48,7 +48,7 @@ const poData = [
 const itemData = {
   name: "Organic Quinoa vv",
   description: "Premium organic white quinoa grains",
-  status: "Accepted",
+  status: "Approved",
   requestedQuantity: 500,
   approvedQuantity: 450,
   unit: "Kg",

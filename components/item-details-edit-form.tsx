@@ -67,7 +67,7 @@ const sampleItemData = {
 }
 
 export function ItemDetailsEditForm({ onSave, onCancel, onDelete, initialData = sampleItemData }: ItemDetailsFormProps) {
-  const [mode, setMode] = useState<FormMode>(initialData ? 'view' : 'add')
+  const [mode, setMode] = useState<FormMode>(initialData ? 'edit' : 'add')
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(
     initialData?.deliveryDate ? parse(initialData.deliveryDate, 'yyyy-MM-dd', new Date()) : undefined
   )

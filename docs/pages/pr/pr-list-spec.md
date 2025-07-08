@@ -36,6 +36,30 @@ The page is organized into the following sections:
 - The header uses a clean, minimal design with adequate spacing
 - Primary action buttons are prominently displayed with appropriate icons
 - The "New PR" button uses the primary color to draw attention
+- Consistent button height (h-9) and spacing for visual alignment
+- Icons positioned to the left of button text with proper spacing
+
+### 2.3. RBAC-Driven Action Availability
+
+**Role-Based Button Visibility:**
+```typescript
+interface HeaderActions {
+  newPR: boolean;        // Available to Staff and above
+  export: boolean;       // Available to all roles
+  print: boolean;        // Available to all roles
+  viewToggle: boolean;   // Available to all roles
+}
+
+// Example role configuration
+const getHeaderActions = (userRole: string): HeaderActions => {
+  return {
+    newPR: ['Staff', 'Department Manager', 'Purchasing Staff'].includes(userRole),
+    export: true,
+    print: true,
+    viewToggle: true
+  };
+};
+```
 
 ## 3. Filter Bar Section
 
@@ -55,13 +79,41 @@ The filter interface dynamically adapts based on user's role configuration:
 ```typescript
 interface RoleConfiguration {
   widgetAccess: {
-    myPR: boolean;        // Shows "My PR" toggle
-    myApproval: boolean;  // Shows "My Approvals" toggle
+    myPR: boolean;        // Shows "My Pending" toggle
+    myApproval: boolean;  // Shows "All Documents" toggle
     myOrder: boolean;     // Shows "Ready for PO" toggle
   }
   visibilitySetting: 'location' | 'department' | 'full';
 }
+
+// Current Implementation - Widget Toggle System
+const WidgetToggleSystem = {
+  staff: {
+    available: ['myPending'],
+    default: 'myPending',
+    label: 'My Pending'
+  },
+  departmentManager: {
+    available: ['myPending', 'allDocuments'],
+    default: 'myPending',
+    labels: { myPending: 'My Pending', allDocuments: 'All Documents' }
+  },
+  purchasingStaff: {
+    available: ['myPending', 'allDocuments', 'readyForPO'],
+    default: 'allDocuments',
+    labels: { 
+      myPending: 'My Pending', 
+      allDocuments: 'All Documents',
+      readyForPO: 'Ready for PO'
+    }
+  }
+};
 ```
+
+**Secondary Filter Integration:**
+- **My Pending Widget**: Shows status-based secondary filters (Draft, Submitted, Approved, etc.)
+- **All Documents Widget**: Shows workflow stage-based filters (Department Approval, Financial Approval, etc.)
+- **Dynamic Filter Options**: Secondary filters change based on selected primary widget
 
 ### 3.3. Advanced Filter Panel
 
@@ -134,10 +186,34 @@ interface RoleConfiguration {
 
 ### 5.4. Grid View Alternative
 
-- Displays PRs as cards in a grid layout
-- Each card shows key information: Ref Number, Date, Requestor, Status, Total Amount
-- Cards have the same action options as table rows
-- Cards use color-coding for status indication
+**Enhanced Card Layout:**
+```
+┌─────────────────────────────────────────────┐
+│ PR-2024-001                    [Draft Badge] │
+│ Kitchen Equipment Request                     │
+│ ─────────────────────────────────────────── │
+│ 👤 Chef Maria Rodriguez                      │
+│ 🏢 Kitchen Department                        │
+│ 📅 Jan 15, 2024 → Required: Jan 25, 2024   │
+│ 💰 $5,627.50 THB                            │
+│ ─────────────────────────────────────────── │
+│ [View] [Edit] [Delete] [•••]                │
+└─────────────────────────────────────────────┘
+```
+
+**Card Features:**
+- **Responsive grid**: 3-4 cards per row on desktop, 1-2 on tablet, 1 on mobile
+- **Status-based border colors**: Visual hierarchy through color coding
+- **Hover animations**: Subtle lift effect and shadow on hover
+- **Role-based actions**: Action buttons adapt to user permissions
+- **Financial information masking**: Pricing hidden from Requestor roles
+- **Overflow menu**: Additional actions in dropdown for space efficiency
+
+**Visual Design Elements:**
+- **Card elevation**: Subtle shadows with hover state enhancement
+- **Typography hierarchy**: Bold ref numbers, medium titles, light metadata
+- **Icon consistency**: Standardized icons for user, department, date, currency
+- **Action button styling**: Consistent button sizes and spacing
 
 ## 6. Pagination Section
 
@@ -247,3 +323,176 @@ interface RoleConfiguration {
 - **User Permissions**: Integration with RBAC system
 - **Notifications**: Real-time updates for status changes
 - **Export Services**: Integration with export/print services
+
+## 13. Enhanced UI Components and Patterns
+
+### 13.1. StatusBadge Component
+
+**Implementation:**
+```typescript
+interface StatusBadgeProps {
+  status: DocumentStatus;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className, size = 'md' }) => {
+  const statusConfig = {
+    draft: { color: 'gray', bg: 'bg-gray-100', text: 'text-gray-800', label: 'Draft' },
+    submitted: { color: 'blue', bg: 'bg-blue-100', text: 'text-blue-800', label: 'Submitted' },
+    inProgress: { color: 'yellow', bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'In Progress' },
+    approved: { color: 'green', bg: 'bg-green-100', text: 'text-green-800', label: 'Approved' },
+    rejected: { color: 'red', bg: 'bg-red-100', text: 'text-red-800', label: 'Rejected' },
+    completed: { color: 'purple', bg: 'bg-purple-100', text: 'text-purple-800', label: 'Completed' }
+  };
+  
+  return (
+    <span className={`badge ${statusConfig[status].bg} ${statusConfig[status].text} ${className}`}>
+      {statusConfig[status].label}
+    </span>
+  );
+};
+```
+
+### 13.2. AdvancedFilter System
+
+**Filter Panel Layout:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Advanced Filters                                       [✕] │
+├─────────────────────────────────────────────────────────────┤
+│ ┌─── Basic Filters ─────────────────────────────────────────┐ │
+│ │ Status: [Multiple Select ▼]                              │ │
+│ │ Date Range: [From Date] - [To Date]                      │ │
+│ │ Department: [Select ▼]                                   │ │
+│ │ Requestor: [Autocomplete Field]                          │ │
+│ └───────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─── Financial Filters ────────────────────────────────────┐ │
+│ │ Amount Range: [$0.00] - [$10,000.00]                    │ │
+│ │ Currency: [THB ▼]                                        │ │
+│ │ Vendor: [Autocomplete Field]                             │ │
+│ └───────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─── Workflow Filters ─────────────────────────────────────┐ │
+│ │ Current Stage: [Multiple Select ▼]                       │ │
+│ │ Assigned to Me: [☐] Include items requiring my action   │ │
+│ └───────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ [Clear All] [Apply Filters] [Save as Preset]               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Features:**
+- **Multi-select dropdowns**: Allow selection of multiple values for status, stage, etc.
+- **Date range pickers**: With preset options (Today, This Week, This Month, etc.)
+- **Autocomplete fields**: For requestor and vendor selection with search capability
+- **Saved filter presets**: Allow users to save frequently used filter combinations
+- **Real-time preview**: Show count of matching items as filters are applied
+
+### 13.3. Bulk Operations Enhanced Flow
+
+**Bulk Action Modal:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Bulk Action: Approve Selected Items                    [✕] │
+├─────────────────────────────────────────────────────────────┤
+│ You have selected 5 items:                                 │
+│ • 3 items ready for approval                               │
+│ • 2 items in review status                                 │
+│                                                             │
+│ ⚠️ Items in review status will be skipped                   │
+│                                                             │
+│ ┌─── Approval Settings ──────────────────────────────────┐ │
+│ │ Comments (optional):                                    │ │
+│ │ [Text area for bulk approval comments]                  │ │
+│ │                                                         │ │
+│ │ Notification Settings:                                  │ │
+│ │ [☑] Notify requestors of approval                       │ │
+│ │ [☑] Notify next stage approvers                         │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ [Cancel] [Approve 3 Items]                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 13.4. Responsive Table Patterns
+
+**Mobile Table Adaptation:**
+- **Priority column system**: Essential columns always visible, others collapsible
+- **Expandable rows**: Secondary information revealed on tap
+- **Swipe actions**: Left/right swipe for common actions
+- **Sticky headers**: Column headers remain visible during scroll
+
+**Tablet Optimization:**
+- **Horizontal scroll**: Full table with smooth scrolling
+- **Column reordering**: Drag and drop column arrangement
+- **Density controls**: Compact, normal, and comfortable row heights
+
+### 13.5. Real-time Updates and Notifications
+
+**Live Data Synchronization:**
+```typescript
+// WebSocket integration for real-time updates
+const useLiveUpdates = (prList: PurchaseRequest[]) => {
+  useEffect(() => {
+    const socket = new WebSocket('/api/live-updates');
+    
+    socket.onmessage = (event) => {
+      const update = JSON.parse(event.data);
+      if (update.type === 'PR_STATUS_CHANGED') {
+        // Update specific PR in list
+        updatePRInList(update.prId, update.newStatus);
+        // Show toast notification
+        showNotification(`PR ${update.refNumber} status changed to ${update.newStatus}`);
+      }
+    };
+    
+    return () => socket.close();
+  }, []);
+};
+```
+
+**Notification Patterns:**
+- **Toast notifications**: Non-intrusive status updates
+- **Badge indicators**: New/updated item counts
+- **Real-time status badges**: Live status updates without page refresh
+- **Activity indicators**: Visual feedback for ongoing operations
+
+### 13.6. Accessibility Enhancements
+
+**Enhanced ARIA Implementation:**
+```typescript
+// Accessible filter controls
+<div role="region" aria-label="Purchase Request Filters">
+  <button 
+    aria-expanded={isFilterOpen}
+    aria-controls="filter-panel"
+    aria-describedby="filter-help"
+  >
+    Advanced Filters
+  </button>
+  <div id="filter-help" className="sr-only">
+    Use filters to narrow down the purchase request list
+  </div>
+</div>
+
+// Accessible table with screen reader support
+<table role="table" aria-label="Purchase Requests">
+  <thead>
+    <tr>
+      <th scope="col" aria-sort="ascending">
+        <button aria-label="Sort by Reference Number, currently ascending">
+          Ref Number ↑
+        </button>
+      </th>
+    </tr>
+  </thead>
+</table>
+```
+
+**Keyboard Navigation:**
+- **Focus management**: Logical tab order through all interactive elements
+- **Keyboard shortcuts**: Alt+N for New PR, Alt+F for filters, etc.
+- **Skip links**: Quick navigation to main content areas
+- **Escape key handling**: Close modals and dropdowns consistently

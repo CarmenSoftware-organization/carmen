@@ -54,7 +54,7 @@ const inventoryData = [
 const itemData = {
   name: "Organic Quinoa ccc",
   description: "Premium organic white quinoa grains",
-  status: "Accepted",
+  status: "Approved",
 }
 
 export default function InventoryBreakdown() {
@@ -72,8 +72,7 @@ export default function InventoryBreakdown() {
           <TableRow className="text-nowrap">
             <TableHead className="w-[180px]">Location</TableHead>
             <TableHead >Quantity On Hand</TableHead>
-            <TableHead >Inv. Units</TableHead>
-            <TableHead >Par</TableHead>
+            <TableHead >Par Level</TableHead>
             <TableHead >Reorder Point</TableHead>
             <TableHead >Min Stock</TableHead>
             <TableHead >Max Stock</TableHead>
@@ -83,12 +82,11 @@ export default function InventoryBreakdown() {
           {inventoryData.map((item) => (
             <TableRow className="text-nowrap" key={item.location}>
               <TableCell className="font-medium">{item.location}</TableCell>
-              <TableCell>{item.quantityOnHand}</TableCell>
-              <TableCell>{item.units}</TableCell>
-              <TableCell>{item.par}</TableCell>
-              <TableCell>{item.reorderPoint}</TableCell>
-              <TableCell>{item.minStock}</TableCell>
-              <TableCell>{item.maxStock}</TableCell>
+              <TableCell>{item.quantityOnHand} {item.units}</TableCell>
+              <TableCell>{item.par} {item.units}</TableCell>
+              <TableCell>{item.reorderPoint} {item.units}</TableCell>
+              <TableCell>{item.minStock} {item.units}</TableCell>
+              <TableCell>{item.maxStock} {item.units}</TableCell>
             </TableRow>
           ))}
         </TableBody>

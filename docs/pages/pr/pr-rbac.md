@@ -1,54 +1,85 @@
 # Purchase Request: Role-Based Access Control (RBAC)
 
-This document outlines the Role-Based Access Control (RBAC) for the Purchase Request (PR) module. The permissions are defined based on user roles.
+This document outlines the Role-Based Access Control (RBAC) for the Purchase Request (PR) module, categorizing permissions based on user roles and workflow stages.
 
 ## 1. Roles
 
-*   **Requester**: A user who can create and submit purchase requests.
-*   **Approver**: A user who is responsible for approving or rejecting purchase requests.
-*   **Purchasing**: A user who is responsible for processing approved purchase requests.
-*   **Admin**: A user with full access to the system.
+- **Requester**: Can create, edit, and submit PRs. Can view their own PRs.
+- **Approver**: Can approve, reject, or send back PRs for revision. Can view PRs pending their approval.
+- **Purchasing**: Can process approved PRs, create purchase orders, and manage vendors. Can allocate vendor, change price, discount, quantity, unit, and override tax and discount. Can view all PRs.
+- **Admin**: Has full access to all PRs and can perform any action.
 
-## 2. Permissions Matrix
+## 2. Role-Based Permissions
+
+These permissions are directly tied to a user's assigned role, regardless of the PR's current workflow status.
+
+### 2.1. Action-Level Permissions
 
 | Action | Requester | Approver | Purchasing | Admin |
-| :--- | :--- | :--- | :--- | :--- |
-| **Create PR** | Yes | No | No | Yes |
-| **View Own PRs** | Yes | N/A | N/A | Yes |
-| **View All PRs** | No | No | Yes | Yes |
-| **Edit PR (Draft)** | Yes | No | No | Yes |
-| **Edit PR (Submitted)** | No | No | No | Yes |
-| **Edit PR (Rejected)** | Yes | No | No | Yes |
-| **Submit PR** | Yes | No | No | Yes |
-| **Approve PR** | No | Yes | No | Yes |
-| **Reject PR** | No | Yes | No | Yes |
-| **Send Back PR** | No | Yes | No | Yes |
-| **Add Item to PR** | Yes | No | No | Yes |
-| **Edit Item in PR** | Yes | No | No | Yes |
-| **Delete Item from PR** | Yes | No | No | Yes |
-| **View PR Budget** | Yes | Yes | Yes | Yes |
-| **View PR Workflow** | Yes | Yes | Yes | Yes |
-| **View PR Attachments** | Yes | Yes | Yes | Yes |
-| **View PR Activity Log** | Yes | Yes | Yes | Yes |
+| --- | --- | --- | --- | --- |
+| Create PR | ✅ | ❌ | ❌ | ✅ |
+| Edit PR | ✅ (own, before submission) | ❌ | ❌ | ✅ |
+| Delete PR | ✅ (own, before submission) | ❌ | ❌ | ✅ |
+| Submit PR | ✅ (own) | ❌ | ❌ | ✅ |
+| View All PRs | ❌ | ❌ | ✅ | ✅ |
+| View Own PRs | ✅ | ✅ (pending approval) | ✅ | ✅ |
 
-## 3. Field-Level Permissions
+### 2.2. PR Header Field-Level Permissions
 
-In addition to the action-level permissions, there are also field-level permissions that restrict which fields a user can edit based on their role and the current status of the PR.
+| Field | Requester | Approver | Purchasing | Admin |
+| --- | --- | --- | --- | --- |
+| Reference Number | ✅ | ❌ | ❌ | ✅ |
+| Date | ✅ | ❌ | ❌ | ✅ |
+| Type | ✅ | ❌ | ❌ | ✅ |
+| Requestor | ✅ | ❌ | ❌ | ✅ |
+| Department | ✅ | ❌ | ❌ | ✅ |
+| Description | ✅ | ❌ | ❌ | ✅ |
 
-*   **Requester**: Can edit most fields when the PR is in "Draft" or "Rejected" status.
-*   **Approver**: Can only edit specific fields, such as the "Approved Quantity" of an item.
-*   **Purchasing**: Can edit fields related to the purchasing process, such as the vendor and price.
+### 2.3. PR Item Field-Level Permissions
 
-These field-level permissions are enforced by the `canEditField` utility function.
+These permissions apply to individual fields within PR items.
 
-## 4. Item-Level Action Permissions
+| Field | Requester | Approver | Purchasing | Admin |
+| --- | --- | --- | --- | --- |
+| Location | ✅ | ❌ | ❌ | ✅ |
+| Product | ✅ | ❌ | ❌ | ✅ |
+| Comment | ✅ | ✅ | ✅ | ✅ |
+| Request Qty | ✅ | ❌ | ❌ | ✅ |
+| Request Unit | ✅ | ❌ | ❌ | ✅ |
+| Required Date | ✅ | ❌ | ❌ | ✅ |
+| Approved Qty | ❌ | ✅ | ✅ | ✅ |
+| Vendor | ❌ | ❌ | ✅ | ✅ |
+| Price | ❌ | ❌ | ✅ | ✅ |
+| Order Unit | ❌ | ❌ | ✅ | ✅ |
+| Discount | ❌ | ❌ | ✅ | ✅ |
+| Tax | ❌ | ❌ | ✅ | ✅ |
+| Override Discount | ❌ | ❌ | ✅ | ✅ |
+| Override Tax | ❌ | ❌ | ✅ | ✅ |
+
+## 3. Workflow-Based Permissions
+
+These permissions are dependent on the PR's current workflow stage and apply to actions that move the PR through its lifecycle.
+
+### 3.1. PR Item Action-Level Permissions
 
 | Action | Role | Item Status | Allowed |
-| :--- | :--- | :--- | :--- |
-| Approve | Department Manager | `Pending`, `Review` | Yes |
-| Reject | Department Manager | `Pending`, `Review` | Yes |
-| Review | Department Manager | `Pending`, `Review` | Yes |
-| Approve | Purchasing Staff | `Approved`, `Review` | Yes |
-| Reject | Purchasing Staff | `Approved`, `Review` | Yes |
-| Review | Purchasing Staff | `Approved`, `Review` | Yes |
-| Review | Requester | `Pending` | Yes |
+| --- | --- | --- | --- |
+| **Approve PR** | Approver | Any | ✅ |
+| | Admin | Any | ✅ |
+| **Reject PR** | Approver | Any | ✅ |
+| | Admin | Any | ✅ |
+| **Send Back PR** | Approver | Any | ✅ |
+| | Admin | Any | ✅ |
+| **Edit Item** | Requester | `Pending` | ✅ |
+| | Requester | `Rejected` | ✅ |
+| | Approver | `Pending` | ❌ |
+| | Purchasing | `Approved` | ✅ |
+| | Admin | Any | ✅ |
+| **Delete Item** | Requester | `Pending` | ✅ |
+| | Admin | Any | ✅ |
+| **Approve Item** | Approver | `Pending` | ✅ |
+| | Admin | Any | ✅ |
+| **Reject Item** | Approver | `Pending` | ✅ |
+| | Admin | Any | ✅ |
+| **Send Back Item** | Approver | `Pending` | ✅ |
+| | Admin | Any | ✅ |

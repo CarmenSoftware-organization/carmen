@@ -34,6 +34,7 @@ export default function PRDetailPage({ params }: { params: { id: string } }) {
   const [action, setAction] = useState<"approve" | "reject" | "return" | null>(null)
   const [reason, setReason] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [itemComments, setItemComments] = useState<Record<string, string>>({})
 
   // Mock data for PR details
   const prDetails = {
@@ -233,14 +234,15 @@ export default function PRDetailPage({ params }: { params: { id: string } }) {
 
         <h2 className="text-lg font-medium mb-3">Line Items</h2>
         <div className="border rounded-md overflow-hidden mb-6">
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 bg-muted text-sm font-medium">
+          <div className="grid grid-cols-[1fr_auto_auto_2fr] gap-2 p-3 bg-muted text-sm font-medium">
             <div>Item</div>
             <div className="text-right">Qty</div>
             <div className="text-right">On Hand</div>
+            <div>Comment</div>
           </div>
 
           {prDetails.items.map((item) => (
-            <div key={item.id} className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 border-t text-sm">
+            <div key={item.id} className="grid grid-cols-[1fr_auto_auto_2fr] gap-2 p-3 border-t text-sm items-center">
               <div>
                 <div className="font-medium">{item.name}</div>
                 <div className="text-xs text-muted-foreground">
@@ -249,6 +251,19 @@ export default function PRDetailPage({ params }: { params: { id: string } }) {
               </div>
               <div className="text-right self-center">{item.quantity}</div>
               <div className="text-right self-center">{item.onHand}</div>
+              <div>
+                <Textarea
+                  placeholder="Add a comment..."
+                  className="text-sm"
+                  value={itemComments[item.id] || ""}
+                  onChange={(e) =>
+                    setItemComments((prev) => ({
+                      ...prev,
+                      [item.id]: e.target.value,
+                    }))
+                  }
+                />
+              </div>
             </div>
           ))}
         </div>

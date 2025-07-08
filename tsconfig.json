@@ -6,6 +6,7 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "downlevelIteration": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -22,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(main)/procurement/credit-note/components/credit-note-detail.tsx", "docs/advance-filter/filter-component-mockup.tsx.src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "docs/**/*"]
 }

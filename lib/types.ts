@@ -398,6 +398,13 @@ export interface PurchaseRequestItem {
   };
   accountCode: string;
   jobCode: string;
+  // Business Dimensions (Allocation Fields)
+  event?: string;
+  project?: string;
+  marketSegment?: string;
+  // Tax and Discount Types
+  taxType?: string;
+  discountType?: string;
   baseSubTotalPrice: number;
   subTotalPrice: number;
   baseNetAmount: number;
@@ -413,14 +420,36 @@ export interface PurchaseRequestItem {
 
 export type PurchaseRequestItemStatus =
  "Pending"|
- "Accepted"|
+ "Approved"|
  "Rejected"|
  "Review";
 
+export interface ReturnStep {
+  id: string;
+  label: string;
+  description: string;
+  targetStage: string;
+}
+
+export interface ConsolidatedButtonState {
+  action: "approve" | "reject" | "return" | "disabled";
+  label: string;
+  color: string;
+  disabled: boolean;
+  requiresStepSelection?: boolean;
+}
+
 
 export interface WorkflowStep {
-  stage: WorkflowStage;
+  stage?: WorkflowStage;
   status: WorkflowStatus;
+  stepId?: string;
+  stepName?: string;
+  assignedUserId?: string;
+  assignedUserName?: string;
+  completedDate?: Date;
+  comments?: string;
+  order?: number;
 }
 
 export interface GoodsReceiveNote {
@@ -627,9 +656,10 @@ export interface ActivityLogEntry {
   action: string;
   userId: string;
   userName: string;
-  activityType: string;
+  activityType?: string;
   description: string;
   timestamp: Date;
+  details?: string;
 }
 
 export interface Department {
@@ -707,6 +737,17 @@ export interface PurchaseRequest {
   taxAmount: number;
   baseTotalAmount: number;
   totalAmount: number;
+  comments?: Comment[];
+  approvals?: WorkflowStep[];
+  deliveryPoint?: string;
+  activityLog?: ActivityLogEntry[];
+  additionalCharges?: Money;
+  budgetCode?: string;
+  allocatedBudget?: Money;
+  yearToDateSpending?: Money;
+  exchangeRate?: number;
+  exchangeRateDate?: Date;
+  items?: PurchaseRequestItem[];
 }
 
 export type WorkflowAction = "approve" | "reject" | "sendBack";

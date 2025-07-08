@@ -53,6 +53,7 @@ import StatusBadge from "@/components/ui/custom-status-badge";
 import { AdvancedFilter } from '@/components/ui/advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
 import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, CurrencyCode } from '@/lib/types'
+import { mockPRListData } from './mockPRListData'
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -81,113 +82,8 @@ interface SortConfig {
   direction: "asc" | "desc"
 }
 
-const sampleData: PurchaseRequest[] = [
-  {
-    id: 'sample-pr-001',
-    refNumber: 'PR-2023-001',
-    date: new Date('2023-01-01'),
-    type: PRType.GeneralPurchase,
-    description: 'Sample purchase request for office supplies',
-    requestorId: 'user-001',
-    requestor: {
-      name: 'John Doe',
-      id: 'user-001',
-      department: 'Administration'
-    },
-    status: DocumentStatus.Draft,
-    workflowStatus: WorkflowStatus.pending,
-    currentWorkflowStage: WorkflowStage.requester,
-    location: 'Head Office',
-    department: 'Administration',
-    jobCode: 'JOB-001',
-    estimatedTotal: 1500,
-    vendor: 'Office Supplies Co.',
-    vendorId: 1,
-    deliveryDate: new Date('2023-01-15'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 1000,
-    subTotalPrice: 1000,
-    baseNetAmount: 1000,
-    netAmount: 1000,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 100,
-    taxAmount: 100,
-    baseTotalAmount: 1100,
-    totalAmount: 1100
-  },
-  {
-    id: 'sample-pr-002',
-    refNumber: 'PR-2023-002',
-    date: new Date('2023-01-02'),
-    type: PRType.GeneralPurchase,
-    description: 'IT Equipment and Supplies',
-    requestorId: 'user-002',
-    requestor: {
-      name: 'Jane Smith',
-      id: 'user-002',
-      department: 'IT'
-    },
-    status: DocumentStatus.InProgress,
-    workflowStatus: WorkflowStatus.pending,
-    currentWorkflowStage: WorkflowStage.departmentHeadApproval,
-    location: 'Branch Office',
-    department: 'IT',
-    jobCode: 'JOB-002',
-    estimatedTotal: 2500,
-    vendor: 'Tech Solutions Inc.',
-    vendorId: 2,
-    deliveryDate: new Date('2023-01-20'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 2000,
-    subTotalPrice: 2000,
-    baseNetAmount: 2000,
-    netAmount: 2000,
-    baseDiscAmount: 100,
-    discountAmount: 100,
-    baseTaxAmount: 150,
-    taxAmount: 150,
-    baseTotalAmount: 2050,
-    totalAmount: 2050
-  },
-  {
-    id: 'sample-pr-003',
-    refNumber: 'PR-2023-003',
-    date: new Date('2023-01-03'),
-    type: PRType.GeneralPurchase,
-    description: 'Marketing Materials',
-    requestorId: 'user-003',
-    requestor: {
-      name: 'Bob Wilson',
-      id: 'user-003',
-      department: 'Marketing'
-    },
-    status: DocumentStatus.InProgress,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'Main Office',
-    department: 'Marketing',
-    jobCode: 'JOB-003',
-    estimatedTotal: 3000,
-    vendor: 'Marketing Pro Ltd.',
-    vendorId: 3,
-    deliveryDate: new Date('2023-01-25'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 2800,
-    subTotalPrice: 2800,
-    baseNetAmount: 2800,
-    netAmount: 2800,
-    baseDiscAmount: 140,
-    discountAmount: 140,
-    baseTaxAmount: 200,
-    taxAmount: 200,
-    baseTotalAmount: 2860,
-    totalAmount: 2860
-  }
-];
+// Use mockup data from our comprehensive PR list
+const sampleData: PurchaseRequest[] = mockPRListData;
 
 const filterFields: { value: keyof PurchaseRequest; label: string }[] = [
   { value: 'refNumber', label: 'PR Number' },
@@ -377,11 +273,11 @@ export function PurchaseRequestList() {
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<'table' | 'card'>('table');
-  const [toggleMode, setToggleMode] = useState<'myPR' | 'myApproval' | 'myOrder' | 'allDocument'>('myPR');
+  const [toggleMode, setToggleMode] = useState<'myPending' | 'allDocument'>('allDocument');
   const [selectedRequestor, setSelectedRequestor] = React.useState<string>('');
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState('all');
   const { user } = useUser(); // Get current user from context
-  const currentUserId = user?.id || 'user-001'; // Use actual user ID from context
+  const currentUserId = user?.id || 'demo-user'; // Use actual user ID from context
   
   // RBAC state
   const [availableWidgets, setAvailableWidgets] = useState<string[]>([]);
@@ -400,12 +296,14 @@ export function PurchaseRequestList() {
       
       // Determine available widgets based on role configuration
       const widgets = [];
-      if (config.widgetAccess.myPR) widgets.push('myPR');
-      if (config.widgetAccess.myApproval) widgets.push('myApproval');
-      if (config.widgetAccess.myOrder) widgets.push('myOrder');
+      // Always add myPending for all users
+      widgets.push('myPending');
       
-      // Always add allDocument for admins or users with full visibility
-      if (user.role === 'System Administrator' || config.visibilitySetting === 'full') {
+      // Add allDocument for admins, managers, or users with elevated access
+      if (user.role === 'System Administrator' || 
+          user.role === 'Department Manager' || 
+          user.role === 'Purchasing Staff' ||
+          config.visibilitySetting === 'full') {
         widgets.push('allDocument');
       }
       
@@ -515,11 +413,11 @@ export function PurchaseRequestList() {
   };
 
   const handleViewPR = (id: string) => {
-    router.push(`/procurement/purchase-requests/${id}?mode=view`);
+    router.push(`/procurement/purchase-requests/${id}?id=${id}&mode=view`);
   };
 
   const handleEditPR = (id: string) => {
-    router.push(`/procurement/purchase-requests/${id}?mode=edit`);
+    router.push(`/procurement/purchase-requests/${id}?id=${id}&mode=edit`);
   };
 
   const handleSelectPR = (id: string) => {
@@ -541,26 +439,27 @@ export function PurchaseRequestList() {
     
     // Apply widget-specific filters based on RBAC
     switch (toggleMode) {
-      case 'myPR':
-        // Show ALL PRs created by the user (all statuses)
-        result = result.filter(pr => pr.requestorId === currentUserId);
-        break;
-        
-      case 'myApproval':
-        // Show PRs pending user's approval at assigned workflow stages
+      case 'myPending':
+        // Show combined pending items for current user:
+        // 1. All PRs created by user that are not yet approved
+        // 2. All PRs pending user's approval at assigned workflow stages
+        // 3. For demo purposes, also include pending/in-progress items
         const userAssignedStages = user?.assignedWorkflowStages || [];
-        result = result.filter(pr => 
-          userAssignedStages.includes(pr.currentWorkflowStage) && 
-          [DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status)
-        );
-        break;
-        
-      case 'myOrder':
-        // Show approved PRs ready for purchase order creation
-        result = result.filter(pr => 
-          pr.status === DocumentStatus.Approved && 
-          pr.currentWorkflowStage === WorkflowStage.Completed
-        );
+        result = result.filter(pr => {
+          // PRs created by user that are not completed yet
+          const myUncompletedPRs = pr.requestorId === currentUserId && 
+            pr.status !== DocumentStatus.Completed;
+          
+          // PRs pending my approval (if user has assigned stages)
+          const pendingMyApproval = userAssignedStages.length > 0 ? 
+            userAssignedStages.includes(pr.currentWorkflowStage) && 
+            [DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status) : false;
+          
+          // For demo purposes: if no user context, show all non-completed items
+          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status);
+          
+          return myUncompletedPRs || pendingMyApproval || demoMode;
+        });
         break;
         
       case 'allDocument':
@@ -568,9 +467,18 @@ export function PurchaseRequestList() {
         break;
     }
     
-    // Apply secondary filters (workflow stage)
+    // Apply secondary filters based on toggle mode
     if (selectedWorkflowStage && selectedWorkflowStage !== 'all') {
-      result = result.filter(pr => pr.currentWorkflowStage === selectedWorkflowStage);
+      switch (toggleMode) {
+        case 'myPending':
+          // Filter by status for My Pending
+          result = result.filter(pr => pr.status === selectedWorkflowStage);
+          break;
+        case 'allDocument':
+          // Filter by workflow stage for All Documents
+          result = result.filter(pr => pr.currentWorkflowStage === selectedWorkflowStage);
+          break;
+      }
     }
     
     // Apply sorting
@@ -578,6 +486,12 @@ export function PurchaseRequestList() {
       result = [...result].sort((a, b) => {
         const aValue = a[sortConfig.field];
         const bValue = b[sortConfig.field];
+        
+        // Handle undefined values - put them at the end
+        if (aValue == null && bValue == null) return 0;
+        if (aValue == null) return 1;
+        if (bValue == null) return -1;
+        
         if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
@@ -604,57 +518,69 @@ export function PurchaseRequestList() {
       </div>
     ) : null;
 
-  // Define secondary filters based on selected widget
+  // Define secondary filters based on selected widget and available data
   const getSecondaryFilters = useMemo(() => {
+    // Get base filtered data (before workflow stage filtering)
+    let baseData = sampleData;
+    
+    // Apply widget-specific filters first
     switch (toggleMode) {
-      case 'myPR':
-        return [
-          { value: 'all', label: 'All Status' },
-          { value: 'draft', label: 'Draft' },
-          { value: 'submitted', label: 'Submitted' },
-          { value: 'inProgress', label: 'In Progress' },
-          { value: 'approved', label: 'Approved' },
-          { value: 'rejected', label: 'Rejected' }
-        ];
-      
-      case 'myApproval':
-        // Get workflow stages assigned to the user
+      case 'myPending':
         const userAssignedStages = user?.assignedWorkflowStages || [];
-        return [
-          { value: 'all', label: 'All Stages' },
-          ...userAssignedStages.map(stage => ({
-            value: stage,
-            label: stage.replace(/([A-Z])/g, ' $1').trim() // Convert camelCase to spaces
-          }))
+        baseData = baseData.filter(pr => {
+          const myUncompletedPRs = pr.requestorId === currentUserId && 
+            pr.status !== DocumentStatus.Completed;
+          const pendingMyApproval = userAssignedStages.length > 0 ? 
+            userAssignedStages.includes(pr.currentWorkflowStage) && 
+            [DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status) : false;
+          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status);
+          return myUncompletedPRs || pendingMyApproval || demoMode;
+        });
+        break;
+      case 'allDocument':
+        // No additional filtering for all documents
+        break;
+    }
+    
+    // Get unique workflow stages and statuses from the filtered data
+    const uniqueStages = [...new Set(baseData.map(pr => pr.currentWorkflowStage).filter(Boolean))];
+    const uniqueStatuses = [...new Set(baseData.map(pr => pr.status).filter(Boolean))];
+    
+    // Create filter options based on toggle mode
+    switch (toggleMode) {
+      case 'myPending':
+        const statusFilters = [
+          { value: 'all', label: 'All Status' }
         ];
-      
-      case 'myOrder':
-        return [
-          { value: 'all', label: 'All Approved' },
-          { value: 'pending', label: 'Pending PO Creation' },
-          { value: 'inProgress', label: 'PO In Progress' },
-          { value: 'completed', label: 'PO Created' }
-        ];
+        
+        // Add all DocumentStatus enum values
+        Object.values(DocumentStatus).forEach(status => {
+          statusFilters.push({
+            value: status,
+            label: status.replace(/([A-Z])/g, ' $1').trim()
+          });
+        });
+        
+        return statusFilters;
       
       case 'allDocument':
       default:
-        return [
-          { value: 'all', label: 'All Stages' },
-          { value: 'requester', label: 'Requester' },
-          { value: 'departmentHeadApproval', label: 'Department Head Approval' },
-          { value: 'financeApproval', label: 'Finance Approval' },
-          { value: 'completed', label: 'Completed' },
-          { value: 'rejected', label: 'Rejected' }
+        const stageFilters = [
+          { value: 'all', label: 'All Stages' }
         ];
+        
+        // Add available workflow stages
+        uniqueStages.forEach(stage => {
+          stageFilters.push({
+            value: stage,
+            label: stage.replace(/([A-Z])/g, ' $1').trim()
+          });
+        });
+        
+        return stageFilters;
     }
-  }, [toggleMode, user?.assignedWorkflowStages]);
+  }, [toggleMode, sampleData, currentUserId, user?.assignedWorkflowStages]);
 
-  const documentStatuses = [
-    { value: 'all', label: 'All Status' },
-    { value: 'inProgress', label: 'In Progress' },
-    { value: 'complete', label: 'Complete' },
-    { value: 'reject', label: 'Reject' }
-  ]
 
   const filters = (
     <div>
@@ -669,61 +595,31 @@ export function PurchaseRequestList() {
         {/* RBAC-controlled widget toggles */}
         <div className="inline-flex rounded-md shadow-sm border">
           {/* Only show widgets the user has access to */}
-          {availableWidgets.includes('myPR') && (
+          {availableWidgets.includes('myPending') && (
             <Button
-              variant={toggleMode === 'myPR' ? 'default' : 'ghost'}
+              variant={toggleMode === 'myPending' ? 'default' : 'ghost'}
               size="sm"
               className="rounded-none h-8 px-4"
               onClick={() => {
-                setToggleMode('myPR');
+                setToggleMode('myPending');
                 setSelectedWorkflowStage('all');
               }}
             >
-              My PR
+              My Pending
             </Button>
           )}
           
-          {availableWidgets.includes('myApproval') && (
-            <Button
-              variant={toggleMode === 'myApproval' ? 'default' : 'ghost'}
-              size="sm"
-              className="rounded-none h-8 px-4"
-              onClick={() => {
-                setToggleMode('myApproval');
-                setSelectedWorkflowStage('all');
-              }}
-            >
-              My Approvals
-            </Button>
-          )}
-          
-          {availableWidgets.includes('myOrder') && (
-            <Button
-              variant={toggleMode === 'myOrder' ? 'default' : 'ghost'}
-              size="sm"
-              className="rounded-none h-8 px-4"
-              onClick={() => {
-                setToggleMode('myOrder');
-                setSelectedWorkflowStage('all');
-              }}
-            >
-              Ready for PO
-            </Button>
-          )}
-          
-          {availableWidgets.includes('allDocument') && (
-            <Button
-              variant={toggleMode === 'allDocument' ? 'default' : 'ghost'}
-              size="sm"
-              className="rounded-none h-8 px-4"
-              onClick={() => {
-                setToggleMode('allDocument');
-                setSelectedWorkflowStage('all');
-              }}
-            >
-              All Documents
-            </Button>
-          )}
+          <Button
+            variant={toggleMode === 'allDocument' ? 'default' : 'ghost'}
+            size="sm"
+            className="rounded-none h-8 px-4"
+            onClick={() => {
+              setToggleMode('allDocument');
+              setSelectedWorkflowStage('all');
+            }}
+          >
+            All Documents
+          </Button>
         </div>
         <div className="flex w-full justify-center my-2">
           <Select
@@ -854,7 +750,7 @@ export function PurchaseRequestList() {
     { 
       label: "Amount", 
       field: "totalAmount",
-      format: (value: number) => `$${value.toFixed(2)}`
+      format: (value: number) => `${value.toFixed(2)}`
     },
     { 
       label: "Workflow Stage", 

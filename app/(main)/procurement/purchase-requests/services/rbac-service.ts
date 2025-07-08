@@ -9,11 +9,11 @@ export interface RoleConfiguration {
 }
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   role: string;
   department: string;
-  assignedWorkflowStages: string[];
+  assignedWorkflowStages?: string[];
 }
 
 export interface WorkflowStage {
@@ -94,7 +94,7 @@ export class PRRBACService {
     // Check status-based permissions
     switch (action) {
       case 'edit':
-        return pr.status === 'Draft' || pr.status === 'Rejected';
+        return (pr.status === 'Draft' || pr.status === 'Rejected') && pr.requestorId === user.id;
       
       case 'delete':
         return pr.status === 'Draft' && pr.requestorId === user.id;
@@ -117,7 +117,7 @@ export class PRRBACService {
    */
   static canApproveAtCurrentStage(user: User, pr: any): boolean {
     // Check if user is assigned to current workflow stage
-    if (!user.assignedWorkflowStages.includes(pr.currentWorkflowStage)) {
+    if (!user.assignedWorkflowStages?.includes(pr.currentWorkflowStage)) {
       return false;
     }
 

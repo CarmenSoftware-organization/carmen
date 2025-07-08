@@ -63,15 +63,15 @@ export default function OrderManagementTable({ currentUser, orders, onOrderUpdat
   }
 
   const handleReject = (orderId: string) => {
-    onOrderUpdate(orderId, { status: "rejected" })
+    onOrderUpdate(orderId, { status: "rejected" as any })
   }
 
   const handleOrder = (orderId: string) => {
-    onOrderUpdate(orderId, { status: "ordered" })
+    onOrderUpdate(orderId, { status: "ordered" as any })
   }
 
   const handleReceive = (orderId: string) => {
-    onOrderUpdate(orderId, { status: "received" })
+    onOrderUpdate(orderId, { status: "received" as any })
   }
 
   const filteredOrders = orders.filter((order) => {
@@ -235,7 +235,7 @@ export default function OrderManagementTable({ currentUser, orders, onOrderUpdat
                         </Button>
                       )}
 
-                      {currentUser.role === "purchasing-staff" && order.status === "ordered" && (
+                      {currentUser.role === "purchasing-staff" && (order.status as any) === "ordered" && (
                         <Button
                           variant="ghost"
                           size="sm"

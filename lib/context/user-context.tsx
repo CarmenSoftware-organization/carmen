@@ -3,10 +3,10 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { User, UserContextType, Role, Department, Location, UserContext } from '../types/user';
 
-// Mock data for available options
 const mockRoles: Role[] = [
-  { id: 'requestor', name: 'Requestor', permissions: ['create_pr', 'view_pr', 'edit_own_pr'] },
+  { id: 'staff', name: 'Staff', permissions: ['create_pr', 'view_pr', 'edit_own_pr'] },
   { id: 'department-manager', name: 'Department Manager', permissions: ['approve_pr', 'view_department_pr', 'manage_budget'] },
+  { id: 'financial-manager', name: 'Financial Manager', permissions: ['approve_pr', 'view_all_pr', 'manage_financials'] },
   { id: 'purchasing-staff', name: 'Purchasing Staff', permissions: ['convert_to_po', 'manage_vendors', 'view_all_pr'] },
   { id: 'counter', name: 'Counter Staff', permissions: ['process_orders', 'view_inventory'] },
   { id: 'chef', name: 'Chef', permissions: ['create_recipes', 'manage_kitchen', 'view_inventory'] },
@@ -30,14 +30,14 @@ const mockLocations: Location[] = [
 
 // Mock user data - replace with actual API call
 const createMockUser = (): User => {
-  const defaultRole = mockRoles[0];
+  const defaultRole = mockRoles[0]; // Staff for testing edit mode
   const defaultDepartment = mockDepartments[0];
   const defaultLocation = mockLocations[0];
 
   return {
-    id: 'user-1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
+    id: 'user-chef-001',
+    name: 'Chef Maria Rodriguez',
+    email: 'maria.rodriguez@example.com',
     avatar: '/avatars/default.png',
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
@@ -46,6 +46,8 @@ const createMockUser = (): User => {
     role: defaultRole.name,
     department: defaultDepartment.name,
     location: defaultLocation.name,
+    // Workflow stages this user can approve
+    assignedWorkflowStages: ['departmentHeadApproval', 'financeManagerApproval'],
     context: {
       currentRole: defaultRole,
       currentDepartment: defaultDepartment,

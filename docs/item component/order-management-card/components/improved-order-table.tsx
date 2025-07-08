@@ -127,27 +127,27 @@ export default function ImprovedOrderTable({ currentUser, orders, onOrderUpdate 
   }
 
   const canReview = (order: OrderItem) => {
-    return order.status === "received"
+    return (order.status as any) === "received"
   }
 
   const handleApprove = (orderId: string) => {
     onOrderUpdate(orderId, {
-      status: "approved",
+      status: "approved" as any,
       approvalDate: new Date().toISOString().split("T")[0],
       approvedBy: currentUser.name,
     })
   }
 
   const handleReject = (orderId: string) => {
-    onOrderUpdate(orderId, { status: "rejected" })
+    onOrderUpdate(orderId, { status: "rejected" as any })
   }
 
   const handleOrder = (orderId: string) => {
-    onOrderUpdate(orderId, { status: "ordered" })
+    onOrderUpdate(orderId, { status: "ordered" as any })
   }
 
   const handleReceive = (orderId: string) => {
-    onOrderUpdate(orderId, { status: "received" })
+    onOrderUpdate(orderId, { status: "received" as any })
   }
 
   const handleReview = (orderId: string) => {
@@ -219,7 +219,7 @@ export default function ImprovedOrderTable({ currentUser, orders, onOrderUpdate 
       )
     }
 
-    if (currentUser.role === "purchasing-staff" && order.status === "ordered") {
+    if (currentUser.role === "purchasing-staff" && (order.status as any) === "ordered") {
       return (
         <Button
           size="sm"
