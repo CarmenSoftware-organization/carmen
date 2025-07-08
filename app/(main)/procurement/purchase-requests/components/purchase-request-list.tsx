@@ -471,12 +471,12 @@ export function PurchaseRequestList() {
     if (selectedWorkflowStage && selectedWorkflowStage !== 'all') {
       switch (toggleMode) {
         case 'myPending':
-          // Filter by status for My Pending
-          result = result.filter(pr => pr.status === selectedWorkflowStage);
+          // Filter by workflow stage for My Pending
+          result = result.filter(pr => pr.currentWorkflowStage === selectedWorkflowStage);
           break;
         case 'allDocument':
-          // Filter by workflow stage for All Documents
-          result = result.filter(pr => pr.currentWorkflowStage === selectedWorkflowStage);
+          // Filter by status for All Documents
+          result = result.filter(pr => pr.status === selectedWorkflowStage);
           break;
       }
     }
@@ -549,22 +549,6 @@ export function PurchaseRequestList() {
     // Create filter options based on toggle mode
     switch (toggleMode) {
       case 'myPending':
-        const statusFilters = [
-          { value: 'all', label: 'All Status' }
-        ];
-        
-        // Add all DocumentStatus enum values
-        Object.values(DocumentStatus).forEach(status => {
-          statusFilters.push({
-            value: status,
-            label: status.replace(/([A-Z])/g, ' $1').trim()
-          });
-        });
-        
-        return statusFilters;
-      
-      case 'allDocument':
-      default:
         const stageFilters = [
           { value: 'all', label: 'All Stages' }
         ];
@@ -578,6 +562,22 @@ export function PurchaseRequestList() {
         });
         
         return stageFilters;
+      
+      case 'allDocument':
+      default:
+        const statusFilters = [
+          { value: 'all', label: 'All Status' }
+        ];
+        
+        // Add all DocumentStatus enum values
+        Object.values(DocumentStatus).forEach(status => {
+          statusFilters.push({
+            value: status,
+            label: status.replace(/([A-Z])/g, ' $1').trim()
+          });
+        });
+        
+        return statusFilters;
     }
   }, [toggleMode, sampleData, currentUserId, user?.assignedWorkflowStages]);
 

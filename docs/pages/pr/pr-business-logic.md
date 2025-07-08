@@ -459,6 +459,12 @@ The PR Detail page implements a responsive two-column layout:
 4. **Goods Receipt**: Update actual inventory levels and clear commitments
 5. **Invoice Processing**: Final cost updates and variance accounting
 
+#### **Enhanced Inventory Information Display:**
+*   **Color-coded Tiles**: Visual indicators for On Hand, On Order, Reorder Level, Restock Level
+*   **Location-based Stock**: Stock levels per storage location with visual indicators
+*   **Average Usage Calculation**: Historical consumption data for demand forecasting
+*   **Stock Alerts**: Visual warnings when requested quantities exceed available stock
+
 ### 8.2. Vendor Management Integration
 
 #### **Vendor Data Synchronization:**
@@ -472,6 +478,12 @@ The PR Detail page implements a responsive two-column layout:
 *   **Quote Management**: Integration with vendor quote request system
 *   **Contract Compliance**: Verification against existing vendor contracts
 *   **Performance Tracking**: Delivery time and quality metrics collection
+
+#### **Vendor Comparison Functionality:**
+*   **Multi-vendor Pricing**: Side-by-side price comparison for Purchasing Staff
+*   **Historical Performance**: Vendor delivery and quality metrics
+*   **Contract Terms**: Comparison of payment terms and conditions
+*   **Risk Assessment**: Vendor risk scoring and recommendation engine
 
 ### 8.3. Financial System Integration
 
@@ -487,6 +499,12 @@ The PR Detail page implements a responsive two-column layout:
 *   **Payment Processing**: Integration with AP for vendor payment
 *   **Accrual Accounting**: Month-end accrual processing for received goods
 
+#### **Enhanced Financial Controls:**
+*   **Multi-currency Support**: Real-time exchange rate integration
+*   **Financial Information Masking**: Automatic hiding of pricing from Requestor roles
+*   **Budget Validation**: Real-time budget checking with soft and hard limits
+*   **Approval Thresholds**: Dynamic approval routing based on monetary amounts
+
 ### 8.4. Workflow and Notification System
 
 #### **Automated Notifications:**
@@ -500,3 +518,53 @@ The PR Detail page implements a responsive two-column layout:
 *   **Data Synchronization**: Batch processes for master data updates
 *   **Error Handling**: Automatic retry and error notification mechanisms
 *   **Performance Monitoring**: Integration point monitoring and alerting
+
+#### **Real-time Communication:**
+*   **Comment System**: Real-time chat-like communication on PR details
+*   **Activity Logging**: Comprehensive audit trail with searchable history
+*   **Attachment Management**: File upload and download with version control
+*   **WebSocket Updates**: Live status updates without page refresh
+
+## 9. Enhanced User Interface Business Logic
+
+### 9.1. Two-Column Layout Management
+
+#### **Sidebar State Control:**
+*   **Toggle Persistence**: Sidebar state maintained across page refreshes
+*   **Responsive Behavior**: Automatic collapse on mobile devices
+*   **Content Priority**: Main content always accessible, sidebar supplementary
+*   **Accessibility**: Keyboard navigation and screen reader support
+
+#### **Content Organization:**
+*   **Comments & Attachments**: Real-time communication hub
+*   **Activity Log**: Searchable audit trail with user action history
+*   **Dynamic Loading**: Lazy loading of sidebar content for performance
+*   **Context Awareness**: Sidebar content updates based on main content changes
+
+### 9.2. Role-Based UI Adaptation
+
+#### **Dynamic Interface Rendering:**
+*   **Field Visibility**: Real-time field hiding/showing based on user role
+*   **Action Button Availability**: Context-sensitive action buttons
+*   **Information Masking**: Financial data automatically hidden from unauthorized roles
+*   **Navigation Control**: Menu items and tabs filtered by permissions
+
+#### **Progressive Disclosure:**
+*   **Expandable Panels**: Three-tier information architecture in Items tab
+*   **Role-based Sections**: Different expanded views for different roles
+*   **Bulk Operation Intelligence**: Smart handling of mixed-status item selections
+*   **Workflow Context**: Interface adapts to current workflow stage
+
+### 9.3. Enhanced Data Management
+
+#### **Optimistic Updates:**
+*   **Immediate Feedback**: UI updates before server confirmation
+*   **Error Recovery**: Automatic rollback on operation failure
+*   **Conflict Resolution**: Handling of concurrent edit scenarios
+*   **State Synchronization**: Real-time state updates across browser tabs
+
+#### **Performance Optimization:**
+*   **Component Lazy Loading**: Heavy components loaded on demand
+*   **Virtual Scrolling**: Efficient handling of large data sets
+*   **Caching Strategy**: Smart caching of frequently accessed data
+*   **Background Prefetching**: Predictive data loading for common actions

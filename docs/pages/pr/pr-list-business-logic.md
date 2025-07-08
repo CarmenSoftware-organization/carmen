@@ -24,18 +24,22 @@ interface RoleConfiguration {
 
 ### 1.2. Widget-Specific Data Visibility
 
-#### My PR Widget (when `widgetAccess.myPR = true`)
-- **Scope**: ALL PRs created by the user
-- **Filter Logic**: `WHERE requestorId = currentUser.id`
-- **Status Access**: All statuses (Draft, Submitted, In Progress, Approved, Rejected, Cancelled)
-- **Purpose**: Complete ownership view of user's PRs
+#### My Pending Widget (when `widgetAccess.myPR = true`)
+- **Scope**: PRs created by the user that require action or are in progress
+- **Filter Logic**: `WHERE requestorId = currentUser.id AND status IN ('Draft', 'Submitted', 'In Progress', 'Rejected')`
+- **Status Access**: Actionable statuses (Draft, Submitted, In Progress, Rejected)
+- **Secondary Filters**: Status-based filters (Draft, Submitted, Approved, etc.)
+- **Purpose**: User's actionable PR queue for efficient workflow management
 
-#### My Approvals Widget (when `widgetAccess.myApproval = true`)
-- **Scope**: PRs pending user's approval at assigned workflow stages
-- **Filter Logic**: `WHERE currentWorkflowStage IN (${userAssignedStages}) AND status IN ('Submitted', 'In Progress')`
-- **Stage Assignment**: Based on workflow configuration where user is assigned
-- **Status Access**: Only actionable statuses (Submitted, In Progress)
-- **Purpose**: Approval queue for assigned workflow stages
+#### All Documents Widget (when `widgetAccess.myApproval = true`)
+- **Scope**: Comprehensive view of PRs based on user's role and department access
+- **Filter Logic**: Based on user role and visibility settings:
+  - **Staff**: Only own PRs
+  - **Department Manager**: Department PRs + Own PRs
+  - **Financial Manager**: All PRs within authority scope
+  - **Purchasing Staff**: All PRs system-wide
+- **Secondary Filters**: Workflow stage-based filters (Department Approval, Financial Approval, etc.)
+- **Purpose**: Complete document management and oversight
 
 #### Ready for PO Widget (when `widgetAccess.myOrder = true`)
 - **Scope**: Approved PRs ready for purchase order creation
@@ -43,6 +47,14 @@ interface RoleConfiguration {
 - **Access**: Typically for Purchasing Staff role
 - **Status Access**: Approved PRs only
 - **Purpose**: Process approved PRs into Purchase Orders
+
+#### Dynamic Widget Selection
+- **Default Widget**: Based on user role and available permissions
+- **Priority Order**: myPending → allDocuments → readyForPO
+- **Role-based Defaults**:
+  - **Staff**: myPending (only available widget)
+  - **Department Manager**: myPending (default), allDocuments (available)
+  - **Purchasing Staff**: allDocuments (default), myPending and readyForPO (available)
 
 #### Admin Override
 - **Scope**: Can view all PRs regardless of widget access settings
@@ -222,24 +234,48 @@ const getAvailableWorkflowActions = (pr: PurchaseRequest, user: User): string[] 
 
 ### 3.2. Bulk Action Availability
 
+#### Enhanced Bulk Operations with Mixed Status Handling
+
 #### Bulk Approve
 - **Condition**: User must be approver for ALL selected PRs
 - **Status Check**: All PRs must be in "Submitted" or "In Progress" status
 - **Validation**: Each PR must be at the user's approval stage
+- **Mixed Status Handling**: System analyzes selection and provides options:
+  - Process only applicable PRs
+  - Process all PRs (may move some to review status)
+  - Cancel and manually select appropriate PRs
+- **Smart Processing**: Automatically handles different approval stages intelligently
 
 #### Bulk Reject
 - **Condition**: Same as bulk approve
 - **Additional**: Must provide rejection reason
 - **Effect**: All selected PRs move to "Rejected" status
+- **Comment Requirements**: Bulk rejection reason applied to all items
+- **Notification System**: Automated notifications to all affected requestors
+
+#### Bulk Return (Enhanced)
+- **Multi-step Process**: Select target stage for return workflow
+- **Stage Selection**: Choose specific workflow stage to return items to
+- **Reason Required**: Mandatory explanation for bulk return actions
+- **Impact Analysis**: Shows affected users and departments before processing
 
 #### Bulk Delete
 - **Condition**: All selected PRs must be in "Draft" status
 - **Permission**: User must be owner or admin for each PR
 - **Validation**: Cannot delete PRs with items already ordered
+- **Safety Checks**: Additional confirmation for bulk deletion operations
 
 #### Bulk Export
 - **Condition**: User must have view access to all selected PRs
 - **No Status Restriction**: Can export PRs in any status
+- **Format Options**: Excel, CSV, PDF with role-based content filtering
+- **Financial Data Masking**: Pricing information excluded for unauthorized roles
+
+#### Bulk Status Change (Admin Only)
+- **Advanced Operation**: Direct status manipulation for administrative purposes
+- **Audit Trail**: Comprehensive logging of bulk status changes
+- **Validation Rules**: Ensures business rule compliance during bulk operations
+- **Rollback Capability**: Ability to undo bulk operations if needed
 
 ## 4. Search and Filter Logic
 
