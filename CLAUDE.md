@@ -65,3 +65,12 @@
 - Ensure responsive design
 - Implement proper error handling
 - Document all changes 
+
+## Development Mode Guidelines
+
+### When to Run Dev Mode
+- When making local component modifications
+- Before submitting pull requests for testing
+- When debugging specific feature implementations
+- To verify role-based access control configurations
+- To test new UI/UX interactions

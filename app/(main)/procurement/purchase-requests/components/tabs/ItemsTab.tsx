@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/lib/context/user-context";
 import {
   Eye,
   Edit,
@@ -74,6 +75,9 @@ interface ItemsTabProps {
 }
 
 export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, formMode = "view" }: ItemsTabProps) {
+  // Get user context for price visibility setting
+  const { user } = useUser();
+  
   // Local state for items to ensure UI updates immediately
   const [localItems, setLocalItems] = useState<PurchaseRequestItem[]>(items);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -91,6 +95,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
   const [isReturnStepSelectorOpen, setIsReturnStepSelectorOpen] = useState(false);
   const [isMixedStatusModalOpen, setIsMixedStatusModalOpen] = useState(false);
   const [pendingBulkAction, setPendingBulkAction] = useState<{action: 'approve' | 'reject' | 'return', analysis: any} | null>(null);
+  const [isBulkDateModalOpen, setIsBulkDateModalOpen] = useState(false);
+  const [bulkRequiredDate, setBulkRequiredDate] = useState<Date | undefined>();
   
   // Local state for checkbox overrides
   const [itemAdjustments, setItemAdjustments] = useState<{[itemId: string]: {tax: boolean, discount: boolean}}>({});
@@ -314,6 +320,36 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
   function handleBulkSplit() {
     console.log("Bulk splitting items:", selectedItems);
     // This would open a modal to split selected items into multiple line items
+  }
+
+  function handleBulkSetRequiredDate() {
+    console.log("Setting required date for items:", selectedItems);
+    setIsBulkDateModalOpen(true);
+  }
+
+  function handleBulkDateConfirm() {
+    if (!bulkRequiredDate || selectedItems.length === 0) return;
+    
+    console.log(`✓ Setting required date for ${selectedItems.length} items to:`, bulkRequiredDate);
+    
+    // Update local state immediately for instant UI feedback
+    setLocalItems(prevItems => 
+      prevItems.map(item => 
+        selectedItems.includes(item.id || '') 
+          ? { ...item, deliveryDate: bulkRequiredDate }
+          : item
+      )
+    );
+    
+    // Also call parent onOrderUpdate for each selected item
+    selectedItems.forEach(itemId => {
+      onOrderUpdate(itemId, { deliveryDate: bulkRequiredDate });
+    });
+    
+    setIsBulkDateModalOpen(false);
+    setBulkRequiredDate(undefined);
+    setSelectedItems([]); // Clear selection after action
+    console.log(`🎉 Successfully set required date for ${selectedItems.length} items`);
   }
 
   function handleToggleTableExpand(itemId: string) {
@@ -603,15 +639,118 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     );
   };
 
-  // Render compact fields row (comment, required date, delivery point)
+  // Delivery point options
+  const deliveryPointOptions = [
+    { value: "main-kitchen", label: "Main Kitchen" },
+    { value: "storage-room", label: "Storage Room" },
+    { value: "receiving-dock", label: "Receiving Dock" },
+    { value: "cold-storage", label: "Cold Storage" },
+    { value: "dry-storage", label: "Dry Storage" },
+    { value: "bar-storage", label: "Bar Storage" },
+    { value: "housekeeping", label: "Housekeeping" },
+    { value: "maintenance", label: "Maintenance" },
+    { value: "front-office", label: "Front Office" },
+    { value: "spa", label: "Spa" },
+    { value: "gym", label: "Gym" },
+    { value: "pool-area", label: "Pool Area" },
+    { value: "restaurant", label: "Restaurant" },
+    { value: "banquet", label: "Banquet Hall" },
+    { value: "laundry", label: "Laundry" },
+    { value: "other", label: "Other" }
+  ];
+
+  // Render detailed pricing information row - compact single row layout
+  const renderDetailedPricingRow = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, isItemEditable: boolean) => (
+    <div className="py-2">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-2 items-center">
+        {/* Vendor Field */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Vendor</div>
+          {isItemEditable && (isApprover || isPurchaser) ? (
+            <Input
+              value={item.vendor || ""}
+              onChange={(e) => item.id && handleItemChange(item.id, 'vendor', e.target.value)}
+              placeholder="Vendor"
+              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1"
+            />
+          ) : (
+            <div className="text-xs font-medium text-gray-800 truncate">
+              {item.vendor || <span className="text-gray-400">-</span>}
+            </div>
+          )}
+        </div>
+
+
+        {/* Discount Field */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Discount</div>
+          {isItemEditable && (isApprover || isPurchaser) ? (
+            <Input
+              type="number"
+              value={item.discountRate?.toFixed(2) || ""}
+              onChange={(e) => item.id && handleItemChange(item.id, 'discountRate', parseFloat(e.target.value))}
+              placeholder="0.00"
+              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1"
+              step="0.01"
+            />
+          ) : (
+            <div className="text-xs font-medium text-gray-800">
+              {item.currency} {(item.discountRate || 0).toFixed(2)}
+            </div>
+          )}
+        </div>
+
+        {/* Net Amount Field */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-blue-600 uppercase mb-0.5">Net Amount</div>
+          <div className="text-xs font-semibold text-blue-700">
+            {item.currency} {((item.price || 0) * (item.quantityRequested || 0) - (item.discountRate || 0)).toFixed(2)}
+          </div>
+        </div>
+
+        {/* Tax Field */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Tax</div>
+          {isItemEditable && (isApprover || isPurchaser) ? (
+            <Input
+              type="number"
+              value={item.taxRate?.toFixed(2) || ""}
+              onChange={(e) => item.id && handleItemChange(item.id, 'taxRate', parseFloat(e.target.value))}
+              placeholder="0.00"
+              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1"
+              step="0.01"
+            />
+          ) : (
+            <div className="text-xs font-medium text-gray-800">
+              {item.currency} {(item.taxRate || 0).toFixed(2)}
+            </div>
+          )}
+        </div>
+
+        {/* Total Field */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-green-600 uppercase mb-0.5">Total</div>
+          <div className="text-sm font-bold text-green-700">
+            {item.currency} {(item.totalAmount || 0).toFixed(2)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Render compact fields row (comment, on hand, on order, date required, delivery point)
   const renderCompactFieldsRow = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, isItemEditable: boolean) => (
     <div className="py-2">
-      {/* Desktop: 4-column grid, Mobile: Stack */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {/* Comment Field - 2/4 columns on desktop */}
-        <div className="md:col-span-2">
+      {/* Desktop: 8-column grid, Mobile: Stack */}
+      <div className="grid grid-cols-1 md:grid-cols-8 gap-3">
+        {/* Comment Field - 4/8 columns on desktop */}
+        <div className="md:col-span-4">
+          <Label htmlFor={`comment-${item.id}`} className="text-xs font-medium text-gray-700 mb-1 block">
+            Comment
+          </Label>
           {isItemEditable ? (
             <Textarea
+              id={`comment-${item.id}`}
               value={item.comment || ""}
               onChange={(e) => item.id && handleItemChange(item.id, 'comment', e.target.value)}
               placeholder="💬 Add comment..."
@@ -626,8 +765,33 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
           )}
         </div>
 
-        {/* Required Date Field - 1/4 column on desktop */}
+        {/* On Hand Field - 1/8 column on desktop */}
         <div className="md:col-span-1">
+          <Label className="text-xs font-medium text-gray-700 mb-1 block">
+            On Hand
+          </Label>
+          <div className="text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded border">
+            <div className="font-semibold">{(item.inventoryInfo?.onHand || 0).toFixed(2)}</div>
+            <div className="text-[10px] text-gray-500">{item.unit}</div>
+          </div>
+        </div>
+
+        {/* On Order Field - 1/8 column on desktop */}
+        <div className="md:col-span-1">
+          <Label className="text-xs font-medium text-gray-700 mb-1 block">
+            On Order
+          </Label>
+          <div className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded border">
+            <div className="font-semibold">{(item.inventoryInfo?.onOrdered || 0).toFixed(2)}</div>
+            <div className="text-[10px] text-gray-500">{item.unit}</div>
+          </div>
+        </div>
+
+        {/* Required Date Field - 1/8 column on desktop */}
+        <div className="md:col-span-1">
+          <Label htmlFor={`required-date-${item.id}`} className="text-xs font-medium text-gray-700 mb-1 block">
+            Date Required
+          </Label>
           {isItemEditable ? (
             <div className="w-full">
               <DatePickerField
@@ -644,19 +808,34 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
           )}
         </div>
 
-        {/* Delivery Point Field - 1/4 column on desktop */}
+        {/* Delivery Point Field - 1/8 column on desktop */}
         <div className="md:col-span-1">
+          <Label htmlFor={`delivery-point-${item.id}`} className="text-xs font-medium text-gray-700 mb-1 block">
+            Delivery Point
+          </Label>
           {isItemEditable ? (
-            <Input
+            <Select
               value={item.deliveryPoint || ""}
-              onChange={(e) => item.id && handleItemChange(item.id, 'deliveryPoint', e.target.value)}
-              placeholder="📍 Delivery point"
-              className="h-7 text-xs w-full"
-            />
+              onValueChange={(value) => item.id && handleItemChange(item.id, 'deliveryPoint', value)}
+            >
+              <SelectTrigger className="h-7 text-xs w-full">
+                <SelectValue placeholder="📍 Select delivery point" />
+              </SelectTrigger>
+              <SelectContent>
+                {deliveryPointOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           ) : (
             <div className="text-xs font-medium flex items-center gap-1">
               <MapPin className="h-3 w-3 text-gray-500" />
-              {item.deliveryPoint || "📍 Not specified"}
+              {item.deliveryPoint ? 
+                deliveryPointOptions.find(opt => opt.value === item.deliveryPoint)?.label || item.deliveryPoint 
+                : "📍 Not specified"
+              }
             </div>
           )}
         </div>
@@ -797,8 +976,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               </div>
             </div>
 
-            {/* Consolidated Pricing Section */}
-            {canSeePrices && (
+            {/* Consolidated Pricing Section - Hidden for requestors */}
+            {canSeePrices && !isRequestor && (
               <div className="bg-white rounded-lg border p-4">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
@@ -893,227 +1072,229 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                   </div>
                 </div>
 
-                {/* Third Row: Price and Net Total */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">@ Price</label>
-                    {isPurchaser ? (
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={item.price || ""}
-                        onChange={(e) => item.id && handleItemChange(item.id, 'price', parseFloat(e.target.value))}
-                        placeholder="Enter unit price"
-                        className="h-10 text-right"
-                      />
-                    ) : (
-                      <div className="text-base font-medium bg-gray-50 p-2 rounded border text-right">{item.currency} {(item.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    )}
-                    <div className="text-sm text-muted-foreground text-right">
-                      Base Price: {item.baseCurrency || 'USD'} {((item.price || 0) / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Net Total</label>
-                    <div className="text-lg font-bold bg-blue-50 p-3 rounded border border-blue-200 text-blue-700 text-right">
-                      {item.currency} {((item.price || 0) * (item.quantityApproved || item.quantityRequested || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                    <div className="text-sm text-muted-foreground text-right">
-                      Base Net Total: {item.baseCurrency || 'USD'} {(((item.price || 0) * (item.quantityApproved || item.quantityRequested || 0)) / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                </div>
 
                 {/* Tax and Discount Overrides */}
                 {isPurchaser && (
-                  <>
-                    {/* Discount Override Section */}
-                    <div className="bg-green-50 rounded-lg p-4 border border-green-200 mb-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <Star className="h-4 w-4 text-green-600" />
-                        <h5 className="font-semibold text-base text-green-800">Discount Amount</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    {/* Left Column: Discount and Tax Sections */}
+                    <div className="flex flex-col">
+                      {/* Discount Section */}
+                      <div className="space-y-2 mb-4">
+                        <label className="text-sm font-medium text-gray-700">Discount</label>
+                        <div className="bg-green-50 p-3 rounded border border-green-200" style={{ minHeight: '80px' }}>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div>
+                              <label className="text-xs text-green-700 font-medium mb-1 block">Type</label>
+                              <Select 
+                                value={item.discountType || "Percentage"} 
+                                onValueChange={(value) => item.id && handleItemChange(item.id, 'discountType', value)}
+                                disabled={!getItemAdjustments(item.id || '').discount}
+                              >
+                                <SelectTrigger className="h-8 text-xs">
+                                  <SelectValue placeholder="Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Percentage">%</SelectItem>
+                                  <SelectItem value="Fixed Amount">Fixed</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div>
+                              <label className="text-xs text-green-700 font-medium mb-1 block">Rate</label>
+                              <div className="text-center bg-white p-1 rounded border h-8 flex items-center justify-center">
+                                <span className="text-xs text-green-700 font-medium">
+                                  {((item.discountRate || 0) * 100).toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <div className="flex items-center space-x-2 mb-1">
+                                <Checkbox 
+                                  id={`discount-override-${item.id}`}
+                                  checked={getItemAdjustments(item.id || '').discount}
+                                  onCheckedChange={(checked) => {
+                                    console.log('Discount checkbox clicked:', checked);
+                                    if (item.id) {
+                                      updateItemAdjustments(item.id, 'discount', Boolean(checked));
+                                    }
+                                  }}
+                                  className="cursor-pointer"
+                                />
+                                <label 
+                                  htmlFor={`discount-override-${item.id}`}
+                                  className="text-xs text-green-700 font-medium cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    const currentValue = getItemAdjustments(item.id || '').discount;
+                                    const newValue = !currentValue;
+                                    console.log('Discount label clicked, new value:', newValue);
+                                    if (item.id) {
+                                      updateItemAdjustments(item.id, 'discount', newValue);
+                                    }
+                                  }}
+                                >
+                                  Amount
+                                </label>
+                              </div>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={item.discountAmount || ""}
+                                onChange={(e) => item.id && handleItemChange(item.id, 'discountAmount', parseFloat(e.target.value))}
+                                placeholder="Enter amount"
+                                className="h-8 text-right text-xs"
+                                disabled={!getItemAdjustments(item.id || '').discount}
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2 cursor-pointer">
-                            <Checkbox 
-                              id={`discount-override-${item.id}`}
-                              checked={getItemAdjustments(item.id || '').discount}
-                              onCheckedChange={(checked) => {
-                                console.log('Discount checkbox clicked:', checked);
-                                if (item.id) {
-                                  updateItemAdjustments(item.id, 'discount', Boolean(checked));
-                                }
-                              }}
-                              className="cursor-pointer"
-                            />
-                            <label 
-                              htmlFor={`discount-override-${item.id}`}
-                              className="text-sm font-medium text-gray-700 cursor-pointer"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                const currentValue = getItemAdjustments(item.id || '').discount;
-                                const newValue = !currentValue;
-                                console.log('Discount label clicked, new value:', newValue);
-                                if (item.id) {
-                                  updateItemAdjustments(item.id, 'discount', newValue);
-                                }
-                              }}
-                            >
-                              Override Discount
-                            </label>
+                      {/* Tax Section - Aligned with Total Amount */}
+                      <div className="space-y-2" style={{ marginTop: '24px' }}>
+                        <label className="text-sm font-medium text-gray-700">Tax</label>
+                        <div className="bg-yellow-50 p-3 rounded border border-yellow-200" style={{ minHeight: '80px' }}>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div>
+                              <label className="text-xs text-orange-700 font-medium mb-1 block">Type</label>
+                              <Select 
+                                value={item.taxType || "VAT"} 
+                                onValueChange={(value) => item.id && handleItemChange(item.id, 'taxType', value)}
+                                disabled={!getItemAdjustments(item.id || '').tax}
+                              >
+                                <SelectTrigger className="h-8 text-xs">
+                                  <SelectValue placeholder="Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="VAT">VAT</SelectItem>
+                                  <SelectItem value="GST">GST</SelectItem>
+                                  <SelectItem value="SST">SST</SelectItem>
+                                  <SelectItem value="None">None</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div>
+                              <label className="text-xs text-orange-700 font-medium mb-1 block">Rate</label>
+                              <div className="text-center bg-white p-1 rounded border h-8 flex items-center justify-center">
+                                <span className="text-xs text-orange-700 font-medium">
+                                  {((item.taxRate || 0.07) * 100).toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <div className="flex items-center space-x-2 mb-1">
+                                <Checkbox 
+                                  id={`tax-override-${item.id}`}
+                                  checked={getItemAdjustments(item.id || '').tax}
+                                  onCheckedChange={(checked) => {
+                                    console.log('Tax checkbox clicked:', checked);
+                                    if (item.id) {
+                                      updateItemAdjustments(item.id, 'tax', Boolean(checked));
+                                    }
+                                  }}
+                                  className="cursor-pointer"
+                                />
+                                <label 
+                                  htmlFor={`tax-override-${item.id}`}
+                                  className="text-xs text-orange-700 font-medium cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    const currentValue = getItemAdjustments(item.id || '').tax;
+                                    const newValue = !currentValue;
+                                    console.log('Tax label clicked, new value:', newValue);
+                                    if (item.id) {
+                                      updateItemAdjustments(item.id, 'tax', newValue);
+                                    }
+                                  }}
+                                >
+                                  Amount
+                                </label>
+                              </div>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={item.taxAmount || ""}
+                                onChange={(e) => item.id && handleItemChange(item.id, 'taxAmount', parseFloat(e.target.value))}
+                                placeholder="Enter tax amount"
+                                className="h-8 text-right text-xs"
+                                disabled={!getItemAdjustments(item.id || '').tax}
+                              />
+                            </div>
                           </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Discount Type</label>
-                          <Select 
-                            value={item.discountType || "Percentage"} 
-                            onValueChange={(value) => item.id && handleItemChange(item.id, 'discountType', value)}
-                            disabled={!getItemAdjustments(item.id || '').discount}
-                          >
-                            <SelectTrigger className="h-10">
-                              <SelectValue placeholder="Select discount type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Percentage">Percentage</SelectItem>
-                              <SelectItem value="Fixed Amount">Fixed Amount</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Discount Rate</label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={item.discountRate ? (item.discountRate * 100) : ""}
-                            onChange={(e) => item.id && handleItemChange(item.id, 'discountRate', parseFloat(e.target.value) / 100)}
-                            placeholder="Enter discount rate %"
-                            className="h-10 text-right"
-                            disabled={!getItemAdjustments(item.id || '').discount}
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Discount Amount</label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={item.discountAmount || ""}
-                            onChange={(e) => item.id && handleItemChange(item.id, 'discountAmount', parseFloat(e.target.value))}
-                            placeholder="Enter discount amount"
-                            className="h-10 text-right"
-                            disabled={!getItemAdjustments(item.id || '').discount}
-                          />
-                          <div className="text-sm text-muted-foreground text-right">
-                            Base: {item.baseCurrency || 'USD'} {((item.discountAmount || 0) / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </div>
+                        <div className="text-sm text-muted-foreground text-right">
+                          Base Tax: {item.baseCurrency || 'USD'} {((item.taxAmount || 0) / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </div>
                     </div>
 
-                    {/* Tax Override Section */}
-                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200 mb-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <Crown className="h-4 w-4 text-yellow-600" />
-                        <h5 className="font-semibold text-base text-yellow-800">Tax Amount</h5>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2 cursor-pointer">
-                            <Checkbox 
-                              id={`tax-override-${item.id}`}
-                              checked={getItemAdjustments(item.id || '').tax}
-                              onCheckedChange={(checked) => {
-                                console.log('Tax checkbox clicked:', checked);
-                                if (item.id) {
-                                  updateItemAdjustments(item.id, 'tax', Boolean(checked));
-                                }
-                              }}
-                              className="cursor-pointer"
-                            />
-                            <label 
-                              htmlFor={`tax-override-${item.id}`}
-                              className="text-sm font-medium text-gray-700 cursor-pointer"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                const currentValue = getItemAdjustments(item.id || '').tax;
-                                const newValue = !currentValue;
-                                console.log('Tax label clicked, new value:', newValue);
-                                if (item.id) {
-                                  updateItemAdjustments(item.id, 'tax', newValue);
-                                }
-                              }}
-                            >
-                              Override Tax
-                            </label>
-                          </div>
+                    {/* Right Column: Net Amount and Total Amount */}
+                    <div className="space-y-4">
+                      {/* Net Amount */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Net Total</label>
+                        <div className="text-lg font-bold bg-blue-50 p-3 rounded border border-blue-200 text-blue-700 text-right" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                          {item.currency} {(() => {
+                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * (item.discountRate || 0);
+                            const netAmount = subtotal - discountAmount;
+                            return netAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                          })()}
                         </div>
-                        
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Tax Type</label>
-                          <Select 
-                            value={item.taxType || "VAT"} 
-                            onValueChange={(value) => item.id && handleItemChange(item.id, 'taxType', value)}
-                            disabled={!getItemAdjustments(item.id || '').tax}
-                          >
-                            <SelectTrigger className="h-10">
-                              <SelectValue placeholder="Select tax type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="VAT">VAT</SelectItem>
-                              <SelectItem value="GST">GST</SelectItem>
-                              <SelectItem value="SST">SST</SelectItem>
-                              <SelectItem value="None">None</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Tax Rate</label>
-                          <div className="text-base font-medium bg-gray-50 p-2 rounded border">
-                            {((item.taxRate || 0.07) * 100)}%
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Tax Amount</label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={item.taxAmount || ""}
-                            onChange={(e) => item.id && handleItemChange(item.id, 'taxAmount', parseFloat(e.target.value))}
-                            placeholder="Enter tax amount"
-                            className="h-10 text-right"
-                            disabled={!getItemAdjustments(item.id || '').tax}
-                          />
-                          <div className="text-sm text-muted-foreground text-right">
-                            Base: {item.baseCurrency || 'USD'} {((item.taxAmount || 0) / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </div>
+                        <div className="text-sm text-muted-foreground text-right">
+                          Base Net Total: {item.baseCurrency || 'USD'} {(() => {
+                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * (item.discountRate || 0);
+                            const netAmount = subtotal - discountAmount;
+                            return (netAmount / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                          })()}
                         </div>
                       </div>
-                    </div>
-                  </>
-                )}
 
-                {/* Total Amount */}
-                <div className="border-t pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div></div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Total Amount</label>
-                      <div className="text-xl font-bold bg-green-50 p-4 rounded border border-green-200 text-green-700 text-right">
-                        {item.currency} {(((item.price || 0) * (item.quantityApproved || item.quantityRequested || 0)) * (1 + (item.taxRate || 0) / 100) * (1 - (item.discountRate || 0) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </div>
-                      <div className="text-sm text-muted-foreground text-right">
-                        Base Total Amount: {item.baseCurrency || 'USD'} {((((item.price || 0) * (item.quantityApproved || item.quantityRequested || 0)) * (1 + (item.taxRate || 0) / 100) * (1 - (item.discountRate || 0) / 100)) / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {/* Total Amount */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Total Amount</label>
+                        <div className="text-xl font-bold bg-green-50 p-3 rounded border border-green-200 text-green-700 text-right" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                          {item.currency} {(() => {
+                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * (item.discountRate || 0);
+                            const netAmount = subtotal - discountAmount;
+                            const taxAmount = getItemAdjustments(item.id || '').tax 
+                              ? (item.taxAmount || 0)
+                              : netAmount * (item.taxRate || 0);
+                            const totalAmount = netAmount + taxAmount;
+                            return totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                          })()}
+                        </div>
+                        <div className="text-sm text-muted-foreground text-right">
+                          Base Total Amount: {item.baseCurrency || 'USD'} {(() => {
+                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * (item.discountRate || 0);
+                            const netAmount = subtotal - discountAmount;
+                            const taxAmount = getItemAdjustments(item.id || '').tax 
+                              ? (item.taxAmount || 0)
+                              : netAmount * (item.taxRate || 0);
+                            const totalAmount = netAmount + taxAmount;
+                            return (totalAmount / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
+
               </div>
             )}
 
@@ -1146,7 +1327,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               currentUser.role === 'Approver';
         const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
                                currentUser.role === 'Purchaser';
-        const canSeePrices = !itemIsRequestor;
+        const canSeePrices = (user?.context.showPrices !== false);
+        const canSeePricingPanel = (itemIsApprover || itemIsPurchaser); // Pricing panel: hidden for requestors, visible for approvers/purchasers
         
         return (
           <Card key={item.id} className={`relative transition-all duration-200 ${isTableEditMode ? 'ring-2 ring-amber-300 bg-amber-50/20 shadow-md' : 'hover:shadow-md'}`}>
@@ -1179,12 +1361,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     <p className="text-xs text-green-600">Approved: {item.quantityApproved}</p>
                   )}
                 </div>
-                {canSeePrices && (
-                  <div>
-                    <p className="text-xs text-muted-foreground">Price</p>
-                    <p className="font-medium text-sm">{item.currency} {item.price?.toFixed(2)}</p>
-                  </div>
-                )}
                 <div>
                   <p className="text-xs text-muted-foreground">Delivery</p>
                   <p className="font-medium text-sm">{item.deliveryDate ? format(item.deliveryDate, "MMM dd") : "TBD"}</p>
@@ -1265,7 +1441,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                     currentUser.role === 'Approver';
               const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
                                      currentUser.role === 'Purchaser';
-              const canSeePrices = !itemIsRequestor;
+              const canSeePrices = (user?.context.showPrices !== false);
+        const canSeePricingPanel = (itemIsApprover || itemIsPurchaser); // Pricing panel: hidden for requestors, visible for approvers/purchasers
               const isRowEditing = editingRows.has(item.id || "");
               const isItemEditable = isTableEditMode || isRowEditing;
               
@@ -1392,9 +1569,10 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             )}
                           </div>
                         )}
-                        {/* FOC field below approved quantity */}
-                        <div className="pt-1 border-t border-gray-200 mt-2">
-                          {isItemEditable && (itemIsApprover || itemIsPurchaser) ? (
+                        {/* FOC field below approved quantity - Hidden for requestors */}
+                        {!itemIsRequestor && (
+                          <div className="pt-1 border-t border-gray-200 mt-2">
+                            {isItemEditable && (itemIsApprover || itemIsPurchaser) ? (
                             <div className="flex items-center gap-1 justify-center">
                               <span className="text-xs text-gray-500">FOC:</span>
                               <Input 
@@ -1415,14 +1593,14 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           ) : (
                             <div className="text-xs font-medium text-blue-600 text-right">FOC: {item.foc?.toFixed(5) || '0.00000'} {item.unit}</div>
                           )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     {canSeePrices && (
                       <TableCell className="py-3 text-right">
                         <div className="space-y-1">
                           <div className="font-semibold text-base text-right">{item.currency} {(item.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                          <div className="text-xs text-muted-foreground text-right">@ {item.currency} {(item.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/{item.unit}</div>
                           <div className="text-xs text-blue-600 mt-1 text-right">
                             {item.baseCurrency || 'USD'} {((item.totalAmount || 0) * (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
@@ -1528,6 +1706,17 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
+                  
+                  {/* Detailed pricing information row - Show for Approvers and Purchasers only */}
+                  {canSeePricingPanel && (
+                    <TableRow className="border-none">
+                      <TableCell colSpan={canSeePrices ? 9 : 8} className="py-0 pb-2">
+                        <div className="px-6 border-l-2 border-green-200 bg-green-50/20 rounded-r-md ml-2">
+                          {renderDetailedPricingRow(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, isItemEditable)}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
                   
                   {/* Compact fields row for comment, required date, delivery point */}
                   {(item.comment || item.deliveryDate || item.deliveryPoint || isItemEditable) && (
@@ -1679,6 +1868,12 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               <Button variant="outline" size="sm" onClick={handleBulkSplit} className="text-xs text-blue-600 hover:text-blue-700">
                 <Split className="h-4 w-4 mr-1" />
                 Split
+              </Button>
+              
+              {/* Set Required Date Button (always available) */}
+              <Button variant="outline" size="sm" onClick={handleBulkSetRequiredDate} className="text-xs text-purple-600 hover:text-purple-700">
+                <CalendarIcon className="h-4 w-4 mr-1" />
+                Set Required Date
               </Button>
             </div>
           </div>
@@ -1966,6 +2161,49 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 }}
               >
                 Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Set Required Date Modal */}
+      <Dialog open={isBulkDateModalOpen} onOpenChange={setIsBulkDateModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Set Required Date</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-sm text-gray-600">
+              Set the required date for {selectedItems.length} selected item{selectedItems.length !== 1 ? 's' : ''}:
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Required Date</label>
+              <DatePickerField
+                value={bulkRequiredDate}
+                onChange={setBulkRequiredDate}
+                placeholder="Select required date"
+              />
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsBulkDateModalOpen(false);
+                  setBulkRequiredDate(undefined);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleBulkDateConfirm}
+                disabled={!bulkRequiredDate}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                <CalendarIcon className="h-4 w-4 mr-2" />
+                Set Date
               </Button>
             </div>
           </div>

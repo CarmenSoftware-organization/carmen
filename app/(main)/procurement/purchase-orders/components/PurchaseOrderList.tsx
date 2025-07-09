@@ -63,8 +63,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";  
 import StatusBadge from "@/components/ui/custom-status-badge";
-import CreatePOFromPR from "./createpofrompr";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { randomUUID } from "crypto";
 import { AdvancedFilter } from './advanced-filter'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
@@ -679,56 +677,7 @@ export function PurchaseOrderList() {
     </div>
   );
 
-  const [showCreateFromPRDialog, setShowCreateFromPRDialog] = useState(false);
   
-  const handleSelectPRs = (selectedPRs: PurchaseRequest[]) => {
-    setShowCreateFromPRDialog(false);
-    
-    if (selectedPRs.length > 0) {
-      // Group PRs by vendor and currency - each group becomes a separate PO
-      const groupedPRs = selectedPRs.reduce((groups, pr) => {
-        const key = `${pr.vendor}-${pr.currency}`;
-        if (!groups[key]) {
-          groups[key] = {
-            vendor: pr.vendor,
-            vendorId: pr.vendorId,
-            currency: pr.currency,
-            prs: [],
-            totalAmount: 0
-          };
-        }
-        groups[key].prs.push(pr);
-        groups[key].totalAmount += pr.totalAmount;
-        return groups;
-      }, {} as Record<string, { 
-        vendor: string; 
-        vendorId: number; 
-        currency: string; 
-        prs: PurchaseRequest[]; 
-        totalAmount: number 
-      }>);
-
-      // Store grouped PRs for PO creation
-      try {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('groupedPurchaseRequests', JSON.stringify(groupedPRs));
-          localStorage.setItem('selectedPurchaseRequests', JSON.stringify(selectedPRs)); // Keep for compatibility
-        }
-      } catch (error) {
-        console.error('Error storing grouped PRs:', error);
-      }
-      
-      // Navigate to PO creation page with grouped data
-      const groupCount = Object.keys(groupedPRs).length;
-      if (groupCount === 1) {
-        // Single PO - go directly to creation page
-        router.push('/procurement/purchase-orders/create?mode=fromPR&grouped=true');
-      } else {
-        // Multiple POs - go to bulk creation page or show summary
-        router.push('/procurement/purchase-orders/create?mode=fromPR&grouped=true&bulk=true');
-      }
-    }
-  };
 
   // Action buttons
   const actionButtons = (
@@ -745,7 +694,7 @@ export function PurchaseOrderList() {
             Create Blank PO
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowCreateFromPRDialog(true)}>
+          <DropdownMenuItem onClick={() => router.push("/procurement/purchase-orders/create/from-pr")}>
             Create from Purchase Requests
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -762,39 +711,13 @@ export function PurchaseOrderList() {
   );
 
   return (
-    <>
-      <ListPageTemplate
-        title="Purchase Orders"
-        actionButtons={actionButtons}
-        filters={filters}
-        bulkActions={bulkActions}
-        content={content}
-      />
-      <Dialog 
-        open={showCreateFromPRDialog} 
-        onOpenChange={(open) => {
-          if (!open) setShowCreateFromPRDialog(false);
-        }}
-      >
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Create PO from Purchase Requests</DialogTitle>
-          </DialogHeader>
-          <div className="py-4 flex-1 min-h-0 overflow-auto">
-            <CreatePOFromPR onSelectPRs={handleSelectPRs} />
-          </div>
-          <DialogFooter className="sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowCreateFromPRDialog(false)}
-            >
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+    <ListPageTemplate
+      title="Purchase Orders"
+      actionButtons={actionButtons}
+      filters={filters}
+      bulkActions={bulkActions}
+      content={content}
+    />
   );
 }
 

@@ -17,7 +17,9 @@
       "mcp__MCP_DOCKER__list_directory",
       "mcp__MCP_DOCKER__read_file",
       "mcp__MCP_DOCKER__directory_tree",
-      "mcp__MCP_DOCKER__read_multiple_files"
+      "mcp__MCP_DOCKER__read_multiple_files",
+      "mcp__MCP_DOCKER__list_allowed_directories",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }

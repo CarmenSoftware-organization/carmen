@@ -287,60 +287,432 @@ At each stage, the authorized approver can perform these actions:
 
 ## 5. Role-Based Access Control (RBAC)
 
-The actions a user can perform on a PR are determined by their role, with granular field-level permissions and information visibility controls.
+The Purchase Request system implements a comprehensive dual-role RBAC system that supports users having multiple organizational roles and multiple workflow stage roles. This system provides precise control over permissions based on both the user's inherent organizational role and their assigned workflow stage role for each PR.
 
-### 5.1. Role Definitions and Permissions
+### 5.0. Multi-Role RBAC System Overview
+
+#### **Dual-Role Architecture**
+The system operates on two distinct but interconnected role types:
+
+1. **Organizational Roles (User Roles)**: Permanent roles based on organizational structure
+   - Staff/Requestor, Department Manager, Financial Manager, Purchasing Staff, System Administrator
+   - Users can have multiple organizational roles simultaneously
+   - Permission aggregation follows Union principle (user inherits permissions from all assigned roles)
+
+2. **Workflow Stage Roles (Contextual Roles)**: Assigned per PR per workflow stage
+   - Requestor, Approver, Purchaser, Observer
+   - Users can be assigned multiple workflow stage roles across different PRs
+   - Users can have different workflow stage roles for different stages of the same PR
+
+#### **Permission Calculation Formula**
+```
+Final Permission = Active Organizational Role ∩ Max(Workflow Stage Roles) ∩ Current Stage ∩ Visibility Scope
+```
+
+#### **Visibility Rules Foundation**
+- **Base Rule**: Users can ALWAYS see PRs they created (regardless of other permissions)
+- **Extended Visibility**: Users can see department or BU PRs ONLY if explicitly assigned visibility permissions
+- **Additive Model**: All visibility levels are cumulative (Own + Department + BU if assigned)
+
+### 5.1. PR Visibility Matrix
+
+#### **Base Visibility Rules**
+| User Type | Own Created PRs | Department PRs | Entire BU PRs |
+|-----------|----------------|----------------|---------------|
+| **Any User** | ✅ Always Visible | 🔐 Only if Assigned | 🔐 Only if Assigned |
+| **System Admin** | ✅ Always Visible | ✅ Always Visible | ✅ Always Visible |
+
+#### **Assigned Visibility Permissions Matrix**
+| Organizational Role | Default Visibility | Can Be Assigned Dept | Can Be Assigned BU |
+|-------------------|-------------------|-------------------|------------------|
+| **Staff** | Self Only | ✅ Yes | ❌ No |
+| **Department Manager** | Self Only | ✅ Yes (Own Dept) | 🔐 Special Approval |
+| **Financial Manager** | Self Only | ✅ Yes (Any Dept) | ✅ Yes |
+| **Purchasing Staff** | Self Only | ✅ Yes (Relevant Depts) | ✅ Yes |
+| **System Administrator** | Full BU | ✅ Yes | ✅ Yes |
+
+#### **Visibility Assignment Authorization**
+| Assigner Role | Can Assign Self | Can Assign Department | Can Assign BU |
+|---------------|----------------|---------------------|---------------|
+| **System Admin** | ✅ Yes | ✅ Yes | ✅ Yes |
+| **BU Manager** | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Department Manager** | ✅ Yes | ✅ Own Dept Only | ❌ No |
+| **Financial Manager** | ✅ Yes | ✅ Yes | 🔐 With Approval |
+| **Others** | ❌ No | ❌ No | ❌ No |
+
+#### **Visibility Calculation Examples**
+- **Example 1**: Staff user creates PR-001 → Can see PR-001 (own)
+- **Example 2**: Staff user + Department visibility assigned → Can see PR-001 (own) + all department PRs
+- **Example 3**: Department Manager + BU visibility assigned → Can see own PRs + all BU PRs
+- **Example 4**: Multiple role user (Staff + Dept Manager) → Inherits highest visibility scope
+
+### 5.2. Multiple Organizational Roles Support
+
+#### **Role Combination Matrix**
+| Primary Role | Secondary Roles Allowed | Permission Aggregation | Active Role Selection |
+|-------------|------------------------|---------------------|---------------------|
+| **Staff** | Department Manager, Purchasing Staff | Union of Permissions | Required |
+| **Department Manager** | Financial Manager, Purchasing Staff | Union of Permissions | Required |
+| **Financial Manager** | Department Manager, Purchasing Staff | Union of Permissions | Required |
+| **Purchasing Staff** | Department Manager | Union of Permissions | Required |
+| **System Administrator** | All Roles | Full Permissions | Optional |
+
+#### **Multi-Role Business Rules**
+- **Rule 1**: Users can have multiple organizational roles simultaneously
+- **Rule 2**: Permission aggregation follows Union principle (user inherits ALL permissions)
+- **Rule 3**: Users must select "active" organizational role for current session
+- **Rule 4**: Higher organizational role permissions override lower ones
+- **Rule 5**: Active role selection affects current session permissions only
+
+### 5.3. Workflow Stage Role Assignment Matrix
+
+#### **Workflow Stage Roles per PR**
+| PR Stage | Requestor | Approver | Purchaser | Observer |
+|----------|-----------|----------|-----------|----------|
+| **Draft** | ✅ Creator | ❌ None | ❌ None | 🔍 Assigned Users |
+| **Department Approval** | 🔍 Creator | ✅ Dept Manager | ❌ None | 🔍 Others |
+| **Financial Approval** | 🔍 Creator | ✅ Finance Manager | ❌ None | 🔍 Others |
+| **Purchasing Processing** | 🔍 Creator | ❌ None | ✅ Purchasing Staff | 🔍 Others |
+| **Completed** | 🔍 Creator | ❌ None | ❌ None | 🔍 All |
+
+#### **Multiple Workflow Stage Roles Support**
+| User Assignment | Same PR | Different PRs | Conflict Resolution |
+|----------------|---------|---------------|-------------------|
+| **Multiple Observer Roles** | ✅ Allowed | ✅ Allowed | No Conflict |
+| **Requestor + Observer** | ✅ Allowed | ✅ Allowed | No Conflict |
+| **Requestor + Approver** | ❌ Not Allowed | ✅ Allowed | System Prevents |
+| **Approver + Observer** | ✅ Allowed | ✅ Allowed | User Chooses |
+| **Approver + Purchaser** | ❌ Same PR | ✅ Allowed | System Prevents |
+
+#### **Workflow Stage Role Assignment Rules**
+- **Rule 1**: Each PR must have exactly one Requestor (the creator)
+- **Rule 2**: Each workflow stage must have exactly one Approver assigned
+- **Rule 3**: Each PR can have multiple Observers at any stage
+- **Rule 4**: Users can hold different workflow stage roles for different PRs
+- **Rule 5**: Workflow stage roles can be reassigned by administrators
+- **Rule 6**: Users cannot be both Requestor and final Approver for same PR
+
+### 5.4. Combined Permission Calculation Matrix
+
+#### **Permission Aggregation Formula**
+```
+Final Permission = Active Org Role ∩ Max(Workflow Stage Roles) ∩ Current Stage ∩ Visibility Scope
+```
+
+#### **Role Combination Permission Matrix**
+| Org Role | Workflow Role | Current Stage | Visibility Scope | Final Permission |
+|----------|---------------|---------------|------------------|------------------|
+| Staff | Requestor | Draft | Self | Full Edit (Own PR) |
+| Staff | Requestor | Submitted | Self | View Only (Own PR) |
+| Staff | Observer | Any | Department | View Only (Dept PRs) |
+| Dept Manager | Approver | Dept Approval | Department | Approve (Dept PRs) |
+| Dept Manager | Observer | Other Stages | Department | View Only (Dept PRs) |
+| Financial Manager | Approver | Financial Approval | BU | Approve (All PRs) |
+| Purchasing Staff | Purchaser | Purchasing | BU | Process (All PRs) |
+
+#### **Multi-Role Permission Calculation Examples**
+
+**Scenario 1: User with Staff + Department Manager roles**
+- Available Roles: Staff, Department Manager
+- Active Role: Department Manager
+- Workflow Stage Role: Approver (Department Approval stage)
+- Visibility Scope: Department
+- **Result**: Can approve department PRs with full departmental financial access
+
+**Scenario 2: User with multiple workflow stage roles**
+- Organizational Role: Financial Manager
+- Workflow Stage Roles: Observer (PR-1), Approver (PR-2)
+- Visibility Scope: BU
+- **Result**: Can view PR-1, can approve PR-2, sees all BU PRs
+
+**Scenario 3: Conflict resolution**
+- Organizational Role: Staff
+- Workflow Stage Role: Requestor (created PR-1)
+- System Assignment: Approver (PR-1) - BLOCKED
+- **Result**: System prevents assignment, maintains segregation of duties
+
+#### **Permission Hierarchy Rules**
+- **Rule 1**: Organizational role provides base permission foundation
+- **Rule 2**: Workflow stage role can enhance or restrict organizational permissions
+- **Rule 3**: Current workflow stage validates action availability
+- **Rule 4**: Visibility scope determines data access boundaries
+- **Rule 5**: Most restrictive permission always takes precedence
+- **Rule 6**: No permission can exceed user's organizational role limitations
+
+### 5.5. Enhanced Field-Level Access Matrix
+
+#### **Field Visibility by Role Combination**
+| Field Category | Staff/Requestor | Staff/Observer | Dept Mgr/Approver | Finance Mgr/Approver | Purchasing/Purchaser |
+|---------------|----------------|----------------|-------------------|---------------------|-------------------|
+| **Basic Info** | ✅ Edit | 🔍 View | 🔍 View | 🔍 View | 🔍 View |
+| **Quantities** | ✅ Edit Request | 🔍 View | ✅ Edit Approved | ✅ Edit Approved | ✅ Edit Order |
+| **Dates** | ✅ Edit Required | 🔍 View | 🔍 View | 🔍 View | ✅ Edit Delivery |
+| **Vendor Info** | ❌ Hidden | ❌ Hidden | 🔍 View | 🔍 View | ✅ Edit |
+| **Pricing** | ❌ Hidden* | ❌ Hidden* | 🔍 View | 🔍 View | ✅ Edit |
+| **Financial** | ❌ Hidden | ❌ Hidden | ✅ Edit Discounts | ✅ Edit All | 🔍 View |
+| **Budget** | ❌ Hidden | ❌ Hidden | 🔍 View Dept | ✅ Edit All | 🔍 View |
+| **Comments** | ✅ Edit | ✅ Edit | ✅ Edit | ✅ Edit | ✅ Edit |
+
+*Except with "Show Prices" toggle enabled
+
+#### **Enhanced Field Permission Rules**
+- **Financial fields are hidden from Staff organizational role** regardless of workflow stage role
+- **Vendor information is hidden from Requestor workflow stage role** regardless of organizational role
+- **Approval fields are only editable by Approver workflow stage role**
+- **Procurement fields are only editable by Purchaser workflow stage role**
+- **"Show Prices" toggle only affects total amounts**, not detailed pricing panels
+- **Role-based panels are completely hidden** for unauthorized roles
+
+#### **Multi-Role Field Access Logic**
+1. **Base Access**: Determined by active organizational role
+2. **Role Enhancement**: Workflow stage role can provide additional access
+3. **Role Restriction**: Workflow stage role can restrict organizational access
+4. **Stage Validation**: Current workflow stage validates field editability
+5. **Scope Filtering**: Visibility scope determines which PRs are accessible
+
+### 5.6. Role Definitions and Permissions
 
 #### **Requestor/Staff Role**
-*   **Edit Permissions**: Can edit location, product, comment, request quantity, request unit, required date, PR header fields (ref number, date, type, requestor, department, description)
+*   **Edit Permissions**: Can edit location, product, comment, request quantity, request unit, required date, delivery point, PR header fields (type, description)
 *   **View Restrictions**: 
-    *   **Cannot view** vendor names, pricelist numbers, or any pricing information
+    *   **Cannot view** vendor names, pricelist numbers, or price per unit information
+    *   **Cannot view** detailed pricing panels (vendor, discount, net amount, tax breakdown)
+    *   **Cannot view** FOC (Free of Charge) quantities
     *   **Cannot view** transaction summary (financial totals)
     *   **Cannot access** vendor comparison functionality
+*   **Conditional Access**: Can see total amounts only when "Show Prices" toggle is enabled
 *   **Actions**: Create, edit, submit, and delete own PRs
 *   **Workflow**: Can submit PR for approval, delete draft PRs
 
 #### **Department Manager Role**
-*   **Edit Permissions**: Can edit comments and approved quantities only
-*   **View Access**: Can view all vendor and pricing information but cannot edit vendor/pricing fields
+*   **Edit Permissions**: Can edit comments, approved quantities, vendor information, discount amounts, and tax amounts
+*   **View Access**: Can view all vendor and pricing information including detailed pricing panels
+*   **View FOC Information**: Can view and edit FOC (Free of Charge) quantities
 *   **Actions**: Approve, reject, or send back PRs assigned to them
 *   **Financial Access**: Can view transaction summary and all financial information
+*   **Pricing Panel Access**: Always visible regardless of "Show Prices" toggle setting
 
 #### **Financial Manager Role**
-*   **Edit Permissions**: Can edit comments and approved quantities only
-*   **View Access**: Full access to all vendor, pricing, and financial information
+*   **Edit Permissions**: Can edit comments, approved quantities, vendor information, discount amounts, and tax amounts
+*   **View Access**: Full access to all vendor, pricing, and financial information including detailed pricing panels
+*   **View FOC Information**: Can view and edit FOC (Free of Charge) quantities
 *   **Actions**: Provide final financial approval, reject, or send back PRs
 *   **Financial Access**: Can view transaction summary and all financial information
+*   **Pricing Panel Access**: Always visible regardless of "Show Prices" toggle setting
 
 #### **Purchasing Staff Role**
-*   **Edit Permissions**: Can edit comments, approved quantities, vendor fields, pricing information, and order units
-*   **View Access**: Full access to all information including vendor comparison functionality
+*   **Edit Permissions**: Can edit comments, approved quantities, vendor fields, all pricing information (including price per unit), discount amounts, tax amounts, and order units
+*   **View Access**: Full access to all information including vendor comparison functionality and detailed pricing panels
+*   **View FOC Information**: Can view and edit FOC (Free of Charge) quantities
 *   **Actions**: Process approved PRs, manage vendor selection, create purchase orders
 *   **Financial Access**: Can view transaction summary and all financial information
+*   **Pricing Panel Access**: Always visible regardless of "Show Prices" toggle setting
+
+### 5.7. Action Authorization Matrix
+
+#### **Actions by Role Combination and Stage**
+| Action | Staff/Requestor | Dept Mgr/Approver | Finance Mgr/Approver | Purchasing/Purchaser |
+|--------|----------------|-------------------|---------------------|-------------------|
+| **Edit** | ✅ Draft Stage Only | ❌ Never | ❌ Never | ✅ Procurement Fields |
+| **Delete** | ✅ Draft Stage Only | ❌ Never | ❌ Never | ❌ Never |
+| **Submit** | ✅ Draft Stage Only | ❌ Never | ❌ Never | ❌ Never |
+| **Approve** | ❌ Never | ✅ At Dept Stage | ✅ At Finance Stage | ❌ Never |
+| **Reject** | ❌ Never | ✅ At Dept Stage | ✅ At Finance Stage | ✅ At Purchasing |
+| **Send Back** | ❌ Never | ✅ At Dept Stage | ✅ At Finance Stage | ✅ At Purchasing |
+| **Process** | ❌ Never | ❌ Never | ❌ Never | ✅ At Purchasing |
+| **Create PO** | ❌ Never | ❌ Never | ❌ Never | ✅ At Purchasing |
+| **Comment** | ✅ Always | ✅ Always | ✅ Always | ✅ Always |
+
+#### **Scope-Based Action Authorization**
+| Visibility Scope | Own Created PRs | Department PRs | BU PRs |
+|-----------------|----------------|----------------|---------|
+| **Self Only** | Full Actions (if workflow role) | ❌ No Access | ❌ No Access |
+| **Department Assigned** | Full Actions (if workflow role) | Actions (if workflow role) | ❌ No Access |
+| **BU Assigned** | Full Actions (if workflow role) | Actions (if workflow role) | Actions (if workflow role) |
+
+#### **Stage-Specific Action Rules**
+| Workflow Stage | Requestor Actions | Approver Actions | Purchaser Actions | Observer Actions |
+|----------------|-------------------|------------------|-------------------|------------------|
+| **Draft** | Edit, Delete, Submit | - | - | View |
+| **Submitted** | View, Comment | Approve, Reject, Send Back | - | View |
+| **Dept Approval** | View, Comment | - | - | View |
+| **Financial Approval** | View, Comment | Approve, Reject, Send Back | - | View |
+| **Purchasing** | View, Comment | - | Process, Create PO, Edit Vendors | View |
+| **Completed** | View | View | View | View |
+
+#### **Multi-Role Action Logic**
+- **Rule 1**: User can perform any action authorized by their highest applicable role combination
+- **Rule 2**: User must explicitly choose which role combination to use for each action
+- **Rule 3**: Actions must be logged with specific role combination used
+- **Rule 4**: User cannot perform conflicting actions simultaneously
+- **Rule 5**: Stage restrictions override role permissions
+
+### 5.8. Conflict Resolution and Compliance Matrix
+
+#### **Role Conflict Scenarios**
+| Conflict Type | Scenario | Resolution | System Action |
+|---------------|----------|------------|---------------|
+| **Same PR Requestor/Approver** | User created PR, assigned as approver | Block Assignment | Prevent + Alert |
+| **Multiple Approver Roles** | User assigned multiple approver roles | Allow with Selection | Prompt Role Choice |
+| **Competing Organizational Roles** | User has Staff + Manager roles | Use Active Role | Require Role Selection |
+| **Workflow Stage Conflicts** | User assigned conflicting workflow roles | Block Conflicts | Prevent + Alert |
+
+#### **Conflict Prevention Rules**
+| Prevention Rule | Validation Point | Action |
+|----------------|------------------|--------|
+| **No Self-Approval** | Assignment Time | Block assignment if user is requestor |
+| **No Role Stacking** | Action Time | Prevent conflicting actions |
+| **Segregation of Duties** | Workflow Time | Require different users for key stages |
+| **Authority Limits** | Approval Time | Validate approval authority |
+
+#### **Segregation of Duties Matrix**
+| Role Combination | Same PR | Different PRs | Compliance Rule |
+|-----------------|---------|---------------|-----------------|
+| **Requestor + Dept Approver** | ❌ Blocked | ✅ Allowed | No self-approval |
+| **Requestor + Finance Approver** | ❌ Blocked | ✅ Allowed | No self-approval |
+| **Requestor + Purchaser** | 🔐 Restricted | ✅ Allowed | Limited procurement actions |
+| **Dept Approver + Finance Approver** | ❌ Blocked | ✅ Allowed | No double approval |
+| **Approver + Purchaser** | 🔐 Restricted | ✅ Allowed | Sequential stages only |
+
+### 5.9. Audit and Compliance Matrix
+
+#### **Audit Requirements by Role Combination**
+| Role Combination | Actions Logged | Visibility Logged | Role Switches Logged |
+|-----------------|----------------|-------------------|-------------------|
+| **All Users** | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Approvers** | ✅ Enhanced | ✅ Enhanced | ✅ Enhanced |
+| **System Admin** | ✅ All Actions | ✅ All Access | ✅ All Switches |
+
+#### **Enhanced Audit Trail Requirements**
+- **Multi-Role Action Logging**: All actions must be logged with specific role combination used
+- **Role Switch Tracking**: Role switches must be logged with timestamp and reason  
+- **Permission Calculation Audit**: System must track which roles were active for each action
+- **Compliance Validation Logging**: System must log segregation of duties validations
+
+#### **Compliance Validation Matrix**
+| Compliance Check | Frequency | Trigger | Action |
+|-----------------|-----------|---------|--------|
+| **Segregation of Duties** | Real-time | Action Attempt | Block if Violation |
+| **Authority Limits** | Real-time | Approval Attempt | Block if Exceeded |
+| **Role Assignments** | Daily | Batch Process | Alert if Irregular |
+| **Visibility Permissions** | Weekly | Audit Process | Report Anomalies |
+
+### 5.10. Multi-Role RBAC Implementation Summary
+
+#### **Key Features of the Multi-Role RBAC System**
+
+1. **Dual-Role Architecture**: Combines organizational roles (permanent) with workflow stage roles (contextual)
+2. **Multiple Role Support**: Users can have multiple organizational roles and multiple workflow stage roles
+3. **Dynamic Permission Calculation**: Real-time permission aggregation using intersection formulas
+4. **Granular Visibility Control**: Base visibility (own PRs) + assigned visibility (department/BU)
+5. **Conflict Resolution**: Automatic prevention of segregation of duties violations
+6. **Comprehensive Audit**: Enhanced logging for multi-role scenarios
+
+#### **Permission Calculation Hierarchy**
+```
+1. Base Visibility: Own created PRs (always accessible)
+2. Extended Visibility: Department/BU PRs (if assigned)
+3. Organizational Role: Provides permission foundation
+4. Workflow Stage Role: Enhances or restricts permissions
+5. Current Stage: Validates action availability
+6. Final Permission: Most restrictive takes precedence
+```
+
+#### **Implementation Phases**
+- **Phase 1**: Organizational role multiplicity support
+- **Phase 2**: Workflow stage role assignment system
+- **Phase 3**: Permission aggregation and calculation engine
+- **Phase 4**: Conflict resolution and compliance validation
+- **Phase 5**: Enhanced audit and monitoring
+
+#### **Business Benefits**
+- **Flexibility**: Supports complex organizational structures
+- **Security**: Maintains segregation of duties
+- **Scalability**: Handles growing business requirements  
+- **Compliance**: Comprehensive audit and control framework
+- **Usability**: Clear role selection and permission visibility
 
 ### 5.2. Financial Information Visibility
 
-**Restricted Financial Information** (hidden from Requestor/Staff roles):
-*   Unit prices and total amounts
-*   Vendor pricing details
-*   Transaction summary (subtotals, discounts, taxes, net amounts, total amounts)
-*   Vendor comparison pricing data
-*   Exchange rates and currency conversions
+#### **"Show Prices" Toggle Control**
+*   **Purpose**: Allows users to control visibility of total amounts in main item table
+*   **Scope**: Controls only the price column in the main items table
+*   **Independence**: Separate from detailed pricing panel visibility (which is role-based)
+*   **Location**: Accessible via Profile Menu → Switch Context → Show Prices Toggle
 
-**Purpose**: Ensures budget confidentiality and prevents requestors from seeing sensitive vendor pricing that could influence future negotiations.
+#### **Role-Based Financial Access**
 
-### 5.3. Field-Level Permission Matrix
+**Requestor/Staff Role Restrictions**:
+*   **Always Hidden**: Price per unit, detailed pricing panels, FOC quantities, vendor comparison
+*   **Conditionally Hidden**: Total amounts (controlled by "Show Prices" toggle)
+*   **Never Visible**: Transaction summary, vendor pricing details, exchange rates
+
+**Approver/Purchaser Role Access**:
+*   **Always Visible**: Detailed pricing panels, FOC quantities, vendor information
+*   **Toggle Controlled**: Main table price column (same as requestors)
+*   **Full Access**: Transaction summary, vendor comparison, all financial data
+
+**Purpose**: Ensures budget confidentiality while allowing requestors limited price visibility when needed for decision-making.
+
+### 5.3. Legacy Field-Level Permission Matrix (Single-Role Reference)
+
+**Note**: This matrix shows traditional single-role permissions. For multi-role scenarios, refer to Section 5.5 Enhanced Field-Level Access Matrix.
 
 | Field Category | Requestor/Staff | Dept Manager | Financial Manager | Purchasing Staff |
 |---|---|---|---|---|
 | **Basic Item Details** | Edit | View Only | View Only | Edit |
 | **Quantities** | Edit (Request) | Edit (Approved) | Edit (Approved) | Edit (Approved) |
-| **Vendor Information** | Hidden | View Only | View Only | Edit |
-| **Pricing Information** | Hidden | View Only | View Only | Edit |
+| **Vendor Information** | Hidden | Edit | Edit | Edit |
+| **Price Per Unit** | Hidden | View Only | View Only | Edit |
+| **Discount & Tax** | Hidden | Edit | Edit | Edit |
+| **FOC Quantities** | Hidden | Edit | Edit | Edit |
+| **Total Amounts** | Toggle Control | Always Visible | Always Visible | Always Visible |
 | **Comments** | Edit | Edit | Edit | Edit |
+| **Required Date** | Edit | Edit | Edit | Edit |
+| **Delivery Point** | Edit (Dropdown) | Edit (Dropdown) | Edit (Dropdown) | Edit (Dropdown) |
+| **On Hand/On Order** | View Only | View Only | View Only | View Only |
 | **PR Header Fields** | Edit | View Only | View Only | View Only |
 
-### 5.4. UI Components Access Control
+**Important**: This matrix applies only when users have single organizational roles and single workflow stage roles. For users with multiple roles, the system uses the Enhanced Field-Level Access Matrix (Section 5.5) with permission aggregation rules.
+
+### 5.4. Enhanced Item Interface Design
+
+#### **Multi-Level Information Architecture**
+The item interface implements a three-tier information display system:
+
+1. **Main Item Row**: Basic item details (name, quantity, unit, status)
+2. **Detailed Pricing Panel**: Compact single-row pricing breakdown (role-based visibility)
+3. **Comment & Inventory Row**: Additional fields with enhanced layout
+4. **Expanded Item View**: Full detailed view (when chevron clicked)
+
+#### **Detailed Pricing Panel** (Compact Single Row)
+*   **Layout**: 6-column responsive grid with smaller fonts for space efficiency
+*   **Visibility**: Hidden for requestors, always visible for approvers/purchasers
+*   **Fields Included**: 
+    - Vendor (editable by approvers/purchasers)
+    - Price per Unit (hidden for requestors, editable by purchasers only)
+    - Discount (editable by approvers/purchasers)
+    - Net Amount (calculated: price × quantity - discount)
+    - Tax (editable by approvers/purchasers)
+    - Total (final amount without base currency conversion)
+*   **Design**: Green background with compact 10px labels and 12px values
+
+#### **Comment & Inventory Row** (8-Column Layout)
+*   **Comment Field**: 4/8 columns with textarea for detailed notes
+*   **On Hand Quantity**: 1/8 column showing current inventory with green background
+*   **On Order Quantity**: 1/8 column showing pending deliveries with blue background
+*   **Date Required**: 1/8 column with date picker functionality
+*   **Delivery Point**: 1/8 column with dropdown selection from predefined locations
+
+#### **Delivery Point Options**
+Predefined dropdown options include:
+- Main Kitchen, Storage Room, Receiving Dock
+- Cold Storage, Dry Storage, Bar Storage
+- Housekeeping, Maintenance, Front Office
+- Spa, Gym, Pool Area, Restaurant
+- Banquet Hall, Laundry, Other
+
+### 5.5. UI Components Access Control
 
 #### **Sidebar Functionality**
 *   **Comments & Attachments**: Accessible to all roles
@@ -355,6 +727,11 @@ The actions a user can perform on a PR are determined by their role, with granul
 *   **Accessible to**: Purchasing Staff only
 *   **Hidden from**: All other roles including approvers
 *   **Purpose**: Allows purchasing staff to compare vendor pricing during procurement process
+
+#### **Pricing Panel Visibility Logic**
+*   **Main Table Price Column**: Controlled by "Show Prices" toggle for all roles
+*   **Detailed Pricing Panel**: Role-based - hidden for requestors, visible for approvers/purchasers
+*   **Expanded View Pricing**: Hidden for requestors, toggle-controlled for approvers/purchasers
 
 ## 6. User Interface and Layout
 

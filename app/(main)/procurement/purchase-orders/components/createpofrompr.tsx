@@ -9,6 +9,7 @@ import {
   WorkflowStatus,
 } from "@/lib/types";
 import { PRType } from "@/lib/types";
+import { mockPRListData } from "@/app/(main)/procurement/purchase-requests/components/mockPRListData";
 import {
   Table,
   TableBody,
@@ -31,254 +32,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
-// Import the actual sample PR data from purchase-requests - using the same data from PR list
-const sampleData: PurchaseRequest[] = [
-  {
-    id: 'sample-pr-001',
-    refNumber: 'PR-2023-001',
-    date: new Date('2023-01-01'),
-    type: PRType.GeneralPurchase,
-    description: 'Sample purchase request for office supplies',
-    requestorId: 'user-1',
-    requestor: {
-      name: 'John Doe',
-      id: 'user-1',
-      department: 'Administration'
-    },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'Head Office',
-    department: 'Administration',
-    jobCode: 'JOB-001',
-    estimatedTotal: 1500,
-    vendor: 'Office Supplies Co.',
-    vendorId: 1,
-    deliveryDate: new Date('2023-01-15'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 1000,
-    subTotalPrice: 1000,
-    baseNetAmount: 1000,
-    netAmount: 1000,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 100,
-    taxAmount: 100,
-    baseTotalAmount: 1100,
-    totalAmount: 1100
-  },
-  {
-    id: 'sample-pr-002',
-    refNumber: 'PR-2023-002',
-    date: new Date('2023-01-02'),
-    type: PRType.GeneralPurchase,
-    description: 'IT Equipment and Supplies',
-    requestorId: 'user-1',
-    requestor: {
-      name: 'John Doe',
-      id: 'user-1',
-      department: 'Administration'
-    },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'Branch Office',
-    department: 'IT',
-    jobCode: 'JOB-002',
-    estimatedTotal: 2500,
-    vendor: 'Tech Solutions Inc.',
-    vendorId: 2,
-    deliveryDate: new Date('2023-01-20'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 2000,
-    subTotalPrice: 2000,
-    baseNetAmount: 2000,
-    netAmount: 2000,
-    baseDiscAmount: 100,
-    discountAmount: 100,
-    baseTaxAmount: 150,
-    taxAmount: 150,
-    baseTotalAmount: 2050,
-    totalAmount: 2050
-  },
-  {
-    id: 'sample-pr-003',
-    refNumber: 'PR-2023-003',
-    date: new Date('2023-01-03'),
-    type: PRType.GeneralPurchase,
-    description: 'Marketing Materials',
-    requestorId: 'user-002',
-    requestor: {
-      name: 'Jane Smith',
-      id: 'user-002',
-      department: 'Marketing'
-    },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'Main Office',
-    department: 'Marketing',
-    jobCode: 'JOB-003',
-    estimatedTotal: 3000,
-    vendor: 'Marketing Pro Ltd.',
-    vendorId: 3,
-    deliveryDate: new Date('2023-01-25'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 2800,
-    subTotalPrice: 2800,
-    baseNetAmount: 2800,
-    netAmount: 2800,
-    baseDiscAmount: 140,
-    discountAmount: 140,
-    baseTaxAmount: 200,
-    taxAmount: 200,
-    baseTotalAmount: 2860,
-    totalAmount: 2860
-  },
-  {
-    id: 'sample-pr-004',
-    refNumber: 'PR-2023-004',
-    date: new Date('2023-01-04'),
-    type: PRType.GeneralPurchase,
-    description: 'Kitchen Equipment',
-    requestorId: 'user-003',
-    requestor: {
-      name: 'Bob Wilson',
-      id: 'user-003',
-      department: 'Kitchen'
-    },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'Main Kitchen',
-    department: 'Kitchen',
-    jobCode: 'JOB-004',
-    estimatedTotal: 5000,
-    vendor: 'Kitchen Pro Equipment',
-    vendorId: 4,
-    deliveryDate: new Date('2023-02-01'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 4500,
-    subTotalPrice: 4500,
-    baseNetAmount: 4500,
-    netAmount: 4500,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 450,
-    taxAmount: 450,
-    baseTotalAmount: 4950,
-    totalAmount: 4950
-  },
-  {
-    id: 'sample-pr-005',
-    refNumber: 'PR-2023-005',
-    date: new Date('2023-01-05'),
-    type: PRType.GeneralPurchase,
-    description: 'Office Supplies - Stationery',
-    requestorId: 'user-1',
-    requestor: {
-      name: 'John Doe',
-      id: 'user-1',
-      department: 'Administration'
-    },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'Head Office',
-    department: 'Administration',
-    jobCode: 'JOB-005',
-    estimatedTotal: 800,
-    vendor: 'Office Supplies Co.',
-    vendorId: 1,
-    deliveryDate: new Date('2023-01-25'),
-    currency: 'USD',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 700,
-    subTotalPrice: 700,
-    baseNetAmount: 700,
-    netAmount: 700,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 70,
-    taxAmount: 70,
-    baseTotalAmount: 770,
-    totalAmount: 770
-  },
-  {
-    id: 'sample-pr-006',
-    refNumber: 'PR-2023-006',
-    date: new Date('2023-01-06'),
-    type: PRType.GeneralPurchase,
-    description: 'International Supplies',
-    requestorId: 'user-004',
-    requestor: {
-      name: 'Alice Johnson',
-      id: 'user-004',
-      department: 'International'
-    },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'International Office',
-    department: 'International',
-    jobCode: 'JOB-006',
-    estimatedTotal: 1200,
-    vendor: 'Global Suppliers Ltd.',
-    vendorId: 5,
-    deliveryDate: new Date('2023-02-05'),
-    currency: 'EUR',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 1100,
-    subTotalPrice: 1100,
-    baseNetAmount: 1100,
-    netAmount: 1100,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 110,
-    taxAmount: 110,
-    baseTotalAmount: 1210,
-    totalAmount: 1210
-  },
-  {
-    id: 'sample-pr-007',
-    refNumber: 'PR-2023-007',
-    date: new Date('2023-01-07'),
-    type: PRType.GeneralPurchase,
-    description: 'European Office Equipment',
-    requestorId: 'user-004',
-    requestor: {
-      name: 'Alice Johnson',
-      id: 'user-004',
-      department: 'International'
-    },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
-    location: 'International Office',
-    department: 'International',
-    jobCode: 'JOB-007',
-    estimatedTotal: 2500,
-    vendor: 'Global Suppliers Ltd.',
-    vendorId: 5,
-    deliveryDate: new Date('2023-02-10'),
-    currency: 'EUR',
-    baseCurrencyCode: 'USD',
-    baseSubTotalPrice: 2300,
-    subTotalPrice: 2300,
-    baseNetAmount: 2300,
-    netAmount: 2300,
-    baseDiscAmount: 100,
-    discountAmount: 100,
-    baseTaxAmount: 230,
-    taxAmount: 230,
-    baseTotalAmount: 2430,
-    totalAmount: 2430
-  }
-];
 
 type SortConfig = {
   key: keyof PurchaseRequest;
@@ -298,13 +51,19 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
   });
 
   const filteredAndSortedPurchaseRequests = useMemo(() => {
-    return sampleData
-      .filter(
-        (pr) =>
-          pr.refNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          pr.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          pr.vendor.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    return mockPRListData
+      .filter((pr) => {
+        // Only show approved and completed PRs
+        const isApproved = pr.workflowStatus === WorkflowStatus.approved && 
+                          pr.currentWorkflowStage === WorkflowStage.completed;
+        
+        const matchesSearch = pr.refNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             pr.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             pr.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             pr.requestor.name.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        return isApproved && matchesSearch;
+      })
       .sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
@@ -361,7 +120,7 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
         />
         <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-md">
           <p className="font-medium mb-2">🎯 Grouping Logic:</p>
-          <p>PRs with the same <strong>vendor</strong> and <strong>currency</strong> will be grouped into one PO. Each row is color-coded by vendor+currency combination.</p>
+          <p>Items with the same <strong>vendor</strong>, <strong>currency</strong>, and <strong>date required</strong> will be grouped into one PO. Multiple POs may be created from a single PR if it contains items from different vendors or required dates.</p>
         </div>
       </div>
       <ScrollArea className="flex-1 min-h-0">
@@ -388,8 +147,8 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
                 </Button>
               </TableHead>
               <TableHead>
-                <Button variant="ghost" onClick={() => handleSort("vendor")}>
-                  Vendor <ArrowUpDown className="ml-2 h-4 w-4" />
+                <Button variant="ghost" onClick={() => handleSort("department")}>
+                  Department <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
               <TableHead>
@@ -403,9 +162,9 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
               <TableHead>
                 <Button
                   variant="ghost"
-                  onClick={() => handleSort("deliveryDate")}
+                  onClick={() => handleSort("requestor")}
                 >
-                  Delivery Date <ArrowUpDown className="ml-2 h-4 w-4" />
+                  Requestor <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
               <TableHead>
@@ -448,9 +207,9 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
                   </TableCell>
                   <TableCell>{pr.refNumber}</TableCell>
                   <TableCell>{pr.date.toLocaleDateString()}</TableCell>
-                  <TableCell className="font-medium">{pr.vendor}</TableCell>
+                  <TableCell>{pr.department}</TableCell>
                   <TableCell>{pr.description}</TableCell>
-                  <TableCell>{pr.deliveryDate.toLocaleDateString()}</TableCell>
+                  <TableCell>{pr.requestor.name}</TableCell>
                   <TableCell className="text-right font-medium">
                     {pr.currency} {pr.totalAmount.toFixed(2)}
                   </TableCell>
@@ -467,29 +226,51 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
         <div className="text-sm text-muted-foreground">
           {selectedPRIds.length > 0 && (
             <div>
-              <p className="font-medium">Selected PRs will be grouped by vendor and currency:</p>
+              <p className="font-medium">Selected items will be grouped by vendor, currency, and date required:</p>
               {(() => {
                 const selectedPRs = filteredAndSortedPurchaseRequests.filter(pr => selectedPRIds.includes(pr.id));
-                const groupedPRs = selectedPRs.reduce((groups, pr) => {
-                  const key = `${pr.vendor}-${pr.currency}`;
+                
+                // Extract all items from selected PRs
+                const allItems = selectedPRs.flatMap(pr => 
+                  pr.items?.map(item => ({
+                    ...item,
+                    sourcePR: pr,
+                    prId: pr.id,
+                    prNumber: pr.refNumber
+                  })) || []
+                );
+                
+                // Group items by vendor + currency + deliveryDate
+                const groupedItems = allItems.reduce((groups, item) => {
+                  const key = `${item.vendor}-${item.currency}-${item.deliveryDate}`;
                   if (!groups[key]) {
                     groups[key] = {
-                      vendor: pr.vendor,
-                      currency: pr.currency,
-                      prs: [],
-                      totalAmount: 0
+                      vendor: item.vendor,
+                      currency: item.currency,
+                      deliveryDate: item.deliveryDate,
+                      items: [],
+                      totalAmount: 0,
+                      sourcePRs: new Set()
                     };
                   }
-                  groups[key].prs.push(pr);
-                  groups[key].totalAmount += pr.totalAmount;
+                  groups[key].items.push(item);
+                  groups[key].totalAmount += item.totalAmount || 0;
+                  groups[key].sourcePRs.add(item.prNumber);
                   return groups;
-                }, {} as Record<string, { vendor: string; currency: string; prs: PurchaseRequest[]; totalAmount: number }>);
+                }, {} as Record<string, { 
+                  vendor: string; 
+                  currency: string; 
+                  deliveryDate: Date; 
+                  items: any[]; 
+                  totalAmount: number; 
+                  sourcePRs: Set<string> 
+                }>);
                 
                 return (
                   <ul className="mt-2 space-y-1">
-                    {Object.values(groupedPRs).map((group, index) => (
+                    {Object.values(groupedItems).map((group, index) => (
                       <li key={index} className="text-xs">
-                        • <strong>{group.vendor}</strong> ({group.currency}) - {group.prs.length} PR{group.prs.length > 1 ? 's' : ''} - Total: {group.currency} {group.totalAmount.toFixed(2)}
+                        • <strong>{group.vendor}</strong> ({group.currency}) - {group.deliveryDate.toLocaleDateString()} - {group.items.length} item{group.items.length > 1 ? 's' : ''} from {group.sourcePRs.size} PR{group.sourcePRs.size > 1 ? 's' : ''} - Total: {group.currency} {group.totalAmount.toFixed(2)}
                       </li>
                     ))}
                   </ul>
@@ -508,8 +289,27 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
         >
           Create PO{selectedPRIds.length > 0 ? `s (${(() => {
             const selectedPRs = filteredAndSortedPurchaseRequests.filter(pr => selectedPRIds.includes(pr.id));
-            const uniqueGroups = new Set(selectedPRs.map(pr => `${pr.vendor}-${pr.currency}`));
-            return uniqueGroups.size;
+            
+            // Extract all items from selected PRs
+            const allItems = selectedPRs.flatMap(pr => 
+              pr.items?.map(item => ({
+                ...item,
+                sourcePR: pr,
+                prId: pr.id,
+                prNumber: pr.refNumber
+              })) || []
+            );
+            
+            // Group items by vendor + currency + deliveryDate
+            const groupedItems = allItems.reduce((groups, item) => {
+              const key = `${item.vendor}-${item.currency}-${item.deliveryDate}`;
+              if (!groups[key]) {
+                groups[key] = true;
+              }
+              return groups;
+            }, {} as Record<string, boolean>);
+            
+            return Object.keys(groupedItems).length;
           })()})` : ''}
         </Button>
       </div>

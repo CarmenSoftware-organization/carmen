@@ -52,6 +52,7 @@ const createMockUser = (): User => {
       currentRole: defaultRole,
       currentDepartment: defaultDepartment,
       currentLocation: defaultLocation,
+      showPrices: true, // Default to showing prices
     }
   };
 };
@@ -83,6 +84,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (contextUpdates.currentLocation) {
       updatedUser.context.currentLocation = contextUpdates.currentLocation;
       updatedUser.location = contextUpdates.currentLocation.name;
+    }
+
+    // Update price visibility if provided
+    if (contextUpdates.showPrices !== undefined) {
+      updatedUser.context.showPrices = contextUpdates.showPrices;
     }
 
     setUser(updatedUser);

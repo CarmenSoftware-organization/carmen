@@ -504,10 +504,6 @@ export default function PRDetailPage() {
                         <span className="text-sm text-muted-foreground">Created:</span>
                         <span className="text-sm">{isMounted ? format(formData.date, "dd MMM yyyy") : formData.date.toISOString().split('T')[0]}</span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Estimated Cost:</span>
-                        <span className="text-sm font-medium">{new Intl.NumberFormat('en-US', { style: 'currency', currency: formData.currency }).format(formData.estimatedTotal)}</span>
-                      </div>
                     </div>
                   </div>
                 </CardContent>

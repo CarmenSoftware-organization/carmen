@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, Building2, MapPin, UserCog, Users } from "lucide-react";
+import { Check, ChevronDown, Building2, MapPin, UserCog, Users, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { useUser } from "@/lib/context/user-context";
 import type { Role, Department, Location, User } from "@/lib/types/user";
 
@@ -137,6 +138,10 @@ export function UserContextSwitcher() {
     
     setUser(updatedUser);
     setIsOpen(false);
+  };
+
+  const handlePriceVisibilityToggle = (showPrices: boolean) => {
+    updateUserContext({ showPrices });
   };
 
   const getLocationTypeIcon = (type: string) => {
@@ -298,6 +303,29 @@ export function UserContextSwitcher() {
             ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
+
+        <DropdownMenuSeparator />
+
+        {/* Price Visibility Toggle */}
+        <div className="px-2 py-1.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              {user.context.showPrices ? (
+                <Eye className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <EyeOff className="h-4 w-4 text-muted-foreground" />
+              )}
+              <span className="text-sm font-medium">Show Prices</span>
+            </div>
+            <Switch
+              checked={user.context.showPrices || false}
+              onCheckedChange={handlePriceVisibilityToggle}
+            />
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Toggle visibility of price information
+          </div>
+        </div>
 
         <DropdownMenuSeparator />
 

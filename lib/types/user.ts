@@ -33,6 +33,8 @@ export interface UserContext {
   currentRole: Role;
   currentDepartment: Department;
   currentLocation: Location;
+  // UI preferences
+  showPrices?: boolean;
 }
 
 export interface User extends UserProfile {

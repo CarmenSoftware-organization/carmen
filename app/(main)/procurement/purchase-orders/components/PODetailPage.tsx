@@ -96,9 +96,10 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       // Check if we're creating a PO from PRs
       const searchParams = new URLSearchParams(window.location.search);
       const fromPR = searchParams.get('fromPR') === 'true';
+      const grouped = searchParams.get('grouped') === 'true';
+      const bulk = searchParams.get('bulk') === 'true';
       
-      // Initialize new PO
-      const newPO = {
+      let newPO = {
         poId: 'new',
         number: 'New PO',
         vendorId: 0,
@@ -115,6 +116,8 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         description: '',
         remarks: '',
         items: [],
+        purchaseRequisitionIds: [] as string[],
+        purchaseRequisitionNumbers: [] as string[],
         baseSubTotalPrice: 0,
         subTotalPrice: 0,
         baseNetAmount: 0,
@@ -127,6 +130,93 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         totalAmount: 0,
         activityLog: []
       };
+
+      if (fromPR && grouped) {
+        try {
+          const groupedPRsData = localStorage.getItem('groupedPurchaseRequests');
+          if (groupedPRsData) {
+            const groupedItems = JSON.parse(groupedPRsData);
+            const groups = Object.values(groupedItems) as any[];
+            
+            if (groups.length > 0) {
+              // For single PO creation, use the first group
+              const firstGroup = groups[0];
+              
+              // Convert item group data to PO format
+              newPO = {
+                ...newPO,
+                vendorId: firstGroup.vendorId,
+                vendorName: firstGroup.vendor,
+                currencyCode: firstGroup.currency,
+                description: `Purchase Order created from ${firstGroup.items.length} item${firstGroup.items.length > 1 ? 's' : ''} from PR${firstGroup.sourcePRs.length > 1 ? 's' : ''}: ${firstGroup.sourcePRs.join(', ')}`,
+                purchaseRequisitionIds: firstGroup.items.map((item: any) => item.prId),
+                purchaseRequisitionNumbers: firstGroup.sourcePRs,
+                // Convert items to PO items
+                items: firstGroup.items.map((item: any) => ({
+                  id: `po-item-${Math.random().toString(36).substr(2, 9)}`,
+                  name: item.name,
+                  description: item.description,
+                  convRate: 1,
+                  orderedQuantity: item.quantityApproved || item.quantityRequested,
+                  orderUnit: item.unit,
+                  baseQuantity: item.quantityApproved || item.quantityRequested,
+                  baseUnit: item.unit,
+                  baseReceivingQty: 0,
+                  receivedQuantity: 0,
+                  remainingQuantity: item.quantityApproved || item.quantityRequested,
+                  unitPrice: item.price || 0,
+                  status: 'Open' as any,
+                  isFOC: false,
+                  taxRate: (item.taxRate || 0) * 100,
+                  discountRate: (item.discountRate || 0) * 100,
+                  taxIncluded: item.taxIncluded || false,
+                  baseSubTotalPrice: (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0),
+                  subTotalPrice: (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0),
+                  baseNetAmount: item.netAmount || 0,
+                  netAmount: item.netAmount || 0,
+                  baseDiscAmount: item.discountAmount || 0,
+                  discountAmount: item.discountAmount || 0,
+                  baseTaxAmount: item.taxAmount || 0,
+                  taxAmount: item.taxAmount || 0,
+                  baseTotalAmount: item.totalAmount || 0,
+                  totalAmount: item.totalAmount || 0,
+                  inventoryInfo: item.inventoryInfo || {
+                    onHand: 0,
+                    onOrdered: 0,
+                    reorderLevel: 0,
+                    restockLevel: 0,
+                    averageMonthlyUsage: 0,
+                    lastPrice: 0,
+                    lastOrderDate: new Date(),
+                    lastVendor: ''
+                  },
+                  // Add PR traceability
+                  sourcePRId: item.prId,
+                  sourcePRNumber: item.prNumber,
+                  sourcePRItemId: item.id
+                })),
+                // Calculate totals from items
+                baseSubTotalPrice: firstGroup.items.reduce((sum: number, item: any) => sum + (item.baseSubTotalPrice || 0), 0),
+                subTotalPrice: firstGroup.items.reduce((sum: number, item: any) => sum + (item.subTotalPrice || 0), 0),
+                baseNetAmount: firstGroup.items.reduce((sum: number, item: any) => sum + (item.baseNetAmount || 0), 0),
+                netAmount: firstGroup.items.reduce((sum: number, item: any) => sum + (item.netAmount || 0), 0),
+                baseDiscAmount: firstGroup.items.reduce((sum: number, item: any) => sum + (item.baseDiscAmount || 0), 0),
+                discountAmount: firstGroup.items.reduce((sum: number, item: any) => sum + (item.discountAmount || 0), 0),
+                baseTaxAmount: firstGroup.items.reduce((sum: number, item: any) => sum + (item.baseTaxAmount || 0), 0),
+                taxAmount: firstGroup.items.reduce((sum: number, item: any) => sum + (item.taxAmount || 0), 0),
+                baseTotalAmount: firstGroup.totalAmount,
+                totalAmount: firstGroup.totalAmount
+              };
+            }
+            
+            // Clear the localStorage after use
+            localStorage.removeItem('groupedPurchaseRequests');
+            localStorage.removeItem('selectedPurchaseRequests');
+          }
+        } catch (error) {
+          console.error('Error processing grouped item data:', error);
+        }
+      }
       
       setPOData(newPO);
       setStatusHistory([]);
