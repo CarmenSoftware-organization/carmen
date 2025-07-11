@@ -1741,7 +1741,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                   value={item.deliveryDate}
                                   onChange={(date) => item.id && handleItemChange(item.id, 'deliveryDate', date)}
                                   placeholder="Select date"
-                                  className="ml-1 h-6"
                                 />
                               ) : (
                                 <span className="text-gray-900 font-semibold ml-1">
