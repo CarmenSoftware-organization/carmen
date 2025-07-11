@@ -58,6 +58,7 @@ import { ItemDetailsEditForm } from "../item-details-edit-form";
 import { samplePRItems } from "../sampleData";
 import { NewItemRow } from "./NewItemRow";
 import VendorComparison from "../vendor-comparison";
+import VendorComparisonView from "../vendor-comparison-view";
 import {
   Table,
   TableBody,
@@ -89,6 +90,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
   const [editingRows, setEditingRows] = useState<Set<string>>(new Set());
   const [isAddingNewItem, setIsAddingNewItem] = useState(false);
   const [isVendorComparisonOpen, setIsVendorComparisonOpen] = useState(false);
+  const [isVendorComparisonViewOpen, setIsVendorComparisonViewOpen] = useState(false);
+  const [selectedItemForComparison, setSelectedItemForComparison] = useState<PurchaseRequestItem | null>(null);
   const [isOnHandPopupOpen, setIsOnHandPopupOpen] = useState(false);
   const [isOnOrderPopupOpen, setIsOnOrderPopupOpen] = useState(false);
   const [selectedItemForPopup, setSelectedItemForPopup] = useState<PurchaseRequestItem | null>(null);
@@ -624,7 +627,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {value ? format(value, "PPP") : <span>{placeholder}</span>}
+            {value ? format(value, "dd/MM/yyyy") : <span>{placeholder}</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
@@ -661,10 +664,10 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
 
   // Render detailed pricing information row - compact single row layout
   const renderDetailedPricingRow = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, isItemEditable: boolean) => (
-    <div className="py-2">
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-2 items-center">
-        {/* Vendor Field */}
-        <div className="min-w-0">
+    <div className="py-2 w-full">
+      <div className="grid grid-cols-2 md:grid-cols-11 gap-3 items-center w-full">
+        {/* Vendor Field - Takes 2 columns */}
+        <div className="min-w-0 md:col-span-2">
           <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Vendor</div>
           {isItemEditable && (isApprover || isPurchaser) ? (
             <Input
@@ -680,59 +683,146 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
           )}
         </div>
 
-
-        {/* Discount Field */}
+        {/* Currency Field - Takes 1 column */}
         <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Discount</div>
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Currency</div>
+          <div className="text-xs font-medium text-gray-800">
+            {item.currency || "USD"}
+          </div>
+        </div>
+
+        {/* Price per Unit Field - Takes 1 column */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">Price/Unit</div>
+          <div className="text-xs font-medium text-gray-800 text-right">
+            {(item.price || 0).toFixed(2)} / {item.unit || 'unit'}
+          </div>
+        </div>
+
+        {/* Subtotal Before Discount Field - Takes 1 column */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">Subtotal</div>
+          <div className="text-xs font-medium text-gray-800 text-right">
+            {((item.price || 0) * (item.quantityApproved || 0)).toFixed(2)}
+          </div>
+        </div>
+
+        {/* Discount Field - Takes 1 column */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">Discount</div>
           {isItemEditable && (isApprover || isPurchaser) ? (
             <Input
               type="number"
               value={item.discountRate?.toFixed(2) || ""}
               onChange={(e) => item.id && handleItemChange(item.id, 'discountRate', parseFloat(e.target.value))}
               placeholder="0.00"
-              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1"
+              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1 text-right"
               step="0.01"
             />
           ) : (
-            <div className="text-xs font-medium text-gray-800">
-              {item.currency} {(item.discountRate || 0).toFixed(2)}
+            <div className="text-xs font-medium text-gray-800 text-right">
+              {(item.discountRate || 0).toFixed(2)}
             </div>
           )}
         </div>
 
-        {/* Net Amount Field */}
+        {/* Net Amount Field - Takes 1 column */}
         <div className="min-w-0">
-          <div className="text-[10px] font-medium text-blue-600 uppercase mb-0.5">Net Amount</div>
-          <div className="text-xs font-semibold text-blue-700">
-            {item.currency} {((item.price || 0) * (item.quantityRequested || 0) - (item.discountRate || 0)).toFixed(2)}
+          <div className="text-[10px] font-medium text-blue-600 uppercase mb-0.5 text-right">Net Amount</div>
+          <div className="text-xs font-semibold text-blue-700 text-right">
+            {(() => {
+              const subtotal = (item.price || 0) * (item.quantityApproved || 0);
+              const discountAmount = getItemAdjustments(item.id || '').discount 
+                ? (item.discountAmount || 0)
+                : subtotal * (item.discountRate || 0);
+              const netAmount = subtotal - discountAmount;
+              return netAmount.toFixed(2);
+            })()}
           </div>
         </div>
 
-        {/* Tax Field */}
+        {/* Tax Field - Takes 1 column */}
         <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Tax</div>
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">
+            Tax ({((item.taxRate || 0) * 100).toFixed(1)}%)
+          </div>
           {isItemEditable && (isApprover || isPurchaser) ? (
             <Input
               type="number"
               value={item.taxRate?.toFixed(2) || ""}
               onChange={(e) => item.id && handleItemChange(item.id, 'taxRate', parseFloat(e.target.value))}
               placeholder="0.00"
-              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1"
+              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1 text-right"
               step="0.01"
             />
           ) : (
-            <div className="text-xs font-medium text-gray-800">
-              {item.currency} {(item.taxRate || 0).toFixed(2)}
+            <div className="text-xs font-medium text-gray-800 text-right">
+              {(() => {
+                const subtotal = (item.price || 0) * (item.quantityApproved || 0);
+                const discountAmount = getItemAdjustments(item.id || '').discount 
+                  ? (item.discountAmount || 0)
+                  : subtotal * (item.discountRate || 0);
+                const netAmount = subtotal - discountAmount;
+                const taxAmount = getItemAdjustments(item.id || '').tax 
+                  ? (item.taxAmount || 0)
+                  : netAmount * (item.taxRate || 0);
+                return taxAmount.toFixed(2);
+              })()}
             </div>
           )}
         </div>
 
-        {/* Total Field */}
+        {/* Total Field - Takes 1 column */}
         <div className="min-w-0">
-          <div className="text-[10px] font-medium text-green-600 uppercase mb-0.5">Total</div>
-          <div className="text-sm font-bold text-green-700">
-            {item.currency} {(item.totalAmount || 0).toFixed(2)}
+          <div className="text-[10px] font-medium text-green-600 uppercase mb-0.5 text-right">Total</div>
+          <div className="text-sm font-bold text-green-700 text-right">
+            {(() => {
+              const subtotal = (item.price || 0) * (item.quantityApproved || 0);
+              const discountAmount = getItemAdjustments(item.id || '').discount 
+                ? (item.discountAmount || 0)
+                : subtotal * (item.discountRate || 0);
+              const netAmount = subtotal - discountAmount;
+              const taxAmount = getItemAdjustments(item.id || '').tax 
+                ? (item.taxAmount || 0)
+                : netAmount * (item.taxRate || 0);
+              const totalAmount = netAmount + taxAmount;
+              return totalAmount.toFixed(2);
+            })()}
           </div>
+        </div>
+
+        {/* Vendor Compare Button - Takes 1 column */}
+        <div className="min-w-0">
+          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">&nbsp;</div>
+          {!isRequestor && (
+            <Dialog open={isVendorComparisonViewOpen} onOpenChange={setIsVendorComparisonViewOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-6 text-xs px-2 border-blue-300 text-blue-600 hover:bg-blue-50"
+                  onClick={() => setSelectedItemForComparison(item)}
+                >
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Compare
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Pricelist Information</DialogTitle>
+                </DialogHeader>
+                <VendorComparisonView 
+                  currentPricelistNumber={selectedItemForComparison?.pricelistNumber}
+                  itemName={selectedItemForComparison?.name}
+                  itemDescription={selectedItemForComparison?.description}
+                  itemUnit={selectedItemForComparison?.unit}
+                  itemStatus={selectedItemForComparison?.status}
+                  requestedQuantity={selectedItemForComparison?.quantityRequested}
+                  approvedQuantity={selectedItemForComparison?.quantityApproved}
+                />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
     </div>
@@ -771,8 +861,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
             On Hand
           </Label>
           <div className="text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded border">
-            <div className="font-semibold">{(item.inventoryInfo?.onHand || 0).toFixed(2)}</div>
-            <div className="text-[10px] text-gray-500">{item.unit}</div>
+            <div className="font-semibold">{(item.inventoryInfo?.onHand || 0).toFixed(2)} {item.unit}</div>
           </div>
         </div>
 
@@ -782,8 +871,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
             On Order
           </Label>
           <div className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded border">
-            <div className="font-semibold">{(item.inventoryInfo?.onOrdered || 0).toFixed(2)}</div>
-            <div className="text-[10px] text-gray-500">{item.unit}</div>
+            <div className="font-semibold">{(item.inventoryInfo?.onOrdered || 0).toFixed(2)} {item.unit}</div>
           </div>
         </div>
 
@@ -803,7 +891,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
           ) : (
             <div className="text-xs font-medium flex items-center gap-1">
               <CalendarIcon className="h-3 w-3 text-gray-500" />
-              {item.deliveryDate ? format(item.deliveryDate, "MMM dd, yyyy") : "📅 Not specified"}
+              {item.deliveryDate ? format(item.deliveryDate, "dd/MM/yyyy") : "📅 Not specified"}
             </div>
           )}
         </div>
@@ -987,7 +1075,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                   {isPurchaser && (
                     <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedItemForComparison(item)}
+                        >
                           <TrendingUp className="h-4 w-4 mr-2" />
                           Vendor Comparison
                         </Button>
@@ -996,14 +1088,31 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         <DialogHeader>
                           <DialogTitle>Vendor Comparison</DialogTitle>
                         </DialogHeader>
-                        <VendorComparison />
+                        <VendorComparison 
+                          currentPricelistNumber={selectedItemForComparison?.pricelistNumber} 
+                          selectedVendor={selectedItemForComparison?.vendor}
+                          itemName={selectedItemForComparison?.name}
+                          itemDescription={selectedItemForComparison?.description}
+                          itemUnit={selectedItemForComparison?.unit}
+                          itemStatus={selectedItemForComparison?.status}
+                          requestedQuantity={selectedItemForComparison?.quantityRequested}
+                          approvedQuantity={selectedItemForComparison?.quantityApproved}
+                          onPricelistSelect={(vendor, pricelistNumber, unitPrice) => {
+                            if (selectedItemForComparison?.id) {
+                              handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
+                              handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
+                              handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
+                            }
+                            setIsVendorComparisonOpen(false);
+                          }}
+                        />
                       </DialogContent>
                     </Dialog>
                   )}
                 </div>
 
-                {/* Top Row: Vendor, Pricelist, Order Currency, Exchange Rate */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                {/* Top Row: Vendor, Pricelist, Order Currency, Exchange Rate, Price per Unit */}
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">Vendor</label>
                     {isPurchaser ? (
@@ -1069,6 +1178,23 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     ) : (
                       <div className="text-base font-medium bg-gray-50 p-2 rounded border text-right">{(item.currencyRate || 1).toFixed(4)}</div>
                     )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Price per Unit</label>
+                    {isPurchaser ? (
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={item.price || ""}
+                        onChange={(e) => item.id && handleItemChange(item.id, 'price', parseFloat(e.target.value))}
+                        placeholder="Enter price per unit"
+                        className="h-10 text-right"
+                      />
+                    ) : (
+                      <div className="text-base font-medium bg-gray-50 p-2 rounded border text-right">{(item.price || 0).toFixed(2)}</div>
+                    )}
+                    <div className="text-sm text-muted-foreground text-right">per {item.unit || 'unit'}</div>
                   </div>
                 </div>
 
@@ -1363,7 +1489,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Delivery</p>
-                  <p className="font-medium text-sm">{item.deliveryDate ? format(item.deliveryDate, "MMM dd") : "TBD"}</p>
+                  <p className="font-medium text-sm">{item.deliveryDate ? format(item.deliveryDate, "dd/MM") : "TBD"}</p>
                 </div>
               </div>
 
@@ -1410,7 +1536,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                   onCheckedChange={handleSelectAllItems}
                 />
               </TableHead>
-              <TableHead className="w-[40px] text-center"></TableHead>
               <TableHead className="w-[60px] text-center font-semibold">#</TableHead>
               <TableHead className="font-semibold text-left min-w-[140px]">Location & Status</TableHead>
               <TableHead className="font-semibold text-left min-w-[200px]">Product Details</TableHead>
@@ -1454,11 +1579,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         checked={selectedItems.includes(item.id || "")}
                         onCheckedChange={() => handleSelectItem(item.id || "")}
                       />
-                    </TableCell>
-                    <TableCell className="py-3 cursor-pointer text-center" onClick={() => handleToggleTableExpand(item.id || "")}>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-muted/60">
-                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                      </Button>
                     </TableCell>
                     <TableCell className="py-3 text-center">
                       <div className="text-sm font-medium text-gray-600">
@@ -1707,23 +1827,33 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     </TableCell>
                   </TableRow>
                   
-                  {/* Detailed pricing information row - Show for Approvers and Purchasers only */}
-                  {canSeePricingPanel && (
-                    <TableRow className="border-none">
-                      <TableCell colSpan={canSeePrices ? 9 : 8} className="py-0 pb-2">
-                        <div className="px-6 border-l-2 border-green-200 bg-green-50/20 rounded-r-md ml-2">
-                          {renderDetailedPricingRow(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, isItemEditable)}
+                  {/* Compact fields row for comment, required date, delivery point */}
+                  {(item.comment || item.deliveryDate || item.deliveryPoint || isItemEditable) && (
+                    <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-25">
+                      <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
+                        <div className="flex items-start gap-2 px-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 hover:bg-muted/60 mt-1 flex-shrink-0"
+                            onClick={() => handleToggleTableExpand(item.id || "")}
+                          >
+                            {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </Button>
+                          <div className="flex-1">
+                            {renderCompactFieldsRow(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, isItemEditable)}
+                          </div>
                         </div>
                       </TableCell>
                     </TableRow>
                   )}
                   
-                  {/* Compact fields row for comment, required date, delivery point */}
-                  {(item.comment || item.deliveryDate || item.deliveryPoint || isItemEditable) && (
-                    <TableRow className="border-none">
-                      <TableCell colSpan={canSeePrices ? 9 : 8} className="py-0 pb-3">
-                        <div className="px-6 border-l-2 border-blue-200 bg-blue-50/30 rounded-r-md ml-2">
-                          {renderCompactFieldsRow(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, isItemEditable)}
+                  {/* Detailed pricing information row - Show for Approvers and Purchasers only */}
+                  {canSeePricingPanel && (
+                    <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-25">
+                      <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
+                        <div className="px-2">
+                          {renderDetailedPricingRow(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, isItemEditable)}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -1731,9 +1861,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                   
                   {/* Full expanded view - only when chevron is clicked */}
                   {isExpanded && (
-                    <TableRow className="bg-gray-50/50 border-none">
-                      <TableCell colSpan={canSeePrices ? 9 : 8}>
-                        <div className="py-4 px-6">
+                    <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-50">
+                      <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
+                        <div className="px-2">
                           {renderExpandedItemInfo(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, canSeePrices, isExpanded)}
                         </div>
                       </TableCell>
@@ -1788,13 +1918,29 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
             <Plus className="h-4 w-4 mr-1" />
             Add Item
           </Button>
+
+          {/* Allocate Vendor Button - Only visible to purchasers */}
+          {isPurchaser && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // TODO: Implement vendor allocation functionality
+                console.log("Allocate Vendor clicked");
+              }}
+              className="text-xs"
+            >
+              <TrendingUp className="h-4 w-4 mr-1" />
+              Allocate Vendor
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Bulk Item Actions */}
       {selectedItems.length > 0 && (() => {
         const analysis = analyzeSelectedItemsStatus();
-        const isApprover = ['Department Manager', 'Financial Manager', 'Purchasing Staff'].includes(currentUser.role);
+        const isApprover = ['Department Manager', 'Financial Manager', 'Purchasing Staff', 'Purchaser'].includes(currentUser.role);
         
         return (
           <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg border border-dashed">
@@ -1838,12 +1984,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     Approve Selected
                   </Button>
                   
-                  {/* Reject Selected Button */}
+                  {/* Reject Selected Button - Ensure visibility for purchasers */}
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={() => handleBulkActionWithMixedCheck('reject')}
                     className="text-xs font-medium text-red-600 hover:text-red-700 border-red-200"
+                    style={{ display: 'inline-flex' }}
                   >
                     <XCircle className="h-4 w-4 mr-1" />
                     Reject Selected
@@ -1861,7 +2008,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                   </Button>
                 </>
               ) : (
-                <span className="text-xs text-gray-500 italic">No approval permission</span>
+                <span className="text-xs text-gray-500 italic">
+                  No approval permission (Role: {currentUser.role})
+                </span>
               )}
               
               {/* Split Button (always available) */}
@@ -1910,7 +2059,15 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
           <DialogHeader>
             <DialogTitle>Vendor Comparison</DialogTitle>
           </DialogHeader>
-          <VendorComparison />
+          <VendorComparison 
+            currentPricelistNumber={selectedItemForComparison?.pricelistNumber}
+            itemName={selectedItemForComparison?.name}
+            itemDescription={selectedItemForComparison?.description}
+            itemUnit={selectedItemForComparison?.unit}
+            itemStatus={selectedItemForComparison?.status}
+            requestedQuantity={selectedItemForComparison?.quantityRequested}
+            approvedQuantity={selectedItemForComparison?.quantityApproved}
+          />
         </DialogContent>
       </Dialog>
 

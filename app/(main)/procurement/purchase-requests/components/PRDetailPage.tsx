@@ -666,6 +666,15 @@ export default function PRDetailPage() {
                 return (
                   <>
                     <Button
+                      onClick={handleReject}
+                      variant="destructive"
+                      size="sm"
+                      className="h-9"
+                    >
+                      <XCircleIcon className="mr-2 h-4 w-4" />
+                      Reject
+                    </Button>
+                    <Button
                       onClick={handleSendBack}
                       variant="outline"
                       size="sm"

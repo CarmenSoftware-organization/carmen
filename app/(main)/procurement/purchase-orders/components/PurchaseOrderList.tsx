@@ -690,10 +690,6 @@ export function PurchaseOrderList() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => router.push("/procurement/purchase-orders/create")}>
-            Create Blank PO
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => router.push("/procurement/purchase-orders/create/from-pr")}>
             Create from Purchase Requests
           </DropdownMenuItem>
