@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check, Plus } from "lucide-react"
+import { Check, Plus, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -127,12 +127,6 @@ export default function VendorComparison({
           <div>
             <h2 className="text-lg font-semibold text-gray-800 mb-1">{itemData.name}</h2>
             <p className="text-gray-500 text-xs">{itemData.description}</p>
-            {currentPricelistNumber && (
-              <div className="mt-1 flex items-center gap-2">
-                <span className="text-xs text-gray-500">Current:</span>
-                <span className="text-xs font-medium text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">{currentPricelistNumber}</span>
-              </div>
-            )}
           </div>
           <StatusBadge status={itemData.status} />
         </div>
@@ -144,6 +138,32 @@ export default function VendorComparison({
           <div className="bg-gray-50/60 p-2 rounded border border-gray-100">
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Approved</span>
             <div className="text-sm font-semibold text-gray-700">{itemData.approvedQuantity} {itemData.unit}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Price History Section */}
+      <div className="mb-4 bg-blue-50/50 border border-blue-200 p-4 rounded-lg">
+        <div className="flex items-center gap-2 mb-3">
+          <History className="h-4 w-4 text-blue-600" />
+          <h3 className="text-sm font-semibold text-gray-800">Price History</h3>
+        </div>
+        <div className="grid grid-cols-4 gap-3">
+          <div className="bg-white/80 p-2 rounded border border-blue-100">
+            <span className="text-xs font-medium text-gray-500 block">Last Vendor</span>
+            <div className="text-sm font-medium text-gray-900 mt-0.5">Seasonal Gourmet Supplies</div>
+          </div>
+          <div className="bg-white/80 p-2 rounded border border-blue-100">
+            <span className="text-xs font-medium text-gray-500 block">Last Purchase Date</span>
+            <div className="text-sm font-medium text-gray-900 mt-0.5">15/02/2024</div>
+          </div>
+          <div className="bg-white/80 p-2 rounded border border-blue-100">
+            <span className="text-xs font-medium text-gray-500 block">Last Price</span>
+            <div className="text-sm font-medium text-gray-900 mt-0.5">$4,150.00</div>
+          </div>
+          <div className="bg-white/80 p-2 rounded border border-blue-100">
+            <span className="text-xs font-medium text-gray-500 block">Unit</span>
+            <div className="text-sm font-medium text-gray-900 mt-0.5">kg</div>
           </div>
         </div>
       </div>
@@ -253,12 +273,10 @@ export default function VendorComparison({
             {selectedPricelist ? (
               <span className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-600" />
-                Selected Pricelist: <span className="font-medium">{selectedPricelist}</span>
+                <span>Pricelist selected</span>
               </span>
             ) : (
-              selectedVendor 
-                ? `Select a pricelist from ${selectedVendor}` 
-                : "Select a pricelist to compare and choose"
+              "Select a pricelist to compare and choose"
             )}
           </div>
           <div className="flex space-x-3">

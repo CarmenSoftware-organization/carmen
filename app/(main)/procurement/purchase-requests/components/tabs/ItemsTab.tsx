@@ -51,6 +51,7 @@ import {
   Clock,
   Trash2,
   MoreHorizontal,
+  History,
 } from "lucide-react";
 import { PurchaseRequestItem, PurchaseRequestItemStatus, ConsolidatedButtonState, ReturnStep } from "@/lib/types";
 import type { User } from "./types";
@@ -828,108 +829,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     </div>
   );
 
-  // Render compact fields row (comment, on hand, on order, date required, delivery point)
-  const renderCompactFieldsRow = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, isItemEditable: boolean) => (
-    <div className="py-2">
-      {/* Desktop: 8-column grid, Mobile: Stack */}
-      <div className="grid grid-cols-1 md:grid-cols-8 gap-3">
-        {/* Comment Field - 4/8 columns on desktop */}
-        <div className="md:col-span-4">
-          <Label htmlFor={`comment-${item.id}`} className="text-xs font-medium text-gray-700 mb-1 block">
-            Comment
-          </Label>
-          {isItemEditable ? (
-            <Textarea
-              id={`comment-${item.id}`}
-              value={item.comment || ""}
-              onChange={(e) => item.id && handleItemChange(item.id, 'comment', e.target.value)}
-              placeholder="💬 Add comment..."
-              className="text-xs min-h-[50px] max-h-[80px] resize-none w-full"
-            />
-          ) : item.comment ? (
-            <div className="bg-white/70 border-l-2 border-blue-400 px-2 py-1 rounded-r text-xs text-blue-800 shadow-sm">
-              💬 {item.comment}
-            </div>
-          ) : (
-            <div className="text-xs text-gray-400 italic">💬 No comment</div>
-          )}
-        </div>
-
-        {/* On Hand Field - 1/8 column on desktop */}
-        <div className="md:col-span-1">
-          <Label className="text-xs font-medium text-gray-700 mb-1 block">
-            On Hand
-          </Label>
-          <div className="text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded border">
-            <div className="font-semibold">{(item.inventoryInfo?.onHand || 0).toFixed(2)} {item.unit}</div>
-          </div>
-        </div>
-
-        {/* On Order Field - 1/8 column on desktop */}
-        <div className="md:col-span-1">
-          <Label className="text-xs font-medium text-gray-700 mb-1 block">
-            On Order
-          </Label>
-          <div className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded border">
-            <div className="font-semibold">{(item.inventoryInfo?.onOrdered || 0).toFixed(2)} {item.unit}</div>
-          </div>
-        </div>
-
-        {/* Required Date Field - 1/8 column on desktop */}
-        <div className="md:col-span-1">
-          <Label htmlFor={`required-date-${item.id}`} className="text-xs font-medium text-gray-700 mb-1 block">
-            Date Required
-          </Label>
-          {isItemEditable ? (
-            <div className="w-full">
-              <DatePickerField
-                value={item.deliveryDate}
-                onChange={(date) => item.id && handleItemChange(item.id, 'deliveryDate', date)}
-                placeholder="📅 Required date"
-              />
-            </div>
-          ) : (
-            <div className="text-xs font-medium flex items-center gap-1">
-              <CalendarIcon className="h-3 w-3 text-gray-500" />
-              {item.deliveryDate ? format(item.deliveryDate, "dd/MM/yyyy") : "📅 Not specified"}
-            </div>
-          )}
-        </div>
-
-        {/* Delivery Point Field - 1/8 column on desktop */}
-        <div className="md:col-span-1">
-          <Label htmlFor={`delivery-point-${item.id}`} className="text-xs font-medium text-gray-700 mb-1 block">
-            Delivery Point
-          </Label>
-          {isItemEditable ? (
-            <Select
-              value={item.deliveryPoint || ""}
-              onValueChange={(value) => item.id && handleItemChange(item.id, 'deliveryPoint', value)}
-            >
-              <SelectTrigger className="h-7 text-xs w-full">
-                <SelectValue placeholder="📍 Select delivery point" />
-              </SelectTrigger>
-              <SelectContent>
-                {deliveryPointOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-xs">
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <div className="text-xs font-medium flex items-center gap-1">
-              <MapPin className="h-3 w-3 text-gray-500" />
-              {item.deliveryPoint ? 
-                deliveryPointOptions.find(opt => opt.value === item.deliveryPoint)?.label || item.deliveryPoint 
-                : "📍 Not specified"
-              }
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
 
   // Render expanded item information
   const renderExpandedItemInfo = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, canSeePrices: boolean, isExpanded: boolean) => (
@@ -938,37 +837,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
       {isExpanded && (
           <>
             
-            {/* Inventory Information with Color Tiles */}
-            <div className="bg-white rounded-lg border p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Package className="h-4 w-4 text-green-600" />
-                <h4 className="font-semibold text-sm text-gray-900">Inventory Information</h4>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div 
-                  className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center cursor-pointer hover:bg-blue-100 transition-colors"
-                  onClick={() => handleOnHandClick(item)}
-                >
-                  <div className="text-lg font-bold text-blue-700">{item.inventoryInfo?.onHand || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                  <div className="text-xs text-blue-600 font-medium">On Hand</div>
-                </div>
-                <div 
-                  className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center cursor-pointer hover:bg-orange-100 transition-colors"
-                  onClick={() => handleOnOrderClick(item)}
-                >
-                  <div className="text-lg font-bold text-orange-700">{item.inventoryInfo?.onOrdered || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                  <div className="text-xs text-orange-600 font-medium">On Order</div>
-                </div>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
-                  <div className="text-lg font-bold text-yellow-700">{item.inventoryInfo?.reorderLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                  <div className="text-xs text-yellow-600 font-medium">Reorder Level</div>
-                </div>
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
-                  <div className="text-lg font-bold text-purple-700">{item.inventoryInfo?.restockLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                  <div className="text-xs text-purple-600 font-medium">Restock Level</div>
-                </div>
-              </div>
-            </div>
 
             {/* Business Dimensions (Allocation Fields) */}
             <div className="bg-white rounded-lg border p-4">
@@ -1064,8 +932,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               </div>
             </div>
 
-            {/* Consolidated Pricing Section - Hidden for requestors */}
-            {canSeePrices && !isRequestor && (
+            {/* Consolidated Pricing Section - Only visible for purchasers */}
+            {canSeePrices && isPurchaser && (
               <div className="bg-white rounded-lg border p-4">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
@@ -1198,7 +1066,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                   </div>
                 </div>
 
-
                 {/* Tax and Discount Overrides */}
                 {isPurchaser && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -1284,7 +1151,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         <div className="bg-yellow-50 p-3 rounded border border-yellow-200" style={{ minHeight: '80px' }}>
                           <div className="grid grid-cols-3 gap-2">
                             <div>
-                              <label className="text-xs text-orange-700 font-medium mb-1 block">Type</label>
+                              <label className="text-xs text-orange-700 font-medium mb-1 block">Profile</label>
                               <Select 
                                 value={item.taxType || "VAT"} 
                                 onValueChange={(value) => item.id && handleItemChange(item.id, 'taxType', value)}
@@ -1454,7 +1321,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
                                currentUser.role === 'Purchaser';
         const canSeePrices = (user?.context.showPrices !== false);
-        const canSeePricingPanel = (itemIsApprover || itemIsPurchaser); // Pricing panel: hidden for requestors, visible for approvers/purchasers
+        const canSeeVendorPricingPanel = (itemIsApprover || itemIsPurchaser); // Vendor pricing panel: visible for approvers and purchasers
         
         return (
           <Card key={item.id} className={`relative transition-all duration-200 ${isTableEditMode ? 'ring-2 ring-amber-300 bg-amber-50/20 shadow-md' : 'hover:shadow-md'}`}>
@@ -1493,11 +1360,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 </div>
               </div>
 
-              {item.comment && (
-                <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg mb-4">
-                  <p className="text-sm text-blue-800">{item.comment}</p>
-                </div>
-              )}
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1567,7 +1429,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
                                      currentUser.role === 'Purchaser';
               const canSeePrices = (user?.context.showPrices !== false);
-        const canSeePricingPanel = (itemIsApprover || itemIsPurchaser); // Pricing panel: hidden for requestors, visible for approvers/purchasers
+        const canSeeVendorPricingPanel = (itemIsApprover || itemIsPurchaser); // Vendor pricing panel: visible for approvers and purchasers
               const isRowEditing = editingRows.has(item.id || "");
               const isItemEditable = isTableEditMode || isRowEditing;
               
@@ -1616,11 +1478,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               {item.status === 'Pending' && <Clock className="h-3 w-3" />}
                               {item.status}
                             </Badge>
-                            {!itemIsRequestor && item.vendor && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                Vendor: {item.vendor}
-                              </div>
-                            )}
                           </div>
                         </div>
                       )}
@@ -1827,29 +1684,85 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     </TableCell>
                   </TableRow>
                   
-                  {/* Compact fields row for comment, required date, delivery point */}
-                  {(item.comment || item.deliveryDate || item.deliveryPoint || isItemEditable) && (
-                    <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-25">
-                      <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
-                        <div className="flex items-start gap-2 px-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-6 w-6 p-0 hover:bg-muted/60 mt-1 flex-shrink-0"
-                            onClick={() => handleToggleTableExpand(item.id || "")}
-                          >
-                            {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                          </Button>
-                          <div className="flex-1">
-                            {renderCompactFieldsRow(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, isItemEditable)}
+                  {/* Always visible comment row with chevron */}
+                  <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-25">
+                    <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
+                      <div className="flex items-start gap-2 px-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 hover:bg-muted/60 mt-1 flex-shrink-0"
+                          onClick={() => handleToggleTableExpand(item.id || "")}
+                        >
+                          {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        </Button>
+                        <div className="flex-1 space-y-3">
+                          {/* Comment Section */}
+                          {item.comment ? (
+                            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+                              <p className="text-sm text-blue-800">{item.comment}</p>
+                            </div>
+                          ) : (
+                            <div className="text-sm text-gray-400 italic">No comment</div>
+                          )}
+                          
+                          {/* Inventory Information */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <div 
+                              className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center cursor-pointer hover:bg-blue-100 transition-colors"
+                              onClick={() => handleOnHandClick(item)}
+                            >
+                              <div className="text-xs font-bold text-blue-700">{item.inventoryInfo?.onHand || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-[10px] text-blue-600 font-medium">On Hand</div>
+                            </div>
+                            <div 
+                              className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-center cursor-pointer hover:bg-orange-100 transition-colors"
+                              onClick={() => handleOnOrderClick(item)}
+                            >
+                              <div className="text-xs font-bold text-orange-700">{item.inventoryInfo?.onOrdered || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-[10px] text-orange-600 font-medium">On Order</div>
+                            </div>
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
+                              <div className="text-xs font-bold text-yellow-700">{item.inventoryInfo?.reorderLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-[10px] text-yellow-600 font-medium">Reorder Level</div>
+                            </div>
+                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center">
+                              <div className="text-xs font-bold text-purple-700">{item.inventoryInfo?.restockLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-[10px] text-purple-600 font-medium">Restock Level</div>
+                            </div>
+                          </div>
+                          
+                          {/* Date Required and Delivery Point */}
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="text-[10px]">
+                              <span className="text-gray-600 font-medium">Date Required:</span>
+                              {isItemEditable && itemIsRequestor ? (
+                                <DatePickerField
+                                  value={item.deliveryDate}
+                                  onChange={(date) => item.id && handleItemChange(item.id, 'deliveryDate', date)}
+                                  placeholder="Select date"
+                                  className="ml-1 h-6"
+                                />
+                              ) : (
+                                <span className="text-gray-900 font-semibold ml-1">
+                                  {item.deliveryDate ? format(item.deliveryDate, "dd/MM/yyyy") : "Not specified"}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px]">
+                              <span className="text-gray-600 font-medium">Delivery Point:</span>
+                              <span className="text-gray-900 font-semibold ml-1">
+                                {item.deliveryPoint || "Not specified"}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
                   
                   {/* Detailed pricing information row - Show for Approvers and Purchasers only */}
-                  {canSeePricingPanel && (
+                  {canSeeVendorPricingPanel && (
                     <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-25">
                       <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
                         <div className="px-2">

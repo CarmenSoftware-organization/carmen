@@ -562,7 +562,7 @@ export default function PRDetailPage() {
           {user && canViewFinancialInfo(user.role) && (
             <Card className="shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Transaction Summary</CardTitle>
+                <CardTitle className="text-lg">Transaction Summary ({formData.baseCurrencyCode || 'USD'})</CardTitle>
               </CardHeader>
               <CardContent className="pb-6">
                 <SummaryTotal prData={formData} />
