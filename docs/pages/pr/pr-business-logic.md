@@ -50,6 +50,29 @@ The PR workflow follows a series of stages, each requiring approval from a speci
 4. **Purchasing Processing** (purchasing)
 5. **Final Completion** (completed)
 
+### 2.1.1. Workflow Decision Engine
+
+The system implements an intelligent **Workflow Decision Engine** that automatically determines the appropriate workflow action based on item status analysis:
+
+**Priority-Based Decision Logic:**
+1. **All Rejected**: If all items are rejected → Automatic PR rejection
+2. **Any Review**: If any items need review → Return to previous stage
+3. **Any Pending**: If any items are pending → Block submission (requires action)
+4. **Any Approved**: If any items are approved → Allow progression to next stage
+
+**Decision Engine Outputs:**
+- **Action Type**: approve, reject, return, or blocked
+- **Button Text**: Dynamic text based on workflow state ("Submit & Approve", "Submit & Reject", etc.)
+- **Button Styling**: Visual indicators with appropriate colors (green for approve, red for reject, orange for review)
+- **Validation Reason**: Clear explanation of why the action is or isn't available
+- **Items Summary**: Count breakdown of approved, rejected, review, and pending items
+
+**Workflow State Management:**
+- **Real-time Analysis**: Engine evaluates workflow state on every item status change
+- **Intelligent Blocking**: Prevents submission when items require attention
+- **Clear Communication**: Provides specific feedback on what actions are needed
+- **Status Aggregation**: Summarizes complex item states into actionable decisions
+
 ### 2.2. Workflow Actions by Stage
 
 At each stage, the authorized approver can perform these actions:
@@ -169,12 +192,26 @@ At each stage, the authorized approver can perform these actions:
 
 ### 3.5. Item-Level Workflow Permissions
 
+#### **Enhanced Item Action Framework:**
+The system implements a sophisticated **Item Workflow State** engine that determines available actions based on:
+- **User Role**: Organizational role (Staff, Department Manager, Financial Manager, Purchasing Staff)
+- **Item Status**: Current item status (Pending, Review, Approved, Rejected)
+- **Workflow Stage**: Current PR workflow stage (departmentHeadApproval, financialApproval, purchasing)
+- **Role Context**: Active role selection for multi-role users
+
+#### **Smart Action Availability:**
+- **Dynamic Permissions**: Available actions calculated in real-time based on role and context
+- **Status-Based Logic**: Only relevant actions shown for current item status
+- **Workflow Stage Validation**: Actions validated against current PR workflow stage
+- **Comment Requirement**: Certain actions require mandatory comments for audit trail
+
 #### **Department Manager Actions:**
 *   Can **Approve**, **Reject**, or set to **Review** any item with status `Pending` or `Review`
 *   Can modify **Approved Quantity** (must be ≤ requested quantity unless justified)
 *   Can add **Comments** explaining approval decisions
 *   Cannot edit **Vendor** or **Pricing** information
 *   Must provide **Rejection Reason** for rejected items
+*   **Available Actions**: ['approve', 'reject', 'review', 'comment', 'history']
 
 #### **Financial Manager Actions:**
 *   Can **Approve**, **Reject**, or set to **Review** items approved by Department Manager
@@ -182,6 +219,7 @@ At each stage, the authorized approver can perform these actions:
 *   Can view all **Pricing Information** but cannot edit
 *   Can place items **On Hold** for budget-related issues
 *   Must validate **Budget Availability** before final approval
+*   **Available Actions**: ['approve', 'reject', 'review', 'comment', 'history']
 
 #### **Purchasing Staff Actions:**
 *   Can **Approve**, **Reject**, or set to **Review** items with status `Approved`, `Accepted`, or `Review`
@@ -189,12 +227,20 @@ At each stage, the authorized approver can perform these actions:
 *   Can access **Vendor Comparison** functionality
 *   Can **Split Items** across multiple purchase orders
 *   Can set **Order Unit** different from request unit
+*   **Available Actions**: ['approve', 'reject', 'review', 'comment', 'history', 'vendor_compare', 'split']
 
 #### **Requestor Actions:**
 *   Can set item to **Review** if status is `Pending` (with comment required)
 *   Can **Edit** all item details while PR is in `Draft` status
 *   Can **Delete** items from draft PRs
 *   Cannot modify items once PR is submitted (except when returned for revision)
+*   **Available Actions**: ['review', 'comment', 'history'] (for pending items only)
+
+#### **System Administrator Actions:**
+*   **Full Permissions**: Can perform all available actions regardless of workflow stage
+*   **Override Capability**: Can approve, reject, or review any item at any stage
+*   **Administrative Functions**: Can reassign workflow roles and modify system settings
+*   **Available Actions**: ['approve', 'reject', 'review', 'comment', 'history', 'admin_override']
 
 ### 3.6. Split Items Action
 
@@ -856,11 +902,24 @@ The PR Detail page implements a responsive two-column layout:
 *   **Contract Compliance**: Verification against existing vendor contracts
 *   **Performance Tracking**: Delivery time and quality metrics collection
 
-#### **Vendor Comparison Functionality:**
-*   **Multi-vendor Pricing**: Side-by-side price comparison for Purchasing Staff
-*   **Historical Performance**: Vendor delivery and quality metrics
-*   **Contract Terms**: Comparison of payment terms and conditions
+#### **Enhanced Vendor Comparison Functionality:**
+*   **Multi-vendor Pricing**: Side-by-side price comparison for Purchasing Staff only
+*   **Comprehensive Vendor Data**: Displays vendor ID, name, ratings, and preference status
+*   **Price List Analysis**: Shows price list numbers, names, validity periods, and pricing tiers
+*   **Performance Metrics**: Historical delivery performance, lead times, and reliability scores
+*   **Contract Terms**: Payment terms, minimum quantities, and order units comparison
+*   **Cost Analysis**: Unit prices, total costs, and financial impact assessment
 *   **Risk Assessment**: Vendor risk scoring and recommendation engine
+*   **Role-Based Access**: Completely hidden from Requestor and Approver roles for confidentiality
+
+#### **Vendor Comparison Interface Features:**
+*   **Tabular Comparison View**: Side-by-side vendor comparison in organized table format
+*   **Preferred Vendor Highlighting**: Visual indicators for preferred vendors
+*   **Price Validity Tracking**: Clear display of price list validity periods
+*   **Lead Time Analysis**: Comparison of delivery times across vendors
+*   **Historical Performance**: Vendor ratings and past performance metrics
+*   **Selection Assistance**: Intelligent recommendations based on price, quality, and reliability
+*   **Export Functionality**: Ability to export comparison data for offline analysis
 
 ### 8.3. Financial System Integration
 
@@ -945,3 +1004,149 @@ The PR Detail page implements a responsive two-column layout:
 *   **Virtual Scrolling**: Efficient handling of large data sets
 *   **Caching Strategy**: Smart caching of frequently accessed data
 *   **Background Prefetching**: Predictive data loading for common actions
+
+### 9.4. Enhanced ItemsTab Expandable Panel System
+
+#### **Multi-Tier Information Architecture:**
+The ItemsTab implements a sophisticated expandable panel system providing role-based access to detailed item information:
+
+#### **Main Item Row Components:**
+*   **Basic Information**: Item name, description, request quantity, approved quantity, status indicators
+*   **Action Buttons**: Role-based action buttons (Approve, Reject, Review) with intelligent availability
+*   **Status Indicators**: Color-coded status badges with clear visual hierarchy
+*   **Expand/Collapse Control**: Chevron-based expansion for detailed views
+
+#### **Expandable Panel Sections:**
+
+**1. Business Dimensions Section (All Roles):**
+*   **Job Number**: Project-specific job code assignment
+*   **Events**: Event-related categorization and tracking
+*   **Projects**: Project association and budget allocation
+*   **Market Segments**: Business unit and market segment classification
+*   **Edit Capability**: Universal edit button for all authorized roles
+
+**2. Enhanced Inventory Information (All Roles):**
+*   **Location-Based Stock Levels**: Real-time inventory by storage location
+*   **Color-Coded Indicators**: Visual representation of stock status (adequate, low, critical)
+*   **Reorder Alerts**: Automatic warnings when stock falls below reorder points
+*   **Historical Usage**: Average monthly consumption patterns
+*   **On-Order Quantities**: Pending deliveries and expected arrival dates
+
+**3. Vendor Comparison Section (Purchaser Role Only):**
+*   **Multi-Vendor Analysis**: Side-by-side comparison of available vendors
+*   **Price Comparison Matrix**: Comprehensive pricing analysis across vendors
+*   **Performance Metrics**: Vendor reliability, delivery time, and quality scores
+*   **Contract Terms**: Payment terms, minimum quantities, and lead times
+*   **Recommendation Engine**: Intelligent vendor selection guidance
+
+**4. Financial Details Section (Manager/Purchaser Roles):**
+*   **Detailed Pricing Breakdown**: Unit prices, discounts, taxes, and totals
+*   **Currency Conversion**: Multi-currency support with real-time exchange rates
+*   **Budget Impact**: Real-time budget consumption and availability
+*   **Cost Center Allocation**: Department and project-specific cost assignments
+
+#### **Role-Based Panel Visibility:**
+*   **Requestor (Staff) Role**: Business dimensions and inventory information only
+*   **Approver Roles**: All sections except vendor comparison
+*   **Purchaser Role**: Full access to all expandable panel sections
+*   **Progressive Disclosure**: Information revealed based on role permissions and workflow stage
+
+#### **Enhanced User Experience Features:**
+*   **Smooth Animations**: Fluid expand/collapse transitions for better usability
+*   **Persistent State**: Panel expansion preferences saved per user session
+*   **Keyboard Navigation**: Full keyboard accessibility for all panel interactions
+*   **Mobile Responsive**: Optimized layout for mobile and tablet devices
+*   **Loading States**: Intelligent loading indicators for data-heavy sections
+
+## 10. Recent Implementation Enhancements (January 2025)
+
+### 10.1. Workflow Decision Engine Implementation
+
+#### **Technical Implementation:**
+*   **Location**: `/services/workflow-decision-engine.ts`
+*   **Status**: Fully implemented and integrated
+*   **Features**: Priority-based workflow analysis, intelligent action determination, real-time status aggregation
+*   **Integration**: Seamlessly integrated with ItemsTab and PR detail components
+
+#### **Key Capabilities:**
+*   **Dynamic Action Buttons**: Context-aware approval buttons with intelligent text and styling
+*   **Status Aggregation**: Real-time analysis of item statuses for workflow decisions
+*   **Role-Based Actions**: Intelligent action availability based on user role and workflow stage
+*   **Validation Logic**: Comprehensive validation of workflow state changes
+
+### 10.2. Enhanced Vendor Comparison System
+
+#### **Implementation Status:**
+*   **Components**: `vendor-comparison-view.tsx`, `vendor-comparison.tsx`
+*   **Data Layer**: `item-vendor-data.ts` with comprehensive vendor database
+*   **Integration**: Role-based access with purchasing staff exclusive access
+*   **Currency Support**: Multi-currency pricing with USD standardization
+
+#### **Business Features:**
+*   **Comprehensive Vendor Database**: 30+ vendors with detailed pricing and performance data
+*   **Price List Management**: Valid date ranges, minimum quantities, lead times
+*   **Performance Metrics**: Vendor ratings, delivery performance, quality scores
+*   **Risk Assessment**: Preferred vendor highlighting and recommendation engine
+
+### 10.3. Role-Based Access Control Enhancements
+
+#### **Advanced RBAC Features:**
+*   **Multi-Role Support**: Users can have multiple organizational roles simultaneously
+*   **Workflow Stage Roles**: Contextual roles per PR per workflow stage
+*   **Dynamic Permission Calculation**: Real-time permission aggregation using intersection formulas
+*   **Visibility Scope Management**: Granular control over PR visibility (Self, Department, Business Unit)
+*   **Conflict Resolution**: Automatic prevention of segregation of duties violations
+
+#### **Field-Level Security:**
+*   **Financial Information Masking**: Automatic hiding of pricing information from Staff roles
+*   **Vendor Information Protection**: Complete vendor details hidden from Requestor roles
+*   **Progressive Disclosure**: Information revealed incrementally based on role and workflow stage
+*   **"Show Prices" Toggle**: User-controlled visibility of total amounts
+
+### 10.4. Enhanced User Interface Components
+
+#### **ItemsTab Expandable Panels:**
+*   **Implementation Status**: Ready for deployment
+*   **JSX Structure**: Requires malformed JSX structure fixes
+*   **Role-Based Sections**: Business dimensions, inventory info, vendor comparison, financial details
+*   **Responsive Design**: Mobile-optimized with smooth animations
+
+#### **Technical Requirements:**
+*   **RBAC Integration**: Complete integration with field-permission utilities
+*   **Performance Optimization**: Lazy loading and efficient state management
+*   **Accessibility**: Full keyboard navigation and screen reader support
+*   **Mobile Responsiveness**: Touch-optimized interface for mobile devices
+
+### 10.5. Current Development Status
+
+#### **Completed Features:**
+- ✅ Workflow Decision Engine
+- ✅ Vendor Comparison System  
+- ✅ Multi-Role RBAC Framework
+- ✅ Financial Information Masking
+- ✅ Enhanced Inventory Integration
+
+#### **In Progress:**
+- 🔄 ItemsTab Expandable Panel Implementation
+- 🔄 Enhanced UI/UX Improvements
+- 🔄 Mobile Responsiveness Enhancements
+
+#### **Pending Implementation:**
+- ⏳ Complete ItemsTab JSX structure fixes
+- ⏳ Full deployment of expandable panel system
+- ⏳ Advanced reporting and analytics integration
+- ⏳ Mobile app synchronization
+
+### 10.6. Integration with Existing Systems
+
+#### **Maintained Compatibility:**
+*   **Existing Workflows**: All existing PR workflows remain functional
+*   **Legacy Data**: Full backward compatibility with existing PR data
+*   **API Consistency**: Enhanced APIs maintain backward compatibility
+*   **User Experience**: Gradual rollout ensures minimal disruption
+
+#### **Future Roadmap:**
+*   **Advanced Analytics**: Integration with business intelligence systems
+*   **Mobile Application**: Native mobile app for approvals and reviews
+*   **AI-Powered Insights**: Machine learning for vendor recommendations and demand forecasting
+*   **Advanced Reporting**: Enhanced financial and operational reporting capabilities

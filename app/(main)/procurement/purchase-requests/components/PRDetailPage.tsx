@@ -44,6 +44,7 @@ import { AttachmentsTab } from "./tabs/AttachmentsTab";
 import { ActivityTab } from "./tabs/ActivityTab";
 import PRCommentsAttachmentsTab from "./tabs/PRCommentsAttachmentsTab";
 import { PRRBACService, type WorkflowAction } from "../services/rbac-service";
+import { WorkflowDecisionEngine, type WorkflowDecision } from "../services/workflow-decision-engine";
 import {
   PurchaseRequest,
   PurchaseRequestItem,
@@ -72,6 +73,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import SummaryTotal from "./SummaryTotal";
 import { Badge } from "@/components/ui/badge";
@@ -117,6 +119,10 @@ export default function PRDetailPage() {
   const [availableActions, setAvailableActions] = useState<WorkflowAction[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [workflowDecision, setWorkflowDecision] = useState<WorkflowDecision | null>(null);
+  const [isReturnStepSelectorOpen, setIsReturnStepSelectorOpen] = useState(false);
+  const [returnComment, setReturnComment] = useState("");
+  const [selectedReturnStep, setSelectedReturnStep] = useState<any>(null);
   const { user } = useUser(); // Get current user from context</invoke>
 
   useEffect(() => {
@@ -146,6 +152,14 @@ export default function PRDetailPage() {
       setAvailableActions(actions);
     }
   }, [user, formData]);
+
+  // Update workflow decision when items change
+  useEffect(() => {
+    if (currentItems && currentItems.length > 0) {
+      const decision = WorkflowDecisionEngine.analyzeWorkflowState(currentItems);
+      setWorkflowDecision(decision);
+    }
+  }, [currentItems]);
 
   const handleModeChange = (newMode: "view" | "edit") => setMode(newMode);
 
@@ -181,37 +195,72 @@ export default function PRDetailPage() {
   };
 
   const handleApprove = () => {
-    const nextStage = getNextWorkflowStage(formData.currentWorkflowStage);
+    if (!workflowDecision || !workflowDecision.canSubmit) {
+      console.warn('Cannot approve: workflow decision prevents submission');
+      return;
+    }
+
+    const nextStage = WorkflowDecisionEngine.getNextWorkflowStage(
+      formData.currentWorkflowStage, 
+      workflowDecision
+    );
+    
     const updatedData = {
       ...formData,
-      status: nextStage === WorkflowStage.completed ? DocumentStatus.Completed : DocumentStatus.InProgress,
-      workflowStage: nextStage,
+      status: nextStage === 'completed' ? DocumentStatus.Completed : DocumentStatus.InProgress,
+      currentWorkflowStage: nextStage as any,
       lastModified: new Date().toISOString(),
     };
     setFormData(updatedData);
-    console.log('PR Approved:', updatedData);
+    console.log('PR Workflow Action:', workflowDecision.action, updatedData);
   };
 
   const handleReject = () => {
+    if (!workflowDecision || !workflowDecision.canSubmit) {
+      console.warn('Cannot reject: workflow decision prevents submission');
+      return;
+    }
+
+    const nextStage = WorkflowDecisionEngine.getNextWorkflowStage(
+      formData.currentWorkflowStage, 
+      workflowDecision
+    );
+    
     const updatedData = {
       ...formData,
       status: DocumentStatus.Rejected,
+      currentWorkflowStage: nextStage as any,
       lastModified: new Date().toISOString(),
     };
     setFormData(updatedData);
-    console.log('PR Rejected:', updatedData);
+    console.log('PR Workflow Action:', workflowDecision.action, updatedData);
   };
 
   const handleSendBack = () => {
-    const previousStage = getPreviousWorkflowStage(formData.currentWorkflowStage);
+    if (!workflowDecision || !workflowDecision.canSubmit) {
+      console.warn('Cannot send back: workflow decision prevents submission');
+      return;
+    }
+    
+    // Open step selector for PR-level return action
+    setIsReturnStepSelectorOpen(true);
+  };
+  
+  const handleReturnWithStep = (step: any) => {
     const updatedData = {
       ...formData,
       status: DocumentStatus.InProgress,
-      workflowStage: previousStage,
+      currentWorkflowStage: step.targetStage as any,
       lastModified: new Date().toISOString(),
     };
     setFormData(updatedData);
-    console.log('PR Sent Back:', updatedData);
+    
+    // Reset state
+    setIsReturnStepSelectorOpen(false);
+    setReturnComment("");
+    setSelectedReturnStep(null);
+    
+    console.log('PR Returned to:', step.targetStage, 'with comment:', returnComment, updatedData);
   };
 
   const handleDelete = () => {
@@ -272,6 +321,28 @@ export default function PRDetailPage() {
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
+
+  // Return steps for PR level actions
+  const returnSteps = [
+    {
+      id: "return-to-requestor",
+      label: "Return to Requestor",
+      description: "Send back to original requestor for revisions",
+      targetStage: "requester"
+    },
+    {
+      id: "return-to-department",
+      label: "Return to Department Manager", 
+      description: "Send back to department manager for review",
+      targetStage: "departmentHeadApproval"
+    },
+    {
+      id: "return-to-previous",
+      label: "Return to Previous Approver",
+      description: "Send back to previous approval stage", 
+      targetStage: "financialApproval"
+    }
+  ];
 
   return (
     <div className="container mx-auto py-6 pb-32">
@@ -484,15 +555,6 @@ export default function PRDetailPage() {
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Workflow Status:</span>
-                      <Badge 
-                        variant={formData.workflowStatus === WorkflowStatus.approved ? "default" : formData.workflowStatus === WorkflowStatus.rejected ? "destructive" : "secondary"} 
-                        className={`font-normal ${formData.workflowStatus === WorkflowStatus.approved ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900" : ""}`}
-                      >
-                        {formData.workflowStatus.charAt(0).toUpperCase() + formData.workflowStatus.slice(1)}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Document Status:</span>
                       <StatusBadge status={formData.status} />
                     </div>
@@ -593,9 +655,21 @@ export default function PRDetailPage() {
         </div>
       </div>
       
-      {/* Floating Action Menu - Role-based workflow actions */}
-      {mode === "view" && user && (
-        <div className="fixed bottom-6 right-6 flex space-x-3 z-50">
+      {/* Smart Floating Action Menu - Workflow Decision Based */}
+      {mode === "view" && user && workflowDecision && (
+        <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
+          {/* Workflow Summary */}
+          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+            <div className="text-xs text-muted-foreground mb-1">Items Status</div>
+            <div className="text-sm font-medium">
+              {WorkflowDecisionEngine.getWorkflowSummaryText(workflowDecision)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {workflowDecision.reason}
+            </div>
+          </div>
+          
+          {/* Action Buttons */}
           <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-4 flex space-x-3 border border-gray-200 dark:border-gray-700">
             {(() => {
               const userRole = user.role;
@@ -609,6 +683,7 @@ export default function PRDetailPage() {
                       variant="destructive"
                       size="sm"
                       className="h-9"
+                      disabled={formData.status !== 'Draft'}
                     >
                       <X className="mr-2 h-4 w-4" />
                       Delete
@@ -618,6 +693,7 @@ export default function PRDetailPage() {
                       variant="default"
                       size="sm"
                       className="h-9"
+                      disabled={!workflowDecision.canSubmit || formData.status !== 'Draft'}
                     >
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Submit
@@ -626,72 +702,122 @@ export default function PRDetailPage() {
                 );
               }
               
-              // For Approvers - show workflow buttons (Approve, Reject, Send Back)
+              // For Approvers - show smart workflow buttons
               if (['Department Manager', 'Financial Manager'].includes(userRole)) {
+                if (workflowDecision.action === 'blocked') {
+                  return (
+                    <Button
+                      variant={workflowDecision.buttonVariant}
+                      size="sm"
+                      className="h-9"
+                      disabled={true}
+                    >
+                      <ClipboardListIcon className="mr-2 h-4 w-4" />
+                      {workflowDecision.buttonText}
+                    </Button>
+                  );
+                }
+                
                 return (
                   <>
-                    <Button
-                      onClick={handleReject}
-                      variant="destructive"
-                      size="sm"
-                      className="h-9"
-                    >
-                      <XCircleIcon className="mr-2 h-4 w-4" />
-                      Reject
-                    </Button>
-                    <Button
-                      onClick={handleSendBack}
-                      variant="outline"
-                      size="sm"
-                      className="h-9"
-                    >
-                      <RotateCcwIcon className="mr-2 h-4 w-4" />
-                      Return
-                    </Button>
-                    <Button
-                      onClick={handleApprove}
-                      variant="default"
-                      size="sm"
-                      className="h-9 bg-green-600 hover:bg-green-700"
-                    >
-                      <CheckCircleIcon className="mr-2 h-4 w-4" />
-                      Approve
-                    </Button>
+                    {workflowDecision.action === 'reject' && (
+                      <Button
+                        onClick={handleReject}
+                        variant={workflowDecision.buttonVariant}
+                        size="sm"
+                        className="h-9"
+                        disabled={!workflowDecision.canSubmit}
+                      >
+                        <XCircleIcon className="mr-2 h-4 w-4" />
+                        {workflowDecision.buttonText}
+                      </Button>
+                    )}
+                    
+                    {workflowDecision.action === 'return' && (
+                      <Button
+                        onClick={handleSendBack}
+                        variant={workflowDecision.buttonVariant}
+                        size="sm"
+                        className={`h-9 ${workflowDecision.buttonColor || ''}`}
+                        disabled={!workflowDecision.canSubmit}
+                      >
+                        <RotateCcwIcon className="mr-2 h-4 w-4" />
+                        {workflowDecision.buttonText}
+                      </Button>
+                    )}
+                    
+                    {workflowDecision.action === 'approve' && (
+                      <Button
+                        onClick={handleApprove}
+                        variant={workflowDecision.buttonVariant}
+                        size="sm"
+                        className={`h-9 ${workflowDecision.buttonColor || 'bg-green-600 hover:bg-green-700'}`}
+                        disabled={!workflowDecision.canSubmit}
+                      >
+                        <CheckCircleIcon className="mr-2 h-4 w-4" />
+                        {workflowDecision.buttonText}
+                      </Button>
+                    )}
                   </>
                 );
               }
               
-              // For Purchasing Staff - show workflow buttons
+              // For Purchasing Staff - show smart workflow buttons
               if (['Purchasing Staff'].includes(userRole)) {
+                if (workflowDecision.action === 'blocked') {
+                  return (
+                    <Button
+                      variant={workflowDecision.buttonVariant}
+                      size="sm"
+                      className="h-9"
+                      disabled={true}
+                    >
+                      <ClipboardListIcon className="mr-2 h-4 w-4" />
+                      {workflowDecision.buttonText}
+                    </Button>
+                  );
+                }
+                
                 return (
                   <>
-                    <Button
-                      onClick={handleReject}
-                      variant="destructive"
-                      size="sm"
-                      className="h-9"
-                    >
-                      <XCircleIcon className="mr-2 h-4 w-4" />
-                      Reject
-                    </Button>
-                    <Button
-                      onClick={handleSendBack}
-                      variant="outline"
-                      size="sm"
-                      className="h-9"
-                    >
-                      <RotateCcwIcon className="mr-2 h-4 w-4" />
-                      Return
-                    </Button>
-                    <Button
-                      onClick={handleSubmitForApproval}
-                      variant="default"
-                      size="sm"
-                      className="h-9"
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Submit
-                    </Button>
+                    {workflowDecision.action === 'reject' && (
+                      <Button
+                        onClick={handleReject}
+                        variant={workflowDecision.buttonVariant}
+                        size="sm"
+                        className="h-9"
+                        disabled={!workflowDecision.canSubmit}
+                      >
+                        <XCircleIcon className="mr-2 h-4 w-4" />
+                        {workflowDecision.buttonText}
+                      </Button>
+                    )}
+                    
+                    {workflowDecision.action === 'return' && (
+                      <Button
+                        onClick={handleSendBack}
+                        variant={workflowDecision.buttonVariant}
+                        size="sm"
+                        className={`h-9 ${workflowDecision.buttonColor || ''}`}
+                        disabled={!workflowDecision.canSubmit}
+                      >
+                        <RotateCcwIcon className="mr-2 h-4 w-4" />
+                        {workflowDecision.buttonText}
+                      </Button>
+                    )}
+                    
+                    {workflowDecision.action === 'approve' && (
+                      <Button
+                        onClick={handleSubmitForApproval}
+                        variant={workflowDecision.buttonVariant}
+                        size="sm"
+                        className={`h-9 ${workflowDecision.buttonColor || 'bg-green-600 hover:bg-green-700'}`}
+                        disabled={!workflowDecision.canSubmit}
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Submit & {workflowDecision.buttonText.replace('Submit & ', '')}
+                      </Button>
+                    )}
                   </>
                 );
               }
@@ -702,6 +828,72 @@ export default function PRDetailPage() {
           </div>
         </div>
       )}
+      
+      {/* Return Step Selector Dialog for PR-Level Actions */}
+      <Dialog open={isReturnStepSelectorOpen} onOpenChange={setIsReturnStepSelectorOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Return Purchase Request - Select Destination</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-sm text-gray-600">
+              Choose where to return this purchase request for review:
+            </div>
+            
+            {/* Step Selection */}
+            <div className="space-y-2">
+              {returnSteps.map((step) => (
+                <Button
+                  key={step.id}
+                  variant={selectedReturnStep?.id === step.id ? "default" : "outline"}
+                  className="w-full justify-start p-4 h-auto"
+                  onClick={() => setSelectedReturnStep(step)}
+                >
+                  <div className="text-left">
+                    <div className="font-medium">{step.label}</div>
+                    <div className="text-xs text-gray-500 mt-1">{step.description}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+            
+            {/* Comment Section */}
+            {selectedReturnStep && (
+              <div className="space-y-2 pt-4 border-t">
+                <label className="text-sm font-medium text-gray-700">
+                  Add a comment explaining the reason for return:
+                </label>
+                <Textarea
+                  placeholder="Enter reason for return..."
+                  value={returnComment}
+                  onChange={(e) => setReturnComment(e.target.value)}
+                  className="min-h-[80px] resize-none"
+                />
+              </div>
+            )}
+            
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsReturnStepSelectorOpen(false);
+                  setReturnComment("");
+                  setSelectedReturnStep(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => selectedReturnStep && handleReturnWithStep(selectedReturnStep)}
+                disabled={!selectedReturnStep || !returnComment.trim()}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                Return to {selectedReturnStep?.label || 'Selected Step'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

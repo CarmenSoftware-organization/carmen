@@ -57,6 +57,7 @@ import { PurchaseRequestItem, PurchaseRequestItemStatus, ConsolidatedButtonState
 import type { User } from "./types";
 import { ItemDetailsEditForm } from "../item-details-edit-form";
 import { samplePRItems } from "../sampleData";
+import { WorkflowDecisionEngine } from "../../services/workflow-decision-engine";
 import { NewItemRow } from "./NewItemRow";
 import VendorComparison from "../vendor-comparison";
 import VendorComparisonView from "../vendor-comparison-view";
@@ -93,10 +94,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
   const [isVendorComparisonOpen, setIsVendorComparisonOpen] = useState(false);
   const [isVendorComparisonViewOpen, setIsVendorComparisonViewOpen] = useState(false);
   const [selectedItemForComparison, setSelectedItemForComparison] = useState<PurchaseRequestItem | null>(null);
+  // showPricesOverride state removed - using automatic role-based pricing visibility
   const [isOnHandPopupOpen, setIsOnHandPopupOpen] = useState(false);
   const [isOnOrderPopupOpen, setIsOnOrderPopupOpen] = useState(false);
   const [selectedItemForPopup, setSelectedItemForPopup] = useState<PurchaseRequestItem | null>(null);
-  const [isReturnStepSelectorOpen, setIsReturnStepSelectorOpen] = useState(false);
+  const [isReturnCommentDialogOpen, setIsReturnCommentDialogOpen] = useState(false);
+  const [returnComment, setReturnComment] = useState("");
+  const [itemsToReturn, setItemsToReturn] = useState<string[]>([]);
   const [isMixedStatusModalOpen, setIsMixedStatusModalOpen] = useState(false);
   const [pendingBulkAction, setPendingBulkAction] = useState<{action: 'approve' | 'reject' | 'return', analysis: any} | null>(null);
   const [isBulkDateModalOpen, setIsBulkDateModalOpen] = useState(false);
@@ -233,29 +237,36 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         handleBulkRejectItems(targetItems);
         break;
       case 'return':
-        if (scope === 'all' || analysis.review > 0) {
-          setIsReturnStepSelectorOpen(true);
-        } else {
-          handleBulkReturnItems(targetItems);
-        }
+        setItemsToReturn(targetItems);
+        setIsReturnCommentDialogOpen(true);
         break;
     }
   };
 
-  const handleReturnWithStep = (step: ReturnStep) => {
-    const analysis = analyzeSelectedItemsStatus();
-    console.log(`✓ Returning ${analysis.total} items with step: ${step.label}`, {
-      step: step,
-      items: selectedItems,
-      targetStage: step.targetStage
+  const handleReturnWithComment = () => {
+    console.log(`✓ Returning ${itemsToReturn.length} items with comment:`, returnComment);
+    
+    // Update local state immediately for instant UI feedback
+    setLocalItems(prevItems => 
+      prevItems.map(item => 
+        itemsToReturn.includes(item.id || '') 
+          ? { ...item, status: 'Review' as PurchaseRequestItemStatus, comment: returnComment }
+          : item
+      )
+    );
+    
+    // Also call parent onOrderUpdate for each item
+    itemsToReturn.forEach(itemId => {
+      onOrderUpdate(itemId, { status: 'Review', comment: returnComment });
     });
-    // Update selected items to 'Review' status with return step info
-    // In real implementation, this would call onOrderUpdate for each selected item
-    setIsReturnStepSelectorOpen(false);
+    
+    // Reset state
+    setIsReturnCommentDialogOpen(false);
+    setReturnComment("");
+    setItemsToReturn([]);
     setSelectedItems([]); // Clear selection after action
     
-    // Show success feedback (in real implementation, this would be a toast)
-    console.log(`🎉 Successfully returned ${analysis.total} items to ${step.targetStage}`);
+    console.log(`🎉 Successfully returned ${itemsToReturn.length} items for review`);
   };
 
   function handleBulkApproveItems(itemIds: string[]) {
@@ -300,26 +311,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     console.log(`🎉 Successfully rejected ${itemIds.length} items`);
   }
 
-  function handleBulkReturnItems(itemIds: string[]) {
-    console.log(`✓ Bulk returning ${itemIds.length} items:`, itemIds);
-    
-    // Update local state immediately for instant UI feedback
-    setLocalItems(prevItems => 
-      prevItems.map(item => 
-        itemIds.includes(item.id || '') 
-          ? { ...item, status: 'Review' as PurchaseRequestItemStatus }
-          : item
-      )
-    );
-    
-    // Also call parent onOrderUpdate
-    itemIds.forEach(itemId => {
-      onOrderUpdate(itemId, { status: 'Review' });
-    });
-    
-    setSelectedItems([]); // Clear selection after action
-    console.log(`🎉 Successfully returned ${itemIds.length} items for review`);
-  }
+  // handleBulkReturnItems removed - now using handleReturnWithComment
 
   function handleBulkSplit() {
     console.log("Bulk splitting items:", selectedItems);
@@ -439,22 +431,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     console.log(`🎉 Successfully rejected item: ${item?.name}`);
   }
 
-  function handleReviewItem(itemId: string) {
-    const item = filteredItems.find(i => i.id === itemId);
-    console.log(`✓ Sending item for review: ${item?.name} (${itemId})`);
-    
-    // Update local state immediately
-    setLocalItems(prevItems => 
-      prevItems.map(item => 
-        item.id === itemId 
-          ? { ...item, status: 'Review' as PurchaseRequestItemStatus }
-          : item
-      )
-    );
-    
-    // Also call parent onOrderUpdate
-    onOrderUpdate(itemId, { status: 'Review' });
-    console.log(`🎉 Successfully sent item for review: ${item?.name}`);
+  // handleReviewItem function removed - 'Send for Review' option no longer available
+  
+  function handleReturnItem(itemId: string) {
+    setItemsToReturn([itemId]);
+    setIsReturnCommentDialogOpen(true);
   }
 
   function handleDeleteItem(itemId: string) {
@@ -546,33 +527,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     }
   ];
 
-  // Workflow return steps data
-  const returnSteps: ReturnStep[] = [
-    {
-      id: "return-to-requestor",
-      label: "Return to Requestor",
-      description: "Send back to original requestor for revisions",
-      targetStage: "Requestor"
-    },
-    {
-      id: "return-to-department",
-      label: "Return to Department Manager",
-      description: "Send back to department manager for review",
-      targetStage: "Department"
-    },
-    {
-      id: "return-to-previous",
-      label: "Return to Previous Approver",
-      description: "Send back to previous approval stage",
-      targetStage: "Previous"
-    },
-    {
-      id: "return-with-comments",
-      label: "Return with Comments",
-      description: "Return with specific comments and requirements",
-      targetStage: "Custom"
-    }
-  ];
+  // Return steps data removed - now using simple comment-based return
 
   // Helper function to analyze selected items status mix
   const analyzeSelectedItemsStatus = () => {
@@ -595,20 +550,15 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
   };
 
 
-  // Get available actions for individual items based on status
-  const getAvailableItemActions = (status: string) => {
-    switch (status) {
-      case "Pending":
-        return ["approve", "review", "reject"];
-      case "Approved":
-        return ["reject", "review"];
-      case "Rejected":
-        return ["approve", "review"];
-      case "Review":
-        return ["approve", "reject", "return"];
-      default:
-        return [];
-    }
+  // Get available actions for individual items using WorkflowDecisionEngine
+  const getAvailableItemActions = (item: PurchaseRequestItem, userRole: string) => {
+    const workflowState = WorkflowDecisionEngine.getItemWorkflowState(
+      item, 
+      userRole, 
+      'departmentHeadApproval' // Current workflow stage - could be dynamic
+    );
+    
+    return workflowState.availableActions;
   };
 
   // Date picker component
@@ -670,18 +620,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         {/* Vendor Field - Takes 2 columns */}
         <div className="min-w-0 md:col-span-2">
           <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Vendor</div>
-          {isItemEditable && (isApprover || isPurchaser) ? (
-            <Input
-              value={item.vendor || ""}
-              onChange={(e) => item.id && handleItemChange(item.id, 'vendor', e.target.value)}
-              placeholder="Vendor"
-              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1"
-            />
-          ) : (
-            <div className="text-xs font-medium text-gray-800 truncate">
-              {item.vendor || <span className="text-gray-400">-</span>}
-            </div>
-          )}
+          <div className="text-xs font-medium text-gray-800 truncate">
+            {item.vendor || <span className="text-gray-400">-</span>}
+          </div>
         </div>
 
         {/* Currency Field - Takes 1 column */}
@@ -711,20 +652,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         {/* Discount Field - Takes 1 column */}
         <div className="min-w-0">
           <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">Discount</div>
-          {isItemEditable && (isApprover || isPurchaser) ? (
-            <Input
-              type="number"
-              value={item.discountRate?.toFixed(2) || ""}
-              onChange={(e) => item.id && handleItemChange(item.id, 'discountRate', parseFloat(e.target.value))}
-              placeholder="0.00"
-              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1 text-right"
-              step="0.01"
-            />
-          ) : (
-            <div className="text-xs font-medium text-gray-800 text-right">
-              {(item.discountRate || 0).toFixed(2)}
-            </div>
-          )}
+          <div className="text-xs font-medium text-gray-800 text-right">
+            {(item.discountRate || 0).toFixed(2)}
+          </div>
         </div>
 
         {/* Net Amount Field - Takes 1 column */}
@@ -747,30 +677,19 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
           <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">
             Tax ({((item.taxRate || 0) * 100).toFixed(1)}%)
           </div>
-          {isItemEditable && (isApprover || isPurchaser) ? (
-            <Input
-              type="number"
-              value={item.taxRate?.toFixed(2) || ""}
-              onChange={(e) => item.id && handleItemChange(item.id, 'taxRate', parseFloat(e.target.value))}
-              placeholder="0.00"
-              className="h-6 text-xs border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1 text-right"
-              step="0.01"
-            />
-          ) : (
-            <div className="text-xs font-medium text-gray-800 text-right">
-              {(() => {
-                const subtotal = (item.price || 0) * (item.quantityApproved || 0);
-                const discountAmount = getItemAdjustments(item.id || '').discount 
-                  ? (item.discountAmount || 0)
-                  : subtotal * (item.discountRate || 0);
-                const netAmount = subtotal - discountAmount;
-                const taxAmount = getItemAdjustments(item.id || '').tax 
-                  ? (item.taxAmount || 0)
-                  : netAmount * (item.taxRate || 0);
-                return taxAmount.toFixed(2);
-              })()}
-            </div>
-          )}
+          <div className="text-xs font-medium text-gray-800 text-right">
+            {(() => {
+              const subtotal = (item.price || 0) * (item.quantityApproved || 0);
+              const discountAmount = getItemAdjustments(item.id || '').discount 
+                ? (item.discountAmount || 0)
+                : subtotal * (item.discountRate || 0);
+              const netAmount = subtotal - discountAmount;
+              const taxAmount = getItemAdjustments(item.id || '').tax 
+                ? (item.taxAmount || 0)
+                : netAmount * (item.taxRate || 0);
+              return taxAmount.toFixed(2);
+            })()}
+          </div>
         </div>
 
         {/* Total Field - Takes 1 column */}
@@ -831,7 +750,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
 
 
   // Render expanded item information
-  const renderExpandedItemInfo = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, canSeePrices: boolean, isExpanded: boolean) => (
+  const renderExpandedItemInfo = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, canSeePrices: boolean, isExpanded: boolean, isItemEditable: boolean) => (
     <div className="space-y-6">
       {/* Expandable Sections - Only show when chevron is expanded */}
       {isExpanded && (
@@ -847,7 +766,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-gray-700">Job Number</label>
-                  {isTableEditMode ? (
+                  {formMode === "edit" ? (
                     <Select 
                       value={item.jobCode || ""} 
                       onValueChange={(value) => item.id && handleItemChange(item.id, 'jobCode', value)}
@@ -868,7 +787,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-gray-700">Event</label>
-                  {isTableEditMode ? (
+                  {formMode === "edit" ? (
                     <Select 
                       value={item.event || ""} 
                       onValueChange={(value) => item.id && handleItemChange(item.id, 'event', value)}
@@ -889,7 +808,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-gray-700">Project</label>
-                  {isTableEditMode ? (
+                  {formMode === "edit" ? (
                     <Select 
                       value={item.project || ""} 
                       onValueChange={(value) => item.id && handleItemChange(item.id, 'project', value)}
@@ -910,7 +829,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-gray-700">Market Segment</label>
-                  {isTableEditMode ? (
+                  {formMode === "edit" ? (
                     <Select 
                       value={item.marketSegment || ""} 
                       onValueChange={(value) => item.id && handleItemChange(item.id, 'marketSegment', value)}
@@ -932,15 +851,15 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               </div>
             </div>
 
-            {/* Consolidated Pricing Section - Only visible for purchasers */}
-            {canSeePrices && isPurchaser && (
+            {/* Consolidated Pricing Section - Visible for approvers and purchasers */}
+            {canSeePrices && (isApprover || isPurchaser) && (
               <div className="bg-white rounded-lg border p-4">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-green-600" />
-                    <h4 className="font-semibold text-lg text-gray-900">Pricing</h4>
+                    <h4 className="font-semibold text-sm text-gray-900">Pricing</h4>
                   </div>
-                  {isPurchaser && (
+                  {isItemEditable && isPurchaser && (
                     <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
                       <DialogTrigger asChild>
                         <Button 
@@ -980,43 +899,43 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 </div>
 
                 {/* Top Row: Vendor, Pricelist, Order Currency, Exchange Rate, Price per Unit */}
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Vendor</label>
-                    {isPurchaser ? (
+                    <label className="text-xs font-medium text-gray-700">Vendor</label>
+                    {isItemEditable && isPurchaser ? (
                       <Input
                         value={item.vendor || ""}
                         onChange={(e) => item.id && handleItemChange(item.id, 'vendor', e.target.value)}
                         placeholder="Enter vendor name"
-                        className="h-10"
+                        className="h-8"
                       />
                     ) : (
-                      <div className="text-base font-medium bg-gray-50 p-2 rounded border">{item.vendor || "Not assigned"}</div>
+                      <div className="text-sm font-medium">{item.vendor || "Not assigned"}</div>
                     )}
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Pricelist Number</label>
-                    {isPurchaser ? (
+                    <label className="text-xs font-medium text-gray-700">Pricelist Number</label>
+                    {isItemEditable && isPurchaser ? (
                       <Input
                         value={item.pricelistNumber || ""}
                         onChange={(e) => item.id && handleItemChange(item.id, 'pricelistNumber', e.target.value)}
                         placeholder="Enter pricelist number"
-                        className="h-10"
+                        className="h-8"
                       />
                     ) : (
-                      <div className="text-base font-medium bg-gray-50 p-2 rounded border">{item.pricelistNumber || "Not specified"}</div>
+                      <div className="text-sm font-medium">{item.pricelistNumber || "Not specified"}</div>
                     )}
                   </div>
-
+                  
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Order Currency</label>
-                    {isPurchaser ? (
+                    <label className="text-xs font-medium text-gray-700">Order Currency</label>
+                    {isItemEditable && isPurchaser ? (
                       <Select 
                         value={item.currency || "USD"} 
                         onValueChange={(value) => item.id && handleItemChange(item.id, 'currency', value)}
                       >
-                        <SelectTrigger className="h-10">
+                        <SelectTrigger className="h-8">
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1027,63 +946,48 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         </SelectContent>
                       </Select>
                     ) : (
-                      <div className="text-base font-medium bg-gray-50 p-2 rounded border">{item.currency || "USD"}</div>
+                      <div className="text-sm font-medium">{item.currency || "USD"}</div>
                     )}
-                    <div className="text-sm text-muted-foreground">Base Currency: {item.baseCurrency || 'USD'}</div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Exchange Rate</label>
-                    {isPurchaser ? (
-                      <Input
-                        type="number"
-                        step="0.0001"
-                        value={item.currencyRate || ""}
-                        onChange={(e) => item.id && handleItemChange(item.id, 'currencyRate', parseFloat(e.target.value))}
-                        placeholder="Enter exchange rate"
-                        className="h-10 text-right"
-                      />
-                    ) : (
-                      <div className="text-base font-medium bg-gray-50 p-2 rounded border text-right">{(item.currencyRate || 1).toFixed(4)}</div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Price per Unit</label>
-                    {isPurchaser ? (
+                    <label className="text-xs font-medium text-gray-700">Price per Unit</label>
+                    {isItemEditable && isPurchaser ? (
                       <Input
                         type="number"
                         step="0.01"
                         value={item.price || ""}
                         onChange={(e) => item.id && handleItemChange(item.id, 'price', parseFloat(e.target.value))}
                         placeholder="Enter price per unit"
-                        className="h-10 text-right"
+                        className="h-8 text-right"
                       />
                     ) : (
-                      <div className="text-base font-medium bg-gray-50 p-2 rounded border text-right">{(item.price || 0).toFixed(2)}</div>
+                      <div className="text-sm font-medium text-right">{(item.price || 0).toFixed(2)}</div>
                     )}
-                    <div className="text-sm text-muted-foreground text-right">per {item.unit || 'unit'}</div>
+                    <div className="text-xs text-muted-foreground text-right">per {item.unit || 'unit'}</div>
                   </div>
                 </div>
 
-                {/* Tax and Discount Overrides */}
-                {isPurchaser && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                    {/* Left Column: Discount and Tax Sections */}
-                    <div className="flex flex-col">
-                      {/* Discount Section */}
-                      <div className="space-y-2 mb-4">
-                        <label className="text-sm font-medium text-gray-700">Discount</label>
-                        <div className="bg-green-50 p-3 rounded border border-green-200" style={{ minHeight: '80px' }}>
-                          <div className="grid grid-cols-3 gap-2">
-                            <div>
-                              <label className="text-xs text-green-700 font-medium mb-1 block">Type</label>
+
+                {/* Financial Summary - 4 Panel Row */}
+                {(isApprover || isPurchaser) && (
+                  <div className="grid grid-cols-4 gap-4">
+                    {/* Discount Panel */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-gray-700">Discount</label>
+                      <div className={`p-3 rounded border h-20 flex flex-col justify-center ${
+                        isItemEditable && isPurchaser && getItemAdjustments(item.id || '').discount 
+                          ? 'bg-white border-green-400' 
+                          : 'bg-green-50 border-green-200'
+                      }`}>
+                        {isItemEditable && isPurchaser ? (
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-2 gap-1">
                               <Select 
                                 value={item.discountType || "Percentage"} 
                                 onValueChange={(value) => item.id && handleItemChange(item.id, 'discountType', value)}
-                                disabled={!getItemAdjustments(item.id || '').discount}
                               >
-                                <SelectTrigger className="h-8 text-xs">
+                                <SelectTrigger className="h-6 text-xs">
                                   <SelectValue placeholder="Type" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1091,73 +995,86 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                   <SelectItem value="Fixed Amount">Fixed</SelectItem>
                                 </SelectContent>
                               </Select>
-                            </div>
-                            
-                            <div>
-                              <label className="text-xs text-green-700 font-medium mb-1 block">Rate</label>
-                              <div className="text-center bg-white p-1 rounded border h-8 flex items-center justify-center">
+                              <div className={`p-1 rounded border h-6 flex items-center justify-center ${
+                                getItemAdjustments(item.id || '').discount 
+                                  ? 'bg-white border-green-300' 
+                                  : 'bg-green-50 border-green-300'
+                              }`}>
                                 <span className="text-xs text-green-700 font-medium">
                                   {((item.discountRate || 0) * 100).toFixed(1)}%
                                 </span>
                               </div>
                             </div>
-                            
-                            <div>
-                              <div className="flex items-center space-x-2 mb-1">
-                                <Checkbox 
-                                  id={`discount-override-${item.id}`}
-                                  checked={getItemAdjustments(item.id || '').discount}
-                                  onCheckedChange={(checked) => {
-                                    console.log('Discount checkbox clicked:', checked);
-                                    if (item.id) {
-                                      updateItemAdjustments(item.id, 'discount', Boolean(checked));
-                                    }
-                                  }}
-                                  className="cursor-pointer"
-                                />
-                                <label 
-                                  htmlFor={`discount-override-${item.id}`}
-                                  className="text-xs text-green-700 font-medium cursor-pointer"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    const currentValue = getItemAdjustments(item.id || '').discount;
-                                    const newValue = !currentValue;
-                                    console.log('Discount label clicked, new value:', newValue);
-                                    if (item.id) {
-                                      updateItemAdjustments(item.id, 'discount', newValue);
-                                    }
-                                  }}
-                                >
-                                  Amount
-                                </label>
-                              </div>
-                              <Input
-                                type="number"
-                                step="0.01"
-                                value={item.discountAmount || ""}
-                                onChange={(e) => item.id && handleItemChange(item.id, 'discountAmount', parseFloat(e.target.value))}
-                                placeholder="Enter amount"
-                                className="h-8 text-right text-xs"
-                                disabled={!getItemAdjustments(item.id || '').discount}
+                            <div className="flex items-center gap-1">
+                              <Checkbox 
+                                id={`discount-override-${item.id}`}
+                                checked={getItemAdjustments(item.id || '').discount}
+                                onCheckedChange={(checked) => {
+                                  if (item.id) {
+                                    updateItemAdjustments(item.id, 'discount', Boolean(checked));
+                                  }
+                                }}
+                                className="h-3 w-3"
                               />
+                              {getItemAdjustments(item.id || '').discount ? (
+                                <Input
+                                  type="text"
+                                  value={(item.discountAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  onChange={(e) => {
+                                    const numericValue = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                    item.id && handleItemChange(item.id, 'discountAmount', numericValue);
+                                  }}
+                                  placeholder="0.00"
+                                  className="h-6 text-xs text-right flex-1"
+                                />
+                              ) : (
+                                <div className="flex-1 text-right">
+                                  <span className="text-sm font-medium text-green-700">
+                                    {(() => {
+                                      const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                                      const discountAmount = subtotal * (item.discountRate || 0);
+                                      return discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    })()}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <>
+                            <div className="text-lg font-bold text-green-700 text-center">
+                              {item.currency} {(() => {
+                                const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                                const discountAmount = getItemAdjustments(item.id || '').discount 
+                                  ? (item.discountAmount || 0)
+                                  : subtotal * (item.discountRate || 0);
+                                return discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                              })()}
+                            </div>
+                            <div className="text-xs text-green-600 text-center">
+                              {item.discountType || "Percentage"} {((item.discountRate || 0) * 100).toFixed(1)}%
+                            </div>
+                          </>
+                        )}
                       </div>
+                    </div>
 
-                      {/* Tax Section - Aligned with Total Amount */}
-                      <div className="space-y-2" style={{ marginTop: '24px' }}>
-                        <label className="text-sm font-medium text-gray-700">Tax</label>
-                        <div className="bg-yellow-50 p-3 rounded border border-yellow-200" style={{ minHeight: '80px' }}>
-                          <div className="grid grid-cols-3 gap-2">
-                            <div>
-                              <label className="text-xs text-orange-700 font-medium mb-1 block">Profile</label>
+                    {/* Tax Panel */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-gray-700">Tax</label>
+                      <div className={`p-3 rounded border h-20 flex flex-col justify-center ${
+                        isItemEditable && isPurchaser && getItemAdjustments(item.id || '').tax 
+                          ? 'bg-white border-orange-400' 
+                          : 'bg-yellow-50 border-yellow-200'
+                      }`}>
+                        {isItemEditable && isPurchaser ? (
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-2 gap-1">
                               <Select 
                                 value={item.taxType || "VAT"} 
                                 onValueChange={(value) => item.id && handleItemChange(item.id, 'taxType', value)}
-                                disabled={!getItemAdjustments(item.id || '').tax}
                               >
-                                <SelectTrigger className="h-8 text-xs">
+                                <SelectTrigger className="h-6 text-xs">
                                   <SelectValue placeholder="Type" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1167,70 +1084,83 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                   <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                               </Select>
-                            </div>
-                            
-                            <div>
-                              <label className="text-xs text-orange-700 font-medium mb-1 block">Rate</label>
-                              <div className="text-center bg-white p-1 rounded border h-8 flex items-center justify-center">
+                              <div className={`p-1 rounded border h-6 flex items-center justify-center ${
+                                getItemAdjustments(item.id || '').tax 
+                                  ? 'bg-white border-orange-300' 
+                                  : 'bg-yellow-50 border-orange-300'
+                              }`}>
                                 <span className="text-xs text-orange-700 font-medium">
                                   {((item.taxRate || 0.07) * 100).toFixed(1)}%
                                 </span>
                               </div>
                             </div>
-                            
-                            <div>
-                              <div className="flex items-center space-x-2 mb-1">
-                                <Checkbox 
-                                  id={`tax-override-${item.id}`}
-                                  checked={getItemAdjustments(item.id || '').tax}
-                                  onCheckedChange={(checked) => {
-                                    console.log('Tax checkbox clicked:', checked);
-                                    if (item.id) {
-                                      updateItemAdjustments(item.id, 'tax', Boolean(checked));
-                                    }
-                                  }}
-                                  className="cursor-pointer"
-                                />
-                                <label 
-                                  htmlFor={`tax-override-${item.id}`}
-                                  className="text-xs text-orange-700 font-medium cursor-pointer"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    const currentValue = getItemAdjustments(item.id || '').tax;
-                                    const newValue = !currentValue;
-                                    console.log('Tax label clicked, new value:', newValue);
-                                    if (item.id) {
-                                      updateItemAdjustments(item.id, 'tax', newValue);
-                                    }
-                                  }}
-                                >
-                                  Amount
-                                </label>
-                              </div>
-                              <Input
-                                type="number"
-                                step="0.01"
-                                value={item.taxAmount || ""}
-                                onChange={(e) => item.id && handleItemChange(item.id, 'taxAmount', parseFloat(e.target.value))}
-                                placeholder="Enter tax amount"
-                                className="h-8 text-right text-xs"
-                                disabled={!getItemAdjustments(item.id || '').tax}
+                            <div className="flex items-center gap-1">
+                              <Checkbox 
+                                id={`tax-override-${item.id}`}
+                                checked={getItemAdjustments(item.id || '').tax}
+                                onCheckedChange={(checked) => {
+                                  if (item.id) {
+                                    updateItemAdjustments(item.id, 'tax', Boolean(checked));
+                                  }
+                                }}
+                                className="h-3 w-3"
                               />
+                              {getItemAdjustments(item.id || '').tax ? (
+                                <Input
+                                  type="text"
+                                  value={(item.taxAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  onChange={(e) => {
+                                    const numericValue = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                    item.id && handleItemChange(item.id, 'taxAmount', numericValue);
+                                  }}
+                                  placeholder="0.00"
+                                  className="h-6 text-xs text-right flex-1"
+                                />
+                              ) : (
+                                <div className="flex-1 text-right">
+                                  <span className="text-sm font-medium text-orange-700">
+                                    {(() => {
+                                      const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                                      const discountAmount = getItemAdjustments(item.id || '').discount 
+                                        ? (item.discountAmount || 0)
+                                        : subtotal * (item.discountRate || 0);
+                                      const netAmount = subtotal - discountAmount;
+                                      const taxAmount = netAmount * (item.taxRate || 0);
+                                      return taxAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    })()}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground text-right">
-                          Base Tax: {item.baseCurrency || 'USD'} {((item.taxAmount || 0) / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
+                        ) : (
+                          <>
+                            <div className="text-lg font-bold text-orange-700 text-center">
+                              {item.currency} {(() => {
+                                const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
+                                const discountAmount = getItemAdjustments(item.id || '').discount 
+                                  ? (item.discountAmount || 0)
+                                  : subtotal * (item.discountRate || 0);
+                                const netAmount = subtotal - discountAmount;
+                                const taxAmount = getItemAdjustments(item.id || '').tax 
+                                  ? (item.taxAmount || 0)
+                                  : netAmount * (item.taxRate || 0);
+                                return taxAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                              })()}
+                            </div>
+                            <div className="text-xs text-orange-600 text-center">
+                              {item.taxType || "VAT"} {((item.taxRate || 0.07) * 100).toFixed(1)}%
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
-                    {/* Right Column: Net Amount and Total Amount */}
-                    <div className="space-y-4">
-                      {/* Net Amount */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Net Total</label>
-                        <div className="text-lg font-bold bg-blue-50 p-3 rounded border border-blue-200 text-blue-700 text-right" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    {/* Net Total Panel */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-gray-700">Net Total</label>
+                      <div className="bg-blue-50 p-3 rounded border border-blue-200 h-20 flex flex-col justify-center">
+                        <div className="text-lg font-bold text-blue-700 text-center">
                           {item.currency} {(() => {
                             const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
                             const discountAmount = getItemAdjustments(item.id || '').discount 
@@ -1240,22 +1170,14 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             return netAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                           })()}
                         </div>
-                        <div className="text-sm text-muted-foreground text-right">
-                          Base Net Total: {item.baseCurrency || 'USD'} {(() => {
-                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                            const discountAmount = getItemAdjustments(item.id || '').discount 
-                              ? (item.discountAmount || 0)
-                              : subtotal * (item.discountRate || 0);
-                            const netAmount = subtotal - discountAmount;
-                            return (netAmount / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                          })()}
-                        </div>
                       </div>
+                    </div>
 
-                      {/* Total Amount */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Total Amount</label>
-                        <div className="text-xl font-bold bg-green-50 p-3 rounded border border-green-200 text-green-700 text-right" style={{ minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    {/* Total Amount Panel */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-gray-700">Total Amount</label>
+                      <div className="bg-green-50 p-3 rounded border border-green-200 h-20 flex flex-col justify-center">
+                        <div className="text-xl font-bold text-green-700 text-center">
                           {item.currency} {(() => {
                             const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
                             const discountAmount = getItemAdjustments(item.id || '').discount 
@@ -1267,20 +1189,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               : netAmount * (item.taxRate || 0);
                             const totalAmount = netAmount + taxAmount;
                             return totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                          })()}
-                        </div>
-                        <div className="text-sm text-muted-foreground text-right">
-                          Base Total Amount: {item.baseCurrency || 'USD'} {(() => {
-                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                            const discountAmount = getItemAdjustments(item.id || '').discount 
-                              ? (item.discountAmount || 0)
-                              : subtotal * (item.discountRate || 0);
-                            const netAmount = subtotal - discountAmount;
-                            const taxAmount = getItemAdjustments(item.id || '').tax 
-                              ? (item.taxAmount || 0)
-                              : netAmount * (item.taxRate || 0);
-                            const totalAmount = netAmount + taxAmount;
-                            return (totalAmount / (item.currencyRate || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                           })()}
                         </div>
                       </div>
@@ -1320,11 +1228,15 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               currentUser.role === 'Approver';
         const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
                                currentUser.role === 'Purchaser';
-        const canSeePrices = (user?.context.showPrices !== false);
+        // Price visibility: Requestors use user settings, Approvers/Purchasers always see prices
+        const canSeePrices = isRequestor ? 
+          (user?.context.showPrices !== false) :
+          true; // Approvers and Purchasers always see prices
         const canSeeVendorPricingPanel = (itemIsApprover || itemIsPurchaser); // Vendor pricing panel: visible for approvers and purchasers
+        const isItemEditable = formMode === "edit";
         
         return (
-          <Card key={item.id} className={`relative transition-all duration-200 ${isTableEditMode ? 'ring-2 ring-amber-300 bg-amber-50/20 shadow-md' : 'hover:shadow-md'}`}>
+          <Card key={item.id} className={`relative transition-all duration-200 ${formMode === "edit" ? 'ring-2 ring-amber-300 bg-amber-50/20 shadow-md' : 'hover:shadow-md'}`}>
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -1403,7 +1315,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               <TableHead className="font-semibold text-left min-w-[200px]">Product Details</TableHead>
               <TableHead className="font-semibold text-center min-w-[120px]">Requested</TableHead>
               <TableHead className="font-semibold text-center min-w-[120px]">Approved</TableHead>
-              {!isRequestor && (
+              {/* Pricing column: Always visible for approvers/purchasers, user setting for requestors */}
+              {(!isRequestor || (isRequestor && (user?.context.showPrices !== false))) && (
                 <TableHead className="font-semibold text-right min-w-[120px]">Pricing</TableHead>
               )}
               <TableHead className="w-[100px] font-semibold text-center">More</TableHead>
@@ -1428,10 +1341,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                     currentUser.role === 'Approver';
               const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
                                      currentUser.role === 'Purchaser';
-              const canSeePrices = (user?.context.showPrices !== false);
+              // Price visibility: Requestors use user settings, Approvers/Purchasers always see prices
+              const canSeePrices = isRequestor ? 
+          (user?.context.showPrices !== false) :
+          true; // Approvers and Purchasers always see prices
         const canSeeVendorPricingPanel = (itemIsApprover || itemIsPurchaser); // Vendor pricing panel: visible for approvers and purchasers
               const isRowEditing = editingRows.has(item.id || "");
-              const isItemEditable = isTableEditMode || isRowEditing;
+              const isItemEditable = formMode === "edit";
               
               return (
                 <React.Fragment key={item.id}>
@@ -1527,7 +1443,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     {/* Approved Quantity Column */}
                     <TableCell className="py-3 text-center">
                       <div className="space-y-1">
-                        {(itemIsApprover || itemIsPurchaser) ? (
+                        {isItemEditable && (itemIsApprover || itemIsPurchaser) ? (
                           <div className="flex items-center gap-1 justify-center">
                             <Input type="number" step="0.00001" value={item.quantityApproved?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityApproved', parseFloat(e.target.value))} className="h-8 w-24 text-right" placeholder="0.00000" />
                             <span className="text-xs text-gray-600">{item.unit}</span>
@@ -1546,10 +1462,10 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             )}
                           </div>
                         )}
-                        {/* FOC field below approved quantity - Hidden for requestors */}
-                        {!itemIsRequestor && (
+                        {/* FOC field below approved quantity - Hidden for requestors and approvers, only visible for purchasers */}
+                        {itemIsPurchaser && (
                           <div className="pt-1 border-t border-gray-200 mt-2">
-                            {isItemEditable && (itemIsApprover || itemIsPurchaser) ? (
+                            {isItemEditable ? (
                             <div className="flex items-center gap-1 justify-center">
                               <span className="text-xs text-gray-500">FOC:</span>
                               <Input 
@@ -1592,30 +1508,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          {/* Edit Actions - Always visible */}
-                          {!editingRows.has(item.id || "") ? (
-                            <DropdownMenuItem onClick={() => handleToggleRowEdit(item.id || "")}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit Item
-                            </DropdownMenuItem>
-                          ) : (
-                            <>
-                              <DropdownMenuItem 
-                                onClick={() => handleSaveRowEdit(item.id || "")}
-                                className="text-green-600 focus:text-green-600"
-                              >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                Save Changes
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleCancelRowEdit(item.id || "")}
-                                className="text-gray-600 focus:text-gray-600"
-                              >
-                                <XCircle className="mr-2 h-4 w-4" />
-                                Cancel Edit
-                              </DropdownMenuItem>
-                            </>
-                          )}
                           
                           {/* Role-based actions */}
                           {(itemIsRequestor || itemIsApprover || itemIsPurchaser) && <DropdownMenuSeparator />}
@@ -1631,13 +1523,21 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             </DropdownMenuItem>
                           )}
                           
-                          {/* Status-based Actions for Approvers/Purchasers */}
+                          {/* Workflow-based Actions using WorkflowDecisionEngine */}
                           {(itemIsApprover || itemIsPurchaser) && (() => {
-                            const availableActions = getAvailableItemActions(item.status);
+                            const availableActions = getAvailableItemActions(item, currentUser.role);
+                            const workflowState = WorkflowDecisionEngine.getItemWorkflowState(
+                              item, 
+                              currentUser.role, 
+                              'departmentHeadApproval'
+                            );
+                            
+                            // Only show actions if user has permissions
+                            if (!availableActions.length) return null;
                             
                             return (
                               <>
-                                {availableActions.includes("approve") && (
+                                {availableActions.includes("approve") && workflowState.canApprove && (
                                   <DropdownMenuItem 
                                     onClick={() => handleApproveItem(item.id || "")}
                                     className="text-green-600 focus:text-green-600"
@@ -1646,7 +1546,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                     Approve Item
                                   </DropdownMenuItem>
                                 )}
-                                {availableActions.includes("reject") && (
+                                {availableActions.includes("reject") && workflowState.canReject && (
                                   <DropdownMenuItem 
                                     onClick={() => handleRejectItem(item.id || "")}
                                     className="text-red-600 focus:text-red-600"
@@ -1655,25 +1555,42 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                     Reject Item
                                   </DropdownMenuItem>
                                 )}
-                                {availableActions.includes("review") && (
+                                {/* Return action for items that need to go back */}
+                                {item.status === 'Review' && workflowState.canReview && (
                                   <DropdownMenuItem 
-                                    onClick={() => handleReviewItem(item.id || "")}
-                                    className="text-yellow-600 focus:text-yellow-600"
-                                  >
-                                    <RotateCcw className="mr-2 h-4 w-4" />
-                                    Send for Review
-                                  </DropdownMenuItem>
-                                )}
-                                {availableActions.includes("return") && (
-                                  <DropdownMenuItem 
-                                    onClick={() => {
-                                      setSelectedItems([item.id || ""]);
-                                      setIsReturnStepSelectorOpen(true);
-                                    }}
+                                    onClick={() => handleReturnItem(item.id || "")}
                                     className="text-orange-600 focus:text-orange-600"
                                   >
                                     <RotateCcw className="mr-2 h-4 w-4" />
                                     Return Item
+                                  </DropdownMenuItem>
+                                )}
+                                {availableActions.includes("comment") && workflowState.canComment && (
+                                  <DropdownMenuItem 
+                                    onClick={() => {
+                                      // Focus on comment field for this item
+                                      const commentField = document.querySelector(`#comment-${item.id}`) as HTMLTextAreaElement;
+                                      if (commentField) {
+                                        commentField.focus();
+                                        commentField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                      }
+                                    }}
+                                    className="text-blue-600 focus:text-blue-600"
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Add Comment
+                                  </DropdownMenuItem>
+                                )}
+                                {availableActions.includes("history") && (
+                                  <DropdownMenuItem 
+                                    onClick={() => {
+                                      // TODO: Implement history view modal
+                                      console.log('View history for item:', item.id);
+                                    }}
+                                    className="text-gray-600 focus:text-gray-600"
+                                  >
+                                    <History className="mr-2 h-4 w-4" />
+                                    View History
                                   </DropdownMenuItem>
                                 )}
                               </>
@@ -1698,44 +1615,51 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         </Button>
                         <div className="flex-1 space-y-3">
                           {/* Comment Section */}
-                          {item.comment ? (
-                            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
-                              <p className="text-sm text-blue-800">{item.comment}</p>
+                          {isItemEditable ? (
+                            <div className="space-y-2">
+                              <label className="text-xs font-medium text-gray-700">Comment</label>
+                              <Textarea
+                                value={item.comment || ""}
+                                onChange={(e) => item.id && handleItemChange(item.id, 'comment', e.target.value)}
+                                placeholder="Add a comment..."
+                                className="min-h-[60px] text-sm"
+                              />
                             </div>
                           ) : (
-                            <div className="text-sm text-gray-400 italic">No comment</div>
+                            item.comment ? (
+                              <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+                                <p className="text-sm text-blue-800">{item.comment}</p>
+                              </div>
+                            ) : (
+                              <div className="text-sm text-gray-400 italic">No comment</div>
+                            )
                           )}
                           
-                          {/* Inventory Information */}
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {/* Inventory & Delivery Information - Single Row, 6 Column Layout */}
+                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                             <div 
-                              className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center cursor-pointer hover:bg-blue-100 transition-colors"
+                              className="bg-blue-50 border border-blue-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-blue-100 transition-colors"
                               onClick={() => handleOnHandClick(item)}
                             >
                               <div className="text-xs font-bold text-blue-700">{item.inventoryInfo?.onHand || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
                               <div className="text-[10px] text-blue-600 font-medium">On Hand</div>
                             </div>
                             <div 
-                              className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-center cursor-pointer hover:bg-orange-100 transition-colors"
+                              className="bg-orange-50 border border-orange-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-orange-100 transition-colors"
                               onClick={() => handleOnOrderClick(item)}
                             >
                               <div className="text-xs font-bold text-orange-700">{item.inventoryInfo?.onOrdered || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
                               <div className="text-[10px] text-orange-600 font-medium">On Order</div>
                             </div>
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1.5 text-center">
                               <div className="text-xs font-bold text-yellow-700">{item.inventoryInfo?.reorderLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
                               <div className="text-[10px] text-yellow-600 font-medium">Reorder Level</div>
                             </div>
-                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center">
+                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-1.5 text-center">
                               <div className="text-xs font-bold text-purple-700">{item.inventoryInfo?.restockLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
                               <div className="text-[10px] text-purple-600 font-medium">Restock Level</div>
                             </div>
-                          </div>
-                          
-                          {/* Date Required and Delivery Point */}
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="text-[10px]">
-                              <span className="text-gray-600 font-medium">Date Required:</span>
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-1.5 text-center">
                               {isItemEditable && itemIsRequestor ? (
                                 <DatePickerField
                                   value={item.deliveryDate}
@@ -1743,16 +1667,17 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                   placeholder="Select date"
                                 />
                               ) : (
-                                <span className="text-gray-900 font-semibold ml-1">
+                                <div className="text-xs font-bold text-green-700">
                                   {item.deliveryDate ? format(item.deliveryDate, "dd/MM/yyyy") : "Not specified"}
-                                </span>
+                                </div>
                               )}
+                              <div className="text-[10px] text-green-600 font-medium">Date Required</div>
                             </div>
-                            <div className="text-[10px]">
-                              <span className="text-gray-600 font-medium">Delivery Point:</span>
-                              <span className="text-gray-900 font-semibold ml-1">
+                            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-1.5 text-center">
+                              <div className="text-xs font-bold text-indigo-700">
                                 {item.deliveryPoint || "Not specified"}
-                              </span>
+                              </div>
+                              <div className="text-[10px] text-indigo-600 font-medium">Delivery Point</div>
                             </div>
                           </div>
                         </div>
@@ -1776,7 +1701,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-50">
                       <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
                         <div className="px-2">
-                          {renderExpandedItemInfo(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, canSeePrices, isExpanded)}
+                          {renderExpandedItemInfo(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, canSeePrices, isExpanded, isItemEditable)}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -1803,21 +1728,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         </div>
         
         <div className="flex items-center gap-2">
-          {/* Global Edit Toggle */}
-          <div className="flex items-center gap-2">
-            <Label htmlFor="edit-mode" className="text-sm font-medium">
-              {formMode === "edit" ? "Edit Mode (Form)" : "Edit Mode"}
-            </Label>
-            <Checkbox
-              id="edit-mode"
-              checked={isTableEditMode}
-              onCheckedChange={(checked) => setIsTableEditMode(checked === true)}
-              disabled={formMode === "edit"}
-            />
-            {formMode === "edit" && (
-              <span className="text-xs text-blue-600 font-medium">Controlled by form</span>
-            )}
-          </div>
 
           {/* Add New Item Button */}
           <Button
@@ -2105,34 +2015,39 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         </DialogContent>
       </Dialog>
 
-      {/* Return Step Selector Modal */}
-      <Dialog open={isReturnStepSelectorOpen} onOpenChange={setIsReturnStepSelectorOpen}>
+      {/* Return Comment Dialog */}
+      <Dialog open={isReturnCommentDialogOpen} onOpenChange={setIsReturnCommentDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Select Return Step</DialogTitle>
+            <DialogTitle>Return Items for Review</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-sm text-gray-600">
-              Choose where to return the selected items:
+              Add a comment explaining why these {itemsToReturn.length} item{itemsToReturn.length === 1 ? '' : 's'} need{itemsToReturn.length === 1 ? 's' : ''} to be returned:
             </div>
-            <div className="space-y-2">
-              {returnSteps.map((step) => (
-                <Button
-                  key={step.id}
-                  variant="outline"
-                  className="w-full justify-start p-4 h-auto"
-                  onClick={() => handleReturnWithStep(step)}
-                >
-                  <div className="text-left">
-                    <div className="font-medium">{step.label}</div>
-                    <div className="text-xs text-gray-500 mt-1">{step.description}</div>
-                  </div>
-                </Button>
-              ))}
-            </div>
+            <Textarea
+              placeholder="Enter reason for return..."
+              value={returnComment}
+              onChange={(e) => setReturnComment(e.target.value)}
+              className="min-h-[100px] resize-none"
+            />
             <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsReturnStepSelectorOpen(false)}>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsReturnCommentDialogOpen(false);
+                  setReturnComment("");
+                  setItemsToReturn([]);
+                }}
+              >
                 Cancel
+              </Button>
+              <Button 
+                onClick={handleReturnWithComment}
+                disabled={!returnComment.trim()}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                Return Items
               </Button>
             </div>
           </div>

@@ -73,11 +73,11 @@ export default function VendorComparisonView({
         </div>
       </div>
 
-      {/* Price History Section */}
+      {/* Purchase History Section */}
       <div className="mb-4 bg-blue-50/50 border border-blue-200 p-4 rounded-lg">
         <div className="flex items-center gap-2 mb-3">
           <History className="h-4 w-4 text-blue-600" />
-          <h3 className="text-sm font-semibold text-gray-800">Price History</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Purchase History</h3>
         </div>
         <div className="grid grid-cols-4 gap-3">
           <div className="bg-white/80 p-2 rounded border border-blue-100">
@@ -110,6 +110,7 @@ export default function VendorComparisonView({
                 <TableHead className="font-semibold text-gray-700">Description</TableHead>
                 <TableHead className="w-[140px] text-center font-semibold text-gray-700">Valid Period</TableHead>
                 <TableHead className="font-semibold text-gray-700">Price List #</TableHead>
+                <TableHead className="w-[80px] text-center font-semibold text-gray-700">Currency</TableHead>
                 <TableHead className="text-right font-semibold text-gray-700">Unit Price</TableHead>
                 <TableHead className="text-right font-semibold text-gray-700">Min. Quantity</TableHead>
               </TableRow>
@@ -162,15 +163,13 @@ export default function VendorComparisonView({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <span className={`font-mono text-sm font-medium ${isCurrentPricelist ? 'text-gray-800' : 'text-gray-600'}`}>{option.priceListNumber}</span>
-                        {isCurrentPricelist && (
-                          <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-700">
-                            Current
-                          </Badge>
-                        )}
                       </div>
                     </TableCell>
+                    <TableCell className="text-center">
+                      <div className={`font-medium ${isCurrentPricelist ? 'text-gray-900' : 'text-gray-700'}`}>USD</div>
+                    </TableCell>
                     <TableCell className="text-right">
-                      <div className={`${isCurrentPricelist ? 'font-semibold text-lg text-gray-900' : 'font-medium text-gray-700'}`}>${option.unitPrice.toFixed(2)}</div>
+                      <div className={`${isCurrentPricelist ? 'font-semibold text-lg text-gray-900' : 'font-medium text-gray-700'}`}>{option.unitPrice.toFixed(2)}</div>
                       <div className="text-xs text-gray-500">per {option.orderUnit}</div>
                     </TableCell>
                     <TableCell className="text-right">
