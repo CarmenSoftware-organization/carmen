@@ -51,7 +51,7 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
         {/* Subtotal */}
         <Card className="border-l-4 border-l-blue-500">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
               <div className="flex items-center space-x-2">
                 <DollarSign className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-muted-foreground">
@@ -59,7 +59,7 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
                 </span>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 text-right">
               <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 {formatCurrency(prData.subTotalPrice ?? 0, currency)}
               </div>
@@ -75,7 +75,7 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
         {/* Discount */}
         <Card className="border-l-4 border-l-green-500">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
               <div className="flex items-center space-x-2">
                 <Percent className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-muted-foreground">
@@ -83,12 +83,9 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
                 </span>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 text-right">
               <div className="text-lg font-bold text-green-600">
                 {formatCurrency(Math.abs(prData.discountAmount ?? 0), currency)}
-                {(prData.discountAmount ?? 0) > 0 && (
-                  <span className="text-xs ml-1 text-green-600">saved</span>
-                )}
               </div>
               {showBaseCurrency && (
                 <div className="text-xs text-muted-foreground">
@@ -102,7 +99,7 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
         {/* Net Amount */}
         <Card className="border-l-4 border-l-blue-500">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
               <div className="flex items-center space-x-2">
                 <Calculator className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-muted-foreground">
@@ -110,7 +107,7 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
                 </span>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 text-right">
               <div className="text-lg font-bold text-blue-600">
                 {formatCurrency(netAmount, currency)}
               </div>
@@ -126,7 +123,7 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
         {/* Tax */}
         <Card className="border-l-4 border-l-orange-500">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
               <div className="flex items-center space-x-2">
                 <Calculator className="h-4 w-4 text-orange-600" />
                 <span className="text-sm font-medium text-muted-foreground">
@@ -134,7 +131,7 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
                 </span>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 text-right">
               <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 {formatCurrency(prData.taxAmount ?? 0, currency)}
               </div>

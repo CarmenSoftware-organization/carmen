@@ -62,12 +62,12 @@ export default function VendorComparisonView({
           <StatusBadge status={itemData.status} />
         </div>
         <div className="grid grid-cols-2 gap-3 mt-3">
-          <div className="bg-gray-50/60 p-2 rounded border border-gray-100">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Requested</span>
+          <div className="bg-gray-50/60 p-2 rounded border border-gray-100 text-right">
+            <span className="text-xs font-medium text-gray-500 tracking-wide">Requested</span>
             <div className="text-sm font-semibold text-gray-700">{itemData.requestedQuantity} {itemData.unit}</div>
           </div>
-          <div className="bg-gray-50/60 p-2 rounded border border-gray-100">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Approved</span>
+          <div className="bg-gray-50/60 p-2 rounded border border-gray-100 text-right">
+            <span className="text-xs font-medium text-gray-500 tracking-wide">Approved</span>
             <div className="text-sm font-semibold text-gray-700">{itemData.approvedQuantity} {itemData.unit}</div>
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function VendorComparisonView({
           </div>
           <div className="bg-white/80 p-2 rounded border border-blue-100">
             <span className="text-xs font-medium text-gray-500 block">Last Price</span>
-            <div className="text-sm font-medium text-gray-900 mt-0.5">$4,150.00</div>
+            <div className="text-sm font-medium text-gray-900 mt-0.5">4,150.00 EUR</div>
           </div>
           <div className="bg-white/80 p-2 rounded border border-blue-100">
             <span className="text-xs font-medium text-gray-500 block">Unit</span>
@@ -166,7 +166,7 @@ export default function VendorComparisonView({
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className={`font-medium ${isCurrentPricelist ? 'text-gray-900' : 'text-gray-700'}`}>USD</div>
+                      <div className={`font-medium ${isCurrentPricelist ? 'text-gray-900' : 'text-gray-700'}`}>{option.currency || "USD"}</div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className={`${isCurrentPricelist ? 'font-semibold text-lg text-gray-900' : 'font-medium text-gray-700'}`}>{option.unitPrice.toFixed(2)}</div>
@@ -175,9 +175,6 @@ export default function VendorComparisonView({
                     <TableCell className="text-right">
                       <div className={`font-medium ${isCurrentPricelist ? 'text-gray-900' : 'text-gray-700'}`}>{option.minQuantity}</div>
                       <div className="text-xs text-gray-500">{option.orderUnit}</div>
-                      {option.leadTime && (
-                        <div className={`text-xs mt-1 ${isCurrentPricelist ? 'text-blue-600' : 'text-blue-500'}`}>{option.leadTime} days</div>
-                      )}
                     </TableCell>
                   </TableRow>
                 );

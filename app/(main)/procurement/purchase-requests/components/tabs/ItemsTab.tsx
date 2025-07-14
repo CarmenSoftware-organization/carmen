@@ -675,7 +675,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         {/* Tax Field - Takes 1 column */}
         <div className="min-w-0">
           <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">
-            Tax ({((item.taxRate || 0) * 100).toFixed(1)}%)
+            Tax ({(item.taxRate || 0).toFixed(1)}%)
           </div>
           <div className="text-xs font-medium text-gray-800 text-right">
             {(() => {
@@ -686,7 +686,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               const netAmount = subtotal - discountAmount;
               const taxAmount = getItemAdjustments(item.id || '').tax 
                 ? (item.taxAmount || 0)
-                : netAmount * (item.taxRate || 0);
+                : netAmount * ((item.taxRate || 0) / 100);
               return taxAmount.toFixed(2);
             })()}
           </div>
@@ -704,7 +704,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               const netAmount = subtotal - discountAmount;
               const taxAmount = getItemAdjustments(item.id || '').tax 
                 ? (item.taxAmount || 0)
-                : netAmount * (item.taxRate || 0);
+                : netAmount * ((item.taxRate || 0) / 100);
               const totalAmount = netAmount + taxAmount;
               return totalAmount.toFixed(2);
             })()}
@@ -983,27 +983,29 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         {isItemEditable && isPurchaser ? (
                           <div className="space-y-1">
                             <div className="grid grid-cols-2 gap-1">
-                              <Select 
-                                value={item.discountType || "Percentage"} 
-                                onValueChange={(value) => item.id && handleItemChange(item.id, 'discountType', value)}
-                              >
-                                <SelectTrigger className="h-6 text-xs">
-                                  <SelectValue placeholder="Type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="Percentage">%</SelectItem>
-                                  <SelectItem value="Fixed Amount">Fixed</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <div className={`p-1 rounded border h-6 flex items-center justify-center ${
-                                getItemAdjustments(item.id || '').discount 
-                                  ? 'bg-white border-green-300' 
-                                  : 'bg-green-50 border-green-300'
-                              }`}>
-                                <span className="text-xs text-green-700 font-medium">
-                                  {((item.discountRate || 0) * 100).toFixed(1)}%
-                                </span>
+                              <div className="h-6 px-2 rounded border bg-green-50 border-green-200 flex items-center text-xs text-gray-700">
+                                Rate
                               </div>
+                              {getItemAdjustments(item.id || '').discount ? (
+                                <div className="h-6 px-2 rounded border bg-green-50 border-green-200 flex items-center justify-center">
+                                  <span className="text-xs text-green-700 font-medium">
+                                    {(item.discountRate || 0).toFixed(1)}%
+                                  </span>
+                                </div>
+                              ) : (
+                                <Input
+                                  type="number"
+                                  value={item.discountRate || 0}
+                                  onChange={(e) => {
+                                    const numericValue = parseFloat(e.target.value) || 0;
+                                    item.id && handleItemChange(item.id, 'discountRate', numericValue);
+                                  }}
+                                  placeholder="0.0"
+                                  className="h-6 text-xs text-right bg-white border-gray-300"
+                                  min="0"
+                                  max="999"
+                                />
+                              )}
                             </div>
                             <div className="flex items-center gap-1">
                               <Checkbox 
@@ -1016,23 +1018,27 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                 }}
                                 className="h-3 w-3"
                               />
+                              <label htmlFor={`discount-override-${item.id}`} className="text-xs text-gray-600 cursor-pointer">
+                                Override
+                              </label>
                               {getItemAdjustments(item.id || '').discount ? (
                                 <Input
-                                  type="text"
-                                  value={(item.discountAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  type="number"
+                                  value={(item.discountAmount || 0)}
                                   onChange={(e) => {
-                                    const numericValue = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                    const numericValue = parseInt(e.target.value) || 0;
                                     item.id && handleItemChange(item.id, 'discountAmount', numericValue);
                                   }}
-                                  placeholder="0.00"
-                                  className="h-6 text-xs text-right flex-1"
+                                  placeholder="0"
+                                  className="h-6 text-xs text-right flex-1 bg-white border-gray-300"
+                                  min="0"
                                 />
                               ) : (
-                                <div className="flex-1 text-right">
-                                  <span className="text-sm font-medium text-green-700">
+                                <div className="flex-1 text-right h-6 px-2 rounded border bg-green-50 border-green-200 flex items-center justify-end">
+                                  <span className="text-xs text-green-700 font-medium">
                                     {(() => {
                                       const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                                      const discountAmount = subtotal * (item.discountRate || 0);
+                                      const discountAmount = subtotal * ((item.discountRate || 0) / 100);
                                       return discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     })()}
                                   </span>
@@ -1047,12 +1053,12 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                 const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
                                 const discountAmount = getItemAdjustments(item.id || '').discount 
                                   ? (item.discountAmount || 0)
-                                  : subtotal * (item.discountRate || 0);
+                                  : subtotal * ((item.discountRate || 0) / 100);
                                 return discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                               })()}
                             </div>
                             <div className="text-xs text-green-600 text-center">
-                              {item.discountType || "Percentage"} {((item.discountRate || 0) * 100).toFixed(1)}%
+                              Rate {(item.discountRate || 0).toFixed(1)}%
                             </div>
                           </>
                         )}
@@ -1084,15 +1090,26 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                   <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                               </Select>
-                              <div className={`p-1 rounded border h-6 flex items-center justify-center ${
-                                getItemAdjustments(item.id || '').tax 
-                                  ? 'bg-white border-orange-300' 
-                                  : 'bg-yellow-50 border-orange-300'
-                              }`}>
-                                <span className="text-xs text-orange-700 font-medium">
-                                  {((item.taxRate || 0.07) * 100).toFixed(1)}%
-                                </span>
-                              </div>
+                              {getItemAdjustments(item.id || '').tax ? (
+                                <div className="h-6 px-2 rounded border bg-orange-50 border-orange-200 flex items-center justify-center">
+                                  <span className="text-xs text-orange-700 font-medium">
+                                    {(item.taxRate || 7).toFixed(1)}%
+                                  </span>
+                                </div>
+                              ) : (
+                                <Input
+                                  type="number"
+                                  value={item.taxRate || 7}
+                                  onChange={(e) => {
+                                    const numericValue = parseFloat(e.target.value) || 0;
+                                    item.id && handleItemChange(item.id, 'taxRate', numericValue);
+                                  }}
+                                  placeholder="0.0"
+                                  className="h-6 text-xs text-right bg-white border-gray-300"
+                                  min="0"
+                                  max="999"
+                                />
+                              )}
                             </div>
                             <div className="flex items-center gap-1">
                               <Checkbox 
@@ -1107,14 +1124,15 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               />
                               {getItemAdjustments(item.id || '').tax ? (
                                 <Input
-                                  type="text"
-                                  value={(item.taxAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  type="number"
+                                  value={(item.taxAmount || 0)}
                                   onChange={(e) => {
-                                    const numericValue = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                    const numericValue = parseInt(e.target.value) || 0;
                                     item.id && handleItemChange(item.id, 'taxAmount', numericValue);
                                   }}
-                                  placeholder="0.00"
-                                  className="h-6 text-xs text-right flex-1"
+                                  placeholder="0"
+                                  className="h-6 text-xs text-right flex-1 bg-white border-gray-300"
+                                  min="0"
                                 />
                               ) : (
                                 <div className="flex-1 text-right">
@@ -1125,7 +1143,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                         ? (item.discountAmount || 0)
                                         : subtotal * (item.discountRate || 0);
                                       const netAmount = subtotal - discountAmount;
-                                      const taxAmount = netAmount * (item.taxRate || 0);
+                                      const taxAmount = netAmount * ((item.taxRate || 0) / 100);
                                       return taxAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     })()}
                                   </span>
@@ -1144,12 +1162,12 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                 const netAmount = subtotal - discountAmount;
                                 const taxAmount = getItemAdjustments(item.id || '').tax 
                                   ? (item.taxAmount || 0)
-                                  : netAmount * (item.taxRate || 0);
+                                  : netAmount * ((item.taxRate || 0) / 100);
                                 return taxAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                               })()}
                             </div>
                             <div className="text-xs text-orange-600 text-center">
-                              {item.taxType || "VAT"} {((item.taxRate || 0.07) * 100).toFixed(1)}%
+                              {item.taxType || "VAT"} {(item.taxRate || 7).toFixed(1)}%
                             </div>
                           </>
                         )}
@@ -1186,7 +1204,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             const netAmount = subtotal - discountAmount;
                             const taxAmount = getItemAdjustments(item.id || '').tax 
                               ? (item.taxAmount || 0)
-                              : netAmount * (item.taxRate || 0);
+                              : netAmount * ((item.taxRate || 0) / 100);
                             const totalAmount = netAmount + taxAmount;
                             return totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                           })()}
@@ -1841,10 +1859,10 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                 Split
               </Button>
               
-              {/* Set Required Date Button (always available) */}
+              {/* Set Date Required Button (always available) */}
               <Button variant="outline" size="sm" onClick={handleBulkSetRequiredDate} className="text-xs text-purple-600 hover:text-purple-700">
                 <CalendarIcon className="h-4 w-4 mr-1" />
-                Set Required Date
+                Set Date Required
               </Button>
             </div>
           </div>
@@ -2151,11 +2169,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         </DialogContent>
       </Dialog>
 
-      {/* Bulk Set Required Date Modal */}
+      {/* Bulk Set Date Required Modal */}
       <Dialog open={isBulkDateModalOpen} onOpenChange={setIsBulkDateModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Set Required Date</DialogTitle>
+            <DialogTitle>Set Date Required</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-sm text-gray-600">

@@ -9,6 +9,7 @@ export interface ItemVendorOption {
   priceListNumber: string;
   priceListName: string;
   unitPrice: number;
+  currency?: string;
   minQuantity: number;
   orderUnit: string;
   validFrom: string;
@@ -39,6 +40,7 @@ export const itemVendorDatabase: { [itemName: string]: ItemVendorData } = {
         priceListNumber: "PL-2023-06-FB",
         priceListName: "Coffee & Beverages",
         unitPrice: 15.50,
+        currency: "USD",
         minQuantity: 10,
         orderUnit: "kg",
         validFrom: "01/06/2024",
@@ -54,6 +56,7 @@ export const itemVendorDatabase: { [itemName: string]: ItemVendorData } = {
         priceListNumber: "PL-2023-06-COFFEE",
         priceListName: "Specialty Coffee",
         unitPrice: 16.20,
+        currency: "EUR",
         minQuantity: 25,
         orderUnit: "kg",
         validFrom: "15/06/2024",
@@ -69,6 +72,7 @@ export const itemVendorDatabase: { [itemName: string]: ItemVendorData } = {
         priceListNumber: "PL-2023-06-SPECIALTY",
         priceListName: "Artisan Coffee",
         unitPrice: 14.80,
+        currency: "GBP",
         minQuantity: 50,
         orderUnit: "kg",
         validFrom: "01/07/2024",
@@ -91,6 +95,7 @@ export const itemVendorDatabase: { [itemName: string]: ItemVendorData } = {
         priceListNumber: "PL-2023-06-BAKE",
         priceListName: "Baking Essentials",
         unitPrice: 3.00,
+        currency: "USD",
         minQuantity: 50,
         orderUnit: "kg",
         validFrom: "01/06/2024",
