@@ -32,8 +32,6 @@ import {
 } from "@/components/ui/select";
 import {
   Gift,
-  ChevronDown,
-  ChevronRight,
   MoreHorizontal,
   Plus,
   FileText,
@@ -76,7 +74,6 @@ interface ItemsTabProps {
 
 export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState<Partial<PurchaseOrderItem>>({
     name: "",
     description: "",
@@ -104,6 +101,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
   const [viewingItem, setViewingItem] = useState<PurchaseOrderItem | null>(
     null
   );
+  const [isAddItemFormOpen, setIsAddItemFormOpen] = useState(false);
 
   const handleExport = () => {
     // if (!poData) {
@@ -210,8 +208,6 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
     updatedItem.orderUnit = newUnit;
     onUpdateItem(updatedItem);
   }
-
-  const [isAddItemFormOpen, setIsAddItemFormOpen] = useState(false);
 
   const handleAddNewItem = (newItem: PurchaseOrderItem) => {
     onAddItem(newItem);
@@ -323,6 +319,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
                         setSelectedItems([]);
                       }
                     }}
+                    aria-label="Select all items"
                   />
                 </TableHead>
                 <TableHead className="w-[100px]">PO Item</TableHead>
@@ -424,12 +421,4 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
       </div>
     </TooltipProvider>
   );
-}
-
-function onAddItem(newItem: PurchaseOrderItem) {
-  throw new Error("Function not implemented.");
-}
-
-function setEditingItem(arg0: null) {
-  throw new Error("Function not implemented.");
 }

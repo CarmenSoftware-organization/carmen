@@ -140,13 +140,14 @@ export class WorkflowDecisionEngine {
       canApprove: false,
       canReject: false,
       canReview: false,
-      canComment: true, // All users can comment
+      canComment: false, // No users can comment
       availableActions: []
     };
     
     // Only allow actions on Pending or Review status items
     if (!['Pending', 'Review'].includes(item.status)) {
-      state.availableActions = ['comment', 'history'];
+      // No users can add comments
+      state.availableActions = ['history'];
       return state;
     }
     
@@ -155,7 +156,7 @@ export class WorkflowDecisionEngine {
       state.canApprove = true;
       state.canReject = true;
       state.canReview = true;
-      state.availableActions = ['approve', 'reject', 'review', 'comment', 'history'];
+      state.availableActions = ['approve', 'reject', 'review', 'history'];
     }
     
     // Financial Manager permissions
@@ -163,7 +164,7 @@ export class WorkflowDecisionEngine {
       state.canApprove = true;
       state.canReject = true;
       state.canReview = true;
-      state.availableActions = ['approve', 'reject', 'review', 'comment', 'history'];
+      state.availableActions = ['approve', 'reject', 'review', 'history'];
     }
     
     // Purchasing Staff permissions
@@ -171,13 +172,21 @@ export class WorkflowDecisionEngine {
       state.canApprove = true;
       state.canReject = true;
       state.canReview = true;
-      state.availableActions = ['approve', 'reject', 'review', 'comment', 'history'];
+      state.availableActions = ['approve', 'reject', 'review', 'history'];
+    }
+    
+    // Approver permissions
+    if (['Approver'].includes(userRole)) {
+      state.canApprove = true;
+      state.canReject = true;
+      state.canReview = true;
+      state.availableActions = ['approve', 'reject', 'review', 'history'];
     }
     
     // Requestor can only mark for review on pending items
     if (['Staff', 'Requestor'].includes(userRole) && item.status === 'Pending') {
       state.canReview = true;
-      state.availableActions = ['review', 'comment', 'history'];
+      state.availableActions = ['review', 'history'];
     }
     
     // System Administrator has all permissions
@@ -185,7 +194,7 @@ export class WorkflowDecisionEngine {
       state.canApprove = true;
       state.canReject = true;
       state.canReview = true;
-      state.availableActions = ['approve', 'reject', 'review', 'comment', 'history'];
+      state.availableActions = ['approve', 'reject', 'review', 'history'];
     }
     
     return state;

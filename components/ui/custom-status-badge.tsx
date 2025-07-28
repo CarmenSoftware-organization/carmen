@@ -44,10 +44,12 @@ const statusStyles: Record<string, { bg: string, text: string }> = {
   Posted: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
   
   // Primary states (using corporate blue)
-  Open: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
   InProgress: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
   Submitted: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
   Sent: { bg: 'bg-primary/20 dark:bg-primary/30', text: 'text-primary dark:text-primary-foreground' },
+  
+  // Draft/Pending states (amber/yellow)
+  Open: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-800 dark:text-amber-300' },
   
   // Warning states
   Pending: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
@@ -61,8 +63,10 @@ const statusStyles: Record<string, { bg: string, text: string }> = {
   Deleted: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
   Voided: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
   
+  // Success states - Closed PO means successful completion
+  Closed: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+  
   // Neutral states
-  Closed: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-800 dark:text-gray-300' },
   Inactive: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-800 dark:text-gray-300' },
   
   // Special states

@@ -46,6 +46,8 @@ import {
   FileText,
   LayoutGrid,
   List,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
@@ -187,9 +189,18 @@ const columns = (router: ReturnType<typeof useRouter>): ColumnDef[] => [
     cell: ({ row }) => (
       <div className="text-right">
         {new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: row.original.currency,
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         }).format(row.getValue("totalAmount"))}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "currency",
+    header: "Currency",
+    cell: ({ row }) => (
+      <div className="text-center">
+        {row.original.currency}
       </div>
     ),
   },
@@ -202,33 +213,6 @@ const columns = (router: ReturnType<typeof useRouter>): ColumnDef[] => [
       return (
         <TableCell className="text-right">
           <div className="flex justify-end space-x-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(`/procurement/purchase-requests/${pr.id}?mode=view`)}
-              className="h-8 w-8"
-            >
-              <span className="sr-only">View</span>
-              <FileText className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(`/procurement/purchase-requests/${pr.id}?mode=edit`)}
-              className="h-8 w-8"
-            >
-              <span className="sr-only">Edit</span>
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {/* Implement delete functionality */}}
-              className="h-8 w-8"
-            >
-              <span className="sr-only">Delete</span>
-              <Trash2 className="h-4 w-4" />
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -237,14 +221,27 @@ const columns = (router: ReturnType<typeof useRouter>): ColumnDef[] => [
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => {/* Implement additional actions */}}>
+                <DropdownMenuItem 
+                  onClick={() => {/* Implement approve functionality */}}
+                  className="text-green-600 focus:text-green-600"
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
                   Approve
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {/* Implement additional actions */}}>
+                <DropdownMenuItem 
+                  onClick={() => {/* Implement reject functionality */}}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
                   Reject
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {/* Implement additional actions */}}>
-                  Send Email
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => {/* Implement delete functionality */}}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -511,10 +508,24 @@ export function PurchaseRequestList() {
 
   const bulkActions =
     selectedPRs.length > 0 ? (
-      <div className="flex flex-wrap gap-2">
-        <Button variant="outline">Delete Selected</Button>
-        <Button variant="outline">Approve Selected</Button>
-        <Button variant="outline">Reject Selected</Button>
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-medium text-muted-foreground">
+          {selectedPRs.length} item{selectedPRs.length !== 1 ? 's' : ''} selected
+        </span>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700">
+            <CheckCircle className="mr-2 h-4 w-4" />
+            Approve Selected
+          </Button>
+          <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
+            <XCircle className="mr-2 h-4 w-4" />
+            Reject Selected
+          </Button>
+          <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Selected
+          </Button>
+        </div>
       </div>
     ) : null;
 
@@ -750,7 +761,7 @@ export function PurchaseRequestList() {
     { 
       label: "Amount", 
       field: "totalAmount",
-      format: (value: number) => `${value.toFixed(2)}`
+      format: (value: number) => value.toFixed(2)
     },
     { 
       label: "Workflow Stage", 
@@ -830,11 +841,11 @@ export function PurchaseRequestList() {
                     <p className="text-base font-semibold">
                       {isMounted 
                         ? new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: pr.currency,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
                           }).format(pr.totalAmount)
-                        : `${pr.currency} ${pr.totalAmount.toFixed(2)}`
-                      }
+                        : pr.totalAmount.toFixed(2)
+                      } {pr.currency}
                     </p>
                   </div>
                   <div className="text-right">
@@ -845,33 +856,6 @@ export function PurchaseRequestList() {
               </div>
               
               <div className="flex justify-end px-4 py-3 bg-muted/20 border-t space-x-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleViewPR(pr.id)}
-                  className="h-8 w-8 rounded-full"
-                >
-                  <span className="sr-only">View</span>
-                  <FileText className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleEditPR(pr.id)}
-                  className="h-8 w-8 rounded-full"
-                >
-                  <span className="sr-only">Edit</span>
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeletePR(pr.id)}
-                  className="h-8 w-8 rounded-full"
-                >
-                  <span className="sr-only">Delete</span>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -880,15 +864,27 @@ export function PurchaseRequestList() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => console.log("Approve", pr.id)}>
+                    <DropdownMenuItem 
+                      onClick={() => console.log("Approve", pr.id)}
+                      className="text-green-600 focus:text-green-600"
+                    >
+                      <CheckCircle className="mr-2 h-4 w-4" />
                       Approve
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => console.log("Reject", pr.id)}>
+                    <DropdownMenuItem 
+                      onClick={() => console.log("Reject", pr.id)}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
                       Reject
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => console.log("Send Email", pr.id)}>
-                      <Mail className="mr-2 h-4 w-4" />
-                      Send Email
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => handleDeletePR(pr.id)}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -921,6 +917,7 @@ export function PurchaseRequestList() {
                 <TableHead className="font-medium">Requestor</TableHead>
                 <TableHead className="font-medium">Department</TableHead>
                 <TableHead className="text-right font-medium">Amount</TableHead>
+                <TableHead className="text-center font-medium">Currency</TableHead>
                 <TableHead className="w-[170px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -969,50 +966,17 @@ export function PurchaseRequestList() {
                   <TableCell className="text-right font-medium">
                     {isMounted 
                       ? new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: pr.currency,
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
                         }).format(pr.totalAmount)
-                      : `${pr.currency} ${pr.totalAmount.toFixed(2)}`
+                      : pr.totalAmount.toFixed(2)
                     }
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {pr.currency}
                   </TableCell>
                   <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewPR(pr.id);
-                        }}
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <span className="sr-only">View</span>
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditPR(pr.id);
-                        }}
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <span className="sr-only">Edit</span>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeletePR(pr.id);
-                        }}
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <span className="sr-only">Delete</span>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button 
@@ -1031,7 +995,9 @@ export function PurchaseRequestList() {
                               e.stopPropagation();
                               console.log("Approve", pr.id);
                             }}
+                            className="text-green-600 focus:text-green-600"
                           >
+                            <CheckCircle className="mr-2 h-4 w-4" />
                             Approve
                           </DropdownMenuItem>
                           <DropdownMenuItem 
@@ -1039,17 +1005,21 @@ export function PurchaseRequestList() {
                               e.stopPropagation();
                               console.log("Reject", pr.id);
                             }}
+                            className="text-red-600 focus:text-red-600"
                           >
+                            <XCircle className="mr-2 h-4 w-4" />
                             Reject
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log("Send Email", pr.id);
+                              handleDeletePR(pr.id);
                             }}
+                            className="text-red-600 focus:text-red-600"
                           >
-                            <Mail className="mr-2 h-4 w-4" />
-                            Send Email
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

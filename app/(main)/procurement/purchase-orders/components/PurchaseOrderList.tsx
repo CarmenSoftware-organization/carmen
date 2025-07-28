@@ -63,6 +63,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";  
 import StatusBadge from "@/components/ui/custom-status-badge";
+import CreatePOFromPR from "./createpofrompr";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { randomUUID } from "crypto";
 import { AdvancedFilter } from './advanced-filter'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
@@ -308,9 +310,9 @@ export function PurchaseOrderList() {
           <Mail className="mr-2 h-4 w-4" />
           Send Selected
         </Button>
-        <Button variant="outline" size="sm">
-          <CheckSquare className="mr-2 h-4 w-4" />
-          Approve Selected
+        <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete Selected
         </Button>
         <Button variant="outline" size="sm">
           <X className="mr-2 h-4 w-4" />
@@ -389,13 +391,24 @@ export function PurchaseOrderList() {
                   )}
                 </div>
               </TableHead>
+              <TableHead className="font-medium">
+                <div 
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort('currencyCode')}
+                >
+                  Currency
+                  {sortConfig.field === 'currencyCode' && (
+                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortConfig.direction === 'desc' ? 'rotate-180' : ''}`} />
+                  )}
+                </div>
+              </TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedPOs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={9} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center text-muted-foreground">
                     <Search className="h-8 w-8 mb-2 opacity-50" />
                     <p>No purchase orders found</p>
@@ -428,7 +441,15 @@ export function PurchaseOrderList() {
                       onCheckedChange={(checked) => handleSelectPO(po.poId, checked as boolean)}
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{po.number}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link 
+                      href={`/procurement/purchase-orders/${po.poId}`}
+                      className="text-primary hover:text-primary/80 hover:underline font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {po.number}
+                    </Link>
+                  </TableCell>
                   <TableCell>{po.vendorName}</TableCell>
                   <TableCell>{po.orderDate.toLocaleDateString()}</TableCell>
                   <TableCell>{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</TableCell>
@@ -436,34 +457,13 @@ export function PurchaseOrderList() {
                     <StatusBadge status={po.status} />
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    {po.currencyCode} {po.totalAmount.toFixed(2)}
+                    {po.totalAmount.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {po.currencyCode}
                   </TableCell>
                   <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/procurement/purchase-orders/${po.poId}`);
-                        }}
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <span className="sr-only">View</span>
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/procurement/purchase-orders/${po.poId}/edit`);
-                        }}
-                        className="h-8 w-8 rounded-full"
-                      >
-                        <span className="sr-only">Edit</span>
-                        <Edit className="h-4 w-4" />
-                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -473,13 +473,16 @@ export function PurchaseOrderList() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                            <Printer className="mr-2 h-4 w-4" />
                             Print
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                            <FileDown className="mr-2 h-4 w-4" />
                             Download PDF
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={(e) => e.stopPropagation()} className="text-destructive">
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -536,7 +539,13 @@ export function PurchaseOrderList() {
                       onClick={(e) => e.stopPropagation()}
                     />
                     <div>
-                      <h3 className="text-lg font-semibold text-primary">{po.number}</h3>
+                      <Link 
+                        href={`/procurement/purchase-orders/${po.poId}`}
+                        className="text-lg font-semibold text-primary hover:text-primary/80 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {po.number}
+                      </Link>
                       <p className="text-sm text-muted-foreground">{po.orderDate.toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -552,10 +561,6 @@ export function PurchaseOrderList() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Currency</p>
-                    <p className="text-sm font-medium">{po.currencyCode}</p>
-                  </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Delivery Date</p>
                     <p className="text-sm font-medium">{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</p>
@@ -573,37 +578,17 @@ export function PurchaseOrderList() {
                 <div className="flex justify-between items-center mt-4 pt-3 border-t border-border/50">
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Total Amount</p>
-                    <p className="text-base font-semibold">{po.currencyCode} {po.totalAmount.toFixed(2)}</p>
+                    <p className="text-base font-semibold">{po.totalAmount.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Currency</p>
+                    <p className="text-sm font-medium">{po.currencyCode}</p>
                   </div>
                 </div>
               </div>
               
               {/* Card Actions */}
               <div className="flex justify-end px-4 py-3 bg-muted/20 border-t space-x-1" onClick={(e) => e.stopPropagation()}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/procurement/purchase-orders/${po.poId}`);
-                  }}
-                  className="h-8 w-8 rounded-full"
-                >
-                  <span className="sr-only">View</span>
-                  <FileText className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/procurement/purchase-orders/${po.poId}/edit`);
-                  }}
-                  className="h-8 w-8 rounded-full"
-                >
-                  <span className="sr-only">Edit</span>
-                  <Edit className="h-4 w-4" />
-                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -612,10 +597,19 @@ export function PurchaseOrderList() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Print</DropdownMenuItem>
-                    <DropdownMenuItem>Download PDF</DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Printer className="mr-2 h-4 w-4" />
+                      Print
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <FileDown className="mr-2 h-4 w-4" />
+                      Download PDF
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive">
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -677,7 +671,56 @@ export function PurchaseOrderList() {
     </div>
   );
 
+  const [showCreateFromPRDialog, setShowCreateFromPRDialog] = useState(false);
   
+  const handleSelectPRs = (selectedPRs: PurchaseRequest[]) => {
+    setShowCreateFromPRDialog(false);
+    
+    if (selectedPRs.length > 0) {
+      // Group PRs by vendor and currency - each group becomes a separate PO
+      const groupedPRs = selectedPRs.reduce((groups, pr) => {
+        const key = `${pr.vendor}-${pr.currency}`;
+        if (!groups[key]) {
+          groups[key] = {
+            vendor: pr.vendor,
+            vendorId: pr.vendorId,
+            currency: pr.currency,
+            prs: [],
+            totalAmount: 0
+          };
+        }
+        groups[key].prs.push(pr);
+        groups[key].totalAmount += pr.totalAmount;
+        return groups;
+      }, {} as Record<string, { 
+        vendor: string; 
+        vendorId: number; 
+        currency: string; 
+        prs: PurchaseRequest[]; 
+        totalAmount: number 
+      }>);
+
+      // Store grouped PRs for PO creation
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('groupedPurchaseRequests', JSON.stringify(groupedPRs));
+          localStorage.setItem('selectedPurchaseRequests', JSON.stringify(selectedPRs)); // Keep for compatibility
+        }
+      } catch (error) {
+        console.error('Error storing grouped PRs:', error);
+      }
+      
+      // Navigate to PO creation page with grouped data
+      const groupCount = Object.keys(groupedPRs).length;
+      if (groupCount === 1) {
+        // Single PO - go directly to creation page
+        router.push('/procurement/purchase-orders/create?mode=fromPR&grouped=true');
+      } else {
+        // Multiple POs - go to bulk creation page or show summary
+        router.push('/procurement/purchase-orders/create?mode=fromPR&grouped=true&bulk=true');
+      }
+    }
+  };
 
   // Action buttons
   const actionButtons = (
@@ -690,7 +733,11 @@ export function PurchaseOrderList() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => router.push("/procurement/purchase-orders/create/from-pr")}>
+          <DropdownMenuItem onClick={() => router.push("/procurement/purchase-orders/create")}>
+            Create Blank PO
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowCreateFromPRDialog(true)}>
             Create from Purchase Requests
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -707,13 +754,39 @@ export function PurchaseOrderList() {
   );
 
   return (
-    <ListPageTemplate
-      title="Purchase Orders"
-      actionButtons={actionButtons}
-      filters={filters}
-      bulkActions={bulkActions}
-      content={content}
-    />
+    <>
+      <ListPageTemplate
+        title="Purchase Orders"
+        actionButtons={actionButtons}
+        filters={filters}
+        bulkActions={bulkActions}
+        content={content}
+      />
+      <Dialog 
+        open={showCreateFromPRDialog} 
+        onOpenChange={(open) => {
+          if (!open) setShowCreateFromPRDialog(false);
+        }}
+      >
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Create PO from Purchase Requests</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 flex-1 min-h-0 overflow-auto">
+            <CreatePOFromPR onSelectPRs={handleSelectPRs} />
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCreateFromPRDialog(false)}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
