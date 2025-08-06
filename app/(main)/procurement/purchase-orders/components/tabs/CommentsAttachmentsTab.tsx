@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { Paperclip, Send } from 'lucide-react';
 
@@ -14,6 +14,7 @@ interface Comment {
   timestamp: string;
   attachments?: string[];
 }
+
 
 interface CommentsAttachmentsTabProps {
   poData: any; // Replace 'any' with your PurchaseOrder type
@@ -45,6 +46,7 @@ const mockComments: Comment[] = [
   },
 ];
 
+
 export default function CommentsAttachmentsTab({ poData }: CommentsAttachmentsTabProps) {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(mockComments);
@@ -64,60 +66,68 @@ export default function CommentsAttachmentsTab({ poData }: CommentsAttachmentsTa
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Comments & Attachments</h2>
-      
-      <div className="space-y-4 mb-4">
-        {comments.map((comment) => (
-          <Card key={comment.id}>
-            <CardContent className="p-4">
-              <div className="flex items-start space-x-4">
-                <AvatarWithFallback
-                  src={comment.avatar}
-                  alt={comment.user}
-                  fallbackText={comment.user}
-                  size="md"
-                />
-                <div className="flex-1">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">{comment.user}</h3>
-                    <span className="text-sm text-gray-500">{comment.timestamp}</span>
-                  </div>
-                  <p className="mt-1">{comment.content}</p>
-                  {comment.attachments && comment.attachments.length > 0 && (
-                    <div className="mt-2">
-                      <h4 className="text-sm font-semibold">Attachments:</h4>
-                      <ul className="list-disc list-inside">
-                        {comment.attachments.map((attachment, index) => (
-                          <li key={index} className="text-sm text-blue-500 hover:underline">
-                            <a href="#">{attachment}</a>
-                          </li>
-                        ))}
-                      </ul>
+    <div className="h-full">
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full flex flex-col space-y-4">
+            <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+              {comments.map((comment) => (
+                <Card key={comment.id} className="shadow-sm">
+                  <CardContent className="p-3">
+                    <div className="flex items-start space-x-3">
+                      <AvatarWithFallback
+                        src={comment.avatar}
+                        alt={comment.user}
+                        fallbackText={comment.user}
+                        size="sm"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center mb-1">
+                          <h4 className="font-medium text-sm">{comment.user}</h4>
+                          <span className="text-xs text-gray-500">{comment.timestamp}</span>
+                        </div>
+                        <p className="text-sm text-gray-700">{comment.content}</p>
+                        {comment.attachments && comment.attachments.length > 0 && (
+                          <div className="mt-2">
+                            <h5 className="text-xs font-medium text-gray-600 mb-1">Attachments:</h5>
+                            <ul className="space-y-1">
+                              {comment.attachments.map((attachment, index) => (
+                                <li key={index} className="text-xs text-blue-600 hover:underline">
+                                  <a href="#" className="flex items-center gap-1">
+                                    <Paperclip className="h-3 w-3" />
+                                    {attachment}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            <div className="border-t pt-3">
+              <div className="flex items-start space-x-2">
+                <Textarea
+                  placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="flex-1 min-h-[60px] resize-none"
+                />
+                <div className="flex flex-col space-y-1">
+                  <Button variant="outline" size="icon" className="h-8 w-8">
+                    <Paperclip className="h-3 w-3" />
+                  </Button>
+                  <Button onClick={handleAddComment} size="sm" className="h-8">
+                    <Send className="h-3 w-3" />
+                  </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      
-      <div className="flex items-start space-x-2">
-        <Textarea
-          placeholder="Add a comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          className="flex-1"
-        />
-        <div className="space-y-2">
-          <Button variant="outline" size="icon">
-            <Paperclip className="h-4 w-4" />
-          </Button>
-          <Button onClick={handleAddComment}>
-            <Send className="h-4 w-4 mr-2" />
-            Send
-          </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

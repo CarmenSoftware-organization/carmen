@@ -131,11 +131,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                      currentUser.role === 'Purchaser';
   
   // Debug: Log role detection results
-  console.log('Role detection:', { 
+  console.log('ItemsTab Role detection:', { 
     currentRole: currentUser.role, 
     isRequestor, 
     isApprover, 
-    isPurchaser 
+    isPurchaser,
+    buttonVisible: isPurchaser || isApprover,
+    onPricelistSelectDefined: !!isPurchaser
   });
 
   // Unit conversion utility function
@@ -595,158 +597,24 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
 
   // Delivery point options
   const deliveryPointOptions = [
-    { value: "main-kitchen", label: "Main Kitchen" },
-    { value: "storage-room", label: "Storage Room" },
-    { value: "receiving-dock", label: "Receiving Dock" },
-    { value: "cold-storage", label: "Cold Storage" },
-    { value: "dry-storage", label: "Dry Storage" },
-    { value: "bar-storage", label: "Bar Storage" },
-    { value: "housekeeping", label: "Housekeeping" },
-    { value: "maintenance", label: "Maintenance" },
-    { value: "front-office", label: "Front Office" },
-    { value: "spa", label: "Spa" },
-    { value: "gym", label: "Gym" },
-    { value: "pool-area", label: "Pool Area" },
-    { value: "restaurant", label: "Restaurant" },
-    { value: "banquet", label: "Banquet Hall" },
-    { value: "laundry", label: "Laundry" },
-    { value: "other", label: "Other" }
+    { value: "Main Kitchen Loading Dock", label: "Main Kitchen Loading Dock" },
+    { value: "Cold Storage Room A", label: "Cold Storage Room A" },
+    { value: "Dry Storage Area", label: "Dry Storage Area" },
+    { value: "Mechanical Room Loading", label: "Mechanical Room Loading" },
+    { value: "Pool Equipment Room", label: "Pool Equipment Room" },
+    { value: "Housekeeping Storage Level 3", label: "Housekeeping Storage Level 3" },
+    { value: "Rooftop Bar Storage", label: "Rooftop Bar Storage" },
+    { value: "Rooftop Bar", label: "Rooftop Bar" },
+    { value: "Front Office Storage", label: "Front Office Storage" },
+    { value: "Generator Room", label: "Generator Room" },
+    { value: "Pastry Kitchen Loading Area", label: "Pastry Kitchen Loading Area" },
+    { value: "International Pantry Storage", label: "International Pantry Storage" },
+    { value: "Cold Storage Premium", label: "Cold Storage Premium" },
+    { value: "Training Kitchen Storage", label: "Training Kitchen Storage" },
+    { value: "Seasonal Storage Area", label: "Seasonal Storage Area" },
+    { value: "Other", label: "Other" }
   ];
 
-  // Render detailed pricing information row - compact single row layout
-  const renderDetailedPricingRow = (item: PurchaseRequestItem, isRequestor: boolean, isApprover: boolean, isPurchaser: boolean, isItemEditable: boolean) => (
-    <div className="py-2 w-full">
-      <div className="grid grid-cols-2 md:grid-cols-11 gap-3 items-center w-full">
-        {/* Vendor Field - Takes 2 columns */}
-        <div className="min-w-0 md:col-span-2">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Vendor</div>
-          <div className="text-xs font-medium text-gray-800 truncate">
-            {item.vendor || <span className="text-gray-400">-</span>}
-          </div>
-        </div>
-
-        {/* Currency Field - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">Currency</div>
-          <div className="text-xs font-medium text-gray-800">
-            {item.currency || "USD"}
-          </div>
-        </div>
-
-        {/* Price per Unit Field - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">Price/Unit</div>
-          <div className="text-xs font-medium text-gray-800 text-right">
-            {(item.price || 0).toFixed(2)} / {item.unit || 'unit'}
-          </div>
-        </div>
-
-        {/* Subtotal Before Discount Field - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">Subtotal</div>
-          <div className="text-xs font-medium text-gray-800 text-right">
-            {((item.price || 0) * (item.quantityApproved || 0)).toFixed(2)}
-          </div>
-        </div>
-
-        {/* Discount Field - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">Discount</div>
-          <div className="text-xs font-medium text-gray-800 text-right">
-            {(item.discountRate || 0).toFixed(2)}
-          </div>
-        </div>
-
-        {/* Net Amount Field - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-blue-600 uppercase mb-0.5 text-right">Net Amount</div>
-          <div className="text-xs font-semibold text-blue-700 text-right">
-            {(() => {
-              const subtotal = (item.price || 0) * (item.quantityApproved || 0);
-              const discountAmount = getItemAdjustments(item.id || '').discount 
-                ? (item.discountAmount || 0)
-                : subtotal * (item.discountRate || 0);
-              const netAmount = subtotal - discountAmount;
-              return netAmount.toFixed(2);
-            })()}
-          </div>
-        </div>
-
-        {/* Tax Field - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5 text-right">
-            Tax ({(item.taxRate || 0).toFixed(1)}%)
-          </div>
-          <div className="text-xs font-medium text-gray-800 text-right">
-            {(() => {
-              const subtotal = (item.price || 0) * (item.quantityApproved || 0);
-              const discountAmount = getItemAdjustments(item.id || '').discount 
-                ? (item.discountAmount || 0)
-                : subtotal * (item.discountRate || 0);
-              const netAmount = subtotal - discountAmount;
-              const taxAmount = getItemAdjustments(item.id || '').tax 
-                ? (item.taxAmount || 0)
-                : netAmount * ((item.taxRate || 0) / 100);
-              return taxAmount.toFixed(2);
-            })()}
-          </div>
-        </div>
-
-        {/* Total Field - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-green-600 uppercase mb-0.5 text-right">Total</div>
-          <div className="text-sm font-bold text-green-700 text-right">
-            {(() => {
-              const subtotal = (item.price || 0) * (item.quantityApproved || 0);
-              const discountAmount = getItemAdjustments(item.id || '').discount 
-                ? (item.discountAmount || 0)
-                : subtotal * (item.discountRate || 0);
-              const netAmount = subtotal - discountAmount;
-              const taxAmount = getItemAdjustments(item.id || '').tax 
-                ? (item.taxAmount || 0)
-                : netAmount * ((item.taxRate || 0) / 100);
-              const totalAmount = netAmount + taxAmount;
-              return totalAmount.toFixed(2);
-            })()}
-          </div>
-        </div>
-
-        {/* Vendor Compare Button - Takes 1 column */}
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-gray-500 uppercase mb-0.5">&nbsp;</div>
-          {!isRequestor && (
-            <Dialog open={isVendorComparisonViewOpen} onOpenChange={setIsVendorComparisonViewOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="h-6 text-xs px-2 border-blue-300 text-blue-600 hover:bg-blue-50"
-                  onClick={() => setSelectedItemForComparison(item)}
-                >
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  Compare
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Pricelist Information</DialogTitle>
-                </DialogHeader>
-                <VendorComparisonView 
-                  currentPricelistNumber={selectedItemForComparison?.pricelistNumber}
-                  itemName={selectedItemForComparison?.name}
-                  itemDescription={selectedItemForComparison?.description}
-                  itemUnit={selectedItemForComparison?.unit}
-                  itemStatus={selectedItemForComparison?.status}
-                  requestedQuantity={selectedItemForComparison?.quantityRequested}
-                  approvedQuantity={selectedItemForComparison?.quantityApproved}
-                />
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
-      </div>
-    </div>
-  );
 
 
   // Render expanded item information
@@ -756,16 +624,266 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
       {isExpanded && (
           <>
             
+            {/* Pricing Panel - Visible for approvers and purchasers */}
+            {canSeePrices && (isApprover || isPurchaser) && (
+              <div className="bg-white rounded-lg border border-gray-200">
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 bg-gray-50/50">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="h-3 w-3 text-blue-600" />
+                    <h3 className="text-xs font-semibold text-gray-900">Vendor & Pricing</h3>
+                  </div>
+                  {(isPurchaser || isApprover) && (
+                    <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedItemForComparison(item)}
+                          className="h-6 text-xs px-2"
+                        >
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          Compare
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Vendor Comparison</DialogTitle>
+                        </DialogHeader>
+                        <VendorComparison 
+                          currentPricelistNumber={selectedItemForComparison?.pricelistNumber} 
+                          selectedVendor={isPurchaser ? undefined : selectedItemForComparison?.vendor}
+                          itemName={selectedItemForComparison?.name}
+                          itemDescription={selectedItemForComparison?.description}
+                          itemUnit={selectedItemForComparison?.unit}
+                          itemStatus={selectedItemForComparison?.status}
+                          requestedQuantity={selectedItemForComparison?.quantityRequested}
+                          approvedQuantity={selectedItemForComparison?.quantityApproved}
+                          userRole={currentUser.role}
+                          onPricelistSelect={isPurchaser ? (vendor, pricelistNumber, unitPrice) => {
+                            if (selectedItemForComparison?.id) {
+                              handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
+                              handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
+                              handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
+                            }
+                            setIsVendorComparisonOpen(false);
+                          } : undefined}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="p-4 space-y-3">
+                  {/* Vendor Information */}
+                  <div className="grid grid-cols-5 gap-3 text-sm">
+                    <div>
+                      <div className="text-gray-500 mb-1 text-xs">Vendor</div>
+                      <div className="font-medium text-gray-900">{item.vendor || "Premium Food Supplier Inc."}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 mb-1 text-xs">Pricelist</div>
+                      <div className="font-mono text-gray-700 bg-gray-50 px-1 py-0.5 rounded text-center">
+                        {item.pricelistNumber || "PL - 00121 KTH"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 mb-1 text-xs text-right">Currency</div>
+                      <div className="space-y-1">
+                        <div className="font-medium text-gray-900 bg-blue-50 px-1 py-0.5 rounded text-right">
+                          {item.currency || "BHT"}
+                        </div>
+                        <div className="text-xs text-blue-600 text-right">
+                          {item.baseCurrency || 'USD'}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 mb-1 text-xs text-right">Unit Price</div>
+                      <div className="space-y-1">
+                        <div className="font-semibold text-gray-900 text-right">
+                          {(item.price || 3200).toFixed(2)} / {item.unit || "Pcs"}
+                        </div>
+                        <div className="text-xs text-blue-600 text-right">
+                          {((item.price || 3200) * (item.currencyRate || 1)).toFixed(2)} / {item.unit || "Pcs"}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 mb-1 text-xs text-right">Subtotal</div>
+                      <div className="space-y-1">
+                        <div className="font-semibold text-gray-900 text-right">
+                          {((item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2)).toFixed(2)}
+                        </div>
+                        <div className="text-xs text-blue-600 text-right">
+                          {(((item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2)) * (item.currencyRate || 1)).toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Financial Summary */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {/* Discount */}
+                    <div className="bg-red-50 border border-red-100 rounded p-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-red-700">Discount</span>
+                        <span className="text-sm text-red-600">{Math.round((item.discountRate || 0.05) * 100)}%</span>
+                      </div>
+                      <div className="flex items-start gap-1">
+                        <Checkbox 
+                          id={`discount-override-${item.id}`}
+                          checked={getItemAdjustments(item.id || '').discount}
+                          onCheckedChange={(checked) => {
+                            if (item.id) {
+                              updateItemAdjustments(item.id, 'discount', Boolean(checked));
+                            }
+                          }}
+                          className="h-3 w-3 mt-1"
+                        />
+                        <div className="space-y-1 flex-1">
+                          <div className="text-base font-semibold text-red-700 text-right">
+                            -{(() => {
+                              const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                              const discountAmount = getItemAdjustments(item.id || '').discount 
+                                ? (item.discountAmount || 0)
+                                : subtotal * (item.discountRate || 0.05);
+                              return discountAmount.toFixed(2);
+                            })()}
+                          </div>
+                          <div className="text-xs text-blue-600 text-right">
+                            {item.baseCurrency || 'USD'} -{(() => {
+                              const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                              const discountAmount = getItemAdjustments(item.id || '').discount 
+                                ? (item.discountAmount || 0)
+                                : subtotal * (item.discountRate || 0.05);
+                              return (discountAmount * (item.currencyRate || 1)).toFixed(2);
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Net Amount */}
+                    <div className="bg-blue-50 border border-blue-100 rounded p-2">
+                      <div className="text-sm font-medium text-blue-700 mb-1 text-right">Net Amount</div>
+                      <div className="space-y-1">
+                        <div className="text-base font-semibold text-blue-700 text-right">
+                          {(() => {
+                            const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * ((item.discountRate || 5) / 100);
+                            return (subtotal - discountAmount).toFixed(2);
+                          })()}
+                        </div>
+                        <div className="text-xs text-blue-600 text-right">
+                          {item.baseCurrency || 'USD'} {(() => {
+                            const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * ((item.discountRate || 5) / 100);
+                            return ((subtotal - discountAmount) * (item.currencyRate || 1)).toFixed(2);
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tax */}
+                    <div className="bg-orange-50 border border-orange-100 rounded p-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-orange-700">Tax ({item.taxType || "VAT"})</span>
+                        <span className="text-sm text-orange-600">{Math.round((item.taxRate || 0.08) * 100)}%</span>
+                      </div>
+                      <div className="flex items-start gap-1">
+                        <Checkbox 
+                          id={`tax-override-${item.id}`}
+                          checked={getItemAdjustments(item.id || '').tax}
+                          onCheckedChange={(checked) => {
+                            if (item.id) {
+                              updateItemAdjustments(item.id, 'tax', Boolean(checked));
+                            }
+                          }}
+                          className="h-3 w-3 mt-1"
+                        />
+                        <div className="space-y-1 flex-1">
+                          <div className="text-base font-semibold text-orange-700 text-right">
+                            +{(() => {
+                              const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                              const discountAmount = getItemAdjustments(item.id || '').discount 
+                                ? (item.discountAmount || 0)
+                                : subtotal * (item.discountRate || 0.05);
+                              const netAmount = subtotal - discountAmount;
+                              const taxAmount = getItemAdjustments(item.id || '').tax 
+                                ? (item.taxAmount || 0)
+                                : netAmount * (item.taxRate || 0.08);
+                              return taxAmount.toFixed(2);
+                            })()}
+                          </div>
+                          <div className="text-xs text-blue-600 text-right">
+                            {item.baseCurrency || 'USD'} +{(() => {
+                              const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                              const discountAmount = getItemAdjustments(item.id || '').discount 
+                                ? (item.discountAmount || 0)
+                                : subtotal * (item.discountRate || 0.05);
+                              const netAmount = subtotal - discountAmount;
+                              const taxAmount = getItemAdjustments(item.id || '').tax 
+                                ? (item.taxAmount || 0)
+                                : netAmount * (item.taxRate || 0.08);
+                              return (taxAmount * (item.currencyRate || 1)).toFixed(2);
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Total */}
+                    <div className="bg-green-50 border border-green-100 rounded p-2">
+                      <div className="text-sm font-medium text-green-700 mb-1 text-right">Final Total</div>
+                      <div className="space-y-1">
+                        <div className="text-base font-bold text-green-700 text-right">
+                          {(() => {
+                            const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * ((item.discountRate || 5) / 100);
+                            const netAmount = subtotal - discountAmount;
+                            const taxAmount = getItemAdjustments(item.id || '').tax 
+                              ? (item.taxAmount || 0)
+                              : netAmount * ((item.taxRate || 7) / 100);
+                            return (netAmount + taxAmount).toFixed(2);
+                          })()}
+                        </div>
+                        <div className="text-xs text-blue-600 text-right">
+                          {item.baseCurrency || 'USD'} {(() => {
+                            const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
+                            const discountAmount = getItemAdjustments(item.id || '').discount 
+                              ? (item.discountAmount || 0)
+                              : subtotal * ((item.discountRate || 5) / 100);
+                            const netAmount = subtotal - discountAmount;
+                            const taxAmount = getItemAdjustments(item.id || '').tax 
+                              ? (item.taxAmount || 0)
+                              : netAmount * ((item.taxRate || 7) / 100);
+                            return ((netAmount + taxAmount) * (item.currencyRate || 1)).toFixed(2);
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Business Dimensions (Allocation Fields) */}
             <div className="bg-white rounded-lg border p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Building2 className="h-4 w-4 text-purple-600" />
-                <h4 className="font-semibold text-sm text-gray-900">Business Dimensions</h4>
+                <Building2 className="h-3 w-3 text-purple-600" />
+                <h3 className="text-xs font-semibold text-gray-900">Business Dimensions</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-700">Job Number</label>
+                  <label className="text-sm font-medium text-gray-700">Job Number</label>
                   {formMode === "edit" ? (
                     <Select 
                       value={item.jobCode || ""} 
@@ -781,12 +899,12 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="text-sm font-medium">{item.jobCode || "Not assigned"}</div>
+                    <div className="text-base font-medium">{item.jobCode || "Not assigned"}</div>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-700">Event</label>
+                  <label className="text-sm font-medium text-gray-700">Event</label>
                   {formMode === "edit" ? (
                     <Select 
                       value={item.event || ""} 
@@ -802,12 +920,12 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="text-sm font-medium">{item.event || "Not assigned"}</div>
+                    <div className="text-base font-medium">{item.event || "Not assigned"}</div>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-700">Project</label>
+                  <label className="text-sm font-medium text-gray-700">Project</label>
                   {formMode === "edit" ? (
                     <Select 
                       value={item.project || ""} 
@@ -823,12 +941,12 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="text-sm font-medium">{item.project || "Not assigned"}</div>
+                    <div className="text-base font-medium">{item.project || "Not assigned"}</div>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-700">Market Segment</label>
+                  <label className="text-sm font-medium text-gray-700">Market Segment</label>
                   {formMode === "edit" ? (
                     <Select 
                       value={item.marketSegment || ""} 
@@ -845,377 +963,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="text-sm font-medium">{item.marketSegment || "Not assigned"}</div>
+                    <div className="text-base font-medium">{item.marketSegment || "Not assigned"}</div>
                   )}
                 </div>
               </div>
             </div>
-
-            {/* Consolidated Pricing Section - Visible for approvers and purchasers */}
-            {canSeePrices && (isApprover || isPurchaser) && (
-              <div className="bg-white rounded-lg border p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-green-600" />
-                    <h4 className="font-semibold text-sm text-gray-900">Pricing</h4>
-                  </div>
-                  {isItemEditable && isPurchaser && (
-                    <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setSelectedItemForComparison(item)}
-                        >
-                          <TrendingUp className="h-4 w-4 mr-2" />
-                          Vendor Comparison
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>Vendor Comparison</DialogTitle>
-                        </DialogHeader>
-                        <VendorComparison 
-                          currentPricelistNumber={selectedItemForComparison?.pricelistNumber} 
-                          selectedVendor={selectedItemForComparison?.vendor}
-                          itemName={selectedItemForComparison?.name}
-                          itemDescription={selectedItemForComparison?.description}
-                          itemUnit={selectedItemForComparison?.unit}
-                          itemStatus={selectedItemForComparison?.status}
-                          requestedQuantity={selectedItemForComparison?.quantityRequested}
-                          approvedQuantity={selectedItemForComparison?.quantityApproved}
-                          onPricelistSelect={(vendor, pricelistNumber, unitPrice) => {
-                            if (selectedItemForComparison?.id) {
-                              handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
-                              handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
-                              handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
-                            }
-                            setIsVendorComparisonOpen(false);
-                          }}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
-
-                {/* Top Row: Vendor, Pricelist, Order Currency, Exchange Rate, Price per Unit */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-700">Vendor</label>
-                    {isItemEditable && isPurchaser ? (
-                      <Input
-                        value={item.vendor || ""}
-                        onChange={(e) => item.id && handleItemChange(item.id, 'vendor', e.target.value)}
-                        placeholder="Enter vendor name"
-                        className="h-8"
-                      />
-                    ) : (
-                      <div className="text-sm font-medium">{item.vendor || "Not assigned"}</div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-700">Pricelist Number</label>
-                    {isItemEditable && isPurchaser ? (
-                      <Input
-                        value={item.pricelistNumber || ""}
-                        onChange={(e) => item.id && handleItemChange(item.id, 'pricelistNumber', e.target.value)}
-                        placeholder="Enter pricelist number"
-                        className="h-8"
-                      />
-                    ) : (
-                      <div className="text-sm font-medium">{item.pricelistNumber || "Not specified"}</div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-700">Order Currency</label>
-                    {isItemEditable && isPurchaser ? (
-                      <Select 
-                        value={item.currency || "USD"} 
-                        onValueChange={(value) => item.id && handleItemChange(item.id, 'currency', value)}
-                      >
-                        <SelectTrigger className="h-8">
-                          <SelectValue placeholder="Select currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="USD">USD</SelectItem>
-                          <SelectItem value="EUR">EUR</SelectItem>
-                          <SelectItem value="THB">THB</SelectItem>
-                          <SelectItem value="GBP">GBP</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div className="text-sm font-medium">{item.currency || "USD"}</div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-700">Price per Unit</label>
-                    {isItemEditable && isPurchaser ? (
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={item.price || ""}
-                        onChange={(e) => item.id && handleItemChange(item.id, 'price', parseFloat(e.target.value))}
-                        placeholder="Enter price per unit"
-                        className="h-8 text-right"
-                      />
-                    ) : (
-                      <div className="text-sm font-medium text-right">{(item.price || 0).toFixed(2)}</div>
-                    )}
-                    <div className="text-xs text-muted-foreground text-right">per {item.unit || 'unit'}</div>
-                  </div>
-                </div>
-
-
-                {/* Financial Summary - 4 Panel Row */}
-                {(isApprover || isPurchaser) && (
-                  <div className="grid grid-cols-4 gap-4">
-                    {/* Discount Panel */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-700">Discount</label>
-                      <div className={`p-3 rounded border h-20 flex flex-col justify-center ${
-                        isItemEditable && isPurchaser && getItemAdjustments(item.id || '').discount 
-                          ? 'bg-white border-green-400' 
-                          : 'bg-green-50 border-green-200'
-                      }`}>
-                        {isItemEditable && isPurchaser ? (
-                          <div className="space-y-1">
-                            <div className="grid grid-cols-2 gap-1">
-                              <div className="h-6 px-2 rounded border bg-green-50 border-green-200 flex items-center text-xs text-gray-700">
-                                Rate
-                              </div>
-                              {getItemAdjustments(item.id || '').discount ? (
-                                <div className="h-6 px-2 rounded border bg-green-50 border-green-200 flex items-center justify-center">
-                                  <span className="text-xs text-green-700 font-medium">
-                                    {(item.discountRate || 0).toFixed(1)}%
-                                  </span>
-                                </div>
-                              ) : (
-                                <Input
-                                  type="number"
-                                  value={item.discountRate || 0}
-                                  onChange={(e) => {
-                                    const numericValue = parseFloat(e.target.value) || 0;
-                                    item.id && handleItemChange(item.id, 'discountRate', numericValue);
-                                  }}
-                                  placeholder="0.0"
-                                  className="h-6 text-xs text-right bg-white border-gray-300"
-                                  min="0"
-                                  max="999"
-                                />
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Checkbox 
-                                id={`discount-override-${item.id}`}
-                                checked={getItemAdjustments(item.id || '').discount}
-                                onCheckedChange={(checked) => {
-                                  if (item.id) {
-                                    updateItemAdjustments(item.id, 'discount', Boolean(checked));
-                                  }
-                                }}
-                                className="h-3 w-3"
-                              />
-                              <label htmlFor={`discount-override-${item.id}`} className="text-xs text-gray-600 cursor-pointer">
-                                Override
-                              </label>
-                              {getItemAdjustments(item.id || '').discount ? (
-                                <Input
-                                  type="number"
-                                  value={(item.discountAmount || 0)}
-                                  onChange={(e) => {
-                                    const numericValue = parseInt(e.target.value) || 0;
-                                    item.id && handleItemChange(item.id, 'discountAmount', numericValue);
-                                  }}
-                                  placeholder="0"
-                                  className="h-6 text-xs text-right flex-1 bg-white border-gray-300"
-                                  min="0"
-                                />
-                              ) : (
-                                <div className="flex-1 text-right h-6 px-2 rounded border bg-green-50 border-green-200 flex items-center justify-end">
-                                  <span className="text-xs text-green-700 font-medium">
-                                    {(() => {
-                                      const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                                      const discountAmount = subtotal * ((item.discountRate || 0) / 100);
-                                      return discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                    })()}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="text-lg font-bold text-green-700 text-center">
-                              {item.currency} {(() => {
-                                const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                                const discountAmount = getItemAdjustments(item.id || '').discount 
-                                  ? (item.discountAmount || 0)
-                                  : subtotal * ((item.discountRate || 0) / 100);
-                                return discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                              })()}
-                            </div>
-                            <div className="text-xs text-green-600 text-center">
-                              Rate {(item.discountRate || 0).toFixed(1)}%
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Tax Panel */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-700">Tax</label>
-                      <div className={`p-3 rounded border h-20 flex flex-col justify-center ${
-                        isItemEditable && isPurchaser && getItemAdjustments(item.id || '').tax 
-                          ? 'bg-white border-orange-400' 
-                          : 'bg-yellow-50 border-yellow-200'
-                      }`}>
-                        {isItemEditable && isPurchaser ? (
-                          <div className="space-y-1">
-                            <div className="grid grid-cols-2 gap-1">
-                              <Select 
-                                value={item.taxType || "VAT"} 
-                                onValueChange={(value) => item.id && handleItemChange(item.id, 'taxType', value)}
-                              >
-                                <SelectTrigger className="h-6 text-xs">
-                                  <SelectValue placeholder="Type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="VAT">VAT</SelectItem>
-                                  <SelectItem value="GST">GST</SelectItem>
-                                  <SelectItem value="SST">SST</SelectItem>
-                                  <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              {getItemAdjustments(item.id || '').tax ? (
-                                <div className="h-6 px-2 rounded border bg-orange-50 border-orange-200 flex items-center justify-center">
-                                  <span className="text-xs text-orange-700 font-medium">
-                                    {(item.taxRate || 7).toFixed(1)}%
-                                  </span>
-                                </div>
-                              ) : (
-                                <Input
-                                  type="number"
-                                  value={item.taxRate || 7}
-                                  onChange={(e) => {
-                                    const numericValue = parseFloat(e.target.value) || 0;
-                                    item.id && handleItemChange(item.id, 'taxRate', numericValue);
-                                  }}
-                                  placeholder="0.0"
-                                  className="h-6 text-xs text-right bg-white border-gray-300"
-                                  min="0"
-                                  max="999"
-                                />
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Checkbox 
-                                id={`tax-override-${item.id}`}
-                                checked={getItemAdjustments(item.id || '').tax}
-                                onCheckedChange={(checked) => {
-                                  if (item.id) {
-                                    updateItemAdjustments(item.id, 'tax', Boolean(checked));
-                                  }
-                                }}
-                                className="h-3 w-3"
-                              />
-                              {getItemAdjustments(item.id || '').tax ? (
-                                <Input
-                                  type="number"
-                                  value={(item.taxAmount || 0)}
-                                  onChange={(e) => {
-                                    const numericValue = parseInt(e.target.value) || 0;
-                                    item.id && handleItemChange(item.id, 'taxAmount', numericValue);
-                                  }}
-                                  placeholder="0"
-                                  className="h-6 text-xs text-right flex-1 bg-white border-gray-300"
-                                  min="0"
-                                />
-                              ) : (
-                                <div className="flex-1 text-right">
-                                  <span className="text-sm font-medium text-orange-700">
-                                    {(() => {
-                                      const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                                      const discountAmount = getItemAdjustments(item.id || '').discount 
-                                        ? (item.discountAmount || 0)
-                                        : subtotal * (item.discountRate || 0);
-                                      const netAmount = subtotal - discountAmount;
-                                      const taxAmount = netAmount * ((item.taxRate || 0) / 100);
-                                      return taxAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                    })()}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="text-lg font-bold text-orange-700 text-center">
-                              {item.currency} {(() => {
-                                const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                                const discountAmount = getItemAdjustments(item.id || '').discount 
-                                  ? (item.discountAmount || 0)
-                                  : subtotal * (item.discountRate || 0);
-                                const netAmount = subtotal - discountAmount;
-                                const taxAmount = getItemAdjustments(item.id || '').tax 
-                                  ? (item.taxAmount || 0)
-                                  : netAmount * ((item.taxRate || 0) / 100);
-                                return taxAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                              })()}
-                            </div>
-                            <div className="text-xs text-orange-600 text-center">
-                              {item.taxType || "VAT"} {(item.taxRate || 7).toFixed(1)}%
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Net Total Panel */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-700">Net Total</label>
-                      <div className="bg-blue-50 p-3 rounded border border-blue-200 h-20 flex flex-col justify-center">
-                        <div className="text-lg font-bold text-blue-700 text-center">
-                          {item.currency} {(() => {
-                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                            const discountAmount = getItemAdjustments(item.id || '').discount 
-                              ? (item.discountAmount || 0)
-                              : subtotal * (item.discountRate || 0);
-                            const netAmount = subtotal - discountAmount;
-                            return netAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Total Amount Panel */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-700">Total Amount</label>
-                      <div className="bg-green-50 p-3 rounded border border-green-200 h-20 flex flex-col justify-center">
-                        <div className="text-xl font-bold text-green-700 text-center">
-                          {item.currency} {(() => {
-                            const subtotal = (item.price || 0) * (item.quantityApproved || item.quantityRequested || 0);
-                            const discountAmount = getItemAdjustments(item.id || '').discount 
-                              ? (item.discountAmount || 0)
-                              : subtotal * (item.discountRate || 0);
-                            const netAmount = subtotal - discountAmount;
-                            const taxAmount = getItemAdjustments(item.id || '').tax 
-                              ? (item.taxAmount || 0)
-                              : netAmount * ((item.taxRate || 0) / 100);
-                            const totalAmount = netAmount + taxAmount;
-                            return totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            )}
 
           </>
         )}
@@ -1250,7 +1002,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         const canSeePrices = isRequestor ? 
           (user?.context.showPrices !== false) :
           true; // Approvers and Purchasers always see prices
-        const canSeeVendorPricingPanel = (itemIsApprover || itemIsPurchaser); // Vendor pricing panel: visible for approvers and purchasers
         const isItemEditable = formMode === "edit";
         
         return (
@@ -1291,19 +1042,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               </div>
 
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" onClick={() => openItemForm(item, "view")} className="h-8 px-3">
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => openItemForm(item, "edit")} className="h-8 px-3">
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                </div>
+              <div className="flex items-center justify-end">
                 {!itemIsRequestor && (
-                  <div className="text-xs text-muted-foreground">
+                  <div className="flex-1 text-xs text-muted-foreground">
                     Vendor: {item.vendor || "Not assigned"}
                   </div>
                 )}
@@ -1331,8 +1072,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               <TableHead className="w-[60px] text-center font-semibold">#</TableHead>
               <TableHead className="font-semibold text-left min-w-[140px]">Location & Status</TableHead>
               <TableHead className="font-semibold text-left min-w-[200px]">Product Details</TableHead>
-              <TableHead className="font-semibold text-center min-w-[120px]">Requested</TableHead>
-              <TableHead className="font-semibold text-center min-w-[120px]">Approved</TableHead>
+              <TableHead className="font-semibold text-right min-w-[120px]">Requested</TableHead>
+              <TableHead className="font-semibold text-right min-w-[120px]">Approved</TableHead>
               {/* Pricing column: Always visible for approvers/purchasers, user setting for requestors */}
               {(!isRequestor || (isRequestor && (user?.context.showPrices !== false))) && (
                 <TableHead className="font-semibold text-right min-w-[120px]">Pricing</TableHead>
@@ -1363,25 +1104,24 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               const canSeePrices = isRequestor ? 
           (user?.context.showPrices !== false) :
           true; // Approvers and Purchasers always see prices
-        const canSeeVendorPricingPanel = (itemIsApprover || itemIsPurchaser); // Vendor pricing panel: visible for approvers and purchasers
               const isRowEditing = editingRows.has(item.id || "");
               const isItemEditable = formMode === "edit";
               
               return (
                 <React.Fragment key={item.id}>
                   <TableRow className="hover:bg-muted/30 group transition-colors border-b">
-                    <TableCell className="text-center py-3" onClick={(e) => e.stopPropagation()}>
+                    <TableCell className="text-center py-3 align-top" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.id || "")}
                         onCheckedChange={() => handleSelectItem(item.id || "")}
                       />
                     </TableCell>
-                    <TableCell className="py-3 text-center">
+                    <TableCell className="py-3 text-center align-top">
                       <div className="text-sm font-medium text-gray-600">
                         {index + 1}
                       </div>
                     </TableCell>
-                    <TableCell className="py-3">
+                    <TableCell className="py-3 align-top">
                       {isItemEditable && itemIsRequestor ? (
                         <Select value={item.location || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'location', value)}>
                           <SelectTrigger className="w-full"><SelectValue placeholder="Select location" /></SelectTrigger>
@@ -1416,7 +1156,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="py-3">
+                    <TableCell className="py-3 align-top">
                       {isItemEditable && itemIsRequestor ? (
                         <Select value={item.name || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'name', value)}>
                           <SelectTrigger className="w-full"><SelectValue placeholder="Select product" /></SelectTrigger>
@@ -1425,20 +1165,17 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="flex items-start gap-3">
-                          <Package className="h-4 w-4 text-primary/70 flex-shrink-0 mt-0.5" />
-                          <div className="min-w-0 flex-1">
-                            <div className="font-semibold text-sm leading-tight">{item.name}</div>
-                            <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</div>
-                          </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-sm leading-tight">{item.name}</div>
+                          <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</div>
                         </div>
                       )}
                     </TableCell>
                     {/* Requested Quantity Column */}
-                    <TableCell className="py-3 text-center">
+                    <TableCell className="py-3 text-right align-top">
                       <div className="space-y-1">
                         {isItemEditable && itemIsRequestor ? (
-                          <div className="flex items-center gap-1 justify-center">
+                          <div className="flex items-center gap-1 justify-end">
                             <Input type="number" step="0.00001" value={item.quantityRequested?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityRequested', parseFloat(e.target.value))} className="h-8 w-20 text-right" />
                             <Select value={item.unit || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'unit', value)}>
                               <SelectTrigger className="h-8 w-20"><SelectValue placeholder="Unit" /></SelectTrigger>
@@ -1448,9 +1185,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             </Select>
                           </div>
                         ) : (
-                          <div className="text-center">
+                          <div className="text-right">
                             <div className="text-sm font-medium text-right">{item.quantityRequested?.toFixed(5) || '0.00000'} {item.unit}</div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground text-right">
                               {convertToInventoryUnit(item.quantityRequested, item.unit, 'pieces', 12)}
                             </div>
                           </div>
@@ -1459,24 +1196,24 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     </TableCell>
                     
                     {/* Approved Quantity Column */}
-                    <TableCell className="py-3 text-center">
+                    <TableCell className="py-3 text-right align-top">
                       <div className="space-y-1">
                         {isItemEditable && (itemIsApprover || itemIsPurchaser) ? (
-                          <div className="flex items-center gap-1 justify-center">
+                          <div className="flex items-center gap-1 justify-end">
                             <Input type="number" step="0.00001" value={item.quantityApproved?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityApproved', parseFloat(e.target.value))} className="h-8 w-24 text-right" placeholder="0.00000" />
                             <span className="text-xs text-gray-600">{item.unit}</span>
                           </div>
                         ) : (
-                          <div className="text-center">
+                          <div className="text-right">
                             {item.quantityApproved ? (
                               <>
                                 <div className="text-sm font-medium text-green-700 text-right">{item.quantityApproved?.toFixed(5) || '0.00000'} {item.unit}</div>
-                                <div className="text-xs text-muted-foreground">
+                                <div className="text-xs text-muted-foreground text-right">
                                   {convertToInventoryUnit(item.quantityApproved, item.unit, 'pieces', 12)}
                                 </div>
                               </>
                             ) : (
-                              <div className="text-xs text-gray-400 italic">Pending</div>
+                              <div className="text-xs text-gray-400 italic text-right">Pending</div>
                             )}
                           </div>
                         )}
@@ -1484,7 +1221,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         {itemIsPurchaser && (
                           <div className="pt-1 border-t border-gray-200 mt-2">
                             {isItemEditable ? (
-                            <div className="flex items-center gap-1 justify-center">
+                            <div className="flex items-center gap-1 justify-end">
                               <span className="text-xs text-gray-500">FOC:</span>
                               <Input 
                                 type="number" 
@@ -1509,7 +1246,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       </div>
                     </TableCell>
                     {canSeePrices && (
-                      <TableCell className="py-3 text-right">
+                      <TableCell className="py-3 text-right align-top">
                         <div className="space-y-1">
                           <div className="font-semibold text-base text-right">{item.currency} {(item.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                           <div className="text-xs text-blue-600 mt-1 text-right">
@@ -1518,7 +1255,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                         </div>
                       </TableCell>
                     )}
-                    <TableCell onClick={(e) => e.stopPropagation()} className="py-3 text-center">
+                    <TableCell onClick={(e) => e.stopPropagation()} className="py-3 text-center align-top">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted/60">
@@ -1583,22 +1320,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                     Return Item
                                   </DropdownMenuItem>
                                 )}
-                                {availableActions.includes("comment") && workflowState.canComment && (
-                                  <DropdownMenuItem 
-                                    onClick={() => {
-                                      // Focus on comment field for this item
-                                      const commentField = document.querySelector(`#comment-${item.id}`) as HTMLTextAreaElement;
-                                      if (commentField) {
-                                        commentField.focus();
-                                        commentField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                      }
-                                    }}
-                                    className="text-blue-600 focus:text-blue-600"
-                                  >
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Add Comment
-                                  </DropdownMenuItem>
-                                )}
                                 {availableActions.includes("history") && (
                                   <DropdownMenuItem 
                                     onClick={() => {
@@ -1635,7 +1356,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           {/* Comment Section */}
                           {isItemEditable ? (
                             <div className="space-y-2">
-                              <label className="text-xs font-medium text-gray-700">Comment</label>
+                              <label className="text-sm font-medium text-gray-700">Comment</label>
                               <Textarea
                                 value={item.comment || ""}
                                 onChange={(e) => item.id && handleItemChange(item.id, 'comment', e.target.value)}
@@ -1645,8 +1366,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             </div>
                           ) : (
                             item.comment ? (
-                              <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
-                                <p className="text-sm text-blue-800">{item.comment}</p>
+                              <div className="bg-gray-50 p-3 rounded-lg">
+                                <p className="text-sm text-gray-800">{item.comment}</p>
                               </div>
                             ) : (
                               <div className="text-sm text-gray-400 italic">No comment</div>
@@ -1654,30 +1375,30 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           )}
                           
                           {/* Inventory & Delivery Information - Single Row, 6 Column Layout */}
-                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 items-start">
                             <div 
-                              className="bg-blue-50 border border-blue-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-blue-100 transition-colors"
+                              className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-gray-100 transition-colors self-start"
                               onClick={() => handleOnHandClick(item)}
                             >
-                              <div className="text-xs font-bold text-blue-700">{item.inventoryInfo?.onHand || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-[10px] text-blue-600 font-medium">On Hand</div>
+                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.onHand || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-xs text-gray-600 font-medium">On Hand</div>
                             </div>
                             <div 
-                              className="bg-orange-50 border border-orange-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-orange-100 transition-colors"
+                              className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-gray-100 transition-colors self-start"
                               onClick={() => handleOnOrderClick(item)}
                             >
-                              <div className="text-xs font-bold text-orange-700">{item.inventoryInfo?.onOrdered || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-[10px] text-orange-600 font-medium">On Order</div>
+                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.onOrdered || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-xs text-gray-600 font-medium">On Order</div>
                             </div>
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1.5 text-center">
-                              <div className="text-xs font-bold text-yellow-700">{item.inventoryInfo?.reorderLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-[10px] text-yellow-600 font-medium">Reorder Level</div>
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
+                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.reorderLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-xs text-gray-600 font-medium">Reorder Level</div>
                             </div>
-                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-1.5 text-center">
-                              <div className="text-xs font-bold text-purple-700">{item.inventoryInfo?.restockLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-[10px] text-purple-600 font-medium">Restock Level</div>
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
+                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.restockLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                              <div className="text-xs text-gray-600 font-medium">Restock Level</div>
                             </div>
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-1.5 text-center">
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
                               {isItemEditable && itemIsRequestor ? (
                                 <DatePickerField
                                   value={item.deliveryDate}
@@ -1685,17 +1406,35 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                   placeholder="Select date"
                                 />
                               ) : (
-                                <div className="text-xs font-bold text-green-700">
+                                <div className="text-xs font-bold text-gray-700">
                                   {item.deliveryDate ? format(item.deliveryDate, "dd/MM/yyyy") : "Not specified"}
                                 </div>
                               )}
-                              <div className="text-[10px] text-green-600 font-medium">Date Required</div>
+                              <div className="text-xs text-gray-600 font-medium">Date Required</div>
                             </div>
-                            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-1.5 text-center">
-                              <div className="text-xs font-bold text-indigo-700">
-                                {item.deliveryPoint || "Not specified"}
-                              </div>
-                              <div className="text-[10px] text-indigo-600 font-medium">Delivery Point</div>
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
+                              {isItemEditable && (itemIsRequestor || itemIsPurchaser) ? (
+                                <Select 
+                                  value={item.deliveryPoint || ""} 
+                                  onValueChange={(value) => item.id && handleItemChange(item.id, 'deliveryPoint', value)}
+                                >
+                                  <SelectTrigger className="h-6 text-xs border-0 bg-transparent shadow-none focus:ring-1 focus:ring-indigo-300">
+                                    <SelectValue placeholder="Select delivery point" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {deliveryPointOptions.map((option) => (
+                                      <SelectItem key={option.value} value={option.value} className="text-xs">
+                                        {option.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <div className="text-xs font-bold text-gray-700">
+                                  {deliveryPointOptions.find(option => option.value === item.deliveryPoint)?.label || item.deliveryPoint || "Not specified"}
+                                </div>
+                              )}
+                              <div className="text-xs text-gray-600 font-medium">Delivery Point</div>
                             </div>
                           </div>
                         </div>
@@ -1703,16 +1442,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     </TableCell>
                   </TableRow>
                   
-                  {/* Detailed pricing information row - Show for Approvers and Purchasers only */}
-                  {canSeeVendorPricingPanel && (
-                    <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-25">
-                      <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
-                        <div className="px-2">
-                          {renderDetailedPricingRow(item, itemIsRequestor, itemIsApprover, itemIsPurchaser, isItemEditable)}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
                   
                   {/* Full expanded view - only when chevron is clicked */}
                   {isExpanded && (
@@ -1734,49 +1463,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     </Card>
   );
 
+  // Main component return
   return (
-    <div className="space-y-6">
-      {/* Header with action buttons */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-gray-900">Purchase Request Items</h2>
-          <Badge variant="secondary" className="px-2 py-1 text-xs">
-            {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
-          </Badge>
-        </div>
-        
-        <div className="flex items-center gap-2">
-
-          {/* Add New Item Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsAddingNewItem(true)}
-            disabled={isAddingNewItem}
-            className="text-xs"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Add Item
-          </Button>
-
-          {/* Allocate Vendor Button - Only visible to purchasers */}
-          {isPurchaser && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // TODO: Implement vendor allocation functionality
-                console.log("Allocate Vendor clicked");
-              }}
-              className="text-xs"
-            >
-              <TrendingUp className="h-4 w-4 mr-1" />
-              Allocate Vendor
-            </Button>
-          )}
-        </div>
-      </div>
-
+    <div className="space-y-4">
       {/* Bulk Item Actions */}
       {selectedItems.length > 0 && (() => {
         const analysis = analyzeSelectedItemsStatus();
@@ -1811,55 +1500,41 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
             </div>
             
             <div className="flex items-center gap-2">
-              {isApprover ? (
-                <>
-                  {/* Approve Selected Button */}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleBulkActionWithMixedCheck('approve')}
-                    className="text-xs font-medium text-green-600 hover:text-green-700 border-green-200"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    Approve Selected
-                  </Button>
-                  
-                  {/* Reject Selected Button - Ensure visibility for purchasers */}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleBulkActionWithMixedCheck('reject')}
-                    className="text-xs font-medium text-red-600 hover:text-red-700 border-red-200"
-                    style={{ display: 'inline-flex' }}
-                  >
-                    <XCircle className="h-4 w-4 mr-1" />
-                    Reject Selected
-                  </Button>
-                  
-                  {/* Return Selected Button */}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleBulkActionWithMixedCheck('return')}
-                    className="text-xs font-medium text-orange-600 hover:text-orange-700 border-orange-200"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-1" />
-                    Return Selected
-                  </Button>
-                </>
-              ) : (
-                <span className="text-xs text-gray-500 italic">
-                  No approval permission (Role: {currentUser.role})
-                </span>
-              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleBulkActionWithMixedCheck('approve')}
+                className="text-xs font-medium text-green-600 hover:text-green-700 border-green-200"
+              >
+                <CheckCircle className="h-4 w-4 mr-1" />
+                Approve Selected
+              </Button>
               
-              {/* Split Button (always available) */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleBulkActionWithMixedCheck('reject')}
+                className="text-xs font-medium text-red-600 hover:text-red-700 border-red-200"
+              >
+                <XCircle className="h-4 w-4 mr-1" />
+                Reject Selected
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleBulkActionWithMixedCheck('return')}
+                className="text-xs font-medium text-orange-600 hover:text-orange-700 border-orange-200"
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                Return Selected
+              </Button>
+              
               <Button variant="outline" size="sm" onClick={handleBulkSplit} className="text-xs text-blue-600 hover:text-blue-700">
                 <Split className="h-4 w-4 mr-1" />
                 Split
               </Button>
               
-              {/* Set Date Required Button (always available) */}
               <Button variant="outline" size="sm" onClick={handleBulkSetRequiredDate} className="text-xs text-purple-600 hover:text-purple-700">
                 <CalendarIcon className="h-4 w-4 mr-1" />
                 Set Date Required
@@ -1870,7 +1545,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
       })()}
 
       {/* Render current view */}
-      {true ? renderTableView() : renderMobileCardView()}
+      {renderTableView()}
 
       {/* Item Details Form Modal */}
       {selectedItem && (
@@ -1901,12 +1576,22 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
           </DialogHeader>
           <VendorComparison 
             currentPricelistNumber={selectedItemForComparison?.pricelistNumber}
+            selectedVendor={isPurchaser ? undefined : selectedItemForComparison?.vendor}
             itemName={selectedItemForComparison?.name}
             itemDescription={selectedItemForComparison?.description}
             itemUnit={selectedItemForComparison?.unit}
             itemStatus={selectedItemForComparison?.status}
             requestedQuantity={selectedItemForComparison?.quantityRequested}
-            approvedQuantity={selectedItemForComparison?.quantityApproved}
+            approvedQuantity={selectedItemForComparison?.approvedQuantity}
+            userRole={currentUser.role}
+            onPricelistSelect={isPurchaser ? (vendor, pricelistNumber, unitPrice) => {
+              if (selectedItemForComparison?.id) {
+                handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
+                handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
+                handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
+              }
+              setIsVendorComparisonOpen(false);
+            } : undefined}
           />
         </DialogContent>
       </Dialog>
