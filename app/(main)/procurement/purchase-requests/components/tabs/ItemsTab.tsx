@@ -90,6 +90,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
   const [isTableEditMode, setIsTableEditMode] = useState(formMode === "edit");
   const [expandedTableRows, setExpandedTableRows] = useState<Set<string>>(new Set());
   const [editingRows, setEditingRows] = useState<Set<string>>(new Set());
+  const [focusedRow, setFocusedRow] = useState<string | null>(null);
+  const [autoExpandedRow, setAutoExpandedRow] = useState<string | null>(null);
   const [isAddingNewItem, setIsAddingNewItem] = useState(false);
   const [isVendorComparisonOpen, setIsVendorComparisonOpen] = useState(false);
   const [isVendorComparisonViewOpen, setIsVendorComparisonViewOpen] = useState(false);
@@ -360,6 +362,19 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     setExpandedTableRows(newExpanded);
   }
 
+  function handleRowMouseEnter(itemId: string) {
+    // Only auto-expand if not already manually expanded
+    if (!expandedTableRows.has(itemId)) {
+      setFocusedRow(itemId);
+      setAutoExpandedRow(itemId);
+    }
+  }
+
+  function handleRowMouseLeave() {
+    setFocusedRow(null);
+    setAutoExpandedRow(null);
+  }
+
   function handleToggleRowEdit(itemId: string) {
     const newEditing = new Set(editingRows);
     if (newEditing.has(itemId)) {
@@ -623,6 +638,77 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
       {/* Expandable Sections - Only show when chevron is expanded */}
       {isExpanded && (
           <>
+            {/* Inventory & Delivery Information Panel */}
+            <div className="bg-white rounded-lg border border-gray-200">
+              <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 bg-gray-50/50">
+                <Package className="h-3 w-3 text-green-600" />
+                <h3 className="text-xs font-semibold text-gray-900">Inventory & Delivery Information</h3>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 items-start">
+                  <div 
+                    className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-gray-100 transition-colors self-start"
+                    onClick={() => handleOnHandClick(item)}
+                  >
+                    <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.onHand || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                    <div className="text-xs text-gray-600 font-medium">On Hand</div>
+                  </div>
+                  <div 
+                    className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-gray-100 transition-colors self-start"
+                    onClick={() => handleOnOrderClick(item)}
+                  >
+                    <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.onOrdered || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                    <div className="text-xs text-gray-600 font-medium">On Order</div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
+                    <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.reorderLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                    <div className="text-xs text-gray-600 font-medium">Reorder Level</div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
+                    <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.restockLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
+                    <div className="text-xs text-gray-600 font-medium">Restock Level</div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
+                    {isItemEditable && isRequestor ? (
+                      <DatePickerField
+                        value={item.deliveryDate}
+                        onChange={(date) => item.id && handleItemChange(item.id, 'deliveryDate', date)}
+                        placeholder="Select date"
+                      />
+                    ) : (
+                      <div className="text-xs font-bold text-gray-700">
+                        {item.deliveryDate ? format(item.deliveryDate, "dd/MM/yyyy") : "Not specified"}
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-600 font-medium">Date Required</div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
+                    {isItemEditable && (isRequestor || isPurchaser) ? (
+                      <Select 
+                        value={item.deliveryPoint || ""} 
+                        onValueChange={(value) => item.id && handleItemChange(item.id, 'deliveryPoint', value)}
+                      >
+                        <SelectTrigger className="h-6 text-xs border-0 bg-transparent shadow-none focus:ring-1 focus:ring-indigo-300">
+                          <SelectValue placeholder="Select delivery point" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {deliveryPointOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value} className="text-xs">
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="text-xs font-bold text-gray-700">
+                        {deliveryPointOptions.find(option => option.value === item.deliveryPoint)?.label || item.deliveryPoint || "Not specified"}
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-600 font-medium">Delivery Point</div>
+                  </div>
+                </div>
+              </div>
+            </div>
             
             {/* Pricing Panel - Visible for approvers and purchasers */}
             {canSeePrices && (isApprover || isPurchaser) && (
@@ -729,7 +815,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     <div className="bg-red-50 border border-red-100 rounded p-2">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-red-700">Discount</span>
-                        <span className="text-sm text-red-600">{Math.round((item.discountRate || 0.05) * 100)}%</span>
+                        <span className="text-sm text-red-600">{Math.round((item.discountRate || 0.12) * 100)}%</span>
                       </div>
                       <div className="flex items-start gap-1">
                         <Checkbox 
@@ -748,7 +834,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                               const discountAmount = getItemAdjustments(item.id || '').discount 
                                 ? (item.discountAmount || 0)
-                                : subtotal * (item.discountRate || 0.05);
+                                : subtotal * (item.discountRate || 0.12);
                               return discountAmount.toFixed(2);
                             })()}
                           </div>
@@ -757,7 +843,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                               const discountAmount = getItemAdjustments(item.id || '').discount 
                                 ? (item.discountAmount || 0)
-                                : subtotal * (item.discountRate || 0.05);
+                                : subtotal * (item.discountRate || 0.12);
                               return (discountAmount * (item.currencyRate || 1)).toFixed(2);
                             })()}
                           </div>
@@ -774,7 +860,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                             const discountAmount = getItemAdjustments(item.id || '').discount 
                               ? (item.discountAmount || 0)
-                              : subtotal * ((item.discountRate || 5) / 100);
+                              : subtotal * (item.discountRate || 0.12);
                             return (subtotal - discountAmount).toFixed(2);
                           })()}
                         </div>
@@ -783,7 +869,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                             const discountAmount = getItemAdjustments(item.id || '').discount 
                               ? (item.discountAmount || 0)
-                              : subtotal * ((item.discountRate || 5) / 100);
+                              : subtotal * (item.discountRate || 0.12);
                             return ((subtotal - discountAmount) * (item.currencyRate || 1)).toFixed(2);
                           })()}
                         </div>
@@ -794,7 +880,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     <div className="bg-orange-50 border border-orange-100 rounded p-2">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-orange-700">Tax ({item.taxType || "VAT"})</span>
-                        <span className="text-sm text-orange-600">{Math.round((item.taxRate || 0.08) * 100)}%</span>
+                        <span className="text-sm text-orange-600">{Math.round((item.taxRate || 0.07) * 100)}%</span>
                       </div>
                       <div className="flex items-start gap-1">
                         <Checkbox 
@@ -813,11 +899,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                               const discountAmount = getItemAdjustments(item.id || '').discount 
                                 ? (item.discountAmount || 0)
-                                : subtotal * (item.discountRate || 0.05);
+                                : subtotal * (item.discountRate || 0.12);
                               const netAmount = subtotal - discountAmount;
                               const taxAmount = getItemAdjustments(item.id || '').tax 
                                 ? (item.taxAmount || 0)
-                                : netAmount * (item.taxRate || 0.08);
+                                : netAmount * (item.taxRate || 0.07);
                               return taxAmount.toFixed(2);
                             })()}
                           </div>
@@ -826,11 +912,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                               const discountAmount = getItemAdjustments(item.id || '').discount 
                                 ? (item.discountAmount || 0)
-                                : subtotal * (item.discountRate || 0.05);
+                                : subtotal * (item.discountRate || 0.12);
                               const netAmount = subtotal - discountAmount;
                               const taxAmount = getItemAdjustments(item.id || '').tax 
                                 ? (item.taxAmount || 0)
-                                : netAmount * (item.taxRate || 0.08);
+                                : netAmount * (item.taxRate || 0.07);
                               return (taxAmount * (item.currencyRate || 1)).toFixed(2);
                             })()}
                           </div>
@@ -847,11 +933,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                             const discountAmount = getItemAdjustments(item.id || '').discount 
                               ? (item.discountAmount || 0)
-                              : subtotal * ((item.discountRate || 5) / 100);
+                              : subtotal * (item.discountRate || 0.12);
                             const netAmount = subtotal - discountAmount;
                             const taxAmount = getItemAdjustments(item.id || '').tax 
                               ? (item.taxAmount || 0)
-                              : netAmount * ((item.taxRate || 7) / 100);
+                              : netAmount * (item.taxRate || 0.07);
                             return (netAmount + taxAmount).toFixed(2);
                           })()}
                         </div>
@@ -860,11 +946,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             const subtotal = (item.price || 3200) * (item.quantityApproved || item.quantityRequested || 2);
                             const discountAmount = getItemAdjustments(item.id || '').discount 
                               ? (item.discountAmount || 0)
-                              : subtotal * ((item.discountRate || 5) / 100);
+                              : subtotal * (item.discountRate || 0.12);
                             const netAmount = subtotal - discountAmount;
                             const taxAmount = getItemAdjustments(item.id || '').tax 
                               ? (item.taxAmount || 0)
-                              : netAmount * ((item.taxRate || 7) / 100);
+                              : netAmount * (item.taxRate || 0.07);
                             return ((netAmount + taxAmount) * (item.currencyRate || 1)).toFixed(2);
                           })()}
                         </div>
@@ -1072,8 +1158,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               <TableHead className="w-[60px] text-center font-semibold">#</TableHead>
               <TableHead className="font-semibold text-left min-w-[140px]">Location & Status</TableHead>
               <TableHead className="font-semibold text-left min-w-[200px]">Product Details</TableHead>
-              <TableHead className="font-semibold text-right min-w-[120px]">Requested</TableHead>
-              <TableHead className="font-semibold text-right min-w-[120px]">Approved</TableHead>
+              <TableHead className="font-semibold text-center min-w-[120px] !text-center" style={{ textAlign: 'center !important' }}>Requested</TableHead>
+              <TableHead className="font-semibold text-center min-w-[120px] !text-center" style={{ textAlign: 'center !important' }}>Approved</TableHead>
               {/* Pricing column: Always visible for approvers/purchasers, user setting for requestors */}
               {(!isRequestor || (isRequestor && (user?.context.showPrices !== false))) && (
                 <TableHead className="font-semibold text-right min-w-[120px]">Pricing</TableHead>
@@ -1093,7 +1179,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               />
             )}
             {filteredItems.map((item, index) => {
-              const isExpanded = expandedTableRows.has(item.id || "");
+              const isManuallyExpanded = expandedTableRows.has(item.id || "");
+              const isAutoExpanded = autoExpandedRow === item.id;
+              const isExpanded = isManuallyExpanded || isAutoExpanded;
               const itemIsRequestor = currentUser.role === 'Staff' || currentUser.role === 'Requestor';
               const itemIsApprover = currentUser.role === 'Department Manager' || 
                                     currentUser.role === 'Financial Manager' ||
@@ -1108,8 +1196,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
               const isItemEditable = formMode === "edit";
               
               return (
-                <React.Fragment key={item.id}>
-                  <TableRow className="hover:bg-muted/30 group transition-colors border-b">
+                <>
+                  <TableRow 
+                    key={item.id}
+                    className="hover:bg-muted/30 group transition-colors border-b bg-blue-50/30"
+                    onMouseEnter={() => handleRowMouseEnter(item.id || "")}
+                    onMouseLeave={handleRowMouseLeave}
+                  >
                     <TableCell className="text-center py-3 align-top" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.id || "")}
@@ -1172,11 +1265,11 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       )}
                     </TableCell>
                     {/* Requested Quantity Column */}
-                    <TableCell className="py-3 text-right align-top">
-                      <div className="space-y-1">
+                    <TableCell className="py-3 text-center align-top !text-center" style={{ textAlign: 'center !important' }}>
+                      <div className="flex flex-col items-center justify-center space-y-1 w-full">
                         {isItemEditable && itemIsRequestor ? (
-                          <div className="flex items-center gap-1 justify-end">
-                            <Input type="number" step="0.00001" value={item.quantityRequested?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityRequested', parseFloat(e.target.value))} className="h-8 w-20 text-right" />
+                          <div className="flex items-center gap-1 justify-center">
+                            <Input type="number" step="0.00001" value={item.quantityRequested?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityRequested', parseFloat(e.target.value))} className="h-8 w-20 text-center" />
                             <Select value={item.unit || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'unit', value)}>
                               <SelectTrigger className="h-8 w-20"><SelectValue placeholder="Unit" /></SelectTrigger>
                               <SelectContent>
@@ -1185,9 +1278,9 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                             </Select>
                           </div>
                         ) : (
-                          <div className="text-right">
-                            <div className="text-sm font-medium text-right">{item.quantityRequested?.toFixed(5) || '0.00000'} {item.unit}</div>
-                            <div className="text-xs text-muted-foreground text-right">
+                          <div className="flex flex-col items-center justify-center">
+                            <div className="text-sm font-medium text-center">{item.quantityRequested?.toFixed(5) || '0.00000'} {item.unit}</div>
+                            <div className="text-xs text-muted-foreground text-center">
                               {convertToInventoryUnit(item.quantityRequested, item.unit, 'pieces', 12)}
                             </div>
                           </div>
@@ -1196,38 +1289,38 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                     </TableCell>
                     
                     {/* Approved Quantity Column */}
-                    <TableCell className="py-3 text-right align-top">
-                      <div className="space-y-1">
+                    <TableCell className="py-3 text-center align-top !text-center" style={{ textAlign: 'center !important' }}>
+                      <div className="flex flex-col items-center justify-center space-y-1 w-full">
                         {isItemEditable && (itemIsApprover || itemIsPurchaser) ? (
-                          <div className="flex items-center gap-1 justify-end">
-                            <Input type="number" step="0.00001" value={item.quantityApproved?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityApproved', parseFloat(e.target.value))} className="h-8 w-24 text-right" placeholder="0.00000" />
+                          <div className="flex items-center gap-1 justify-center">
+                            <Input type="number" step="0.00001" value={item.quantityApproved?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityApproved', parseFloat(e.target.value))} className="h-8 w-24 text-center" placeholder="0.00000" />
                             <span className="text-xs text-gray-600">{item.unit}</span>
                           </div>
                         ) : (
-                          <div className="text-right">
+                          <div className="flex flex-col items-center justify-center">
                             {item.quantityApproved ? (
                               <>
-                                <div className="text-sm font-medium text-green-700 text-right">{item.quantityApproved?.toFixed(5) || '0.00000'} {item.unit}</div>
-                                <div className="text-xs text-muted-foreground text-right">
+                                <div className="text-sm font-medium text-green-700 text-center">{item.quantityApproved?.toFixed(5) || '0.00000'} {item.unit}</div>
+                                <div className="text-xs text-muted-foreground text-center">
                                   {convertToInventoryUnit(item.quantityApproved, item.unit, 'pieces', 12)}
                                 </div>
                               </>
                             ) : (
-                              <div className="text-xs text-gray-400 italic text-right">Pending</div>
+                              <div className="text-xs text-gray-400 italic text-center">Pending</div>
                             )}
                           </div>
                         )}
                         {/* FOC field below approved quantity - Hidden for requestors and approvers, only visible for purchasers */}
                         {itemIsPurchaser && (
-                          <div className="pt-1 border-t border-gray-200 mt-2">
+                          <div className="pt-1 border-t border-gray-200 mt-2 flex flex-col items-center">
                             {isItemEditable ? (
-                            <div className="flex items-center gap-1 justify-end">
+                            <div className="flex items-center gap-1 justify-center">
                               <span className="text-xs text-gray-500">FOC:</span>
                               <Input 
                                 type="number" 
                                 value={item.foc?.toFixed(5) || ""} 
                                 onChange={(e) => item.id && handleItemChange(item.id, 'foc', parseFloat(e.target.value))} 
-                                className="h-6 w-20 text-right text-xs" 
+                                className="h-6 w-20 text-center text-xs" 
                                 step="0.00001" 
                                 placeholder="0"
                               />
@@ -1239,7 +1332,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               </Select>
                             </div>
                           ) : (
-                            <div className="text-xs font-medium text-blue-600 text-right">FOC: {item.foc?.toFixed(5) || '0.00000'} {item.unit}</div>
+                            <div className="text-xs font-medium text-blue-600 text-center">FOC: {item.foc?.toFixed(5) || '0.00000'} {item.unit}</div>
                           )}
                           </div>
                         )}
@@ -1341,7 +1434,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                   </TableRow>
                   
                   {/* Always visible comment row with chevron */}
-                  <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-gray-25">
+                  <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-blue-50/20">
                     <TableCell colSpan={canSeePrices ? 8 : 7} className="py-3">
                       <div className="flex items-start gap-2 px-2">
                         <Button 
@@ -1350,7 +1443,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           className="h-6 w-6 p-0 hover:bg-muted/60 mt-1 flex-shrink-0"
                           onClick={() => handleToggleTableExpand(item.id || "")}
                         >
-                          {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          {isManuallyExpanded ? (
+                            <ChevronDown className="h-4 w-4 text-blue-600" />
+                          ) : isAutoExpanded ? (
+                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
                         </Button>
                         <div className="flex-1 space-y-3">
                           {/* Comment Section */}
@@ -1373,70 +1472,6 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               <div className="text-sm text-gray-400 italic">No comment</div>
                             )
                           )}
-                          
-                          {/* Inventory & Delivery Information - Single Row, 6 Column Layout */}
-                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 items-start">
-                            <div 
-                              className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-gray-100 transition-colors self-start"
-                              onClick={() => handleOnHandClick(item)}
-                            >
-                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.onHand || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-xs text-gray-600 font-medium">On Hand</div>
-                            </div>
-                            <div 
-                              className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center cursor-pointer hover:bg-gray-100 transition-colors self-start"
-                              onClick={() => handleOnOrderClick(item)}
-                            >
-                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.onOrdered || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-xs text-gray-600 font-medium">On Order</div>
-                            </div>
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
-                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.reorderLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-xs text-gray-600 font-medium">Reorder Level</div>
-                            </div>
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
-                              <div className="text-sm font-bold text-gray-700">{item.inventoryInfo?.restockLevel || 0} {item.inventoryInfo?.inventoryUnit || 'units'}</div>
-                              <div className="text-xs text-gray-600 font-medium">Restock Level</div>
-                            </div>
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
-                              {isItemEditable && itemIsRequestor ? (
-                                <DatePickerField
-                                  value={item.deliveryDate}
-                                  onChange={(date) => item.id && handleItemChange(item.id, 'deliveryDate', date)}
-                                  placeholder="Select date"
-                                />
-                              ) : (
-                                <div className="text-xs font-bold text-gray-700">
-                                  {item.deliveryDate ? format(item.deliveryDate, "dd/MM/yyyy") : "Not specified"}
-                                </div>
-                              )}
-                              <div className="text-xs text-gray-600 font-medium">Date Required</div>
-                            </div>
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-center self-start">
-                              {isItemEditable && (itemIsRequestor || itemIsPurchaser) ? (
-                                <Select 
-                                  value={item.deliveryPoint || ""} 
-                                  onValueChange={(value) => item.id && handleItemChange(item.id, 'deliveryPoint', value)}
-                                >
-                                  <SelectTrigger className="h-6 text-xs border-0 bg-transparent shadow-none focus:ring-1 focus:ring-indigo-300">
-                                    <SelectValue placeholder="Select delivery point" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {deliveryPointOptions.map((option) => (
-                                      <SelectItem key={option.value} value={option.value} className="text-xs">
-                                        {option.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <div className="text-xs font-bold text-gray-700">
-                                  {deliveryPointOptions.find(option => option.value === item.deliveryPoint)?.label || item.deliveryPoint || "Not specified"}
-                                </div>
-                              )}
-                              <div className="text-xs text-gray-600 font-medium">Delivery Point</div>
-                            </div>
-                          </div>
                         </div>
                       </div>
                     </TableCell>
@@ -1453,7 +1488,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                       </TableCell>
                     </TableRow>
                   )}
-                </React.Fragment>
+                </>
               );
             })}
           </TableBody>
@@ -1582,7 +1617,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
             itemUnit={selectedItemForComparison?.unit}
             itemStatus={selectedItemForComparison?.status}
             requestedQuantity={selectedItemForComparison?.quantityRequested}
-            approvedQuantity={selectedItemForComparison?.approvedQuantity}
+            approvedQuantity={selectedItemForComparison?.quantityApproved}
             userRole={currentUser.role}
             onPricelistSelect={isPurchaser ? (vendor, pricelistNumber, unitPrice) => {
               if (selectedItemForComparison?.id) {
