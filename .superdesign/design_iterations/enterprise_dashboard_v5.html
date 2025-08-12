@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Dashboard Card - Variation 5: Split-Screen Enterprise View</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="enterprise_theme_v5.css">
+    <style>
+        /* Split-Screen Animation System */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        @keyframes dividerReveal {
+            from {
+                opacity: 0;
+                transform: scaleY(0.3);
+            }
+            to {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+        
+        @keyframes metricCountUp {
+            from {
+                opacity: 0;
+                transform: scale(0.6) rotate(-5deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(2deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        @keyframes alertPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                border-color: hsl(var(--split-critical));
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(1.02);
+                border-color: hsl(var(--split-warning));
+            }
+        }
+        
+        @keyframes progressSweep {
+            from { 
+                width: 0%; 
+                opacity: 0.5;
+            }
+            to { 
+                width: 26.7%; 
+                opacity: 1;
+            }
+        }
+        
+        @keyframes contextSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes vendorFade {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        @keyframes priceStagger {
+            from {
+                opacity: 0;
+                transform: translateX(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes totalEmphasize {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes buttonReady {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes panelElevate {
+            from {
+                transform: translateY(0);
+                box-shadow: var(--shadow-split);
+            }
+            to {
+                transform: translateY(-3px);
+                box-shadow: var(--shadow-split-elevated);
+            }
+        }
+        
+        @keyframes cardFocus {
+            from {
+                border-color: hsl(var(--border-split));
+                transform: scale(1);
+            }
+            to {
+                border-color: hsl(var(--split-primary));
+                transform: scale(1.02);
+            }
+        }
+        
+        @keyframes buttonPress {
+            from {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes checkboxFlip {
+            from {
+                transform: scale(1) rotateY(0deg);
+            }
+            50% {
+                transform: scale(1.2) rotateY(180deg);
+            }
+            to {
+                transform: scale(1) rotateY(360deg);
+            }
+        }
+        
+        @keyframes splitShimmer {
+            0% { 
+                transform: translateX(-100%) skewX(-15deg); 
+                opacity: 0;
+            }
+            50% { 
+                opacity: 0.8;
+            }
+            100% { 
+                transform: translateX(100%) skewX(-15deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Animation Classes */
+        .animate-slide-in-left {
+            animation: slideInLeft 0.6s ease-out;
+        }
+        
+        .animate-slide-in-right {
+            animation: slideInRight 0.7s ease-out;
+        }
+        
+        .animate-divider-reveal {
+            animation: dividerReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-metric-count {
+            animation: metricCountUp 0.8s ease-out;
+        }
+        
+        .animate-alert-pulse {
+            animation: alertPulse 2s infinite;
+        }
+        
+        .animate-progress-sweep {
+            animation: progressSweep 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-context-slide {
+            animation: contextSlide 0.3s ease-out;
+        }
+        
+        .animate-vendor-fade {
+            animation: vendorFade 0.5s ease-out;
+        }
+        
+        .animate-price-stagger {
+            animation: priceStagger 0.25s ease-out;
+        }
+        
+        .animate-total-emphasize {
+            animation: totalEmphasize 0.6s ease-out;
+        }
+        
+        .animate-button-ready {
+            animation: buttonReady 0.4s ease-out;
+        }
+        
+        .animate-panel-elevate {
+            animation: panelElevate 0.2s ease-out forwards;
+        }
+        
+        .animate-card-focus {
+            animation: cardFocus 0.15s ease-out forwards;
+        }
+        
+        .animate-button-press {
+            animation: buttonPress 0.1s ease-out;
+        }
+        
+        .animate-checkbox-flip {
+            animation: checkboxFlip 0.3s ease-out;
+        }
+        
+        .animate-split-shimmer {
+            animation: splitShimmer 3s infinite;
+        }
+        
+        /* Custom Split Layout */
+        .split-dashboard-layout {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-8);
+            background: hsl(var(--background));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Enhanced Panel Interactions */
+        .split-panel:hover {
+            animation: panelElevate 0.3s ease-out forwards;
+        }
+        
+        .metric-box:hover {
+            animation: cardFocus 0.2s ease-out forwards;
+        }
+        
+        /* Enhanced Progress Styling */
+        .enhanced-split-progress {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-split-progress::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255,255,255,0.3) 50%, 
+                transparent 70%);
+            animation: splitShimmer 3s infinite;
+            z-index: 1;
+        }
+        
+        /* Status Enhancement */
+        .enhanced-status-alert {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-status-alert::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255,255,255,0.1) 0%, 
+                transparent 50%);
+            animation: splitShimmer 4s infinite;
+        }
+        
+        /* Button Enhancement */
+        .enhanced-action-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255,255,255,0.2), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .enhanced-action-button:hover::before {
+            left: 100%;
+        }
+        
+        /* Responsive Enhancements */
+        @media (max-width: 1200px) {
+            .split-dashboard-layout {
+                padding: var(--space-6);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .split-dashboard-layout {
+                padding: var(--space-4);
+                align-items: flex-start;
+                padding-top: var(--space-8);
+            }
+        }
+        
+        /* Icon Styling */
+        .split-icon {
+            width: 20px;
+            height: 20px;
+            color: currentColor;
+        }
+        
+        .split-icon-lg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .split-icon-xl {
+            width: 32px;
+            height: 32px;
+        }
+        
+        /* Accessibility Enhancements */
+        .split-card[tabindex]:focus {
+            outline: 2px solid hsl(var(--split-primary));
+            outline-offset: 2px;
+        }
+        
+        .action-button[tabindex]:focus {
+            outline: 2px solid hsl(var(--split-primary));
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="split-dashboard-layout">
+        <div class="split-container">
+            
+            <!-- Left Panel: Operational Data -->
+            <div class="split-panel split-panel-left animate-slide-in-left">
+                
+                <!-- Operational Header -->
+                <div class="split-header">
+                    <h2 class="split-title">
+                        <i data-lucide="package" class="split-icon-lg"></i>
+                        Operational Dashboard
+                    </h2>
+                    <p class="split-subtitle">Inventory Status & Business Context</p>
+                </div>
+                
+                <!-- Inventory Metrics -->
+                <div class="split-card">
+                    <h3 class="split-title" style="font-size: var(--text-base); margin-bottom: var(--space-4);">
+                        <i data-lucide="bar-chart-3" class="split-icon"></i>
+                        Current Inventory Status
+                    </h3>
+                    <div class="inventory-metrics">
+                        <div class="metric-box animate-metric-count" style="animation-delay: 0.8s;" tabindex="0">
+                            <span class="metric-label">On Hand</span>
+                            <span class="metric-value" id="onHand">12</span>
+                            <span class="metric-unit">kg</span>
+                        </div>
+                        <div class="metric-box animate-metric-count" style="animation-delay: 0.9s;" tabindex="0">
+                            <span class="metric-label">On Order</span>
+                            <span class="metric-value" id="onOrder">20</span>
+                            <span class="metric-unit">kg</span>
+                        </div>
+                        <div class="metric-box animate-metric-count" style="animation-delay: 1s;" tabindex="0">
+                            <span class="metric-label">Reorder Level</span>
+                            <span class="metric-value" id="reorderLevel">15</span>
+                            <span class="metric-unit">kg</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status Alert -->
+                <div class="status-alert enhanced-status-alert animate-alert-pulse" style="animation-delay: 1.2s;">
+                    <div class="alert-header">
+                        <i data-lucide="alert-triangle" class="alert-icon split-icon-xl"></i>
+                        <div>
+                            <div class="alert-title">Critical Stock Level</div>
+                            <div style="font-size: var(--text-xs); color: hsl(var(--split-warning)); font-weight: 500; margin-top: var(--space-1);">
+                                Immediate reorder required
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-info">
+                        <span class="progress-label">
+                            <i data-lucide="trending-down" class="split-icon"></i>
+                            Stock Depletion Rate
+                        </span>
+                        <span class="progress-percentage animate-metric-count" style="animation-delay: 1.4s;">26.7%</span>
+                    </div>
+                    
+                    <div class="split-progress enhanced-split-progress">
+                        <div class="split-progress-fill animate-progress-sweep" style="width: 26.7%; animation-delay: 1.6s;"></div>
+                    </div>
+                    
+                    <div style="margin-top: var(--space-4); position: relative; z-index: 1;">
+                        <div class="split-flex-between" style="font-size: var(--text-xs); color: hsl(var(--operational-muted-foreground));">
+                            <span>Required by: <strong>08/02/2024</strong></span>
+                            <span>Delivery: <strong>Pastry Kitchen Storage</strong></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Business Context -->
+                <div class="split-card">
+                    <h3 class="split-title" style="font-size: var(--text-base); margin-bottom: var(--space-4);">
+                        <i data-lucide="briefcase" class="split-icon"></i>
+                        Business Context & Dimensions
+                    </h3>
+                    <div class="business-context">
+                        <div class="context-item animate-context-slide" style="animation-delay: 1.8s;">
+                            <span class="context-label">Job Number</span>
+                            <span class="context-value">PASTRY-2024-Q1-001</span>
+                        </div>
+                        <div class="context-item animate-context-slide" style="animation-delay: 1.9s;">
+                            <span class="context-label">Event Code</span>
+                            <span class="context-value">DESSERT-UPGRADE</span>
+                        </div>
+                        <div class="context-item animate-context-slide" style="animation-delay: 2s;">
+                            <span class="context-label">Project ID</span>
+                            <span class="context-value">PROJ001</span>
+                        </div>
+                        <div class="context-item animate-context-slide" style="animation-delay: 2.1s;">
+                            <span class="context-label">Market Segment</span>
+                            <span class="context-value">HOSPITALITY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Central Divider -->
+            <div class="split-divider animate-divider-reveal" style="animation-delay: 0.5s;"></div>
+            
+            <!-- Right Panel: Financial & Vendor Data -->
+            <div class="split-panel split-panel-right animate-slide-in-right">
+                
+                <!-- Financial Header -->
+                <div class="split-header split-header-financial">
+                    <h2 class="split-title">
+                        <i data-lucide="dollar-sign" class="split-icon-lg"></i>
+                        Financial Overview
+                    </h2>
+                    <p class="split-subtitle">Vendor Details & Pricing Breakdown</p>
+                </div>
+                
+                <!-- Vendor Information -->
+                <div class="vendor-info animate-vendor-fade" style="animation-delay: 1s;">
+                    <div class="vendor-title">Premium Food Suppliers Inc.</div>
+                    <div class="vendor-details">
+                        Pricelist: PL-2024-USD-CHOCOLATE<br>
+                        Currency: USD | Unit Price: $22.00/kg<br>
+                        <span style="color: hsl(var(--split-info)); font-weight: 600;">Active Contract • Preferred Vendor</span>
+                    </div>
+                </div>
+                
+                <!-- Pricing Calculator -->
+                <div class="pricing-calculator">
+                    <div class="calculator-title">
+                        <i data-lucide="calculator" class="split-icon"></i>
+                        Pricing Breakdown & Total
+                    </div>
+                    
+                    <div class="price-line animate-price-stagger" style="animation-delay: 1.3s;">
+                        <span class="price-label">Subtotal (25kg × $22.00)</span>
+                        <span class="price-value price-neutral">USD 550.00</span>
+                    </div>
+                    
+                    <div class="price-line animate-price-stagger" style="animation-delay: 1.4s;">
+                        <span class="price-label">
+                            <input type="checkbox" class="split-checkbox" checked>
+                            Volume Discount (5%)
+                        </span>
+                        <span class="price-value price-negative">-USD 27.50</span>
+                    </div>
+                    
+                    <div class="price-line animate-price-stagger" style="animation-delay: 1.5s;">
+                        <span class="price-label">Net Amount</span>
+                        <span class="price-value price-neutral">USD 522.50</span>
+                    </div>
+                    
+                    <div class="price-line animate-price-stagger" style="animation-delay: 1.6s;">
+                        <span class="price-label">
+                            <input type="checkbox" class="split-checkbox" checked>
+                            Tax (VAT 7%)
+                        </span>
+                        <span class="price-value price-positive">+USD 36.58</span>
+                    </div>
+                    
+                    <div class="price-line price-total animate-total-emphasize" style="animation-delay: 1.7s;">
+                        <span class="price-label">
+                            <i data-lucide="circle-dollar-sign" class="split-icon"></i>
+                            <strong>TOTAL AMOUNT</strong>
+                        </span>
+                        <span class="price-value">USD 559.08</span>
+                    </div>
+                </div>
+                
+                <!-- Action Center -->
+                <div class="split-card">
+                    <h3 class="split-title" style="font-size: var(--text-base); margin-bottom: var(--space-4);">
+                        <i data-lucide="settings" class="split-icon"></i>
+                        Action Center
+                    </h3>
+                    <div class="action-center">
+                        <button class="action-button action-button-primary enhanced-action-button animate-button-ready" style="animation-delay: 2s;" tabindex="0">
+                            <i data-lucide="bar-chart-3" class="split-icon"></i>
+                            Compare Prices
+                        </button>
+                        <button class="action-button enhanced-action-button animate-button-ready" style="animation-delay: 2.1s;" tabindex="0">
+                            <i data-lucide="shopping-cart" class="split-icon"></i>
+                            Reorder Now
+                        </button>
+                        <button class="action-button enhanced-action-button animate-button-ready" style="animation-delay: 2.2s;" tabindex="0">
+                            <i data-lucide="history" class="split-icon"></i>
+                            View History
+                        </button>
+                        <button class="action-button enhanced-action-button animate-button-ready" style="animation-delay: 2.3s;" tabindex="0">
+                            <i data-lucide="download" class="split-icon"></i>
+                            Export Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Split-Screen Animation System
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                lucide.createIcons();
+            }, 100);
+            
+            // Animate numbers with enhanced split-screen timing
+            setTimeout(() => {
+                animateSplitNumber('onHand', 12, 1200);
+                animateSplitNumber('onOrder', 20, 1400);
+                animateSplitNumber('reorderLevel', 15, 1600);
+            }, 1000);
+        });
+
+        // Enhanced split-screen number animation
+        function animateSplitNumber(elementId, targetValue, duration) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const startValue = 0;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Split-screen specific easing with bounce
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const bounce = progress < 0.8 ? easeOut : easeOut + (Math.sin((progress - 0.8) * Math.PI * 5) * 0.1 * (1 - progress));
+                const currentValue = Math.round(startValue + (targetValue - startValue) * bounce);
+                
+                element.textContent = currentValue;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    // Add completion effect
+                    element.style.color = 'hsl(var(--split-primary))';
+                    element.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        element.style.color = '';
+                        element.style.transform = 'scale(1)';
+                    }, 300);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // Enhanced split checkbox interactions
+        document.querySelectorAll('.split-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                this.classList.add('animate-checkbox-flip');
+                
+                // Create ripple effect
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'hsl(var(--split-primary) / 0.3)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'checkboxRipple 0.6s linear';
+                ripple.style.left = ripple.style.top = '50%';
+                ripple.style.width = ripple.style.height = '30px';
+                ripple.style.marginLeft = ripple.style.marginTop = '-15px';
+                ripple.style.pointerEvents = 'none';
+                
+                this.parentElement.style.position = 'relative';
+                this.parentElement.appendChild(ripple);
+                
+                setTimeout(() => {
+                    this.classList.remove('animate-checkbox-flip');
+                    if (this.parentElement.contains(ripple)) {
+                        this.parentElement.removeChild(ripple);
+                    }
+                }, 600);
+            });
+        });
+
+        // Enhanced action button interactions
+        document.querySelectorAll('.action-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Button press animation
+                this.classList.add('animate-button-press');
+                
+                // Create expanding circle effect
+                const circle = document.createElement('div');
+                circle.style.position = 'absolute';
+                circle.style.borderRadius = '50%';
+                circle.style.background = 'rgba(255,255,255,0.4)';
+                circle.style.transform = 'scale(0)';
+                circle.style.animation = 'expandCircle 0.6s ease-out';
+                circle.style.left = circle.style.top = '50%';
+                circle.style.width = circle.style.height = '120px';
+                circle.style.marginLeft = circle.style.marginTop = '-60px';
+                circle.style.pointerEvents = 'none';
+                
+                this.style.position = 'relative';
+                this.appendChild(circle);
+                
+                setTimeout(() => {
+                    this.classList.remove('animate-button-press');
+                    if (this.contains(circle)) {
+                        this.removeChild(circle);
+                    }
+                }, 600);
+                
+                // Trigger hover effect on adjacent buttons
+                const allButtons = document.querySelectorAll('.action-button');
+                allButtons.forEach(btn => {
+                    if (btn !== this) {
+                        btn.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            btn.style.transform = '';
+                        }, 150);
+                    }
+                });
+            });
+        });
+
+        // Enhanced metric box interactions
+        document.querySelectorAll('.metric-box').forEach(box => {
+            box.addEventListener('mouseenter', function() {
+                const value = this.querySelector('.metric-value');
+                if (value) {
+                    value.style.color = 'hsl(var(--split-primary))';
+                    value.style.transform = 'scale(1.15) rotate(2deg)';
+                    value.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                }
+                
+                // Animate neighboring boxes
+                const allBoxes = document.querySelectorAll('.metric-box');
+                allBoxes.forEach(otherBox => {
+                    if (otherBox !== this) {
+                        otherBox.style.transform = 'scale(0.95)';
+                        otherBox.style.opacity = '0.7';
+                    }
+                });
+            });
+            
+            box.addEventListener('mouseleave', function() {
+                const value = this.querySelector('.metric-value');
+                if (value) {
+                    value.style.color = '';
+                    value.style.transform = '';
+                    value.style.transition = '';
+                }
+                
+                // Reset all boxes
+                const allBoxes = document.querySelectorAll('.metric-box');
+                allBoxes.forEach(otherBox => {
+                    otherBox.style.transform = '';
+                    otherBox.style.opacity = '';
+                });
+            });
+        });
+
+        // Context item interactions
+        document.querySelectorAll('.context-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.background = 'hsl(var(--hover-operational))';
+                this.style.borderColor = 'hsl(var(--split-primary))';
+                this.style.transform = 'translateX(8px) scale(1.02)';
+                
+                // Animate the value
+                const value = this.querySelector('.context-value');
+                if (value) {
+                    value.style.color = 'hsl(var(--split-primary))';
+                    value.style.fontWeight = '700';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.background = '';
+                this.style.borderColor = '';
+                this.style.transform = '';
+                
+                const value = this.querySelector('.context-value');
+                if (value) {
+                    value.style.color = '';
+                    value.style.fontWeight = '';
+                }
+            });
+        });
+
+        // Panel interaction effects
+        document.querySelectorAll('.split-panel').forEach(panel => {
+            panel.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = 'var(--shadow-split-elevated)';
+            });
+            
+            panel.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+        });
+
+        // Progress bar click interaction
+        document.querySelector('.split-progress').addEventListener('click', function() {
+            const fill = this.querySelector('.split-progress-fill');
+            if (fill) {
+                fill.style.animation = 'none';
+                fill.offsetHeight; // Trigger reflow
+                fill.style.animation = 'progressSweep 1s cubic-bezier(0.4, 0, 0.2, 1)';
+            }
+        });
+
+        // Keyboard navigation enhancements
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const focused = document.activeElement;
+                if (focused.classList.contains('metric-box') || 
+                    focused.classList.contains('action-button')) {
+                    e.preventDefault();
+                    focused.click();
+                }
+            }
+        });
+
+        // Add CSS for additional animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes checkboxRipple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes expandCircle {
+                to {
+                    transform: scale(1);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Intersection Observer for re-triggering animations on scroll
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const animationObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const animatedElements = entry.target.querySelectorAll('[class*="animate-"]');
+                    animatedElements.forEach(el => {
+                        el.style.animation = 'none';
+                        el.offsetHeight; // Trigger reflow
+                        el.style.animation = null;
+                    });
+                }
+            });
+        }, observerOptions);
+
+        // Observe the main container
+        document.querySelectorAll('.split-container').forEach(container => {
+            animationObserver.observe(container);
+        });
+
+        // Enhanced focus management
+        document.querySelectorAll('[tabindex]').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.style.outline = '2px solid hsl(var(--split-primary))';
+                this.style.outlineOffset = '2px';
+                this.style.zIndex = '10';
+            });
+            
+            element.addEventListener('blur', function() {
+                this.style.outline = '';
+                this.style.outlineOffset = '';
+                this.style.zIndex = '';
+            });
+        });
+    </script>
+</body>
+</html>

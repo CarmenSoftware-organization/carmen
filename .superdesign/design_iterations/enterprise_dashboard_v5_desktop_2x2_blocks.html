@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Dashboard - Desktop 2x2 Blocks Layout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="enterprise_theme_v5.css">
+    <style>
+        /* Desktop 2x2 Blocks Layout */
+        .desktop-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: calc(50vh - 24px) calc(50vh - 24px);
+            gap: 16px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .desktop-panel {
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric-box {
+            background: #f6f6f6;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* Status Alert */
+        .status-alert {
+            background: hsl(var(--split-critical) / 0.1);
+            border: 1px solid hsl(var(--split-critical));
+            border-radius: var(--radius);
+            padding: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: hsl(var(--split-critical));
+            margin-bottom: var(--space-2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: hsl(var(--operational-muted));
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: hsl(var(--split-critical));
+            width: 26.7%;
+        }
+
+        /* Business Context */
+        .context-grid {
+            display: grid;
+            gap: var(--space-2);
+        }
+
+        .context-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2);
+            background: hsl(var(--operational-accent));
+            border-radius: var(--radius-sm);
+        }
+
+        .context-label {
+            font-size: var(--text-xs);
+            color: hsl(var(--operational-muted-foreground));
+        }
+
+        .context-value {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        /* Vendor Section */
+        .vendor-info {
+            background: hsl(var(--financial-accent));
+            border-radius: var(--radius);
+            padding: var(--space-4);
+            text-align: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .vendor-name {
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+        }
+
+        .vendor-details {
+            font-size: var(--text-sm);
+            color: hsl(var(--financial-muted-foreground));
+            font-family: var(--font-mono);
+        }
+
+        /* Pricing Table */
+        .price-table {
+            margin-bottom: var(--space-4);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            border-bottom: 1px solid hsl(var(--financial-muted));
+        }
+
+        .price-label {
+            font-size: var(--text-sm);
+        }
+
+        .price-value {
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+
+        .price-total {
+            border-top: 2px solid hsl(var(--split-primary));
+            padding-top: var(--space-3);
+            margin-top: var(--space-3);
+            font-weight: 700;
+        }
+
+        .price-negative {
+            color: hsl(var(--split-negative));
+        }
+
+        .price-positive {
+            color: hsl(var(--split-positive));
+        }
+
+        /* Actions Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-2);
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            border: var(--border-split);
+            border-radius: var(--radius);
+            background: hsl(var(--card));
+            text-decoration: none;
+            color: inherit;
+            font-size: var(--text-sm);
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: hsl(var(--hover-split));
+            border-color: hsl(var(--split-primary));
+        }
+
+        .action-btn-primary {
+            background: hsl(var(--split-primary));
+            color: hsl(var(--split-primary-foreground));
+            border-color: hsl(var(--split-primary));
+        }
+
+        .checkbox {
+            width: 14px;
+            height: 14px;
+            margin-right: var(--space-2);
+        }
+
+        /* Force 2x2 Grid Layout */
+        @media (min-width: 768px) {
+            .desktop-container {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                grid-template-rows: calc(50vh - 24px) calc(50vh - 24px) !important;
+                gap: 16px !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .desktop-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 300px);
+                height: auto;
+            }
+            
+            .desktop-panel {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop-container">
+        
+        <!-- Block 1: Inventory Information (Top Left) -->
+        <div class="desktop-panel">
+            <h2 class="panel-title">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                Inventory Information
+            </h2>
+            
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-label">On Hand</span>
+                    <span class="metric-value">12</span>
+                    <span class="metric-label">kg</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">On Order</span>
+                    <span class="metric-value">20</span>
+                    <span class="metric-label">kg</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Reorder</span>
+                    <span class="metric-value">15</span>
+                    <span class="metric-label">kg</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Level</span>
+                    <span class="metric-value">26.7</span>
+                    <span class="metric-label">%</span>
+                </div>
+            </div>
+            
+            <!-- Status Alert -->
+            <div class="status-alert">
+                <div class="alert-title">
+                    <i data-lucide="alert-triangle" class="w-4 h-4" style="display: inline; margin-right: 8px;"></i>
+                    Critical Stock Level
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Stock Depletion</span>
+                    <span>26.7%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div style="margin-top: 12px; font-size: 12px; color: #666;">
+                    Required by: 08/02/2024 • Delivery: Pastry Kitchen Storage
+                </div>
+            </div>
+        </div>
+        
+        <!-- Block 2: Vendor/Pricelist Information (Top Right) -->
+        <div class="desktop-panel">
+            <h2 class="panel-title">
+                <i data-lucide="building-2" class="w-5 h-5"></i>
+                Vendor/Pricelist Information
+            </h2>
+            
+            <div class="vendor-info">
+                <div class="vendor-name">Premium Food Suppliers Inc.</div>
+                <div class="vendor-details">
+                    PL-2024-USD-CHOCOLATE<br>
+                    USD • $22.00/kg<br>
+                    <span style="color: hsl(var(--split-info)); font-weight: 600;">Active Contract • Preferred Vendor</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Block 3: Business Dimensions (Bottom Left) -->
+        <div class="desktop-panel">
+            <h2 class="panel-title">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+                Business Dimensions
+            </h2>
+            
+            <div class="context-grid">
+                <div class="context-item">
+                    <span class="context-label">Job Number</span>
+                    <span class="context-value">PASTRY-2024-Q1-001</span>
+                </div>
+                <div class="context-item">
+                    <span class="context-label">Event</span>
+                    <span class="context-value">DESSERT-UPGRADE</span>
+                </div>
+                <div class="context-item">
+                    <span class="context-label">Project</span>
+                    <span class="context-value">PROJ001</span>
+                </div>
+                <div class="context-item">
+                    <span class="context-label">Segment</span>
+                    <span class="context-value">HOSPITALITY</span>
+                </div>
+            </div>
+            
+            <div class="actions-grid" style="margin-top: var(--space-4);">
+                <button class="action-btn action-btn-primary">
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                    Reorder Now
+                </button>
+                <button class="action-btn">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    Compare Prices
+                </button>
+                <button class="action-btn">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    View History
+                </button>
+                <button class="action-btn">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    Export Data
+                </button>
+            </div>
+        </div>
+        
+        <!-- Block 4: Pricing Breakdown (Bottom Right) -->
+        <div class="desktop-panel">
+            <h2 class="panel-title">
+                <i data-lucide="calculator" class="w-5 h-5"></i>
+                Pricing Breakdown
+            </h2>
+            
+            <div class="price-table">
+                <div class="price-row">
+                    <span class="price-label">Subtotal (25kg × $22.00)</span>
+                    <span class="price-value">USD 550.00</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">
+                        <input type="checkbox" class="checkbox" checked>
+                        Discount 5%
+                    </span>
+                    <span class="price-value price-negative">-USD 27.50</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">Net Amount</span>
+                    <span class="price-value">USD 522.50</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">
+                        <input type="checkbox" class="checkbox" checked>
+                        Tax (VAT 7%)
+                    </span>
+                    <span class="price-value price-positive">+USD 36.58</span>
+                </div>
+                <div class="price-row price-total">
+                    <span class="price-label">TOTAL</span>
+                    <span class="price-value">USD 559.08</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
