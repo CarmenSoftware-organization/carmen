@@ -1,9 +1,11 @@
-import { PurchaseRequestList } from './components/purchase-request-list'
+import { Metadata } from 'next'
+import { ModernPurchaseRequestList } from './components/ModernPurchaseRequestList'
+
+export const metadata: Metadata = {
+  title: 'Purchase Requests',
+  description: 'Manage and view all purchase requests',
+}
 
 export default function PurchaseRequestsPage() {
-  return (
-    <div>
-      <PurchaseRequestList />
-    </div>
-  )
+  return <ModernPurchaseRequestList />
 }

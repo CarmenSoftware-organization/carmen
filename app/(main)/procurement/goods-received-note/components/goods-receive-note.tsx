@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ChevronLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, CalendarIcon, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { ChevronLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, CalendarIcon, PanelRightClose, PanelRightOpen, Download, Share, Send, Archive } from "lucide-react";
 import {
   GoodsReceiveNote,
   GoodsReceiveNoteMode,
@@ -40,14 +40,17 @@ import {
 import { ExtraCostsTab } from "./tabs/ExtraCostsTab";
 import { StockMovementTab } from "./tabs/StockMovementTab";
 import { FinancialSummaryTab } from "./tabs/FinancialSummaryTab";
-import { ActivityLogTab } from "./tabs/ActivityLogTab";
 import { BulkActions } from "./tabs/BulkActions";
+import { GoodsReceiveNoteItemsBulkActions } from "./tabs/GoodsReceiveNoteItemsBulkActions";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import { useState, FC } from "react";
 import SummaryTotal from "./SummaryTotal";
+import { ModernTransactionSummary } from '@/components/ui/modern-transaction-summary';
 import ItemDetailForm  from "./tabs/itemDetailForm";
-import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import { TaxTab } from "./tabs/TaxTab";
+import { ActivityLogTab } from "./tabs/ActivityLogTab";
+import { FormFooter, ActionItem } from '@/components/ui/form-footer';
+import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import StockMovementContent from "./tabs/stock-movement";
 import { GoodsReceiveNoteDetail, GRNDetailMode } from "./GoodsReceiveNoteDetail";
 import { RelatedPOList } from "./tabs/RelatedPOList";
@@ -92,6 +95,8 @@ export function GoodsReceiveNoteComponent({
   const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false)
   const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Extract unique Purchase Order References from items
   const relatedPurchaseOrderRefs = React.useMemo(() => {
@@ -112,24 +117,57 @@ export function GoodsReceiveNoteComponent({
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+    setHasUnsavedChanges(true);
   };
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setHasUnsavedChanges(true);
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
+    setHasUnsavedChanges(true);
   };
 
-  const handleSave = () => {
-    console.log("Saving data:", formData);
-    setInternalMode("view");
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      console.log("Saving data:", formData);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setHasUnsavedChanges(false);
+      setInternalMode("view");
+    } catch (error) {
+      console.error('Error saving GRN:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
     setFormData(initialData);
+    setHasUnsavedChanges(false);
     setInternalMode("view");
+  };
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this GRN? This action cannot be undone.')) {
+      console.log('Deleting GRN:', formData.id);
+      // Simulate delete operation
+      alert('GRN deleted successfully!');
+      router.push('/procurement/goods-received-note');
+    }
+  };
+
+  const handleSend = () => {
+    console.log('Sending GRN:', formData.id);
+    alert('GRN sent successfully!');
+  };
+
+  const handleArchive = () => {
+    console.log('Archiving GRN:', formData.id);
+    alert('GRN archived successfully!');
   };
 
   const isEditable = internalMode === "edit" || internalMode === "add";
@@ -139,22 +177,52 @@ export function GoodsReceiveNoteComponent({
 
   const handleItemsChange = (updatedItems: GoodsReceiveNoteItem[]) => {
     setFormData((prev) => ({ ...prev, items: updatedItems }));
+    setHasUnsavedChanges(true);
   };
 
   const handleItemSelect = (itemId: string, isSelected: boolean) => {
-    setSelectedItems((prev) =>
-      isSelected ? [...prev, itemId] : prev.filter((id) => id !== itemId)
-    );
+    if (itemId === "") {
+      // Handle select all case
+      if (isSelected) {
+        // Select all items
+        setSelectedItems(formData.items.map(item => item.id));
+      } else {
+        // Deselect all items
+        setSelectedItems([]);
+      }
+    } else {
+      // Handle individual item selection
+      setSelectedItems((prev) =>
+        isSelected ? [...prev, itemId] : prev.filter((id) => id !== itemId)
+      );
+    }
   };
 
   const handleBulkAction = (action: string) => {
     console.log(`Applying ${action} to items:`, selectedItems);
-    if (action === "delete") {
-      setFormData((prev) => ({
-        ...prev,
-        items: prev.items.filter((item) => !selectedItems.includes(item.id)),
-      }));
+    
+    switch (action) {
+      case "delete":
+        setFormData((prev) => ({
+          ...prev,
+          items: prev.items.filter((item) => !selectedItems.includes(item.id)),
+        }));
+        break;
+      
+      case "changeQuantity":
+        // TODO: Implement bulk quantity change dialog
+        console.log("Bulk quantity change for items:", selectedItems);
+        break;
+      
+      case "changePrice":
+        // TODO: Implement bulk price change dialog
+        console.log("Bulk price change for items:", selectedItems);
+        break;
+      
+      default:
+        console.log(`Unknown bulk action: ${action}`);
     }
+    
     setSelectedItems([]);
   };
 
@@ -215,6 +283,47 @@ export function GoodsReceiveNoteComponent({
 
   const childMode: GoodsReceiveNoteMode = internalMode as GoodsReceiveNoteMode;
 
+  // Additional actions for view mode
+  const getAdditionalActions = (): ActionItem[] => {
+    if (internalMode !== 'view') return [];
+    
+    const actions: ActionItem[] = [];
+    
+    // Add Send action for received GRNs
+    if (formData.status === 'Received') {
+      actions.push({
+        id: 'send',
+        label: 'Send',
+        icon: Send,
+        variant: 'outline',
+        onClick: handleSend,
+        disabled: isLoading
+      });
+    }
+
+    // Add Archive action
+    actions.push({
+      id: 'archive',
+      label: 'Archive',
+      icon: Archive,
+      variant: 'outline',
+      onClick: handleArchive,
+      disabled: isLoading
+    });
+
+    // Add Delete action (destructive)
+    actions.push({
+      id: 'delete',
+      label: 'Delete',
+      icon: Trash2,
+      variant: 'destructive',
+      onClick: handleDelete,
+      disabled: isLoading
+    });
+
+    return actions;
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
@@ -230,42 +339,72 @@ export function GoodsReceiveNoteComponent({
                   <CardTitle className="text-xl font-bold">Goods Receive Note</CardTitle>
                   <StatusBadge status={formData.status} />
                 </div>
-                <div className="flex gap-2">
-                  {internalMode === "view" && (
+                <div className="flex items-center gap-2">
+                  {/* Mode-based Actions */}
+                  {internalMode === "view" ? (
                     <>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => setInternalMode("edit")}
+                      <Button 
+                        onClick={() => setInternalMode("edit")} 
+                        size="sm" 
+                        className="h-9"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        onClick={handleDelete} 
+                        size="sm" 
+                        className="h-9 text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200"
+                        disabled={isLoading}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </Button>
                     </>
-                  )}
-                  {isEditable && (
+                  ) : (
                     <>
-                      <Button variant="outline" size="sm" onClick={handleSave}>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={handleCancel}>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleCancel} 
+                        size="sm" 
+                        className="h-9"
+                        disabled={isLoading}
+                      >
                         <X className="mr-2 h-4 w-4" />
                         Cancel
                       </Button>
+                      <Button 
+                        onClick={handleSave} 
+                        size="sm" 
+                        className="h-9"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <Save className="mr-2 h-4 w-4" />
+                        ) : (
+                          <CheckSquare className="mr-2 h-4 w-4" />
+                        )}
+                        Save
+                      </Button>
                     </>
                   )}
-                  <Button variant="outline" size="sm">
+                  
+                  {/* Separator */}
+                  <div className="w-px h-6 bg-gray-300 mx-1" />
+                  
+                  {/* Utility Actions */}
+                  <Button variant="outline" size="sm" className="h-9">
                     <Printer className="mr-2 h-4 w-4" />
                     Print
                   </Button>
-                  <Button variant="outline" size="sm">
-                    <CheckSquare className="mr-2 h-4 w-4" />
-                    Commit
+                  <Button variant="outline" size="sm" className="h-9">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <Share className="mr-2 h-4 w-4" />
+                    Share
                   </Button>
                   <TooltipProvider>
                     <Tooltip>
@@ -540,13 +679,12 @@ export function GoodsReceiveNoteComponent({
           <Card>
             <CardContent>
               <Tabs defaultValue="items" className="w-full">
-                <TabsList className="grid w-full grid-cols-6">
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="items">Items</TabsTrigger>
                   <TabsTrigger value="stock-movements">Stock Movements</TabsTrigger>
                   <TabsTrigger value="extra-costs">Extra Costs</TabsTrigger>
                   <TabsTrigger value="related-po">Related POs</TabsTrigger>
                   <TabsTrigger value="financials">Financials</TabsTrigger>
-                  <TabsTrigger value="activity">Activity</TabsTrigger>
                 </TabsList>
                 <TabsContent value="items" className="mt-4">
                   <GoodsReceiveNoteItems
@@ -558,6 +696,12 @@ export function GoodsReceiveNoteComponent({
                     exchangeRate={formData.exchangeRate || 1}
                     baseCurrency={formData.baseCurrency || ''}
                     currency={formData.currency || ''}
+                    bulkActions={selectedItems.length > 0 && (
+                      <GoodsReceiveNoteItemsBulkActions
+                        selectedItems={selectedItems}
+                        onBulkAction={handleBulkAction}
+                      />
+                    )}
                   />
                 </TabsContent>
                 <TabsContent value="stock-movements" className="mt-4">
@@ -597,24 +741,30 @@ export function GoodsReceiveNoteComponent({
                      baseCurrency={formData.baseCurrency}
                    />
                 </TabsContent>
-                <TabsContent value="activity" className="mt-4">
-                  <CommentsAttachmentsTab 
-                      poData={formData}
-                  />
-                  <ActivityLogTab 
-                      activityLog={formData.activityLog || []}
-                  />
-                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Transaction Summary</CardTitle>
+              <CardTitle>
+                Transaction Summary ({formData.currency || 'USD'}
+                {formData.baseCurrency && formData.baseCurrency !== formData.currency && 
+                  ` / ${formData.baseCurrency}`
+                })
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <SummaryTotal poData={formData} />
+              <ModernTransactionSummary
+                subtotal={formData.subTotalPrice || 0}
+                discount={formData.discountAmount || 0}
+                netAmount={formData.netAmount || 0}
+                tax={formData.taxAmount || 0}
+                totalAmount={formData.totalAmount || 0}
+                currency={formData.currency || 'USD'}
+                baseCurrency={formData.baseCurrency}
+                exchangeRate={formData.exchangeRate || 1}
+              />
             </CardContent>
           </Card>
         </div>
@@ -639,6 +789,26 @@ export function GoodsReceiveNoteComponent({
           </Card>
         </div>
       </div>
+
+      {/* Form Footer for Standard Actions */}
+      <FormFooter
+        mode={internalMode}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onEdit={() => setInternalMode("edit")}
+        onDelete={handleDelete}
+        additionalActions={getAdditionalActions()}
+        isLoading={isLoading}
+        hasChanges={hasUnsavedChanges}
+        className="mt-6"
+      >
+        {internalMode !== 'view' && (
+          <span className="text-sm text-muted-foreground">
+            {hasUnsavedChanges ? 'You have unsaved changes' : 'No changes made'}
+          </span>
+        )}
+      </FormFooter>
+
     </div>
   );
 }

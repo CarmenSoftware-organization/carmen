@@ -1,0 +1,1407 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  ChevronDown, 
+  ChevronRight, 
+  Edit, 
+  Eye, 
+  Save, 
+  X, 
+  Package, 
+  DollarSign, 
+  AlertCircle, 
+  Settings, 
+  Truck, 
+  Split,
+  MoreHorizontal,
+  FileText,
+  Trash2
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+  DialogFooter,
+} from "@/components/ui/custom-dialog";
+import {
+  CalendarIcon,
+  Edit2Icon,
+  PlusIcon,
+  XIcon,
+  EyeIcon,
+  SaveIcon,
+  Table,
+} from "lucide-react";
+import { PurchaseOrderItem, PurchaseOrderStatus } from "@/lib/types";
+import { PrItemsTable } from "./pr-items-table";
+import InventoryBreakdown from "./inventory-breakdown";
+import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
+import { GoodsReceiveNoteTable } from "./goods-receive-note-table";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import SummaryTable from "./Summary";
+
+type Mode = "view" | "edit" | "add";
+
+interface ItemDetailsComponentProps {
+  initialMode: Mode;
+  onClose: () => void;
+  isOpen: boolean;
+  initialData?: PurchaseOrderItem;
+  onSubmit?: (item: PurchaseOrderItem) => void;
+}
+
+export function ItemDetailsComponent({
+  initialMode,
+  onClose,
+  isOpen,
+  initialData,
+  onSubmit,
+}: ItemDetailsComponentProps) {
+  const [activeTab, setActiveTab] = useState("details");
+  const [mode, setMode] = useState<Mode>(initialMode);
+  const [itemData, setItemData] = useState<Partial<PurchaseOrderItem>>(
+    initialData || {}
+  );
+  const [isPrItemsTableOpen, setIsPrItemsTableOpen] = useState(false);
+  const [isInventoryBreakdownOpen, setIsInventoryBreakdownOpen] =
+    useState(false);
+  const [isPendingPOsOpen, setIsPendingPOsOpen] = useState(false);
+  const [isGRNDialogOpen, setIsGRNDialogOpen] = useState(false);
+
+  useEffect(() => {
+    setMode(initialMode);
+    setItemData(initialData || {});
+  }, [initialMode, initialData]);
+
+  const isReadOnly = mode === "view";
+
+  const handleModeChange = (newMode: Mode) => {
+    setMode(newMode);
+  };
+
+  const handleInputChange = (field: keyof PurchaseOrderItem, value: any) => {
+    setItemData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    if (onSubmit && (mode === "edit" || mode === "add")) {
+      onSubmit(itemData as PurchaseOrderItem);
+    }
+    onClose();
+  };
+
+  const handleRequestNumberClick = () => {
+    setIsPrItemsTableOpen(true);
+  };
+
+  const handleOnHandClick = () => {
+    setIsInventoryBreakdownOpen(true);
+  };
+
+  const handleOnOrderClick = () => {
+    setIsPendingPOsOpen(true);
+  };
+
+  const handleGoodsReceivedClick = () => {
+    setIsGRNDialogOpen(true);
+  };
+
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-6xl max-h-[90vh] [&>button]:hidden">
+          <DialogHeader>
+            <div className="flex justify-between items-center">
+              <DialogTitle className="text-2xl font-bold">
+                PO Item Details
+              </DialogTitle>
+              <div className="flex items-center space-x-2">
+                {mode === "view" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleModeChange("edit")}
+                  >
+                    <Edit2Icon className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                )}
+                {mode === "edit" && (
+                  <>
+                    <Button variant="outline" size="sm" onClick={handleSave}>
+                      <SaveIcon className="h-4 w-4 mr-2" />
+                      Save
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleModeChange("view")}
+                    >
+                      <XIcon className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </>
+                )}
+                {mode === "add" && (
+                  <Button variant="outline" size="sm" onClick={handleSave}>
+                    <SaveIcon className="h-4 w-4 mr-2" />
+                    Save
+                  </Button>
+                )}
+
+                <DialogClose asChild>
+                  <Button variant="ghost" size="sm">
+                    <XIcon className="h-4 w-4" />
+                  </Button>
+                </DialogClose>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <ScrollArea className="max-h-[60vh] w-full overflow-y-auto">
+           <div className="space-y-2">
+                <div>
+                  <h3 className="text-md font-semibold mb-2">Basic Information</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                    <div className="space-y-1 col-span-1">
+                      <Label htmlFor="name" className="text-xs">Name</Label>
+                      <Input
+                        id="name"
+                        defaultValue="Organic Quinoa zzz"
+                        readOnly={isReadOnly}
+                        className="h-7 text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1 col-span-1 lg:col-span-3">
+                      <Label htmlFor="description" className="text-xs">Description</Label>
+                      <Input
+                        id="description"
+                        defaultValue="Premium organic white quinoa grains"
+                        readOnly={isReadOnly}
+                        className="h-7 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <div className="flex flex-col md:flex-row justify-between gap-2">
+                  <h3 className="text-md font-semibold mb-2">Quantity and Delivery</h3>
+                  <div className="flex flex-wrap justify-end gap-2 py-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRequestNumberClick}
+              >
+                Request #
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleOnHandClick}>
+                On Hand
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleOnOrderClick}>
+                On Order
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGoodsReceivedClick}
+              >
+                G. Received
+              </Button>
+            </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-2">
+                    <div className="lg:col-span-1 space-y-1">
+                      <Label htmlFor="unit" className="text-xs">
+                        Unit
+                      </Label>
+                      <Input
+                        id="unit"
+                        defaultValue="Kg"
+                        readOnly={isReadOnly}
+                        className="h-7 text-sm"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Base: Kg | 1 Bag = 0.5 Kg
+                      </p>
+                    </div>
+                    <div className="lg:col-span-1 space-y-1 flex items-center">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="foc" disabled={isReadOnly} />
+                        <Label htmlFor="foc" className="text-xs">
+                          FOC
+                        </Label>
+                      </div>
+                    </div>
+                    <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      <div className="space-y-1">
+                        <Label htmlFor="ordered-quantity" className="text-xs">
+                          Ordered Quantity
+                        </Label>
+                        <Input
+                          id="ordered-quantity"
+                          defaultValue="500"
+                          readOnly={isReadOnly}
+                          className="h-7 text-sm"
+                        />
+                        <p className="text-xs text-gray-500">5 Kg</p>
+                      </div>
+                      <div className="space-y-1">
+                        <Label
+                          htmlFor="received-quantity"
+                          className="text-xs"
+                        >
+                          Received Quantity
+                        </Label>
+                        <Input
+                          id="received-quantity"
+                          defaultValue="450"
+                          readOnly={isReadOnly}
+                          className="h-7 text-sm"
+                        />
+                        <p className="text-xs text-gray-500">4.5 Kg</p>
+                      </div>
+                      <div className="space-y-1">
+                        <Label
+                          htmlFor="remaining-quantity"
+                          className="text-xs"
+                        >
+                          Remaining Quantity
+                        </Label>
+                        <Input
+                          id="remaining-quantity"
+                          defaultValue="50"
+                          readOnly={isReadOnly}
+                          className="h-7 text-sm"
+                        />
+                        <p className="text-xs text-gray-500">0.5 Kg</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-500 bg-muted p-2">
+                    <div>
+                      <Label className="block text-xs">On Hand</Label>
+                      <span>100 Kg</span>
+                    </div>
+                    <div>
+                      <Label className="block text-xs">On Ordered</Label>
+                      <span>200 Kg</span>
+                    </div>
+                    <div>
+                      <Label className="block text-xs">Reorder Level</Label>
+                      <span>50 Kg</span>
+                    </div>
+                    <div>
+                      <Label className="block text-xs">Restock Level</Label>
+                      <span>300 Kg</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-md font-semibold mb-2">Pricing</h3>
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div className="space-y-1 sm:col-span-1">
+                          <Label htmlFor="currency" className="text-xs">
+                            Currency
+                          </Label>
+                          <Input
+                            id="currency"
+                            defaultValue="USD"
+                            readOnly={isReadOnly}
+                            className="h-7 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1 sm:col-span-1">
+                          <Label htmlFor="exch-rate" className="text-xs">
+                            Exch. Rate
+                          </Label>
+                          <Input
+                            id="exch-rate"
+                            defaultValue="1"
+                            readOnly={isReadOnly}
+                            className="h-7 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1 sm:col-span-1">
+                          <Label htmlFor="price" className="text-xs">
+                            Price
+                          </Label>
+                          <Input
+                            id="price"
+                            defaultValue="3.99"
+                            readOnly={isReadOnly}
+                            className="h-7 text-sm"
+                          />
+                        </div>
+
+                        <div className="flex flex-col pt-2">
+                        <Label
+                          htmlFor="enable-adjustment"
+                          className="text-xs"
+                        >
+                           Tax Incl.
+                        </Label>
+                        <div className="flex items-center h-7">
+                        <Checkbox
+                          id="enable-adjustment"
+                          disabled={isReadOnly}
+                          className="text-sm"
+                        />
+                        </div>
+                        
+                      </div>
+
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="flex gap-2 items-center w-full">
+                          <div className="flex flex-col">
+                            <Label
+                              htmlFor="enable-disc-adjustment"
+                              className="space-y-1 text-xs"
+                            >
+                              Adj.
+                            </Label>
+                            <div className="flex items-center h-7">
+                              <Checkbox
+                                id="enable-disc-adjustment"
+                                disabled={isReadOnly}
+                                className="text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <Label htmlFor="disc-rate" className="text-xs">
+                              Disc. Rate (%)
+                            </Label>
+                            <Input
+                              id="disc-rate"
+                              defaultValue="5"
+                              readOnly={isReadOnly}
+                              className="h-7 text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1 w-full">
+                          <Label htmlFor="override-discount" className="text-xs">
+                            Override Discount
+                          </Label>
+                          <Input
+                            id="override-discount"
+                            placeholder="Enter to override"
+                            readOnly={isReadOnly}
+                            className="h-7 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="flex gap-2 items-center w-full">
+                          <div className="flex flex-col">
+                            <Label
+                              htmlFor="enable-tax-adjustment"
+                              className="space-y-1 text-xs"
+                            >
+                              Adj.
+                            </Label>
+                            <div className="flex items-center h-7">
+                              <Checkbox
+                                id="enable-tax-adjustment"
+                                disabled={isReadOnly}
+                                className="text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1 w-full">
+                            <Label htmlFor="tax-rate" className="text-xs">
+                              Tax Rate (%)
+                            </Label>
+                            <Input
+                              id="tax-rate"
+                              defaultValue="7"
+                              readOnly={isReadOnly}
+                              className="h-7 text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="override-tax" className="text-xs">
+                            Override Tax
+                          </Label>
+                          <Input
+                            id="override-tax"
+                            placeholder="Enter to override"
+                            readOnly={isReadOnly}
+                            className="h-7 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <Separator className="my-2" />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-500 bg-muted p-2">
+                        <div>
+                          <Label className="block text-xs">Last Price</Label>
+                          <span>$3.85 per Kg</span>
+                        </div>
+                        <div>
+                          <Label className="block text-xs">
+                            Last Order Date
+                          </Label>
+                          <span>2023-05-15</span>
+                        </div>
+                        <div>
+                          <Label className="block text-xs">Last Vendor</Label>
+                          <span>Organic Supplies Inc.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-md font-semibold mb-2">Calculated Amounts</h3>
+                    <SummaryTable
+                      item={itemData as PurchaseOrderItem}
+                      currencyBase="THB"
+                      currencyCurrent="USD"
+                    />
+                  </div>
+                </div>
+                </div>
+          </ScrollArea>
+
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isPrItemsTableOpen} onOpenChange={setIsPrItemsTableOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] [&>button]:hidden">
+          <DialogHeader>
+            <div className="flex justify-between w-full items-center">
+              <DialogTitle>Relate Purchase Requests</DialogTitle>
+              <DialogClose asChild>
+                <Button variant="ghost" size="sm">
+                  <XIcon className="h-4 w-4" />
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogHeader>
+          <PrItemsTable />
+        </DialogContent>
+      </Dialog>
+
+      <InventoryBreakdown
+        isOpen={isInventoryBreakdownOpen}
+        onClose={() => setIsInventoryBreakdownOpen(false)}
+        itemData={{
+          name: itemData.name || "",
+          description: itemData.description || "",
+          status: itemData.status || "Pending",
+        }}
+      />
+
+      <Dialog open={isPendingPOsOpen} onOpenChange={setIsPendingPOsOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] [&>button]:hidden">
+          <DialogHeader>
+            <div className="flex justify-between w-full items-center">
+              <DialogTitle>Pending Purchase Orders</DialogTitle>
+              <DialogClose asChild>
+                <Button variant="ghost" size="sm">
+                  <XIcon className="h-4 w-4" />
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogHeader>
+          <PendingPurchaseOrdersComponent />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isGRNDialogOpen} onOpenChange={setIsGRNDialogOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
+        <DialogHeader>
+          <div className="flex justify-between w-full items-center">
+          <DialogTitle>Goods Receive Note</DialogTitle>
+          <DialogClose asChild>
+                  <Button variant="ghost" size="sm">
+                    <XIcon className="h-4 w-4" />
+                  </Button>
+                </DialogClose>
+                </div>
+          </DialogHeader>
+          <GoodsReceiveNoteTable />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+// Enhanced PO Item Row Component - Three-tier collapsible architecture
+interface EnhancedPOItemRowProps {
+  item: PurchaseOrderItem;
+  isExpanded?: boolean;
+  isEditMode?: boolean;
+  isSelected?: boolean;
+  onToggleExpand: (itemId: string) => void;
+  onToggleEdit: (itemId: string) => void;
+  onSelect: (itemId: string) => void;
+  onUpdateItem: (item: PurchaseOrderItem) => void;
+  onViewDetails: (item: PurchaseOrderItem) => void;
+  onGoodsReceived?: (item: PurchaseOrderItem) => void;
+  onSplitLine?: (item: PurchaseOrderItem) => void;
+  onCancelItem?: (item: PurchaseOrderItem) => void;
+  showCheckbox?: boolean;
+  className?: string;
+}
+
+export function EnhancedPOItemRow({
+  item,
+  isExpanded = false,
+  isEditMode = false,
+  isSelected = false,
+  onToggleExpand,
+  onToggleEdit,
+  onSelect,
+  onUpdateItem,
+  onViewDetails,
+  onGoodsReceived,
+  onSplitLine,
+  onCancelItem,
+  showCheckbox = true,
+  className = "",
+}: EnhancedPOItemRowProps) {
+  const [editedItem, setEditedItem] = useState<PurchaseOrderItem>(() => ({ ...item }));
+  const [isCurrentlyEditing, setIsCurrentlyEditing] = useState(false);
+
+  // Update edited item when item prop changes
+  useEffect(() => {
+    if (!isCurrentlyEditing) {
+      setEditedItem({ ...item });
+    }
+  }, [item, isCurrentlyEditing]);
+
+  // Track edit mode changes
+  useEffect(() => {
+    if (isEditMode && !isCurrentlyEditing) {
+      setIsCurrentlyEditing(true);
+    } else if (!isEditMode && isCurrentlyEditing) {
+      setIsCurrentlyEditing(false);
+      setEditedItem({ ...item });
+    }
+  }, [isEditMode, isCurrentlyEditing, item]);
+
+  const handleFieldChange = (field: keyof PurchaseOrderItem, value: any) => {
+    setEditedItem(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    onUpdateItem(editedItem);
+    setIsCurrentlyEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedItem({ ...item });
+    setIsCurrentlyEditing(false);
+    onToggleEdit(item.id);
+  };
+
+  // Calculate derived values
+  const lineTotal = (editedItem.orderedQuantity || 0) * (editedItem.unitPrice || 0);
+  const taxAmount = lineTotal * (editedItem.taxRate || 0);
+  const discountAmount = lineTotal * (editedItem.discountRate || 0);
+  const finalTotal = lineTotal + taxAmount - discountAmount;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Not Received': return 'bg-red-100 text-red-800 border-red-200';
+      case 'Partially Received': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Fully Received': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const renderField = (
+    field: keyof PurchaseOrderItem,
+    label: string,
+    displayValue: React.ReactNode,
+    editComponent: React.ReactNode,
+    editable: boolean = true
+  ) => {
+    return isEditMode && editable ? editComponent : displayValue;
+  };
+
+  return (
+    <Card className={`transition-all duration-200 hover:shadow-md ${isEditMode ? 'ring-2 ring-blue-300 bg-blue-50/20' : ''} ${className}`}>
+      {/* Tier 1: Compact Row (Always Visible) */}
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            {showCheckbox && (
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onSelect(item.id)}
+                className="data-[state=checked]:bg-blue-600"
+              />
+            )}
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onToggleExpand(item.id)}
+              className="p-1 h-8 w-8"
+            >
+              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 truncate">
+                    {renderField(
+                      'name',
+                      'Item Name',
+                      item.name,
+                      <Input
+                        value={editedItem.name}
+                        onChange={(e) => handleFieldChange('name', e.target.value)}
+                        className="font-semibold"
+                        placeholder="Item name"
+                      />
+                    )}
+                  </h4>
+                  <p className="text-sm text-gray-500 truncate">
+                    {renderField(
+                      'description',
+                      'Description',
+                      item.description || 'No description',
+                      <Input
+                        value={editedItem.description || ''}
+                        onChange={(e) => handleFieldChange('description', e.target.value)}
+                        className="text-sm"
+                        placeholder="Item description"
+                      />
+                    )}
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-6 text-sm">
+                  <div className="text-center">
+                    <div className="text-gray-500 text-xs">Ordered</div>
+                    <div className="font-medium">
+                      {renderField(
+                        'orderedQuantity',
+                        'Ordered Quantity',
+                        `${item.orderedQuantity} ${item.orderUnit}`,
+                        <div className="flex items-center space-x-1">
+                          <Input
+                            type="number"
+                            value={editedItem.orderedQuantity}
+                            onChange={(e) => handleFieldChange('orderedQuantity', parseFloat(e.target.value) || 0)}
+                            className="w-20 text-center"
+                            min={0}
+                            step={0.01}
+                          />
+                          <Select value={editedItem.orderUnit} onValueChange={(value) => handleFieldChange('orderUnit', value)}>
+                            <SelectTrigger className="w-16">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pieces">pcs</SelectItem>
+                              <SelectItem value="kg">kg</SelectItem>
+                              <SelectItem value="liters">L</SelectItem>
+                              <SelectItem value="boxes">box</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="text-gray-500 text-xs">Unit Price</div>
+                    <div className="font-medium">
+                      {renderField(
+                        'unitPrice',
+                        'Unit Price',
+                        `$${item.unitPrice?.toFixed(2) || '0.00'}`,
+                        <Input
+                          type="number"
+                          value={editedItem.unitPrice}
+                          onChange={(e) => handleFieldChange('unitPrice', parseFloat(e.target.value) || 0)}
+                          className="w-24 text-center"
+                          min={0}
+                          step={0.01}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="text-gray-500 text-xs">Total</div>
+                    <div className="font-semibold text-blue-600">
+                      ${finalTotal.toFixed(2)}
+                    </div>
+                  </div>
+
+                  <Badge className={getStatusColor(item.status || 'Not Received')}>
+                    {item.status || 'Not Received'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            {isEditMode ? (
+              <>
+                <Button size="sm" onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                  <Save className="h-4 w-4 mr-1" />
+                  Save
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleCancel}>
+                  <X className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onToggleEdit(item.id)}
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onViewDetails(item)}
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  Details
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Tier 2: Essential Details (Expandable) */}
+      {isExpanded && (
+        <div className="border-t bg-gray-50/50 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Receiving Information */}
+            <div className="space-y-3">
+              <h5 className="font-medium text-gray-900 flex items-center">
+                <Package className="h-4 w-4 mr-2" />
+                Receiving Info
+              </h5>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Base Quantity:</span>
+                  <span className="font-medium">
+                    {renderField(
+                      'baseQuantity',
+                      'Base Quantity',
+                      `${item.baseQuantity} ${item.baseUnit}`,
+                      <div className="flex items-center space-x-1">
+                        <Input
+                          type="number"
+                          value={editedItem.baseQuantity}
+                          onChange={(e) => handleFieldChange('baseQuantity', parseFloat(e.target.value) || 0)}
+                          className="w-16 text-xs"
+                          min={0}
+                          step={0.01}
+                        />
+                        <span className="text-xs">{editedItem.baseUnit}</span>
+                      </div>
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Received Qty:</span>
+                  <span className="font-medium">
+                    {renderField(
+                      'baseReceivingQty',
+                      'Received Quantity',
+                      `${item.baseReceivingQty || 0} ${item.baseUnit}`,
+                      <Input
+                        type="number"
+                        value={editedItem.baseReceivingQty || 0}
+                        onChange={(e) => handleFieldChange('baseReceivingQty', parseFloat(e.target.value) || 0)}
+                        className="w-20 text-xs"
+                        min={0}
+                        step={0.01}
+                      />
+                    )}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={editedItem.isFOC}
+                    onCheckedChange={(checked) => handleFieldChange('isFOC', checked)}
+                    disabled={!isEditMode}
+                  />
+                  <label className="text-xs">Free of Charge (FOC)</label>
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Information */}
+            <div className="space-y-3">
+              <h5 className="font-medium text-gray-900 flex items-center">
+                <DollarSign className="h-4 w-4 mr-2" />
+                Financial Details
+              </h5>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Subtotal:</span>
+                  <span className="font-medium">${lineTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Tax ({((editedItem.taxRate || 0) * 100).toFixed(1)}%):</span>
+                  <div className="flex items-center space-x-1">
+                    <span className="font-medium">${taxAmount.toFixed(2)}</span>
+                    {isEditMode && (
+                      <Input
+                        type="number"
+                        value={((editedItem.taxRate || 0) * 100).toFixed(1)}
+                        onChange={(e) => handleFieldChange('taxRate', (parseFloat(e.target.value) || 0) / 100)}
+                        className="w-16 text-xs"
+                        min={0}
+                        max={100}
+                        step={0.1}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Discount ({((editedItem.discountRate || 0) * 100).toFixed(1)}%):</span>
+                  <div className="flex items-center space-x-1">
+                    <span className="font-medium text-red-600">-${discountAmount.toFixed(2)}</span>
+                    {isEditMode && (
+                      <Input
+                        type="number"
+                        value={((editedItem.discountRate || 0) * 100).toFixed(1)}
+                        onChange={(e) => handleFieldChange('discountRate', (parseFloat(e.target.value) || 0) / 100)}
+                        className="w-16 text-xs"
+                        min={0}
+                        max={100}
+                        step={0.1}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="flex justify-between border-t pt-2">
+                  <span className="text-gray-900 font-medium">Final Total:</span>
+                  <span className="font-semibold text-blue-600">${finalTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={editedItem.taxIncluded}
+                    onCheckedChange={(checked) => handleFieldChange('taxIncluded', checked)}
+                    disabled={!isEditMode}
+                  />
+                  <label className="text-xs">Tax Included in Price</label>
+                </div>
+              </div>
+            </div>
+
+            {/* Status & Actions */}
+            <div className="space-y-3">
+              <h5 className="font-medium text-gray-900 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Status & Actions
+              </h5>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs text-gray-500">Current Status</Label>
+                  <Badge className={`${getStatusColor(item.status || 'Not Received')} w-full justify-center mt-1`}>
+                    {item.status || 'Not Received'}
+                  </Badge>
+                </div>
+                
+                <div className="flex flex-col space-y-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => onGoodsReceived?.(item)}
+                  >
+                    <Truck className="h-4 w-4 mr-2" />
+                    Goods Received
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => onSplitLine?.(item)}
+                  >
+                    <Split className="h-4 w-4 mr-2" />
+                    Split Line
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-red-600 hover:text-red-700"
+                    onClick={() => onCancelItem?.(item)}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel Item
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tier 3: Detailed Edit Panel (when expanded + edit mode) */}
+      {isExpanded && isEditMode && (
+        <div className="border-t bg-blue-50/30 p-4">
+          <h5 className="font-medium text-gray-900 mb-4 flex items-center">
+            <Settings className="h-4 w-4 mr-2" />
+            Advanced Settings
+          </h5>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Advanced Pricing */}
+            <div className="space-y-4">
+              <h6 className="font-medium text-gray-800">Advanced Pricing</h6>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm">Tax Amount Override</Label>
+                  <Input
+                    type="number"
+                    value={editedItem.taxAmount || ''}
+                    onChange={(e) => handleFieldChange('taxAmount', parseFloat(e.target.value) || 0)}
+                    placeholder="Custom tax amount"
+                    min={0}
+                    step={0.01}
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm">Discount Amount Override</Label>
+                  <Input
+                    type="number"
+                    value={editedItem.discountAmount || ''}
+                    onChange={(e) => handleFieldChange('discountAmount', parseFloat(e.target.value) || 0)}
+                    placeholder="Custom discount amount"
+                    min={0}
+                    step={0.01}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">Adjustments</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={editedItem.adjustments?.discount || false}
+                        onCheckedChange={(checked) => 
+                          handleFieldChange('adjustments', { 
+                            ...editedItem.adjustments, 
+                            discount: checked 
+                          })
+                        }
+                      />
+                      <label className="text-sm">Apply Discount</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={editedItem.adjustments?.tax || false}
+                        onCheckedChange={(checked) => 
+                          handleFieldChange('adjustments', { 
+                            ...editedItem.adjustments, 
+                            tax: checked 
+                          })
+                        }
+                      />
+                      <label className="text-sm">Apply Tax</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="space-y-4">
+              <h6 className="font-medium text-gray-800">Additional Information</h6>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm">Internal Notes</Label>
+                  <Textarea
+                    value={editedItem.internalNotes || ''}
+                    onChange={(e) => handleFieldChange('internalNotes', e.target.value)}
+                    placeholder="Internal notes (not visible to vendor)"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm">Vendor Reference</Label>
+                  <Input
+                    value={editedItem.vendorReference || ''}
+                    onChange={(e) => handleFieldChange('vendorReference', e.target.value)}
+                    placeholder="Vendor's requisition #"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+// Enhanced PO Item Row Component - Three-tier collapsible architecture
+interface EnhancedPOItemRowProps {
+  item: PurchaseOrderItem;
+  isExpanded?: boolean;
+  isEditMode?: boolean;
+  isSelected?: boolean;
+  onToggleExpand: (itemId: string) => void;
+  onToggleEdit: (itemId: string) => void;
+  onSelect: (itemId: string) => void;
+  onUpdateItem: (item: PurchaseOrderItem) => void;
+  onViewDetails: (item: PurchaseOrderItem) => void;
+  onGoodsReceived?: (item: PurchaseOrderItem) => void;
+  onSplitLine?: (item: PurchaseOrderItem) => void;
+  onCancelItem?: (item: PurchaseOrderItem) => void;
+  showCheckbox?: boolean;
+  className?: string;
+}
+
+export function EnhancedPOItemRow({
+  item,
+  isExpanded = false,
+  isEditMode = false,
+  isSelected = false,
+  onToggleExpand,
+  onToggleEdit,
+  onSelect,
+  onUpdateItem,
+  onViewDetails,
+  onGoodsReceived,
+  onSplitLine,
+  onCancelItem,
+  showCheckbox = true,
+  className = ""
+}: EnhancedPOItemRowProps) {
+  const [editedItem, setEditedItem] = useState<PurchaseOrderItem>(item);
+
+  // Handle input changes in edit mode
+  const handleInputChange = (field: keyof PurchaseOrderItem, value: any) => {
+    setEditedItem(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Calculate totals
+  const lineTotal = (editedItem.orderedQuantity || 0) * (editedItem.unitPrice || 0);
+  const taxAmount = lineTotal * (editedItem.taxRate || 0);
+  const discountAmount = lineTotal * (editedItem.discountRate || 0);
+  const netAmount = lineTotal + taxAmount - discountAmount;
+
+  const handleSave = () => {
+    onUpdateItem(editedItem);
+    onToggleEdit(item.id);
+  };
+
+  const handleCancel = () => {
+    setEditedItem(item); // Reset to original
+    onToggleEdit(item.id);
+  };
+
+  return (
+    <Card className={`transition-all duration-200 ${isSelected ? 'ring-2 ring-blue-500' : ''} ${className}`}>
+      {/* Tier 1: Compact Row (Always Visible) */}
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3 flex-1">
+            {showCheckbox && (
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onSelect(item.id)}
+                className="data-[state=checked]:bg-blue-600"
+              />
+            )}
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-3">
+                <h3 className="font-medium text-sm truncate">{item.name}</h3>
+                <Badge variant="outline" className="text-xs">
+                  {item.status || 'Pending'}
+                </Badge>
+              </div>
+              <p className="text-xs text-gray-500 truncate mt-1">{item.description}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <div className="text-right hidden sm:block">
+              <div className="text-sm font-medium">{item.orderedQuantity} {item.orderUnit}</div>
+              <div className="text-xs text-gray-500">${(item.unitPrice || 0).toFixed(2)}</div>
+            </div>
+            
+            <div className="text-right hidden md:block">
+              <div className="text-sm font-semibold text-blue-600">
+                ${netAmount.toFixed(2)}
+              </div>
+              <div className="text-xs text-gray-500">Total</div>
+            </div>
+
+            <div className="flex items-center space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onToggleExpand(item.id)}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onViewDetails(item)}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onToggleEdit(item.id)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    {isEditMode ? 'Cancel Edit' : 'Edit'}
+                  </DropdownMenuItem>
+                  {onGoodsReceived && (
+                    <DropdownMenuItem onClick={() => onGoodsReceived(item)}>
+                      <Package className="h-4 w-4 mr-2" />
+                      Goods Received
+                    </DropdownMenuItem>
+                  )}
+                  {onSplitLine && (
+                    <DropdownMenuItem onClick={() => onSplitLine(item)}>
+                      <Split className="h-4 w-4 mr-2" />
+                      Split Line
+                    </DropdownMenuItem>
+                  )}
+                  {onCancelItem && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => onCancelItem(item)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Cancel Item
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tier 3: Expandable Details Panel */}
+      {isExpanded && (
+        <div className="border-t border-gray-200">
+          <div className="p-4 bg-gray-50">
+            {isEditMode ? (
+              // Edit Mode
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-medium text-sm">Edit Item Details</h4>
+                  <div className="flex space-x-2">
+                    <Button size="sm" onClick={handleSave}>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handleCancel}>
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-name" className="text-xs font-medium">Item Name</Label>
+                    <Input
+                      id="edit-name"
+                      value={editedItem.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-quantity" className="text-xs font-medium">Quantity</Label>
+                    <Input
+                      id="edit-quantity"
+                      type="number"
+                      value={editedItem.orderedQuantity}
+                      onChange={(e) => handleInputChange('orderedQuantity', parseFloat(e.target.value) || 0)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-unit-price" className="text-xs font-medium">Unit Price</Label>
+                    <Input
+                      id="edit-unit-price"
+                      type="number"
+                      step="0.01"
+                      value={editedItem.unitPrice}
+                      onChange={(e) => handleInputChange('unitPrice', parseFloat(e.target.value) || 0)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-unit" className="text-xs font-medium">Unit</Label>
+                    <Input
+                      id="edit-unit"
+                      value={editedItem.orderUnit}
+                      onChange={(e) => handleInputChange('orderUnit', e.target.value)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-tax-rate" className="text-xs font-medium">Tax Rate (%)</Label>
+                    <Input
+                      id="edit-tax-rate"
+                      type="number"
+                      step="0.01"
+                      value={(editedItem.taxRate || 0) * 100}
+                      onChange={(e) => handleInputChange('taxRate', (parseFloat(e.target.value) || 0) / 100)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-discount-rate" className="text-xs font-medium">Discount (%)</Label>
+                    <Input
+                      id="edit-discount-rate"
+                      type="number"
+                      step="0.01"
+                      value={(editedItem.discountRate || 0) * 100}
+                      onChange={(e) => handleInputChange('discountRate', (parseFloat(e.target.value) || 0) / 100)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium">Net Amount</Label>
+                    <div className="h-8 px-3 py-2 bg-white border rounded-md text-sm font-medium text-blue-600">
+                      ${netAmount.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-description" className="text-xs font-medium">Description</Label>
+                  <Textarea
+                    id="edit-description"
+                    value={editedItem.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    className="text-sm min-h-[60px]"
+                    placeholder="Item description..."
+                  />
+                </div>
+              </div>
+            ) : (
+              // View Mode
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Ordered Quantity</Label>
+                    <div className="text-sm">{item.orderedQuantity} {item.orderUnit}</div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Unit Price</Label>
+                    <div className="text-sm">${(item.unitPrice || 0).toFixed(2)}</div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Line Total</Label>
+                    <div className="text-sm">${lineTotal.toFixed(2)}</div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Net Amount</Label>
+                    <div className="text-sm font-semibold text-blue-600">${netAmount.toFixed(2)}</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Tax ({((item.taxRate || 0) * 100).toFixed(1)}%)</Label>
+                    <div className="text-sm">${taxAmount.toFixed(2)}</div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Discount ({((item.discountRate || 0) * 100).toFixed(1)}%)</Label>
+                    <div className="text-sm">${discountAmount.toFixed(2)}</div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Status</Label>
+                    <Badge variant="outline" className="text-xs">
+                      {item.status || 'Pending'}
+                    </Badge>
+                  </div>
+                </div>
+
+                {item.description && (
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Description</Label>
+                    <div className="text-sm text-gray-700">{item.description}</div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}

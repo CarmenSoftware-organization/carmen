@@ -1,0 +1,429 @@
+[
+  {
+    "id": "email-sub-001",
+    "vendorId": "vendor-001",
+    "vendorName": "ABC Food Supplies",
+    "templateId": "template-001",
+    "submissionMethod": "email",
+    "emailDetails": {
+      "from": "john.smith@abcfood.com",
+      "to": "pricing@carmen.com",
+      "subject": "ABC Food Supplies - January 2024 Price Update",
+      "receivedAt": "2024-01-15T14:30:00Z",
+      "messageId": "msg-001-abc-jan2024",
+      "attachments": [
+        {
+          "filename": "ABC_Food_Supplies_Prices_Jan2024.xlsx",
+          "size": 45678,
+          "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+      ]
+    },
+    "processingStatus": "completed",
+    "processingSteps": [
+      {
+        "step": "email_received",
+        "timestamp": "2024-01-15T14:30:00Z",
+        "status": "success",
+        "message": "Email received and queued for processing"
+      },
+      {
+        "step": "attachment_extracted",
+        "timestamp": "2024-01-15T14:30:15Z",
+        "status": "success",
+        "message": "Excel file extracted successfully"
+      },
+      {
+        "step": "file_validation",
+        "timestamp": "2024-01-15T14:30:30Z",
+        "status": "success",
+        "message": "File format validation passed"
+      },
+      {
+        "step": "data_parsing",
+        "timestamp": "2024-01-15T14:30:45Z",
+        "status": "success",
+        "message": "45 price items parsed successfully"
+      },
+      {
+        "step": "business_validation",
+        "timestamp": "2024-01-15T14:31:00Z",
+        "status": "success",
+        "message": "All business rules validation passed"
+      },
+      {
+        "step": "data_import",
+        "timestamp": "2024-01-15T14:31:15Z",
+        "status": "success",
+        "message": "Price data imported to system"
+      },
+      {
+        "step": "confirmation_sent",
+        "timestamp": "2024-01-15T14:31:30Z",
+        "status": "success",
+        "message": "Confirmation email sent to vendor"
+      }
+    ],
+    "validationResults": {
+      "totalRows": 45,
+      "validRows": 45,
+      "invalidRows": 0,
+      "warnings": 0,
+      "errors": []
+    },
+    "importResults": {
+      "itemsProcessed": 45,
+      "itemsCreated": 42,
+      "itemsUpdated": 3,
+      "itemsSkipped": 0
+    },
+    "confirmationEmail": {
+      "sentTo": "john.smith@abcfood.com",
+      "sentAt": "2024-01-15T14:31:30Z",
+      "subject": "Price Submission Confirmation - ABC Food Supplies",
+      "status": "delivered"
+    },
+    "createdAt": "2024-01-15T14:30:00Z",
+    "completedAt": "2024-01-15T14:31:30Z"
+  },
+  {
+    "id": "email-sub-002",
+    "vendorId": "vendor-002",
+    "vendorName": "Fresh Produce Co.",
+    "templateId": "template-002",
+    "submissionMethod": "email",
+    "emailDetails": {
+      "from": "maria.garcia@freshproduce.com",
+      "to": "pricing@carmen.com",
+      "subject": "Fresh Produce Weekly Prices - Week 3 Jan 2024",
+      "receivedAt": "2024-01-14T16:45:00Z",
+      "messageId": "msg-002-fresh-week3",
+      "attachments": [
+        {
+          "filename": "Fresh_Produce_Week3_Jan2024.xlsx",
+          "size": 28934,
+          "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+      ]
+    },
+    "processingStatus": "completed",
+    "processingSteps": [
+      {
+        "step": "email_received",
+        "timestamp": "2024-01-14T16:45:00Z",
+        "status": "success",
+        "message": "Email received and queued for processing"
+      },
+      {
+        "step": "attachment_extracted",
+        "timestamp": "2024-01-14T16:45:10Z",
+        "status": "success",
+        "message": "Excel file extracted successfully"
+      },
+      {
+        "step": "file_validation",
+        "timestamp": "2024-01-14T16:45:20Z",
+        "status": "success",
+        "message": "File format validation passed"
+      },
+      {
+        "step": "data_parsing",
+        "timestamp": "2024-01-14T16:45:35Z",
+        "status": "success",
+        "message": "28 price items parsed successfully"
+      },
+      {
+        "step": "business_validation",
+        "timestamp": "2024-01-14T16:45:50Z",
+        "status": "warning",
+        "message": "2 items have validity period exceeding 7 days"
+      },
+      {
+        "step": "data_import",
+        "timestamp": "2024-01-14T16:46:05Z",
+        "status": "success",
+        "message": "Price data imported with warnings"
+      },
+      {
+        "step": "confirmation_sent",
+        "timestamp": "2024-01-14T16:46:20Z",
+        "status": "success",
+        "message": "Confirmation email sent with warnings"
+      }
+    ],
+    "validationResults": {
+      "totalRows": 28,
+      "validRows": 28,
+      "invalidRows": 0,
+      "warnings": 2,
+      "errors": [],
+      "warningDetails": [
+        {
+          "row": 15,
+          "field": "validTo",
+          "message": "Validity period exceeds 7 days for fresh produce",
+          "severity": "warning"
+        },
+        {
+          "row": 23,
+          "field": "validTo",
+          "message": "Validity period exceeds 7 days for fresh produce",
+          "severity": "warning"
+        }
+      ]
+    },
+    "importResults": {
+      "itemsProcessed": 28,
+      "itemsCreated": 25,
+      "itemsUpdated": 3,
+      "itemsSkipped": 0
+    },
+    "confirmationEmail": {
+      "sentTo": "maria.garcia@freshproduce.com",
+      "sentAt": "2024-01-14T16:46:20Z",
+      "subject": "Price Submission Confirmation - Fresh Produce Co. (With Warnings)",
+      "status": "delivered"
+    },
+    "createdAt": "2024-01-14T16:45:00Z",
+    "completedAt": "2024-01-14T16:46:20Z"
+  },
+  {
+    "id": "email-sub-003",
+    "vendorId": "vendor-003",
+    "vendorName": "Kitchen Equipment Ltd",
+    "templateId": "template-003",
+    "submissionMethod": "email",
+    "emailDetails": {
+      "from": "david.wilson@kitchenequip.com",
+      "to": "pricing@carmen.com",
+      "subject": "Q1 2024 Equipment Pricing Update",
+      "receivedAt": "2024-01-10T11:20:00Z",
+      "messageId": "msg-003-kitchen-q1",
+      "attachments": [
+        {
+          "filename": "Kitchen_Equipment_Q1_2024_Pricing.xlsx",
+          "size": 67890,
+          "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+      ]
+    },
+    "processingStatus": "failed",
+    "processingSteps": [
+      {
+        "step": "email_received",
+        "timestamp": "2024-01-10T11:20:00Z",
+        "status": "success",
+        "message": "Email received and queued for processing"
+      },
+      {
+        "step": "attachment_extracted",
+        "timestamp": "2024-01-10T11:20:15Z",
+        "status": "success",
+        "message": "Excel file extracted successfully"
+      },
+      {
+        "step": "file_validation",
+        "timestamp": "2024-01-10T11:20:30Z",
+        "status": "success",
+        "message": "File format validation passed"
+      },
+      {
+        "step": "data_parsing",
+        "timestamp": "2024-01-10T11:20:45Z",
+        "status": "success",
+        "message": "15 price items parsed successfully"
+      },
+      {
+        "step": "business_validation",
+        "timestamp": "2024-01-10T11:21:00Z",
+        "status": "error",
+        "message": "3 items failed validation - invalid currency codes"
+      },
+      {
+        "step": "error_notification_sent",
+        "timestamp": "2024-01-10T11:21:15Z",
+        "status": "success",
+        "message": "Error notification sent to vendor"
+      }
+    ],
+    "validationResults": {
+      "totalRows": 15,
+      "validRows": 12,
+      "invalidRows": 3,
+      "warnings": 0,
+      "errors": [
+        {
+          "row": 8,
+          "field": "currency",
+          "message": "Invalid currency code 'CAD' - not in supported currencies list",
+          "severity": "error"
+        },
+        {
+          "row": 12,
+          "field": "currency",
+          "message": "Invalid currency code 'CAD' - not in supported currencies list",
+          "severity": "error"
+        },
+        {
+          "row": 14,
+          "field": "unitPrice",
+          "message": "Unit price cannot be negative",
+          "severity": "error"
+        }
+      ]
+    },
+    "importResults": {
+      "itemsProcessed": 0,
+      "itemsCreated": 0,
+      "itemsUpdated": 0,
+      "itemsSkipped": 15
+    },
+    "errorNotificationEmail": {
+      "sentTo": "david.wilson@kitchenequip.com",
+      "sentAt": "2024-01-10T11:21:15Z",
+      "subject": "Price Submission Error - Kitchen Equipment Ltd",
+      "status": "delivered"
+    },
+    "createdAt": "2024-01-10T11:20:00Z",
+    "failedAt": "2024-01-10T11:21:15Z"
+  },
+  {
+    "id": "email-sub-004",
+    "vendorId": "vendor-004",
+    "vendorName": "Quality Beverages Inc",
+    "templateId": "template-004",
+    "submissionMethod": "email",
+    "emailDetails": {
+      "from": "sarah.johnson@qualitybev.com",
+      "to": "pricing@carmen.com",
+      "subject": "January 2024 Beverage Pricing",
+      "receivedAt": "2024-01-12T13:15:00Z",
+      "messageId": "msg-004-beverages-jan",
+      "attachments": [
+        {
+          "filename": "Quality_Beverages_Jan2024.xlsx",
+          "size": 38456,
+          "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+      ]
+    },
+    "processingStatus": "processing",
+    "processingSteps": [
+      {
+        "step": "email_received",
+        "timestamp": "2024-01-12T13:15:00Z",
+        "status": "success",
+        "message": "Email received and queued for processing"
+      },
+      {
+        "step": "attachment_extracted",
+        "timestamp": "2024-01-12T13:15:10Z",
+        "status": "success",
+        "message": "Excel file extracted successfully"
+      },
+      {
+        "step": "file_validation",
+        "timestamp": "2024-01-12T13:15:25Z",
+        "status": "success",
+        "message": "File format validation passed"
+      },
+      {
+        "step": "data_parsing",
+        "timestamp": "2024-01-12T13:15:40Z",
+        "status": "in_progress",
+        "message": "Parsing price data..."
+      }
+    ],
+    "validationResults": null,
+    "importResults": null,
+    "createdAt": "2024-01-12T13:15:00Z",
+    "completedAt": null
+  },
+  {
+    "id": "email-sub-005",
+    "vendorId": "vendor-001",
+    "vendorName": "ABC Food Supplies",
+    "templateId": "template-001",
+    "submissionMethod": "email",
+    "emailDetails": {
+      "from": "john.smith@abcfood.com",
+      "to": "pricing@carmen.com",
+      "subject": "Re: ABC Food Supplies - December 2023 Price Update",
+      "receivedAt": "2023-12-15T10:45:00Z",
+      "messageId": "msg-005-abc-dec2023",
+      "attachments": [
+        {
+          "filename": "ABC_Food_Supplies_Prices_Dec2023.xlsx",
+          "size": 42134,
+          "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+      ]
+    },
+    "processingStatus": "completed",
+    "processingSteps": [
+      {
+        "step": "email_received",
+        "timestamp": "2023-12-15T10:45:00Z",
+        "status": "success",
+        "message": "Email received and queued for processing"
+      },
+      {
+        "step": "attachment_extracted",
+        "timestamp": "2023-12-15T10:45:12Z",
+        "status": "success",
+        "message": "Excel file extracted successfully"
+      },
+      {
+        "step": "file_validation",
+        "timestamp": "2023-12-15T10:45:25Z",
+        "status": "success",
+        "message": "File format validation passed"
+      },
+      {
+        "step": "data_parsing",
+        "timestamp": "2023-12-15T10:45:40Z",
+        "status": "success",
+        "message": "43 price items parsed successfully"
+      },
+      {
+        "step": "business_validation",
+        "timestamp": "2023-12-15T10:45:55Z",
+        "status": "success",
+        "message": "All business rules validation passed"
+      },
+      {
+        "step": "data_import",
+        "timestamp": "2023-12-15T10:46:10Z",
+        "status": "success",
+        "message": "Price data imported to system"
+      },
+      {
+        "step": "confirmation_sent",
+        "timestamp": "2023-12-15T10:46:25Z",
+        "status": "success",
+        "message": "Confirmation email sent to vendor"
+      }
+    ],
+    "validationResults": {
+      "totalRows": 43,
+      "validRows": 43,
+      "invalidRows": 0,
+      "warnings": 0,
+      "errors": []
+    },
+    "importResults": {
+      "itemsProcessed": 43,
+      "itemsCreated": 40,
+      "itemsUpdated": 3,
+      "itemsSkipped": 0
+    },
+    "confirmationEmail": {
+      "sentTo": "john.smith@abcfood.com",
+      "sentAt": "2023-12-15T10:46:25Z",
+      "subject": "Price Submission Confirmation - ABC Food Supplies",
+      "status": "delivered"
+    },
+    "createdAt": "2023-12-15T10:45:00Z",
+    "completedAt": "2023-12-15T10:46:25Z"
+  }
+]

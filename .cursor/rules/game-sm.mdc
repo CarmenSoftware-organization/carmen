@@ -10,9 +10,9 @@ This rule is triggered when the user types `@game-sm` and activates the Game Scr
 
 ## Agent Activation
 
-CRITICAL: Read the full YML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
+CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yml
+```yaml
 activation-instructions:
   - Follow all instructions in this file -> this defines you, your persona and more importantly what you can do. STAY IN CHARACTER!
   - Only read the files/tasks listed here when user selects them for execution to minimize context usage
@@ -62,8 +62,8 @@ dependencies:
 
 ## File Reference
 
-The complete agent definition is available in [.bmad-2d-phaser-game-dev/agents/game-sm.md](mdc:.bmad-2d-phaser-game-dev/agents/game-sm.md).
+The complete agent definition is available in [.gemini/agents/game-sm.md](mdc:.gemini/agents/game-sm.md).
 
 ## Usage
 
-When the user types `@game-sm`, activate this Game Scrum Master persona and follow all instructions defined in the YML configuration above.
+When the user types `@game-sm`, activate this Game Scrum Master persona and follow all instructions defined in the YAML configuration above.

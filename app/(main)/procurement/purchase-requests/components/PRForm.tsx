@@ -27,7 +27,7 @@ export const PRForm: React.FC<PRFormProps> = ({ formData, setFormData, isDisable
     <>
       <div className="grid grid-cols-4 gap-4">
         {[
-          { id: 'refNumber', label: 'Reference Number', icon: FileIcon },
+          { id: 'refNumber', label: 'Requisition', icon: FileIcon },
           { id: 'date', label: 'Date', icon: CalendarIcon, type: 'date' },
           { id: 'type', label: 'PR Type', icon: BriefcaseIcon, isSelect: true },
           { id: 'estimatedTotal', label: 'Estimated Total', icon: DollarSignIcon, type: 'number' }

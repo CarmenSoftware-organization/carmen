@@ -37,6 +37,7 @@ import {
   PanelRightOpen,
 } from "lucide-react";
 import { PRHeader } from "./PRHeader";
+import { CompactWorkflowIndicator } from "./CompactWorkflowIndicator";
 import { ItemsTab } from "./tabs/ItemsTab";
 import { ResponsiveBudgetScreen } from "./tabs/budget-tab";
 import { WorkflowTab } from "./tabs/WorkflowTab";
@@ -88,11 +89,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export default function PRDetailPage() {
+interface PRDetailPageProps {
+  prId?: string;
+}
+
+export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isAddMode = searchParams?.get("mode") === "add";
-  const prId = searchParams?.get("id");
+  const prId = propPrId || searchParams?.get("id");
 
   const [mode, setMode] = useState<"view" | "edit" | "add">(
     isAddMode ? "add" : "view"
@@ -102,7 +107,11 @@ export default function PRDetailPage() {
   const getPRData = () => {
     if (isAddMode) return getEmptyPurchaseRequest();
     if (prId) {
-      const foundPR = mockPRListData.find(pr => pr.id === prId);
+      // Case-insensitive lookup for PR ID
+      const foundPR = mockPRListData.find(pr => 
+        pr.id.toLowerCase() === prId.toLowerCase() || 
+        pr.refNumber.toLowerCase() === prId.toLowerCase()
+      );
       if (foundPR) return foundPR;
     }
     return samplePRData;
@@ -136,7 +145,11 @@ export default function PRDetailPage() {
   // Update data when PR ID changes (for navigation from PR list)
   useEffect(() => {
     if (prId && !isAddMode) {
-      const foundPR = mockPRListData.find(pr => pr.id === prId);
+      // Case-insensitive lookup for PR ID
+      const foundPR = mockPRListData.find(pr => 
+        pr.id.toLowerCase() === prId.toLowerCase() || 
+        pr.refNumber.toLowerCase() === prId.toLowerCase()
+      );
       if (foundPR) {
         setFormData(foundPR);
         setCurrentItems(foundPR.items && foundPR.items.length > 0 ? foundPR.items : samplePRItems);
@@ -345,7 +358,7 @@ export default function PRDetailPage() {
   ];
 
   return (
-    <div className="container mx-auto py-6 pb-32">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 pb-32">
       <div className="flex flex-col lg:flex-row space-y-6 lg:space-y-0 lg:space-x-6">
         {/* Main Content */}
         <div className={`flex-grow space-y-6 ${isSidebarVisible ? 'lg:w-3/4' : 'w-full'}`}>
@@ -364,11 +377,16 @@ export default function PRDetailPage() {
                           <ChevronLeft className="h-5 w-5" />
                           <span className="sr-only">Back to Purchase Requests</span>
                         </Button>
-                        <h1 className="text-2xl font-bold">
-                          {mode === "add"
-                            ? "Create New Purchase Request"
-                            : formData.refNumber || "Purchase Request Details"}
-                        </h1>
+                        <div className="flex flex-col">
+                          <h1 className="text-2xl font-bold">
+                            {mode === "add"
+                              ? "Create New Purchase Request"
+                              : formData.refNumber || "Purchase Request Details"}
+                          </h1>
+                          {mode !== "add" && (
+                            <p className="text-sm text-muted-foreground mt-1">Purchase Request</p>
+                          )}
+                        </div>
                         {formData.refNumber && <StatusBadge status={formData.status} className="h-6" />}
                       </div>
                     </div>
@@ -443,137 +461,147 @@ export default function PRDetailPage() {
         
         {/* Main Content */}
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* Left side - Details */}
-            <div className="col-span-8 space-y-6">
+          <div className="grid grid-cols-1 gap-6">
+            {/* Main Details */}
+            <div className="space-y-6">
               {/* Main Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="refNumber" className="text-xs text-muted-foreground flex items-center gap-1">
-                    PR #
+                  <Label htmlFor="date" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                    <CalendarIcon className="h-4 w-4" />
+                    Date
                   </Label>
-                  <Input
-                    id="refNumber"
-                    name="refNumber"
-                    value={formData.refNumber}
-                    onChange={handleInputChange}
-                    disabled={mode === "view" || !canEditField("refNumber", user?.context.currentRole.name || "")}
-                    className={mode === "view" || !canEditField("refNumber", user?.context.currentRole.name || "") ? "bg-muted" : ""}
-                  />
+                  {mode === "view" ? (
+                    <div className="text-gray-900 font-medium">
+                      {formData.date.toLocaleDateString('en-GB')}
+                    </div>
+                  ) : (
+                    <Input
+                      id="date"
+                      name="date"
+                      type="date"
+                      value={formData.date.toISOString().split("T")[0]}
+                      onChange={handleInputChange}
+                      disabled={!canEditField("date", user?.context.currentRole.name || "")}
+                      className={!canEditField("date", user?.context.currentRole.name || "") ? "bg-muted" : ""}
+                    />
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="date" className="text-xs text-muted-foreground flex items-center gap-1">
-                    <CalendarIcon className="h-3 w-3" /> Date
+                  <Label htmlFor="type" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                    <TagIcon className="h-4 w-4" />
+                    PR Type
                   </Label>
-                  <Input
-                    id="date"
-                    name="date"
-                    type="date"
-                    value={formData.date.toISOString().split("T")[0]}
-                    onChange={handleInputChange}
-                    disabled={mode === "view" || !canEditField("date", user?.context.currentRole.name || "")}
-                    className={mode === "view" || !canEditField("date", user?.context.currentRole.name || "") ? "bg-muted" : ""}
-                  />
+                  {mode === "view" ? (
+                    <div className="text-gray-900 font-medium">{formData.type}</div>
+                  ) : (
+                    <Select
+                      value={formData.type}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, type: value as PRType })
+                      }
+                      disabled={!canEditField("type", user?.context.currentRole.name || "")}
+                    >
+                      <SelectTrigger id="type" className={!canEditField("type", user?.context.currentRole.name || "") ? "bg-muted" : ""}>
+                        <SelectValue placeholder="Select PR Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(PRType).map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="type" className="text-xs text-muted-foreground flex items-center gap-1">
-                    <TagIcon className="h-3 w-3" /> PR Type
+                  <Label htmlFor="requestor.name" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                    <UserIcon className="h-4 w-4" />
+                    Requestor
                   </Label>
-                  <Select
-                    value={formData.type}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, type: value as PRType })
-                    }
-                    disabled={mode === "view" || !canEditField("type", user?.context.currentRole.name || "")}
-                  >
-                    <SelectTrigger id="type" className={mode === "view" || !canEditField("type", user?.context.currentRole.name || "") ? "bg-muted" : ""}>
-                      <SelectValue placeholder="Select PR Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(PRType).map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {mode === "view" ? (
+                    <div className="text-gray-900 font-medium">{formData.requestor.name}</div>
+                  ) : (
+                    <Input
+                      id="requestor.name"
+                      name="requestor.name"
+                      value={formData.requestor.name}
+                      onChange={handleInputChange}
+                      disabled={!canEditField("requestor", user?.context.currentRole.name || "")}
+                      className={!canEditField("requestor", user?.context.currentRole.name || "") ? "bg-muted" : ""}
+                    />
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="requestor.name" className="text-xs text-muted-foreground flex items-center gap-1">
-                    <UserIcon className="h-3 w-3" /> Requestor
+                  <Label htmlFor="department" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                    <BuildingIcon className="h-4 w-4" />
+                    Department
                   </Label>
-                  <Input
-                    id="requestor.name"
-                    name="requestor.name"
-                    value={formData.requestor.name}
-                    onChange={handleInputChange}
-                    disabled={mode === "view" || !canEditField("requestor", user?.context.currentRole.name || "")}
-                    className={mode === "view" || !canEditField("requestor", user?.context.currentRole.name || "") ? "bg-muted" : ""}
-                  />
+                  {mode === "view" ? (
+                    <div className="text-gray-900 font-medium">{formData.department || "Not specified"}</div>
+                  ) : (
+                    <Input
+                      id="department"
+                      name="department"
+                      value={formData.department}
+                      onChange={handleInputChange}
+                      disabled={!canEditField("department", user?.context.currentRole.name || "")}
+                      className={!canEditField("department", user?.context.currentRole.name || "") ? "bg-muted" : ""}
+                    />
+                  )}
                 </div>
               </div>
               
               {/* Secondary Details */}
-              <div className="grid grid-cols-4 gap-4">
-                <div className="space-y-2 col-span-1">
-                  <Label htmlFor="department" className="text-xs text-muted-foreground">Department</Label>
-                  <Input
-                    id="department"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleInputChange}
-                    disabled={mode === "view" || !canEditField("department", user?.context.currentRole.name || "")}
-                    className={mode === "view" || !canEditField("department", user?.context.currentRole.name || "") ? "bg-muted" : ""}
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
+                    <FileIcon className="h-4 w-4" />
+                    Description
+                  </Label>
+                  {mode === "view" ? (
+                    <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
+                      {formData.description || "No description"}
+                    </div>
+                  ) : (
+                    <Textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      disabled={!canEditField("description", user?.context.currentRole.name || "")}
+                      className={`min-h-[60px] ${!canEditField("description", user?.context.currentRole.name || "") ? "bg-muted" : ""}}`}
+                      placeholder="Add purchase request description..."
+                    />
+                  )}
                 </div>
-                <div className="space-y-2 col-span-3">
-                  <Label htmlFor="description" className="text-xs text-muted-foreground">Description</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    disabled={mode === "view" || !canEditField("description", user?.context.currentRole.name || "")}
-                    className={`min-h-[100px] ${mode === "view" || !canEditField("description", user?.context.currentRole.name || "") ? "bg-muted" : ""}`}
-                  />
+                
+                {/* Workflow Progress - Right Half */}
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground mb-2 block">
+                    Workflow Progress
+                  </Label>
+                  {formData.refNumber && formData.currentWorkflowStage ? (
+                    <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center">
+                      <CompactWorkflowIndicator 
+                        currentStage={formData.currentWorkflowStage}
+                        prData={formData}
+                        className="flex-shrink-0"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center justify-center text-gray-500 text-sm">
+                      No workflow data available
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-            
-            {/* Right side - Status */}
-            <div className="col-span-4">
-              <Card className="shadow-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-medium">Status Information</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Current Stage:</span>
-                      <Badge variant="outline" className="font-normal">
-                        {formData.currentWorkflowStage.split(/(?=[A-Z])/).join(" ")}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Document Status:</span>
-                      <StatusBadge status={formData.status} />
-                    </div>
-                    
-                    <Separator className="my-2" />
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Created:</span>
-                        <span className="text-sm">{isMounted ? format(formData.date, "dd MMM yyyy") : formData.date.toISOString().split('T')[0]}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </CardContent>
       </Card>
+      
       
       {/* Tabs and Content */}
       <Card className="shadow-sm">
@@ -658,17 +686,6 @@ export default function PRDetailPage() {
       {/* Smart Floating Action Menu - Workflow Decision Based */}
       {mode === "view" && user && workflowDecision && (
         <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
-          {/* Workflow Summary */}
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-            <div className="text-xs text-muted-foreground mb-1">Items Status</div>
-            <div className="text-sm font-medium">
-              {WorkflowDecisionEngine.getWorkflowSummaryText(workflowDecision)}
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              {workflowDecision.reason}
-            </div>
-          </div>
-          
           {/* Action Buttons */}
           <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-4 flex space-x-3 border border-gray-200 dark:border-gray-700">
             {(() => {

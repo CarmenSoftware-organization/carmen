@@ -1,0 +1,599 @@
+[
+  {
+    "id": "template-001",
+    "vendorId": "vendor-001",
+    "vendorName": "ABC Food Supplies",
+    "templateName": "ABC Food Supplies - Price Template",
+    "templateType": "vendor_specific",
+    "categories": ["Food & Beverage", "Dry Goods"],
+    "currency": "USD",
+    "supportedCurrencies": ["USD", "EUR"],
+    "columns": [
+      {
+        "name": "Product ID",
+        "key": "productId",
+        "type": "text",
+        "required": true,
+        "validation": "alphanumeric"
+      },
+      {
+        "name": "Product Name",
+        "key": "productName",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Category",
+        "key": "category",
+        "type": "dropdown",
+        "required": true,
+        "options": ["Food & Beverage", "Dry Goods"],
+        "validation": "list"
+      },
+      {
+        "name": "Unit Price",
+        "key": "unitPrice",
+        "type": "currency",
+        "required": true,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Currency",
+        "key": "currency",
+        "type": "dropdown",
+        "required": true,
+        "options": ["USD", "EUR"],
+        "validation": "list"
+      },
+      {
+        "name": "Min Quantity",
+        "key": "minQuantity",
+        "type": "number",
+        "required": true,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Bulk Price",
+        "key": "bulkPrice",
+        "type": "currency",
+        "required": false,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Bulk Min Qty",
+        "key": "bulkMinQuantity",
+        "type": "number",
+        "required": false,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Valid From",
+        "key": "validFrom",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Valid To",
+        "key": "validTo",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Unit",
+        "key": "unit",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Description",
+        "key": "description",
+        "type": "text",
+        "required": false,
+        "validation": "text"
+      }
+    ],
+    "instructions": [
+      "Fill in all required fields marked with *",
+      "Use valid currency codes (USD, EUR)",
+      "Ensure Valid From date is before Valid To date",
+      "Bulk price must be less than unit price",
+      "Contact support@abcfood.com for assistance"
+    ],
+    "validationRules": [
+      {
+        "rule": "date_range",
+        "fields": ["validFrom", "validTo"],
+        "message": "Valid From date must be before Valid To date"
+      },
+      {
+        "rule": "bulk_price_validation",
+        "fields": ["unitPrice", "bulkPrice"],
+        "message": "Bulk price must be less than unit price"
+      },
+      {
+        "rule": "bulk_quantity_validation",
+        "fields": ["minQuantity", "bulkMinQuantity"],
+        "message": "Bulk minimum quantity must be greater than minimum quantity"
+      }
+    ],
+    "createdAt": "2024-01-15T09:00:00Z",
+    "updatedAt": "2024-01-15T09:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "template-002",
+    "vendorId": "vendor-002",
+    "vendorName": "Fresh Produce Co.",
+    "templateName": "Fresh Produce Co. - Weekly Price Template",
+    "templateType": "vendor_specific",
+    "categories": ["Fresh Produce", "Vegetables", "Fruits"],
+    "currency": "USD",
+    "supportedCurrencies": ["USD"],
+    "columns": [
+      {
+        "name": "Product ID",
+        "key": "productId",
+        "type": "text",
+        "required": true,
+        "validation": "alphanumeric"
+      },
+      {
+        "name": "Product Name",
+        "key": "productName",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Category",
+        "key": "category",
+        "type": "dropdown",
+        "required": true,
+        "options": ["Fresh Produce", "Vegetables", "Fruits"],
+        "validation": "list"
+      },
+      {
+        "name": "Unit Price",
+        "key": "unitPrice",
+        "type": "currency",
+        "required": true,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Currency",
+        "key": "currency",
+        "type": "dropdown",
+        "required": true,
+        "options": ["USD"],
+        "validation": "list"
+      },
+      {
+        "name": "Min Quantity",
+        "key": "minQuantity",
+        "type": "number",
+        "required": true,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Bulk Price",
+        "key": "bulkPrice",
+        "type": "currency",
+        "required": false,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Bulk Min Qty",
+        "key": "bulkMinQuantity",
+        "type": "number",
+        "required": false,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Valid From",
+        "key": "validFrom",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Valid To",
+        "key": "validTo",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Unit",
+        "key": "unit",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Grade",
+        "key": "grade",
+        "type": "dropdown",
+        "required": false,
+        "options": ["Premium", "Standard", "Economy"],
+        "validation": "list"
+      },
+      {
+        "name": "Origin",
+        "key": "origin",
+        "type": "text",
+        "required": false,
+        "validation": "text"
+      }
+    ],
+    "instructions": [
+      "Submit weekly pricing by Sunday 6 PM",
+      "All produce items must include grade classification",
+      "Specify origin for imported items",
+      "Contact maria.garcia@freshproduce.com for questions"
+    ],
+    "validationRules": [
+      {
+        "rule": "date_range",
+        "fields": ["validFrom", "validTo"],
+        "message": "Valid From date must be before Valid To date"
+      },
+      {
+        "rule": "weekly_validity",
+        "fields": ["validFrom", "validTo"],
+        "message": "Validity period should not exceed 7 days for fresh produce"
+      }
+    ],
+    "createdAt": "2024-01-14T09:00:00Z",
+    "updatedAt": "2024-01-14T09:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "template-003",
+    "vendorId": "vendor-003",
+    "vendorName": "Kitchen Equipment Ltd",
+    "templateName": "Kitchen Equipment Ltd - Quarterly Price Template",
+    "templateType": "vendor_specific",
+    "categories": ["Equipment", "Kitchen Equipment"],
+    "currency": "USD",
+    "supportedCurrencies": ["USD", "CAD"],
+    "columns": [
+      {
+        "name": "Product ID",
+        "key": "productId",
+        "type": "text",
+        "required": true,
+        "validation": "alphanumeric"
+      },
+      {
+        "name": "Product Name",
+        "key": "productName",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Category",
+        "key": "category",
+        "type": "dropdown",
+        "required": true,
+        "options": ["Equipment", "Kitchen Equipment"],
+        "validation": "list"
+      },
+      {
+        "name": "Unit Price",
+        "key": "unitPrice",
+        "type": "currency",
+        "required": true,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Currency",
+        "key": "currency",
+        "type": "dropdown",
+        "required": true,
+        "options": ["USD", "CAD"],
+        "validation": "list"
+      },
+      {
+        "name": "Min Quantity",
+        "key": "minQuantity",
+        "type": "number",
+        "required": true,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Valid From",
+        "key": "validFrom",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Valid To",
+        "key": "validTo",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Unit",
+        "key": "unit",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Model Number",
+        "key": "modelNumber",
+        "type": "text",
+        "required": false,
+        "validation": "alphanumeric"
+      },
+      {
+        "name": "Warranty (Months)",
+        "key": "warrantyMonths",
+        "type": "number",
+        "required": false,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Lead Time (Days)",
+        "key": "leadTimeDays",
+        "type": "number",
+        "required": false,
+        "validation": "positive_integer"
+      }
+    ],
+    "instructions": [
+      "Submit quarterly pricing by the 10th of each quarter",
+      "Include model numbers for all equipment",
+      "Specify warranty period in months",
+      "Lead times are critical for planning",
+      "Contact david.wilson@kitchenequip.com for technical questions"
+    ],
+    "validationRules": [
+      {
+        "rule": "date_range",
+        "fields": ["validFrom", "validTo"],
+        "message": "Valid From date must be before Valid To date"
+      },
+      {
+        "rule": "quarterly_validity",
+        "fields": ["validFrom", "validTo"],
+        "message": "Validity period should be approximately 3 months for equipment"
+      }
+    ],
+    "createdAt": "2024-01-10T09:00:00Z",
+    "updatedAt": "2024-01-10T09:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "template-004",
+    "vendorId": "vendor-004",
+    "vendorName": "Quality Beverages Inc",
+    "templateName": "Quality Beverages Inc - Monthly Price Template",
+    "templateType": "vendor_specific",
+    "categories": ["Beverages", "Soft Drinks"],
+    "currency": "USD",
+    "supportedCurrencies": ["USD"],
+    "columns": [
+      {
+        "name": "Product ID",
+        "key": "productId",
+        "type": "text",
+        "required": true,
+        "validation": "alphanumeric"
+      },
+      {
+        "name": "Product Name",
+        "key": "productName",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Category",
+        "key": "category",
+        "type": "dropdown",
+        "required": true,
+        "options": ["Beverages", "Soft Drinks"],
+        "validation": "list"
+      },
+      {
+        "name": "Unit Price",
+        "key": "unitPrice",
+        "type": "currency",
+        "required": true,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Currency",
+        "key": "currency",
+        "type": "dropdown",
+        "required": true,
+        "options": ["USD"],
+        "validation": "list"
+      },
+      {
+        "name": "Min Quantity",
+        "key": "minQuantity",
+        "type": "number",
+        "required": true,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Bulk Price",
+        "key": "bulkPrice",
+        "type": "currency",
+        "required": false,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Bulk Min Qty",
+        "key": "bulkMinQuantity",
+        "type": "number",
+        "required": false,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Valid From",
+        "key": "validFrom",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Valid To",
+        "key": "validTo",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Unit",
+        "key": "unit",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Package Size",
+        "key": "packageSize",
+        "type": "text",
+        "required": false,
+        "validation": "text"
+      },
+      {
+        "name": "Brand",
+        "key": "brand",
+        "type": "text",
+        "required": false,
+        "validation": "text"
+      }
+    ],
+    "instructions": [
+      "Submit monthly pricing by the 12th of each month",
+      "Include package size information",
+      "Brand information helps with product identification",
+      "Contact sarah.johnson@qualitybev.com for support"
+    ],
+    "validationRules": [
+      {
+        "rule": "date_range",
+        "fields": ["validFrom", "validTo"],
+        "message": "Valid From date must be before Valid To date"
+      },
+      {
+        "rule": "bulk_price_validation",
+        "fields": ["unitPrice", "bulkPrice"],
+        "message": "Bulk price must be less than unit price"
+      }
+    ],
+    "createdAt": "2024-01-12T09:00:00Z",
+    "updatedAt": "2024-01-12T09:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "template-generic-001",
+    "vendorId": null,
+    "vendorName": "Generic Template",
+    "templateName": "Standard Price Submission Template",
+    "templateType": "generic",
+    "categories": ["All Categories"],
+    "currency": "USD",
+    "supportedCurrencies": ["USD", "EUR", "CAD", "GBP"],
+    "columns": [
+      {
+        "name": "Product ID",
+        "key": "productId",
+        "type": "text",
+        "required": true,
+        "validation": "alphanumeric"
+      },
+      {
+        "name": "Product Name",
+        "key": "productName",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Category",
+        "key": "category",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Unit Price",
+        "key": "unitPrice",
+        "type": "currency",
+        "required": true,
+        "validation": "positive_number"
+      },
+      {
+        "name": "Currency",
+        "key": "currency",
+        "type": "dropdown",
+        "required": true,
+        "options": ["USD", "EUR", "CAD", "GBP"],
+        "validation": "list"
+      },
+      {
+        "name": "Min Quantity",
+        "key": "minQuantity",
+        "type": "number",
+        "required": true,
+        "validation": "positive_integer"
+      },
+      {
+        "name": "Valid From",
+        "key": "validFrom",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Valid To",
+        "key": "validTo",
+        "type": "date",
+        "required": true,
+        "validation": "date"
+      },
+      {
+        "name": "Unit",
+        "key": "unit",
+        "type": "text",
+        "required": true,
+        "validation": "text"
+      },
+      {
+        "name": "Description",
+        "key": "description",
+        "type": "text",
+        "required": false,
+        "validation": "text"
+      }
+    ],
+    "instructions": [
+      "Use this template if no vendor-specific template is available",
+      "Fill in all required fields marked with *",
+      "Use standard currency codes",
+      "Contact support for assistance"
+    ],
+    "validationRules": [
+      {
+        "rule": "date_range",
+        "fields": ["validFrom", "validTo"],
+        "message": "Valid From date must be before Valid To date"
+      }
+    ],
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z",
+    "isActive": true
+  }
+]

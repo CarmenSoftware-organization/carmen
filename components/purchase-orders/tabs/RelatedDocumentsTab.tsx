@@ -29,7 +29,7 @@ export default function RelatedDocumentsTab({ poData }: { poData: any }) {
         <TableHeader>
           <TableRow>
             <TableHead>Document Type</TableHead>
-            <TableHead>Reference Number</TableHead>
+            <TableHead>Requisition</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>

@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { FileText, Edit, Trash2, Plus } from "lucide-react";
+import { FileText, Edit, Trash2, Plus, MoreHorizontal } from "lucide-react";
 import { GoodsReceiveNoteMode, GoodsReceiveNoteItem, Product, UnitConversion, LocationInfo } from "@/lib/types";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/custom-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,13 @@ import {
   TooltipProvider 
 } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import ItemDetailForm from "./itemDetailForm";
 import { formatCurrency } from "@/lib/utils";
 
@@ -102,6 +109,7 @@ interface GoodsReceiveNoteItemsProps {
   exchangeRate: number;
   baseCurrency: string;
   currency: string;
+  bulkActions?: React.ReactNode;
 }
 
 export function GoodsReceiveNoteItems({
@@ -113,6 +121,7 @@ export function GoodsReceiveNoteItems({
   exchangeRate,
   baseCurrency,
   currency,
+  bulkActions,
 }: GoodsReceiveNoteItemsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<GoodsReceiveNoteMode | 'add'>('view');
@@ -215,6 +224,7 @@ export function GoodsReceiveNoteItems({
   };
 
   const allSelected = items.length > 0 && selectedItems.length === items.length;
+  const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
 
   // Format amount without currency symbol
   const formatAmount = (amount: number) => {
@@ -248,9 +258,9 @@ export function GoodsReceiveNoteItems({
   const unitOptions = ["Kg", "Pcs", "Box", "Pack", "L", "mL"];
 
   // --- Add New Record Handler (Placeholder) ---
-  const handleAddNewRecord = (fieldType: 'projectCode' | 'jobCode' | 'marketSegment') => {
+  const handleAddNewRecord = (fieldType: 'projectCode' | 'jobCode' | 'marketSegment' | 'jobNumber' | 'event') => {
       // In a real application, this would likely:
-      // 1. Open a new dialog specific to creating a Project/Job/Market Segment.
+      // 1. Open a new dialog specific to creating a Project/Job/Market Segment/Job Number/Event.
       // 2. Navigate to a dedicated creation page.
       // 3. After successful creation, potentially refresh the list of options
       //    and maybe even select the newly created item in the dropdown.
@@ -294,33 +304,48 @@ export function GoodsReceiveNoteItems({
         )}
       </div>
 
+      {/* Bulk Actions below Item Details heading */}
+      {bulkActions && (
+        <div className="mb-4">
+          {bulkActions}
+        </div>
+      )}
+
       <Table>
         <TableHeader>
           {/* Single Header Row */}
-          <TableRow>
+          <TableRow className="align-top">
             {/* Checkbox */}
-            <TableHead className="w-[50px]"> 
+            <TableHead className="w-[50px] align-top"> 
               <Checkbox
                 checked={allSelected}
+                ref={(ref) => {
+                  if (ref) {
+                    const inputElement = ref.querySelector('input');
+                    if (inputElement) {
+                      inputElement.indeterminate = someSelected;
+                    }
+                  }
+                }}
                 onCheckedChange={handleSelectAll}
                 disabled={mode === "view"}
               />
             </TableHead>
             {/* Headers matching the image */}
-            <TableHead>Location</TableHead> 
-            <TableHead>Product Name</TableHead> 
-            <TableHead className={numberCellClass}>Ordered Qty</TableHead> 
-            <TableHead>Ordered Unit</TableHead>
-            <TableHead className={numberCellClass}>Received Qty</TableHead> 
-            <TableHead>Unit</TableHead>
-            <TableHead className={numberCellClass}>FOC Qty</TableHead> 
-            <TableHead>FOC Unit</TableHead>
-            <TableHead className={numberCellClass}>Price</TableHead> 
-            <TableHead className={numberCellClass}>Discount</TableHead>
-            <TableHead className={numberCellClass}>Net Amount</TableHead>
-            <TableHead className={numberCellClass}>Tax Amount</TableHead>
-            <TableHead className={numberCellClass}>Total Amount</TableHead>
-            <TableHead>Actions</TableHead> 
+            <TableHead className="align-top">Location</TableHead> 
+            <TableHead className="align-top">Product Name</TableHead> 
+            <TableHead className={`${numberCellClass} align-top`}>Ordered Qty</TableHead> 
+            <TableHead className="align-top">Ordered Unit</TableHead>
+            <TableHead className={`${numberCellClass} align-top`}>Received Qty</TableHead> 
+            <TableHead className="align-top">Unit</TableHead>
+            <TableHead className={`${numberCellClass} align-top`}>FOC Qty</TableHead> 
+            <TableHead className="align-top">FOC Unit</TableHead>
+            <TableHead className={`${numberCellClass} align-top`}>Price</TableHead> 
+            <TableHead className={`${numberCellClass} align-top`}>Discount</TableHead>
+            <TableHead className={`${numberCellClass} align-top`}>Net Amount</TableHead>
+            <TableHead className={`${numberCellClass} align-top`}>Tax Amount</TableHead>
+            <TableHead className={`${numberCellClass} align-top`}>Total Amount</TableHead>
+            <TableHead className="align-top">Actions</TableHead> 
           </TableRow>
         </TableHeader>
         
@@ -328,9 +353,9 @@ export function GoodsReceiveNoteItems({
           {items.map((item) => {
             console.log('[GoodsReceiveNoteItems] Received mode prop:', mode);
             return (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} className="align-top">
                  {/* Checkbox Cell */} 
-                 <TableCell>
+                 <TableCell className="align-top">
                    <Checkbox
                      checked={selectedItems.includes(item.id)}
                      onCheckedChange={(checked) =>
@@ -340,9 +365,9 @@ export function GoodsReceiveNoteItems({
                    />
                  </TableCell>
                  {/* Location Cell */} 
-                 <TableCell>{item.location || "N/A"}</TableCell>
+                 <TableCell className="align-top">{item.location || "N/A"}</TableCell>
                  {/* Product Name Cell */} 
-                 <TableCell>
+                 <TableCell className="align-top">
                    <div className="flex items-center space-x-2">
                      <div>
                        {item.name}
@@ -360,17 +385,17 @@ export function GoodsReceiveNoteItems({
                  </TableCell>
                  
                  {/* Ordered Qty Cell (Add Base info back) */}
-                 <TableCell className={numberCellClass}> 
+                 <TableCell className={`${numberCellClass} align-top`}> 
                    {item.orderedQuantity}
                    <div className="text-xs text-muted-foreground"> 
                     Base: {(item.orderedQuantity * item.conversionRate).toFixed(2)} {item.baseUnit || 'N/A'}
                    </div>
                  </TableCell>
                  {/* Ordered Unit Cell */} 
-                 <TableCell>{item.orderUnit}</TableCell>
+                 <TableCell className="align-top">{item.orderUnit}</TableCell>
                  
                  {/* Received Qty Cell (Add Base info back) */} 
-                 <TableCell className={numberCellClass}> 
+                 <TableCell className={`${numberCellClass} align-top`}> 
                     <Input 
                        type="number"
                        value={item.receivedQuantity}
@@ -389,7 +414,7 @@ export function GoodsReceiveNoteItems({
                     </div>
                  </TableCell>
                  {/* Received Unit Cell */} 
-                 <TableCell> 
+                 <TableCell className="align-top"> 
                     <Select 
                       value={itemUnits[item.id] || item.unit}
                       onValueChange={(value) => handleUnitChange(item.id, value)}
@@ -411,7 +436,7 @@ export function GoodsReceiveNoteItems({
                  </TableCell>
 
                  {/* FOC Qty Cell (Add Base info back) */} 
-                 <TableCell className={numberCellClass}> 
+                 <TableCell className={`${numberCellClass} align-top`}> 
                     <Input 
                        type="number"
                        value={item.focQuantity || 0}
@@ -430,7 +455,7 @@ export function GoodsReceiveNoteItems({
                     </div>
                  </TableCell>
                  {/* FOC Unit Cell */} 
-                 <TableCell> 
+                 <TableCell className="align-top"> 
                     <select 
                       value={item.focUnit || item.unit}
                       onChange={(e) =>
@@ -452,53 +477,62 @@ export function GoodsReceiveNoteItems({
                  </TableCell>
                  
                  {/* Price Cell */}
-                 <TableCell className={numberCellClass}>
+                 <TableCell className={`${numberCellClass} align-top`}>
                    {formatAmount(item.unitPrice)}
                  </TableCell>
                  
                  {/* Discount Cell */}
-                 <TableCell className={numberCellClass}>
+                 <TableCell className={`${numberCellClass} align-top`}>
                    {item.discountRate ? `${item.discountRate}%` : '-'}
                  </TableCell>
                  
                  {/* Net Amount Cell */}
-                 <TableCell className={numberCellClass}>
+                 <TableCell className={`${numberCellClass} align-top`}>
                    {formatAmount(calculateNetAmount(item))}
                  </TableCell>
                  
                  {/* Tax Amount Cell */}
-                 <TableCell className={numberCellClass}>
+                 <TableCell className={`${numberCellClass} align-top`}>
                    {formatAmount(calculateTaxAmount(item))}
                  </TableCell>
                  
                  {/* Total Amount Cell */}
-                 <TableCell className={numberCellClass}>
+                 <TableCell className={`${numberCellClass} align-top`}>
                    {formatAmount(calculateNetAmount(item) + calculateTaxAmount(item))}
                  </TableCell>
                  
                  {/* Actions Cell */} 
-                 <TableCell>
-                   <div className="flex space-x-2">
-                     <Button variant="ghost" size="sm" onClick={() => handleOpenItemDetail(item)}>
-                       <FileText className="h-4 w-4" />
-                     </Button>
-                     <Button 
-                       variant="ghost" 
-                       size="sm" 
-                       onClick={() => handleEditItem(item)}
-                       disabled={mode === "view"}
-                     >
-                       <Edit className="h-4 w-4" />
-                     </Button>
-                     <Button 
-                       variant="ghost" 
-                       size="sm" 
-                       onClick={() => handleDeleteItem(item.id)}
-                       disabled={mode === "view"}
-                     >
-                       <Trash2 className="h-4 w-4" />
-                     </Button>
-                   </div>
+                 <TableCell className="align-top">
+                   <DropdownMenu>
+                     <DropdownMenuTrigger asChild>
+                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                         <span className="sr-only">Open menu</span>
+                         <MoreHorizontal className="h-4 w-4" />
+                       </Button>
+                     </DropdownMenuTrigger>
+                     <DropdownMenuContent align="end">
+                       <DropdownMenuItem onClick={() => handleOpenItemDetail(item)}>
+                         <FileText className="mr-2 h-4 w-4" />
+                         View Details
+                       </DropdownMenuItem>
+                       <DropdownMenuItem 
+                         onClick={() => handleEditItem(item)}
+                         disabled={mode === "view"}
+                       >
+                         <Edit className="mr-2 h-4 w-4" />
+                         Edit Item
+                       </DropdownMenuItem>
+                       <DropdownMenuSeparator />
+                       <DropdownMenuItem 
+                         onClick={() => handleDeleteItem(item.id)}
+                         disabled={mode === "view"}
+                         className="text-destructive"
+                       >
+                         <Trash2 className="mr-2 h-4 w-4" />
+                         Delete Item
+                       </DropdownMenuItem>
+                     </DropdownMenuContent>
+                   </DropdownMenu>
                  </TableCell>
               </TableRow>
              );

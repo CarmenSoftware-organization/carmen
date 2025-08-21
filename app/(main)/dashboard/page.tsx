@@ -1,33 +1,41 @@
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Overview } from "./components/overview"
-import { PerformanceMetrics } from "./components/performance-metrics"
-import { InventoryStatus } from "./components/inventory-status"
-import { SupplierAnalytics } from "./components/supplier-analytics"
-import { CostCenter } from "./components/cost-center"
-import { ActiveOrders } from "./components/active-orders"
+import {
+  SidebarInset,
+  SidebarProvider,
+} from "@/components/ui/sidebar"
+import { DashboardHeader } from "./components/dashboard-header"
+import { DashboardCards } from "./components/dashboard-cards"
+import { DashboardChart } from "./components/dashboard-chart"
+import { DashboardDataTable } from "./components/dashboard-data-table"
 
 export default function DashboardPage() {
   return (
-    <div className="flex-1 space-y-4 p-2 sm:p-4 md:p-8 pt-4 md:pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Hotel Supply Chain Dashboard</h2>
-      </div>
-      <div className="grid gap-2 sm:gap-4">
-        <Overview />
-        <div className="grid gap-2 sm:gap-4 grid-cols-1 lg:grid-cols-2">
-          <PerformanceMetrics />
-          <InventoryStatus />
-        </div>
-        <div className="grid gap-2 sm:gap-4 grid-cols-1 lg:grid-cols-2">
-          <SupplierAnalytics />
-          <div className="grid gap-2 sm:gap-4">
-            <CostCenter />
-            <ActiveOrders />
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <SidebarInset>
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <div className="px-4 lg:px-6">
+                <DashboardCards />
+              </div>
+              <div className="px-4 lg:px-6">
+                <DashboardChart />
+              </div>
+              <div className="px-4 lg:px-6">
+                <DashboardDataTable />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

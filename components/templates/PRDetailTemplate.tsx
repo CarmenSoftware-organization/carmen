@@ -144,7 +144,7 @@ export function PRDetailTemplate({
             <CardContent className="p-4">
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div>
-                  <Label htmlFor="refNumber">Reference Number</Label>
+                  <Label htmlFor="refNumber">Requisition</Label>
                   <Input
                     id="refNumber"
                     name="refNumber"

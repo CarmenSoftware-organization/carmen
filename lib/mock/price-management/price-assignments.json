@@ -1,0 +1,212 @@
+{
+  "priceAssignments": [
+    {
+      "id": "pa-001",
+      "prItemId": "pri-001",
+      "vendorId": "vendor-001",
+      "vendorName": "Global Office Supplies",
+      "pricelistId": "pl-001",
+      "priceItemId": "pi-001",
+      "assignedPrice": 24.99,
+      "currency": "USD",
+      "normalizedPriceUsd": 24.99,
+      "assignmentReason": "Best price match with preferred vendor status",
+      "confidenceScore": 0.92,
+      "ruleId": "rule-001",
+      "isManualOverride": false,
+      "assignedBy": "system",
+      "assignedAt": "2024-01-15T10:30:00Z",
+      "productId": "prod-001",
+      "productName": "Office Chair - Ergonomic",
+      "quantity": 5,
+      "alternatives": [
+        {
+          "vendorId": "vendor-002",
+          "vendorName": "Premium Office Solutions",
+          "price": 28.50,
+          "currency": "USD",
+          "normalizedPrice": 28.50,
+          "confidenceScore": 0.85,
+          "reason": "Higher price but better quality rating"
+        },
+        {
+          "vendorId": "vendor-003",
+          "vendorName": "Budget Furniture Co",
+          "price": 22.00,
+          "currency": "USD",
+          "normalizedPrice": 22.00,
+          "confidenceScore": 0.65,
+          "reason": "Lower price but longer lead time"
+        }
+      ]
+    },
+    {
+      "id": "pa-002",
+      "prItemId": "pri-002",
+      "vendorId": "vendor-004",
+      "vendorName": "Tech Solutions Inc",
+      "pricelistId": "pl-004",
+      "priceItemId": "pi-015",
+      "assignedPrice": 1299.99,
+      "currency": "USD",
+      "normalizedPriceUsd": 1299.99,
+      "assignmentReason": "Only vendor with current stock availability",
+      "confidenceScore": 0.88,
+      "ruleId": "rule-003",
+      "isManualOverride": false,
+      "assignedBy": "system",
+      "assignedAt": "2024-01-15T14:45:00Z",
+      "productId": "prod-015",
+      "productName": "Laptop - Business Grade",
+      "quantity": 2,
+      "alternatives": [
+        {
+          "vendorId": "vendor-005",
+          "vendorName": "Computer World",
+          "price": 1250.00,
+          "currency": "USD",
+          "normalizedPrice": 1250.00,
+          "confidenceScore": 0.45,
+          "reason": "Lower price but out of stock"
+        }
+      ]
+    },
+    {
+      "id": "pa-003",
+      "prItemId": "pri-003",
+      "vendorId": "vendor-006",
+      "vendorName": "International Supplies Ltd",
+      "pricelistId": "pl-006",
+      "priceItemId": "pi-025",
+      "assignedPrice": 45.50,
+      "currency": "EUR",
+      "normalizedPriceUsd": 49.28,
+      "assignmentReason": "Multi-currency assignment with favorable exchange rate",
+      "confidenceScore": 0.78,
+      "ruleId": "rule-005",
+      "isManualOverride": false,
+      "assignedBy": "system",
+      "assignedAt": "2024-01-16T09:15:00Z",
+      "productId": "prod-025",
+      "productName": "Industrial Printer Cartridge",
+      "quantity": 10,
+      "alternatives": [
+        {
+          "vendorId": "vendor-007",
+          "vendorName": "Local Print Supplies",
+          "price": 52.00,
+          "currency": "USD",
+          "normalizedPrice": 52.00,
+          "confidenceScore": 0.82,
+          "reason": "Local vendor with faster delivery"
+        }
+      ]
+    }
+  ],
+  "vendorSelections": [
+    {
+      "selectionId": "vs-001",
+      "prItemId": "pri-001",
+      "availableVendors": [
+        {
+          "vendorId": "vendor-001",
+          "vendorName": "Global Office Supplies",
+          "price": 24.99,
+          "currency": "USD",
+          "normalizedPrice": 24.99,
+          "minQuantity": 1,
+          "availability": "available",
+          "leadTime": 3,
+          "rating": 4.5,
+          "isPreferred": true,
+          "qualityScore": 0.9,
+          "reliabilityScore": 0.95,
+          "priceCompetitiveness": 0.88
+        },
+        {
+          "vendorId": "vendor-002",
+          "vendorName": "Premium Office Solutions",
+          "price": 28.50,
+          "currency": "USD",
+          "normalizedPrice": 28.50,
+          "minQuantity": 1,
+          "availability": "available",
+          "leadTime": 2,
+          "rating": 4.8,
+          "isPreferred": false,
+          "qualityScore": 0.95,
+          "reliabilityScore": 0.92,
+          "priceCompetitiveness": 0.75
+        },
+        {
+          "vendorId": "vendor-003",
+          "vendorName": "Budget Furniture Co",
+          "price": 22.00,
+          "currency": "USD",
+          "normalizedPrice": 22.00,
+          "minQuantity": 5,
+          "availability": "limited",
+          "leadTime": 7,
+          "rating": 3.8,
+          "isPreferred": false,
+          "qualityScore": 0.7,
+          "reliabilityScore": 0.8,
+          "priceCompetitiveness": 0.95
+        }
+      ],
+      "selectionCriteria": {
+        "priceWeight": 0.4,
+        "qualityWeight": 0.3,
+        "reliabilityWeight": 0.2,
+        "leadTimeWeight": 0.1
+      },
+      "selectedVendorId": "vendor-001",
+      "selectionReason": "Best overall score considering price, quality, and preferred vendor status"
+    }
+  ],
+  "assignmentHistory": [
+    {
+      "historyId": "ah-001",
+      "prItemId": "pri-001",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "action": "initial_assignment",
+      "vendorId": "vendor-001",
+      "price": 24.99,
+      "currency": "USD",
+      "reason": "Automated assignment based on business rules",
+      "performedBy": "system",
+      "ruleId": "rule-001",
+      "confidenceScore": 0.92
+    },
+    {
+      "historyId": "ah-002",
+      "prItemId": "pri-004",
+      "timestamp": "2024-01-14T16:20:00Z",
+      "action": "manual_override",
+      "vendorId": "vendor-008",
+      "price": 35.00,
+      "currency": "USD",
+      "reason": "Manager override for strategic vendor relationship",
+      "performedBy": "user-manager-001",
+      "previousVendorId": "vendor-001",
+      "previousPrice": 32.50,
+      "overrideReason": "Strategic partnership priority",
+      "confidenceScore": 1.0
+    },
+    {
+      "historyId": "ah-003",
+      "prItemId": "pri-005",
+      "timestamp": "2024-01-13T11:45:00Z",
+      "action": "reassignment",
+      "vendorId": "vendor-002",
+      "price": 18.75,
+      "currency": "USD",
+      "reason": "Original vendor became unavailable",
+      "performedBy": "system",
+      "previousVendorId": "vendor-009",
+      "previousPrice": 17.50,
+      "ruleId": "rule-002",
+      "confidenceScore": 0.85
+    }
+  ]
+}

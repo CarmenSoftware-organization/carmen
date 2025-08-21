@@ -11,14 +11,15 @@ import { GoodsReceiveNoteItems } from './tabs/GoodsReceiveNoteItems'
 import { GoodsReceiveNoteMode, GoodsReceiveNote, GoodsReceiveNoteItem, ExtraCost, FinancialSummary, GoodsReceiveNoteStatus } from '@/lib/types'
 import { ExtraCostsTab } from './tabs/ExtraCostsTab'
 import { GoodsReceiveNoteItemsBulkActions } from './tabs/GoodsReceiveNoteItemsBulkActions'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
 import { StockMovementTab } from './tabs/StockMovementTab'
-import { ChevronLeft, Edit, Trash2, Printer, Send, Save, PanelRightClose, PanelRightOpen, CheckCheck, PencilRuler } from 'lucide-react'
+import { ChevronLeft, Edit, Trash2, Printer, Send, Save, PanelRightClose, PanelRightOpen, CheckCheck, PencilRuler, Download, Share } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { FormFooter, FloatingActionMenu, ActionItem } from '@/components/ui/form-footer'
 import { FinancialSummaryTab } from './tabs/FinancialSummaryTab'
-import { ActivityLogTab } from './tabs/ActivityLogTab'
 import StockMovementContent from './tabs/stock-movement'
+import SummaryTotal from './SummaryTotal'
 import { format } from 'date-fns'
 
 // Extend GoodsReceiveNoteMode to include 'confirm'
@@ -77,6 +78,8 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
   const [extraCosts, setExtraCosts] = useState<ExtraCost[]>(initialData.extraCosts || [])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     setFormData(initialData);
@@ -99,12 +102,20 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
     handleModeChange('edit');
   };
 
-  const handleConfirmAndSave = () => {
-    console.log('Confirming and Saving GRN:', formData);
-    const realId = `GRN-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
-    alert(`GRN Saved! Real ID: ${realId}`);
-    router.push(`/procurement/goods-received-note/${realId}?mode=view`);
-  };
+  const handleConfirmAndSave = async () => {
+    setIsLoading(true)
+    try {
+      console.log('Confirming and Saving GRN:', formData)
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      const realId = `GRN-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
+      router.push(`/procurement/goods-received-note/${realId}?mode=view`)
+    } catch (error) {
+      console.error('Error confirming GRN:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleEditFurther = () => {
     handleModeChange('edit');
@@ -142,14 +153,25 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
     setSelectedItems([])
   }
 
-  const handleSave = () => {
-    console.log('Saving GRN (edit mode):', formData)
-    handleModeChange('view');
+  const handleSave = async () => {
+    setIsLoading(true)
+    try {
+      console.log('Saving GRN (edit mode):', formData)
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setHasUnsavedChanges(false)
+      handleModeChange('view')
+    } catch (error) {
+      console.error('Error saving GRN:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleCancelEdit = () => {
-    setFormData(initialData);
-    handleModeChange('view');
+    setFormData(initialData)
+    setHasUnsavedChanges(false)
+    handleModeChange('view')
   }
 
   const handleBack = () => {
@@ -196,45 +218,11 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
 
   const handleItemsChange = (newItems: GoodsReceiveNoteItem[]) => {
     if (!isReadOnly) {
-      setFormData(prev => ({ ...prev, items: newItems }));
+      setFormData(prev => ({ ...prev, items: newItems }))
+      setHasUnsavedChanges(true)
     }
-  };
+  }
 
-  const handleEditComment = (id: string, text: string) => {
-    setFormData(prev => ({
-      ...prev,
-      comments: prev.comments.map(comment =>
-        comment.id === id ? { ...comment, text } : comment
-      )
-    }));
-  };
-
-  const handleDeleteComment = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      comments: prev.comments.filter(comment => comment.id !== id)
-    }));
-  };
-
-  const handleEditAttachment = (id: string, description: string, publicAccess: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      attachments: prev.attachments.map(attachment =>
-        attachment.id === id ? { ...attachment, description, publicAccess } : attachment
-      )
-    }));
-  };
-
-  const handleDeleteAttachment = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      attachments: prev.attachments.filter(attachment => attachment.id !== id)
-    }));
-  };
-
-  const handleDownloadAttachment = (id: string) => {
-    console.log(`Downloading attachment with id: ${id}`);
-  };
 
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
 
@@ -251,65 +239,20 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
               `Goods Receive Note (${formData.ref})`}
           </h1>
         </div>
-        <div className="flex items-center space-x-2">
-          <TooltipProvider>
-            {currentMode === 'view' && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button onClick={handleEditClick}><Edit className="h-4 w-4 mr-2" /> Edit</Button>
-                </TooltipTrigger>
-                <TooltipContent>Edit this GRN</TooltipContent>
-              </Tooltip>
-            )}
-            {currentMode === 'confirm' && (
-              <>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="secondary" onClick={handleEditFurther}><PencilRuler className="h-4 w-4 mr-2" /> Edit Further</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Make changes before saving</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button onClick={handleConfirmAndSave}><CheckCheck className="h-4 w-4 mr-2" /> Confirm & Save GRN</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Confirm and save this new GRN</TooltipContent>
-                </Tooltip>
-              </>
-            )}
-            {currentMode === 'edit' && (
-              <>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" onClick={handleCancelEdit}>
-                      <ChevronLeft className="h-4 w-4 mr-2" /> Cancel
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Discard changes</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button onClick={handleSave}><Save className="h-4 w-4 mr-2" /> Save Changes</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Save changes to this GRN</TooltipContent>
-                </Tooltip>
-              </>
-            )}
-            {currentMode !== 'confirm' && currentMode !== 'edit' && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline"><Trash2 className="h-4 w-4 mr-2" /> Delete</Button>
-                </TooltipTrigger>
-                <TooltipContent>Delete this GRN</TooltipContent>
-              </Tooltip>
-            )}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline"><Printer className="h-4 w-4 mr-2" /> Print</Button>
-              </TooltipTrigger>
-              <TooltipContent>Print this GRN</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        <div className="flex items-center gap-2">
+          {/* Utility Actions */}
+          <Button variant="outline" size="sm" className="h-9">
+            <Printer className="mr-2 h-4 w-4" />
+            Print
+          </Button>
+          <Button variant="outline" size="sm" className="h-9">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+          <Button variant="outline" size="sm" className="h-9">
+            <Share className="mr-2 h-4 w-4" />
+            Share
+          </Button>
         </div>
       </div>
 
@@ -317,20 +260,29 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
         <CardContent className="p-6">
           <div className="grid grid-cols-6 gap-6">
             <div className="space-y-2 col-span-1">
-              <Label htmlFor="ref">Ref#</Label>
+              <Label htmlFor="ref">Requisition</Label>
               <Input id="ref" readOnly value={formData.ref} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="date">Date</Label>
-              <Input id="date" type="date" readOnly={isReadOnly} value={formData.date ? format(new Date(formData.date), 'yyyy-MM-dd') : ''} onChange={e => setFormData({...formData, date: new Date(e.target.value)})} />
+              <Input id="date" type="date" readOnly={isReadOnly} value={formData.date ? format(new Date(formData.date), 'yyyy-MM-dd') : ''} onChange={e => {
+                setFormData({...formData, date: new Date(e.target.value)})
+                setHasUnsavedChanges(true)
+              }} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="invoiceDate">Invoice Date</Label>
-              <Input id="invoiceDate" type="date" readOnly={isReadOnly} value={formData.invoiceDate ? format(new Date(formData.invoiceDate), 'yyyy-MM-dd') : ''} onChange={e => setFormData({...formData, invoiceDate: new Date(e.target.value)})} />
+              <Input id="invoiceDate" type="date" readOnly={isReadOnly} value={formData.invoiceDate ? format(new Date(formData.invoiceDate), 'yyyy-MM-dd') : ''} onChange={e => {
+                setFormData({...formData, invoiceDate: new Date(e.target.value)})
+                setHasUnsavedChanges(true)
+              }} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="invoiceNumber">Invoice#</Label>
-              <Input id="invoiceNumber" readOnly={isReadOnly} value={formData.invoiceNumber} onChange={e => setFormData({...formData, invoiceNumber: e.target.value})} />
+              <Input id="invoiceNumber" readOnly={isReadOnly} value={formData.invoiceNumber} onChange={e => {
+                setFormData({...formData, invoiceNumber: e.target.value})
+                setHasUnsavedChanges(true)
+              }} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="taxInvoiceDate">Tax Invoice Date</Label>
@@ -342,11 +294,17 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             </div>
             <div className="space-y-2 col-span-3">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" readOnly={isReadOnly} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+              <Textarea id="description" readOnly={isReadOnly} value={formData.description} onChange={e => {
+                setFormData({...formData, description: e.target.value})
+                setHasUnsavedChanges(true)
+              }} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="receiver">Receiver</Label>
-              <Select disabled={isReadOnly} value={formData.receiver} onValueChange={(value) => setFormData(prev => ({ ...prev, receiver: value }))}>
+              <Select disabled={isReadOnly} value={formData.receiver} onValueChange={(value) => {
+                setFormData(prev => ({ ...prev, receiver: value }))
+                setHasUnsavedChanges(true)
+              }}>
                 <SelectTrigger id="receiver">
                   <SelectValue placeholder="Select receiver" />
                 </SelectTrigger>
@@ -431,9 +389,6 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
           <TabsTrigger value="extra-costs">Extra Costs</TabsTrigger>
           <TabsTrigger value="stock-movement">Stock Movement</TabsTrigger>
           <TabsTrigger value="financial-summary">Financial Summary</TabsTrigger>
-          <TabsTrigger value="comments">Comments</TabsTrigger>
-          <TabsTrigger value="attachments">Attachments</TabsTrigger>
-          <TabsTrigger value="activity-log">Activity Log</TabsTrigger>
         </TabsList>
         <TabsContent value="items">
           {!isReadOnly && selectedItems.length > 0 && (
@@ -474,16 +429,108 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             baseCurrency={formData.baseCurrency}
           />
         </TabsContent>
-        <TabsContent value="comments">
-        </TabsContent>
-        <TabsContent value="attachments">
-        </TabsContent>
-        <TabsContent value="activity-log">
-          <ActivityLogTab activityLog={formData.activityLog} />
-        </TabsContent>
       </Tabs>
+
+      {/* Transaction Summary */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Transaction Summary ({formData.currency || 'USD'})</CardTitle>
+        </CardHeader>
+        <CardContent className="pb-6">
+          <SummaryTotal poData={formData} />
+        </CardContent>
+      </Card>
+
+      {/* Form Footer for Standard Actions */}
+      <FormFooter
+        mode={currentMode}
+        onSave={handleSave}
+        onCancel={handleCancelEdit}
+        onEdit={handleEditClick}
+        isLoading={isLoading}
+        hasChanges={hasUnsavedChanges}
+        className="mt-6"
+      >
+        {currentMode !== 'view' && (
+          <span className="text-sm text-muted-foreground">
+            {hasUnsavedChanges ? 'You have unsaved changes' : 'No changes made'}
+          </span>
+        )}
+      </FormFooter>
+
+      {/* Floating Action Menu for Context-Specific Actions */}
+      <FloatingActionMenu
+        visible={currentMode === 'confirm' || (currentMode === 'view' && formData.status === 'Received')}
+        position="bottom-right"
+        summary={{
+          title: currentMode === 'confirm' ? 'Confirmation Required' : 'GRN Status',
+          description: currentMode === 'confirm' 
+            ? 'Review all details before saving' 
+            : `Status: ${formData.status}`,
+          metadata: currentMode === 'confirm' 
+            ? `${formData.items?.length || 0} items to process`
+            : `Last updated: ${formData.date ? new Date(formData.date).toLocaleDateString() : 'N/A'}`
+        }}
+        actions={getFloatingActions()}
+      />
     </div>
   )
+
+  function getFloatingActions(): ActionItem[] {
+    const actions: ActionItem[] = []
+
+    if (currentMode === 'confirm') {
+      actions.push(
+        {
+          id: 'edit-further',
+          label: 'Edit Further',
+          icon: PencilRuler,
+          variant: 'outline',
+          onClick: handleEditFurther,
+          disabled: isLoading
+        },
+        {
+          id: 'confirm-save',
+          label: 'Confirm & Save',
+          icon: CheckCheck,
+          variant: 'default',
+          onClick: handleConfirmAndSave,
+          disabled: isLoading,
+          className: 'bg-green-600 hover:bg-green-700'
+        }
+      )
+    } else if (currentMode === 'view' && formData.status === 'Received') {
+      actions.push(
+        {
+          id: 'delete',
+          label: 'Delete',
+          icon: Trash2,
+          variant: 'destructive',
+          onClick: () => {
+            if (confirm('Are you sure you want to delete this GRN?')) {
+              console.log('Deleting GRN:', formData.id)
+              router.push('/procurement/goods-received-note')
+            }
+          },
+          disabled: isLoading
+        },
+        {
+          id: 'send',
+          label: 'Send',
+          icon: Send,
+          variant: 'default',
+          onClick: () => {
+            console.log('Sending GRN:', formData.id)
+            alert('GRN sent successfully!')
+          },
+          disabled: isLoading,
+          className: 'bg-blue-600 hover:bg-blue-700'
+        }
+      )
+    }
+
+    return actions
+  }
 }
 
 export default GoodsReceiveNoteDetail;

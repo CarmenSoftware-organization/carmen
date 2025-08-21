@@ -1,0 +1,311 @@
+{
+  "performanceMetrics": {
+    "overview": {
+      "totalAssignments": 1247,
+      "successfulAssignments": 1091,
+      "failedAssignments": 156,
+      "successRate": 87.5,
+      "averageAssignmentTime": "2.3 minutes",
+      "averageConfidenceScore": 0.84,
+      "costSavings": 23450.75,
+      "lastUpdated": "2024-01-15T15:00:00Z"
+    },
+    "dailyMetrics": [
+      {
+        "date": "2024-01-15",
+        "totalAssignments": 45,
+        "successfulAssignments": 39,
+        "failedAssignments": 6,
+        "successRate": 86.7,
+        "averageTime": "2.1 minutes",
+        "averageConfidence": 0.86,
+        "costSavings": 892.30
+      },
+      {
+        "date": "2024-01-14",
+        "totalAssignments": 52,
+        "successfulAssignments": 47,
+        "failedAssignments": 5,
+        "successRate": 90.4,
+        "averageTime": "2.0 minutes",
+        "averageConfidence": 0.88,
+        "costSavings": 1156.45
+      },
+      {
+        "date": "2024-01-13",
+        "totalAssignments": 38,
+        "successfulAssignments": 33,
+        "failedAssignments": 5,
+        "successRate": 86.8,
+        "averageTime": "2.4 minutes",
+        "averageConfidence": 0.82,
+        "costSavings": 743.20
+      },
+      {
+        "date": "2024-01-12",
+        "totalAssignments": 41,
+        "successfulAssignments": 36,
+        "failedAssignments": 5,
+        "successRate": 87.8,
+        "averageTime": "2.2 minutes",
+        "averageConfidence": 0.85,
+        "costSavings": 967.80
+      },
+      {
+        "date": "2024-01-11",
+        "totalAssignments": 49,
+        "successfulAssignments": 44,
+        "failedAssignments": 5,
+        "successRate": 89.8,
+        "averageTime": "1.9 minutes",
+        "averageConfidence": 0.87,
+        "costSavings": 1234.50
+      }
+    ],
+    "categoryPerformance": [
+      {
+        "category": "Office Supplies",
+        "totalAssignments": 324,
+        "successRate": 94.1,
+        "averageTime": "1.8 minutes",
+        "averageConfidence": 0.91,
+        "topVendor": "Office Supplies Co",
+        "costSavings": 4567.80
+      },
+      {
+        "category": "IT Equipment",
+        "totalAssignments": 187,
+        "successRate": 82.4,
+        "averageTime": "3.2 minutes",
+        "averageConfidence": 0.78,
+        "topVendor": "Tech Solutions Inc",
+        "costSavings": 8934.25
+      },
+      {
+        "category": "Cleaning Supplies",
+        "totalAssignments": 156,
+        "successRate": 89.7,
+        "averageTime": "2.1 minutes",
+        "averageConfidence": 0.86,
+        "topVendor": "Clean Pro Services",
+        "costSavings": 2345.60
+      },
+      {
+        "category": "Industrial Equipment",
+        "totalAssignments": 89,
+        "successRate": 75.3,
+        "averageTime": "4.1 minutes",
+        "averageConfidence": 0.72,
+        "topVendor": "Heavy Machinery Corp",
+        "costSavings": 5678.90
+      },
+      {
+        "category": "Software",
+        "totalAssignments": 67,
+        "successRate": 79.1,
+        "averageTime": "3.5 minutes",
+        "averageConfidence": 0.74,
+        "topVendor": "Software Solutions Ltd",
+        "costSavings": 1924.20
+      }
+    ],
+    "vendorPerformance": [
+      {
+        "vendorId": "vendor-001",
+        "vendorName": "Office Supplies Co",
+        "assignmentCount": 234,
+        "winRate": 72.4,
+        "averagePrice": 125.50,
+        "averageConfidence": 0.89,
+        "categories": ["Office Supplies", "Stationery"],
+        "lastAssignment": "2024-01-15T14:30:00Z"
+      },
+      {
+        "vendorId": "vendor-002",
+        "vendorName": "Tech Solutions Inc",
+        "assignmentCount": 156,
+        "winRate": 68.2,
+        "averagePrice": 567.80,
+        "averageConfidence": 0.82,
+        "categories": ["IT Equipment", "Software"],
+        "lastAssignment": "2024-01-15T13:45:00Z"
+      },
+      {
+        "vendorId": "vendor-003",
+        "vendorName": "Clean Pro Services",
+        "assignmentCount": 98,
+        "winRate": 81.3,
+        "averagePrice": 89.25,
+        "averageConfidence": 0.87,
+        "categories": ["Cleaning Supplies", "Maintenance"],
+        "lastAssignment": "2024-01-15T12:20:00Z"
+      },
+      {
+        "vendorId": "vendor-004",
+        "vendorName": "Heavy Machinery Corp",
+        "assignmentCount": 45,
+        "winRate": 55.6,
+        "averagePrice": 2345.75,
+        "averageConfidence": 0.75,
+        "categories": ["Industrial Equipment"],
+        "lastAssignment": "2024-01-14T16:10:00Z"
+      }
+    ],
+    "failureAnalysis": {
+      "failureReasons": [
+        {
+          "reason": "No vendors found",
+          "count": 45,
+          "percentage": 28.8,
+          "trend": "increasing"
+        },
+        {
+          "reason": "Price validation failed",
+          "count": 38,
+          "percentage": 24.4,
+          "trend": "stable"
+        },
+        {
+          "reason": "Multiple vendors same price",
+          "count": 32,
+          "percentage": 20.5,
+          "trend": "decreasing"
+        },
+        {
+          "reason": "Vendor capacity exceeded",
+          "count": 24,
+          "percentage": 15.4,
+          "trend": "stable"
+        },
+        {
+          "reason": "Currency conversion error",
+          "count": 17,
+          "percentage": 10.9,
+          "trend": "decreasing"
+        }
+      ],
+      "resolutionTimes": {
+        "average": "4.2 hours",
+        "median": "2.8 hours",
+        "fastest": "15 minutes",
+        "slowest": "24 hours"
+      }
+    },
+    "timeAnalysis": {
+      "hourlyDistribution": [
+        { "hour": 8, "assignments": 45, "successRate": 89.2 },
+        { "hour": 9, "assignments": 67, "successRate": 91.0 },
+        { "hour": 10, "assignments": 89, "successRate": 88.7 },
+        { "hour": 11, "assignments": 78, "successRate": 87.2 },
+        { "hour": 12, "assignments": 34, "successRate": 85.3 },
+        { "hour": 13, "assignments": 56, "successRate": 86.8 },
+        { "hour": 14, "assignments": 72, "successRate": 89.4 },
+        { "hour": 15, "assignments": 65, "successRate": 88.1 },
+        { "hour": 16, "assignments": 43, "successRate": 86.0 },
+        { "hour": 17, "assignments": 28, "successRate": 82.1 }
+      ],
+      "peakHours": [9, 10, 14],
+      "lowActivityHours": [12, 17]
+    }
+  },
+  "trackingData": {
+    "recentAssignments": [
+      {
+        "id": "assignment-001",
+        "prItemId": "pr-item-001",
+        "prId": "PR-2024-001",
+        "productName": "Office Paper A4",
+        "assignedVendor": "Office Supplies Co",
+        "assignedPrice": 125.00,
+        "currency": "USD",
+        "confidence": 0.89,
+        "assignmentTime": "1.8 minutes",
+        "assignedAt": "2024-01-15T14:30:00Z",
+        "status": "completed",
+        "ruleApplied": "Lowest Price Rule"
+      },
+      {
+        "id": "assignment-002",
+        "prItemId": "pr-item-002",
+        "prId": "PR-2024-002",
+        "productName": "Laptop Dell Inspiron",
+        "assignedVendor": "Tech Solutions Inc",
+        "assignedPrice": 899.00,
+        "currency": "USD",
+        "confidence": 0.82,
+        "assignmentTime": "3.2 minutes",
+        "assignedAt": "2024-01-15T13:45:00Z",
+        "status": "completed",
+        "ruleApplied": "Preferred Vendor Rule"
+      },
+      {
+        "id": "assignment-003",
+        "prItemId": "pr-item-003",
+        "prId": "PR-2024-003",
+        "productName": "Cleaning Supplies",
+        "assignedVendor": null,
+        "assignedPrice": null,
+        "currency": null,
+        "confidence": null,
+        "assignmentTime": "5.1 minutes",
+        "assignedAt": "2024-01-15T12:20:00Z",
+        "status": "failed",
+        "failureReason": "No vendors found for category",
+        "ruleApplied": null
+      }
+    ],
+    "bulkOperations": [
+      {
+        "id": "bulk-001",
+        "name": "Weekly Office Supplies Assignment",
+        "description": "Bulk assignment for weekly office supplies orders",
+        "itemCount": 45,
+        "successCount": 42,
+        "failureCount": 3,
+        "successRate": 93.3,
+        "totalValue": 2345.67,
+        "averageTime": "1.9 minutes per item",
+        "startedAt": "2024-01-15T09:00:00Z",
+        "completedAt": "2024-01-15T09:15:00Z",
+        "status": "completed",
+        "initiatedBy": "jane.doe@company.com"
+      },
+      {
+        "id": "bulk-002",
+        "name": "IT Equipment Quarterly Assignment",
+        "description": "Quarterly IT equipment price assignments",
+        "itemCount": 23,
+        "successCount": 19,
+        "failureCount": 4,
+        "successRate": 82.6,
+        "totalValue": 12456.89,
+        "averageTime": "3.4 minutes per item",
+        "startedAt": "2024-01-14T14:00:00Z",
+        "completedAt": "2024-01-14T14:25:00Z",
+        "status": "completed",
+        "initiatedBy": "mike.wilson@company.com"
+      }
+    ],
+    "alerts": [
+      {
+        "id": "alert-001",
+        "type": "performance_degradation",
+        "severity": "medium",
+        "message": "Assignment success rate dropped below 85% in the last hour",
+        "details": "Current rate: 82.3%, Previous hour: 89.1%",
+        "createdAt": "2024-01-15T14:45:00Z",
+        "status": "active"
+      },
+      {
+        "id": "alert-002",
+        "type": "vendor_unavailable",
+        "severity": "high",
+        "message": "Primary vendor 'Office Supplies Co' not responding",
+        "details": "Last successful assignment: 2 hours ago",
+        "createdAt": "2024-01-15T13:30:00Z",
+        "status": "resolved",
+        "resolvedAt": "2024-01-15T14:15:00Z"
+      }
+    ]
+  }
+}

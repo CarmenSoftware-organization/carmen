@@ -22,6 +22,21 @@ export interface PreparationStep {
   image: string
 }
 
+export interface RecipeYieldVariant {
+  id: string
+  name: string
+  unit: string
+  quantity: number
+  conversionRate: number  // Portion of base recipe (1.0 = whole recipe, 0.125 = 1/8)
+  sellingPrice: number
+  costPerUnit: number
+  isDefault: boolean
+  shelfLife?: number  // Hours after preparation/opening
+  wastageRate?: number  // Expected waste percentage for this variant
+  minOrderQuantity?: number
+  maxOrderQuantity?: number
+}
+
 export interface Recipe {
   id: string
   name: string
@@ -32,6 +47,11 @@ export interface Recipe {
   image: string
   yield: number
   yieldUnit: string
+  // Enhanced yield management for fractional sales
+  yieldVariants: RecipeYieldVariant[]
+  defaultVariantId: string
+  allowsFractionalSales: boolean
+  fractionalSalesType?: 'pizza-slice' | 'cake-slice' | 'bottle-glass' | 'portion-control' | 'custom'
   prepTime: number
   cookTime: number
   totalTime: number
@@ -77,6 +97,23 @@ export const mockRecipes: Recipe[] = [
     image: "/images/recipes/thai-green-curry.jpg",
     yield: 4,
     yieldUnit: "portions",
+    // Standard recipe - single portion sales
+    yieldVariants: [
+      {
+        id: "thai-curry-portion",
+        name: "Single Portion",
+        unit: "portion",
+        quantity: 1,
+        conversionRate: 0.25, // 1 portion = 1/4 of recipe
+        sellingPrice: 16.99,
+        costPerUnit: 4.75,
+        isDefault: true,
+        shelfLife: 4, // 4 hours hot holding
+        wastageRate: 2
+      }
+    ],
+    defaultVariantId: "thai-curry-portion",
+    allowsFractionalSales: false,
     prepTime: 30,
     cookTime: 20,
     totalTime: 50,
@@ -367,6 +404,373 @@ export const mockRecipes: Recipe[] = [
     foodCostPercentage: 25,
     grossProfit: 6.74,
     unitOfSale: "portion"
+  },
+  // Pizza example with fractional sales
+  {
+    id: "margherita-pizza",
+    name: "Margherita Pizza",
+    description: "Classic Italian pizza with fresh mozzarella, tomatoes, and basil",
+    category: "main-course",
+    cuisine: "Italian",
+    status: "published",
+    image: "/images/recipes/margherita-pizza.jpg",
+    yield: 1,
+    yieldUnit: "large pizza",
+    // Multiple selling options for pizza
+    yieldVariants: [
+      {
+        id: "pizza-slice",
+        name: "Pizza Slice",
+        unit: "slice",
+        quantity: 1,
+        conversionRate: 0.125, // 1 slice = 1/8 of pizza
+        sellingPrice: 4.99,
+        costPerUnit: 1.85,
+        isDefault: false,
+        shelfLife: 4, // 4 hours under heat lamps
+        wastageRate: 5,
+        minOrderQuantity: 1,
+        maxOrderQuantity: 8
+      },
+      {
+        id: "pizza-half",
+        name: "Half Pizza",
+        unit: "half",
+        quantity: 1,
+        conversionRate: 0.5, // Half pizza
+        sellingPrice: 18.99,
+        costPerUnit: 7.40,
+        isDefault: false,
+        shelfLife: 2, // 2 hours optimal quality
+        wastageRate: 3
+      },
+      {
+        id: "pizza-whole",
+        name: "Whole Pizza",
+        unit: "whole",
+        quantity: 1,
+        conversionRate: 1.0, // Full recipe
+        sellingPrice: 34.99,
+        costPerUnit: 14.80,
+        isDefault: true,
+        shelfLife: 1, // Best served immediately
+        wastageRate: 1
+      }
+    ],
+    defaultVariantId: "pizza-whole",
+    allowsFractionalSales: true,
+    fractionalSalesType: "pizza-slice",
+    prepTime: 20,
+    cookTime: 12,
+    totalTime: 32,
+    difficulty: "medium",
+    costPerPortion: 14.80,
+    sellingPrice: 34.99,
+    grossMargin: 57.7,
+    netPrice: 32.99,
+    grossPrice: 34.99,
+    totalCost: 14.80,
+    carbonFootprint: 2.1,
+    carbonFootprintSource: "Ingredient analysis",
+    hasMedia: true,
+    deductFromStock: true,
+    ingredients: [
+      {
+        id: "pizza-dough",
+        name: "Pizza Dough",
+        type: "product",
+        quantity: 350,
+        unit: "g",
+        wastage: 2,
+        inventoryQty: 5000,
+        inventoryUnit: "g",
+        costPerUnit: 0.008,
+        totalCost: 2.80
+      },
+      {
+        id: "mozzarella",
+        name: "Fresh Mozzarella",
+        type: "product",
+        quantity: 200,
+        unit: "g",
+        wastage: 3,
+        inventoryQty: 2000,
+        inventoryUnit: "g",
+        costPerUnit: 0.025,
+        totalCost: 5.00
+      },
+      {
+        id: "tomato-sauce",
+        name: "Pizza Tomato Sauce",
+        type: "recipe",
+        quantity: 150,
+        unit: "ml",
+        wastage: 2,
+        inventoryQty: 2000,
+        inventoryUnit: "ml",
+        costPerUnit: 0.012,
+        totalCost: 1.80
+      },
+      {
+        id: "basil-fresh",
+        name: "Fresh Basil Leaves",
+        type: "product",
+        quantity: 15,
+        unit: "g",
+        wastage: 10,
+        inventoryQty: 200,
+        inventoryUnit: "g",
+        costPerUnit: 0.04,
+        totalCost: 0.60
+      }
+    ],
+    steps: [
+      {
+        id: "step-1",
+        order: 1,
+        description: "Prepare pizza dough and let rest for 15 minutes",
+        duration: 15,
+        temperature: 20,
+        equipments: ["mixing-bowl", "dough-scraper"],
+        image: ""
+      },
+      {
+        id: "step-2",
+        order: 2,
+        description: "Roll out dough to 14-inch circle",
+        duration: 5,
+        equipments: ["rolling-pin", "floured-surface"],
+        image: ""
+      },
+      {
+        id: "step-3",
+        order: 3,
+        description: "Spread tomato sauce evenly, add mozzarella and basil",
+        duration: 3,
+        equipments: ["ladle", "cheese-grater"],
+        image: ""
+      },
+      {
+        id: "step-4",
+        order: 4,
+        description: "Bake in pizza oven until crust is golden and cheese bubbles",
+        duration: 12,
+        temperature: 450,
+        equipments: ["pizza-oven", "pizza-peel"],
+        image: ""
+      }
+    ],
+    prepNotes: "Ensure dough is at room temperature before rolling",
+    specialInstructions: "Cut into 8 equal slices when selling by slice",
+    additionalInfo: "Can be prepared ahead and par-baked for faster service",
+    allergens: ["gluten", "dairy"],
+    tags: ["pizza", "vegetarian", "italian", "fractional-sales"],
+    createdAt: "2023-10-15T10:00:00Z",
+    updatedAt: "2023-12-01T15:30:00Z",
+    createdBy: "Chef Mario",
+    updatedBy: "Kitchen Manager",
+    targetFoodCost: 42,
+    laborCostPercentage: 25,
+    overheadPercentage: 18,
+    recommendedPrice: 34.99,
+    foodCostPercentage: 42.3,
+    grossProfit: 20.19,
+    unitOfSale: "whole"
+  },
+  // Cake example with fractional sales
+  {
+    id: "chocolate-pound-cake",
+    name: "Chocolate Pound Cake",
+    description: "Rich, dense chocolate cake perfect for slicing",
+    category: "dessert",
+    cuisine: "American",
+    status: "published",
+    image: "/images/recipes/chocolate-pound-cake.jpg",
+    yield: 1,
+    yieldUnit: "whole cake",
+    // Multiple selling options for cake
+    yieldVariants: [
+      {
+        id: "cake-slice",
+        name: "Cake Slice",
+        unit: "slice",
+        quantity: 1,
+        conversionRate: 0.0625, // 1 slice = 1/16 of cake
+        sellingPrice: 6.99,
+        costPerUnit: 1.25,
+        isDefault: true,
+        shelfLife: 72, // 3 days refrigerated
+        wastageRate: 8,
+        minOrderQuantity: 1,
+        maxOrderQuantity: 16
+      },
+      {
+        id: "cake-quarter",
+        name: "Quarter Cake",
+        unit: "quarter",
+        quantity: 1,
+        conversionRate: 0.25, // 1/4 of cake
+        sellingPrice: 24.99,
+        costPerUnit: 5.00,
+        isDefault: false,
+        shelfLife: 120, // 5 days when uncut
+        wastageRate: 3
+      },
+      {
+        id: "cake-half",
+        name: "Half Cake",
+        unit: "half",
+        quantity: 1,
+        conversionRate: 0.5, // Half cake
+        sellingPrice: 47.99,
+        costPerUnit: 10.00,
+        isDefault: false,
+        shelfLife: 120,
+        wastageRate: 2
+      },
+      {
+        id: "cake-whole",
+        name: "Whole Cake",
+        unit: "whole",
+        quantity: 1,
+        conversionRate: 1.0, // Full recipe
+        sellingPrice: 89.99,
+        costPerUnit: 20.00,
+        isDefault: false,
+        shelfLife: 168, // 7 days unopened
+        wastageRate: 1
+      }
+    ],
+    defaultVariantId: "cake-slice",
+    allowsFractionalSales: true,
+    fractionalSalesType: "cake-slice",
+    prepTime: 25,
+    cookTime: 60,
+    totalTime: 85,
+    difficulty: "easy",
+    costPerPortion: 20.00,
+    sellingPrice: 89.99,
+    grossMargin: 77.8,
+    netPrice: 84.99,
+    grossPrice: 89.99,
+    totalCost: 20.00,
+    carbonFootprint: 1.8,
+    carbonFootprintSource: "Recipe analysis",
+    hasMedia: true,
+    deductFromStock: true,
+    ingredients: [
+      {
+        id: "flour",
+        name: "All-Purpose Flour",
+        type: "product",
+        quantity: 300,
+        unit: "g",
+        wastage: 1,
+        inventoryQty: 10000,
+        inventoryUnit: "g",
+        costPerUnit: 0.002,
+        totalCost: 0.60
+      },
+      {
+        id: "cocoa-powder",
+        name: "Cocoa Powder",
+        type: "product",
+        quantity: 80,
+        unit: "g",
+        wastage: 2,
+        inventoryQty: 1000,
+        inventoryUnit: "g",
+        costPerUnit: 0.015,
+        totalCost: 1.20
+      },
+      {
+        id: "butter",
+        name: "Unsalted Butter",
+        type: "product",
+        quantity: 250,
+        unit: "g",
+        wastage: 1,
+        inventoryQty: 2500,
+        inventoryUnit: "g",
+        costPerUnit: 0.012,
+        totalCost: 3.00
+      },
+      {
+        id: "sugar",
+        name: "Granulated Sugar",
+        type: "product",
+        quantity: 350,
+        unit: "g",
+        wastage: 1,
+        inventoryQty: 5000,
+        inventoryUnit: "g",
+        costPerUnit: 0.003,
+        totalCost: 1.05
+      },
+      {
+        id: "eggs",
+        name: "Large Eggs",
+        type: "product",
+        quantity: 4,
+        unit: "pieces",
+        wastage: 2,
+        inventoryQty: 60,
+        inventoryUnit: "pieces",
+        costPerUnit: 0.35,
+        totalCost: 1.40
+      }
+    ],
+    steps: [
+      {
+        id: "step-1",
+        order: 1,
+        description: "Cream butter and sugar until light and fluffy",
+        duration: 8,
+        equipments: ["stand-mixer", "paddle-attachment"],
+        image: ""
+      },
+      {
+        id: "step-2",
+        order: 2,
+        description: "Add eggs one at a time, mixing well after each",
+        duration: 5,
+        equipments: ["stand-mixer"],
+        image: ""
+      },
+      {
+        id: "step-3",
+        order: 3,
+        description: "Sift together flour and cocoa powder, fold into batter",
+        duration: 7,
+        equipments: ["sifter", "mixing-spoon"],
+        image: ""
+      },
+      {
+        id: "step-4",
+        order: 4,
+        description: "Pour into greased loaf pan and bake until done",
+        duration: 60,
+        temperature: 350,
+        equipments: ["loaf-pan", "oven"],
+        image: ""
+      }
+    ],
+    prepNotes: "All ingredients should be at room temperature",
+    specialInstructions: "Cut into 16 equal slices for portion control when selling by slice",
+    additionalInfo: "Freezes well for up to 3 months",
+    allergens: ["gluten", "dairy", "eggs"],
+    tags: ["cake", "chocolate", "dessert", "fractional-sales", "make-ahead"],
+    createdAt: "2023-09-20T14:00:00Z",
+    updatedAt: "2023-11-15T11:45:00Z",
+    createdBy: "Pastry Chef Sarah",
+    updatedBy: "Head Chef",
+    targetFoodCost: 22,
+    laborCostPercentage: 20,
+    overheadPercentage: 15,
+    recommendedPrice: 89.99,
+    foodCostPercentage: 22.2,
+    grossProfit: 69.99,
+    unitOfSale: "slice"
   }
 ]
 

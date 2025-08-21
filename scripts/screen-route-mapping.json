@@ -1,0 +1,504 @@
+{
+  "screenRouteMapping": {
+    "description": "Complete mapping of Carmen ERP screens with corresponding documentation files and modal interactions",
+    "version": "1.0",
+    "lastUpdated": "2025-01-14",
+    "screens": {
+      "dashboard": {
+        "route": "/dashboard",
+        "component": "app/(main)/dashboard/page.tsx",
+        "documentationFile": "docs/prd/output/screens/dashboard-screen.md",
+        "testId": "dashboard-page",
+        "modals": {
+          "settings-modal": {
+            "trigger": "[data-testid='settings-button']",
+            "component": "components/dashboard/settings-modal.tsx",
+            "description": "Dashboard configuration and preferences"
+          },
+          "notification-modal": {
+            "trigger": "[data-testid='notifications-button']",
+            "component": "components/dashboard/notification-modal.tsx",
+            "description": "Recent notifications and alerts"
+          }
+        },
+        "states": ["default", "loading", "error"],
+        "fractionalSalesSupport": false
+      },
+      "purchase-requests": {
+        "route": "/procurement/purchase-requests",
+        "component": "app/(main)/procurement/purchase-requests/page.tsx",
+        "documentationFile": "docs/prd/output/screens/purchase-requests-screen.md",
+        "testId": "purchase-requests-page",
+        "modals": {
+          "create-pr-modal": {
+            "trigger": "[data-testid='create-pr-button']",
+            "component": "app/(main)/procurement/purchase-requests/components/PRForm.tsx",
+            "description": "Create new purchase request with fractional sales support"
+          },
+          "filter-modal": {
+            "trigger": "[data-testid='filter-button']",
+            "component": "components/common/filter-modal.tsx",
+            "description": "Advanced filtering and search options"
+          },
+          "bulk-actions-modal": {
+            "trigger": "[data-testid='bulk-actions-button']",
+            "component": "components/common/bulk-actions-modal.tsx",
+            "description": "Bulk operations for selected items"
+          }
+        },
+        "states": ["default", "empty", "loading"],
+        "fractionalSalesSupport": true
+      },
+      "purchase-request-detail": {
+        "route": "/procurement/purchase-requests/[id]",
+        "component": "app/(main)/procurement/purchase-requests/[id]/page.tsx",
+        "documentationFile": "docs/prd/output/screens/purchase-request-details-screen.md",
+        "testId": "purchase-request-detail-page",
+        "modals": {
+          "item-details-modal": {
+            "trigger": "[data-testid='item-details-button']:first-child",
+            "component": "app/(main)/procurement/purchase-requests/components/item-details-edit-form.tsx",
+            "description": "Edit item details with fractional sales variants"
+          },
+          "vendor-comparison-modal": {
+            "trigger": "[data-testid='vendor-comparison-button']",
+            "component": "app/(main)/procurement/purchase-requests/components/vendor-comparison.tsx",
+            "description": "Compare vendor prices and options"
+          },
+          "approval-modal": {
+            "trigger": "[data-testid='approve-button']",
+            "component": "components/common/approval-modal.tsx",
+            "description": "Approval workflow interface"
+          },
+          "comment-modal": {
+            "trigger": "[data-testid='add-comment-button']",
+            "component": "components/common/comment-modal.tsx",
+            "description": "Add comments and notes"
+          }
+        },
+        "states": ["default", "editing", "approved", "rejected"],
+        "fractionalSalesSupport": true
+      },
+      "purchase-orders": {
+        "route": "/procurement/purchase-orders",
+        "component": "app/(main)/procurement/purchase-orders/page.tsx",
+        "documentationFile": "docs/prd/output/screens/purchase-orders-screen.md",
+        "testId": "purchase-orders-page",
+        "modals": {
+          "create-po-modal": {
+            "trigger": "[data-testid='create-po-button']",
+            "component": "app/(main)/procurement/purchase-orders/components/createpofrompr.tsx",
+            "description": "Create purchase order from PR"
+          },
+          "filter-modal": {
+            "trigger": "[data-testid='filter-button']",
+            "component": "components/common/filter-modal.tsx",
+            "description": "Advanced filtering options"
+          }
+        },
+        "states": ["default", "empty"],
+        "fractionalSalesSupport": true
+      },
+      "purchase-order-detail": {
+        "route": "/procurement/purchase-orders/[id]",
+        "component": "app/(main)/procurement/purchase-orders/components/PODetailPage.tsx",
+        "documentationFile": "docs/prd/output/screens/purchase-order-details-screen.md",
+        "testId": "purchase-order-detail-page",
+        "modals": {
+          "item-details-modal": {
+            "trigger": "[data-testid='item-details-button']:first-child",
+            "component": "app/(main)/procurement/purchase-orders/components/tabs/item-details.tsx",
+            "description": "View and edit PO item details"
+          },
+          "receipt-modal": {
+            "trigger": "[data-testid='receipt-button']",
+            "component": "components/procurement/receipt-modal.tsx",
+            "description": "Goods receipt processing"
+          },
+          "comment-modal": {
+            "trigger": "[data-testid='add-comment-button']",
+            "component": "components/common/comment-modal.tsx",
+            "description": "Add comments and notes"
+          }
+        },
+        "states": ["default", "editing", "received"],
+        "fractionalSalesSupport": true
+      },
+      "goods-received-note": {
+        "route": "/procurement/goods-received-note",
+        "component": "app/(main)/procurement/goods-received-note/page.tsx",
+        "documentationFile": "docs/prd/output/screens/goods-received-note-screen.md",
+        "testId": "goods-received-note-page",
+        "modals": {
+          "create-grn-modal": {
+            "trigger": "[data-testid='create-grn-button']",
+            "component": "app/(main)/procurement/goods-received-note/components/goods-receive-note.tsx",
+            "description": "Create new goods received note"
+          },
+          "filter-modal": {
+            "trigger": "[data-testid='filter-button']",
+            "component": "components/common/filter-modal.tsx",
+            "description": "Filter and search GRN records"
+          }
+        },
+        "states": ["default", "empty"],
+        "fractionalSalesSupport": true
+      },
+      "goods-received-note-detail": {
+        "route": "/procurement/goods-received-note/[id]",
+        "component": "app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail.tsx",
+        "documentationFile": "docs/prd/output/screens/goods-received-note-details-screen.md",
+        "testId": "goods-received-note-detail-page",
+        "modals": {
+          "item-details-modal": {
+            "trigger": "[data-testid='item-details-button']:first-child",
+            "component": "app/(main)/procurement/goods-received-note/components/tabs/itemDetailForm.tsx",
+            "description": "GRN item details with fractional quantities"
+          },
+          "discrepancy-modal": {
+            "trigger": "[data-testid='discrepancy-button']",
+            "component": "components/procurement/discrepancy-modal.tsx",
+            "description": "Handle quantity or quality discrepancies"
+          },
+          "comment-modal": {
+            "trigger": "[data-testid='add-comment-button']",
+            "component": "components/common/comment-modal.tsx",
+            "description": "Add comments and notes"
+          }
+        },
+        "states": ["default", "editing", "completed"],
+        "fractionalSalesSupport": true
+      },
+      "vendor-management": {
+        "route": "/vendor-management/manage-vendors",
+        "component": "app/(main)/vendor-management/manage-vendors/page.tsx",
+        "documentationFile": "docs/prd/output/screens/vendor-management-screen.md",
+        "testId": "vendor-management-page",
+        "modals": {
+          "create-vendor-modal": {
+            "trigger": "[data-testid='create-vendor-button']",
+            "component": "components/vendor-management/create-vendor-modal.tsx",
+            "description": "Create new vendor profile"
+          },
+          "import-modal": {
+            "trigger": "[data-testid='import-button']",
+            "component": "components/vendor-management/import-modal.tsx",
+            "description": "Import vendor data from files"
+          }
+        },
+        "states": ["default", "empty"],
+        "fractionalSalesSupport": false
+      },
+      "vendor-detail": {
+        "route": "/vendor-management/manage-vendors/[id]",
+        "component": "app/(main)/vendor-management/manage-vendors/[id]/page.tsx",
+        "documentationFile": "docs/prd/output/screens/vendor-details-screen.md",
+        "testId": "vendor-detail-page",
+        "modals": {
+          "edit-vendor-modal": {
+            "trigger": "[data-testid='edit-vendor-button']",
+            "component": "components/vendor-management/edit-vendor-modal.tsx",
+            "description": "Edit vendor information"
+          },
+          "price-list-modal": {
+            "trigger": "[data-testid='price-list-button']",
+            "component": "components/vendor-management/price-list-modal.tsx",
+            "description": "Manage vendor price lists with fractional pricing"
+          },
+          "contact-modal": {
+            "trigger": "[data-testid='add-contact-button']",
+            "component": "components/vendor-management/contact-modal.tsx",
+            "description": "Manage vendor contacts"
+          }
+        },
+        "states": ["default", "editing"],
+        "fractionalSalesSupport": true
+      },
+      "vendor-pricelists": {
+        "route": "/vendor-management/pricelists",
+        "component": "app/(main)/vendor-management/pricelists/page.tsx",
+        "documentationFile": "docs/prd/output/screens/vendor-pricelists-screen.md",
+        "testId": "vendor-pricelists-page",
+        "modals": {
+          "upload-pricelist-modal": {
+            "trigger": "[data-testid='upload-pricelist-button']",
+            "component": "components/vendor-management/upload-pricelist-modal.tsx",
+            "description": "Upload vendor price list files"
+          },
+          "edit-price-modal": {
+            "trigger": "[data-testid='edit-price-button']:first-child",
+            "component": "components/vendor-management/edit-price-modal.tsx",
+            "description": "Edit individual price entries"
+          }
+        },
+        "states": ["default", "empty"],
+        "fractionalSalesSupport": true
+      },
+      "inventory-overview": {
+        "route": "/inventory-management/stock-overview",
+        "component": "app/(main)/inventory-management/stock-overview/page.tsx",
+        "documentationFile": "docs/prd/output/screens/inventory-overview-screen.md",
+        "testId": "inventory-overview-page",
+        "modals": {
+          "adjustment-modal": {
+            "trigger": "[data-testid='create-adjustment-button']",
+            "component": "components/inventory/adjustment-modal.tsx",
+            "description": "Create inventory adjustment"
+          },
+          "filter-modal": {
+            "trigger": "[data-testid='filter-button']",
+            "component": "components/common/filter-modal.tsx",
+            "description": "Filter inventory items"
+          }
+        },
+        "states": ["default", "low-stock", "out-of-stock"],
+        "fractionalSalesSupport": true
+      },
+      "inventory-adjustments": {
+        "route": "/inventory-management/inventory-adjustments",
+        "component": "app/(main)/inventory-management/inventory-adjustments/page.tsx",
+        "documentationFile": "docs/prd/output/screens/inventory-adjustments-screen.md",
+        "testId": "inventory-adjustments-page",
+        "modals": {
+          "create-adjustment-modal": {
+            "trigger": "[data-testid='new-adjustment-button']",
+            "component": "components/inventory/create-adjustment-modal.tsx",
+            "description": "Create new inventory adjustment"
+          },
+          "approval-modal": {
+            "trigger": "[data-testid='approve-button']",
+            "component": "components/common/approval-modal.tsx",
+            "description": "Approve inventory adjustments"
+          }
+        },
+        "states": ["default", "pending-approval"],
+        "fractionalSalesSupport": true
+      },
+      "store-requisitions": {
+        "route": "/store-operations/store-requisitions",
+        "component": "app/(main)/store-operations/store-requisitions/page.tsx",
+        "documentationFile": "docs/prd/output/screens/store-requisitions-screen.md",
+        "testId": "store-requisitions-page",
+        "modals": {
+          "create-requisition-modal": {
+            "trigger": "[data-testid='create-requisition-button']",
+            "component": "components/store-operations/create-requisition-modal.tsx",
+            "description": "Create new store requisition"
+          },
+          "approval-modal": {
+            "trigger": "[data-testid='approve-button']",
+            "component": "components/common/approval-modal.tsx",
+            "description": "Approve store requisitions"
+          }
+        },
+        "states": ["default", "pending-approval"],
+        "fractionalSalesSupport": true
+      },
+      "store-requisition-detail": {
+        "route": "/store-operations/store-requisitions/[id]",
+        "component": "app/(main)/store-operations/store-requisitions/components/store-requisition-detail.tsx",
+        "documentationFile": "docs/prd/output/screens/store-requisition-details-screen.md",
+        "testId": "store-requisition-detail-page",
+        "modals": {
+          "item-details-modal": {
+            "trigger": "[data-testid='item-details-button']:first-child",
+            "component": "components/store-operations/item-details-modal.tsx",
+            "description": "Edit requisition item details"
+          },
+          "approval-log-modal": {
+            "trigger": "[data-testid='approval-log-button']",
+            "component": "app/(main)/store-operations/store-requisitions/components/approval-log-dialog.tsx",
+            "description": "View approval history and logs"
+          }
+        },
+        "states": ["default", "editing", "approved"],
+        "fractionalSalesSupport": true
+      },
+      "pos-integration": {
+        "route": "/system-administration/system-integrations/pos",
+        "component": "app/(main)/system-administration/system-integrations/pos/page.tsx",
+        "documentationFile": "docs/prd/output/screens/pos-integration-fractional-screen.md",
+        "testId": "pos-integration-page",
+        "modals": {
+          "settings-modal": {
+            "trigger": "[data-testid='settings-button']",
+            "component": "components/pos-integration/settings-modal.tsx",
+            "description": "POS integration settings and configuration"
+          },
+          "mapping-modal": {
+            "trigger": "[data-testid='mapping-button']",
+            "component": "components/pos-integration/mapping-modal.tsx",
+            "description": "Recipe to POS item mapping"
+          },
+          "sync-status-modal": {
+            "trigger": "[data-testid='sync-status-button']",
+            "component": "components/pos-integration/sync-status-modal.tsx",
+            "description": "Synchronization status and logs"
+          }
+        },
+        "states": ["default", "connected", "disconnected", "syncing"],
+        "fractionalSalesSupport": true
+      },
+      "pos-mapping": {
+        "route": "/system-administration/system-integrations/pos/mapping/recipes",
+        "component": "app/(main)/system-administration/system-integrations/pos/mapping/recipes/page.tsx",
+        "documentationFile": "docs/prd/output/screens/pos-recipe-mapping-screen.md",
+        "testId": "pos-mapping-page",
+        "modals": {
+          "create-mapping-modal": {
+            "trigger": "[data-testid='create-mapping-button']",
+            "component": "components/pos-integration/create-mapping-modal.tsx",
+            "description": "Create new recipe mapping"
+          },
+          "fractional-sales-modal": {
+            "trigger": "[data-testid='fractional-sales-button']",
+            "component": "components/pos-integration/fractional-sales-modal.tsx",
+            "description": "Configure fractional sales variants (pizza slices, cake portions)"
+          },
+          "validation-modal": {
+            "trigger": "[data-testid='validate-mapping-button']",
+            "component": "components/pos-integration/validation-modal.tsx",
+            "description": "Validate mapping configurations"
+          }
+        },
+        "states": ["default", "editing", "validation-error"],
+        "fractionalSalesSupport": true
+      },
+      "help-support": {
+        "route": "/help-support",
+        "component": "app/(main)/help-support/page.tsx",
+        "documentationFile": "docs/prd/output/screens/help-support-main-screen.md",
+        "testId": "help-support-page",
+        "modals": {
+          "search-modal": {
+            "trigger": "[data-testid='search-button']",
+            "component": "components/help-support/search-modal.tsx",
+            "description": "Advanced help content search"
+          },
+          "feedback-modal": {
+            "trigger": "[data-testid='feedback-button']",
+            "component": "components/help-support/feedback-modal.tsx",
+            "description": "Submit feedback and suggestions"
+          }
+        },
+        "states": ["default"],
+        "fractionalSalesSupport": false
+      },
+      "user-manuals": {
+        "route": "/help-support/user-manuals",
+        "component": "app/(main)/help-support/user-manuals/page.tsx",
+        "documentationFile": "docs/prd/output/screens/user-manuals-screen.md",
+        "testId": "user-manuals-page",
+        "modals": {
+          "search-modal": {
+            "trigger": "[data-testid='search-button']",
+            "component": "components/help-support/search-modal.tsx",
+            "description": "Search user manuals"
+          },
+          "download-modal": {
+            "trigger": "[data-testid='download-button']",
+            "component": "components/help-support/download-modal.tsx",
+            "description": "Download manual files"
+          }
+        },
+        "states": ["default"],
+        "fractionalSalesSupport": false
+      },
+      "video-tutorials": {
+        "route": "/help-support/video-tutorials",
+        "component": "app/(main)/help-support/video-tutorials/page.tsx",
+        "documentationFile": "docs/prd/output/screens/video-tutorials-screen.md",
+        "testId": "video-tutorials-page",
+        "modals": {
+          "video-player-modal": {
+            "trigger": "[data-testid='play-video-button']:first-child",
+            "component": "components/help-support/video-player-modal.tsx",
+            "description": "Full-screen video player"
+          },
+          "playlist-modal": {
+            "trigger": "[data-testid='playlist-button']",
+            "component": "components/help-support/playlist-modal.tsx",
+            "description": "Manage video playlists"
+          }
+        },
+        "states": ["default", "playing"],
+        "fractionalSalesSupport": false
+      },
+      "faqs": {
+        "route": "/help-support/faqs",
+        "component": "app/(main)/help-support/faqs/page.tsx",
+        "documentationFile": "docs/prd/output/screens/faqs-screen.md",
+        "testId": "faqs-page",
+        "modals": {
+          "search-modal": {
+            "trigger": "[data-testid='search-button']",
+            "component": "components/help-support/search-modal.tsx",
+            "description": "Search FAQ database"
+          },
+          "feedback-modal": {
+            "trigger": "[data-testid='feedback-button']",
+            "component": "components/help-support/feedback-modal.tsx",
+            "description": "Rate FAQ helpfulness"
+          }
+        },
+        "states": ["default"],
+        "fractionalSalesSupport": false
+      },
+      "support-tickets": {
+        "route": "/help-support/support-ticket-system",
+        "component": "app/(main)/help-support/support-ticket-system/page.tsx",
+        "documentationFile": "docs/prd/output/screens/support-ticket-system-screen.md",
+        "testId": "support-tickets-page",
+        "modals": {
+          "create-ticket-modal": {
+            "trigger": "[data-testid='create-ticket-button']",
+            "component": "components/help-support/create-ticket-modal.tsx",
+            "description": "Create new support ticket"
+          },
+          "ticket-detail-modal": {
+            "trigger": "[data-testid='ticket-row']:first-child",
+            "component": "components/help-support/ticket-detail-modal.tsx",
+            "description": "View ticket details and history"
+          }
+        },
+        "states": ["default", "empty"],
+        "fractionalSalesSupport": false
+      }
+    },
+    "fractionalSalesScreens": [
+      "purchase-requests",
+      "purchase-request-detail", 
+      "purchase-orders",
+      "purchase-order-detail",
+      "goods-received-note",
+      "goods-received-note-detail",
+      "vendor-detail",
+      "vendor-pricelists", 
+      "inventory-overview",
+      "inventory-adjustments",
+      "store-requisitions",
+      "store-requisition-detail",
+      "pos-integration",
+      "pos-mapping"
+    ],
+    "highPriorityScreens": [
+      "dashboard",
+      "purchase-requests",
+      "purchase-request-detail",
+      "pos-integration",
+      "pos-mapping",
+      "vendor-management",
+      "inventory-overview",
+      "help-support"
+    ],
+    "modalCategories": {
+      "creation": ["create-pr-modal", "create-po-modal", "create-grn-modal", "create-vendor-modal", "create-requisition-modal", "create-ticket-modal"],
+      "editing": ["item-details-modal", "edit-vendor-modal", "edit-price-modal"],
+      "workflow": ["approval-modal", "approval-log-modal"],
+      "fractional-sales": ["fractional-sales-modal", "price-list-modal"],
+      "system": ["settings-modal", "sync-status-modal", "validation-modal"],
+      "content": ["search-modal", "video-player-modal", "download-modal"],
+      "feedback": ["comment-modal", "feedback-modal"]
+    }
+  }
+}

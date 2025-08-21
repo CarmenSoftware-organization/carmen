@@ -75,14 +75,13 @@ export function InventoryStatus() {
               <div className="flex items-center gap-4">
                 <Progress
                   value={(item.stock / item.maxStock) * 100}
-                  className="h-2"
-                  indicatorClassName={
+                  className={`h-2 ${
                     item.status === "Critical"
-                      ? "bg-red-500"
+                      ? "[&>div]:bg-red-500"
                       : item.status === "Warning"
-                      ? "bg-yellow-500"
-                      : "bg-green-500"
-                  }
+                      ? "[&>div]:bg-yellow-500"
+                      : "[&>div]:bg-green-500"
+                  }`}
                 />
                 <span className="text-sm font-medium">
                   {Math.round((item.stock / item.maxStock) * 100)}%

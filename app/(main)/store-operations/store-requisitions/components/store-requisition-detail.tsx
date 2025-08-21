@@ -27,7 +27,17 @@ import {
   Split,
   X,
   Calculator,
-  ArrowLeft
+  ArrowLeft,
+  ChevronRight,
+  ChevronDown,
+  PanelRightOpen,
+  PanelRightClose,
+  CheckCircle,
+  UserCheck,
+  Clock,
+  Undo2,
+  Copy,
+  MoreHorizontal
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
@@ -43,13 +53,61 @@ import {
 import { Input } from '@/components/ui/input'
 import { ApprovalLogDialog } from './approval-log-dialog'
 import { JournalEntriesTab } from './tabs/journal-entries-tab'
+import { ApprovalWorkflow } from './approval-workflow'
 
 interface StoreRequisitionDetailProps {
   id: string
 }
 
+interface ItemInfo {
+  location: string
+  locationCode: string
+  itemName: string
+  category: string
+  subCategory: string
+  itemGroup: string
+  barCode: string
+  locationType: string
+}
+
+interface InventoryInfo {
+  onHand: number
+  onOrder: number
+  lastPrice: number
+  lastVendor: string
+}
+
+interface RequisitionItem {
+  id: number
+  description: string
+  unit: string
+  qtyRequired: number
+  qtyApproved: number
+  costPerUnit: number
+  total: number
+  requestDate: string
+  inventory: InventoryInfo
+  itemInfo: ItemInfo
+  qtyIssued: number
+  taxRate: number  // Tax rate as percentage (e.g., 7 for 7%)
+  discountRate: number  // Discount rate as percentage (e.g., 5 for 5%)
+  approvalStatus: 'Pending' | 'Approved' | 'Reject' | 'Review'
+}
+
 // This would come from your API/database
-const mockRequisition = {
+const mockRequisition: {
+  refNo: string
+  date: string
+  expectedDeliveryDate: string
+  movementType: string
+  description: string
+  requestedFrom: string
+  department: string
+  jobCode: string
+  process: string
+  status: string
+  items: RequisitionItem[]
+} & Record<string, any> = {
   refNo: 'SR-2024-001',
   date: '2024-01-15',
   expectedDeliveryDate: '2024-01-20',
@@ -87,7 +145,9 @@ const mockRequisition = {
         locationType: 'direct'
       },
       qtyIssued: 5,
-      approvalStatus: 'Accept'
+      taxRate: 7, // 7% tax
+      discountRate: 2, // 2% discount
+      approvalStatus: 'Approved' as const
     },
     {
       id: 2,
@@ -115,7 +175,9 @@ const mockRequisition = {
         locationType: 'inventory'
       },
       qtyIssued: 10,
-      approvalStatus: 'Reject'
+      taxRate: 7, // 7% tax
+      discountRate: 5, // 5% discount
+      approvalStatus: 'Reject' as const
     },
     {
       id: 3,
@@ -143,7 +205,9 @@ const mockRequisition = {
         locationType: 'direct'
       },
       qtyIssued: 15,
-      approvalStatus: 'Accept'
+      taxRate: 10, // 10% tax
+      discountRate: 3, // 3% discount
+      approvalStatus: 'Approved' as const
     },
     {
       id: 4,
@@ -171,7 +235,9 @@ const mockRequisition = {
         locationType: 'direct'
       },
       qtyIssued: 4,
-      approvalStatus: 'Review'
+      taxRate: 7, // 7% tax
+      discountRate: 0, // No discount
+      approvalStatus: 'Review' as const
     },
     {
       id: 5,
@@ -199,7 +265,9 @@ const mockRequisition = {
         locationType: 'direct'
       },
       qtyIssued: 20,
-      approvalStatus: 'Accept'
+      taxRate: 8, // 8% tax
+      discountRate: 1, // 1% discount
+      approvalStatus: 'Approved' as const
     },
     {
       id: 6,
@@ -227,7 +295,39 @@ const mockRequisition = {
         locationType: 'direct'
       },
       qtyIssued: 3,
-      approvalStatus: 'Reject'
+      taxRate: 7, // 7% tax
+      discountRate: 4, // 4% discount
+      approvalStatus: 'Reject' as const
+    },
+    {
+      id: 7,
+      description: 'Vanilla Extract',
+      unit: 'Bottle',
+      qtyRequired: 4,
+      qtyApproved: 0,
+      costPerUnit: 150.00,
+      total: 600.00,
+      requestDate: '2024-01-20',
+      inventory: {
+        onHand: 12,
+        onOrder: 25,
+        lastPrice: 145.00,
+        lastVendor: 'Flavor Essentials Ltd.'
+      },
+      itemInfo: {
+        location: 'Central Kitchen',
+        locationCode: 'CK001',
+        itemName: 'Vanilla Extract',
+        category: 'Ingredients',
+        subCategory: 'Extracts',
+        itemGroup: 'Flavorings',
+        barCode: '8851234567896',
+        locationType: 'direct'
+      },
+      qtyIssued: 0,
+      taxRate: 6, // 6% tax
+      discountRate: 0, // No discount
+      approvalStatus: 'Pending' as const
     }
   ],
   comments: [
@@ -255,6 +355,46 @@ const mockRequisition = {
       by: 'John Doe',
       action: 'Created',
       log: 'Store requisition created'
+    }
+  ],
+  approvalSteps: [
+    {
+      id: 'submission',
+      level: 'Submission',
+      approver: 'System',
+      role: 'system',
+      status: 'approved' as const,
+      comments: 'Store requisition submitted for approval workflow.',
+      approvedAt: '2024-01-15 08:30 AM',
+      isRequired: true
+    },
+    {
+      id: 'hod',
+      level: 'HOD Approval',
+      approver: 'Dr. Amanda Lee',
+      role: 'hod',
+      status: 'approved' as const,
+      comments: 'Items are necessary for department operations. Approved for next stage.',
+      approvedAt: '2024-01-16 09:30 AM',
+      isRequired: true
+    },
+    {
+      id: 'store-manager',
+      level: 'Store Manager Approval',
+      approver: 'Mike Chen',
+      role: 'store-manager', 
+      status: 'current' as const,
+      comments: '',
+      isRequired: true
+    },
+    {
+      id: 'complete',
+      level: 'Complete',
+      approver: 'System',
+      role: 'system',
+      status: 'pending' as const,
+      comments: '',
+      isRequired: true
     }
   ]
 }
@@ -306,7 +446,7 @@ const mockStockMovements = [
 interface ApprovalLogEntry {
   id: number
   date: string
-  status: 'Accept' | 'Reject' | 'Review'
+  status: 'Pending' | 'Approved' | 'Reject' | 'Review'
   by: string
   comments: string
 }
@@ -321,7 +461,7 @@ const mockApprovalLogs: ApprovalLogs = {
     {
       id: 1,
       date: '2024-01-15 14:30',
-      status: 'Accept',
+      status: 'Approved',
       by: 'John Doe',
       comments: 'Quantity approved as requested'
     },
@@ -340,25 +480,97 @@ const mockApprovalLogs: ApprovalLogs = {
       status: 'Reject',
       by: 'Mike Johnson',
       comments: 'Insufficient stock available'
+    },
+    {
+      id: 2,
+      date: '2024-01-15 09:15',
+      status: 'Review',
+      by: 'Sarah Wilson',
+      comments: 'Need to verify alternative suppliers'
     }
   ],
   3: [
     {
       id: 1,
       date: '2024-01-15 11:45',
-      status: 'Accept',
+      status: 'Approved',
       by: 'Sarah Wilson',
       comments: 'Approved as per request'
+    }
+  ],
+  4: [
+    {
+      id: 1,
+      date: '2024-01-15 12:20',
+      status: 'Review',
+      by: 'Emma Davis',
+      comments: 'Check if generic brand is acceptable to reduce cost'
+    },
+    {
+      id: 2,
+      date: '2024-01-15 08:45',
+      status: 'Pending',
+      by: 'System',
+      comments: 'Submitted for inventory manager review'
+    }
+  ],
+  5: [
+    {
+      id: 1,
+      date: '2024-01-15 15:10',
+      status: 'Approved',
+      by: 'Robert Chen',
+      comments: 'Approved - sufficient inventory available'
+    },
+    {
+      id: 2,
+      date: '2024-01-15 09:30',
+      status: 'Pending',
+      by: 'System',
+      comments: 'Initial submission - awaiting review'
+    }
+  ],
+  6: [
+    {
+      id: 1,
+      date: '2024-01-15 16:05',
+      status: 'Reject',
+      by: 'Lisa Zhang',
+      comments: 'Current stock sufficient for next 2 weeks. Reorder not required at this time'
+    },
+    {
+      id: 2,
+      date: '2024-01-15 14:15',
+      status: 'Review',
+      by: 'Robert Chen',
+      comments: 'Reviewing current inventory levels'
+    },
+    {
+      id: 3,
+      date: '2024-01-15 10:30',
+      status: 'Pending',
+      by: 'System',
+      comments: 'Submitted for procurement review'
+    }
+  ],
+  7: [
+    {
+      id: 1,
+      date: '2024-01-15 08:30',
+      status: 'Pending',
+      by: 'System',
+      comments: 'Awaiting approval from procurement team'
     }
   ]
 } as const
 
 // Add the ApprovalBadge component
-function ApprovalBadge({ status }: { status: 'Accept' | 'Reject' | 'Review' }) {
+function ApprovalBadge({ status }: { status: 'Pending' | 'Approved' | 'Review' | 'Reject' }) {
   const styles = {
-    Accept: 'bg-green-100 text-green-800',
-    Reject: 'bg-red-100 text-red-800',
-    Review: 'bg-yellow-100 text-yellow-800'
+    Pending: 'bg-blue-100 text-blue-800',
+    Approved: 'bg-green-100 text-green-800',
+    Review: 'bg-yellow-100 text-yellow-800',
+    Reject: 'bg-red-100 text-red-800'
   }
 
   return (
@@ -466,20 +678,46 @@ const movements: StockMovement[] = [
 
 export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailProps) {
   const router = useRouter()
-  const [items, setItems] = useState(mockRequisition.items)
+  const [items, setItems] = useState<RequisitionItem[]>(mockRequisition.items)
   const [selectedItems, setSelectedItems] = useState<number[]>([])
   const [isEditMode, setIsEditMode] = useState(false)
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false)
+  const [sidePanelTab, setSidePanelTab] = useState('comments')
+  const [expandedItems, setExpandedItems] = useState<number[]>([])
 
-  const handleBulkAction = (action: 'Accept' | 'Reject' | 'Review' | 'Delete' | 'Split') => {
+  const toggleItemExpansion = (itemId: number) => {
+    setExpandedItems(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    )
+  }
+
+  const handleBulkAction = (action: 'Pending' | 'Approved' | 'Reject' | 'Review' | 'Delete' | 'Split' | 'Approve' | 'Return') => {
     if (!selectedItems.length) return
 
     switch (action) {
-      case 'Accept':
+      case 'Pending':
+      case 'Approved':
       case 'Reject':
       case 'Review':
         setItems(items.map(item => 
           selectedItems.includes(item.id) 
             ? { ...item, approvalStatus: action }
+            : item
+        ))
+        break
+      case 'Approve':
+        setItems(items.map(item => 
+          selectedItems.includes(item.id) 
+            ? { ...item, approvalStatus: 'Approved' }
+            : item
+        ))
+        break
+      case 'Return':
+        setItems(items.map(item => 
+          selectedItems.includes(item.id) 
+            ? { ...item, approvalStatus: 'Pending' }
             : item
         ))
         break
@@ -521,245 +759,418 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
     ))
   }
 
-  return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-col gap-6">
-        {/* Top Actions */}
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.back()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-3">
-              <CardTitle>Store Requisition Details</CardTitle>
-              <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                {mockRequisition.status}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {isEditMode ? (
-              <>
-                <Button 
-                  variant="outline"
-                  className="flex items-center gap-2"
-                  onClick={() => setIsEditMode(false)}
-                >
-                  <X className="h-4 w-4" />
-                  Cancel
-                </Button>
-                <Button 
-                  className="flex items-center gap-2"
-                  onClick={() => {
-                    // Save changes
-                    setIsEditMode(false)
-                  }}
-                >
-                  <Check className="h-4 w-4" />
-                  Save Changes
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button 
-                  className="flex items-center gap-2"
-                  onClick={() => setIsEditMode(true)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                  Edit
-                </Button>
-                <Button
-                  className="flex items-center gap-2"
-                  onClick={() => console.log('Submit')}
-                >
-                  Submit
-                </Button>
-              </>
-            )}
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => console.log('Print requisition')}
-            >
-              <Printer className="h-4 w-4" />
-              Print
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2 text-red-600 hover:text-red-600"
-              onClick={() => console.log('Void requisition')}
-            >
-              <XCircle className="h-4 w-4" />
-              Void
-            </Button>
-          </div>
-        </div>
+  // Dynamic workflow action - single primary action based on status and items
+  const getWorkflowActions = () => {
+    const requisitionStatus = mockRequisition.status
+    const currentStep = mockRequisition.approvalSteps.find((step: { status: string; role: string }) => step.status === 'current')
+    const canUserApprove = currentStep && currentStep.role === 'store-manager' // This would come from user context
+    
+    // Get item statuses summary
+    const itemStatuses = items.reduce((acc, item) => {
+      acc[item.approvalStatus] = (acc[item.approvalStatus] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
 
-        {/* Updated Header Information with 6 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-          {/* Column 1 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Hash className="h-4 w-4" />
-              <span>Reference Number</span>
+    const totalItems = items.length
+    const pendingItems = itemStatuses['Pending'] || 0
+    const approvedItems = itemStatuses['Approved'] || 0
+    const rejectedItems = itemStatuses['Reject'] || 0
+    const reviewItems = itemStatuses['Review'] || 0
+
+    let primaryAction = null
+
+    // Draft status - primary action is to submit
+    if (requisitionStatus === 'Draft') {
+      primaryAction = {
+        type: 'submit',
+        label: 'Submit for Approval',
+        variant: 'default',
+        className: 'bg-blue-600 hover:bg-blue-700',
+        icon: 'CheckCircle',
+        disabled: totalItems === 0,
+        tooltip: totalItems === 0 ? 'Add items before submitting' : 'Submit requisition for approval workflow'
+      }
+    }
+
+    // In Process - single action based on item states priority
+    else if (requisitionStatus === 'In Process' && canUserApprove) {
+      // Priority 1: If ALL items are rejected, reject the entire requisition
+      if (rejectedItems === totalItems && totalItems > 0) {
+        primaryAction = {
+          type: 'reject',
+          label: `Reject Requisition (${rejectedItems} items rejected)`,
+          variant: 'destructive',
+          className: 'bg-red-600 hover:bg-red-700',
+          icon: 'XCircle',
+          disabled: false,
+          tooltip: `All ${rejectedItems} items have been rejected. Reject the entire requisition.`
+        }
+      }
+      // Priority 2: If there are rejected or review items (but not all rejected), must return first
+      else if (rejectedItems > 0 || reviewItems > 0) {
+        primaryAction = {
+          type: 'return',
+          label: `Return for Review (${reviewItems + rejectedItems} items)`,
+          variant: 'default',
+          className: 'bg-orange-600 hover:bg-orange-700',
+          icon: 'ArrowLeft',
+          disabled: false,
+          tooltip: `Return ${reviewItems + rejectedItems} items for review and modifications`
+        }
+      }
+      // Priority 3: If all items are approved, can proceed with approval
+      else if (approvedItems === totalItems && totalItems > 0) {
+        primaryAction = {
+          type: 'approve',
+          label: `Approve All (${approvedItems} items)`,
+          variant: 'default',
+          className: 'bg-green-600 hover:bg-green-700',
+          icon: 'Check',
+          disabled: false,
+          tooltip: `Approve all ${approvedItems} items and proceed to next stage`
+        }
+      }
+      // Priority 4: If there are pending items, waiting for item-level decisions
+      else if (pendingItems > 0) {
+        primaryAction = {
+          type: 'waiting',
+          label: `Waiting for Item Review (${pendingItems} pending)`,
+          variant: 'outline',
+          className: 'cursor-not-allowed opacity-60',
+          icon: 'Clock',
+          disabled: true,
+          tooltip: `${pendingItems} items are still pending review. Please review individual items first.`
+        }
+      }
+      // Priority 5: If no approved items and mixed states, cannot proceed
+      else if (approvedItems === 0 && totalItems > 0) {
+        primaryAction = {
+          type: 'reject',
+          label: 'Reject Requisition',
+          variant: 'outline',
+          className: 'text-red-600 border-red-200 hover:bg-red-50',
+          icon: 'XCircle',
+          disabled: false,
+          tooltip: 'Reject entire requisition as no items are approved'
+        }
+      }
+    }
+
+    // Rejected status - primary action is to resubmit
+    else if (requisitionStatus === 'Reject') {
+      primaryAction = {
+        type: 'resubmit',
+        label: 'Resubmit for Approval',
+        variant: 'default',
+        className: 'bg-blue-600 hover:bg-blue-700',
+        icon: 'Undo2',
+        disabled: totalItems === 0,
+        tooltip: 'Resubmit requisition after addressing concerns'
+      }
+    }
+
+    // Complete and Void status - no actions available
+
+    return {
+      action: primaryAction,
+      summary: {
+        total: totalItems,
+        pending: pendingItems,
+        approved: approvedItems,
+        rejected: rejectedItems,
+        review: reviewItems
+      }
+    }
+  }
+
+  const workflowActions = getWorkflowActions()
+
+  return (
+    <div className="w-full px-0 py-6">
+      <div className="flex gap-4">
+        {/* Main Content */}
+        <div className={`transition-all duration-300 ${isSidePanelOpen ? 'flex-1' : 'w-full'}`}>
+          <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="p-6 pb-4 bg-muted/30 border-b space-y-6">
+          {/* Top Actions - Mobile-First Responsive Layout */}
+          <div className="space-y-4">
+            {/* Header Section with Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => router.back()}
+                  aria-label="Go back to Store Requisition List"
+                  className="focus:ring-2 focus:ring-primary/20 flex-shrink-0"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <div className="flex items-center gap-3 min-w-0">
+                  <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-bold truncate">Store Requisition Details</CardTitle>
+                  <StatusBadge status={mockRequisition.status} />
+                </div>
+              </div>
+              
+              {/* Action Buttons - Now on the same row */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              {isEditMode ? (
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Button 
+                    variant="outline"
+                    className="flex items-center justify-center gap-2 border-muted-foreground/20 hover:bg-muted/50"
+                    onClick={() => setIsEditMode(false)}
+                  >
+                    <X className="w-4 h-4" />
+                    <span className="sm:inline">Cancel</span>
+                  </Button>
+                  <Button 
+                    className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/20"
+                    onClick={() => {
+                      // Save changes
+                      setIsEditMode(false)
+                    }}
+                  >
+                    <Check className="w-4 h-4" />
+                    <span className="sm:inline">Save Changes</span>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Button 
+                    className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/20"
+                    onClick={() => setIsEditMode(true)}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    <span className="sm:inline">Edit</span>
+                  </Button>
+                  <Button
+                    className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/20"
+                    onClick={() => console.log('Submit')}
+                  >
+                    <span className="sm:inline">Submit</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center justify-center gap-2 border-muted-foreground/20 hover:bg-muted/50"
+                    onClick={() => console.log('Print requisition')}
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span className="hidden sm:inline">Print</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center justify-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={() => console.log('Void requisition')}
+                  >
+                    <XCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">Void</span>
+                  </Button>
+                </div>
+              )}
+              
+              {/* Side Panel Toggle Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="flex-shrink-0 border-muted-foreground/20 hover:bg-muted/50"
+                onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
+                aria-label={isSidePanelOpen ? "Hide side panel" : "Show side panel"}
+              >
+                {isSidePanelOpen ? (
+                  <PanelRightClose className="w-4 h-4" />
+                ) : (
+                  <PanelRightOpen className="w-4 h-4" />
+                )}
+              </Button>
+              </div>
             </div>
-            <p className="font-medium">{mockRequisition.refNo}</p>
+          </div>
+
+        {/* Header Information - Three Row Layout */}
+        <div className="space-y-4 sm:space-y-6">
+          {/* First Row - 1/3, 1/3, 1/3 */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Hash className="w-4 h-4" />
+                <span>Requisition</span>
+              </div>
+              <p className="font-semibold">{mockRequisition.refNo}</p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                <span>Date</span>
+              </div>
+              <p className="font-semibold">{mockRequisition.date}</p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                <span>Date Required</span>
+              </div>
+              {isEditMode ? (
+                <Input
+                  type="date"
+                  value={mockRequisition.expectedDeliveryDate}
+                  onChange={(e) => handleHeaderUpdate('expectedDeliveryDate', e.target.value)}
+                  className="h-8"
+                />
+              ) : (
+                <p className="font-semibold">{mockRequisition.expectedDeliveryDate}</p>
+              )}
+            </div>
           </div>
           
-          {/* Column 2 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="h-4 w-4" />
-              <span>Date</span>
+          {/* Second Row - 1/3, 1/3, 1/3 */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Store className="w-4 h-4" />
+                <span>Requested From</span>
+              </div>
+              <p className="font-semibold">{mockRequisition.requestedFrom}</p>
             </div>
-            <p className="font-medium">{mockRequisition.date}</p>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Building2 className="w-4 h-4" />
+                <span>To Location</span>
+              </div>
+              <p className="font-semibold">Central Kitchen</p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Building2 className="w-4 h-4" />
+                <span>Department</span>
+              </div>
+              <p className="font-semibold">{mockRequisition.department}</p>
+            </div>
           </div>
           
-          {/* Column 3 */}
+          {/* Third Row - 3/3 (Full Width) */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="h-4 w-4" />
-              <span>Expected Delivery</span>
-            </div>
-            {isEditMode ? (
-              <Input
-                type="date"
-                value={mockRequisition.expectedDeliveryDate}
-                onChange={(e) => handleHeaderUpdate('expectedDeliveryDate', e.target.value)}
-                className="h-8"
-              />
-            ) : (
-              <p className="font-medium">{mockRequisition.expectedDeliveryDate}</p>
-            )}
-          </div>
-          
-          {/* Column 4 */}
-         
-          {/* Column 5 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Store className="h-4 w-4" />
-              <span>Requested From</span>
-            </div>
-            <p className="font-medium">{mockRequisition.requestedFrom}</p>
-          </div>
-          
-          {/* Column 6 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <FileText className="h-4 w-4" />
-              <span>Job Code</span>
-            </div>
-            <p className="font-medium">{mockRequisition.jobCode}</p>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Building2 className="h-4 w-4" />
-              <span>Department</span>
-            </div>
-            <p className="font-medium">{mockRequisition.department}</p>
-          </div>
-          
-          {/* Description - Spans full width */}
-          <div className="xl:col-span-6 space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <FileText className="h-4 w-4" />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <FileText className="w-4 h-4" />
               <span>Description</span>
             </div>
-            <p className="font-medium">{mockRequisition.description}</p>
+            <p className="font-semibold">{mockRequisition.description}</p>
           </div>
-           
-          
         </div>
 
         <Separator className="my-4" />
-      </CardHeader>
+        </CardHeader>
 
-      <CardContent>
         <Tabs defaultValue="items" className="w-full">
-          <TabsList className="w-full justify-start border-b mb-4">
-            <TabsTrigger value="items" className="flex items-center gap-2 px-6">
-              <ListTodo className="h-4 w-4" />
-              Items
-            </TabsTrigger>
-            <TabsTrigger value="stock-movements" className="flex items-center gap-2 px-6">
-              <Box className="h-4 w-4" />
-              Stock Movements
-            </TabsTrigger>
-            <TabsTrigger value="journal-entries" className="flex items-center gap-2 px-6">
-              <Calculator className="h-4 w-4" />
-              Journal Entries
-            </TabsTrigger>
-            <TabsTrigger value="comments" className="flex items-center gap-2 px-6">
-              <MessageSquare className="h-4 w-4" />
-              Comments
-            </TabsTrigger>
-            <TabsTrigger value="attachments" className="flex items-center gap-2 px-6">
-              <Paperclip className="h-4 w-4" />
-              Attachments
-            </TabsTrigger>
-            <TabsTrigger value="activity" className="flex items-center gap-2 px-6">
-              <History className="h-4 w-4" />
-              Activity Log
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="items" className="mt-6">
+          <CardHeader className="pb-0 pt-4 px-4">
+            <TabsList className="w-full grid grid-cols-4">
+              <TabsTrigger 
+                value="items" 
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Items
+              </TabsTrigger>
+              <TabsTrigger 
+                value="stock-movements" 
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Stock
+              </TabsTrigger>
+              <TabsTrigger 
+                value="journal-entries" 
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Journal
+              </TabsTrigger>
+              <TabsTrigger 
+                value="approval-workflow" 
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Approval
+              </TabsTrigger>
+            </TabsList>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="w-full rounded-b-md border-t">
+              <div className="p-6">
+                <TabsContent value="items" className="mt-0">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Items Details</h3>
+                <h3 className="text-xl font-semibold">Items Details</h3>
                 <Button
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/20"
                   onClick={() => console.log('Add new item')}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="w-4 h-4" />
                   Add Item
                 </Button>
               </div>
 
-              {/* Add bulk actions buttons below the title */}
+              {/* Selected items info and bulk actions */}
               {selectedItems.length > 0 && (
-                <div className="flex gap-2">
-                  <Button 
-                    className="bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2"
-                    onClick={() => handleBulkAction('Accept')}
-                  >
-                    <Check className="h-4 w-4" />
-                    Accept Selected ({selectedItems.length})
-                  </Button>
-                  <Button 
-                    className="bg-red-100 text-red-700 hover:bg-red-200 flex items-center gap-2"
-                    onClick={() => handleBulkAction('Reject')}
-                  >
-                    <XCircle className="h-4 w-4" />
-                    Reject Selected ({selectedItems.length})
-                  </Button>
-                  <Button 
-                    className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 flex items-center gap-2"
-                    onClick={() => handleBulkAction('Review')}
-                  >
-                    <AlertCircle className="h-4 w-4" />
-                    Review Selected ({selectedItems.length})
-                  </Button>
-                  <Button 
-                    className="bg-blue-100 text-blue-700 hover:bg-blue-200 flex items-center gap-2"
-                    onClick={() => handleBulkAction('Split')}
-                  >
-                    <Split className="h-4 w-4" />
-                    Split Selected ({selectedItems.length})
-                  </Button>
+                <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  {/* Selection Info */}
+                  <div className="flex items-center gap-1">
+                    <Check className="w-4 h-4 text-blue-600" />
+                    <span className="font-medium text-blue-900 dark:text-blue-100 text-sm">
+                      {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
+                    </span>
+                  </div>
+
+                  {/* Bulk Action Buttons */}
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      className="text-green-600 border-green-200 hover:bg-green-50 flex items-center gap-2"
+                      onClick={() => handleBulkAction('Approve')}
+                    >
+                      <Check className="w-4 h-4" />
+                      <span className="hidden sm:inline">Approve</span>
+                      <span className="sm:hidden">✓</span>
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      className="text-yellow-600 border-yellow-200 hover:bg-yellow-50 flex items-center gap-2"
+                      onClick={() => handleBulkAction('Review')}
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="hidden sm:inline">Review</span>
+                      <span className="sm:hidden">?</span>
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 border-red-200 hover:bg-red-50 flex items-center gap-2"
+                      onClick={() => handleBulkAction('Reject')}
+                    >
+                      <XCircle className="w-4 h-4" />
+                      <span className="hidden sm:inline">Reject</span>
+                      <span className="sm:hidden">✗</span>
+                    </Button>
+                    <Button 
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={() => setSelectedItems([])}
+                      title="Clear selection"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               )}
 
-              <div className="border rounded-lg">
-                <table className="w-full">
+              <div className="border rounded-lg overflow-x-auto">
+                <table className="w-full min-w-[800px]">
                   <thead>
                     <tr className="border-b bg-gray-50">
-                      <th className="text-left p-4 text-xs font-medium text-gray-500">
+                      <th className="text-left p-2 sm:p-4 text-xs font-medium text-gray-500">
                         <input
                           type="checkbox"
                           className="rounded border-gray-300"
@@ -767,145 +1178,229 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
                           onChange={(e) => handleSelectAll(e.target.checked)}
                         />
                       </th>
-                      <th className="text-left p-4 text-xs font-medium text-gray-500">Location</th>
-                      <th className="text-left p-4 text-xs font-medium text-gray-500">Product</th>
-                      <th className="text-left p-4 text-xs font-medium text-gray-500">Unit</th>
-                      <th className="text-right p-4 text-xs font-medium text-gray-500">Required</th>
-                      <th className="text-right p-4 text-xs font-medium text-gray-500">Approved</th>
-                      <th className="text-right p-4 text-xs font-medium text-gray-500">Issued</th>
-                      <th className="text-right p-4 text-xs font-medium text-gray-500">Total</th>
-                      <th className="text-center p-4 text-xs font-medium text-gray-500">Status</th>
-                      <th className="text-right p-4 text-xs font-medium text-gray-500 w-[100px]">Actions</th>
+                      <th className="text-left p-2 sm:p-4 text-xs font-medium text-gray-500 min-w-[150px]">Product</th>
+                      <th className="text-left p-2 sm:p-4 text-xs font-medium text-gray-500 min-w-[60px]">Unit</th>
+                      <th className="text-right p-2 sm:p-4 text-xs font-medium text-gray-500 min-w-[80px]">Required</th>
+                      <th className="text-right p-2 sm:p-4 text-xs font-medium text-gray-500 min-w-[80px]">Approved</th>
+                      <th className="text-right p-2 sm:p-4 text-xs font-medium text-gray-500 min-w-[80px]">Issued</th>
+                      <th className="text-right p-2 sm:p-4 text-xs font-medium text-gray-500 min-w-[80px]">Total</th>
+                      <th className="text-center p-2 sm:p-4 text-xs font-medium text-gray-500 min-w-[80px]">Status</th>
+                      <th className="text-right p-2 sm:p-4 text-xs font-medium text-gray-500 w-[100px]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {items.map((item) => (
-                      <>
+                      <React.Fragment key={item.id}>
                         {/* Primary Information Row */}
-                        <tr key={item.id} className="group hover:bg-gray-50">
-                          <td className="p-4">
-                            <input
-                              type="checkbox"
-                              className="rounded border-gray-300"
-                              checked={selectedItems.includes(item.id)}
-                              onChange={(e) => handleSelectItem(item.id, e.target.checked)}
-                            />
-                          </td>
-                          <td className="p-4">
-                            <div className="space-y-1">
-                              <p className="font-medium">{item.itemInfo.location}</p>
-                              <div className="flex flex-col gap-0.5">
-                                <p className="text-sm text-gray-500">
-                                  {item.itemInfo.locationCode} • {item.itemInfo.locationType === 'inventory' ? 'Inventory' : 'Direct'}
-                                </p>
-                              </div>
+                        <tr className="group hover:bg-gray-50">
+                          <td className="p-2 sm:p-4">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                className="rounded border-gray-300"
+                                checked={selectedItems.includes(item.id)}
+                                onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleItemExpansion(item.id)}
+                                className="p-1 h-6 w-6"
+                              >
+                                <ChevronRight
+                                  className={`h-4 w-4 transition-transform ${
+                                    expandedItems.includes(item.id) ? 'rotate-90' : ''
+                                  }`}
+                                />
+                              </Button>
                             </div>
                           </td>
-                          <td className="p-4">
+                          <td className="p-2 sm:p-4">
                             <div className="space-y-1">
-                              <p className="font-medium text-gray-600">{item.itemInfo.itemName}</p>
-                              <p className="text-sm text-gray-500">{item.description}</p>
+                              <p className="font-medium text-gray-600 text-sm">{item.itemInfo.itemName}</p>
+                              <p className="text-xs text-gray-500 truncate max-w-[150px]">{item.description}</p>
                             </div>
                           </td>
-                          <td className="p-4">
-                            <p>{item.unit}</p>
+                          <td className="p-2 sm:p-4">
+                            <p className="text-sm">{item.unit}</p>
                           </td>
-                          <td className="p-4 text-right">
+                          <td className="p-2 sm:p-4 text-right">
                             {isEditMode ? (
                               <Input
                                 type="number"
                                 value={item.qtyRequired}
                                 onChange={(e) => handleQuantityUpdate(item.id, 'qtyRequired', parseInt(e.target.value))}
-                                className="w-20 h-8 text-right"
+                                className="w-16 sm:w-20 h-8 text-right text-sm"
                               />
                             ) : (
-                              <p>{item.qtyRequired}</p>
+                              <p className="text-sm">{item.qtyRequired}</p>
                             )}
                           </td>
-                          <td className="p-4 text-right">
+                          <td className="p-2 sm:p-4 text-right">
                             {isEditMode ? (
                               <Input
                                 type="number"
                                 value={item.qtyApproved}
                                 onChange={(e) => handleQuantityUpdate(item.id, 'qtyApproved', parseInt(e.target.value))}
-                                className="w-20 h-8 text-right"
+                                className="w-16 sm:w-20 h-8 text-right text-sm"
                               />
                             ) : (
-                              <p>{item.qtyApproved}</p>
+                              <p className="text-sm">{item.qtyApproved}</p>
                             )}
                           </td>
-                          <td className="p-4 text-right">
+                          <td className="p-2 sm:p-4 text-right">
                             {isEditMode ? (
                               <Input
                                 type="number"
                                 value={item.qtyIssued || 0}
                                 onChange={(e) => handleQuantityUpdate(item.id, 'qtyIssued', parseInt(e.target.value))}
-                                className="w-20 h-8 text-right"
+                                className="w-16 sm:w-20 h-8 text-right text-sm"
                               />
                             ) : (
-                              <p>{item.qtyIssued || 0}</p>
+                              <p className="text-sm">{item.qtyIssued || 0}</p>
                             )}
                           </td>
-                          <td className="p-4 text-right">
-                            <p className="font-medium">{item.total.toFixed(2)}</p>
+                          <td className="p-2 sm:p-4 text-right">
+                            <p className="font-medium text-sm">{item.total.toFixed(2)}</p>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="p-2 sm:p-4 text-center">
                             <ApprovalLogDialog 
                               itemId={item.id}
                               itemName={item.itemInfo.itemName}
                               logs={mockApprovalLogs[item.id] || []}
                             >
                               <div className="cursor-pointer">
-                                <StatusBadge status={item.approvalStatus as 'Accept' | 'Reject' | 'Review'} />
+                                <ApprovalBadge status={item.approvalStatus as 'Pending' | 'Approved' | 'Review' | 'Reject'} />
                               </div>
                             </ApprovalLogDialog>
                           </td>
-                          <td className="p-4">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => console.log('Edit item', item.id)}
-                              >
-                                <Edit2 className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-600"
-                                onClick={() => {
-                                  setItems(items.filter(i => i.id !== item.id))
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                          <td className="p-2 sm:p-4">
+                            <div className="flex justify-end">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+
+                                  <DropdownMenuItem onClick={() => console.log('Duplicate item', item.id)}>
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    Duplicate
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                                    className="text-red-600 focus:text-red-600"
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Item
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </td>
                         </tr>
-                        {/* Secondary Information Row */}
-                        <tr className="bg-gray-50 border-b">
-                          <td colSpan={9} className="px-4 py-2">
-                            <div className="flex items-center gap-6 text-xs">
-                              <div className="flex items-center gap-1">
-                                <span className="text-gray-400">On Hand:</span>
-                                <span className="text-gray-600">{item.inventory.onHand}</span>
+
+                        {/* Expandable Details Row */}
+                        {expandedItems.includes(item.id) && (
+                          <tr className="bg-gray-50">
+                            <td colSpan={9} className="px-2 sm:px-4 py-4">
+                              <div className="space-y-6">
+                                {/* Inventory Information Section - Full Width */}
+                                <div className="space-y-4">
+                                  <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                                    <Box className="h-4 w-4 text-gray-600" />
+                                    Inventory Information
+                                  </h4>
+                                  <div className="bg-white rounded-lg p-4 space-y-4 border border-gray-200">
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Current Stock</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.inventory.onHand} {item.unit}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">On Order</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.inventory.onOrder} {item.unit}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Available</label>
+                                        <p className="text-sm font-medium text-gray-900">
+                                          {item.inventory.onHand + item.inventory.onOrder} {item.unit}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">After Issue</label>
+                                        <p className="text-sm font-medium text-gray-900">
+                                          {item.inventory.onHand - (item.qtyIssued || 0)} {item.unit}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <Separator />
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Last Price</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.inventory.lastPrice.toFixed(2)} BHT</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Current Price</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.costPerUnit.toFixed(2)} BHT</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Last Vendor</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.inventory.lastVendor}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Business Dimensions Section - Full Width */}
+                                <div className="space-y-4">
+                                  <h4 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                                    <Building2 className="h-4 w-4 text-gray-600" />
+                                    Business Dimensions
+                                  </h4>
+                                  <div className="bg-white rounded-lg p-4 space-y-4 border border-gray-200">
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Job Code</label>
+                                        <p className="text-sm font-medium text-gray-900">{mockRequisition.jobCode}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Department</label>
+                                        <p className="text-sm font-medium text-gray-900">{mockRequisition.department}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Project</label>
+                                        <p className="text-sm font-medium text-gray-900">General Operations</p>
+                                      </div>
+                                    </div>
+                                    <Separator />
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Category</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.itemInfo.category}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Sub Category</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.itemInfo.subCategory}</p>
+                                      </div>
+                                      <div>
+                                        <label className="text-xs font-medium text-gray-500">Item Group</label>
+                                        <p className="text-sm font-medium text-gray-900">{item.itemInfo.itemGroup}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-1">
-                                <span className="text-gray-400">On Order:</span>
-                                <span className="text-gray-600">{item.inventory.onOrder}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <span className="text-gray-400">Last Price:</span>
-                                <span className="text-gray-600">{item.inventory.lastPrice.toFixed(2)}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <span className="text-gray-400">Last Vendor:</span>
-                                <span className="text-gray-600 truncate max-w-[300px]">{item.inventory.lastVendor}</span>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      </>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>
@@ -913,8 +1408,8 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
             </div>
           </TabsContent>
 
-          <TabsContent value="stock-movements" className="mt-6">
-            <div className="space-y-4 px-8">
+          <TabsContent value="stock-movements" className="mt-0">
+            <div className="space-y-4">
               {/* Header with Add Item button on the right */}
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
@@ -1040,7 +1535,7 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
             </div>
           </TabsContent>
 
-          <TabsContent value="journal-entries" className="mt-6">
+          <TabsContent value="journal-entries" className="mt-0">
             <JournalEntriesTab 
               refNo={mockRequisition.refNo}
               date={mockRequisition.date}
@@ -1049,135 +1544,407 @@ export function StoreRequisitionDetailComponent({ id }: StoreRequisitionDetailPr
             />
           </TabsContent>
 
-          <TabsContent value="comments" className="mt-4">
-            <div className="space-y-4">
-              {mockRequisition.comments.map((comment) => (
-                <div key={comment.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{comment.by}</span>
-                      <span className="text-gray-500 text-sm">{comment.date}</span>
-                    </div>
-                  </div>
-                  <p className="text-sm">{comment.comment}</p>
-                </div>
-              ))}
-            </div>
+          <TabsContent value="approval-workflow" className="mt-0">
+            <ApprovalWorkflow
+              requisitionId={mockRequisition.refNo}
+              currentStatus={mockRequisition.status}
+              approvalSteps={mockRequisition.approvalSteps}
+              currentUserRole="store-manager" // This would come from user context/auth
+              onApprove={(stepId, comments) => {
+                console.log('Approve:', stepId, comments)
+                // This would call your API to approve the step
+              }}
+              onReject={(stepId, comments) => {
+                console.log('Reject:', stepId, comments)
+                // This would call your API to reject the step
+              }}
+              onSendBack={(stepId, comments) => {
+                console.log('Return:', stepId, comments)
+                // This would call your API to return for review
+              }}
+            />
           </TabsContent>
-
-          <TabsContent value="attachments" className="mt-4">
-            <div className="space-y-4">
-              {mockRequisition.attachments.map((attachment) => (
-                <div key={attachment.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Paperclip className="h-4 w-4 text-gray-500" />
-                      <div>
-                        <p className="font-semibold">{attachment.fileName}</p>
-                        <p className="text-sm text-gray-500">{attachment.description}</p>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      <p>{attachment.date}</p>
-                      <p>By: {attachment.by}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="activity" className="mt-4">
-            <div className="space-y-4">
-              {mockRequisition.activityLog.map((activity) => (
-                <div key={activity.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{activity.by}</span>
-                      <span className="text-gray-500 text-sm">{activity.date}</span>
-                    </div>
-                    <span className="px-2 py-1 bg-gray-100 rounded-full text-sm">
-                      {activity.action}
-                    </span>
-                  </div>
-                  <p className="text-sm">{activity.log}</p>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
+          </CardContent>
         </Tabs>
-      </CardContent>
 
-      {/* Transaction Summary */}
+      {/* Transaction Summary - Enhanced with Tax and Discount */}
       <div className="border-t">
-        <div className="p-4">
+        <div className="p-6">
           <h3 className="text-sm font-semibold mb-4">Transaction Summary</h3>
-          <div className="grid grid-cols-5 gap-8">
-            <div>
+          
+          {/* Quantity Summary Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-6">
+            <div className="text-center sm:text-left">
               <div className="text-sm text-gray-500 mb-1">Total Items</div>
               <div className="text-lg font-medium">{items.length}</div>
             </div>
-            <div>
+            <div className="text-center sm:text-left">
               <div className="text-sm text-gray-500 mb-1">Total Quantity</div>
               <div className="text-lg font-medium">
                 {items.reduce((sum, item) => sum + item.qtyRequired, 0)}
               </div>
             </div>
-            <div>
+            <div className="text-center sm:text-left">
               <div className="text-sm text-gray-500 mb-1">Total Approved</div>
               <div className="text-lg font-medium">
                 {items.reduce((sum, item) => sum + item.qtyApproved, 0)}
               </div>
             </div>
-            <div>
+            <div className="text-center sm:text-left">
               <div className="text-sm text-gray-500 mb-1">Total Issued</div>
               <div className="text-lg font-medium">
                 {items.reduce((sum, item) => sum + (item.qtyIssued || 0), 0)}
               </div>
             </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">Total Amount</div>
-              <div className="text-lg font-medium">
-                {items.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
+          </div>
+
+          {/* Financial Summary */}
+          <div className="border-t pt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Subtotal */}
+              <div className="text-center sm:text-left">
+                <div className="text-sm text-gray-500 mb-1">Subtotal</div>
+                <div className="text-lg font-medium">
+                  {(() => {
+                    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+                    return subtotal.toFixed(2);
+                  })()} BHT
+                </div>
+              </div>
+
+              {/* Total Tax */}
+              <div className="text-center sm:text-left">
+                <div className="text-sm text-gray-500 mb-1">Total Tax</div>
+                <div className="text-lg font-medium text-orange-600">
+                  {(() => {
+                    const totalTax = items.reduce((sum, item) => {
+                      return sum + (item.total * item.taxRate / 100);
+                    }, 0);
+                    return totalTax.toFixed(2);
+                  })()} BHT
+                </div>
+              </div>
+
+              {/* Total Discount */}
+              <div className="text-center sm:text-left">
+                <div className="text-sm text-gray-500 mb-1">Total Discount</div>
+                <div className="text-lg font-medium text-green-600">
+                  -{(() => {
+                    const totalDiscount = items.reduce((sum, item) => {
+                      return sum + (item.total * item.discountRate / 100);
+                    }, 0);
+                    return totalDiscount.toFixed(2);
+                  })()} BHT
+                </div>
+              </div>
+
+              {/* Final Total */}
+              <div className="text-center sm:text-left">
+                <div className="text-sm text-gray-500 mb-1">Final Total</div>
+                <div className="text-xl font-bold text-blue-600">
+                  {(() => {
+                    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+                    const totalTax = items.reduce((sum, item) => {
+                      return sum + (item.total * item.taxRate / 100);
+                    }, 0);
+                    const totalDiscount = items.reduce((sum, item) => {
+                      return sum + (item.total * item.discountRate / 100);
+                    }, 0);
+                    const finalTotal = subtotal + totalTax - totalDiscount;
+                    return finalTotal.toFixed(2);
+                  })()} BHT
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Workflow Actions */}
-      <div className="border-t bg-gray-50/50">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span>Last updated by John Doe on 15 Jan 2024 10:30 AM</span>
+        {/* Workflow Actions - Dynamic based on status */}
+        {workflowActions.action && (
+          <div className="fixed bottom-6 right-6 z-50">
+            {(() => {
+              const action = workflowActions.action
+              if (!action) return null
+
+              const IconComponent = action.icon === 'Check' ? Check :
+                                  action.icon === 'XCircle' ? XCircle :
+                                  action.icon === 'ArrowLeft' ? ArrowLeft :
+                                  action.icon === 'CheckCircle' ? CheckCircle :
+                                  action.icon === 'Undo2' ? Undo2 : Check
+
+              return (
+                <Button
+                  key={action.type}
+                  variant={action.variant as any}
+                  size="lg"
+                  className={`flex items-center gap-3 px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 ${action.className}`}
+                  disabled={action.disabled}
+                  onClick={() => console.log(`${action.type} action clicked`)}
+                  title={action.tooltip}
+                >
+                  <IconComponent className="w-5 h-5" />
+                  <span className="font-semibold">{action.label}</span>
+                </Button>
+              )
+            })()}
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-              onClick={() => console.log('Approve')}
-            >
-              <Check className="h-4 w-4" />
-              Approve
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 text-red-600 hover:bg-red-50"
-              onClick={() => console.log('Reject')}
-            >
-              <XCircle className="h-4 w-4" />
-              Reject
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 text-orange-600 hover:bg-orange-50"
-              onClick={() => console.log('Send Back')}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Send Back
-            </Button>
+        )}
+
+        {/* Status Message for non-actionable states */}
+        {!workflowActions.action && (
+          <div className="border-t bg-muted/20">
+            <div className="flex items-center justify-center gap-2 p-6 text-sm text-muted-foreground">
+              {mockRequisition.status === 'Complete' && (
+                <>
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span>This requisition has been completed and processed.</span>
+                </>
+              )}
+              {mockRequisition.status === 'Void' && (
+                <>
+                  <XCircle className="w-4 h-4 text-red-600" />
+                  <span>This requisition has been voided and is no longer active.</span>
+                </>
+              )}
+              {mockRequisition.status === 'In Process' && !workflowActions.action && (
+                <>
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  <span>Waiting for approval from another user in the workflow.</span>
+                </>
+              )}
+            </div>
           </div>
+        )}
+      </Card>
         </div>
+        
+        {/* Side Panel */}
+        {isSidePanelOpen && (
+          <div className="w-96 flex-shrink-0">
+            <div className="space-y-6">
+              {/* Comments & Attachments */}
+              <Card className="overflow-hidden shadow-sm">
+                <CardHeader className="p-6 pb-4 bg-muted/30 border-b">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold">Comments & Attachments</CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsSidePanelOpen(false)}
+                      aria-label="Close side panel"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="p-6">
+                  {/* Comments Section */}
+                  <div className="space-y-4 mb-6">
+                    {/* Comment 1 */}
+                    <div className="border-l-4 border-gray-300 bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-gray-600 font-semibold text-xs">CMR</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <h4 className="font-semibold text-sm">Chef Maria Rodriguez</h4>
+                              <p className="text-xs text-muted-foreground">2/25/2024 08:45 PM</p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-700">Spring menu launch requires premium seasonal ingredients. These items will differentiate our menu from competitors.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Comment 2 */}
+                    <div className="border-l-4 border-gray-300 bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-gray-600 font-semibold text-xs">FMJ</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <h4 className="font-semibold text-sm">Finance Manager John</h4>
+                              <p className="text-xs text-muted-foreground">2/28/2024 09:20 PM</p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-700">REJECTED: Seasonal ingredient budget exhausted for Q1. Please reduce quantities or defer to Q2 budget allocation.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Comment 3 */}
+                    <div className="border-l-4 border-gray-300 bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-gray-600 font-semibold text-xs">CMR</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <h4 className="font-semibold text-sm">Chef Maria Rodriguez</h4>
+                              <p className="text-xs text-muted-foreground">2/28/2024 11:30 PM</p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-700">Understanding budget constraints. Will revise request with core ingredients only and defer specialty items to Q2.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Add Comment Section */}
+                    <div className="border-l-4 border-gray-300 bg-white rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-gray-600 font-semibold text-xs">CMR</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <Input placeholder="Add a comment..." className="flex-1" />
+                            <Button size="sm" variant="default">
+                              <Plus className="w-4 h-4 mr-1" />
+                              Submit
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Attachments Section */}
+                  <div className="border-t pt-6">
+                    <h3 className="font-medium text-sm mb-4">Attachments</h3>
+                    <div className="space-y-3">
+                      {mockRequisition.attachments.map((attachment: { id: number; fileName: string; description: string }) => (
+                        <div key={attachment.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <Paperclip className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm text-blue-600 truncate cursor-pointer hover:underline">
+                              {attachment.fileName}
+                            </p>
+                            <p className="text-xs text-gray-500">{attachment.description}</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm" className="text-xs px-2 py-1 h-6">
+                              View
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-xs px-2 py-1 h-6">
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <Button variant="ghost" size="sm" className="w-full text-gray-500 hover:text-gray-700">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Attach File
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Activity Log Section */}
+                  <div className="border-t pt-6 mt-6">
+                    <h3 className="font-medium text-sm mb-4">Activity Log</h3>
+                    <div className="space-y-3">
+                      {/* Activity 1 */}
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">Store Requisition Created</p>
+                            <span className="text-xs text-gray-500">2/25/2024 08:30 PM</span>
+                          </div>
+                          <p className="text-xs text-gray-600">Created by Chef Maria Rodriguez</p>
+                        </div>
+                      </div>
+
+                      {/* Activity 2 */}
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Edit2 className="w-3 h-3 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">Requisition Submitted</p>
+                            <span className="text-xs text-gray-500">2/25/2024 08:45 PM</span>
+                          </div>
+                          <p className="text-xs text-gray-600">Submitted for approval by Chef Maria Rodriguez</p>
+                        </div>
+                      </div>
+
+                      {/* Activity 3 */}
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <AlertCircle className="w-3 h-3 text-yellow-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">Under Review</p>
+                            <span className="text-xs text-gray-500">2/26/2024 09:15 AM</span>
+                          </div>
+                          <p className="text-xs text-gray-600">Assigned to Finance Manager John for budget review</p>
+                        </div>
+                      </div>
+
+                      {/* Activity 4 */}
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <XCircle className="w-3 h-3 text-red-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">Rejected</p>
+                            <span className="text-xs text-gray-500">2/28/2024 09:20 PM</span>
+                          </div>
+                          <p className="text-xs text-gray-600">Rejected by Finance Manager John - Budget constraints</p>
+                        </div>
+                      </div>
+
+                      {/* Activity 5 */}
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <MessageSquare className="w-3 h-3 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">Comment Added</p>
+                            <span className="text-xs text-gray-500">2/28/2024 11:30 PM</span>
+                          </div>
+                          <p className="text-xs text-gray-600">Chef Maria Rodriguez acknowledged budget constraints</p>
+                        </div>
+                      </div>
+
+                      {/* Activity 6 */}
+                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Edit2 className="w-3 h-3 text-orange-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">Revision in Progress</p>
+                            <span className="text-xs text-gray-500">2/29/2024 08:00 AM</span>
+                          </div>
+                          <p className="text-xs text-gray-600">Chef Maria Rodriguez is preparing revised request</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
       </div>
-    </Card>
+    </div>
   )
 } 

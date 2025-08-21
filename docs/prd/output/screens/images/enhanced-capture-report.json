@@ -1,0 +1,64 @@
+{
+  "timestamp": "2025-08-14T11:41:30.396Z",
+  "capture_type": "enhanced_list_screens_with_first_record_selection",
+  "total_screens": 6,
+  "successful_captures": 6,
+  "failed_captures": 0,
+  "success_rate": "100.0",
+  "results": [
+    {
+      "screen": "purchase-requests-list",
+      "url": "http://localhost:3000/procurement/purchase-requests",
+      "status": "success",
+      "spec_file": "purchase-requests-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/purchase-requests-list/purchase-requests-list-populated.png",
+      "interactions_performed": 2
+    },
+    {
+      "screen": "purchase-orders-list",
+      "url": "http://localhost:3000/procurement/purchase-orders",
+      "status": "success",
+      "spec_file": "purchase-orders-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/purchase-orders-list/purchase-orders-list-populated.png",
+      "interactions_performed": 2
+    },
+    {
+      "screen": "goods-received-note-list",
+      "url": "http://localhost:3000/procurement/goods-received-note",
+      "status": "success",
+      "spec_file": "goods-received-note-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/goods-received-note-list/goods-received-note-list-populated.png",
+      "interactions_performed": 2
+    },
+    {
+      "screen": "inventory-adjustments-list",
+      "url": "http://localhost:3000/inventory-management/inventory-adjustments",
+      "status": "success",
+      "spec_file": "inventory-adjustments-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/inventory-adjustments-list/inventory-adjustments-list-populated.png",
+      "interactions_performed": 2
+    },
+    {
+      "screen": "store-requisitions-list",
+      "url": "http://localhost:3000/store-operations/store-requisitions",
+      "status": "success",
+      "spec_file": "store-requisitions-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/store-requisitions-list/store-requisitions-list-populated.png",
+      "interactions_performed": 2
+    },
+    {
+      "screen": "vendor-list",
+      "url": "http://localhost:3000/vendor-management/manage-vendors",
+      "status": "success",
+      "spec_file": "vendor-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/vendor-list/vendor-list-populated.png",
+      "interactions_performed": 2
+    }
+  ]
+}

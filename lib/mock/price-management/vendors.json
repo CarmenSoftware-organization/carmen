@@ -1,0 +1,294 @@
+{
+  "vendors": [
+    {
+      "id": "v-01",
+      "baseVendorId": "vendor-001",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "USD",
+        "defaultLeadTime": 7,
+        "communicationLanguage": "en-US",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "weekly",
+          "escalationEnabled": true,
+          "escalationDays": 3,
+          "preferredContactTime": "09:00"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 92.5,
+        "averageResponseTime": 36.2,
+        "dataQualityScore": 87,
+        "lastSubmissionDate": "2024-06-15T14:30:00Z",
+        "totalCampaignsInvited": 12,
+        "totalCampaignsCompleted": 11
+      },
+      "assignedCategories": ["office-supplies", "furniture", "electronics"],
+      "status": "active",
+      "createdAt": "2023-12-01T10:00:00Z",
+      "updatedAt": "2024-06-15T14:30:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-02",
+      "baseVendorId": "vendor-002",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "EUR",
+        "defaultLeadTime": 10,
+        "communicationLanguage": "en-GB",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "daily",
+          "escalationEnabled": false,
+          "escalationDays": 5,
+          "preferredContactTime": "10:30"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 78.3,
+        "averageResponseTime": 52.7,
+        "dataQualityScore": 72,
+        "lastSubmissionDate": "2024-05-22T09:15:00Z",
+        "totalCampaignsInvited": 9,
+        "totalCampaignsCompleted": 7
+      },
+      "assignedCategories": ["it-equipment", "software", "electronics"],
+      "status": "active",
+      "createdAt": "2023-12-05T11:30:00Z",
+      "updatedAt": "2024-05-22T09:15:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-03",
+      "baseVendorId": "vendor-003",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "USD",
+        "defaultLeadTime": 5,
+        "communicationLanguage": "en-US",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "weekly",
+          "escalationEnabled": true,
+          "escalationDays": 2,
+          "preferredContactTime": "14:00"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 95.0,
+        "averageResponseTime": 24.5,
+        "dataQualityScore": 94,
+        "lastSubmissionDate": "2024-07-01T16:45:00Z",
+        "totalCampaignsInvited": 20,
+        "totalCampaignsCompleted": 19
+      },
+      "assignedCategories": ["office-supplies", "paper-products", "printing"],
+      "status": "active",
+      "createdAt": "2023-11-15T09:00:00Z",
+      "updatedAt": "2024-07-01T16:45:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-04",
+      "baseVendorId": "vendor-004",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "CAD",
+        "defaultLeadTime": 14,
+        "communicationLanguage": "en-CA",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "weekly",
+          "escalationEnabled": false,
+          "escalationDays": 7,
+          "preferredContactTime": "11:00"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 65.0,
+        "averageResponseTime": 72.3,
+        "dataQualityScore": 68,
+        "lastSubmissionDate": "2024-04-12T10:20:00Z",
+        "totalCampaignsInvited": 8,
+        "totalCampaignsCompleted": 5
+      },
+      "assignedCategories": ["furniture", "office-equipment", "storage"],
+      "status": "inactive",
+      "createdAt": "2024-01-10T13:45:00Z",
+      "updatedAt": "2024-04-12T10:20:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-05",
+      "baseVendorId": "vendor-005",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "USD",
+        "defaultLeadTime": 3,
+        "communicationLanguage": "en-US",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "daily",
+          "escalationEnabled": true,
+          "escalationDays": 1,
+          "preferredContactTime": "08:30"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 98.2,
+        "averageResponseTime": 12.7,
+        "dataQualityScore": 96,
+        "lastSubmissionDate": "2024-07-05T09:10:00Z",
+        "totalCampaignsInvited": 15,
+        "totalCampaignsCompleted": 15
+      },
+      "assignedCategories": ["electronics", "computer-accessories", "cables"],
+      "status": "active",
+      "createdAt": "2023-10-20T08:15:00Z",
+      "updatedAt": "2024-07-05T09:10:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-06",
+      "baseVendorId": "vendor-006",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "GBP",
+        "defaultLeadTime": 12,
+        "communicationLanguage": "en-GB",
+        "notificationPreferences": {
+          "emailReminders": false,
+          "reminderFrequency": "weekly",
+          "escalationEnabled": false,
+          "escalationDays": 5,
+          "preferredContactTime": "13:00"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 45.0,
+        "averageResponseTime": 96.5,
+        "dataQualityScore": 52,
+        "lastSubmissionDate": "2024-03-18T15:30:00Z",
+        "totalCampaignsInvited": 10,
+        "totalCampaignsCompleted": 4
+      },
+      "assignedCategories": ["office-supplies", "stationery", "paper-products"],
+      "status": "suspended",
+      "createdAt": "2023-12-15T14:20:00Z",
+      "updatedAt": "2024-03-18T15:30:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-07",
+      "baseVendorId": "vendor-007",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "USD",
+        "defaultLeadTime": 5,
+        "communicationLanguage": "en-US",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "weekly",
+          "escalationEnabled": true,
+          "escalationDays": 3,
+          "preferredContactTime": "10:00"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 88.9,
+        "averageResponseTime": 32.1,
+        "dataQualityScore": 85,
+        "lastSubmissionDate": "2024-06-28T11:45:00Z",
+        "totalCampaignsInvited": 18,
+        "totalCampaignsCompleted": 16
+      },
+      "assignedCategories": ["furniture", "office-equipment", "ergonomic-accessories"],
+      "status": "active",
+      "createdAt": "2023-11-05T09:30:00Z",
+      "updatedAt": "2024-06-28T11:45:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-08",
+      "baseVendorId": "vendor-008",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "AUD",
+        "defaultLeadTime": 15,
+        "communicationLanguage": "en-AU",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "weekly",
+          "escalationEnabled": false,
+          "escalationDays": 7,
+          "preferredContactTime": "15:00"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 72.5,
+        "averageResponseTime": 48.3,
+        "dataQualityScore": 76,
+        "lastSubmissionDate": "2024-05-15T14:20:00Z",
+        "totalCampaignsInvited": 8,
+        "totalCampaignsCompleted": 6
+      },
+      "assignedCategories": ["electronics", "computer-accessories", "peripherals"],
+      "status": "active",
+      "createdAt": "2024-01-20T10:15:00Z",
+      "updatedAt": "2024-05-15T14:20:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-09",
+      "baseVendorId": "vendor-009",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "USD",
+        "defaultLeadTime": 7,
+        "communicationLanguage": "en-US",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "daily",
+          "escalationEnabled": true,
+          "escalationDays": 2,
+          "preferredContactTime": "09:30"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 91.7,
+        "averageResponseTime": 28.5,
+        "dataQualityScore": 89,
+        "lastSubmissionDate": "2024-07-02T10:15:00Z",
+        "totalCampaignsInvited": 12,
+        "totalCampaignsCompleted": 11
+      },
+      "assignedCategories": ["office-supplies", "cleaning-supplies", "breakroom"],
+      "status": "active",
+      "createdAt": "2023-12-10T11:00:00Z",
+      "updatedAt": "2024-07-02T10:15:00Z",
+      "createdBy": "system-admin"
+    },
+    {
+      "id": "v-10",
+      "baseVendorId": "vendor-010",
+      "priceCollectionPreferences": {
+        "preferredCurrency": "EUR",
+        "defaultLeadTime": 10,
+        "communicationLanguage": "de-DE",
+        "notificationPreferences": {
+          "emailReminders": true,
+          "reminderFrequency": "weekly",
+          "escalationEnabled": false,
+          "escalationDays": 5,
+          "preferredContactTime": "11:30"
+        }
+      },
+      "performanceMetrics": {
+        "responseRate": 83.3,
+        "averageResponseTime": 42.8,
+        "dataQualityScore": 81,
+        "lastSubmissionDate": "2024-06-10T13:40:00Z",
+        "totalCampaignsInvited": 6,
+        "totalCampaignsCompleted": 5
+      },
+      "assignedCategories": ["it-equipment", "software", "networking"],
+      "status": "active",
+      "createdAt": "2024-02-15T09:45:00Z",
+      "updatedAt": "2024-06-10T13:40:00Z",
+      "createdBy": "system-admin"
+    }
+  ]
+}

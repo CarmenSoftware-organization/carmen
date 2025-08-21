@@ -1,0 +1,253 @@
+{
+  "vendorCurrencyPreferences": [
+    {
+      "vendorId": "vendor-001",
+      "vendorName": "Office Supplies Inc",
+      "preferredCurrency": "USD",
+      "supportedCurrencies": ["USD", "CAD"],
+      "defaultCurrency": "USD",
+      "currencySettings": {
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": false,
+        "autoConvertToPreferred": false,
+        "displayOriginalCurrency": true
+      },
+      "priceSubmissionPreferences": {
+        "preferredSubmissionCurrency": "USD",
+        "acceptedCurrencies": ["USD", "CAD"],
+        "currencyConversionTolerance": 2.0,
+        "requireExchangeRateConfirmation": false
+      },
+      "paymentPreferences": {
+        "invoiceCurrency": "USD",
+        "paymentCurrency": "USD",
+        "acceptMultiCurrencyPayments": false
+      },
+      "lastUpdated": "2025-01-15T10:00:00Z",
+      "updatedBy": "system"
+    },
+    {
+      "vendorId": "vendor-002",
+      "vendorName": "European Paper Co",
+      "preferredCurrency": "EUR",
+      "supportedCurrencies": ["EUR", "USD", "GBP"],
+      "defaultCurrency": "EUR",
+      "currencySettings": {
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": true,
+        "autoConvertToPreferred": true,
+        "displayOriginalCurrency": true
+      },
+      "priceSubmissionPreferences": {
+        "preferredSubmissionCurrency": "EUR",
+        "acceptedCurrencies": ["EUR", "USD", "GBP"],
+        "currencyConversionTolerance": 1.5,
+        "requireExchangeRateConfirmation": true
+      },
+      "paymentPreferences": {
+        "invoiceCurrency": "EUR",
+        "paymentCurrency": "EUR",
+        "acceptMultiCurrencyPayments": true
+      },
+      "lastUpdated": "2025-01-15T10:00:00Z",
+      "updatedBy": "vendor-002"
+    },
+    {
+      "vendorId": "vendor-003",
+      "vendorName": "UK Stationery Ltd",
+      "preferredCurrency": "GBP",
+      "supportedCurrencies": ["GBP", "EUR", "USD"],
+      "defaultCurrency": "GBP",
+      "currencySettings": {
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": false,
+        "autoConvertToPreferred": false,
+        "displayOriginalCurrency": true
+      },
+      "priceSubmissionPreferences": {
+        "preferredSubmissionCurrency": "GBP",
+        "acceptedCurrencies": ["GBP", "EUR", "USD"],
+        "currencyConversionTolerance": 2.5,
+        "requireExchangeRateConfirmation": false
+      },
+      "paymentPreferences": {
+        "invoiceCurrency": "GBP",
+        "paymentCurrency": "GBP",
+        "acceptMultiCurrencyPayments": false
+      },
+      "lastUpdated": "2025-01-15T10:00:00Z",
+      "updatedBy": "admin"
+    },
+    {
+      "vendorId": "vendor-004",
+      "vendorName": "Canadian Furniture Corp",
+      "preferredCurrency": "CAD",
+      "supportedCurrencies": ["CAD", "USD"],
+      "defaultCurrency": "CAD",
+      "currencySettings": {
+        "allowMultipleCurrencies": false,
+        "requireCurrencySpecification": false,
+        "autoConvertToPreferred": true,
+        "displayOriginalCurrency": false
+      },
+      "priceSubmissionPreferences": {
+        "preferredSubmissionCurrency": "CAD",
+        "acceptedCurrencies": ["CAD"],
+        "currencyConversionTolerance": 1.0,
+        "requireExchangeRateConfirmation": false
+      },
+      "paymentPreferences": {
+        "invoiceCurrency": "CAD",
+        "paymentCurrency": "CAD",
+        "acceptMultiCurrencyPayments": false
+      },
+      "lastUpdated": "2025-01-15T10:00:00Z",
+      "updatedBy": "vendor-004"
+    },
+    {
+      "vendorId": "vendor-005",
+      "vendorName": "Tokyo Electronics Ltd",
+      "preferredCurrency": "JPY",
+      "supportedCurrencies": ["JPY", "USD"],
+      "defaultCurrency": "JPY",
+      "currencySettings": {
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": true,
+        "autoConvertToPreferred": false,
+        "displayOriginalCurrency": true
+      },
+      "priceSubmissionPreferences": {
+        "preferredSubmissionCurrency": "JPY",
+        "acceptedCurrencies": ["JPY", "USD"],
+        "currencyConversionTolerance": 3.0,
+        "requireExchangeRateConfirmation": true
+      },
+      "paymentPreferences": {
+        "invoiceCurrency": "JPY",
+        "paymentCurrency": "JPY",
+        "acceptMultiCurrencyPayments": false
+      },
+      "lastUpdated": "2025-01-15T10:00:00Z",
+      "updatedBy": "vendor-005"
+    },
+    {
+      "vendorId": "vendor-006",
+      "vendorName": "Australian Tech Supplies",
+      "preferredCurrency": "AUD",
+      "supportedCurrencies": ["AUD", "USD", "EUR"],
+      "defaultCurrency": "AUD",
+      "currencySettings": {
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": false,
+        "autoConvertToPreferred": true,
+        "displayOriginalCurrency": true
+      },
+      "priceSubmissionPreferences": {
+        "preferredSubmissionCurrency": "AUD",
+        "acceptedCurrencies": ["AUD", "USD", "EUR"],
+        "currencyConversionTolerance": 2.0,
+        "requireExchangeRateConfirmation": false
+      },
+      "paymentPreferences": {
+        "invoiceCurrency": "AUD",
+        "paymentCurrency": "AUD",
+        "acceptMultiCurrencyPayments": true
+      },
+      "lastUpdated": "2025-01-15T10:00:00Z",
+      "updatedBy": "admin"
+    }
+  ],
+  "currencyPreferenceTemplates": [
+    {
+      "templateId": "template-001",
+      "templateName": "North American Standard",
+      "description": "Standard currency preferences for North American vendors",
+      "defaultSettings": {
+        "preferredCurrency": "USD",
+        "supportedCurrencies": ["USD", "CAD"],
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": false,
+        "autoConvertToPreferred": false,
+        "currencyConversionTolerance": 2.0
+      },
+      "applicableRegions": ["US", "CA"],
+      "isActive": true
+    },
+    {
+      "templateId": "template-002",
+      "templateName": "European Standard",
+      "description": "Standard currency preferences for European vendors",
+      "defaultSettings": {
+        "preferredCurrency": "EUR",
+        "supportedCurrencies": ["EUR", "USD", "GBP"],
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": true,
+        "autoConvertToPreferred": true,
+        "currencyConversionTolerance": 1.5
+      },
+      "applicableRegions": ["EU", "DE", "FR", "IT", "ES"],
+      "isActive": true
+    },
+    {
+      "templateId": "template-003",
+      "templateName": "Asia-Pacific Standard",
+      "description": "Standard currency preferences for Asia-Pacific vendors",
+      "defaultSettings": {
+        "preferredCurrency": "USD",
+        "supportedCurrencies": ["USD", "JPY", "AUD"],
+        "allowMultipleCurrencies": true,
+        "requireCurrencySpecification": true,
+        "autoConvertToPreferred": false,
+        "currencyConversionTolerance": 3.0
+      },
+      "applicableRegions": ["JP", "AU", "SG", "HK"],
+      "isActive": true
+    }
+  ],
+  "currencyPreferenceHistory": [
+    {
+      "id": "history-001",
+      "vendorId": "vendor-002",
+      "changeType": "preference_update",
+      "previousSettings": {
+        "preferredCurrency": "USD",
+        "supportedCurrencies": ["USD", "EUR"]
+      },
+      "newSettings": {
+        "preferredCurrency": "EUR",
+        "supportedCurrencies": ["EUR", "USD", "GBP"]
+      },
+      "reason": "Vendor requested to use EUR as primary currency",
+      "changedBy": "vendor-002",
+      "changeDate": "2025-01-10T14:30:00Z"
+    },
+    {
+      "id": "history-002",
+      "vendorId": "vendor-003",
+      "changeType": "tolerance_adjustment",
+      "previousSettings": {
+        "currencyConversionTolerance": 2.0
+      },
+      "newSettings": {
+        "currencyConversionTolerance": 2.5
+      },
+      "reason": "Increased tolerance due to GBP volatility",
+      "changedBy": "admin",
+      "changeDate": "2025-01-12T09:15:00Z"
+    }
+  ],
+  "systemCurrencySettings": {
+    "baseCurrency": "USD",
+    "supportedCurrencies": ["USD", "EUR", "GBP", "CAD", "AUD", "JPY"],
+    "defaultConversionTolerance": 2.0,
+    "exchangeRateUpdateFrequency": "hourly",
+    "requireVendorCurrencyApproval": false,
+    "allowVendorCurrencyChanges": true,
+    "maxSupportedCurrenciesPerVendor": 5,
+    "currencyValidationRules": {
+      "requireMinimumVolume": false,
+      "minimumTransactionAmount": 0,
+      "restrictHighVolatilityCurrencies": false
+    }
+  }
+}

@@ -82,82 +82,73 @@ export default function TransactionSummary({ poData, isEditing = false }: Transa
         Transaction Summary ({poData.currencyCode || 'USD'})
       </h3>
       
-      {/* Summary Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {summaryItems.map((item) => {
-          const IconComponent = item.icon;
-          return (
-            <div
-              key={item.label}
-              className={`${item.bgColor} border border-gray-200 rounded-lg ${item.borderColor} border-l-4 overflow-hidden`}
-            >
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <IconComponent className={`h-4 w-4 ${item.iconColor}`} />
-                    <span className="text-sm font-medium text-gray-600">{item.label}</span>
-                  </div>
-                  {isEditing && item.hasOverride && (
-                    <div className="flex items-center gap-1">
-                      <Checkbox
-                        id={`override-${item.label.toLowerCase()}`}
-                        checked={item.overrideChecked}
-                        onCheckedChange={item.onOverrideChange}
-                        className="h-4 w-4"
-                      />
-                      <label 
-                        htmlFor={`override-${item.label.toLowerCase()}`}
-                        className="text-xs text-gray-500 cursor-pointer"
-                      >
-                        Override
-                      </label>
-                    </div>
-                  )}
-                </div>
-                <div className="text-2xl font-bold text-black">
-                  {item.value.toLocaleString('en-US', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                  })}
-                </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  {poData.baseCurrencyCode || 'THB'} {item.baseValue.toLocaleString('en-US', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                  })}
-                </div>
-              </div>
+      {/* Summary Cards Row - Horizontal Layout */}
+      <div className="bg-gray-50 rounded-lg p-6">
+        <div className="grid grid-cols-4 gap-6">
+          {/* Subtotal */}
+          <div className="flex flex-col items-center text-center border-l-4 border-l-blue-500 bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <DollarSign className="h-4 w-4 text-blue-500" />
+              <span className="text-sm text-gray-600">Subtotal</span>
             </div>
-          );
-        })}
+            <div className="text-2xl font-bold text-black">
+              {subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+
+          {/* Discount */}
+          <div className="flex flex-col items-center text-center border-l-4 border-l-green-500 bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <Percent className="h-4 w-4 text-green-500" />
+              <span className="text-sm text-gray-600">Discount</span>
+            </div>
+            <div className="text-2xl font-bold text-green-600">
+              {discount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+
+          {/* Net Amount */}
+          <div className="flex flex-col items-center text-center border-l-4 border-l-blue-500 bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <FileText className="h-4 w-4 text-blue-500" />
+              <span className="text-sm text-gray-600">Net Amount</span>
+            </div>
+            <div className="text-2xl font-bold text-blue-600">
+              {netAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+
+          {/* Tax */}
+          <div className="flex flex-col items-center text-center border-l-4 border-l-orange-500 bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <Receipt className="h-4 w-4 text-orange-500" />
+              <span className="text-sm text-gray-600">Tax</span>
+            </div>
+            <div className="text-2xl font-bold text-orange-600">
+              {tax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Total Amount Card */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg overflow-hidden">
-        <div className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-blue-500 rounded-full p-2.5">
-                <TrendingUp className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold text-black">Total Amount</div>
-                <div className="text-sm text-gray-600">Final amount including all charges</div>
-              </div>
+      <div className="bg-blue-50 border-l-4 border-l-blue-600 rounded-lg p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-500 rounded-full p-2.5">
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-blue-600">
-                {totalAmount.toLocaleString('en-US', { 
-                  minimumFractionDigits: 2, 
-                  maximumFractionDigits: 2 
-                })}
-              </div>
-              <div className="text-sm text-gray-500 mt-1">
-                {poData.baseCurrencyCode || 'THB'} {baseTotalAmount.toLocaleString('en-US', { 
-                  minimumFractionDigits: 2, 
-                  maximumFractionDigits: 2 
-                })}
-              </div>
+            <div>
+              <div className="text-lg font-semibold text-black">Total Amount</div>
+              <div className="text-sm text-gray-600">Final amount including all charges</div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-blue-600">
+              {totalAmount.toLocaleString('en-US', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+              })}
             </div>
           </div>
         </div>

@@ -1,0 +1,155 @@
+{
+  "currentRates": [
+    {
+      "id": "usd-eur-001",
+      "fromCurrency": "USD",
+      "toCurrency": "EUR",
+      "rate": 0.85,
+      "rateDate": "2025-01-15",
+      "source": "ECB",
+      "createdAt": "2025-01-15T08:00:00Z"
+    },
+    {
+      "id": "usd-gbp-001",
+      "fromCurrency": "USD",
+      "toCurrency": "GBP",
+      "rate": 0.78,
+      "rateDate": "2025-01-15",
+      "source": "BOE",
+      "createdAt": "2025-01-15T08:00:00Z"
+    },
+    {
+      "id": "usd-cad-001",
+      "fromCurrency": "USD",
+      "toCurrency": "CAD",
+      "rate": 1.35,
+      "rateDate": "2025-01-15",
+      "source": "BOC",
+      "createdAt": "2025-01-15T08:00:00Z"
+    },
+    {
+      "id": "usd-aud-001",
+      "fromCurrency": "USD",
+      "toCurrency": "AUD",
+      "rate": 1.42,
+      "rateDate": "2025-01-15",
+      "source": "RBA",
+      "createdAt": "2025-01-15T08:00:00Z"
+    },
+    {
+      "id": "usd-jpy-001",
+      "fromCurrency": "USD",
+      "toCurrency": "JPY",
+      "rate": 148.50,
+      "rateDate": "2025-01-15",
+      "source": "BOJ",
+      "createdAt": "2025-01-15T08:00:00Z"
+    },
+    {
+      "id": "eur-gbp-001",
+      "fromCurrency": "EUR",
+      "toCurrency": "GBP",
+      "rate": 0.92,
+      "rateDate": "2025-01-15",
+      "source": "ECB",
+      "createdAt": "2025-01-15T08:00:00Z"
+    },
+    {
+      "id": "eur-usd-001",
+      "fromCurrency": "EUR",
+      "toCurrency": "USD",
+      "rate": 1.18,
+      "rateDate": "2025-01-15",
+      "source": "ECB",
+      "createdAt": "2025-01-15T08:00:00Z"
+    }
+  ],
+  "historicalRates": [
+    {
+      "currencyPair": "USD/EUR",
+      "history": [
+        { "date": "2025-01-01", "rate": 0.84, "source": "ECB" },
+        { "date": "2025-01-02", "rate": 0.845, "source": "ECB" },
+        { "date": "2025-01-03", "rate": 0.843, "source": "ECB" },
+        { "date": "2025-01-08", "rate": 0.847, "source": "ECB" },
+        { "date": "2025-01-09", "rate": 0.849, "source": "ECB" },
+        { "date": "2025-01-10", "rate": 0.851, "source": "ECB" },
+        { "date": "2025-01-13", "rate": 0.848, "source": "ECB" },
+        { "date": "2025-01-14", "rate": 0.852, "source": "ECB" },
+        { "date": "2025-01-15", "rate": 0.85, "source": "ECB" }
+      ]
+    },
+    {
+      "currencyPair": "USD/GBP",
+      "history": [
+        { "date": "2025-01-01", "rate": 0.79, "source": "BOE" },
+        { "date": "2025-01-02", "rate": 0.785, "source": "BOE" },
+        { "date": "2025-01-03", "rate": 0.788, "source": "BOE" },
+        { "date": "2025-01-08", "rate": 0.782, "source": "BOE" },
+        { "date": "2025-01-09", "rate": 0.784, "source": "BOE" },
+        { "date": "2025-01-10", "rate": 0.781, "source": "BOE" },
+        { "date": "2025-01-13", "rate": 0.779, "source": "BOE" },
+        { "date": "2025-01-14", "rate": 0.777, "source": "BOE" },
+        { "date": "2025-01-15", "rate": 0.78, "source": "BOE" }
+      ]
+    },
+    {
+      "currencyPair": "USD/CAD",
+      "history": [
+        { "date": "2025-01-01", "rate": 1.36, "source": "BOC" },
+        { "date": "2025-01-02", "rate": 1.358, "source": "BOC" },
+        { "date": "2025-01-03", "rate": 1.362, "source": "BOC" },
+        { "date": "2025-01-08", "rate": 1.355, "source": "BOC" },
+        { "date": "2025-01-09", "rate": 1.353, "source": "BOC" },
+        { "date": "2025-01-10", "rate": 1.351, "source": "BOC" },
+        { "date": "2025-01-13", "rate": 1.348, "source": "BOC" },
+        { "date": "2025-01-14", "rate": 1.352, "source": "BOC" },
+        { "date": "2025-01-15", "rate": 1.35, "source": "BOC" }
+      ]
+    }
+  ],
+  "supportedCurrencies": [
+    {
+      "code": "USD",
+      "name": "US Dollar",
+      "symbol": "$",
+      "decimalPlaces": 2,
+      "isBaseCurrency": true
+    },
+    {
+      "code": "EUR",
+      "name": "Euro",
+      "symbol": "€",
+      "decimalPlaces": 2,
+      "isBaseCurrency": false
+    },
+    {
+      "code": "GBP",
+      "name": "British Pound",
+      "symbol": "£",
+      "decimalPlaces": 2,
+      "isBaseCurrency": false
+    },
+    {
+      "code": "CAD",
+      "name": "Canadian Dollar",
+      "symbol": "C$",
+      "decimalPlaces": 2,
+      "isBaseCurrency": false
+    },
+    {
+      "code": "AUD",
+      "name": "Australian Dollar",
+      "symbol": "A$",
+      "decimalPlaces": 2,
+      "isBaseCurrency": false
+    },
+    {
+      "code": "JPY",
+      "name": "Japanese Yen",
+      "symbol": "¥",
+      "decimalPlaces": 0,
+      "isBaseCurrency": false
+    }
+  ]
+}

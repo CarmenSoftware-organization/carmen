@@ -32,7 +32,19 @@ export enum BadgeStatus {
   Normal = "normal",
   Posted = "Posted",
   IN = "IN",
-  OUT = "OUT"
+  OUT = "OUT",
+  // Store Requisition specific statuses
+  InProcess = "In Process",
+  Complete = "Complete",
+  Reject = "Reject",
+  Void = "Void",
+  Accept = "Accept",
+  // Approval workflow stages
+  PendingApproval = "Pending Approval",
+  ManagerApproval = "Manager Approval",
+  HODApproval = "HOD Approval",
+  ApprovalRejected = "Approval Rejected",
+  ApprovalApproved = "Approval Approved"
 }
 
 const statusStyles: Record<string, { bg: string, text: string }> = {
@@ -51,8 +63,8 @@ const statusStyles: Record<string, { bg: string, text: string }> = {
   // Draft/Pending states (amber/yellow)
   Open: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-800 dark:text-amber-300' },
   
-  // Warning states
-  Pending: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
+  // Warning states  
+  Pending: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-800 dark:text-blue-300' },
   OnHold: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
   Review: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
   Draft: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-800 dark:text-yellow-300' },
@@ -74,6 +86,20 @@ const statusStyles: Record<string, { bg: string, text: string }> = {
   BelowMin: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' },
   OverMax: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-800 dark:text-blue-300' },
   Normal: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' },
+  
+  // Store Requisition states (following PR semantic color patterns)
+  'In Process': { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-800 dark:text-amber-300' }, // Active workflow/approval state
+  'Complete': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' }, // Success state
+  'Reject': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' }, // Error state
+  'Void': { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-800 dark:text-gray-300' }, // Neutral state
+  'Accept': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' }, // Success state
+  
+  // Approval workflow stages
+  'Pending Approval': { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-800 dark:text-orange-300' }, // Awaiting approval
+  'Manager Approval': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-800 dark:text-blue-300' }, // Manager level
+  'HOD Approval': { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-800 dark:text-purple-300' }, // Head of Department
+  'Approval Rejected': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-300' }, // Rejected in approval
+  'Approval Approved': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-300' } // Final approval
 };
 
 interface StatusBadgeProps {

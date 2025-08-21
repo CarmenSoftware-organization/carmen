@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Item Details - Enterprise Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="enterprise_theme_v5.css">
+    <style>
+        /* PR Item Details Enterprise Layout */
+        .pr-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: calc(50vh - 24px) calc(50vh - 24px);
+            gap: 16px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .pr-panel {
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: hsl(var(--foreground));
+        }
+
+        /* Basic Information Section */
+        .basic-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-label {
+            font-size: 12px;
+            color: hsl(var(--operational-muted-foreground));
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .field-value {
+            background: hsl(var(--operational-accent));
+            border: 1px solid hsl(var(--border-split));
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-family: var(--font-mono);
+            color: hsl(var(--foreground));
+        }
+
+        .field-value.editable {
+            background: hsl(var(--card));
+            border: 2px solid hsl(var(--split-primary));
+        }
+
+        /* Quantity Grid */
+        .quantity-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .quantity-box {
+            background: hsl(var(--operational-accent));
+            border: 1px solid hsl(var(--border-split));
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .quantity-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: hsl(var(--split-primary));
+            display: block;
+            font-family: var(--font-mono);
+        }
+
+        .quantity-label {
+            font-size: 10px;
+            color: hsl(var(--operational-muted-foreground));
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .quantity-unit {
+            font-size: 10px;
+            color: hsl(var(--operational-muted-foreground));
+            margin-top: 4px;
+        }
+
+        /* Status Alert */
+        .status-alert {
+            background: hsl(var(--split-info) / 0.1);
+            border: 1px solid hsl(var(--split-info));
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: hsl(var(--split-info));
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Approval Section */
+        .approval-section {
+            background: hsl(var(--financial-accent));
+            border: var(--border-split);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .approval-info h4 {
+            font-weight: 600;
+            color: hsl(var(--foreground));
+            margin: 0 0 4px 0;
+        }
+
+        .approval-info p {
+            font-size: 12px;
+            color: hsl(var(--financial-muted-foreground));
+            margin: 0;
+        }
+
+        .approval-btn {
+            background: hsl(var(--split-positive));
+            color: hsl(var(--split-primary-foreground));
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        /* Vendor Section */
+        .vendor-info {
+            background: hsl(var(--financial-accent));
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .vendor-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: hsl(var(--foreground));
+        }
+
+        .vendor-details {
+            font-size: 12px;
+            color: hsl(var(--financial-muted-foreground));
+            font-family: var(--font-mono);
+            line-height: 1.5;
+        }
+
+        /* Pricing Table */
+        .price-table {
+            margin-bottom: 16px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid hsl(var(--financial-muted));
+        }
+
+        .price-row:last-child {
+            border-bottom: none;
+        }
+
+        .price-label {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .price-value {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .price-total {
+            border-top: 2px solid hsl(var(--split-primary));
+            padding-top: 12px;
+            margin-top: 12px;
+            font-weight: 700;
+        }
+
+        .price-negative {
+            color: hsl(var(--split-negative));
+        }
+
+        .price-positive {
+            color: hsl(var(--split-positive));
+        }
+
+        .checkbox {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+        }
+
+        /* Business Context */
+        .context-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .context-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: hsl(var(--operational-accent));
+            border-radius: 6px;
+            border: 1px solid hsl(var(--border-split-accent));
+        }
+
+        .context-label {
+            font-size: 12px;
+            color: hsl(var(--operational-muted-foreground));
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .context-value {
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            color: hsl(var(--foreground));
+        }
+
+        /* Action Buttons */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border: var(--border-split);
+            border-radius: var(--radius);
+            background: hsl(var(--card));
+            text-decoration: none;
+            color: inherit;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: hsl(var(--hover-split));
+            border-color: hsl(var(--split-primary));
+        }
+
+        .action-btn-primary {
+            background: hsl(var(--split-primary));
+            color: hsl(var(--split-primary-foreground));
+            border-color: hsl(var(--split-primary));
+        }
+
+        /* Status Badge */
+        .status-badge {
+            background: hsl(var(--split-info));
+            color: hsl(var(--split-primary-foreground));
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Force 2x2 Grid Layout */
+        @media (min-width: 768px) {
+            .pr-container {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                grid-template-rows: calc(50vh - 24px) calc(50vh - 24px) !important;
+                gap: 16px !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .pr-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 300px);
+                height: auto;
+            }
+            
+            .pr-panel {
+                height: 300px;
+            }
+
+            .basic-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quantity-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pr-container">
+        
+        <!-- Block 1: Basic Information & Quantities (Top Left) -->
+        <div class="pr-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 class="panel-title">
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                    Item Information
+                </h2>
+                <div class="status-badge">Approved</div>
+            </div>
+            
+            <!-- Basic Item Information -->
+            <div class="basic-info-grid">
+                <div class="form-field">
+                    <div class="field-label">Location</div>
+                    <div class="field-value">Kitchen</div>
+                </div>
+                <div class="form-field">
+                    <div class="field-label">Product Name</div>
+                    <div class="field-value">Premium Dark Chocolate Chips</div>
+                </div>
+                <div class="form-field">
+                    <div class="field-label">Job Code</div>
+                    <div class="field-value">PASTRY-001</div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-field" style="margin-bottom: 16px;">
+                <div class="field-label">Description</div>
+                <div class="field-value">High-quality Belgian dark chocolate chips, 70% cocoa content, ideal for premium desserts and baking applications</div>
+            </div>
+            
+            <!-- Quantity Information -->
+            <div class="quantity-grid">
+                <div class="quantity-box">
+                    <div class="quantity-label">Request Unit</div>
+                    <div class="quantity-value">Bag</div>
+                    <div class="quantity-unit">25kg/bag</div>
+                </div>
+                <div class="quantity-box">
+                    <div class="quantity-label">Request Qty</div>
+                    <div class="quantity-value">1</div>
+                    <div class="quantity-unit">25 kg</div>
+                </div>
+                <div class="quantity-box">
+                    <div class="quantity-label">Approved Qty</div>
+                    <div class="quantity-value">1</div>
+                    <div class="quantity-unit">25 kg</div>
+                </div>
+                <div class="quantity-box">
+                    <div class="quantity-label">FOC Qty</div>
+                    <div class="quantity-value">0</div>
+                    <div class="quantity-unit">kg</div>
+                </div>
+            </div>
+
+            <!-- Delivery Information -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-field">
+                    <div class="field-label">Required Date</div>
+                    <div class="field-value">08/02/2024</div>
+                </div>
+                <div class="form-field">
+                    <div class="field-label">Delivery Point</div>
+                    <div class="field-value">Pastry Kitchen Storage</div>
+                </div>
+            </div>
+
+            <!-- Comment -->
+            <div class="form-field" style="margin-top: 16px;">
+                <div class="field-label">Comment</div>
+                <div class="field-value">Required for Valentine's Day dessert menu upgrade. Premium quality essential for customer satisfaction.</div>
+            </div>
+        </div>
+        
+        <!-- Block 2: Vendor/Pricelist Information (Top Right) -->
+        <div class="pr-panel">
+            <h2 class="panel-title">
+                <i data-lucide="building-2" class="w-5 h-5"></i>
+                Vendor/Pricelist Information
+            </h2>
+            
+            <div class="vendor-info">
+                <div class="vendor-name">Premium Food Suppliers Inc.</div>
+                <div class="vendor-details">
+                    PL-2024-USD-CHOCOLATE<br>
+                    USD • $22.00/kg<br>
+                    <span style="color: hsl(var(--split-info)); font-weight: 600;">Active Contract • Preferred Vendor</span>
+                </div>
+            </div>
+
+            <!-- Approval Section -->
+            <div class="approval-section">
+                <div class="approval-info">
+                    <h4>Item Approval</h4>
+                    <p>Current status: Approved</p>
+                </div>
+                <button class="approval-btn">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    Approved
+                </button>
+            </div>
+        </div>
+        
+        <!-- Block 3: Business Dimensions (Bottom Left) -->
+        <div class="pr-panel">
+            <h2 class="panel-title">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+                Business Dimensions
+            </h2>
+            
+            <div class="context-grid">
+                <div class="context-item">
+                    <span class="context-label">Job Number</span>
+                    <span class="context-value">PASTRY-2024-Q1-001</span>
+                </div>
+                <div class="context-item">
+                    <span class="context-label">Event</span>
+                    <span class="context-value">VALENTINE-MENU-2024</span>
+                </div>
+                <div class="context-item">
+                    <span class="context-label">Project</span>
+                    <span class="context-value">DESSERT-UPGRADE</span>
+                </div>
+                <div class="context-item">
+                    <span class="context-label">Market Segment</span>
+                    <span class="context-value">HOSPITALITY</span>
+                </div>
+            </div>
+            
+            <div class="actions-grid" style="margin-top: 16px;">
+                <button class="action-btn action-btn-primary">
+                    <i data-lucide="edit" class="w-4 h-4"></i>
+                    Edit Item
+                </button>
+                <button class="action-btn">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    Compare Prices
+                </button>
+                <button class="action-btn">
+                    <i data-lucide="package" class="w-4 h-4"></i>
+                    View Inventory
+                </button>
+                <button class="action-btn">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    View History
+                </button>
+            </div>
+        </div>
+        
+        <!-- Block 4: Pricing Breakdown (Bottom Right) -->
+        <div class="pr-panel">
+            <h2 class="panel-title">
+                <i data-lucide="calculator" class="w-5 h-5"></i>
+                Pricing Breakdown
+            </h2>
+            
+            <div class="price-table">
+                <div class="price-row">
+                    <span class="price-label">Subtotal (25kg × $22.00)</span>
+                    <span class="price-value">USD 550.00</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">
+                        <input type="checkbox" class="checkbox" checked>
+                        Discount 5%
+                    </span>
+                    <span class="price-value price-negative">-USD 27.50</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">Net Amount</span>
+                    <span class="price-value">USD 522.50</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">
+                        <input type="checkbox" class="checkbox" checked>
+                        Tax (VAT 7%)
+                    </span>
+                    <span class="price-value price-positive">+USD 36.58</span>
+                </div>
+                <div class="price-row price-total">
+                    <span class="price-label">TOTAL</span>
+                    <span class="price-value">USD 559.08</span>
+                </div>
+            </div>
+
+            <!-- Status Alert -->
+            <div class="status-alert">
+                <div class="alert-title">
+                    <i data-lucide="info" class="w-4 h-4"></i>
+                    Price Confirmation
+                </div>
+                <div style="font-size: 12px; color: hsl(var(--split-info));">
+                    Price locked until 15/02/2024 • Base currency: USD
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

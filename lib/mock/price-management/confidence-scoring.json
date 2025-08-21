@@ -1,0 +1,178 @@
+{
+  "confidenceScoring": {
+    "scoringCriteria": [
+      {
+        "criteriaId": "price_competitiveness",
+        "name": "Price Competitiveness",
+        "weight": 0.35,
+        "description": "How competitive the price is compared to market average",
+        "scoringMethod": "relative_comparison"
+      },
+      {
+        "criteriaId": "vendor_reliability",
+        "name": "Vendor Reliability",
+        "weight": 0.25,
+        "description": "Historical performance and delivery reliability",
+        "scoringMethod": "historical_performance"
+      },
+      {
+        "criteriaId": "quality_rating",
+        "name": "Quality Rating",
+        "weight": 0.20,
+        "description": "Product quality based on past purchases",
+        "scoringMethod": "quality_metrics"
+      },
+      {
+        "criteriaId": "availability_status",
+        "name": "Availability Status",
+        "weight": 0.15,
+        "description": "Current stock availability and lead time",
+        "scoringMethod": "availability_check"
+      },
+      {
+        "criteriaId": "strategic_preference",
+        "name": "Strategic Preference",
+        "weight": 0.05,
+        "description": "Preferred vendor status and strategic relationships",
+        "scoringMethod": "preference_bonus"
+      }
+    ],
+    "scoringScenarios": [
+      {
+        "scenarioId": "high_confidence",
+        "name": "High Confidence Assignment",
+        "confidenceRange": [0.85, 1.0],
+        "characteristics": [
+          "Preferred vendor with competitive pricing",
+          "High quality rating (>4.5)",
+          "Excellent reliability score (>90%)",
+          "Immediate availability",
+          "Price within 5% of market average"
+        ],
+        "examples": [
+          {
+            "vendorId": "vendor-001",
+            "productCategory": "office_supplies",
+            "confidenceScore": 0.92,
+            "reasoning": "Preferred vendor with best price and proven reliability"
+          }
+        ]
+      },
+      {
+        "scenarioId": "medium_confidence",
+        "name": "Medium Confidence Assignment",
+        "confidenceRange": [0.65, 0.84],
+        "characteristics": [
+          "Good vendor with acceptable pricing",
+          "Moderate quality rating (3.5-4.5)",
+          "Good reliability score (75-90%)",
+          "Available with reasonable lead time",
+          "Price within 15% of market average"
+        ],
+        "examples": [
+          {
+            "vendorId": "vendor-003",
+            "productCategory": "furniture",
+            "confidenceScore": 0.78,
+            "reasoning": "Competitive price but longer lead time affects confidence"
+          }
+        ]
+      },
+      {
+        "scenarioId": "low_confidence",
+        "name": "Low Confidence Assignment",
+        "confidenceRange": [0.40, 0.64],
+        "characteristics": [
+          "Limited vendor options available",
+          "Below average quality rating (<3.5)",
+          "Poor reliability score (<75%)",
+          "Limited availability or long lead time",
+          "Price significantly above market average"
+        ],
+        "examples": [
+          {
+            "vendorId": "vendor-005",
+            "productCategory": "electronics",
+            "confidenceScore": 0.45,
+            "reasoning": "Only available vendor but out of stock, requiring backorder"
+          }
+        ]
+      }
+    ]
+  },
+  "assignmentReasoningScenarios": [
+    {
+      "reasoningId": "best_price_preferred",
+      "scenario": "Best Price with Preferred Vendor",
+      "template": "Selected {vendorName} with best price of {price} {currency} and preferred vendor status",
+      "confidenceImpact": 0.1,
+      "applicableWhen": ["isPreferred", "bestPrice"]
+    },
+    {
+      "reasoningId": "only_available",
+      "scenario": "Only Available Vendor",
+      "template": "Selected {vendorName} as the only vendor with current stock availability",
+      "confidenceImpact": -0.2,
+      "applicableWhen": ["singleOption", "inStock"]
+    },
+    {
+      "reasoningId": "quality_over_price",
+      "scenario": "Quality Priority Over Price",
+      "template": "Selected {vendorName} for superior quality rating ({rating}/5) despite higher price",
+      "confidenceImpact": 0.05,
+      "applicableWhen": ["highQuality", "higherPrice"]
+    },
+    {
+      "reasoningId": "strategic_relationship",
+      "scenario": "Strategic Vendor Relationship",
+      "template": "Selected {vendorName} to maintain strategic partnership and volume commitments",
+      "confidenceImpact": 0.15,
+      "applicableWhen": ["strategicVendor", "volumeCommitment"]
+    },
+    {
+      "reasoningId": "currency_advantage",
+      "scenario": "Multi-Currency Advantage",
+      "template": "Selected {vendorName} with favorable exchange rate ({originalPrice} {originalCurrency} = {convertedPrice} {targetCurrency})",
+      "confidenceImpact": 0.08,
+      "applicableWhen": ["multiCurrency", "favorableRate"]
+    },
+    {
+      "reasoningId": "emergency_assignment",
+      "scenario": "Emergency Assignment",
+      "template": "Emergency assignment to {vendorName} due to urgent requirement despite suboptimal conditions",
+      "confidenceImpact": -0.3,
+      "applicableWhen": ["urgent", "limitedOptions"]
+    }
+  ],
+  "confidenceFactors": {
+    "priceFactors": {
+      "bestPrice": 0.2,
+      "within5Percent": 0.15,
+      "within10Percent": 0.1,
+      "within15Percent": 0.05,
+      "above15Percent": -0.1
+    },
+    "vendorFactors": {
+      "preferredVendor": 0.15,
+      "highRating": 0.1,
+      "strategicPartner": 0.12,
+      "newVendor": -0.05,
+      "problematicHistory": -0.2
+    },
+    "availabilityFactors": {
+      "immediateAvailable": 0.1,
+      "shortLeadTime": 0.05,
+      "standardLeadTime": 0.0,
+      "longLeadTime": -0.05,
+      "backorder": -0.15,
+      "outOfStock": -0.25
+    },
+    "qualityFactors": {
+      "excellentQuality": 0.1,
+      "goodQuality": 0.05,
+      "averageQuality": 0.0,
+      "belowAverageQuality": -0.1,
+      "poorQuality": -0.2
+    }
+  }
+}

@@ -197,14 +197,13 @@ export default function EnhancedItemsTab({
           )}
           <div>
             <h2 className="text-lg font-semibold">Purchase Order Items</h2>
-            <p className="text-sm text-gray-500">
-              {summaryStats.totalItems} items • Total Value: ${summaryStats.totalValue.toFixed(2)}
-              {selectedItems.length > 0 && (
-                <span className="ml-2 text-blue-600 font-medium">
-                  • {selectedItems.length} selected
+            {selectedItems.length > 0 && (
+              <p className="text-sm text-gray-500">
+                <span className="text-blue-600 font-medium">
+                  {selectedItems.length} selected
                 </span>
-              )}
-            </p>
+              </p>
+            )}
           </div>
         </div>
         
@@ -218,10 +217,6 @@ export default function EnhancedItemsTab({
               Add Item
             </Button>
           )}
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
         </div>
       </div>
 
@@ -326,34 +321,6 @@ export default function EnhancedItemsTab({
         )}
       </div>
 
-      {/* Summary Footer */}
-      {filteredItems.length > 0 && (
-        <Card className="p-4 bg-gray-50">
-          <div className="flex justify-between items-center text-sm">
-            <div className="flex items-center space-x-6">
-              <div>
-                <span className="text-gray-500">Total Items:</span>
-                <span className="font-medium ml-2">{summaryStats.totalItems}</span>
-              </div>
-              <div>
-                <span className="text-gray-500">Total Value:</span>
-                <span className="font-semibold text-blue-600 ml-2">
-                  ${summaryStats.totalValue.toFixed(2)}
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {Object.entries(summaryStats.statusCounts).map(([status, count]) => (
-                <div key={status} className="text-xs">
-                  <span className="text-gray-500">{status}:</span>
-                  <span className="font-medium ml-1">{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-      )}
 
       {/* Item Details Modal */}
       {viewingItem && (

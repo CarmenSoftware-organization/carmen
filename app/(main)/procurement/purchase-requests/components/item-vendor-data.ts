@@ -654,6 +654,109 @@ export const itemVendorDatabase: { [itemName: string]: ItemVendorData } = {
         notes: "Same-day delivery available, premium quality"
       }
     ]
+  },
+  "Professional Stand Mixer": {
+    itemName: "Professional Stand Mixer",
+    itemDescription: "Heavy-duty commercial stand mixer, 20-quart capacity with multiple attachments",
+    category: "Food & Beverage",
+    vendorOptions: [
+      {
+        vendorId: 35,
+        vendorName: "Commercial Kitchen Equipment Co",
+        isPreferred: true,
+        rating: 4.7,
+        priceListNumber: "PL-2024-KITCHEN-001",
+        priceListName: "Commercial Kitchen",
+        unitPrice: 2850.00,
+        currency: "USD",
+        minQuantity: 1,
+        orderUnit: "unit",
+        validFrom: "01/01/2024",
+        validTo: "31/12/2024",
+        leadTime: 7,
+        notes: "Includes dough hook, wire whip, and flat beater"
+      },
+      {
+        vendorId: 36,
+        vendorName: "Professional Bakery Supply",
+        isPreferred: false,
+        rating: 4.5,
+        priceListNumber: "PL-2024-BAKERY-001",
+        priceListName: "Bakery Equipment",
+        unitPrice: 2995.00,
+        currency: "USD",
+        minQuantity: 1,
+        orderUnit: "unit",
+        validFrom: "15/01/2024",
+        validTo: "14/01/2025",
+        leadTime: 10,
+        notes: "Premium model with extended warranty and training"
+      },
+      {
+        vendorId: 37,
+        vendorName: "Industrial Food Equipment Ltd",
+        isPreferred: false,
+        rating: 4.3,
+        priceListNumber: "PL-2024-INDUSTRIAL-001",
+        priceListName: "Industrial Equipment",
+        unitPrice: 2750.00,
+        currency: "EUR",
+        minQuantity: 2,
+        orderUnit: "unit",
+        validFrom: "01/02/2024",
+        validTo: "31/01/2025",
+        leadTime: 14,
+        notes: "Bulk pricing available, European manufacturing"
+      },
+      {
+        vendorId: 38,
+        vendorName: "Chef Solutions Pro",
+        isPreferred: false,
+        rating: 4.8,
+        priceListNumber: "PL-2024-CHEF-PRO-001",
+        priceListName: "Professional Chef Equipment",
+        unitPrice: 3200.00,
+        currency: "USD",
+        minQuantity: 1,
+        orderUnit: "unit",
+        validFrom: "01/01/2024",
+        validTo: "31/12/2024",
+        leadTime: 5,
+        notes: "Top-tier model with advanced speed control and safety features"
+      },
+      {
+        vendorId: 39,
+        vendorName: "Restaurant Equipment Direct",
+        isPreferred: false,
+        rating: 4.1,
+        priceListNumber: "PL-2024-RESTAURANT-001",
+        priceListName: "Restaurant Equipment",
+        unitPrice: 2650.00,
+        currency: "CAD",
+        minQuantity: 1,
+        orderUnit: "unit",
+        validFrom: "01/03/2024",
+        validTo: "28/02/2025",
+        leadTime: 12,
+        notes: "Budget-friendly option with standard attachments"
+      },
+      {
+        vendorId: 40,
+        vendorName: "Hospitality Equipment Specialists",
+        isPreferred: false,
+        rating: 4.6,
+        priceListNumber: "PL-2024-HOSPITALITY-001",
+        priceListName: "Hospitality Equipment",
+        unitPrice: 2925.00,
+        currency: "GBP",
+        minQuantity: 1,
+        orderUnit: "unit",
+        validFrom: "15/01/2024",
+        validTo: "14/01/2025",
+        leadTime: 8,
+        notes: "Includes installation and maintenance package"
+      }
+    ]
   }
 };
 

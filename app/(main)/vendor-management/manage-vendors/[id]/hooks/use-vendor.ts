@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/use-toast'
 import { updateVendor } from '../../actions'
-import { Vendor, EnvironmentalImpact } from '../types'
+import { Vendor } from '../../../types'
+import { mockVendors } from '../../../lib/mock-data'
 
-// No need to extend Vendor since our local type already has environmentalImpact
 type VendorWithEnvironmental = Vendor
 
 export function useVendor(id: string) {
@@ -24,57 +24,8 @@ export function useVendor(id: string) {
         // Mock API call
         await new Promise(resolve => setTimeout(resolve, 1000))
         
-        // Mock vendor data
-        const mockVendor: VendorWithEnvironmental = {
-          id,
-          companyName: 'Acme Corp',
-          businessRegistrationNumber: 'BR123456',
-          taxId: 'TAX123456',
-          establishmentDate: '2000-01-01',
-          businessTypeId: 'BT001',
-          rating: 4.5,
-          isActive: true,
-          addresses: [],
-          contacts: [],
-          certifications: [
-            {
-              id: 'cert1',
-              name: 'ISO 9001',
-              status: 'active',
-              issuer: 'ISO',
-              validUntil: '2025-12-31'
-            }
-          ],
-          environmentalImpact: {
-            carbonFootprint: {
-              value: 2450,
-              unit: 'tCO2e',
-              trend: -12
-            },
-            energyEfficiency: {
-              value: 85,
-              benchmark: 80,
-              trend: 5
-            },
-            wasteReduction: {
-              value: 45,
-              trend: 15
-            },
-            complianceRate: {
-              value: 98,
-              trend: 3
-            },
-            lastUpdated: '2024-03-15',
-            esgScore: 'A+',
-            certifications: [
-              {
-                name: 'ISO 14001',
-                status: 'Active',
-                expiry: '2025-12-31'
-              }
-            ]
-          }
-        }
+        // Use centralized mock data
+        const mockVendor = mockVendors.find(v => v.id === id) || mockVendors[0]
         
         setVendor(mockVendor)
         setError(null)
@@ -98,10 +49,11 @@ export function useVendor(id: string) {
 
     const result = await updateVendor(vendor)
     
-    if (result.error) {
+    if (!result.success) {
+      const errorMessage = typeof result.error === 'string' ? result.error : "Failed to update vendor"
       toast({
         title: "Error",
-        description: result.error,
+        description: errorMessage,
         variant: "destructive"
       })
       return

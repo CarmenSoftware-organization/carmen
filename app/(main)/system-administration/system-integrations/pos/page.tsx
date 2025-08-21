@@ -20,7 +20,10 @@ import {
   XCircle,
   ExternalLink,
   Layers,
-  FileBarChart2
+  FileBarChart2,
+  Pizza,
+  Cake,
+  Package2
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -44,7 +47,11 @@ export default function POSIntegrationPage() {
     lastSync: "Today at 14:32",
     unmappedItems: 12,
     failedTransactions: 3,
-    pendingApprovals: 5
+    pendingApprovals: 5,
+    // Fractional sales data
+    fractionalRecipes: 2,
+    unmappedVariants: 3,
+    fractionalSalesActive: true
   }
   
   return (
@@ -159,6 +166,20 @@ export default function POSIntegrationPage() {
                     <Button size="sm" variant="outline" asChild className="h-7 px-2 text-xs">
                       <Link href="/system-administration/system-integrations/pos/transactions/stock-out-review">
                         Approve
+                      </Link>
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              {systemStatus.unmappedVariants > 0 && (
+                <Alert className="bg-purple-50 border-purple-200">
+                  <Package2 className="h-4 w-4 text-purple-600" />
+                  <AlertDescription className="flex items-center justify-between w-full">
+                    <span>{systemStatus.unmappedVariants} Fractional Sales Variants Need Mapping</span>
+                    <Button size="sm" variant="outline" asChild className="h-7 px-2 text-xs">
+                      <Link href="/system-administration/system-integrations/pos/mapping/recipes/fractional-variants">
+                        Map Variants
                       </Link>
                     </Button>
                   </AlertDescription>
@@ -291,6 +312,32 @@ export default function POSIntegrationPage() {
                 <Button asChild variant="outline" size="sm">
                   <Link href="/system-administration/system-integrations/pos/mapping/locations">
                     Map Locations
+                  </Link>
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium flex items-center gap-2">
+                    <div className="flex items-center -space-x-1">
+                      <Pizza className="h-3 w-3 text-orange-600" />
+                      <Cake className="h-3 w-3 text-pink-600" />
+                    </div>
+                    Fractional Sales Management
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {systemStatus.unmappedVariants > 0 ? (
+                      <span className="text-purple-600 font-medium">{systemStatus.unmappedVariants} variants need mapping</span>
+                    ) : (
+                      `Manage pizza slices, cake portions & multi-yield recipes`
+                    )}
+                  </p>
+                </div>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/system-administration/system-integrations/pos/mapping/recipes/fractional-variants">
+                    Manage Variants
                   </Link>
                 </Button>
               </div>
@@ -516,6 +563,26 @@ export default function POSIntegrationPage() {
                     <Button size="sm" variant="ghost" asChild>
                       <Link href="/system-administration/system-integrations/pos/transactions/stock-out-review">
                         Review
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="text-xs">Today 09:15</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                      <Pizza className="h-3 w-3 mr-1" />
+                      Fractional Sales
+                    </Badge>
+                  </TableCell>
+                  <TableCell>24 pizza slices and 6 cake slices sold - inventory auto-deducted</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Success</Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button size="sm" variant="ghost" asChild>
+                      <Link href="/system-administration/system-integrations/pos/mapping/recipes/fractional-variants">
+                        View Details
                       </Link>
                     </Button>
                   </TableCell>

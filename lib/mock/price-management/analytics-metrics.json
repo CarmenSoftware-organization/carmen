@@ -1,0 +1,136 @@
+{
+  "overviewMetrics": {
+    "totalVendors": 156,
+    "activeVendors": 142,
+    "totalPricelists": 1247,
+    "activePricelists": 1089,
+    "totalPriceItems": 45678,
+    "activePriceItems": 42341,
+    "averageResponseTime": 2.3,
+    "systemUptime": 99.7,
+    "lastUpdated": "2025-01-15T10:30:00Z"
+  },
+  "vendorParticipation": {
+    "totalInvited": 156,
+    "responded": 142,
+    "responseRate": 91.0,
+    "onTime": 128,
+    "onTimeRate": 82.1,
+    "late": 14,
+    "lateRate": 9.0,
+    "noResponse": 14,
+    "noResponseRate": 9.0,
+    "byCategory": [
+      {
+        "categoryId": "cat-001",
+        "categoryName": "Office Supplies",
+        "invited": 25,
+        "responded": 23,
+        "responseRate": 92.0,
+        "onTime": 21,
+        "onTimeRate": 84.0
+      },
+      {
+        "categoryId": "cat-002",
+        "categoryName": "IT Equipment",
+        "invited": 18,
+        "responded": 16,
+        "responseRate": 88.9,
+        "onTime": 14,
+        "onTimeRate": 77.8
+      },
+      {
+        "categoryId": "cat-003",
+        "categoryName": "Cleaning Supplies",
+        "invited": 22,
+        "responded": 20,
+        "responseRate": 90.9,
+        "onTime": 18,
+        "onTimeRate": 81.8
+      },
+      {
+        "categoryId": "cat-004",
+        "categoryName": "Food & Beverages",
+        "invited": 31,
+        "responded": 29,
+        "responseRate": 93.5,
+        "onTime": 26,
+        "onTimeRate": 83.9
+      },
+      {
+        "categoryId": "cat-005",
+        "categoryName": "Maintenance Supplies",
+        "invited": 19,
+        "responded": 17,
+        "responseRate": 89.5,
+        "onTime": 15,
+        "onTimeRate": 78.9
+      }
+    ]
+  },
+  "performanceMetrics": {
+    "priceAssignmentAccuracy": 94.2,
+    "automationRate": 87.5,
+    "manualOverrideRate": 12.5,
+    "averageAssignmentTime": 1.8,
+    "costSavingsGenerated": 245678.90,
+    "timesSaved": 1247,
+    "errorRate": 2.1,
+    "userSatisfactionScore": 4.3,
+    "byTimeRange": {
+      "last7Days": {
+        "totalAssignments": 1247,
+        "successfulAssignments": 1174,
+        "failedAssignments": 73,
+        "averageTime": 1.6,
+        "automationRate": 89.2
+      },
+      "last30Days": {
+        "totalAssignments": 5432,
+        "successfulAssignments": 5118,
+        "failedAssignments": 314,
+        "averageTime": 1.8,
+        "automationRate": 87.5
+      },
+      "last90Days": {
+        "totalAssignments": 16789,
+        "successfulAssignments": 15823,
+        "failedAssignments": 966,
+        "averageTime": 1.9,
+        "automationRate": 86.8
+      }
+    }
+  },
+  "engagementMetrics": {
+    "portalUsage": {
+      "totalSessions": 2847,
+      "uniqueVendors": 142,
+      "averageSessionDuration": 12.5,
+      "bounceRate": 15.2,
+      "completionRate": 84.8,
+      "mobileUsage": 23.4
+    },
+    "submissionMethods": {
+      "portal": {
+        "count": 1089,
+        "percentage": 67.8,
+        "averageTime": 8.2,
+        "errorRate": 1.8
+      },
+      "email": {
+        "count": 517,
+        "percentage": 32.2,
+        "averageTime": 15.6,
+        "errorRate": 4.3
+      }
+    },
+    "vendorSatisfaction": {
+      "overallScore": 4.2,
+      "easeOfUse": 4.1,
+      "systemReliability": 4.4,
+      "supportQuality": 4.0,
+      "responseTime": 4.3,
+      "totalResponses": 89
+    }
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "fallbackScenarios": [
+    {
+      "id": "alternative-vendor-high-priority",
+      "name": "Alternative Vendor Selection - High Priority",
+      "description": "Select alternative vendor when primary assignment fails for high-priority items",
+      "priority": 9,
+      "strategy": {
+        "type": "alternative_vendor",
+        "parameters": {
+          "minRating": 4.0,
+          "requireAvailable": true,
+          "preferredOnly": false,
+          "selectionCriteria": "rating",
+          "maxPriceIncrease": 0.1
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["vendor_unavailable", "price_expired", "capacity_exceeded"],
+        "minVendorsAvailable": 2,
+        "urgencyLevel": "high",
+        "quantityThreshold": 1
+      },
+      "expectedResolutionTime": "30 minutes",
+      "successRate": 0.85
+    },
+    {
+      "id": "manual-review-complex",
+      "name": "Manual Review - Complex Cases",
+      "description": "Queue for manual review when automated assignment fails for complex scenarios",
+      "priority": 7,
+      "strategy": {
+        "type": "manual_review",
+        "parameters": {
+          "reviewTimeoutHours": 4,
+          "assignedTo": "senior-procurement-specialist",
+          "escalationPath": ["procurement-manager", "procurement-director"],
+          "requireApproval": true
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["business_rules_conflict", "multiple_constraints", "custom_requirements"],
+        "minVendorsAvailable": 0,
+        "categoryRestrictions": ["specialized-equipment", "regulated-materials"]
+      },
+      "expectedResolutionTime": "4 hours",
+      "successRate": 0.95
+    },
+    {
+      "id": "price-escalation-budget",
+      "name": "Price Escalation - Budget Override",
+      "description": "Allow price escalation within approved limits when budget constraints prevent assignment",
+      "priority": 6,
+      "strategy": {
+        "type": "price_escalation",
+        "parameters": {
+          "maxPriceIncrease": 0.25,
+          "requireApproval": true,
+          "approvalLevel": "manager",
+          "selectionCriteria": "best_value"
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["budget_exceeded", "price_too_high"],
+        "minVendorsAvailable": 1,
+        "quantityThreshold": 1
+      },
+      "expectedResolutionTime": "2 hours",
+      "successRate": 0.75
+    },
+    {
+      "id": "delayed-assignment-availability",
+      "name": "Delayed Assignment - Vendor Availability",
+      "description": "Delay assignment to wait for vendor availability updates",
+      "priority": 5,
+      "strategy": {
+        "type": "delayed_assignment",
+        "parameters": {
+          "delayHours": 24,
+          "maxRetries": 3,
+          "retryInterval": "daily",
+          "monitorAvailability": true
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["vendor_unavailable", "stock_shortage"],
+        "minVendorsAvailable": 1,
+        "urgencyLevel": "normal"
+      },
+      "expectedResolutionTime": "24 hours",
+      "successRate": 0.70
+    },
+    {
+      "id": "emergency-procurement-urgent",
+      "name": "Emergency Procurement - Urgent Items",
+      "description": "Emergency procurement process for urgent requirements",
+      "priority": 10,
+      "strategy": {
+        "type": "emergency_procurement",
+        "parameters": {
+          "emergencyPremium": 0.20,
+          "expeditedProcessing": true,
+          "approvalLevel": "director",
+          "selectionCriteria": "leadTime"
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["vendor_unavailable", "stock_shortage", "delivery_delay"],
+        "minVendorsAvailable": 1,
+        "urgencyLevel": "urgent"
+      },
+      "expectedResolutionTime": "2 hours",
+      "successRate": 0.90
+    },
+    {
+      "id": "split-order-partial-availability",
+      "name": "Split Order - Partial Availability",
+      "description": "Split order across multiple vendors when no single vendor can fulfill complete requirement",
+      "priority": 4,
+      "strategy": {
+        "type": "split_order",
+        "parameters": {
+          "maxSplits": 3,
+          "minSplitQuantity": 5,
+          "coordinationRequired": true,
+          "selectionCriteria": "balanced"
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["capacity_exceeded", "partial_availability"],
+        "minVendorsAvailable": 2,
+        "quantityThreshold": 10
+      },
+      "expectedResolutionTime": "4 hours",
+      "successRate": 0.80
+    },
+    {
+      "id": "alternative-vendor-standard",
+      "name": "Alternative Vendor Selection - Standard",
+      "description": "Standard alternative vendor selection for routine failures",
+      "priority": 3,
+      "strategy": {
+        "type": "alternative_vendor",
+        "parameters": {
+          "minRating": 3.5,
+          "requireAvailable": false,
+          "preferredOnly": false,
+          "selectionCriteria": "price",
+          "maxPriceIncrease": 0.15
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["vendor_unavailable", "price_expired"],
+        "minVendorsAvailable": 1,
+        "urgencyLevel": "normal"
+      },
+      "expectedResolutionTime": "1 hour",
+      "successRate": 0.75
+    },
+    {
+      "id": "manual-review-standard",
+      "name": "Manual Review - Standard Cases",
+      "description": "Standard manual review for routine assignment failures",
+      "priority": 2,
+      "strategy": {
+        "type": "manual_review",
+        "parameters": {
+          "reviewTimeoutHours": 24,
+          "assignedTo": "procurement-team",
+          "escalationPath": ["procurement-manager"],
+          "requireApproval": false
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["no_vendors_available", "system_error"],
+        "minVendorsAvailable": 0
+      },
+      "expectedResolutionTime": "24 hours",
+      "successRate": 0.90
+    },
+    {
+      "id": "price-escalation-minor",
+      "name": "Price Escalation - Minor Increase",
+      "description": "Minor price escalation for small budget overruns",
+      "priority": 3,
+      "strategy": {
+        "type": "price_escalation",
+        "parameters": {
+          "maxPriceIncrease": 0.10,
+          "requireApproval": false,
+          "approvalLevel": "automatic",
+          "selectionCriteria": "price"
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["budget_exceeded"],
+        "minVendorsAvailable": 1,
+        "quantityThreshold": 1
+      },
+      "expectedResolutionTime": "30 minutes",
+      "successRate": 0.85
+    },
+    {
+      "id": "delayed-assignment-low-priority",
+      "name": "Delayed Assignment - Low Priority",
+      "description": "Extended delay for low priority items to optimize vendor availability",
+      "priority": 1,
+      "strategy": {
+        "type": "delayed_assignment",
+        "parameters": {
+          "delayHours": 72,
+          "maxRetries": 5,
+          "retryInterval": "daily",
+          "monitorAvailability": true
+        }
+      },
+      "triggerConditions": {
+        "failureTypes": ["vendor_unavailable", "price_optimization"],
+        "minVendorsAvailable": 0,
+        "urgencyLevel": "low"
+      },
+      "expectedResolutionTime": "72 hours",
+      "successRate": 0.80
+    }
+  ],
+  "fallbackMetrics": {
+    "totalScenarios": 10,
+    "averageSuccessRate": 0.825,
+    "averageResolutionTime": "12.5 hours",
+    "mostCommonFailureTypes": [
+      "vendor_unavailable",
+      "budget_exceeded",
+      "price_expired",
+      "capacity_exceeded"
+    ],
+    "strategyEffectiveness": {
+      "alternative_vendor": 0.80,
+      "manual_review": 0.92,
+      "price_escalation": 0.80,
+      "delayed_assignment": 0.75,
+      "emergency_procurement": 0.90,
+      "split_order": 0.80
+    }
+  }
+}

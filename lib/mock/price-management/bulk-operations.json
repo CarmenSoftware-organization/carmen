@@ -1,0 +1,296 @@
+{
+  "bulkOperations": [
+    {
+      "id": "bulk-001",
+      "name": "Weekly Office Supplies Assignment",
+      "description": "Bulk assignment for weekly office supplies orders",
+      "type": "assign",
+      "status": "completed",
+      "itemCount": 45,
+      "progress": {
+        "total": 45,
+        "processed": 45,
+        "successful": 42,
+        "failed": 3,
+        "percentage": 100
+      },
+      "results": {
+        "successful": 42,
+        "failed": 3,
+        "successRate": 93.3,
+        "totalValue": 2345.67,
+        "costSavings": 234.56,
+        "details": {
+          "assigned": 42,
+          "skipped": 0,
+          "errors": 3
+        },
+        "failureReasons": [
+          {
+            "reason": "No vendors found",
+            "count": 2,
+            "items": ["item-001", "item-002"]
+          },
+          {
+            "reason": "Price validation failed",
+            "count": 1,
+            "items": ["item-003"]
+          }
+        ]
+      },
+      "parameters": {
+        "queueId": "queue-001",
+        "categories": ["Office Supplies", "Stationery"],
+        "maxPriceThreshold": 500.00,
+        "preferredVendorsOnly": false
+      },
+      "startedAt": "2024-01-15T09:00:00Z",
+      "completedAt": "2024-01-15T09:15:00Z",
+      "duration": "15 minutes",
+      "startedBy": "jane.doe@company.com",
+      "startedByName": "Jane Doe"
+    },
+    {
+      "id": "bulk-002",
+      "name": "IT Equipment Quarterly Assignment",
+      "description": "Quarterly IT equipment price assignments",
+      "type": "assign",
+      "status": "completed",
+      "itemCount": 23,
+      "progress": {
+        "total": 23,
+        "processed": 23,
+        "successful": 19,
+        "failed": 4,
+        "percentage": 100
+      },
+      "results": {
+        "successful": 19,
+        "failed": 4,
+        "successRate": 82.6,
+        "totalValue": 12456.89,
+        "costSavings": 1245.67,
+        "details": {
+          "assigned": 19,
+          "skipped": 0,
+          "errors": 4
+        },
+        "failureReasons": [
+          {
+            "reason": "Vendor capacity exceeded",
+            "count": 2,
+            "items": ["item-004", "item-005"]
+          },
+          {
+            "reason": "Currency conversion error",
+            "count": 2,
+            "items": ["item-006", "item-007"]
+          }
+        ]
+      },
+      "parameters": {
+        "categories": ["IT Equipment", "Software"],
+        "maxPriceThreshold": 2000.00,
+        "preferredVendorsOnly": true,
+        "requireApproval": true
+      },
+      "startedAt": "2024-01-14T14:00:00Z",
+      "completedAt": "2024-01-14T14:25:00Z",
+      "duration": "25 minutes",
+      "startedBy": "mike.wilson@company.com",
+      "startedByName": "Mike Wilson"
+    },
+    {
+      "id": "bulk-003",
+      "name": "Failed Items Retry Batch",
+      "description": "Retry assignment for previously failed items",
+      "type": "retry",
+      "status": "in_progress",
+      "itemCount": 12,
+      "progress": {
+        "total": 12,
+        "processed": 8,
+        "successful": 6,
+        "failed": 2,
+        "percentage": 66.7
+      },
+      "results": null,
+      "parameters": {
+        "itemIds": [
+          "item-008", "item-009", "item-010", "item-011",
+          "item-012", "item-013", "item-014", "item-015",
+          "item-016", "item-017", "item-018", "item-019"
+        ],
+        "retryAttempt": 2,
+        "maxRetries": 3,
+        "delayBetweenRetries": "30 seconds"
+      },
+      "startedAt": "2024-01-15T14:30:00Z",
+      "estimatedCompletion": "2024-01-15T14:45:00Z",
+      "startedBy": "sarah.johnson@company.com",
+      "startedByName": "Sarah Johnson"
+    },
+    {
+      "id": "bulk-004",
+      "name": "High Priority Items Assignment",
+      "description": "Emergency assignment for high priority purchase requests",
+      "type": "prioritize",
+      "status": "queued",
+      "itemCount": 8,
+      "progress": {
+        "total": 8,
+        "processed": 0,
+        "successful": 0,
+        "failed": 0,
+        "percentage": 0
+      },
+      "results": null,
+      "parameters": {
+        "queueId": "queue-002",
+        "urgencyLevel": "high",
+        "maxProcessingTime": "5 minutes",
+        "notifyOnCompletion": true,
+        "escalateFailures": true
+      },
+      "queuedAt": "2024-01-15T15:00:00Z",
+      "estimatedStart": "2024-01-15T15:05:00Z",
+      "startedBy": "admin@company.com",
+      "startedByName": "System Administrator"
+    }
+  ],
+  "operationTemplates": [
+    {
+      "id": "template-001",
+      "name": "Standard Category Assignment",
+      "description": "Standard bulk assignment for specific product categories",
+      "type": "assign",
+      "defaultParameters": {
+        "maxPriceThreshold": 1000.00,
+        "preferredVendorsOnly": false,
+        "requireApproval": false,
+        "notifyOnCompletion": true,
+        "maxConcurrentItems": 50
+      },
+      "applicableQueues": ["queue-001", "queue-002"],
+      "estimatedTimePerItem": "2 minutes",
+      "successRateExpected": 85.0,
+      "createdBy": "system",
+      "isActive": true
+    },
+    {
+      "id": "template-002",
+      "name": "High Value Item Assignment",
+      "description": "Bulk assignment for high-value items requiring approval",
+      "type": "assign",
+      "defaultParameters": {
+        "maxPriceThreshold": 5000.00,
+        "preferredVendorsOnly": true,
+        "requireApproval": true,
+        "notifyOnCompletion": true,
+        "maxConcurrentItems": 20,
+        "approvalWorkflow": "high_value_workflow"
+      },
+      "applicableQueues": ["queue-002"],
+      "estimatedTimePerItem": "5 minutes",
+      "successRateExpected": 75.0,
+      "createdBy": "jane.doe@company.com",
+      "isActive": true
+    },
+    {
+      "id": "template-003",
+      "name": "Failed Items Retry",
+      "description": "Retry assignment for failed items with enhanced logic",
+      "type": "retry",
+      "defaultParameters": {
+        "maxRetries": 3,
+        "delayBetweenRetries": "60 seconds",
+        "useAlternativeVendors": true,
+        "relaxPriceThresholds": true,
+        "notifyOnCompletion": true
+      },
+      "applicableQueues": ["queue-003"],
+      "estimatedTimePerItem": "3 minutes",
+      "successRateExpected": 70.0,
+      "createdBy": "system",
+      "isActive": true
+    }
+  ],
+  "operationMetrics": {
+    "totalOperations": 4,
+    "completedOperations": 2,
+    "inProgressOperations": 1,
+    "queuedOperations": 1,
+    "totalItemsProcessed": 68,
+    "totalSuccessfulAssignments": 61,
+    "overallSuccessRate": 89.7,
+    "averageProcessingTime": "3.2 minutes per item",
+    "totalCostSavings": 1480.23,
+    "lastUpdated": "2024-01-15T15:00:00Z",
+    "performanceByType": {
+      "assign": {
+        "operations": 2,
+        "items": 68,
+        "successRate": 88.2,
+        "averageTime": "2.8 minutes"
+      },
+      "retry": {
+        "operations": 1,
+        "items": 8,
+        "successRate": 75.0,
+        "averageTime": "4.1 minutes"
+      },
+      "prioritize": {
+        "operations": 1,
+        "items": 0,
+        "successRate": null,
+        "averageTime": null
+      }
+    }
+  },
+  "scheduledOperations": [
+    {
+      "id": "scheduled-001",
+      "name": "Daily Office Supplies Auto-Assignment",
+      "description": "Automatically assign prices for daily office supply requests",
+      "type": "assign",
+      "schedule": {
+        "frequency": "daily",
+        "time": "09:00",
+        "timezone": "UTC",
+        "enabled": true
+      },
+      "parameters": {
+        "queueId": "queue-001",
+        "categories": ["Office Supplies"],
+        "maxPriceThreshold": 200.00,
+        "preferredVendorsOnly": false
+      },
+      "lastRun": "2024-01-15T09:00:00Z",
+      "nextRun": "2024-01-16T09:00:00Z",
+      "createdBy": "system",
+      "isActive": true
+    },
+    {
+      "id": "scheduled-002",
+      "name": "Weekly IT Equipment Review",
+      "description": "Weekly review and assignment of IT equipment requests",
+      "type": "assign",
+      "schedule": {
+        "frequency": "weekly",
+        "dayOfWeek": "monday",
+        "time": "08:00",
+        "timezone": "UTC",
+        "enabled": true
+      },
+      "parameters": {
+        "categories": ["IT Equipment", "Software"],
+        "requireApproval": true,
+        "notifyStakeholders": true
+      },
+      "lastRun": "2024-01-15T08:00:00Z",
+      "nextRun": "2024-01-22T08:00:00Z",
+      "createdBy": "mike.wilson@company.com",
+      "isActive": true
+    }
+  ]
+}

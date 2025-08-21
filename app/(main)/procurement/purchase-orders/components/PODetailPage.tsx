@@ -23,7 +23,17 @@ import {
   Download,
   FileText,
   Table as TableIcon,
-  Plus
+  Plus,
+  Calendar as CalendarIcon,
+  Tag as TagIcon,
+  User as UserIcon,
+  Building as BuildingIcon,
+  Truck as TruckIcon,
+  DollarSign as DollarSignIcon,
+  TrendingUp as TrendingUpIcon,
+  CreditCard as CreditCardIcon,
+  FileText as FileTextIcon,
+  MessageSquare as MessageSquareIcon
 } from "lucide-react";
 import DetailPageTemplate from "@/components/templates/DetailPageTemplate";
 import {
@@ -52,11 +62,9 @@ import {
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import ItemsTab from "./tabs/ItemsTab";
+import EnhancedItemsTab from "./tabs/EnhancedItemsTab";
 import FinancialDetailsTab from "./tabs/FinancialDetailsTab";
-import GoodsReceiveNoteTab from "./tabs/GoodsReceiveNoteTab";
 import RelatedDocumentsTab from "./tabs/RelatedDocumentsTab";
-import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import ActivityLogTab from "./tabs/ActivityLogTab";
 import {
   PurchaseOrderItem,
@@ -66,7 +74,7 @@ import {
 } from "@/lib/types";
 import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
 import StatusBadge from "@/components/ui/custom-status-badge";
-import SummaryTotal from "./SummaryTotal";
+import TransactionSummary from "./TransactionSummary";
 
 interface PODetailPageProps {
   params: { id: string }
@@ -81,7 +89,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<PurchaseOrderStatus | null>(null);
   const [statusReason, setStatusReason] = useState("");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [exportFormat, setExportFormat] = useState("pdf");
   const [selectedSections, setSelectedSections] = useState<string[]>([
@@ -414,12 +422,20 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         <ChevronLeft className="h-5 w-5" />
         <span className="sr-only">Back to Purchase Orders</span>
       </Button>
-      <h1 className="text-xl md:text-2xl font-bold">Purchase Order</h1>
+      <div className="flex flex-col">
+        <h1 className="text-xl md:text-2xl font-bold">{poData?.number || 'Purchase Order'}</h1>
+        {poData?.number && poData.number !== 'New PO' && (
+          <p className="text-sm text-muted-foreground mt-1">Purchase Order</p>
+        )}
+      </div>
+      {poData?.status && (
+        <StatusBadge status={poData.status} />
+      )}
     </div>
   );
 
   const actionButtons = (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 items-center">
       {isEditing ? (
         <>
           <Button variant="default" onClick={handleSave}>
@@ -453,9 +469,31 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             <FileDown className="mr-2 h-4 w-4" />
             Export
           </Button>
-
         </>
       )}
+      
+      {/* Panel toggle button */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline" 
+              size="icon" 
+              onClick={toggleSidebar}
+              className="h-9 w-9"
+            >
+              {isSidebarCollapsed ? (
+                <PanelRight className="h-4 w-4" />
+              ) : (
+                <PanelRightClose className="h-4 w-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {isSidebarCollapsed ? "Show panel" : "Hide panel"}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 
@@ -471,99 +509,98 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             <div className={`flex-1 space-y-4 ${isSidebarCollapsed ? 'lg:pr-0' : 'lg:pr-4'}`}>
               {/* Header information */}
               <Card className="bg-white dark:bg-gray-800">
-                <CardHeader className="py-3">
-                  <div className="flex flex-col space-y-2 md:flex-row md:justify-between md:items-start">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 flex-1">
-                      <div>
-                        <Label className="text-xs text-muted-foreground">
-                          PO Number
-                        </Label>
-                        <div className="font-semibold">{poData?.number}</div>
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Date</Label>
-                        {isEditing ? (
-                          <Input
-                            type="date"
-                            name="orderDate"
-                            value={poData?.orderDate?.toISOString().split("T")[0] || ""}
-                            onChange={handleInputChange}
-                            className="w-full"
-                          />
-                        ) : (
-                          <div className="font-semibold">
-                            {poData?.orderDate?.toISOString().split("T")[0] || ""}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Vendor</Label>
-                        {isEditing ? (
-                          <Input
-                            type="text"
-                            name="vendorName"
-                            value={poData?.vendorName || ""}
-                            onChange={handleInputChange}
-                            className="w-full"
-                          />
-                        ) : (
-                          <div className="font-semibold">
-                            {poData?.vendorName || ""}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Status</Label>
-                        <div className="font-semibold">
-                          {isEditing ? (
-                            <Select 
-                              value={poData.status} 
-                              onValueChange={handleStatusChange}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {Object.values(PurchaseOrderStatus).map((status) => (
-                                  <SelectItem key={status} value={status}>
-                                    {status}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <StatusBadge status={poData?.status} />
-                          )}
-                        </div>
-                      </div>
+                <CardHeader className="py-6">
+                  {/* Status Change for Editing Mode */}
+                  {isEditing && (
+                    <div className="mb-6">
+                      <Label className="text-sm text-muted-foreground mb-2 block">Update Status</Label>
+                      <Select 
+                        value={poData.status} 
+                        onValueChange={handleStatusChange}
+                      >
+                        <SelectTrigger className="w-40">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.values(PurchaseOrderStatus).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    
-                    {/* Panel toggle button in header - updated with better icons */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline" 
-                          size="icon" 
-                          onClick={toggleSidebar}
-                          className="hidden lg:flex h-8 w-8 rounded-full ml-4 mt-1"
-                        >
-                          {isSidebarCollapsed ? (
-                            <PanelRight className="h-4 w-4" />
-                          ) : (
-                            <PanelRightClose className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {isSidebarCollapsed ? "Show panel" : "Hide panel"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </CardHeader>
-                <CardContent className="py-2">
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                  )}
+
+                  {/* Key Information Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                     <div>
-                      <Label className="text-xs text-muted-foreground">
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <CalendarIcon className="h-4 w-4" />
+                        Date
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          type="date"
+                          name="orderDate"
+                          value={poData?.orderDate?.toISOString().split("T")[0] || ""}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium">
+                          {poData?.orderDate ? new Date(poData.orderDate).toLocaleDateString('en-GB') : ""}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <TagIcon className="h-4 w-4" />
+                        PO Type
+                      </Label>
+                      <div className="text-gray-900 font-medium">General Purchase</div>
+                    </div>
+                    <div>
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <UserIcon className="h-4 w-4" />
+                        Requestor
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          type="text"
+                          name="buyer"
+                          value={poData?.buyer || ""}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium">{poData?.buyer || ""}</div>
+                      )}
+                    </div>
+                    <div>
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <BuildingIcon className="h-4 w-4" />
+                        Department
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          type="text"
+                          name="vendorName"
+                          value={poData?.vendorName || ""}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium">{poData?.vendorName || "Not specified"}</div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Additional Details Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-6 pt-6 border-t border-gray-200">
+                    <div>
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <TruckIcon className="h-4 w-4" />
                         Delivery Date
                       </Label>
                       {isEditing ? (
@@ -575,13 +612,16 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                           className="w-full"
                         />
                       ) : (
-                        <div className="font-semibold mt-1">
-                          {poData?.DeliveryDate?.toISOString().split("T")[0] || ""}
+                        <div className="text-gray-900 font-medium">
+                          {poData?.DeliveryDate?.toISOString().split("T")[0] || "Not set"}
                         </div>
                       )}
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Currency</Label>
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <DollarSignIcon className="h-4 w-4" />
+                        Currency
+                      </Label>
                       {isEditing ? (
                         <Input 
                           name="currencyCode"
@@ -590,12 +630,13 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                           className="w-full"
                         />
                       ) : (
-                        <div className="font-semibold mt-1">{poData?.currencyCode || ""}</div>
+                        <div className="text-gray-900 font-medium">{poData?.currencyCode || ""}</div>
                       )}
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">
-                        Exch. Rate
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <TrendingUpIcon className="h-4 w-4" />
+                        Exchange Rate
                       </Label>
                       {isEditing ? (
                         <Input 
@@ -607,11 +648,12 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                           className="w-full"
                         />
                       ) : (
-                        <div className="font-semibold mt-1">{poData?.exchangeRate || "1"}</div>
+                        <div className="text-gray-900 font-medium">{poData?.exchangeRate || "1"}</div>
                       )}
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">
+                      <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <CreditCardIcon className="h-4 w-4" />
                         Credit Terms
                       </Label>
                       {isEditing ? (
@@ -622,29 +664,16 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                           className="w-full"
                         />
                       ) : (
-                        <div className="font-semibold mt-1">{poData?.creditTerms || ""}</div>
-                      )}
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">
-                        Buyer
-                      </Label>
-                      {isEditing ? (
-                        <Input 
-                          name="buyer"
-                          value={poData?.buyer || ""}
-                          onChange={handleInputChange}
-                          className="w-full"
-                        />
-                      ) : (
-                        <div className="font-semibold mt-1">{poData?.buyer || ""}</div>
+                        <div className="text-gray-900 font-medium">{poData?.creditTerms || "Not specified"}</div>
                       )}
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                  {/* Description and Remarks Section */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-200">
                     <div>
-                      <Label className="text-xs text-muted-foreground">
+                      <Label className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
+                        <FileTextIcon className="h-4 w-4" />
                         Description
                       </Label>
                       {isEditing ? (
@@ -652,96 +681,81 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                           name="description"
                           value={poData?.description || ""}
                           onChange={(e) => poData && setPOData({ ...poData, description: e.target.value })}
-                          className="w-full h-24"
+                          className="w-full h-20"
+                          placeholder="Add purchase order description..."
                         />
                       ) : (
-                        <div className="font-semibold mt-1 bg-gray-50 p-2 rounded-md h-24 overflow-auto">
-                          {poData?.description || ""}
+                        <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
+                          {poData?.description || "No description"}
                         </div>
                       )}
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Remarks</Label>
+                      <Label className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
+                        <MessageSquareIcon className="h-4 w-4" />
+                        Remarks
+                      </Label>
                       {isEditing ? (
                         <Textarea 
                           name="remarks"
                           value={poData?.remarks || ""}
                           onChange={(e) => poData && setPOData({ ...poData, remarks: e.target.value })}
-                          className="w-full h-24"
+                          className="w-full h-20"
+                          placeholder="Add any additional remarks or notes..."
                         />
                       ) : (
-                        <div className="font-semibold mt-1 bg-gray-50 p-2 rounded-md h-24 overflow-auto">
-                          {poData?.remarks || ""}
+                        <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
+                          {poData?.remarks || "No remarks"}
                         </div>
                       )}
                     </div>
                   </div>
-                </CardContent>
+                </CardHeader>
               </Card>
 
               {/* Tabs */}
               <Card className="bg-white dark:bg-gray-800">
                 <Tabs defaultValue="items" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-gray-700">
+                  <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-700">
                     <TabsTrigger value="items" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                       Items
                     </TabsTrigger>
                     {params.id !== 'new' && (
                       <>
-                        <TabsTrigger value="goodsReceive" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                          Goods Receive
-                        </TabsTrigger>
                         <TabsTrigger value="relatedDocs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                           Documents
-                        </TabsTrigger>
-                        <TabsTrigger value="activityLog" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                          Activity Log
                         </TabsTrigger>
                       </>
                     )}
                   </TabsList>
 
                   <TabsContent value="items" className="p-4">
-                    <ItemsTab
+                    <EnhancedItemsTab
                       poData={poData}
                       onUpdateItem={handleUpdateItem}
                       onDeleteItem={handleDeleteItem}
                       onAddItem={handleAddItem}
+                      onGoodsReceived={(item) => {
+                        // Implement goods received logic
+                        console.log('Goods received for item:', item);
+                      }}
+                      onSplitLine={(item) => {
+                        // Implement split line logic
+                        console.log('Split line for item:', item);
+                      }}
+                      onCancelItem={(item) => {
+                        // Implement cancel item logic
+                        console.log('Cancel item:', item);
+                      }}
+                      editable={isEditing}
                     />
                   </TabsContent>
 
                   {params.id !== 'new' && (
                     <>
-                      <TabsContent value="goodsReceive" className="p-4">
-                        <GoodsReceiveNoteTab poData={poData} />
-                      </TabsContent>
 
                       <TabsContent value="relatedDocs" className="p-4">
                         <RelatedDocumentsTab poData={poData} />
-                      </TabsContent>
-
-                      <TabsContent value="activityLog" className="p-4">
-                        <ActivityLogTab poData={poData} />
-                        
-                        {/* Status History Section */}
-                        {statusHistory.length > 0 && (
-                          <div className="mt-6 border rounded-md p-4">
-                            <h3 className="text-md font-medium mb-3">Status Change History</h3>
-                            <div className="space-y-3">
-                              {statusHistory.map((entry) => (
-                                <div key={entry.id} className="flex justify-between border-b pb-2">
-                                  <div>
-                                    <p className="text-sm">{entry.description}</p>
-                                    <p className="text-xs text-muted-foreground">{entry.userName}</p>
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {entry.timestamp.toLocaleString()}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
                       </TabsContent>
                     </>
                   )}
@@ -750,16 +764,13 @@ export default function PODetailPage({ params }: PODetailPageProps) {
 
               {/* Financial Summary */}
               <Card className="bg-white dark:bg-gray-800">
-                <CardHeader className="py-3">
-                  <CardTitle>Transaction Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="py-2">
-                  <SummaryTotal poData={poData} />
+                <CardContent className="py-6">
+                  <TransactionSummary poData={poData} isEditing={isEditing} />
                 </CardContent>
               </Card>
             </div>
 
-            {/* Sidebar - Comments/Attachments */}
+            {/* Sidebar - Activity Log */}
             <div 
               className={`transition-all duration-300 ease-in-out ${
                 isSidebarCollapsed 
@@ -767,13 +778,13 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                   : 'lg:w-80 opacity-100'
               } space-y-4`}
             >
-              {/* Comments & Attachments */}
+              {/* Activity Log */}
               <Card className="bg-white dark:bg-gray-800">
                 <CardHeader className="py-3">
-                  <CardTitle>Comments & Attachments</CardTitle>
+                  <CardTitle>Activity Log</CardTitle>
                 </CardHeader>
                 <CardContent className="py-2">
-                  {params.id !== 'new' && <CommentsAttachmentsTab poData={poData} />}
+                  {params.id !== 'new' && <ActivityLogTab poData={poData} />}
                 </CardContent>
               </Card>
             </div>

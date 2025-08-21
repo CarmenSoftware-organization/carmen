@@ -1,0 +1,223 @@
+{
+  "priceVersionHistory": [
+    {
+      "id": "version-001",
+      "priceItemId": "price-item-001",
+      "vendorId": "vendor-001",
+      "productId": "product-001",
+      "productName": "Industrial Steel Pipes - 2 inch",
+      "version": 1,
+      "price": 45.50,
+      "currency": "USD",
+      "effectiveDate": "2023-01-01T00:00:00Z",
+      "expirationDate": "2023-12-31T23:59:59Z",
+      "state": "archived",
+      "changeType": "initial",
+      "changeReason": "Initial price setup",
+      "changedBy": "john.doe@company.com",
+      "changedAt": "2022-12-15T10:00:00Z",
+      "previousPrice": null,
+      "priceChange": null,
+      "priceChangePercentage": null
+    },
+    {
+      "id": "version-002",
+      "priceItemId": "price-item-001",
+      "vendorId": "vendor-001",
+      "productId": "product-001",
+      "productName": "Industrial Steel Pipes - 2 inch",
+      "version": 2,
+      "price": 48.75,
+      "currency": "USD",
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "expirationDate": "2024-12-31T23:59:59Z",
+      "state": "active",
+      "changeType": "price_increase",
+      "changeReason": "Raw material cost increase",
+      "changedBy": "jane.smith@vendor001.com",
+      "changedAt": "2023-12-20T14:30:00Z",
+      "previousPrice": 45.50,
+      "priceChange": 3.25,
+      "priceChangePercentage": 7.14
+    },
+    {
+      "id": "version-003",
+      "priceItemId": "price-item-002",
+      "vendorId": "vendor-002",
+      "productId": "product-002",
+      "productName": "Electrical Cables - 12 AWG",
+      "version": 1,
+      "price": 2.85,
+      "currency": "USD",
+      "effectiveDate": "2024-06-01T00:00:00Z",
+      "expirationDate": "2024-08-31T23:59:59Z",
+      "state": "expiring",
+      "changeType": "initial",
+      "changeReason": "New product introduction",
+      "changedBy": "mike.johnson@vendor002.com",
+      "changedAt": "2024-05-15T11:15:00Z",
+      "previousPrice": null,
+      "priceChange": null,
+      "priceChangePercentage": null
+    },
+    {
+      "id": "version-004",
+      "priceItemId": "price-item-003",
+      "vendorId": "vendor-003",
+      "productId": "product-003",
+      "productName": "Safety Helmets - Class E",
+      "version": 1,
+      "price": 35.00,
+      "currency": "USD",
+      "effectiveDate": "2024-03-01T00:00:00Z",
+      "expirationDate": "2024-05-31T23:59:59Z",
+      "state": "expired",
+      "changeType": "initial",
+      "changeReason": "Seasonal pricing",
+      "changedBy": "sarah.wilson@vendor003.com",
+      "changedAt": "2024-02-20T09:45:00Z",
+      "previousPrice": null,
+      "priceChange": null,
+      "priceChangePercentage": null
+    },
+    {
+      "id": "version-005",
+      "priceItemId": "price-item-003",
+      "vendorId": "vendor-003",
+      "productId": "product-003",
+      "productName": "Safety Helmets - Class E",
+      "version": 2,
+      "price": 32.50,
+      "currency": "USD",
+      "effectiveDate": "2024-06-01T00:00:00Z",
+      "expirationDate": "2024-11-30T23:59:59Z",
+      "state": "active",
+      "changeType": "price_decrease",
+      "changeReason": "Volume discount applied",
+      "changedBy": "sarah.wilson@vendor003.com",
+      "changedAt": "2024-05-25T16:20:00Z",
+      "previousPrice": 35.00,
+      "priceChange": -2.50,
+      "priceChangePercentage": -7.14
+    }
+  ],
+  "expirationScenarios": [
+    {
+      "id": "scenario-001",
+      "name": "Standard Expiration",
+      "description": "Normal price expiration with renewal opportunity",
+      "priceItemId": "price-item-002",
+      "currentState": "expiring",
+      "daysUntilExpiration": 15,
+      "expirationDate": "2024-08-31T23:59:59Z",
+      "renewalOptions": [
+        {
+          "type": "auto_renewal",
+          "available": false,
+          "reason": "Vendor disabled auto-renewal"
+        },
+        {
+          "type": "manual_renewal",
+          "available": true,
+          "deadline": "2024-08-25T23:59:59Z"
+        },
+        {
+          "type": "price_negotiation",
+          "available": true,
+          "contactRequired": true
+        }
+      ],
+      "impactAssessment": {
+        "affectedPRs": 3,
+        "totalValue": 15750.00,
+        "alternativeVendors": 2,
+        "riskLevel": "medium"
+      }
+    },
+    {
+      "id": "scenario-002",
+      "name": "Critical Expiration",
+      "description": "Price expiration for critical item with no alternatives",
+      "priceItemId": "price-item-006",
+      "currentState": "expiring",
+      "daysUntilExpiration": 5,
+      "expirationDate": "2024-08-20T23:59:59Z",
+      "renewalOptions": [
+        {
+          "type": "auto_renewal",
+          "available": true,
+          "newExpirationDate": "2025-02-20T23:59:59Z"
+        },
+        {
+          "type": "emergency_extension",
+          "available": true,
+          "maxDays": 30,
+          "requiresApproval": true
+        }
+      ],
+      "impactAssessment": {
+        "affectedPRs": 8,
+        "totalValue": 45200.00,
+        "alternativeVendors": 0,
+        "riskLevel": "high"
+      }
+    },
+    {
+      "id": "scenario-003",
+      "name": "Bulk Expiration",
+      "description": "Multiple prices expiring simultaneously",
+      "priceItemIds": ["price-item-007", "price-item-008", "price-item-009"],
+      "currentState": "expiring",
+      "daysUntilExpiration": 7,
+      "expirationDate": "2024-08-22T23:59:59Z",
+      "renewalOptions": [
+        {
+          "type": "bulk_renewal",
+          "available": true,
+          "discountAvailable": true,
+          "discountPercentage": 5
+        },
+        {
+          "type": "selective_renewal",
+          "available": true,
+          "allowPartialRenewal": true
+        }
+      ],
+      "impactAssessment": {
+        "affectedPRs": 12,
+        "totalValue": 78900.00,
+        "alternativeVendors": 4,
+        "riskLevel": "medium"
+      }
+    },
+    {
+      "id": "scenario-004",
+      "name": "Expired with Grace Period",
+      "description": "Recently expired price with grace period still active",
+      "priceItemId": "price-item-003",
+      "currentState": "expired",
+      "daysSinceExpiration": 3,
+      "expirationDate": "2024-05-31T23:59:59Z",
+      "gracePeriodEnd": "2024-06-07T23:59:59Z",
+      "renewalOptions": [
+        {
+          "type": "grace_period_renewal",
+          "available": true,
+          "penaltyFee": 50.00,
+          "deadline": "2024-06-07T23:59:59Z"
+        },
+        {
+          "type": "new_negotiation",
+          "available": true,
+          "estimatedDays": 14
+        }
+      ],
+      "impactAssessment": {
+        "affectedPRs": 2,
+        "totalValue": 8400.00,
+        "alternativeVendors": 3,
+        "riskLevel": "low"
+      }
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "approvalWorkflows": [
+    {
+      "id": "workflow-001",
+      "name": "Standard Price Override Approval",
+      "description": "Default workflow for price assignment overrides",
+      "type": "price_override",
+      "isActive": true,
+      "steps": [
+        {
+          "stepId": "step-001",
+          "name": "Initial Review",
+          "type": "automatic",
+          "condition": "override_amount < 100",
+          "action": "auto_approve",
+          "timeoutHours": 0
+        },
+        {
+          "stepId": "step-002",
+          "name": "Manager Approval",
+          "type": "manual",
+          "condition": "override_amount >= 100 AND override_amount < 500",
+          "approverRole": "purchasing_manager",
+          "timeoutHours": 24
+        },
+        {
+          "stepId": "step-003",
+          "name": "Director Approval",
+          "type": "manual",
+          "condition": "override_amount >= 500",
+          "approverRole": "procurement_director",
+          "timeoutHours": 48
+        }
+      ],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-10T10:00:00Z"
+    },
+    {
+      "id": "workflow-002",
+      "name": "High Value Item Approval",
+      "description": "Workflow for high-value item assignments",
+      "type": "high_value_assignment",
+      "isActive": true,
+      "steps": [
+        {
+          "stepId": "step-001",
+          "name": "Financial Review",
+          "type": "manual",
+          "condition": "item_value >= 1000",
+          "approverRole": "finance_manager",
+          "timeoutHours": 24
+        },
+        {
+          "stepId": "step-002",
+          "name": "Procurement Approval",
+          "type": "manual",
+          "condition": "always",
+          "approverRole": "procurement_director",
+          "timeoutHours": 48
+        }
+      ],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-05T14:30:00Z"
+    }
+  ],
+  "pendingApprovals": [
+    {
+      "id": "approval-001",
+      "workflowId": "workflow-001",
+      "requestId": "override-001",
+      "requestType": "price_override",
+      "currentStep": "step-002",
+      "stepName": "Manager Approval",
+      "assignedTo": "jane.doe@company.com",
+      "assignedToName": "Jane Doe",
+      "assignedToRole": "purchasing_manager",
+      "submittedBy": "john.smith@company.com",
+      "submittedByName": "John Smith",
+      "submittedAt": "2024-01-15T11:30:00Z",
+      "dueDate": "2024-01-16T11:30:00Z",
+      "priority": "medium",
+      "status": "pending",
+      "details": {
+        "prId": "PR-2024-001",
+        "productName": "Office Paper A4",
+        "originalPrice": 125.00,
+        "overridePrice": 135.00,
+        "overrideAmount": 10.00,
+        "overrideReason": "Better quality and faster delivery",
+        "vendorChange": {
+          "from": "Office Supplies Co",
+          "to": "Premium Office Solutions"
+        }
+      },
+      "history": [
+        {
+          "stepId": "step-001",
+          "stepName": "Initial Review",
+          "action": "escalated",
+          "reason": "Override amount exceeds auto-approval threshold",
+          "processedAt": "2024-01-15T11:31:00Z",
+          "processedBy": "system"
+        }
+      ]
+    },
+    {
+      "id": "approval-002",
+      "workflowId": "workflow-002",
+      "requestId": "assignment-high-001",
+      "requestType": "high_value_assignment",
+      "currentStep": "step-001",
+      "stepName": "Financial Review",
+      "assignedTo": "finance.manager@company.com",
+      "assignedToName": "Robert Chen",
+      "assignedToRole": "finance_manager",
+      "submittedBy": "system",
+      "submittedByName": "Auto Assignment System",
+      "submittedAt": "2024-01-15T14:20:00Z",
+      "dueDate": "2024-01-16T14:20:00Z",
+      "priority": "high",
+      "status": "pending",
+      "details": {
+        "prId": "PR-2024-007",
+        "productName": "Industrial Equipment",
+        "assignedPrice": 2500.00,
+        "assignedVendor": "Heavy Machinery Corp",
+        "itemValue": 2500.00,
+        "justification": "Only qualified vendor for specialized equipment"
+      },
+      "history": []
+    }
+  ],
+  "approvalHistory": [
+    {
+      "id": "approval-003",
+      "workflowId": "workflow-001",
+      "requestId": "override-002",
+      "requestType": "price_override",
+      "finalStatus": "approved",
+      "approvedBy": "jane.doe@company.com",
+      "approvedByName": "Jane Doe",
+      "approvedAt": "2024-01-14T17:15:00Z",
+      "processingTime": "30 minutes",
+      "steps": [
+        {
+          "stepId": "step-001",
+          "stepName": "Initial Review",
+          "action": "escalated",
+          "processedAt": "2024-01-14T16:46:00Z",
+          "processedBy": "system"
+        },
+        {
+          "stepId": "step-002",
+          "stepName": "Manager Approval",
+          "action": "approved",
+          "processedAt": "2024-01-14T17:15:00Z",
+          "processedBy": "jane.doe@company.com",
+          "comments": "Environmental compliance is a valid business requirement"
+        }
+      ]
+    }
+  ],
+  "approvalMetrics": {
+    "totalPendingApprovals": 2,
+    "averageApprovalTime": "4.2 hours",
+    "approvalRate": 85.7,
+    "timeoutRate": 5.2,
+    "escalationRate": 12.3,
+    "byPriority": {
+      "high": 1,
+      "medium": 1,
+      "low": 0
+    },
+    "byType": {
+      "price_override": 1,
+      "high_value_assignment": 1
+    },
+    "lastUpdated": "2024-01-15T15:00:00Z"
+  }
+}

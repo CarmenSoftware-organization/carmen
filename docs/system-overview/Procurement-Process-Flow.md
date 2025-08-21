@@ -374,7 +374,7 @@ The Purchase Order (PO) process follows the approval of Purchase Requests and in
 
 5. **PO Issuance**:
    - Approved POs are sent to vendors
-   - Transmission methods include email, EDI, or vendor portal
+   - Transmission methods include email or vendor portal
    - PO acknowledgment from vendor is recorded
    - Changes after issuance follow a formal amendment process
 

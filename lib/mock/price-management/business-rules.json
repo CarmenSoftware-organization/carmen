@@ -1,0 +1,384 @@
+{
+  "businessRules": [
+    {
+      "id": "rule-001",
+      "name": "Preferred Vendor Priority",
+      "description": "Prioritize preferred vendors for office supplies when quantity is less than 100 units",
+      "priority": 1,
+      "isActive": true,
+      "category": "vendor-selection",
+      "conditions": [
+        {
+          "id": "cond-001",
+          "field": "product.category",
+          "operator": "equals",
+          "value": "office-supplies",
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "cond-002", 
+          "field": "request.quantity",
+          "operator": "lessThan",
+          "value": 100,
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "cond-003",
+          "field": "vendor.isPreferred",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "action-001",
+          "type": "assignVendor",
+          "parameters": {
+            "vendorSelectionMethod": "preferred",
+            "priorityBoost": 10
+          }
+        }
+      ],
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-20T14:45:00Z",
+      "createdBy": "user-001",
+      "lastTriggered": "2024-01-25T09:15:00Z",
+      "triggerCount": 45,
+      "successRate": 92.5
+    },
+    {
+      "id": "rule-002",
+      "name": "Bulk Discount Application",
+      "description": "Apply bulk pricing when quantity exceeds vendor minimum bulk quantity",
+      "priority": 2,
+      "isActive": true,
+      "category": "pricing",
+      "conditions": [
+        {
+          "id": "cond-004",
+          "field": "request.quantity",
+          "operator": "greaterThan",
+          "value": "vendor.bulkMinQuantity",
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "cond-005",
+          "field": "vendor.hasBulkPricing",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "action-002",
+          "type": "setPrice",
+          "parameters": {
+            "priceType": "bulk",
+            "discountPercentage": 15
+          }
+        }
+      ],
+      "createdAt": "2024-01-10T08:20:00Z",
+      "updatedAt": "2024-01-18T16:30:00Z",
+      "createdBy": "user-002",
+      "lastTriggered": "2024-01-24T11:20:00Z",
+      "triggerCount": 28,
+      "successRate": 96.4
+    },
+    {
+      "id": "rule-003",
+      "name": "High Value Manual Review",
+      "description": "Flag items over $5000 for manual review and approval",
+      "priority": 3,
+      "isActive": true,
+      "category": "approval",
+      "conditions": [
+        {
+          "id": "cond-006",
+          "field": "price.total",
+          "operator": "greaterThan",
+          "value": 5000,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "action-003",
+          "type": "flagForReview",
+          "parameters": {
+            "reviewType": "high-value",
+            "approvalRequired": true,
+            "notifyApprovers": true
+          }
+        }
+      ],
+      "createdAt": "2024-01-05T12:00:00Z",
+      "updatedAt": "2024-01-22T10:15:00Z",
+      "createdBy": "user-003",
+      "lastTriggered": "2024-01-23T15:45:00Z",
+      "triggerCount": 12,
+      "successRate": 100
+    },
+    {
+      "id": "rule-004",
+      "name": "Local Vendor Preference",
+      "description": "Prefer local vendors for urgent requests to reduce delivery time",
+      "priority": 4,
+      "isActive": false,
+      "category": "vendor-selection",
+      "conditions": [
+        {
+          "id": "cond-007",
+          "field": "request.urgency",
+          "operator": "equals",
+          "value": "urgent",
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "cond-008",
+          "field": "vendor.location",
+          "operator": "equals",
+          "value": "local",
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "action-004",
+          "type": "assignVendor",
+          "parameters": {
+            "vendorSelectionMethod": "location-based",
+            "maxDistance": 50
+          }
+        }
+      ],
+      "createdAt": "2024-01-12T14:30:00Z",
+      "updatedAt": "2024-01-19T09:45:00Z",
+      "createdBy": "user-001",
+      "lastTriggered": null,
+      "triggerCount": 0,
+      "successRate": 0
+    },
+    {
+      "id": "rule-005",
+      "name": "Multi-Currency Normalization",
+      "description": "Convert all foreign currency prices to USD for comparison",
+      "priority": 5,
+      "isActive": true,
+      "category": "currency",
+      "conditions": [
+        {
+          "id": "cond-009",
+          "field": "price.currency",
+          "operator": "not_equals",
+          "value": "USD",
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "action-005",
+          "type": "convertCurrency",
+          "parameters": {
+            "targetCurrency": "USD",
+            "useCurrentRate": true
+          }
+        }
+      ],
+      "createdAt": "2024-01-08T11:15:00Z",
+      "updatedAt": "2024-01-21T13:20:00Z",
+      "createdBy": "user-002",
+      "lastTriggered": "2024-01-25T08:30:00Z",
+      "triggerCount": 67,
+      "successRate": 98.5
+    }
+  ],
+  "conditionTemplates": [
+    {
+      "id": "template-001",
+      "name": "Product Category",
+      "field": "product.category",
+      "dataType": "string",
+      "operators": ["equals", "not_equals", "in", "not_in"],
+      "description": "Filter by product category",
+      "icon": "tag",
+      "category": "product"
+    },
+    {
+      "id": "template-002",
+      "name": "Request Quantity",
+      "field": "request.quantity",
+      "dataType": "number",
+      "operators": ["equals", "not_equals", "greaterThan", "lessThan", "between"],
+      "description": "Filter by requested quantity",
+      "icon": "hash",
+      "category": "request"
+    },
+    {
+      "id": "template-003",
+      "name": "Vendor Preferred Status",
+      "field": "vendor.isPreferred",
+      "dataType": "boolean",
+      "operators": ["equals"],
+      "description": "Filter by vendor preferred status",
+      "icon": "star",
+      "category": "vendor"
+    },
+    {
+      "id": "template-004",
+      "name": "Price Total",
+      "field": "price.total",
+      "dataType": "number",
+      "operators": ["equals", "not_equals", "greaterThan", "lessThan", "between"],
+      "description": "Filter by total price amount",
+      "icon": "dollar-sign",
+      "category": "price"
+    },
+    {
+      "id": "template-005",
+      "name": "Request Urgency",
+      "field": "request.urgency",
+      "dataType": "string",
+      "operators": ["equals", "not_equals", "in"],
+      "description": "Filter by request urgency level",
+      "icon": "clock",
+      "category": "request"
+    },
+    {
+      "id": "template-006",
+      "name": "Vendor Location",
+      "field": "vendor.location",
+      "dataType": "string",
+      "operators": ["equals", "not_equals", "in", "contains"],
+      "description": "Filter by vendor location",
+      "icon": "map-pin",
+      "category": "vendor"
+    },
+    {
+      "id": "template-007",
+      "name": "Price Currency",
+      "field": "price.currency",
+      "dataType": "string",
+      "operators": ["equals", "not_equals", "in"],
+      "description": "Filter by price currency",
+      "icon": "globe",
+      "category": "price"
+    },
+    {
+      "id": "template-008",
+      "name": "Department",
+      "field": "request.department",
+      "dataType": "string",
+      "operators": ["equals", "not_equals", "in"],
+      "description": "Filter by requesting department",
+      "icon": "building",
+      "category": "request"
+    }
+  ],
+  "actionTemplates": [
+    {
+      "id": "action-template-001",
+      "name": "Assign Vendor",
+      "type": "assignVendor",
+      "description": "Automatically assign a vendor based on criteria",
+      "icon": "user-check",
+      "category": "vendor-selection",
+      "parameters": [
+        {
+          "name": "vendorSelectionMethod",
+          "type": "select",
+          "options": ["preferred", "lowest-price", "location-based", "rating-based"],
+          "required": true,
+          "description": "Method for selecting vendor"
+        },
+        {
+          "name": "priorityBoost",
+          "type": "number",
+          "min": 0,
+          "max": 100,
+          "required": false,
+          "description": "Priority boost percentage"
+        }
+      ]
+    },
+    {
+      "id": "action-template-002",
+      "name": "Set Price",
+      "type": "setPrice",
+      "description": "Set or modify the price based on conditions",
+      "icon": "dollar-sign",
+      "category": "pricing",
+      "parameters": [
+        {
+          "name": "priceType",
+          "type": "select",
+          "options": ["standard", "bulk", "promotional", "custom"],
+          "required": true,
+          "description": "Type of pricing to apply"
+        },
+        {
+          "name": "discountPercentage",
+          "type": "number",
+          "min": 0,
+          "max": 100,
+          "required": false,
+          "description": "Discount percentage to apply"
+        }
+      ]
+    },
+    {
+      "id": "action-template-003",
+      "name": "Flag for Review",
+      "type": "flagForReview",
+      "description": "Flag item for manual review and approval",
+      "icon": "flag",
+      "category": "approval",
+      "parameters": [
+        {
+          "name": "reviewType",
+          "type": "select",
+          "options": ["high-value", "unusual-request", "new-vendor", "policy-exception"],
+          "required": true,
+          "description": "Type of review required"
+        },
+        {
+          "name": "approvalRequired",
+          "type": "boolean",
+          "required": true,
+          "description": "Whether approval is required"
+        },
+        {
+          "name": "notifyApprovers",
+          "type": "boolean",
+          "required": false,
+          "description": "Send notification to approvers"
+        }
+      ]
+    },
+    {
+      "id": "action-template-004",
+      "name": "Convert Currency",
+      "type": "convertCurrency",
+      "description": "Convert price to specified currency",
+      "icon": "refresh-cw",
+      "category": "currency",
+      "parameters": [
+        {
+          "name": "targetCurrency",
+          "type": "select",
+          "options": ["USD", "EUR", "GBP", "CAD", "AUD"],
+          "required": true,
+          "description": "Target currency for conversion"
+        },
+        {
+          "name": "useCurrentRate",
+          "type": "boolean",
+          "required": true,
+          "description": "Use current exchange rate"
+        }
+      ]
+    }
+  ]
+}

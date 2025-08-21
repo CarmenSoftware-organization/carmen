@@ -1,0 +1,448 @@
+{
+  "priceHistory": [
+    {
+      "productId": "prod-001",
+      "productName": "Office Paper A4",
+      "history": [
+        {
+          "date": "2025-01-15T00:00:00Z",
+          "price": 12.50,
+          "currency": "USD",
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2025-01-01T00:00:00Z",
+          "price": 12.50,
+          "currency": "USD",
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "changePercentage": 4.2
+        },
+        {
+          "date": "2024-12-01T00:00:00Z",
+          "price": 12.00,
+          "currency": "USD",
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "changePercentage": -3.2
+        },
+        {
+          "date": "2024-11-01T00:00:00Z",
+          "price": 12.40,
+          "currency": "USD",
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "changePercentage": 1.6
+        },
+        {
+          "date": "2024-10-01T00:00:00Z",
+          "price": 12.20,
+          "currency": "USD",
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "changePercentage": -1.6
+        },
+        {
+          "date": "2024-09-01T00:00:00Z",
+          "price": 12.40,
+          "currency": "USD",
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "changePercentage": 3.3
+        }
+      ]
+    },
+    {
+      "productId": "prod-002",
+      "productName": "Laptop Computer",
+      "history": [
+        {
+          "date": "2025-01-15T00:00:00Z",
+          "price": 1250.00,
+          "currency": "USD",
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2025-01-01T00:00:00Z",
+          "price": 1250.00,
+          "currency": "USD",
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "changePercentage": -4.6
+        },
+        {
+          "date": "2024-12-01T00:00:00Z",
+          "price": 1310.00,
+          "currency": "USD",
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "changePercentage": 2.3
+        },
+        {
+          "date": "2024-11-01T00:00:00Z",
+          "price": 1280.00,
+          "currency": "USD",
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "changePercentage": -1.5
+        },
+        {
+          "date": "2024-10-01T00:00:00Z",
+          "price": 1300.00,
+          "currency": "USD",
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "changePercentage": 8.3
+        },
+        {
+          "date": "2024-09-01T00:00:00Z",
+          "price": 1200.00,
+          "currency": "USD",
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "changePercentage": -5.5
+        }
+      ]
+    },
+    {
+      "productId": "prod-003",
+      "productName": "Industrial Cleaning Supplies",
+      "history": [
+        {
+          "date": "2025-01-16T00:00:00Z",
+          "price": 25.75,
+          "currency": "USD",
+          "vendorId": "vendor-007",
+          "vendorName": "CleanPro Supplies",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2025-01-01T00:00:00Z",
+          "price": 25.75,
+          "currency": "USD",
+          "vendorId": "vendor-007",
+          "vendorName": "CleanPro Supplies",
+          "changePercentage": 3.0
+        },
+        {
+          "date": "2024-12-01T00:00:00Z",
+          "price": 25.00,
+          "currency": "USD",
+          "vendorId": "vendor-007",
+          "vendorName": "CleanPro Supplies",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2024-11-01T00:00:00Z",
+          "price": 25.00,
+          "currency": "USD",
+          "vendorId": "vendor-007",
+          "vendorName": "CleanPro Supplies",
+          "changePercentage": -3.8
+        },
+        {
+          "date": "2024-10-01T00:00:00Z",
+          "price": 26.00,
+          "currency": "USD",
+          "vendorId": "vendor-007",
+          "vendorName": "CleanPro Supplies",
+          "changePercentage": 4.0
+        },
+        {
+          "date": "2024-09-01T00:00:00Z",
+          "price": 25.00,
+          "currency": "USD",
+          "vendorId": "vendor-007",
+          "vendorName": "CleanPro Supplies",
+          "changePercentage": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "prod-004",
+      "productName": "Safety Equipment - Hard Hats",
+      "history": [
+        {
+          "date": "2025-01-17T00:00:00Z",
+          "price": 45.00,
+          "currency": "USD",
+          "vendorId": "vendor-010",
+          "vendorName": "Safety First Ltd",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2025-01-01T00:00:00Z",
+          "price": 45.00,
+          "currency": "USD",
+          "vendorId": "vendor-010",
+          "vendorName": "Safety First Ltd",
+          "changePercentage": 12.5
+        },
+        {
+          "date": "2024-12-01T00:00:00Z",
+          "price": 40.00,
+          "currency": "USD",
+          "vendorId": "vendor-010",
+          "vendorName": "Safety First Ltd",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2024-11-01T00:00:00Z",
+          "price": 40.00,
+          "currency": "USD",
+          "vendorId": "vendor-010",
+          "vendorName": "Safety First Ltd",
+          "changePercentage": -4.8
+        },
+        {
+          "date": "2024-10-01T00:00:00Z",
+          "price": 42.00,
+          "currency": "USD",
+          "vendorId": "vendor-010",
+          "vendorName": "Safety First Ltd",
+          "changePercentage": 5.0
+        }
+      ]
+    },
+    {
+      "productId": "prod-005",
+      "productName": "Raw Materials - Steel Sheets",
+      "history": [
+        {
+          "date": "2025-01-17T00:00:00Z",
+          "price": 85.50,
+          "currency": "USD",
+          "vendorId": "vendor-012",
+          "vendorName": "Steel Dynamics Inc.",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2025-01-10T00:00:00Z",
+          "price": 85.50,
+          "currency": "USD",
+          "vendorId": "vendor-012",
+          "vendorName": "Steel Dynamics Inc.",
+          "changePercentage": 9.3
+        },
+        {
+          "date": "2025-01-01T00:00:00Z",
+          "price": 78.20,
+          "currency": "USD",
+          "vendorId": "vendor-013",
+          "vendorName": "Metal Works Ltd",
+          "changePercentage": -2.5
+        },
+        {
+          "date": "2024-12-15T00:00:00Z",
+          "price": 80.20,
+          "currency": "USD",
+          "vendorId": "vendor-013",
+          "vendorName": "Metal Works Ltd",
+          "changePercentage": 6.8
+        },
+        {
+          "date": "2024-12-01T00:00:00Z",
+          "price": 75.10,
+          "currency": "USD",
+          "vendorId": "vendor-013",
+          "vendorName": "Metal Works Ltd",
+          "changePercentage": -8.2
+        },
+        {
+          "date": "2024-11-01T00:00:00Z",
+          "price": 81.80,
+          "currency": "USD",
+          "vendorId": "vendor-014",
+          "vendorName": "Industrial Metals Co.",
+          "changePercentage": 4.5
+        }
+      ]
+    },
+    {
+      "productId": "prod-006",
+      "productName": "Medical Supplies - Surgical Masks",
+      "history": [
+        {
+          "date": "2025-01-18T00:00:00Z",
+          "price": 0.85,
+          "currency": "USD",
+          "vendorId": "vendor-015",
+          "vendorName": "MedSupply International",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2025-01-01T00:00:00Z",
+          "price": 0.85,
+          "currency": "USD",
+          "vendorId": "vendor-015",
+          "vendorName": "MedSupply International",
+          "changePercentage": -10.5
+        },
+        {
+          "date": "2024-12-01T00:00:00Z",
+          "price": 0.95,
+          "currency": "USD",
+          "vendorId": "vendor-015",
+          "vendorName": "MedSupply International",
+          "changePercentage": -5.0
+        },
+        {
+          "date": "2024-11-01T00:00:00Z",
+          "price": 1.00,
+          "currency": "USD",
+          "vendorId": "vendor-015",
+          "vendorName": "MedSupply International",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2024-10-01T00:00:00Z",
+          "price": 1.00,
+          "currency": "USD",
+          "vendorId": "vendor-015",
+          "vendorName": "MedSupply International",
+          "changePercentage": -16.7
+        },
+        {
+          "date": "2024-09-01T00:00:00Z",
+          "price": 1.20,
+          "currency": "USD",
+          "vendorId": "vendor-015",
+          "vendorName": "MedSupply International",
+          "changePercentage": -20.0
+        }
+      ]
+    },
+    {
+      "productId": "prod-007",
+      "productName": "Multi-Currency Item - European Components",
+      "history": [
+        {
+          "date": "2025-01-19T00:00:00Z",
+          "price": 35.20,
+          "currency": "EUR",
+          "vendorId": "vendor-018",
+          "vendorName": "EuroTech Components",
+          "changePercentage": 0.0
+        },
+        {
+          "date": "2025-01-01T00:00:00Z",
+          "price": 35.20,
+          "currency": "EUR",
+          "vendorId": "vendor-018",
+          "vendorName": "EuroTech Components",
+          "changePercentage": 2.9
+        },
+        {
+          "date": "2024-12-01T00:00:00Z",
+          "price": 34.20,
+          "currency": "EUR",
+          "vendorId": "vendor-018",
+          "vendorName": "EuroTech Components",
+          "changePercentage": -1.4
+        },
+        {
+          "date": "2024-11-01T00:00:00Z",
+          "price": 34.70,
+          "currency": "EUR",
+          "vendorId": "vendor-018",
+          "vendorName": "EuroTech Components",
+          "changePercentage": 3.6
+        },
+        {
+          "date": "2024-10-01T00:00:00Z",
+          "price": 33.50,
+          "currency": "EUR",
+          "vendorId": "vendor-018",
+          "vendorName": "EuroTech Components",
+          "changePercentage": -2.3
+        }
+      ]
+    }
+  ],
+  "vendorComparisons": [
+    {
+      "productId": "prod-001",
+      "productName": "Office Paper A4",
+      "date": "2025-01-15T00:00:00Z",
+      "vendors": [
+        {
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "price": 12.50,
+          "currency": "USD",
+          "availability": "available",
+          "leadTime": 2,
+          "rating": 4.5,
+          "isPreferred": true,
+          "minQuantity": 1
+        },
+        {
+          "vendorId": "vendor-002",
+          "vendorName": "Paper World Ltd",
+          "price": 13.20,
+          "currency": "USD",
+          "availability": "available",
+          "leadTime": 3,
+          "rating": 4.2,
+          "isPreferred": false,
+          "minQuantity": 50
+        },
+        {
+          "vendorId": "vendor-003",
+          "vendorName": "Stationery Plus",
+          "price": 11.80,
+          "currency": "USD",
+          "availability": "limited",
+          "leadTime": 7,
+          "rating": 3.8,
+          "isPreferred": false,
+          "minQuantity": 200
+        }
+      ]
+    },
+    {
+      "productId": "prod-002",
+      "productName": "Laptop Computer",
+      "date": "2025-01-15T00:00:00Z",
+      "vendors": [
+        {
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "price": 1250.00,
+          "currency": "USD",
+          "availability": "available",
+          "leadTime": 4,
+          "rating": 4.8,
+          "isPreferred": true,
+          "minQuantity": 1
+        },
+        {
+          "vendorId": "vendor-005",
+          "vendorName": "Computer World",
+          "price": 1180.00,
+          "currency": "USD",
+          "availability": "available",
+          "leadTime": 5,
+          "rating": 4.3,
+          "isPreferred": false,
+          "minQuantity": 1
+        },
+        {
+          "vendorId": "vendor-006",
+          "vendorName": "Electronics Hub",
+          "price": 1320.00,
+          "currency": "USD",
+          "availability": "available",
+          "leadTime": 3,
+          "rating": 4.6,
+          "isPreferred": false,
+          "minQuantity": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,348 @@
+{
+  "statusIndicators": [
+    {
+      "id": "active",
+      "name": "Active",
+      "description": "Price is currently valid and in use",
+      "color": "#10B981",
+      "backgroundColor": "#F0FDF4",
+      "icon": "check-circle",
+      "priority": 1,
+      "displayText": "Active",
+      "badgeVariant": "success",
+      "allowedTransitions": ["expiring", "suspended", "cancelled"],
+      "requiresAction": false
+    },
+    {
+      "id": "expiring",
+      "name": "Expiring Soon",
+      "description": "Price will expire within the warning period",
+      "color": "#F97316",
+      "backgroundColor": "#FFF7ED",
+      "icon": "clock",
+      "priority": 2,
+      "displayText": "Expiring",
+      "badgeVariant": "warning",
+      "allowedTransitions": ["expired", "renewed", "extended"],
+      "requiresAction": true,
+      "actionText": "Renew Price",
+      "urgencyLevel": "medium"
+    },
+    {
+      "id": "expired",
+      "name": "Expired",
+      "description": "Price validity period has ended",
+      "color": "#EF4444",
+      "backgroundColor": "#FEF2F2",
+      "icon": "x-circle",
+      "priority": 3,
+      "displayText": "Expired",
+      "badgeVariant": "destructive",
+      "allowedTransitions": ["renewed", "archived"],
+      "requiresAction": true,
+      "actionText": "Renew or Archive",
+      "urgencyLevel": "high"
+    },
+    {
+      "id": "grace_period",
+      "name": "Grace Period",
+      "description": "Price has expired but is within grace period",
+      "color": "#F59E0B",
+      "backgroundColor": "#FFFBEB",
+      "icon": "exclamation-triangle",
+      "priority": 4,
+      "displayText": "Grace Period",
+      "badgeVariant": "warning",
+      "allowedTransitions": ["renewed", "archived"],
+      "requiresAction": true,
+      "actionText": "Urgent Renewal Required",
+      "urgencyLevel": "high"
+    },
+    {
+      "id": "suspended",
+      "name": "Suspended",
+      "description": "Price is temporarily inactive",
+      "color": "#8B5CF6",
+      "backgroundColor": "#FAF5FF",
+      "icon": "pause",
+      "priority": 5,
+      "displayText": "Suspended",
+      "badgeVariant": "secondary",
+      "allowedTransitions": ["active", "cancelled"],
+      "requiresAction": true,
+      "actionText": "Review Suspension",
+      "urgencyLevel": "medium"
+    },
+    {
+      "id": "pending_approval",
+      "name": "Pending Approval",
+      "description": "Price is awaiting approval before becoming active",
+      "color": "#6366F1",
+      "backgroundColor": "#F0F9FF",
+      "icon": "clock",
+      "priority": 6,
+      "displayText": "Pending",
+      "badgeVariant": "secondary",
+      "allowedTransitions": ["active", "rejected"],
+      "requiresAction": true,
+      "actionText": "Approve Price",
+      "urgencyLevel": "low"
+    },
+    {
+      "id": "rejected",
+      "name": "Rejected",
+      "description": "Price submission was rejected",
+      "color": "#DC2626",
+      "backgroundColor": "#FEF2F2",
+      "icon": "x-circle",
+      "priority": 7,
+      "displayText": "Rejected",
+      "badgeVariant": "destructive",
+      "allowedTransitions": ["draft", "cancelled"],
+      "requiresAction": true,
+      "actionText": "Revise and Resubmit",
+      "urgencyLevel": "medium"
+    },
+    {
+      "id": "draft",
+      "name": "Draft",
+      "description": "Price is being prepared but not yet submitted",
+      "color": "#6B7280",
+      "backgroundColor": "#F9FAFB",
+      "icon": "document",
+      "priority": 8,
+      "displayText": "Draft",
+      "badgeVariant": "outline",
+      "allowedTransitions": ["pending_approval", "cancelled"],
+      "requiresAction": false
+    },
+    {
+      "id": "archived",
+      "name": "Archived",
+      "description": "Price is archived for historical reference only",
+      "color": "#9CA3AF",
+      "backgroundColor": "#F9FAFB",
+      "icon": "archive",
+      "priority": 9,
+      "displayText": "Archived",
+      "badgeVariant": "outline",
+      "allowedTransitions": [],
+      "requiresAction": false
+    }
+  ],
+  "priceStatusData": [
+    {
+      "priceItemId": "price-item-001",
+      "productName": "Industrial Steel Pipes - 2 inch",
+      "vendorName": "Steel Solutions Inc",
+      "currentStatus": "active",
+      "statusHistory": [
+        {
+          "status": "draft",
+          "timestamp": "2023-12-10T10:00:00Z",
+          "changedBy": "john.doe@company.com",
+          "reason": "Initial price creation"
+        },
+        {
+          "status": "pending_approval",
+          "timestamp": "2023-12-15T14:30:00Z",
+          "changedBy": "john.doe@company.com",
+          "reason": "Submitted for approval"
+        },
+        {
+          "status": "active",
+          "timestamp": "2024-01-01T00:00:00Z",
+          "changedBy": "manager@company.com",
+          "reason": "Approved and activated"
+        }
+      ],
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "expirationDate": "2024-12-31T23:59:59Z",
+      "daysUntilExpiration": 137,
+      "warningThreshold": 30,
+      "isInWarningPeriod": false,
+      "autoRenewal": true,
+      "lastStatusCheck": "2024-08-15T12:00:00Z"
+    },
+    {
+      "priceItemId": "price-item-002",
+      "productName": "Electrical Cables - 12 AWG",
+      "vendorName": "ElectroSupply Corp",
+      "currentStatus": "expiring",
+      "statusHistory": [
+        {
+          "status": "active",
+          "timestamp": "2024-06-01T00:00:00Z",
+          "changedBy": "system",
+          "reason": "Auto-activated after approval"
+        },
+        {
+          "status": "expiring",
+          "timestamp": "2024-08-16T00:00:00Z",
+          "changedBy": "system",
+          "reason": "Entered warning period (15 days remaining)"
+        }
+      ],
+      "effectiveDate": "2024-06-01T00:00:00Z",
+      "expirationDate": "2024-08-31T23:59:59Z",
+      "daysUntilExpiration": 15,
+      "warningThreshold": 15,
+      "isInWarningPeriod": true,
+      "autoRenewal": false,
+      "renewalNotificationSent": true,
+      "renewalNotificationDate": "2024-08-16T09:00:00Z",
+      "lastStatusCheck": "2024-08-15T12:00:00Z"
+    },
+    {
+      "priceItemId": "price-item-003",
+      "productName": "Safety Helmets - Class E",
+      "vendorName": "Safety First Equipment",
+      "currentStatus": "grace_period",
+      "statusHistory": [
+        {
+          "status": "active",
+          "timestamp": "2024-03-01T00:00:00Z",
+          "changedBy": "system",
+          "reason": "Auto-activated"
+        },
+        {
+          "status": "expiring",
+          "timestamp": "2024-05-01T00:00:00Z",
+          "changedBy": "system",
+          "reason": "Entered warning period"
+        },
+        {
+          "status": "expired",
+          "timestamp": "2024-06-01T00:00:00Z",
+          "changedBy": "system",
+          "reason": "Reached expiration date"
+        },
+        {
+          "status": "grace_period",
+          "timestamp": "2024-06-01T00:00:01Z",
+          "changedBy": "system",
+          "reason": "Entered 7-day grace period"
+        }
+      ],
+      "effectiveDate": "2024-03-01T00:00:00Z",
+      "expirationDate": "2024-05-31T23:59:59Z",
+      "daysSinceExpiration": 76,
+      "gracePeriodEnd": "2024-06-07T23:59:59Z",
+      "gracePeriodExpired": true,
+      "warningThreshold": 30,
+      "autoRenewal": false,
+      "lastStatusCheck": "2024-08-15T12:00:00Z"
+    },
+    {
+      "priceItemId": "price-item-004",
+      "productName": "Hydraulic Pumps - 5HP",
+      "vendorName": "Hydraulic Systems Ltd",
+      "currentStatus": "active",
+      "statusHistory": [
+        {
+          "status": "draft",
+          "timestamp": "2024-08-15T10:00:00Z",
+          "changedBy": "sarah.wilson@company.com",
+          "reason": "New price entry"
+        },
+        {
+          "status": "pending_approval",
+          "timestamp": "2024-08-20T14:00:00Z",
+          "changedBy": "sarah.wilson@company.com",
+          "reason": "Submitted for approval"
+        },
+        {
+          "status": "active",
+          "timestamp": "2024-09-01T00:00:00Z",
+          "changedBy": "manager@company.com",
+          "reason": "Approved and activated"
+        }
+      ],
+      "effectiveDate": "2024-09-01T00:00:00Z",
+      "expirationDate": "2025-02-28T23:59:59Z",
+      "daysUntilExpiration": 196,
+      "warningThreshold": 45,
+      "isInWarningPeriod": false,
+      "autoRenewal": true,
+      "lastStatusCheck": "2024-08-15T12:00:00Z"
+    },
+    {
+      "priceItemId": "price-item-005",
+      "productName": "Industrial Bearings - SKF 6205",
+      "vendorName": "Bearing Specialists Inc",
+      "currentStatus": "suspended",
+      "statusHistory": [
+        {
+          "status": "active",
+          "timestamp": "2024-07-01T00:00:00Z",
+          "changedBy": "system",
+          "reason": "Auto-activated"
+        },
+        {
+          "status": "suspended",
+          "timestamp": "2024-07-25T15:30:00Z",
+          "changedBy": "quality.manager@company.com",
+          "reason": "Quality issues reported with recent deliveries"
+        }
+      ],
+      "effectiveDate": "2024-07-01T00:00:00Z",
+      "expirationDate": "2024-12-31T23:59:59Z",
+      "daysUntilExpiration": 137,
+      "warningThreshold": 30,
+      "suspensionReason": "Quality issues reported with recent deliveries",
+      "suspensionDate": "2024-07-25T15:30:00Z",
+      "suspensionReviewDate": "2024-08-25T00:00:00Z",
+      "autoRenewal": false,
+      "lastStatusCheck": "2024-08-15T12:00:00Z"
+    },
+    {
+      "priceItemId": "price-item-006",
+      "productName": "Copper Fittings - 1/2 inch",
+      "vendorName": "Plumbing Supplies Plus",
+      "currentStatus": "pending_approval",
+      "statusHistory": [
+        {
+          "status": "draft",
+          "timestamp": "2024-08-10T09:00:00Z",
+          "changedBy": "mike.johnson@vendor.com",
+          "reason": "New price submission"
+        },
+        {
+          "status": "pending_approval",
+          "timestamp": "2024-08-12T11:30:00Z",
+          "changedBy": "mike.johnson@vendor.com",
+          "reason": "Submitted for approval"
+        }
+      ],
+      "effectiveDate": "2024-09-01T00:00:00Z",
+      "expirationDate": "2025-03-01T23:59:59Z",
+      "submissionDate": "2024-08-12T11:30:00Z",
+      "pendingDays": 3,
+      "approvalDeadline": "2024-08-19T23:59:59Z",
+      "warningThreshold": 30,
+      "autoRenewal": true,
+      "lastStatusCheck": "2024-08-15T12:00:00Z"
+    }
+  ],
+  "statusMetrics": {
+    "totalPrices": 6,
+    "statusCounts": {
+      "active": 2,
+      "expiring": 1,
+      "expired": 0,
+      "grace_period": 1,
+      "suspended": 1,
+      "pending_approval": 1,
+      "rejected": 0,
+      "draft": 0,
+      "archived": 0
+    },
+    "requiresActionCount": 4,
+    "highUrgencyCount": 1,
+    "mediumUrgencyCount": 2,
+    "lowUrgencyCount": 1,
+    "autoRenewalEnabled": 3,
+    "averageDaysUntilExpiration": 137.2,
+    "lastUpdated": "2024-08-15T12:00:00Z"
+  }
+}

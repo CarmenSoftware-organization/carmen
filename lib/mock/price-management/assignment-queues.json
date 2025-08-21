@@ -1,0 +1,125 @@
+{
+  "assignmentQueues": [
+    {
+      "id": "queue-001",
+      "name": "Pending Auto-Assignment",
+      "description": "PR items waiting for automatic price assignment",
+      "status": "active",
+      "priority": "high",
+      "itemCount": 24,
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T14:30:00Z",
+      "items": [
+        {
+          "id": "pr-item-001",
+          "prId": "PR-2024-001",
+          "productId": "PROD-001",
+          "productName": "Office Paper A4",
+          "category": "Office Supplies",
+          "quantity": 500,
+          "requestedBy": "John Smith",
+          "department": "Administration",
+          "urgency": "medium",
+          "estimatedValue": 125.00,
+          "currency": "USD",
+          "status": "pending_assignment",
+          "queuedAt": "2024-01-15T09:15:00Z",
+          "availableVendors": 3,
+          "lastAttempt": "2024-01-15T10:30:00Z",
+          "attemptCount": 2,
+          "failureReason": "Multiple vendors with same price"
+        },
+        {
+          "id": "pr-item-002",
+          "prId": "PR-2024-002",
+          "productId": "PROD-002",
+          "productName": "Laptop Dell Inspiron",
+          "category": "IT Equipment",
+          "quantity": 1,
+          "requestedBy": "Sarah Johnson",
+          "department": "IT",
+          "urgency": "high",
+          "estimatedValue": 899.00,
+          "currency": "USD",
+          "status": "pending_assignment",
+          "queuedAt": "2024-01-15T11:20:00Z",
+          "availableVendors": 2,
+          "lastAttempt": "2024-01-15T12:00:00Z",
+          "attemptCount": 1,
+          "failureReason": "Price validation required"
+        }
+      ]
+    },
+    {
+      "id": "queue-002",
+      "name": "Manual Review Required",
+      "description": "Items requiring manual intervention",
+      "status": "active",
+      "priority": "medium",
+      "itemCount": 8,
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T13:45:00Z",
+      "items": [
+        {
+          "id": "pr-item-003",
+          "prId": "PR-2024-003",
+          "productId": "PROD-003",
+          "productName": "Industrial Printer",
+          "category": "Equipment",
+          "quantity": 1,
+          "requestedBy": "Mike Wilson",
+          "department": "Production",
+          "urgency": "low",
+          "estimatedValue": 2500.00,
+          "currency": "USD",
+          "status": "manual_review",
+          "queuedAt": "2024-01-15T08:30:00Z",
+          "availableVendors": 1,
+          "reviewReason": "High value item requires approval",
+          "assignedReviewer": "Jane Doe"
+        }
+      ]
+    },
+    {
+      "id": "queue-003",
+      "name": "Failed Assignments",
+      "description": "Items where automatic assignment failed",
+      "status": "active",
+      "priority": "high",
+      "itemCount": 5,
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T15:00:00Z",
+      "items": [
+        {
+          "id": "pr-item-004",
+          "prId": "PR-2024-004",
+          "productId": "PROD-004",
+          "productName": "Specialized Software License",
+          "category": "Software",
+          "quantity": 10,
+          "requestedBy": "Tom Brown",
+          "department": "Development",
+          "urgency": "medium",
+          "estimatedValue": 1200.00,
+          "currency": "USD",
+          "status": "assignment_failed",
+          "queuedAt": "2024-01-15T09:00:00Z",
+          "availableVendors": 0,
+          "failureReason": "No vendors found for this category",
+          "lastAttempt": "2024-01-15T14:30:00Z",
+          "attemptCount": 3
+        }
+      ]
+    }
+  ],
+  "queueSummary": {
+    "totalQueues": 3,
+    "totalItems": 37,
+    "pendingAssignment": 24,
+    "manualReview": 8,
+    "failedAssignment": 5,
+    "averageProcessingTime": "2.5 hours",
+    "successRate": 87.5,
+    "lastUpdated": "2024-01-15T15:00:00Z"
+  }
+}

@@ -27,6 +27,8 @@ export function NewItemRow({ onSave, onCancel, locations, products, units, showP
     currency: "USD",
     status: "Pending",
     comment: "",
+    deliveryDate: null,
+    deliveryPoint: "",
   });
   
   // Mock inventory info for new items (in real app, this would come from API based on selected product)
@@ -65,7 +67,12 @@ export function NewItemRow({ onSave, onCancel, locations, products, units, showP
         </TableCell>
         {/* Row number column */}
         <TableCell className="text-center">
-          <span className="text-sm font-medium text-green-600">New</span>
+          <div className="flex items-center justify-center gap-1">
+            <div className="h-6 w-6 p-0 rounded-md bg-green-50 border border-green-200 flex items-center justify-center">
+              <div className="h-2 w-2 bg-green-500 rounded-full" />
+            </div>
+            <span className="text-sm font-medium text-green-600 min-w-[24px]">New</span>
+          </div>
         </TableCell>
         {/* Location & Status column */}
         <TableCell>
@@ -99,46 +106,91 @@ export function NewItemRow({ onSave, onCancel, locations, products, units, showP
         </TableCell>
         {/* Requested column */}
         <TableCell className="text-center">
-          <div className="flex items-center gap-2 justify-center">
-            <Input
-              type="number"
-              step="0.00001"
-              placeholder="0.00000"
-              className="w-24 text-right"
-              value={newItem.quantityRequested?.toFixed(5) || ""}
-              onChange={(e) => handleInputChange("quantityRequested", parseFloat(e.target.value))}
-            />
-            <Select value={newItem.unit || ""} onValueChange={(value) => handleInputChange("unit", value)}>
-              <SelectTrigger className="w-20">
-                <SelectValue placeholder="Unit" />
-              </SelectTrigger>
-              <SelectContent>
-                {units.map((unit) => (
-                  <SelectItem key={unit} value={unit}>
-                    {unit}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col items-center justify-center space-y-1">
+            <div className="flex items-center gap-2 justify-center">
+              <Input
+                type="number"
+                step="0.00001"
+                placeholder="0.00000"
+                className="w-24 text-right"
+                value={newItem.quantityRequested?.toFixed(5) || ""}
+                onChange={(e) => handleInputChange("quantityRequested", parseFloat(e.target.value))}
+              />
+              <Select value={newItem.unit || ""} onValueChange={(value) => handleInputChange("unit", value)}>
+                <SelectTrigger className="w-20">
+                  <SelectValue placeholder="Unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {units.map((unit) => (
+                    <SelectItem key={unit} value={unit}>
+                      {unit}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Prototype conversion display - would show if units differ from inventory */}
+            {newItem.quantityRequested && newItem.unit && mockInventoryInfo.inventoryUnit && 
+             newItem.unit !== mockInventoryInfo.inventoryUnit && (
+              <div className="text-xs text-muted-foreground text-center">
+                (≈ {(newItem.quantityRequested * 12).toLocaleString()} {mockInventoryInfo.inventoryUnit})
+              </div>
+            )}
           </div>
         </TableCell>
         {/* Approved column */}
         <TableCell className="text-center">
           <span className="text-xs text-gray-400 italic">Pending</span>
         </TableCell>
+        {/* Date Required column */}
+        <TableCell className="text-center">
+          <Input
+            type="date"
+            placeholder="Select date"
+            className="w-32 text-center text-xs"
+            value={newItem.deliveryDate ? new Date(newItem.deliveryDate).toISOString().split('T')[0] : ""}
+            onChange={(e) => handleInputChange("deliveryDate", e.target.value ? new Date(e.target.value) : null)}
+          />
+        </TableCell>
+        {/* Delivery Point column */}
+        <TableCell className="text-center">
+          <Input
+            placeholder="Delivery point"
+            className="w-36 text-center text-xs"
+            value={newItem.deliveryPoint || ""}
+            onChange={(e) => handleInputChange("deliveryPoint", e.target.value)}
+          />
+        </TableCell>
         {/* Pricing column (only show for non-requestors) */}
         {showPricing && (
           <TableCell className="text-right">
-            <Input
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              className="w-28 text-right"
-              value={newItem.price ? newItem.price.toFixed(2) : ""}
-              onChange={(e) => handleInputChange("price", parseFloat(e.target.value))}
-            />
+            <div className="flex flex-col items-end justify-center space-y-1">
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                className="w-28 text-right"
+                value={newItem.price ? newItem.price.toFixed(2) : ""}
+                onChange={(e) => handleInputChange("price", parseFloat(e.target.value))}
+              />
+              {/* Prototype currency conversion display - would show if currency differs from base */}
+              {newItem.price && newItem.currency && newItem.currency !== 'USD' && (
+                <div className="text-xs text-muted-foreground text-right">
+                  USD {(newItem.price * 1.2).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              )}
+            </div>
           </TableCell>
         )}
+        {/* Comment column */}
+        <TableCell>
+          <Textarea
+            placeholder="Add comment..."
+            value={newItem.comment || ""}
+            onChange={(e) => handleInputChange("comment", e.target.value)}
+            className="min-h-[60px] text-sm resize-none border-gray-200 focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
+          />
+        </TableCell>
         {/* More actions column */}
         <TableCell className="text-center">
           <div className="flex items-center gap-1 justify-center">
@@ -152,26 +204,9 @@ export function NewItemRow({ onSave, onCancel, locations, products, units, showP
         </TableCell>
       </TableRow>
       
-      {/* Comment row for new item */}
-      <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-green-25">
-        <TableCell colSpan={showPricing ? 8 : 7} className="py-3">
-          <div className="flex items-start gap-2 px-2">
-            <div className="w-6 h-6 mt-1 flex-shrink-0"></div>
-            <div className="flex-1">
-              <Textarea
-                placeholder="Add comment for new item..."
-                value={newItem.comment || ""}
-                onChange={(e) => handleInputChange("comment", e.target.value)}
-                className="min-h-[60px] resize-none border-gray-200 focus:border-blue-300"
-              />
-            </div>
-          </div>
-        </TableCell>
-      </TableRow>
-      
       {/* Inventory Information Row for new item - Read Only */}
       <TableRow className="hover:bg-muted/30 group transition-colors border-b bg-green-25">
-        <TableCell colSpan={showPricing ? 8 : 7} className="py-3">
+        <TableCell colSpan={showPricing ? 11 : 10} className="py-3">
           <div className="px-2">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Inventory Status Grid */}

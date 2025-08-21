@@ -1,0 +1,286 @@
+{
+  "expirationScenarios": [
+    {
+      "id": "scenario-001",
+      "name": "Standard 30-Day Warning",
+      "description": "Standard expiration scenario with 30-day advance warning",
+      "triggerCondition": "days_until_expiration <= 30",
+      "severity": "low",
+      "actions": [
+        {
+          "type": "email_notification",
+          "recipients": ["purchaser", "vendor"],
+          "template": "standard_expiration_warning",
+          "scheduleDays": [30, 15, 7, 1]
+        },
+        {
+          "type": "dashboard_alert",
+          "priority": "medium",
+          "autoResolve": false
+        }
+      ],
+      "affectedItems": [
+        {
+          "priceItemId": "price-item-001",
+          "productName": "Industrial Steel Pipes - 2 inch",
+          "vendorName": "Steel Solutions Inc",
+          "currentPrice": 48.75,
+          "currency": "USD",
+          "expirationDate": "2024-12-31T23:59:59Z",
+          "daysUntilExpiration": 25,
+          "renewalStatus": "pending_vendor_response"
+        },
+        {
+          "priceItemId": "price-item-004",
+          "productName": "Hydraulic Pumps - 5HP",
+          "vendorName": "Hydraulic Systems Ltd",
+          "currentPrice": 1250.00,
+          "currency": "USD",
+          "expirationDate": "2025-02-28T23:59:59Z",
+          "daysUntilExpiration": 28,
+          "renewalStatus": "auto_renewal_enabled"
+        }
+      ]
+    },
+    {
+      "id": "scenario-002",
+      "name": "Critical 7-Day Alert",
+      "description": "Critical expiration scenario requiring immediate attention",
+      "triggerCondition": "days_until_expiration <= 7",
+      "severity": "high",
+      "actions": [
+        {
+          "type": "urgent_email_notification",
+          "recipients": ["purchaser", "vendor", "manager"],
+          "template": "critical_expiration_alert",
+          "scheduleDays": [7, 3, 1]
+        },
+        {
+          "type": "dashboard_alert",
+          "priority": "high",
+          "autoResolve": false
+        },
+        {
+          "type": "sms_notification",
+          "recipients": ["purchaser"],
+          "enabled": true
+        }
+      ],
+      "affectedItems": [
+        {
+          "priceItemId": "price-item-002",
+          "productName": "Electrical Cables - 12 AWG",
+          "vendorName": "ElectroSupply Corp",
+          "currentPrice": 2.85,
+          "currency": "USD",
+          "expirationDate": "2024-08-31T23:59:59Z",
+          "daysUntilExpiration": 5,
+          "renewalStatus": "no_response",
+          "impactLevel": "medium",
+          "affectedPRs": 3,
+          "totalValue": 15750.00
+        }
+      ]
+    },
+    {
+      "id": "scenario-003",
+      "name": "Expired Grace Period",
+      "description": "Items that have expired but are within grace period",
+      "triggerCondition": "expired AND within_grace_period",
+      "severity": "medium",
+      "actions": [
+        {
+          "type": "grace_period_notification",
+          "recipients": ["purchaser", "vendor"],
+          "template": "grace_period_active",
+          "frequency": "daily"
+        },
+        {
+          "type": "dashboard_alert",
+          "priority": "high",
+          "message": "Price expired - Grace period active"
+        },
+        {
+          "type": "workflow_restriction",
+          "action": "flag_new_prs",
+          "enabled": true
+        }
+      ],
+      "affectedItems": [
+        {
+          "priceItemId": "price-item-003",
+          "productName": "Safety Helmets - Class E",
+          "vendorName": "Safety First Equipment",
+          "currentPrice": 35.00,
+          "currency": "USD",
+          "expirationDate": "2024-05-31T23:59:59Z",
+          "daysSinceExpiration": 3,
+          "gracePeriodEnd": "2024-06-07T23:59:59Z",
+          "renewalStatus": "negotiating",
+          "impactLevel": "low",
+          "affectedPRs": 2,
+          "totalValue": 8400.00
+        }
+      ]
+    },
+    {
+      "id": "scenario-004",
+      "name": "Bulk Expiration Event",
+      "description": "Multiple items from same vendor expiring together",
+      "triggerCondition": "multiple_items_same_vendor AND days_until_expiration <= 14",
+      "severity": "medium",
+      "actions": [
+        {
+          "type": "bulk_notification",
+          "recipients": ["purchaser", "vendor"],
+          "template": "bulk_expiration_warning",
+          "scheduleDays": [14, 7, 3]
+        },
+        {
+          "type": "vendor_meeting_request",
+          "autoSchedule": true,
+          "priority": "high"
+        },
+        {
+          "type": "bulk_renewal_offer",
+          "discountEligible": true,
+          "discountPercentage": 5
+        }
+      ],
+      "affectedItems": [
+        {
+          "priceItemId": "price-item-007",
+          "productName": "Copper Fittings - 1/2 inch",
+          "vendorName": "Plumbing Supplies Plus",
+          "currentPrice": 12.50,
+          "currency": "USD",
+          "expirationDate": "2024-08-22T23:59:59Z",
+          "daysUntilExpiration": 7
+        },
+        {
+          "priceItemId": "price-item-008",
+          "productName": "Copper Fittings - 3/4 inch",
+          "vendorName": "Plumbing Supplies Plus",
+          "currentPrice": 18.75,
+          "currency": "USD",
+          "expirationDate": "2024-08-22T23:59:59Z",
+          "daysUntilExpiration": 7
+        },
+        {
+          "priceItemId": "price-item-009",
+          "productName": "Copper Fittings - 1 inch",
+          "vendorName": "Plumbing Supplies Plus",
+          "currentPrice": 24.00,
+          "currency": "USD",
+          "expirationDate": "2024-08-22T23:59:59Z",
+          "daysUntilExpiration": 7
+        }
+      ],
+      "bulkMetrics": {
+        "totalItems": 3,
+        "totalValue": 2850.00,
+        "potentialSavings": 142.50,
+        "renewalDeadline": "2024-08-20T23:59:59Z"
+      }
+    },
+    {
+      "id": "scenario-005",
+      "name": "Auto-Renewal Success",
+      "description": "Successful automatic renewal scenario",
+      "triggerCondition": "auto_renewal_enabled AND renewal_successful",
+      "severity": "info",
+      "actions": [
+        {
+          "type": "confirmation_notification",
+          "recipients": ["purchaser"],
+          "template": "auto_renewal_success"
+        },
+        {
+          "type": "dashboard_update",
+          "message": "Price automatically renewed",
+          "priority": "low"
+        }
+      ],
+      "affectedItems": [
+        {
+          "priceItemId": "price-item-010",
+          "productName": "Industrial Lubricants - 5L",
+          "vendorName": "Lubrication Solutions",
+          "previousPrice": 85.00,
+          "newPrice": 87.50,
+          "currency": "USD",
+          "previousExpirationDate": "2024-08-15T23:59:59Z",
+          "newExpirationDate": "2025-02-15T23:59:59Z",
+          "renewalDate": "2024-07-16T10:30:00Z",
+          "priceChange": 2.50,
+          "priceChangePercentage": 2.94
+        }
+      ]
+    },
+    {
+      "id": "scenario-006",
+      "name": "Renewal Failure",
+      "description": "Failed renewal requiring manual intervention",
+      "triggerCondition": "renewal_failed OR vendor_declined",
+      "severity": "high",
+      "actions": [
+        {
+          "type": "urgent_notification",
+          "recipients": ["purchaser", "manager"],
+          "template": "renewal_failure_alert"
+        },
+        {
+          "type": "alternative_vendor_search",
+          "autoTrigger": true,
+          "includeHistoricalVendors": true
+        },
+        {
+          "type": "pr_workflow_flag",
+          "action": "require_manual_pricing",
+          "enabled": true
+        }
+      ],
+      "affectedItems": [
+        {
+          "priceItemId": "price-item-011",
+          "productName": "Specialized Bearings - SKF 6205",
+          "vendorName": "Bearing Specialists Inc",
+          "currentPrice": 45.00,
+          "currency": "USD",
+          "expirationDate": "2024-08-10T23:59:59Z",
+          "renewalAttemptDate": "2024-07-25T14:20:00Z",
+          "failureReason": "Vendor discontinued product line",
+          "alternativeVendors": [
+            {
+              "vendorName": "Industrial Bearings Ltd",
+              "estimatedPrice": 48.50,
+              "availability": "in_stock",
+              "leadTime": 5
+            },
+            {
+              "vendorName": "Precision Parts Supply",
+              "estimatedPrice": 52.00,
+              "availability": "special_order",
+              "leadTime": 14
+            }
+          ],
+          "impactLevel": "high",
+          "affectedPRs": 6,
+          "totalValue": 27000.00
+        }
+      ]
+    }
+  ],
+  "scenarioMetrics": {
+    "totalActiveScenarios": 6,
+    "highSeverityCount": 2,
+    "mediumSeverityCount": 2,
+    "lowSeverityCount": 1,
+    "infoCount": 1,
+    "totalAffectedItems": 12,
+    "totalAffectedValue": 178142.50,
+    "averageDaysUntilExpiration": 12.3,
+    "autoRenewalSuccessRate": 0.75,
+    "manualInterventionRequired": 3
+  }
+}

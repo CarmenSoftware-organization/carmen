@@ -1,0 +1,195 @@
+{
+  "pricingTrends": {
+    "overall": {
+      "trend": "increasing",
+      "changePercentage": 3.2,
+      "period": "last_quarter",
+      "confidence": "high",
+      "description": "Overall pricing has increased by 3.2% over the last quarter, primarily driven by supply chain pressures and inflation."
+    },
+    "byCategory": [
+      {
+        "categoryId": "cat-001",
+        "categoryName": "Office Supplies",
+        "trend": "stable",
+        "changePercentage": 0.8,
+        "period": "last_quarter",
+        "confidence": "medium",
+        "topItems": [
+          {
+            "itemName": "A4 Paper Ream",
+            "changePercentage": 2.1,
+            "currentAvgPrice": 4.85,
+            "previousAvgPrice": 4.75
+          },
+          {
+            "itemName": "Ballpoint Pens (Pack of 10)",
+            "changePercentage": -1.2,
+            "currentAvgPrice": 3.45,
+            "previousAvgPrice": 3.49
+          }
+        ]
+      },
+      {
+        "categoryId": "cat-002",
+        "categoryName": "IT Equipment",
+        "trend": "increasing",
+        "changePercentage": 5.7,
+        "period": "last_quarter",
+        "confidence": "high",
+        "topItems": [
+          {
+            "itemName": "Laptop Computer",
+            "changePercentage": 8.3,
+            "currentAvgPrice": 1245.00,
+            "previousAvgPrice": 1150.00
+          },
+          {
+            "itemName": "USB Flash Drive 32GB",
+            "changePercentage": 3.2,
+            "currentAvgPrice": 12.50,
+            "previousAvgPrice": 12.11
+          }
+        ]
+      },
+      {
+        "categoryId": "cat-003",
+        "categoryName": "Cleaning Supplies",
+        "trend": "increasing",
+        "changePercentage": 4.1,
+        "period": "last_quarter",
+        "confidence": "high",
+        "topItems": [
+          {
+            "itemName": "All-Purpose Cleaner",
+            "changePercentage": 6.2,
+            "currentAvgPrice": 8.95,
+            "previousAvgPrice": 8.43
+          },
+          {
+            "itemName": "Paper Towels (12-pack)",
+            "changePercentage": 2.8,
+            "currentAvgPrice": 24.50,
+            "previousAvgPrice": 23.83
+          }
+        ]
+      }
+    ],
+    "historicalData": [
+      {
+        "period": "2024-Q1",
+        "averagePrice": 100.0,
+        "changeFromPrevious": 2.1,
+        "totalItems": 38456
+      },
+      {
+        "period": "2024-Q2",
+        "averagePrice": 101.8,
+        "changeFromPrevious": 1.8,
+        "totalItems": 39234
+      },
+      {
+        "period": "2024-Q3",
+        "averagePrice": 103.2,
+        "changeFromPrevious": 1.4,
+        "totalItems": 41567
+      },
+      {
+        "period": "2024-Q4",
+        "averagePrice": 106.5,
+        "changeFromPrevious": 3.2,
+        "totalItems": 42341
+      }
+    ]
+  },
+  "marketInsights": {
+    "keyFindings": [
+      {
+        "title": "Supply Chain Stabilization",
+        "description": "Supply chain disruptions have decreased by 40% compared to last year, leading to more predictable pricing.",
+        "impact": "positive",
+        "confidence": "high",
+        "category": "supply_chain"
+      },
+      {
+        "title": "Technology Price Volatility",
+        "description": "IT equipment prices continue to show high volatility due to semiconductor shortages and demand fluctuations.",
+        "impact": "negative",
+        "confidence": "high",
+        "category": "technology"
+      },
+      {
+        "title": "Vendor Consolidation Opportunity",
+        "description": "Analysis shows potential 12% cost savings through strategic vendor consolidation in office supplies category.",
+        "impact": "positive",
+        "confidence": "medium",
+        "category": "optimization"
+      }
+    ],
+    "priceVolatility": {
+      "low": ["Office Supplies", "Cleaning Supplies"],
+      "medium": ["Food & Beverages", "Maintenance Supplies"],
+      "high": ["IT Equipment", "Electronics"]
+    },
+    "seasonalPatterns": [
+      {
+        "category": "Office Supplies",
+        "pattern": "Back-to-school surge in Q3, stable otherwise",
+        "peakMonths": ["August", "September"],
+        "lowMonths": ["December", "January"]
+      },
+      {
+        "category": "IT Equipment",
+        "pattern": "Budget cycle driven, peaks in Q4 and Q1",
+        "peakMonths": ["November", "December", "January"],
+        "lowMonths": ["June", "July"]
+      }
+    ],
+    "competitiveAnalysis": {
+      "marketLeaders": [
+        {
+          "vendorName": "Global Office Solutions",
+          "marketShare": 18.5,
+          "priceCompetitiveness": "high",
+          "reliabilityScore": 4.6
+        },
+        {
+          "vendorName": "TechPro Distributors",
+          "marketShare": 15.2,
+          "priceCompetitiveness": "medium",
+          "reliabilityScore": 4.4
+        },
+        {
+          "vendorName": "CleanCorp Supplies",
+          "marketShare": 12.8,
+          "priceCompetitiveness": "high",
+          "reliabilityScore": 4.2
+        }
+      ],
+      "emergingVendors": [
+        {
+          "vendorName": "EcoFriendly Solutions",
+          "growthRate": 45.2,
+          "priceCompetitiveness": "medium",
+          "specialization": "Sustainable products"
+        }
+      ]
+    },
+    "recommendations": [
+      {
+        "title": "Diversify IT Equipment Suppliers",
+        "description": "Reduce dependency on single suppliers for critical IT equipment to mitigate price volatility.",
+        "priority": "high",
+        "estimatedSavings": 85000,
+        "timeframe": "3-6 months"
+      },
+      {
+        "title": "Implement Dynamic Pricing Alerts",
+        "description": "Set up automated alerts for price changes exceeding 5% to enable proactive procurement decisions.",
+        "priority": "medium",
+        "estimatedSavings": 25000,
+        "timeframe": "1-2 months"
+      }
+    ]
+  }
+}

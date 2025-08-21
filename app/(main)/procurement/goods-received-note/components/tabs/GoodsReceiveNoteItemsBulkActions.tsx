@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
+import { Trash2 } from 'lucide-react'
 
 interface GoodsReceiveNoteItemsBulkActionsProps {
   selectedItems: string[]
@@ -12,16 +13,18 @@ export function GoodsReceiveNoteItemsBulkActions({ selectedItems, onBulkAction }
   }
 
   return (
-    <div className="flex items-center space-x-2 mb-4">
-      <span className="text-sm font-medium">{selectedItems.length} item(s) selected</span>
-      <Button onClick={() => onBulkAction('delete')} variant="destructive" size="sm">
-        Delete
-      </Button>
-      <Button onClick={() => onBulkAction('changeQuantity')} variant="secondary" size="sm">
-        Change Quantity
-      </Button>
-      <Button onClick={() => onBulkAction('changePrice')} variant="secondary" size="sm">
-        Change Price
+    <div className="flex items-center gap-3 bg-muted/30 border rounded-lg px-4 py-3 mb-4">
+      <span className="text-sm font-medium text-muted-foreground">
+        {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
+      </span>
+      <Button 
+        onClick={() => onBulkAction('delete')} 
+        variant="destructive" 
+        size="sm"
+        className="h-8"
+      >
+        <Trash2 className="mr-2 h-4 w-4" />
+        Delete Selected
       </Button>
     </div>
   )

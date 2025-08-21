@@ -42,7 +42,7 @@ export function FilterBuilder({ filters, setFilters }: FilterBuilderProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="date">Date</SelectItem>
-              <SelectItem value="refNo">Ref #</SelectItem>
+              <SelectItem value="refNo">Requisition</SelectItem>
               <SelectItem value="requestTo">Request To</SelectItem>
               <SelectItem value="storeName">Store Name</SelectItem>
               <SelectItem value="description">Description</SelectItem>

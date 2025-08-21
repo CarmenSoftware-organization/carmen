@@ -13,15 +13,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Phone, Award, Calendar, FileText, ChevronLeft } from "lucide-react"
-import { Vendor } from './types'
-import { MOCK_VENDORS } from '../data/mock'
-import { updateVendor } from '../actions'
-import { BasicInfoSection } from './sections/basic-info-section'
-import { AddressesSection } from './sections/addresses-section'
-import { ContactsSection } from './sections/contacts-section'
-import { EnvironmentalProfile } from './sections/environmental-profile'
-import { CertificationsSection } from './sections/certifications-section'
+import { Switch } from "@/components/ui/switch"
+import { MapPin, Phone, Award, Calendar, FileText, ChevronLeft, Printer } from "lucide-react"
+import { Vendor } from '../../types'
+import { mockVendors } from '../../lib/mock-data'
+import { updateVendor, deleteVendor } from '../actions'
+import { vendorService } from '../../lib/services/vendor-service'
+import VendorDeletionDialog from '../../components/VendorDeletionDialog'
+import VendorPricelistsSection from './sections/vendor-pricelists-section'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -35,9 +34,10 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
 
 function VendorDetail({ id }: { id: string }) {
   const router = useRouter()
-  const [vendor, setVendor] = useState<Vendor | null>(MOCK_VENDORS[id] || null)
+  const [vendor, setVendor] = useState<Vendor | null>(mockVendors.find(v => v.id === id) || null)
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [deletionDialogOpen, setDeletionDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
 
   if (!vendor) return notFound()
@@ -50,10 +50,11 @@ function VendorDetail({ id }: { id: string }) {
 
     const result = await updateVendor(vendor)
     
-    if (result.error) {
+    if (!result.success) {
+      const errorMessage = typeof result.error === 'string' ? result.error : "Failed to update vendor"
       toast({
         title: "Error",
-        description: result.error,
+        description: errorMessage,
         variant: "destructive"
       })
       return
@@ -68,21 +69,30 @@ function VendorDetail({ id }: { id: string }) {
     router.refresh()
   }
 
-  const handleDelete = async () => {
-    try {
-      // Mock delete success
-      toast({
-        title: "Success",
-        description: "Vendor deleted successfully"
-      })
-      router.push('/vendor-management/manage-vendors')
-    } catch (error) {
+  const handleDeleteClick = () => {
+    setDeletionDialogOpen(true)
+  }
+
+  const handleDeleteConfirmed = async () => {
+    if (!vendor) return
+
+    const result = await deleteVendor(vendor.id)
+    
+    if (!result.success) {
+      const errorMessage = typeof result.error === 'string' ? result.error : "Failed to delete vendor"
       toast({
         title: "Error",
-        description: "Failed to delete vendor",
+        description: errorMessage,
         variant: "destructive"
       })
+      return
     }
+
+    toast({
+      title: "Success",
+      description: "Vendor deleted successfully"
+    })
+    router.push('/vendor-management/manage-vendors')
   }
 
   const handleFieldChange = (name: string, value: any) => {
@@ -90,6 +100,36 @@ function VendorDetail({ id }: { id: string }) {
       if (!prev) return prev
       return { ...prev, [name]: value }
     })
+  }
+
+  const handleStatusToggle = async (checked: boolean) => {
+    if (!vendor) return
+    
+    const newStatus: 'active' | 'inactive' = checked ? 'active' : 'inactive'
+    const updatedVendor = { ...vendor, status: newStatus }
+    
+    try {
+      setVendor(updatedVendor)
+      // In a real app, you would call an API here
+      // await updateVendorStatus(vendor.id, newStatus)
+      
+      toast({
+        title: "Status Updated",
+        description: `Vendor has been marked as ${newStatus}.`,
+      })
+    } catch (error) {
+      // Revert the change if API call fails
+      setVendor(vendor)
+      toast({
+        title: "Error",
+        description: "Failed to update vendor status.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handlePrint = () => {
+    window.print()
   }
 
   const actionButtons = (
@@ -112,14 +152,22 @@ function VendorDetail({ id }: { id: string }) {
       ) : (
         <div className="flex gap-2">
           <Button 
+            variant="outline"
+            onClick={handlePrint}
+          >
+            <Printer className="h-4 w-4 mr-2" />
+            Print
+          </Button>
+          <Button 
             onClick={handleEdit}
             className="bg-primary hover:bg-primary/90"
           >
             Edit Vendor
           </Button>
           <Button 
-            variant="destructive" 
-            onClick={() => setIsDeleting(true)}
+            variant="outline" 
+            onClick={handleDeleteClick}
+            className="border-red-500 text-red-500 hover:bg-red-50"
           >
             Delete Vendor
           </Button>
@@ -129,27 +177,42 @@ function VendorDetail({ id }: { id: string }) {
   )
 
   // Get primary address and contact
-  const primaryAddress = vendor.addresses.find(a => a.isPrimary) || vendor.addresses[0]
-  const primaryContact = vendor.contacts.find(c => c.isPrimary) || vendor.contacts[0]
+  const primaryAddress = vendor.address
+  const primaryContact = { 
+    email: vendor.contactEmail, 
+    phone: vendor.contactPhone
+  }
+
+  // Custom title component with back button, company name, and status
+  const customTitle = (
+    <div className="flex items-center gap-4">
+      <button 
+        onClick={() => router.push('/vendor-management/manage-vendors')}
+        className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+        aria-label="Back to vendor list"
+      >
+        <ChevronLeft className="h-6 w-6 text-gray-700" />
+      </button>
+      <h1 className="text-2xl font-semibold">{vendor.name}</h1>
+      <Badge 
+        variant="secondary"
+        className={`text-xs px-2 py-1 ${
+          vendor.status === 'active' ? 'bg-green-100 text-green-700 hover:bg-green-100' : 'bg-gray-100 text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        {vendor.status === 'active' ? 'Active' : 'Inactive'}
+      </Badge>
+      <Switch
+        id="vendor-status"
+        checked={vendor.status === 'active'}
+        onCheckedChange={handleStatusToggle}
+        disabled={isEditing}
+      />
+    </div>
+  )
 
   const content = (
     <>
-      {/* Header with back button and title - styled like Credit Note example */}
-      <div className="flex items-center mb-6">
-        <button 
-          onClick={() => router.push('/vendor-management/manage-vendors')}
-          className="mr-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Back to vendor list"
-        >
-          <ChevronLeft className="h-6 w-6 text-gray-700" />
-        </button>
-        <h1 className="text-2xl font-semibold">{vendor.companyName}</h1>
-        <div className="ml-3">
-          <Badge variant={vendor.isActive ? "default" : "secondary"} className="text-sm">
-            {vendor.isActive ? "Active" : "Inactive"}
-          </Badge>
-        </div>
-      </div>
 
       {/* Summary Card */}
       <Card className="mb-6">
@@ -162,7 +225,7 @@ function VendorDetail({ id }: { id: string }) {
                   <div>
                     <p className="text-sm font-medium">Primary Address</p>
                     <p className="text-sm text-muted-foreground">
-                      {primaryAddress ? primaryAddress.addressLine : "No address provided"}
+                      {primaryAddress ? `${primaryAddress.street}, ${primaryAddress.city}, ${primaryAddress.state} ${primaryAddress.postalCode}` : "No address provided"}
                     </p>
                   </div>
                 </div>
@@ -172,7 +235,7 @@ function VendorDetail({ id }: { id: string }) {
                   <div>
                     <p className="text-sm font-medium">Primary Contact</p>
                     <p className="text-sm text-muted-foreground">
-                      {primaryContact ? `${primaryContact.name} (${primaryContact.phone})` : "No contact provided"}
+                      {primaryContact ? `${primaryContact.email} (${primaryContact.phone})` : "No contact provided"}
                     </p>
                   </div>
                 </div>
@@ -182,7 +245,12 @@ function VendorDetail({ id }: { id: string }) {
                   <div>
                     <p className="text-sm font-medium">Registration & Tax</p>
                     <p className="text-sm text-muted-foreground">
-                      Reg: {vendor.businessRegistrationNumber} | Tax ID: {vendor.taxId}
+                      Reg: {vendor.companyRegistration || 'N/A'} | Tax ID: {vendor.taxId || 'N/A'}
+                      {vendor.taxRate !== undefined && (
+                        <span className="ml-2 inline-flex items-center">
+                          | Tax: {vendor.taxRate}%
+                        </span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -192,7 +260,7 @@ function VendorDetail({ id }: { id: string }) {
                   <div>
                     <p className="text-sm font-medium">Established</p>
                     <p className="text-sm text-muted-foreground">
-                      {vendor.establishmentDate}
+                      {vendor.createdAt.toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -205,7 +273,7 @@ function VendorDetail({ id }: { id: string }) {
                   <Award className="h-6 w-6 text-blue-600" />
                 </div>
                 <p className="text-sm font-medium">Vendor Rating</p>
-                <p className="text-2xl font-bold">{vendor.rating}/5</p>
+                <p className="text-2xl font-bold">{(vendor.performanceMetrics.qualityScore/20).toFixed(1)}/5</p>
               </div>
             </div>
           </div>
@@ -216,9 +284,9 @@ function VendorDetail({ id }: { id: string }) {
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4 w-full justify-start">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="pricelists">Price Lists</TabsTrigger>
           <TabsTrigger value="contacts">Contacts & Addresses</TabsTrigger>
           <TabsTrigger value="certifications">Certifications</TabsTrigger>
-          <TabsTrigger value="environmental">Environmental Impact</TabsTrigger>
         </TabsList>
         
         {/* Overview Tab */}
@@ -229,72 +297,116 @@ function VendorDetail({ id }: { id: string }) {
               <CardDescription>General information about the vendor</CardDescription>
             </CardHeader>
             <CardContent>
-              <BasicInfoSection
-                vendor={vendor}
-                isEditing={isEditing}
-                onFieldChange={handleFieldChange}
-              />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Company Name</label>
+                  <p className="text-sm text-muted-foreground">{vendor.name}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Contact Email</label>
+                  <p className="text-sm text-muted-foreground">{vendor.contactEmail}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Business Type</label>
+                  <p className="text-sm text-muted-foreground">{vendor.businessType}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
           {/* Tax configuration section */}
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Tax configuration</CardTitle>
+              <CardTitle>Tax Configuration</CardTitle>
+              <CardDescription>Tax identification and rate configuration for this vendor</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Tax Id</label>
+                  <label className="block text-sm font-medium mb-1">Tax ID</label>
                   <Input
-                    placeholder="Enter Tax Id"
+                    placeholder="Enter Tax ID"
                     value={vendor.taxId || ''}
                     onChange={e => isEditing && handleFieldChange('taxId', e.target.value)}
                     disabled={!isEditing}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Profile</label>
-                  <Select
-                    value={vendor.taxProfile || 'standard'}
-                    onValueChange={val => isEditing && handleFieldChange('taxProfile', val)}
-                    disabled={!isEditing}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select profile" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="reduced">Reduced</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="block text-sm font-medium mb-1">Tax Profile</label>
+                  {isEditing ? (
+                    <Select 
+                      value={vendor.taxProfile || ''} 
+                      onValueChange={value => {
+                        handleFieldChange('taxProfile', value)
+                        // Auto-set tax rate based on profile
+                        if (value === 'none-vat') {
+                          handleFieldChange('taxRate', 0)
+                        } else if (value === 'vat') {
+                          handleFieldChange('taxRate', 7)
+                        } else if (value === 'gst') {
+                          handleFieldChange('taxRate', 10)
+                        } else if (value === 'sales-tax') {
+                          handleFieldChange('taxRate', 8.5)
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select tax profile" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none-vat">None VAT</SelectItem>
+                        <SelectItem value="vat">VAT (Thailand)</SelectItem>
+                        <SelectItem value="gst">GST (Singapore/Australia)</SelectItem>
+                        <SelectItem value="sales-tax">Sales Tax (USA)</SelectItem>
+                        <SelectItem value="custom">Custom Rate</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">
+                        {vendor.taxProfile === 'none-vat' ? 'None VAT' : 
+                         vendor.taxProfile === 'vat' ? 'VAT (Thailand)' :
+                         vendor.taxProfile === 'gst' ? 'GST (Singapore/Australia)' :
+                         vendor.taxProfile === 'sales-tax' ? 'Sales Tax (USA)' :
+                         vendor.taxProfile === 'custom' ? 'Custom Rate' :
+                         'Not set'}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Rate (%)</label>
-                  <Input
-                    type="number"
-                    placeholder="Enter rate"
-                    value={vendor.taxRate ?? 10}
-                    onChange={e => isEditing && handleFieldChange('taxRate', Number(e.target.value))}
-                    disabled={!isEditing}
-                  />
+                  <label className="block text-sm font-medium mb-1">Tax Rate (%)</label>
+                  {isEditing ? (
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      value={vendor.taxRate || ''}
+                      onChange={e => handleFieldChange('taxRate', parseFloat(e.target.value) || 0)}
+                      disabled={!isEditing}
+                      min="0"
+                      max="100"
+                      step="0.01"
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">
+                        {vendor.taxRate !== undefined ? `${vendor.taxRate}%` : 'Not set'}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Type</label>
-                  <Select
-                    value={vendor.taxType || 'add'}
-                    onValueChange={val => isEditing && handleFieldChange('taxType', val)}
-                    disabled={!isEditing}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="add">Add</SelectItem>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="include">Include</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="block text-sm font-medium mb-1">Company Registration</label>
+                  {isEditing ? (
+                    <Input
+                      placeholder="Enter registration number"
+                      value={vendor.companyRegistration || ''}
+                      onChange={e => handleFieldChange('companyRegistration', e.target.value)}
+                      disabled={!isEditing}
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">{vendor.companyRegistration || 'Not provided'}</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -313,10 +425,10 @@ function VendorDetail({ id }: { id: string }) {
               <CardContent>
                 {primaryAddress && (
                   <div className="space-y-2">
-                    <p><span className="font-medium">Address:</span> {primaryAddress.addressLine}</p>
+                    <p><span className="font-medium">Address:</span> {primaryAddress.street}</p>
+                    <p><span className="font-medium">City:</span> {primaryAddress.city}</p>
+                    <p><span className="font-medium">State:</span> {primaryAddress.state}</p>
                     <p><span className="font-medium">Postal Code:</span> {primaryAddress.postalCode}</p>
-                    <p><span className="font-medium">Address Type:</span> {primaryAddress.addressType}</p>
-                    <p><span className="font-medium">Primary:</span> {primaryAddress.isPrimary ? "Yes" : "No"}</p>
                   </div>
                 )}
               </CardContent>
@@ -334,16 +446,15 @@ function VendorDetail({ id }: { id: string }) {
               <CardContent>
                 {primaryContact && (
                   <div className="space-y-2">
-                    <p><span className="font-medium">Name:</span> {primaryContact.name}</p>
-                    <p><span className="font-medium">Phone:</span> {primaryContact.phone}</p>
                     <p><span className="font-medium">Email:</span> {primaryContact.email}</p>
-                    <p><span className="font-medium">Position:</span> {primaryContact.position}</p>
+                    <p><span className="font-medium">Phone:</span> {primaryContact.phone || 'Not provided'}</p>
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
         </TabsContent>
+        
         
         {/* Contacts & Addresses Tab */}
         <TabsContent value="contacts" className="space-y-4">
@@ -362,11 +473,14 @@ function VendorDetail({ id }: { id: string }) {
               </div>
             </CardHeader>
             <CardContent>
-              <AddressesSection
-                addresses={vendor.addresses}
-                isEditing={isEditing}
-                onAddressChange={handleFieldChange}
-              />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Address</label>
+                  <p className="text-sm text-muted-foreground">
+                    {vendor.address ? `${vendor.address.street}, ${vendor.address.city}, ${vendor.address.state} ${vendor.address.postalCode}, ${vendor.address.country}` : 'No address provided'}
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -385,11 +499,16 @@ function VendorDetail({ id }: { id: string }) {
               </div>
             </CardHeader>
             <CardContent>
-              <ContactsSection
-                contacts={vendor.contacts}
-                isEditing={isEditing}
-                onContactChange={handleFieldChange}
-              />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Contact Email</label>
+                  <p className="text-sm text-muted-foreground">{vendor.contactEmail}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Contact Phone</label>
+                  <p className="text-sm text-muted-foreground">{vendor.contactPhone || 'Not provided'}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -411,65 +530,41 @@ function VendorDetail({ id }: { id: string }) {
               </div>
             </CardHeader>
             <CardContent>
-              <CertificationsSection
-                certifications={vendor.certifications}
-                isEditing={isEditing}
-                onCertificationChange={handleFieldChange}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        {/* Environmental Impact Tab */}
-        <TabsContent value="environmental">
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
+              <div className="space-y-4">
                 <div>
-                  <CardTitle className="text-lg font-medium">Environmental Impact</CardTitle>
-                  <CardDescription>Environmental metrics and sustainability data</CardDescription>
+                  <label className="text-sm font-medium">Certifications</label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {vendor.certifications?.map((cert, index) => (
+                      <Badge key={index} variant="secondary">{cert}</Badge>
+                    )) || <p className="text-sm text-muted-foreground">No certifications</p>}
+                  </div>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <EnvironmentalProfile 
-                vendorId={id}
-                environmentalData={vendor.environmentalImpact}
-              />
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Price Lists Tab */}
+        <TabsContent value="pricelists">
+          <VendorPricelistsSection vendorId={id} vendorName={vendor.name} />
+        </TabsContent>
+        
       </Tabs>
 
-      <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the vendor
-              and all associated data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete Vendor
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <VendorDeletionDialog 
+        vendor={vendor}
+        isOpen={deletionDialogOpen}
+        onClose={() => setDeletionDialogOpen(false)}
+        onDeleted={handleDeleteConfirmed}
+      />
     </>
   )
 
   return (
     <DetailPageTemplate
-      title={`Vendor Details`}
+      title={customTitle}
       actionButtons={actionButtons}
       content={content}
-      backLink="/vendor-management/manage-vendors"
     />
   )
 }

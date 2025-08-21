@@ -1,0 +1,60 @@
+{
+  "timestamp": "2025-08-14T11:47:20.087Z",
+  "capture_type": "dynamic_detail_pages_via_list_navigation",
+  "total_mappings": 5,
+  "successful_captures": 0,
+  "failed_captures": 5,
+  "success_rate": "0.0",
+  "results": [
+    {
+      "list_screen": "purchase-requests",
+      "detail_screen": "purchase-request-detail",
+      "list_url": "http://localhost:3000/procurement/purchase-requests",
+      "detail_url": "http://localhost:3000/procurement/purchase-requests/pr-2024-001?id=pr-2024-001&mode=view",
+      "status": "error",
+      "error": "Detail page shows 404 error",
+      "spec_file": "purchase-request-detail-screen.md",
+      "priority": "high"
+    },
+    {
+      "list_screen": "purchase-orders",
+      "detail_screen": "purchase-order-detail",
+      "list_url": "http://localhost:3000/procurement/purchase-orders",
+      "detail_url": "http://localhost:3000/procurement/purchase-orders/PO-002",
+      "status": "error",
+      "error": "Detail page shows 404 error",
+      "spec_file": "purchase-order-detail-screen.md",
+      "priority": "high"
+    },
+    {
+      "list_screen": "goods-received-note",
+      "detail_screen": "goods-received-note-detail",
+      "list_url": "http://localhost:3000/procurement/goods-received-note",
+      "detail_url": "http://localhost:3000/procurement/goods-received-note/GRN006?mode=view",
+      "status": "error",
+      "error": "Detail page shows 404 error",
+      "spec_file": "goods-received-note-detail-screen.md",
+      "priority": "high"
+    },
+    {
+      "list_screen": "inventory-adjustments",
+      "detail_screen": "inventory-adjustment-detail",
+      "list_url": "http://localhost:3000/inventory-management/inventory-adjustments",
+      "detail_url": "http://localhost:3000/inventory-management/inventory-adjustments",
+      "status": "error",
+      "error": "Detail page shows 404 error",
+      "spec_file": "inventory-adjustment-detail-screen.md",
+      "priority": "high"
+    },
+    {
+      "list_screen": "vendor-management",
+      "detail_screen": "vendor-detail",
+      "list_url": "http://localhost:3000/vendor-management/manage-vendors",
+      "detail_url": "http://localhost:3000/vendor-management/manage-vendors",
+      "status": "error",
+      "error": "Detail page shows 404 error",
+      "spec_file": "vendor-detail-screen.md",
+      "priority": "high"
+    }
+  ]
+}

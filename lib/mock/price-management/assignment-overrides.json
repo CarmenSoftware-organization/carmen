@@ -1,0 +1,146 @@
+{
+  "assignmentOverrides": [
+    {
+      "id": "override-001",
+      "prItemId": "pr-item-001",
+      "prId": "PR-2024-001",
+      "productName": "Office Paper A4",
+      "originalAssignment": {
+        "vendorId": "vendor-001",
+        "vendorName": "Office Supplies Co",
+        "price": 125.00,
+        "currency": "USD",
+        "assignmentReason": "Lowest price match",
+        "confidence": 0.85,
+        "assignedAt": "2024-01-15T10:00:00Z"
+      },
+      "override": {
+        "vendorId": "vendor-002",
+        "vendorName": "Premium Office Solutions",
+        "price": 135.00,
+        "currency": "USD",
+        "reason": "Better quality and faster delivery",
+        "overriddenBy": "jane.doe@company.com",
+        "overriddenAt": "2024-01-15T11:30:00Z",
+        "approvalRequired": true,
+        "approvalStatus": "pending"
+      },
+      "status": "pending_approval",
+      "createdAt": "2024-01-15T11:30:00Z",
+      "updatedAt": "2024-01-15T11:30:00Z"
+    },
+    {
+      "id": "override-002",
+      "prItemId": "pr-item-005",
+      "prId": "PR-2024-005",
+      "productName": "Cleaning Supplies",
+      "originalAssignment": {
+        "vendorId": "vendor-003",
+        "vendorName": "Clean Pro Services",
+        "price": 89.50,
+        "currency": "USD",
+        "assignmentReason": "Preferred vendor match",
+        "confidence": 0.92,
+        "assignedAt": "2024-01-14T15:20:00Z"
+      },
+      "override": {
+        "vendorId": "vendor-004",
+        "vendorName": "Eco Clean Solutions",
+        "price": 95.00,
+        "currency": "USD",
+        "reason": "Environmental compliance requirement",
+        "overriddenBy": "mike.wilson@company.com",
+        "overriddenAt": "2024-01-14T16:45:00Z",
+        "approvalRequired": false,
+        "approvalStatus": "auto_approved"
+      },
+      "status": "approved",
+      "createdAt": "2024-01-14T16:45:00Z",
+      "updatedAt": "2024-01-14T16:45:00Z"
+    },
+    {
+      "id": "override-003",
+      "prItemId": "pr-item-006",
+      "prId": "PR-2024-006",
+      "productName": "IT Hardware Components",
+      "originalAssignment": {
+        "vendorId": "vendor-005",
+        "vendorName": "Tech Solutions Inc",
+        "price": 450.00,
+        "currency": "USD",
+        "assignmentReason": "Best price-quality ratio",
+        "confidence": 0.78,
+        "assignedAt": "2024-01-13T09:15:00Z"
+      },
+      "override": {
+        "vendorId": "vendor-006",
+        "vendorName": "Enterprise IT Supply",
+        "price": 475.00,
+        "currency": "USD",
+        "reason": "Existing service contract and warranty coverage",
+        "overriddenBy": "sarah.johnson@company.com",
+        "overriddenAt": "2024-01-13T14:20:00Z",
+        "approvalRequired": true,
+        "approvalStatus": "rejected",
+        "rejectionReason": "Price difference exceeds threshold without sufficient justification"
+      },
+      "status": "rejected",
+      "createdAt": "2024-01-13T14:20:00Z",
+      "updatedAt": "2024-01-13T15:30:00Z"
+    }
+  ],
+  "overrideReasons": [
+    {
+      "code": "quality_preference",
+      "label": "Better Quality",
+      "description": "Selected vendor offers superior quality",
+      "requiresApproval": false
+    },
+    {
+      "code": "delivery_speed",
+      "label": "Faster Delivery",
+      "description": "Vendor can deliver faster than assigned option",
+      "requiresApproval": false
+    },
+    {
+      "code": "existing_relationship",
+      "label": "Existing Vendor Relationship",
+      "description": "Prefer to work with established vendor",
+      "requiresApproval": true
+    },
+    {
+      "code": "compliance_requirement",
+      "label": "Compliance Requirement",
+      "description": "Vendor meets specific compliance standards",
+      "requiresApproval": false
+    },
+    {
+      "code": "bulk_discount",
+      "label": "Bulk Discount Available",
+      "description": "Vendor offers better pricing for larger quantities",
+      "requiresApproval": true
+    },
+    {
+      "code": "service_contract",
+      "label": "Service Contract Benefits",
+      "description": "Vendor provides additional service benefits",
+      "requiresApproval": true
+    },
+    {
+      "code": "other",
+      "label": "Other",
+      "description": "Custom reason specified by user",
+      "requiresApproval": true
+    }
+  ],
+  "overrideSummary": {
+    "totalOverrides": 3,
+    "pendingApproval": 1,
+    "approved": 1,
+    "rejected": 1,
+    "averageOverrideValue": 15.50,
+    "mostCommonReason": "quality_preference",
+    "approvalRate": 50.0,
+    "lastUpdated": "2024-01-15T15:00:00Z"
+  }
+}

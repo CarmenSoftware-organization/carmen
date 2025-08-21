@@ -338,6 +338,8 @@ export function PricingFormComponent({
               currencyRate: formData.currencyRate || 1,
               discountRate: formData.discountRate || 0,
               taxRate: formData.taxRate || 0,
+              price: formData.price || 0,
+              quantityApproved: formData.quantityApproved || 0,
             }}
             currencyBase="THB"
             currencyCurrent={formData.currency || "USD"}

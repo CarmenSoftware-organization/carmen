@@ -26,10 +26,16 @@ interface AdvancedFilterProps {
 const filterFields: { value: keyof GoodsReceiveNote; label: string }[] = [
   { value: 'ref', label: 'GRN Number' },
   { value: 'date', label: 'Date' },
+  { value: 'invoiceDate', label: 'Invoice Date' },
   { value: 'status', label: 'Status' },
   { value: 'vendor', label: 'Vendor' },
+  { value: 'invoiceNumber', label: 'Invoice Number' },
   { value: 'totalAmount', label: 'Total Amount' },
-  { value: 'receiver', label: 'Received By' }
+  { value: 'receiver', label: 'Received By' },
+  { value: 'location', label: 'Location' },
+  { value: 'currency', label: 'Currency' },
+  { value: 'isConsignment', label: 'Is Consignment' },
+  { value: 'isCash', label: 'Is Cash Purchase' }
 ]
 
 export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilterProps) {
@@ -219,7 +225,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
     <div className="flex items-center space-x-2">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="h-8 px-2 lg:px-3">
+          <Button variant="outline" size="sm" className="h-8 px-2 lg:px-3">
             <span>Saved Filters</span>
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
@@ -271,9 +277,18 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button className="h-8">
+          <Button 
+            variant="outline"
+            size="sm"
+            className={`h-8 ${activeFilters.length > 0 ? 'bg-primary/10 border-primary/20' : ''}`}
+          >
             <Filter className="mr-2 h-4 w-4" />
-            <span>Add Filter</span>
+            <span>Filter</span>
+            {activeFilters.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 bg-primary text-primary-foreground text-xs rounded-full">
+                {activeFilters.length}
+              </span>
+            )}
           </Button>
         </SheetTrigger>
         <SheetContent className="sm:max-w-md">
@@ -413,23 +428,6 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
           </div>
         </SheetContent>
       </Sheet>
-      
-      {/* Active filters display */}
-      {activeFilters.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          {activeFilters.map((filter, index) => (
-            <Badge key={index} variant="outline" className="flex items-center gap-1 px-2 py-1">
-              {getFilterDisplay(filter)}
-              <button onClick={() => removeFilter(index)} className="ml-1 rounded-full hover:bg-gray-200">
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={onClearFilters}>
-            Clear all
-          </Button>
-        </div>
-      )}
     </div>
   )
 } 

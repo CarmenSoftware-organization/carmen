@@ -1,0 +1,673 @@
+{
+  "prItemAssignments": [
+    {
+      "prItemId": "pr-item-001",
+      "prNumber": "PR-2025-001",
+      "productId": "prod-001",
+      "productName": "Office Paper A4",
+      "categoryId": "cat-office-supplies",
+      "quantity": 100,
+      "requestedDate": "2025-01-15T00:00:00Z",
+      "location": "Main Office",
+      "department": "Administration",
+      "priceAssignment": {
+        "prItemId": "pr-item-001",
+        "selectedVendor": {
+          "id": "vendor-001",
+          "name": "Office Supplies Co.",
+          "rating": 4.5,
+          "isPreferred": true
+        },
+        "assignedPrice": 12.50,
+        "currency": "USD",
+        "normalizedPrice": 12.50,
+        "assignmentReason": "Best price among preferred vendors with good availability",
+        "confidence": 0.92,
+        "alternatives": [
+          {
+            "vendorId": "vendor-002",
+            "vendorName": "Paper World Ltd",
+            "price": 13.20,
+            "currency": "USD",
+            "normalizedPrice": 13.20,
+            "minQuantity": 50,
+            "availability": "available",
+            "leadTime": 3,
+            "rating": 4.2,
+            "isPreferred": false
+          },
+          {
+            "vendorId": "vendor-003",
+            "vendorName": "Stationery Plus",
+            "price": 11.80,
+            "currency": "USD",
+            "normalizedPrice": 11.80,
+            "minQuantity": 200,
+            "availability": "limited",
+            "leadTime": 7,
+            "rating": 3.8,
+            "isPreferred": false
+          }
+        ],
+        "ruleApplied": "rule-preferred-vendor-price",
+        "assignmentDate": "2025-01-15T10:30:00Z"
+      },
+      "vendorOptions": [
+        {
+          "vendorId": "vendor-001",
+          "vendorName": "Office Supplies Co.",
+          "price": 12.50,
+          "currency": "USD",
+          "normalizedPrice": 12.50,
+          "minQuantity": 1,
+          "availability": "available",
+          "leadTime": 2,
+          "rating": 4.5,
+          "isPreferred": true
+        },
+        {
+          "vendorId": "vendor-002",
+          "vendorName": "Paper World Ltd",
+          "price": 13.20,
+          "currency": "USD",
+          "normalizedPrice": 13.20,
+          "minQuantity": 50,
+          "availability": "available",
+          "leadTime": 3,
+          "rating": 4.2,
+          "isPreferred": false
+        },
+        {
+          "vendorId": "vendor-003",
+          "vendorName": "Stationery Plus",
+          "price": 11.80,
+          "currency": "USD",
+          "normalizedPrice": 11.80,
+          "minQuantity": 200,
+          "availability": "limited",
+          "leadTime": 7,
+          "rating": 3.8,
+          "isPreferred": false
+        }
+      ],
+      "isAutoAssigned": true,
+      "isManualOverride": false,
+      "assignmentConfidence": 0.92,
+      "currencyInfo": {
+        "originalCurrency": "USD",
+        "displayCurrency": "USD",
+        "exchangeRate": 1.0,
+        "lastUpdated": "2025-01-15T08:00:00Z"
+      }
+    },
+    {
+      "prItemId": "pr-item-002",
+      "prNumber": "PR-2025-001",
+      "productId": "prod-002",
+      "productName": "Laptop Computer",
+      "categoryId": "cat-electronics",
+      "quantity": 5,
+      "requestedDate": "2025-01-15T00:00:00Z",
+      "location": "IT Department",
+      "department": "Information Technology",
+      "priceAssignment": {
+        "prItemId": "pr-item-002",
+        "selectedVendor": {
+          "id": "vendor-004",
+          "name": "Tech Solutions Inc.",
+          "rating": 4.8,
+          "isPreferred": true
+        },
+        "assignedPrice": 1250.00,
+        "currency": "USD",
+        "normalizedPrice": 1250.00,
+        "assignmentReason": "Preferred vendor with best warranty terms and competitive pricing",
+        "confidence": 0.88,
+        "alternatives": [
+          {
+            "vendorId": "vendor-005",
+            "vendorName": "Computer World",
+            "price": 1180.00,
+            "currency": "USD",
+            "normalizedPrice": 1180.00,
+            "minQuantity": 1,
+            "availability": "available",
+            "leadTime": 5,
+            "rating": 4.3,
+            "isPreferred": false
+          },
+          {
+            "vendorId": "vendor-006",
+            "vendorName": "Electronics Hub",
+            "price": 1320.00,
+            "currency": "USD",
+            "normalizedPrice": 1320.00,
+            "minQuantity": 1,
+            "availability": "available",
+            "leadTime": 3,
+            "rating": 4.6,
+            "isPreferred": false
+          }
+        ],
+        "ruleApplied": "rule-preferred-vendor-electronics",
+        "assignmentDate": "2025-01-15T10:35:00Z"
+      },
+      "vendorOptions": [
+        {
+          "vendorId": "vendor-004",
+          "vendorName": "Tech Solutions Inc.",
+          "price": 1250.00,
+          "currency": "USD",
+          "normalizedPrice": 1250.00,
+          "minQuantity": 1,
+          "availability": "available",
+          "leadTime": 4,
+          "rating": 4.8,
+          "isPreferred": true
+        },
+        {
+          "vendorId": "vendor-005",
+          "vendorName": "Computer World",
+          "price": 1180.00,
+          "currency": "USD",
+          "normalizedPrice": 1180.00,
+          "minQuantity": 1,
+          "availability": "available",
+          "leadTime": 5,
+          "rating": 4.3,
+          "isPreferred": false
+        },
+        {
+          "vendorId": "vendor-006",
+          "vendorName": "Electronics Hub",
+          "price": 1320.00,
+          "currency": "USD",
+          "normalizedPrice": 1320.00,
+          "minQuantity": 1,
+          "availability": "available",
+          "leadTime": 3,
+          "rating": 4.6,
+          "isPreferred": false
+        }
+      ],
+      "isAutoAssigned": true,
+      "isManualOverride": false,
+      "assignmentConfidence": 0.88,
+      "currencyInfo": {
+        "originalCurrency": "USD",
+        "displayCurrency": "USD",
+        "exchangeRate": 1.0,
+        "lastUpdated": "2025-01-15T08:00:00Z"
+      }
+    },
+    {
+      "prItemId": "pr-item-003",
+      "prNumber": "PR-2025-002",
+      "productId": "prod-003",
+      "productName": "Industrial Cleaning Supplies",
+      "categoryId": "cat-maintenance",
+      "quantity": 50,
+      "requestedDate": "2025-01-16T00:00:00Z",
+      "location": "Warehouse",
+      "department": "Maintenance",
+      "priceAssignment": {
+        "prItemId": "pr-item-003",
+        "selectedVendor": {
+          "id": "vendor-007",
+          "name": "CleanPro Supplies",
+          "rating": 4.1,
+          "isPreferred": false
+        },
+        "assignedPrice": 25.75,
+        "currency": "USD",
+        "normalizedPrice": 25.75,
+        "assignmentReason": "Lowest price with acceptable quality rating and good availability",
+        "confidence": 0.75,
+        "alternatives": [
+          {
+            "vendorId": "vendor-008",
+            "vendorName": "Maintenance Masters",
+            "price": 28.50,
+            "currency": "USD",
+            "normalizedPrice": 28.50,
+            "minQuantity": 25,
+            "availability": "available",
+            "leadTime": 2,
+            "rating": 4.4,
+            "isPreferred": true
+          },
+          {
+            "vendorId": "vendor-009",
+            "vendorName": "Industrial Supply Co.",
+            "price": 27.20,
+            "currency": "USD",
+            "normalizedPrice": 27.20,
+            "minQuantity": 10,
+            "availability": "available",
+            "leadTime": 4,
+            "rating": 4.0,
+            "isPreferred": false
+          }
+        ],
+        "ruleApplied": "rule-lowest-price-maintenance",
+        "assignmentDate": "2025-01-16T09:15:00Z"
+      },
+      "vendorOptions": [
+        {
+          "vendorId": "vendor-007",
+          "vendorName": "CleanPro Supplies",
+          "price": 25.75,
+          "currency": "USD",
+          "normalizedPrice": 25.75,
+          "minQuantity": 20,
+          "availability": "available",
+          "leadTime": 3,
+          "rating": 4.1,
+          "isPreferred": false
+        },
+        {
+          "vendorId": "vendor-008",
+          "vendorName": "Maintenance Masters",
+          "price": 28.50,
+          "currency": "USD",
+          "normalizedPrice": 28.50,
+          "minQuantity": 25,
+          "availability": "available",
+          "leadTime": 2,
+          "rating": 4.4,
+          "isPreferred": true
+        },
+        {
+          "vendorId": "vendor-009",
+          "vendorName": "Industrial Supply Co.",
+          "price": 27.20,
+          "currency": "USD",
+          "normalizedPrice": 27.20,
+          "minQuantity": 10,
+          "availability": "available",
+          "leadTime": 4,
+          "rating": 4.0,
+          "isPreferred": false
+        }
+      ],
+      "isAutoAssigned": true,
+      "isManualOverride": false,
+      "assignmentConfidence": 0.75,
+      "currencyInfo": {
+        "originalCurrency": "USD",
+        "displayCurrency": "USD",
+        "exchangeRate": 1.0,
+        "lastUpdated": "2025-01-16T08:00:00Z"
+      }
+    },
+    {
+      "prItemId": "pr-item-004",
+      "prNumber": "PR-2025-003",
+      "productId": "prod-004",
+      "productName": "Safety Equipment - Hard Hats",
+      "categoryId": "cat-safety",
+      "quantity": 25,
+      "requestedDate": "2025-01-17T00:00:00Z",
+      "location": "Construction Site",
+      "department": "Safety",
+      "priceAssignment": null,
+      "vendorOptions": [
+        {
+          "vendorId": "vendor-010",
+          "vendorName": "Safety First Ltd",
+          "price": 45.00,
+          "currency": "USD",
+          "normalizedPrice": 45.00,
+          "minQuantity": 10,
+          "availability": "unavailable",
+          "leadTime": 0,
+          "rating": 4.7,
+          "isPreferred": true
+        },
+        {
+          "vendorId": "vendor-011",
+          "vendorName": "Industrial Safety Corp",
+          "price": 48.50,
+          "currency": "USD",
+          "normalizedPrice": 48.50,
+          "minQuantity": 5,
+          "availability": "available",
+          "leadTime": 5,
+          "rating": 4.3,
+          "isPreferred": false
+        }
+      ],
+      "isAutoAssigned": false,
+      "isManualOverride": false,
+      "assignmentConfidence": 0.0,
+      "assignmentStatus": "failed",
+      "assignmentFailureReason": "Primary vendor unavailable, alternative vendor exceeds budget threshold",
+      "currencyInfo": {
+        "originalCurrency": "USD",
+        "displayCurrency": "USD",
+        "exchangeRate": 1.0,
+        "lastUpdated": "2025-01-17T08:00:00Z"
+      }
+    },
+    {
+      "prItemId": "pr-item-005",
+      "prNumber": "PR-2025-003",
+      "productId": "prod-005",
+      "productName": "Raw Materials - Steel Sheets",
+      "categoryId": "cat-raw-materials",
+      "quantity": 100,
+      "requestedDate": "2025-01-17T00:00:00Z",
+      "location": "Manufacturing Plant",
+      "department": "Production",
+      "priceAssignment": {
+        "prItemId": "pr-item-005",
+        "selectedVendor": {
+          "id": "vendor-012",
+          "name": "Steel Dynamics Inc.",
+          "rating": 4.2,
+          "isPreferred": false
+        },
+        "assignedPrice": 85.50,
+        "currency": "USD",
+        "normalizedPrice": 85.50,
+        "assignmentReason": "Manual override - better quality despite higher price",
+        "confidence": 0.65,
+        "alternatives": [
+          {
+            "vendorId": "vendor-013",
+            "vendorName": "Metal Works Ltd",
+            "price": 78.20,
+            "currency": "USD",
+            "normalizedPrice": 78.20,
+            "minQuantity": 50,
+            "availability": "available",
+            "leadTime": 7,
+            "rating": 3.9,
+            "isPreferred": false
+          },
+          {
+            "vendorId": "vendor-014",
+            "vendorName": "Industrial Metals Co.",
+            "price": 82.00,
+            "currency": "USD",
+            "normalizedPrice": 82.00,
+            "minQuantity": 25,
+            "availability": "limited",
+            "leadTime": 10,
+            "rating": 4.0,
+            "isPreferred": true
+          }
+        ],
+        "ruleApplied": "rule-quality-over-price",
+        "assignmentDate": "2025-01-17T11:20:00Z"
+      },
+      "vendorOptions": [
+        {
+          "vendorId": "vendor-012",
+          "vendorName": "Steel Dynamics Inc.",
+          "price": 85.50,
+          "currency": "USD",
+          "normalizedPrice": 85.50,
+          "minQuantity": 10,
+          "availability": "available",
+          "leadTime": 5,
+          "rating": 4.2,
+          "isPreferred": false
+        },
+        {
+          "vendorId": "vendor-013",
+          "vendorName": "Metal Works Ltd",
+          "price": 78.20,
+          "currency": "USD",
+          "normalizedPrice": 78.20,
+          "minQuantity": 50,
+          "availability": "available",
+          "leadTime": 7,
+          "rating": 3.9,
+          "isPreferred": false
+        },
+        {
+          "vendorId": "vendor-014",
+          "vendorName": "Industrial Metals Co.",
+          "price": 82.00,
+          "currency": "USD",
+          "normalizedPrice": 82.00,
+          "minQuantity": 25,
+          "availability": "limited",
+          "leadTime": 10,
+          "rating": 4.0,
+          "isPreferred": true
+        }
+      ],
+      "isAutoAssigned": false,
+      "isManualOverride": true,
+      "assignmentConfidence": 0.65,
+      "assignmentStatus": "assigned",
+      "overrideHistory": [
+        {
+          "id": "override-001",
+          "originalVendorId": "vendor-013",
+          "originalVendorName": "Metal Works Ltd",
+          "originalPrice": 78.20,
+          "newVendorId": "vendor-012",
+          "newVendorName": "Steel Dynamics Inc.",
+          "newPrice": 85.50,
+          "currency": "USD",
+          "reason": "Better quality materials needed for critical production run",
+          "overriddenBy": "john.smith@company.com",
+          "overrideDate": "2025-01-17T11:20:00Z",
+          "approvedBy": "manager@company.com",
+          "approvalDate": "2025-01-17T11:25:00Z"
+        }
+      ],
+      "currencyInfo": {
+        "originalCurrency": "USD",
+        "displayCurrency": "USD",
+        "exchangeRate": 1.0,
+        "lastUpdated": "2025-01-17T08:00:00Z"
+      }
+    },
+    {
+      "prItemId": "pr-item-006",
+      "prNumber": "PR-2025-004",
+      "productId": "prod-006",
+      "productName": "Medical Supplies - Surgical Masks",
+      "categoryId": "cat-medical",
+      "quantity": 1000,
+      "requestedDate": "2025-01-18T00:00:00Z",
+      "location": "Medical Center",
+      "department": "Healthcare",
+      "priceAssignment": {
+        "prItemId": "pr-item-006",
+        "selectedVendor": {
+          "id": "vendor-015",
+          "name": "MedSupply International",
+          "rating": 4.9,
+          "isPreferred": true
+        },
+        "assignedPrice": 0.85,
+        "currency": "USD",
+        "normalizedPrice": 0.85,
+        "assignmentReason": "Preferred medical supplier with FDA certification and bulk pricing",
+        "confidence": 0.95,
+        "alternatives": [
+          {
+            "vendorId": "vendor-016",
+            "vendorName": "Healthcare Solutions",
+            "price": 0.92,
+            "currency": "USD",
+            "normalizedPrice": 0.92,
+            "minQuantity": 500,
+            "availability": "available",
+            "leadTime": 3,
+            "rating": 4.6,
+            "isPreferred": false
+          },
+          {
+            "vendorId": "vendor-017",
+            "vendorName": "Global Medical Supply",
+            "price": 0.78,
+            "currency": "USD",
+            "normalizedPrice": 0.78,
+            "minQuantity": 2000,
+            "availability": "available",
+            "leadTime": 14,
+            "rating": 4.1,
+            "isPreferred": false
+          }
+        ],
+        "ruleApplied": "rule-medical-preferred-vendor",
+        "assignmentDate": "2025-01-18T09:45:00Z"
+      },
+      "vendorOptions": [
+        {
+          "vendorId": "vendor-015",
+          "vendorName": "MedSupply International",
+          "price": 0.85,
+          "currency": "USD",
+          "normalizedPrice": 0.85,
+          "minQuantity": 100,
+          "availability": "available",
+          "leadTime": 2,
+          "rating": 4.9,
+          "isPreferred": true
+        },
+        {
+          "vendorId": "vendor-016",
+          "vendorName": "Healthcare Solutions",
+          "price": 0.92,
+          "currency": "USD",
+          "normalizedPrice": 0.92,
+          "minQuantity": 500,
+          "availability": "available",
+          "leadTime": 3,
+          "rating": 4.6,
+          "isPreferred": false
+        },
+        {
+          "vendorId": "vendor-017",
+          "vendorName": "Global Medical Supply",
+          "price": 0.78,
+          "currency": "USD",
+          "normalizedPrice": 0.78,
+          "minQuantity": 2000,
+          "availability": "available",
+          "leadTime": 14,
+          "rating": 4.1,
+          "isPreferred": false
+        }
+      ],
+      "isAutoAssigned": true,
+      "isManualOverride": false,
+      "assignmentConfidence": 0.95,
+      "assignmentStatus": "assigned",
+      "currencyInfo": {
+        "originalCurrency": "USD",
+        "displayCurrency": "USD",
+        "exchangeRate": 1.0,
+        "lastUpdated": "2025-01-18T08:00:00Z"
+      }
+    },
+    {
+      "prItemId": "pr-item-007",
+      "prNumber": "PR-2025-005",
+      "productId": "prod-007",
+      "productName": "Multi-Currency Item - European Components",
+      "categoryId": "cat-components",
+      "quantity": 200,
+      "requestedDate": "2025-01-19T00:00:00Z",
+      "location": "Assembly Plant",
+      "department": "Manufacturing",
+      "priceAssignment": {
+        "prItemId": "pr-item-007",
+        "selectedVendor": {
+          "id": "vendor-018",
+          "name": "EuroTech Components",
+          "rating": 4.4,
+          "isPreferred": true
+        },
+        "assignedPrice": 35.20,
+        "currency": "EUR",
+        "normalizedPrice": 38.72,
+        "assignmentReason": "Best normalized price after currency conversion with preferred European supplier",
+        "confidence": 0.82,
+        "alternatives": [
+          {
+            "vendorId": "vendor-019",
+            "vendorName": "American Parts Co.",
+            "price": 42.00,
+            "currency": "USD",
+            "normalizedPrice": 42.00,
+            "minQuantity": 100,
+            "availability": "available",
+            "leadTime": 7,
+            "rating": 4.1,
+            "isPreferred": false
+          },
+          {
+            "vendorId": "vendor-020",
+            "vendorName": "Asian Manufacturing Ltd",
+            "price": 280.50,
+            "currency": "CNY",
+            "normalizedPrice": 39.85,
+            "minQuantity": 500,
+            "availability": "available",
+            "leadTime": 21,
+            "rating": 3.8,
+            "isPreferred": false
+          }
+        ],
+        "ruleApplied": "rule-multi-currency-best-value",
+        "assignmentDate": "2025-01-19T10:15:00Z"
+      },
+      "vendorOptions": [
+        {
+          "vendorId": "vendor-018",
+          "vendorName": "EuroTech Components",
+          "price": 35.20,
+          "currency": "EUR",
+          "normalizedPrice": 38.72,
+          "minQuantity": 50,
+          "availability": "available",
+          "leadTime": 10,
+          "rating": 4.4,
+          "isPreferred": true
+        },
+        {
+          "vendorId": "vendor-019",
+          "vendorName": "American Parts Co.",
+          "price": 42.00,
+          "currency": "USD",
+          "normalizedPrice": 42.00,
+          "minQuantity": 100,
+          "availability": "available",
+          "leadTime": 7,
+          "rating": 4.1,
+          "isPreferred": false
+        },
+        {
+          "vendorId": "vendor-020",
+          "vendorName": "Asian Manufacturing Ltd",
+          "price": 280.50,
+          "currency": "CNY",
+          "normalizedPrice": 39.85,
+          "minQuantity": 500,
+          "availability": "available",
+          "leadTime": 21,
+          "rating": 3.8,
+          "isPreferred": false
+        }
+      ],
+      "isAutoAssigned": true,
+      "isManualOverride": false,
+      "assignmentConfidence": 0.82,
+      "assignmentStatus": "assigned",
+      "currencyInfo": {
+        "originalCurrency": "EUR",
+        "displayCurrency": "USD",
+        "exchangeRate": 1.10,
+        "lastUpdated": "2025-01-19T08:00:00Z"
+      }
+    }
+  ]
+}

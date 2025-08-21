@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-08-14T11:36:45.107Z",
+  "total_files": 13,
+  "successful_enhancements": 13,
+  "skipped_files": 0,
+  "failed_enhancements": 0,
+  "success_rate": "100.0",
+  "results": [
+    {
+      "file": "main-dashboard-screen.md",
+      "status": "success",
+      "imagePath": "./images/main-dashboard/main-dashboard-default.png"
+    },
+    {
+      "file": "operational-dashboard-fractional-screen.md",
+      "status": "success",
+      "imagePath": "./images/operational-dashboard-fractional/operational-dashboard-fractional-default.png"
+    },
+    {
+      "file": "purchase-order-detail-screen.md",
+      "status": "success",
+      "imagePath": "./images/purchase-order-detail/purchase-order-detail-default.png"
+    },
+    {
+      "file": "goods-received-note-detail-screen.md",
+      "status": "success",
+      "imagePath": "./images/goods-received-note-detail/goods-received-note-detail-default.png"
+    },
+    {
+      "file": "vendor-detail-screen.md",
+      "status": "success",
+      "imagePath": "./images/vendor-detail/vendor-detail-default.png"
+    },
+    {
+      "file": "vendor-list-screen.md",
+      "status": "success",
+      "imagePath": "./images/vendor-list/vendor-list-default.png"
+    },
+    {
+      "file": "inventory-adjustment-detail-screen.md",
+      "status": "success",
+      "imagePath": "./images/inventory-adjustment-detail/inventory-adjustment-detail-default.png"
+    },
+    {
+      "file": "consumption-analytics-fractional-screen.md",
+      "status": "success",
+      "imagePath": "./images/consumption-analytics-fractional/consumption-analytics-fractional-default.png"
+    },
+    {
+      "file": "vendor-management-overview-screen.md",
+      "status": "success",
+      "imagePath": "./images/vendor-management-overview/vendor-management-overview-default.png"
+    },
+    {
+      "file": "inventory-management-overview-screen.md",
+      "status": "success",
+      "imagePath": "./images/inventory-management-overview/inventory-management-overview-default.png"
+    },
+    {
+      "file": "store-operations-overview-screen.md",
+      "status": "success",
+      "imagePath": "./images/store-operations-overview/store-operations-overview-default.png"
+    },
+    {
+      "file": "stock-balance-report-screen.md",
+      "status": "success",
+      "imagePath": "./images/stock-balance-report/stock-balance-report-default.png"
+    },
+    {
+      "file": "my-approvals-screen.md",
+      "status": "success",
+      "imagePath": "./images/my-approvals/my-approvals-default.png"
+    }
+  ]
+}

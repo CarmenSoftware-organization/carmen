@@ -1,0 +1,309 @@
+{
+  "overview": {
+    "totalVendors": 24,
+    "activeVendors": 22,
+    "pendingVendors": 2,
+    "totalPriceLists": 156,
+    "activePriceLists": 142,
+    "expiringPriceLists": 14,
+    "autoAssignmentRate": 89,
+    "manualOverrideRate": 11,
+    "averageConfidenceScore": 87.3,
+    "costSavings": 24580.00,
+    "costSavingsPercentage": 12.5,
+    "lastUpdated": "2024-01-16T16:00:00Z"
+  },
+  "vendorParticipation": {
+    "totalInvited": 24,
+    "responded": 21,
+    "participationRate": 87.5,
+    "averageResponseTime": 2.3,
+    "onTimeSubmissions": 19,
+    "lateSubmissions": 2,
+    "missedSubmissions": 3,
+    "byCategory": [
+      {
+        "category": "Food & Beverage",
+        "totalVendors": 8,
+        "participatingVendors": 7,
+        "participationRate": 87.5
+      },
+      {
+        "category": "Fresh Produce",
+        "totalVendors": 5,
+        "participatingVendors": 5,
+        "participationRate": 100.0
+      },
+      {
+        "category": "Equipment",
+        "totalVendors": 4,
+        "participatingVendors": 3,
+        "participationRate": 75.0
+      },
+      {
+        "category": "Beverages",
+        "totalVendors": 3,
+        "participatingVendors": 3,
+        "participationRate": 100.0
+      },
+      {
+        "category": "Meat & Seafood",
+        "totalVendors": 2,
+        "participatingVendors": 1,
+        "participationRate": 50.0
+      },
+      {
+        "category": "Cleaning Supplies",
+        "totalVendors": 2,
+        "participatingVendors": 2,
+        "participationRate": 100.0
+      }
+    ]
+  },
+  "priceAssignmentPerformance": {
+    "totalAssignments": 1247,
+    "successfulAssignments": 1109,
+    "failedAssignments": 138,
+    "successRate": 88.9,
+    "averageAssignmentTime": 0.8,
+    "averageConfidenceScore": 87.3,
+    "manualOverrides": 142,
+    "overrideRate": 11.4,
+    "byRule": [
+      {
+        "ruleId": "rule-001",
+        "ruleName": "Preferred Vendor Priority",
+        "executions": 156,
+        "successes": 147,
+        "successRate": 94.2,
+        "averageConfidence": 89.5
+      },
+      {
+        "ruleId": "rule-002",
+        "ruleName": "Bulk Quantity Discount",
+        "executions": 89,
+        "successes": 77,
+        "successRate": 86.5,
+        "averageConfidence": 82.3
+      },
+      {
+        "ruleId": "rule-006",
+        "ruleName": "Quality Rating Minimum",
+        "executions": 203,
+        "successes": 198,
+        "successRate": 97.5,
+        "averageConfidence": 91.2
+      }
+    ]
+  },
+  "costAnalysis": {
+    "totalSpend": 487650.00,
+    "projectedSpend": 512230.00,
+    "actualSavings": 24580.00,
+    "savingsPercentage": 4.8,
+    "averageSavingsPerItem": 19.70,
+    "topSavingCategories": [
+      {
+        "category": "Food & Beverage",
+        "savings": 12450.00,
+        "savingsPercentage": 8.2
+      },
+      {
+        "category": "Fresh Produce",
+        "savings": 6780.00,
+        "savingsPercentage": 12.1
+      },
+      {
+        "category": "Equipment",
+        "savings": 3890.00,
+        "savingsPercentage": 3.1
+      },
+      {
+        "category": "Beverages",
+        "savings": 1460.00,
+        "savingsPercentage": 6.8
+      }
+    ]
+  },
+  "trendAnalysis": {
+    "priceAssignmentTrends": [
+      {
+        "date": "2024-01-01",
+        "totalAssignments": 45,
+        "successfulAssignments": 41,
+        "successRate": 91.1,
+        "averageConfidence": 85.2
+      },
+      {
+        "date": "2024-01-02",
+        "totalAssignments": 52,
+        "successfulAssignments": 47,
+        "successRate": 90.4,
+        "averageConfidence": 86.1
+      },
+      {
+        "date": "2024-01-03",
+        "totalAssignments": 38,
+        "successfulAssignments": 35,
+        "successRate": 92.1,
+        "averageConfidence": 87.8
+      },
+      {
+        "date": "2024-01-04",
+        "totalAssignments": 61,
+        "successfulAssignments": 54,
+        "successRate": 88.5,
+        "averageConfidence": 84.9
+      },
+      {
+        "date": "2024-01-05",
+        "totalAssignments": 43,
+        "successfulAssignments": 39,
+        "successRate": 90.7,
+        "averageConfidence": 88.3
+      }
+    ],
+    "vendorEngagementTrends": [
+      {
+        "week": "2024-W01",
+        "invitationsSent": 24,
+        "responsesReceived": 18,
+        "responseRate": 75.0,
+        "averageResponseTime": 2.8
+      },
+      {
+        "week": "2024-W02",
+        "invitationsSent": 22,
+        "responsesReceived": 20,
+        "responseRate": 90.9,
+        "averageResponseTime": 2.1
+      },
+      {
+        "week": "2024-W03",
+        "invitationsSent": 26,
+        "responsesReceived": 23,
+        "responseRate": 88.5,
+        "averageResponseTime": 1.9
+      }
+    ]
+  },
+  "topPerformingVendors": [
+    {
+      "vendorId": "vendor-001",
+      "vendorName": "ABC Food Supplies",
+      "category": "Food & Beverage",
+      "participationRate": 100.0,
+      "averageResponseTime": 1.2,
+      "priceAccuracy": 98.5,
+      "assignmentCount": 45,
+      "rating": 4.8
+    },
+    {
+      "vendorId": "vendor-002",
+      "vendorName": "Fresh Produce Co.",
+      "category": "Fresh Produce",
+      "participationRate": 100.0,
+      "averageResponseTime": 0.8,
+      "priceAccuracy": 96.2,
+      "assignmentCount": 38,
+      "rating": 4.6
+    },
+    {
+      "vendorId": "vendor-004",
+      "vendorName": "Quality Beverages Inc",
+      "category": "Beverages",
+      "participationRate": 95.0,
+      "averageResponseTime": 1.5,
+      "priceAccuracy": 97.8,
+      "assignmentCount": 28,
+      "rating": 4.7
+    },
+    {
+      "vendorId": "vendor-003",
+      "vendorName": "Kitchen Equipment Ltd",
+      "category": "Equipment",
+      "participationRate": 85.0,
+      "averageResponseTime": 3.2,
+      "priceAccuracy": 94.1,
+      "assignmentCount": 12,
+      "rating": 4.4
+    }
+  ],
+  "categoryPerformance": [
+    {
+      "category": "Food & Beverage",
+      "totalItems": 245,
+      "assignedItems": 221,
+      "assignmentRate": 90.2,
+      "averageConfidence": 89.1,
+      "averagePrice": 45.80,
+      "priceVariance": 12.3
+    },
+    {
+      "category": "Fresh Produce",
+      "totalItems": 156,
+      "assignedItems": 148,
+      "assignmentRate": 94.9,
+      "averageConfidence": 85.7,
+      "averagePrice": 18.90,
+      "priceVariance": 18.7
+    },
+    {
+      "category": "Equipment",
+      "totalItems": 89,
+      "assignedItems": 76,
+      "assignmentRate": 85.4,
+      "averageConfidence": 91.2,
+      "averagePrice": 785.50,
+      "priceVariance": 8.9
+    },
+    {
+      "category": "Beverages",
+      "totalItems": 78,
+      "assignedItems": 72,
+      "assignmentRate": 92.3,
+      "averageConfidence": 88.4,
+      "averagePrice": 12.45,
+      "priceVariance": 15.2
+    }
+  ],
+  "systemHealth": {
+    "portalUptime": 99.8,
+    "apiResponseTime": 0.45,
+    "dataQuality": 97.2,
+    "errorRate": 0.8,
+    "lastSystemCheck": "2024-01-16T15:45:00Z",
+    "activeAlerts": 2,
+    "resolvedIssues": 15
+  },
+  "recentInsights": [
+    {
+      "type": "cost_optimization",
+      "title": "Cost Optimization Opportunity",
+      "description": "Saved $2,400 this week through better vendor selection in Food & Beverage category",
+      "impact": "positive",
+      "date": "2024-01-16T12:00:00Z"
+    },
+    {
+      "type": "vendor_engagement",
+      "title": "Vendor Engagement Improvement",
+      "description": "3 new vendors completed price submissions, increasing category coverage",
+      "impact": "positive",
+      "date": "2024-01-16T10:30:00Z"
+    },
+    {
+      "type": "rule_performance",
+      "title": "Business Rule Optimization Needed",
+      "description": "Rule #3 (Location-Based Assignment) showing decreased performance, consider review",
+      "impact": "attention",
+      "date": "2024-01-16T09:15:00Z"
+    },
+    {
+      "type": "price_volatility",
+      "title": "Price Volatility Alert",
+      "description": "Fresh Produce category showing 18% price variance, monitor for market changes",
+      "impact": "attention",
+      "date": "2024-01-15T16:20:00Z"
+    }
+  ]
+}

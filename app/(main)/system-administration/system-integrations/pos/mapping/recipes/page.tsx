@@ -4,7 +4,10 @@ import { useState, useMemo } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import Link from "next/link"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Pizza, Cake, Package2 } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 import { 
   MappingHeader, 

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ChevronDown, ChevronRight, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, PanelLeftClose, PanelLeftOpen, Cog } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
 interface MenuItem {
@@ -41,44 +41,7 @@ const menuItems: MenuItem[] = [
     title: "Dashboard",
     path: "/dashboard",
     icon: "LayoutDashboard",
-    subItems: [
-      { 
-        name: "Overview", 
-        path: "/dashboard/overview",
-        icon: "LayoutDashboard",
-        description: "Hotel supply chain overview"
-      },
-      { 
-        name: "Performance Metrics", 
-        path: "/dashboard/performance",
-        icon: "LineChart",
-        description: "Real-time performance indicators"
-      },
-      { 
-        name: "Inventory Status", 
-        path: "/dashboard/inventory",
-        icon: "PackageCheck",
-        description: "Current stock levels and alerts"
-      },
-      { 
-        name: "Supplier Analytics", 
-        path: "/dashboard/suppliers",
-        icon: "Users",
-        description: "Supplier performance and ratings"
-      },
-      { 
-        name: "Cost Center", 
-        path: "/dashboard/costs",
-        icon: "DollarSign",
-        description: "Financial metrics and cost analysis"
-      },
-      { 
-        name: "Active Orders", 
-        path: "/dashboard/orders",
-        icon: "ShoppingCart",
-        description: "Ongoing orders and deliveries"
-      }
-    ],
+    subItems: [],
   },
   {
     title: "Procurement",
@@ -109,9 +72,32 @@ const menuItems: MenuItem[] = [
     path: "/vendor-management",
     icon: "Users",
     subItems: [
-      { name: "Manage Vendors", path: "/vendor-management/manage-vendors" },
-      { name: "Price Lists", path: "/vendor-management/price-lists" },
-      { name: "Price Comparisons", path: "/vendor-management/price-comparisons" },
+      { 
+        name: "Vendor Directory", 
+        path: "/vendor-management/manage-vendors",
+        icon: "Users"
+      },
+      { 
+        name: "Pricelist Templates", 
+        path: "/vendor-management/templates",
+        icon: "FileText"
+      },
+      { 
+        name: "Requests for Pricing", 
+        path: "/vendor-management/campaigns",
+        icon: "Mail"
+      },
+      { 
+        name: "Price Lists", 
+        path: "/vendor-management/pricelists",
+        icon: "ListChecks"
+      },
+      { 
+        name: "Vendor Entry", 
+        path: "/vendor-management/vendor-portal/sample",
+        icon: "ExternalLink",
+        description: "Simple vendor price entry interface"
+      },
     ],
   },
   {
@@ -351,9 +337,7 @@ function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarCon
   };
 
   const handleItemClick = (item: MenuItem) => {
-    if (item.title === "Dashboard") {
-      onToggleCollapse?.();
-    } else if (item.subItems?.length > 0) {
+    if (item.subItems?.length > 0) {
       toggleExpand(item.title);
     } else {
       router.push(item.path);
@@ -389,7 +373,7 @@ function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarCon
                 >
                   <span className="flex items-center">
                     <LucideIcons.LayoutDashboard className="h-4 w-4" />
-                    {!isCollapsed && <span className="ml-2">{dashboardItem.title}</span>}
+                    {!isCollapsed && <span className="ml-1">{dashboardItem.title}</span>}
                   </span>
                   {!isCollapsed && (
                     isCollapsed ? (
@@ -411,12 +395,12 @@ function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarCon
                         <Button
                           key={subIndex}
                           variant={isSubActive ? "secondary" : "ghost"}
-                          className="w-full justify-start"
+                          className="w-full justify-start h-auto p-2"
                           asChild
                         >
-                          <Link href={subItem.path} className="flex items-center">
-                            {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
-                            <div>
+                          <Link href={subItem.path} className="flex items-center gap-3">
+                            {SubIconComponent && <SubIconComponent className="h-4 w-4 flex-shrink-0" />}
+                            <div className="text-left">
                               <span>{subItem.name}</span>
                               {subItem.description && (
                                 <p className="text-xs text-muted-foreground">{subItem.description}</p>
@@ -449,7 +433,7 @@ function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarCon
                   >
                     <span className="flex items-center">
                       <IconComponent className="h-4 w-4" />
-                      {!isCollapsed && <span className="ml-2">{item.title}</span>}
+                      {!isCollapsed && <span className="ml-1">{item.title}</span>}
                     </span>
                     {!isCollapsed && item.subItems?.length > 0 && (
                       isItemExpanded ? (
@@ -471,15 +455,15 @@ function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarCon
                           <div key={subIndex} className="space-y-1">
                             <Button
                               variant={isSubActive ? "secondary" : "ghost"}
-                              className="w-full justify-between"
+                              className="w-full justify-start h-auto p-2"
                               onClick={(e) => handleSubItemClick(subItem, e)}
                               asChild={!subItem.subItems}
                             >
                               {subItem.subItems ? (
                                 <div className="flex items-center justify-between w-full">
-                                  <span className="flex items-center">
-                                    {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
-                                    <div>
+                                  <span className="flex items-center gap-3">
+                                    {SubIconComponent && <SubIconComponent className="h-4 w-4 flex-shrink-0" />}
+                                    <div className="text-left">
                                       <span>{subItem.name}</span>
                                       {subItem.description && (
                                         <p className="text-xs text-muted-foreground">{subItem.description}</p>
@@ -493,9 +477,9 @@ function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarCon
                                   )}
                                 </div>
                               ) : (
-                                <Link href={subItem.path} className="flex items-center w-full">
-                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 mr-2" />}
-                                  <div>
+                                <Link href={subItem.path} className="flex items-center gap-3">
+                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 flex-shrink-0" />}
+                                  <div className="text-left">
                                     <span>{subItem.name}</span>
                                     {subItem.description && (
                                       <p className="text-xs text-muted-foreground">{subItem.description}</p>
@@ -515,11 +499,11 @@ function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarCon
                                     <Button
                                       key={subSubIndex}
                                       variant={isSubSubActive ? "secondary" : "ghost"}
-                                      className="w-full justify-start"
+                                      className="w-full justify-start h-auto p-2"
                                       asChild
                                     >
-                                      <Link href={subSubItem.path} className="flex items-center">
-                                        {SubSubIconComponent && <SubSubIconComponent className="h-4 w-4 mr-2" />}
+                                      <Link href={subSubItem.path} className="flex items-center gap-3">
+                                        {SubSubIconComponent && <SubSubIconComponent className="h-4 w-4 flex-shrink-0" />}
                                         <span>{subSubItem.name}</span>
                                       </Link>
                                     </Button>

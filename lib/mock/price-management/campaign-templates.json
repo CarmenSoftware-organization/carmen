@@ -1,0 +1,158 @@
+[
+  {
+    "id": "template-001",
+    "name": "Quarterly Price Collection",
+    "description": "Standard template for quarterly price collection campaigns",
+    "settings": {
+      "portalAccessDuration": 14,
+      "allowedSubmissionMethods": ["manual", "upload"],
+      "requireApproval": true,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [7, 3, 1],
+        "escalationRules": [
+          {
+            "daysOverdue": 2,
+            "escalateTo": ["purchasing.manager@company.com"],
+            "messageTemplate": "escalation-template-1"
+          }
+        ]
+      },
+      "emailTemplate": "quarterly-collection-template",
+      "priority": "high"
+    },
+    "defaultVendorFilters": {
+      "status": ["active"],
+      "rating": {
+        "min": 3,
+        "max": 5
+      }
+    },
+    "defaultCategories": ["food-items", "beverages"],
+    "isPublic": true,
+    "createdBy": "admin@company.com",
+    "createdAt": "2023-12-01T10:00:00Z",
+    "usageCount": 12
+  },
+  {
+    "id": "template-002",
+    "name": "Emergency Price Update",
+    "description": "Template for urgent price collection due to market changes",
+    "settings": {
+      "portalAccessDuration": 3,
+      "allowedSubmissionMethods": ["manual", "upload"],
+      "requireApproval": false,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [1],
+        "escalationRules": [
+          {
+            "daysOverdue": 0.5,
+            "escalateTo": ["emergency.contact@company.com"],
+            "messageTemplate": "urgent-escalation-template"
+          }
+        ]
+      },
+      "emailTemplate": "urgent-collection-template",
+      "priority": "urgent"
+    },
+    "defaultVendorFilters": {
+      "status": ["active"]
+    },
+    "isPublic": true,
+    "createdBy": "admin@company.com",
+    "createdAt": "2023-12-01T10:00:00Z",
+    "usageCount": 5
+  },
+  {
+    "id": "template-003",
+    "name": "New Vendor Onboarding",
+    "description": "Template for collecting initial prices from new vendors",
+    "settings": {
+      "portalAccessDuration": 21,
+      "allowedSubmissionMethods": ["manual", "upload"],
+      "requireApproval": true,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [14, 7, 3, 1],
+        "escalationRules": [
+          {
+            "daysOverdue": 3,
+            "escalateTo": ["vendor.relations@company.com"],
+            "messageTemplate": "onboarding-escalation-template"
+          }
+        ]
+      },
+      "emailTemplate": "onboarding-collection-template",
+      "customInstructions": "Welcome to our vendor network! Please provide comprehensive pricing for all items in your assigned categories.",
+      "priority": "medium"
+    },
+    "defaultVendorFilters": {
+      "status": ["active"],
+      "lastActivity": {
+        "days": 30
+      }
+    },
+    "isPublic": true,
+    "createdBy": "admin@company.com",
+    "createdAt": "2023-12-01T10:00:00Z",
+    "usageCount": 8
+  },
+  {
+    "id": "template-004",
+    "name": "Monthly Produce Collection",
+    "description": "Specialized template for fresh produce price collection",
+    "settings": {
+      "portalAccessDuration": 7,
+      "allowedSubmissionMethods": ["upload"],
+      "requireApproval": false,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [3, 1],
+        "escalationRules": [
+          {
+            "daysOverdue": 1,
+            "escalateTo": ["produce.manager@company.com"],
+            "messageTemplate": "produce-escalation-template"
+          }
+        ]
+      },
+      "emailTemplate": "monthly-produce-template",
+      "priority": "medium"
+    },
+    "defaultVendorFilters": {
+      "status": ["active"],
+      "categories": ["fresh-produce", "organic-items"]
+    },
+    "defaultCategories": ["fresh-produce", "organic-items"],
+    "isPublic": true,
+    "createdBy": "produce.manager@company.com",
+    "createdAt": "2023-12-15T14:00:00Z",
+    "usageCount": 15
+  },
+  {
+    "id": "template-005",
+    "name": "Custom Department Template",
+    "description": "Private template for specific department needs",
+    "settings": {
+      "portalAccessDuration": 10,
+      "allowedSubmissionMethods": ["manual"],
+      "requireApproval": true,
+      "autoReminders": false,
+      "emailTemplate": "custom-department-template",
+      "priority": "low"
+    },
+    "defaultVendorFilters": {
+      "status": ["active"],
+      "tags": ["department-specific"]
+    },
+    "isPublic": false,
+    "createdBy": "department.head@company.com",
+    "createdAt": "2024-01-10T09:00:00Z",
+    "usageCount": 2
+  }
+]

@@ -25,6 +25,8 @@ interface SummaryPRTableProps {
     totalAmount: number;
     discountRate: number;
     taxRate: number;
+    price?: number;
+    quantityApproved?: number;
   };
   currencyBase: string;
   currencyCurrent: string;
@@ -35,6 +37,9 @@ export default function SummaryPRTable({ item, currencyBase, currencyCurrent }: 
     return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
   };
 
+  const pricePerUnit = item.price ?? 0;
+  const basePrice = pricePerUnit / (item.currencyRate ?? 1);
+
   const data = [
     {
       Label: "Subtotal Amount",
@@ -42,6 +47,8 @@ export default function SummaryPRTable({ item, currencyBase, currencyCurrent }: 
       localAmt: item.baseSubTotalPrice ?? 0,
       currentCurrency: currencyCurrent,
       currentAmt: item.subTotalPrice ?? 0,
+      pricePerUnit: pricePerUnit,
+      basePricePerUnit: basePrice,
     },{
         Label: "Discount Amount",
         localCurrency: currencyBase,
@@ -82,11 +89,25 @@ export default function SummaryPRTable({ item, currencyBase, currencyCurrent }: 
         </TableHeader>
         <TableBody>
 
-          {data.map((item) => (
-                <TableRow key={item.Label}>
-                <TableCell className="whitespace-nowrap">{item.Label}</TableCell>
-                <TableCell className="text-right font-bold whitespace-nowrap">{item.currentAmt}</TableCell>
-                <TableCell className="hidden md:block text-right text-xs text-gray-500 whitespace-nowrap">{item.localAmt}</TableCell>
+          {data.map((rowItem, index) => (
+                <TableRow key={rowItem.Label}>
+                <TableCell className="whitespace-nowrap">
+                  {rowItem.Label}
+                  {index === 0 && rowItem.pricePerUnit !== undefined && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Price per unit: {formatCurrency(rowItem.pricePerUnit, currencyCurrent)}
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="text-right font-bold whitespace-nowrap">{rowItem.currentAmt}</TableCell>
+                <TableCell className="hidden md:block text-right text-xs text-gray-500 whitespace-nowrap">
+                  {rowItem.localAmt}
+                  {index === 0 && rowItem.basePricePerUnit !== undefined && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {formatCurrency(rowItem.basePricePerUnit, currencyBase)}
+                    </div>
+                  )}
+                </TableCell>
                
               </TableRow>
           ))}

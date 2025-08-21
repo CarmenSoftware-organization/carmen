@@ -359,7 +359,7 @@ export function CreditNoteManagement() {
                           className="-ml-3 h-8 data-[state=selected]:bg-muted"
                           onClick={() => handleSort('refNumber')}
                         >
-                          Ref Number
+                          Requisition
                           <ArrowUpDown className="ml-2 h-4 w-4" />
                         </Button>
                       </div>

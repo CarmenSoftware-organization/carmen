@@ -4,9 +4,8 @@ import { automatedQualityService } from '@/lib/services/automated-quality-servic
 // GET /api/price-management/validation/flags - Get quality flags
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const vendorId = searchParams.get('vendorId');
-    const status = searchParams.get('status') || 'active';
+    const vendorId = request.nextUrl.searchParams.get('vendorId');
+    const status = request.nextUrl.searchParams.get('status') || 'active';
 
     let flags;
     if (status === 'active') {
@@ -51,8 +50,7 @@ export async function GET(request: NextRequest) {
 // PUT /api/price-management/validation/flags/[flagId]/resolve
 export async function PUT(request: NextRequest) {
   try {
-    const url = new URL(request.url);
-    const flagId = url.pathname.split('/').pop()?.replace('/resolve', '');
+    const flagId = request.nextUrl.pathname.split('/').pop()?.replace('/resolve', '');
     
     if (!flagId) {
       return NextResponse.json({

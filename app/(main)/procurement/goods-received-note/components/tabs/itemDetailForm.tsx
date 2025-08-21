@@ -70,8 +70,6 @@ const emptyItem: GoodsReceiveNoteItem = {
   expiryDate: undefined, // Add expiryDate
   serialNumber: undefined, // Add serialNumber
   notes: undefined, // Add notes
-  projectCode: undefined, // Initialize added field
-  marketSegment: undefined, // Initialize added field
 };
 
 // --- Placeholder Options for Dropdowns ---
@@ -85,7 +83,18 @@ const MOCK_JOB_CODES = [
   { value: "JOB-2023-006", label: "Kitchen Reno (JOB-2023-006)" },
   { value: "JOB-2024-001", label: "Lobby Upgrade (JOB-2024-001)" },
 ];
+const MOCK_JOB_NUMBERS = [
+  { value: "FB-2024-Q1-001", label: "FB-2024-Q1-001" },
+  { value: "FB-2024-Q1-002", label: "FB-2024-Q1-002" },
+  { value: "FB-2024-Q2-001", label: "FB-2024-Q2-001" },
+];
+const MOCK_EVENTS = [
+  { value: "CONF2024", label: "CONF2024" },
+  { value: "TRADE2024", label: "TRADE2024" },
+  { value: "SUMMIT2024", label: "SUMMIT2024" },
+];
 const MOCK_MARKET_SEGMENTS = [
+  { value: "ENTERPRISE", label: "ENTERPRISE" },
   { value: "Commercial Construction", label: "Commercial Construction" },
   { value: "Residential", label: "Residential" },
   { value: "Hospitality", label: "Hospitality" },
@@ -100,7 +109,7 @@ interface ItemDetailFormProps {
   productCode?: string;
   locationCode?: string;
   unitConversions?: UnitConversion[];
-  onAddNewRecord?: (fieldType: 'projectCode' | 'jobCode' | 'marketSegment') => void;
+  onAddNewRecord?: (fieldType: 'projectCode' | 'jobCode' | 'marketSegment' | 'jobNumber' | 'event') => void;
   onRequestEdit?: () => void;
   onClose: () => void;
   onSave: (item: GoodsReceiveNoteItem) => void;
@@ -378,7 +387,7 @@ export default function ItemDetailForm({
   const unitOptions = ["Kg", "Pcs", "Box", "Pack", "L", "mL", "Set", "Unit"];
 
   // --- Dropdown Change Handler ---
-  const handleDynamicSelectChange = (field: 'projectCode' | 'jobCode' | 'marketSegment', value: string) => {
+  const handleDynamicSelectChange = (field: 'jobCode', value: string) => {
     if (value === ADD_NEW_VALUE) {
         onAddNewRecord?.(field);
         console.log(`Add new for field: ${field}`);
@@ -431,111 +440,113 @@ export default function ItemDetailForm({
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <Label htmlFor="location">Location</Label>
-                        <Input id="location" value={item.location || ''} onChange={(e) => handleChange('location', e.target.value)} readOnly={isReadOnly} />
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.location || "N/A"}
+                            </div>
+                        ) : (
+                            <Input id="location" value={item.location || ''} onChange={(e) => handleChange('location', e.target.value)} readOnly={isReadOnly} />
+                        )}
                         <p className="text-sm text-gray-500 mt-1">{locationCode || '\u00A0'}</p>
                     </div>
                     <div>
                         <Label htmlFor="productName">Product Name</Label>
-                        <Input id="productName" value={item.name || ''} onChange={(e) => handleChange('name', e.target.value)} readOnly={isReadOnly} />
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.name || "N/A"}
+                            </div>
+                        ) : (
+                            <Input id="productName" value={item.name || ''} onChange={(e) => handleChange('name', e.target.value)} readOnly={isReadOnly} />
+                        )}
                         <p className="text-sm text-gray-500 mt-1">{productCode || '\u00A0'}</p>
                     </div>
                     <div>
                         <Label htmlFor="description">Description</Label>
-                        <Input id="description" value={item.description || ''} onChange={(e) => handleChange('description', e.target.value)} readOnly={isReadOnly} />
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.description || "N/A"}
+                            </div>
+                        ) : (
+                            <Input id="description" value={item.description || ''} onChange={(e) => handleChange('description', e.target.value)} readOnly={isReadOnly} />
+                        )}
                     </div>
                      <div>
                         <Label htmlFor="purchaseOrderRef">PO Reference</Label>
-                        <Input id="purchaseOrderRef" value={item.purchaseOrderRef || ''} onChange={(e) => handleChange('purchaseOrderRef', e.target.value)} readOnly={isReadOnly} />
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.purchaseOrderRef || "N/A"}
+                            </div>
+                        ) : (
+                            <Input id="purchaseOrderRef" value={item.purchaseOrderRef || ''} onChange={(e) => handleChange('purchaseOrderRef', e.target.value)} readOnly={isReadOnly} />
+                        )}
                     </div>
                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                  </div>
                  <div>
                     <Label htmlFor="notes">Notes</Label>
-                    <Input id="notes" value={item.notes || ''} onChange={(e) => handleChange('notes', e.target.value)} readOnly={isReadOnly} />
+                    {isReadOnly ? (
+                        <div className="mt-1 text-sm font-medium">
+                            {item.notes || "N/A"}
+                        </div>
+                    ) : (
+                        <Input id="notes" value={item.notes || ''} onChange={(e) => handleChange('notes', e.target.value)} readOnly={isReadOnly} />
+                    )}
                  </div>
             </CardContent>
         </Card>
 
-        {/* Dynamic Fields Section */}
-        {dynamicFieldsToShow.length > 0 && (
-            <Card>
-                <CardHeader>
-                    <CardTitle>Additional Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        {dynamicFieldsToShow.map((field) => {
-                            // Now we allow jobCode, lotNumber, serialNumber, expiryDate to render here
-                            // if they are included in dynamicFieldsToShow for the category.
-
-                            // Exception: We keep Lot Number in Basic Info as well for now, so filter it out here.
-                            // Decide if Lot Number should *only* be dynamic or always shown.
-                            if (field === 'lotNumber') {
-                                return null;
-                            }
-
-                            const label = getFieldLabel(field);
-                            const isDropdownField = ['projectCode', 'jobCode', 'marketSegment'].includes(field);
-
-                            return (
-                                <div key={field}>
-                                    <Label htmlFor={field}>{label}</Label>
-                                    {isDropdownField ? (
-                                        <Select
-                                            // @ts-ignore - Allow indexing for dynamic fields
-                                            value={item[field] || ""} 
-                                            onValueChange={(value) => handleDynamicSelectChange(field as 'projectCode' | 'jobCode' | 'marketSegment', value)}
-                                            disabled={isReadOnly}
-                                        >
-                                            <SelectTrigger id={field} className="mt-1">
-                                                <SelectValue placeholder={`Select ${label}...`} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {/* Populate options based on field */}
-                                                {(field === 'projectCode' ? MOCK_PROJECT_CODES :
-                                                  field === 'jobCode' ? MOCK_JOB_CODES :
-                                                  MOCK_MARKET_SEGMENTS
-                                                 ).map(option => (
-                                                    <SelectItem key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                                <SelectItem value={ADD_NEW_VALUE} className="text-blue-600 italic">
-                                                    Add New {label}...
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    ) : field.toLowerCase().includes('date') ? (
-                                        // Date Input (existing)
-                                        <Input
-                                          id={field}
-                                          type="date"
-                                          // @ts-ignore 
-                                          value={item[field] ? format(new Date(item[field]), 'yyyy-MM-dd') : ''}
-                                          onChange={(e) => handleChange(field, e.target.value)}
-                                          readOnly={isReadOnly}
-                                          className="mt-1"
-                                        />
-                                    ) : (
-                                        // Text Input (existing for other dynamic fields)
-                                        <Input 
-                                            id={field} 
-                                            type="text" 
-                                            // @ts-ignore 
-                                            value={item[field] || ''} 
-                                            onChange={(e) => handleChange(field, e.target.value)} 
-                                            readOnly={isReadOnly} 
-                                            className="mt-1"
-                                        />
-                                    )}
+        {/* Business Dimension Section */}
+        <Card>
+            <CardHeader>
+                <CardTitle>Business Dimensions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Left Column */}
+                    <div className="space-y-4">
+                        {/* Job Number */}
+                        <div>
+                            <Label htmlFor="jobCode">Job Code</Label>
+                            {isReadOnly ? (
+                                <div className="mt-1 text-sm font-medium">
+                                    {item.jobCode || "N/A"}
                                 </div>
-                            );
-                        })}
+                            ) : (
+                                <Select
+                                    value={item.jobCode || ""} 
+                                    onValueChange={(value) => handleDynamicSelectChange('jobCode', value)}
+                                    disabled={isReadOnly}
+                                >
+                                    <SelectTrigger id="jobNumber" className="mt-1">
+                                        <SelectValue placeholder="Select Job Number..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {MOCK_JOB_NUMBERS.map(option => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                        <SelectItem value={ADD_NEW_VALUE} className="text-blue-600 italic">
+                                            Add New Job Number...
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            )}
+                        </div>
+
                     </div>
-                </CardContent>
-            </Card>
-        )}
+
+                    {/* Right Column */}
+                    <div className="space-y-4">
+                        {/* Additional fields can be added here that exist in GoodsReceiveNoteItem interface */}
+                        <div className="text-sm text-gray-500">
+                            Additional business dimension fields coming soon.
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
 
         {/* Quantity and Delivery */}
         <Card>
@@ -546,57 +557,93 @@ export default function ItemDetailForm({
                 <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
                     <div>
                         <Label htmlFor="orderedQuantity">Ordered Qty</Label>
-                        <Input id="orderedQuantity" type="number" value={item.orderedQuantity} readOnly className="bg-gray-100"/>
+                        {/* Always read-only */}
+                        <div className="mt-1 text-sm font-medium bg-gray-50 p-2 rounded border">
+                            {item.orderedQuantity}
+                        </div>
                         <p className="text-sm text-gray-500 mt-1">Base: {formatAmountOnly(item.orderedQuantity * item.conversionRate)} {item.baseUnit}</p>
                     </div>
                     <div>
                         <Label htmlFor="orderUnit">Ordered Unit</Label>
-                        <Input id="orderUnit" value={item.orderUnit || ''} readOnly className="bg-gray-100" />
+                        {/* Always read-only */}
+                        <div className="mt-1 text-sm font-medium bg-gray-50 p-2 rounded border">
+                            {item.orderUnit || 'N/A'}
+                        </div>
                          <p className="text-sm text-gray-500 mt-1">&nbsp;</p> {/* Spacer */}
                     </div>
                     <div>
                         <Label htmlFor="receivedQuantity">Receiving Qty</Label>
-                        <Input id="receivedQuantity" type="number" value={item.receivedQuantity} onChange={(e) => handleChange('receivedQuantity', e.target.value)} readOnly={isReadOnly} />
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.receivedQuantity}
+                            </div>
+                        ) : (
+                            <Input id="receivedQuantity" type="number" value={item.receivedQuantity} onChange={(e) => handleChange('receivedQuantity', e.target.value)} readOnly={isReadOnly} />
+                        )}
                          <p className="text-sm text-gray-500 mt-1">Base: {formatAmountOnly(item.baseQuantity)} {item.baseUnit}</p>
                     </div>
                     <div>
                         <Label htmlFor="unit">Unit</Label>
-                        <Select value={item.unit || ''} onValueChange={(value) => handleChange('unit', value)} disabled={isReadOnly}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                {unitOptions.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.unit || 'N/A'}
+                            </div>
+                        ) : (
+                            <Select value={item.unit || ''} onValueChange={(value) => handleChange('unit', value)} disabled={isReadOnly}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {unitOptions.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        )}
                         <p className="text-sm text-gray-500 mt-1">1 {item.unit} = {item.conversionRate} {item.baseUnit}</p>
                     </div>
                     <div>
                         <Label htmlFor="focQuantity">FOC Qty</Label>
-                        <Input id="focQuantity" type="number" value={item.focQuantity || 0} onChange={(e) => handleChange('focQuantity', e.target.value)} readOnly={isReadOnly} />
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.focQuantity || 0}
+                            </div>
+                        ) : (
+                            <Input id="focQuantity" type="number" value={item.focQuantity || 0} onChange={(e) => handleChange('focQuantity', e.target.value)} readOnly={isReadOnly} />
+                        )}
                          {/* TODO: Display Base FOC Qty */}
                         <p className="text-sm text-gray-500 mt-1">Base: {/* Calculate Base FOC Qty */} {item.baseUnit}</p>
                     </div>
                      <div>
                         <Label htmlFor="focUnit">FOC Unit</Label>
-                        <Select value={item.focUnit || ''} onValueChange={(value) => handleChange('focUnit', value)} disabled={isReadOnly}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                {unitOptions.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.focUnit || 'N/A'}
+                            </div>
+                        ) : (
+                            <Select value={item.focUnit || ''} onValueChange={(value) => handleChange('focUnit', value)} disabled={isReadOnly}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {unitOptions.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        )}
                          {/* TODO: Display FOC Conversion Rate */}
                         <p className="text-sm text-gray-500 mt-1">1 {item.focUnit} = {item.focConversionRate} {item.baseUnit}</p>
                     </div>
                     <div>
                         <Label htmlFor="deliveryPoint">Delivery Point</Label>
-                        <Select value={item.deliveryPoint || ''} onValueChange={(value) => handleChange('deliveryPoint', value)} disabled={isReadOnly}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                {/* TODO: Populate options dynamically */}
-                                <SelectItem value="kitchen">Kitchen Receiving</SelectItem>
-                                <SelectItem value="warehouse">Warehouse</SelectItem>
-                                <SelectItem value="frontdesk">Front Desk</SelectItem>
-                             </SelectContent>
-                        </Select>
+                        {isReadOnly ? (
+                            <div className="mt-1 text-sm font-medium">
+                                {item.deliveryPoint || 'N/A'}
+                            </div>
+                        ) : (
+                            <Select value={item.deliveryPoint || ''} onValueChange={(value) => handleChange('deliveryPoint', value)} disabled={isReadOnly}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {/* TODO: Populate options dynamically */}
+                                    <SelectItem value="kitchen">Kitchen Receiving</SelectItem>
+                                    <SelectItem value="warehouse">Warehouse</SelectItem>
+                                    <SelectItem value="frontdesk">Front Desk</SelectItem>
+                                 </SelectContent>
+                            </Select>
+                        )}
                          <p className="text-sm text-gray-500 mt-1">&nbsp;</p> {/* Spacer */}
                     </div>
                 </div>
@@ -616,42 +663,66 @@ export default function ItemDetailForm({
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="currency">Currency</Label>
-                                <Select value={item.currency || ''} onValueChange={(value) => handleChange('currency', value)} disabled={isReadOnly}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        {/* TODO: Populate options dynamically */}
-                                        <SelectItem value="USD">USD</SelectItem>
-                                        <SelectItem value="EUR">EUR</SelectItem>
-                                        <SelectItem value="GBP">GBP</SelectItem>
-                                        <SelectItem value="THB">THB</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                {isReadOnly ? (
+                                    <div className="mt-1 text-sm font-medium">
+                                        {item.currency || 'N/A'}
+                                    </div>
+                                ) : (
+                                    <Select value={item.currency || ''} onValueChange={(value) => handleChange('currency', value)} disabled={isReadOnly}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            {/* TODO: Populate options dynamically */}
+                                            <SelectItem value="USD">USD</SelectItem>
+                                            <SelectItem value="EUR">EUR</SelectItem>
+                                            <SelectItem value="GBP">GBP</SelectItem>
+                                            <SelectItem value="THB">THB</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                )}
                             </div>
                             <div>
                                 <Label htmlFor="exchangeRate">Exch. Rate</Label>
-                                <Input id="exchangeRate" type="number" value={item.exchangeRate} onChange={(e) => handleChange('exchangeRate', e.target.value)} readOnly={isReadOnly} />
+                                {isReadOnly ? (
+                                    <div className="mt-1 text-sm font-medium">
+                                        {item.exchangeRate}
+                                    </div>
+                                ) : (
+                                    <Input id="exchangeRate" type="number" value={item.exchangeRate} onChange={(e) => handleChange('exchangeRate', e.target.value)} readOnly={isReadOnly} />
+                                )}
                             </div>
                          </div>
                          <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <Label htmlFor="baseUnitPrice">Price (Base Unit)</Label>
-                                <Input id="baseUnitPrice" type="number" value={item.baseUnitPrice} onChange={(e) => handleChange('baseUnitPrice', e.target.value)} readOnly={isReadOnly}/>
+                                {isReadOnly ? (
+                                    <div className="mt-1 text-sm font-medium">
+                                        {formatAmountOnly(item.baseUnitPrice)}
+                                    </div>
+                                ) : (
+                                    <Input id="baseUnitPrice" type="number" value={item.baseUnitPrice} onChange={(e) => handleChange('baseUnitPrice', e.target.value)} readOnly={isReadOnly}/>
+                                )}
                             </div>
                              <div>
                                 <Label htmlFor="taxType">Tax Type</Label>
-                                <Select 
-                                    value={getTaxTypeValue(item.taxSystem, item.taxIncluded)} 
-                                    onValueChange={(value) => handleChange('taxTypeCombined', value)} // Use combined handler
-                                    disabled={isReadOnly}
-                                >
-                                    <SelectTrigger id="taxType"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="gst_add">GST Add</SelectItem>
-                                        <SelectItem value="gst_include">GST Include</SelectItem>
-                                        <SelectItem value="vat_add">VAT Add</SelectItem>
-                                        <SelectItem value="vat_include">VAT Include</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                {isReadOnly ? (
+                                    <div className="mt-1 text-sm font-medium">
+                                        {item.taxSystem === 'VAT' ? 'VAT' : 'GST'} {item.taxIncluded ? 'Include' : 'Add'}
+                                    </div>
+                                ) : (
+                                    <Select 
+                                        value={getTaxTypeValue(item.taxSystem, item.taxIncluded)} 
+                                        onValueChange={(value) => handleChange('taxTypeCombined', value)} // Use combined handler
+                                        disabled={isReadOnly}
+                                    >
+                                        <SelectTrigger id="taxType"><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="gst_add">GST Add</SelectItem>
+                                            <SelectItem value="gst_include">GST Include</SelectItem>
+                                            <SelectItem value="vat_add">VAT Add</SelectItem>
+                                            <SelectItem value="vat_include">VAT Include</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                )}
                             </div>
                          </div>
 
@@ -661,27 +732,61 @@ export default function ItemDetailForm({
                          <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="discountRate">Disc. Rate (%)</Label>
-                                <Input id="discountRate" type="number" value={item.discountRate} onChange={(e) => handleChange('discountRate', e.target.value)} readOnly={isReadOnly || !!item.adjustments?.discount} className={item.adjustments?.discount ? 'bg-gray-100' : ''}/>
+                                {isReadOnly ? (
+                                    <div className="mt-1 text-sm font-medium">
+                                        {item.discountRate}%
+                                    </div>
+                                ) : (
+                                    <Input id="discountRate" type="number" value={item.discountRate} onChange={(e) => handleChange('discountRate', e.target.value)} readOnly={isReadOnly || !!item.adjustments?.discount} className={item.adjustments?.discount ? 'bg-gray-100' : ''}/>
+                                )}
                             </div>
                              <div>
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <Checkbox id="adjDiscount" checked={item.adjustments?.discount} onCheckedChange={(checked) => handleAdjustmentChange('discount', checked)} disabled={isReadOnly} />
-                                    <Label htmlFor="adjDiscount">Override Discount Amount</Label>
-                                </div>
-                                <Input id="discountAmount" type="number" value={item.discountAmount} onChange={(e) => handleChange('discountAmount', e.target.value)} readOnly={isReadOnly || !item.adjustments?.discount} className={!item.adjustments?.discount ? 'bg-gray-100' : ''}/>
+                                {isReadOnly ? (
+                                    <>
+                                        <Label>Discount Override</Label>
+                                        <div className="mt-1 text-sm font-medium">
+                                            {item.adjustments?.discount ? `Yes (${formatAmountOnly(item.discountAmount)})` : 'No'}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center space-x-2 mb-2">
+                                            <Checkbox id="adjDiscount" checked={item.adjustments?.discount} onCheckedChange={(checked) => handleAdjustmentChange('discount', checked)} disabled={isReadOnly} />
+                                            <Label htmlFor="adjDiscount">Override Discount Amount</Label>
+                                        </div>
+                                        <Input id="discountAmount" type="number" value={item.discountAmount} onChange={(e) => handleChange('discountAmount', e.target.value)} readOnly={isReadOnly || !item.adjustments?.discount} className={!item.adjustments?.discount ? 'bg-gray-100' : ''}/>
+                                    </>
+                                )}
                             </div>
                          </div>
                          <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="taxRate">Tax Rate (%)</Label>
-                                <Input id="taxRate" type="number" value={item.taxRate} onChange={(e) => handleChange('taxRate', e.target.value)} readOnly={isReadOnly || !!item.adjustments?.tax} className={item.adjustments?.tax ? 'bg-gray-100' : ''}/>
+                                {isReadOnly ? (
+                                    <div className="mt-1 text-sm font-medium">
+                                        {item.taxRate}%
+                                    </div>
+                                ) : (
+                                    <Input id="taxRate" type="number" value={item.taxRate} onChange={(e) => handleChange('taxRate', e.target.value)} readOnly={isReadOnly || !!item.adjustments?.tax} className={item.adjustments?.tax ? 'bg-gray-100' : ''}/>
+                                )}
                             </div>
                              <div>
-                                <div className="flex items-center space-x-2 mb-2">
-                                     <Checkbox id="adjTax" checked={item.adjustments?.tax} onCheckedChange={(checked) => handleAdjustmentChange('tax', checked)} disabled={isReadOnly} />
-                                    <Label htmlFor="adjTax">Override Tax Amount</Label>
-                                </div>
-                                <Input id="taxAmount" type="number" value={item.taxAmount} onChange={(e) => handleChange('taxAmount', e.target.value)} readOnly={isReadOnly || !item.adjustments?.tax} className={!item.adjustments?.tax ? 'bg-gray-100' : ''}/>
+                                {isReadOnly ? (
+                                    <>
+                                        <Label>Tax Override</Label>
+                                        <div className="mt-1 text-sm font-medium">
+                                            {item.adjustments?.tax ? `Yes (${formatAmountOnly(item.taxAmount)})` : 'No'}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center space-x-2 mb-2">
+                                             <Checkbox id="adjTax" checked={item.adjustments?.tax} onCheckedChange={(checked) => handleAdjustmentChange('tax', checked)} disabled={isReadOnly} />
+                                            <Label htmlFor="adjTax">Override Tax Amount</Label>
+                                        </div>
+                                        <Input id="taxAmount" type="number" value={item.taxAmount} onChange={(e) => handleChange('taxAmount', e.target.value)} readOnly={isReadOnly || !item.adjustments?.tax} className={!item.adjustments?.tax ? 'bg-gray-100' : ''}/>
+                                    </>
+                                )}
                              </div>
                          </div>
 

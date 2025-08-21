@@ -3,7 +3,9 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
+import StatusBadge from '@/components/ui/custom-status-badge'
 import {
   Table,
   TableBody,
@@ -18,28 +20,22 @@ import {
   ChevronLeft, 
   ChevronRight,
   Plus,
-  Printer,
   Search,
   SlidersHorizontal,
-  ChevronDown,
-  ArrowUpDown,
   X,
   FileText,
   Edit,
   Trash2,
-  Calendar,
-  Hash,
-  Building2,
-  Store,
-  Tags,
   Filter,
-  DollarSign
+  Download,
+  List,
+  Grid,
+  MoreHorizontal
 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -50,24 +46,31 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from 'next/navigation'
-import StatusBadge from '@/components/ui/custom-status-badge'
 
 interface Requisition {
   date: string
   refNo: string
   requestTo: string
+  toLocation: string
   storeName: string
   description: string
   status: 'In Process' | 'Complete' | 'Reject' | 'Void' | 'Draft'
+  workflowStage?: string
   totalAmount: number
+  currency: string
 }
 
 interface FilterCondition {
@@ -76,21 +79,6 @@ interface FilterCondition {
   value: string
 }
 
-const StatusIndicator = ({ status }: { status: Requisition['status'] }) => {
-  const statusColors = {
-    'In Process': 'bg-blue-500',
-    'Complete': 'bg-green-500',
-    'Reject': 'bg-red-500',
-    'Void': 'bg-gray-500',
-    'Draft': 'bg-yellow-500'
-  } as const
-
-  return (
-    <span className={`px-2 py-1 rounded-full text-white text-sm ${statusColors[status]}`}>
-      {status}
-    </span>
-  )
-}
 
 const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
   const [goToPage, setGoToPage] = useState('')
@@ -105,19 +93,22 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: nu
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-muted-foreground text-center sm:text-left">
         Showing page {currentPage} of {totalPages}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
+        {/* First page button - hidden on mobile */}
         <Button 
           variant="outline" 
           size="icon"
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
           aria-label="First page"
+          className="hidden sm:inline-flex"
         >
           <ChevronFirst className="h-4 w-4" />
         </Button>
+        
         <Button 
           variant="outline" 
           size="icon"
@@ -127,6 +118,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: nu
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
+        
+        {/* Go to page input - responsive sizing */}
         <div className="flex items-center gap-1">
           <Input
             type="number"
@@ -134,13 +127,21 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: nu
             max={totalPages}
             value={goToPage}
             onChange={(e) => setGoToPage(e.target.value)}
-            className="w-16"
-            placeholder="Page"
+            className="w-12 sm:w-16 text-center"
+            placeholder={currentPage.toString()}
+            aria-label="Go to page"
           />
-          <Button onClick={handleGoToPage} variant="outline" size="sm">
-            Go
+          <Button 
+            onClick={handleGoToPage} 
+            variant="outline" 
+            size="sm"
+            className="px-2 sm:px-3"
+          >
+            <span className="hidden sm:inline">Go</span>
+            <span className="sm:hidden">→</span>
           </Button>
         </div>
+        
         <Button 
           variant="outline" 
           size="icon"
@@ -150,12 +151,15 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: nu
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
+        
+        {/* Last page button - hidden on mobile */}
         <Button 
           variant="outline" 
           size="icon"
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
           aria-label="Last page"
+          className="hidden sm:inline-flex"
         >
           <ChevronLast className="h-4 w-4" />
         </Button>
@@ -189,11 +193,13 @@ const FilterBuilder = ({ filters, setFilters }: { filters: FilterCondition[], se
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="date">Date</SelectItem>
-              <SelectItem value="refNo">Ref #</SelectItem>
+              <SelectItem value="refNo">Requisition</SelectItem>
               <SelectItem value="requestTo">Request To</SelectItem>
+              <SelectItem value="toLocation">To Location</SelectItem>
               <SelectItem value="storeName">Store Name</SelectItem>
               <SelectItem value="description">Description</SelectItem>
               <SelectItem value="status">Status</SelectItem>
+              <SelectItem value="workflowStage">Workflow Stage</SelectItem>
               <SelectItem value="processStatus">Process Status</SelectItem>
             </SelectContent>
           </Select>
@@ -225,6 +231,64 @@ const FilterBuilder = ({ filters, setFilters }: { filters: FilterCondition[], se
   )
 }
 
+// Helper function to get workflow stage tooltip
+const getWorkflowStageTooltip = (stage: string) => {
+  if (stage.includes('Submission')) {
+    return 'Request has been submitted and is being processed'
+  } else if (stage.includes('HOD')) {
+    return 'Awaiting Head of Department approval - First level review'
+  } else if (stage.includes('Store Manager')) {
+    return 'Awaiting Store Manager approval - Final approval for issue'
+  } else if (stage.includes('Complete')) {
+    return 'All approvals completed - Ready for processing'
+  } else if (stage.includes('Rejected')) {
+    return 'Request was rejected at this approval stage'
+  } else {
+    return 'Current workflow stage'
+  }
+}
+
+// Helper function to get workflow stage styling
+const getWorkflowStageStyle = (stage: string) => {
+  if (stage.includes('Submission')) {
+    return {
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      dotColor: 'bg-blue-500',
+      textColor: 'text-blue-700 dark:text-blue-300'
+    }
+  } else if (stage.includes('HOD')) {
+    return {
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+      dotColor: 'bg-purple-500',
+      textColor: 'text-purple-700 dark:text-purple-300'
+    }
+  } else if (stage.includes('Store Manager')) {
+    return {
+      bgColor: 'bg-amber-50 dark:bg-amber-900/20',
+      dotColor: 'bg-amber-500',
+      textColor: 'text-amber-700 dark:text-amber-300'
+    }
+  } else if (stage.includes('Complete')) {
+    return {
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      dotColor: 'bg-green-500',
+      textColor: 'text-green-700 dark:text-green-300'
+    }
+  } else if (stage.includes('Rejected')) {
+    return {
+      bgColor: 'bg-red-50 dark:bg-red-900/20',
+      dotColor: 'bg-red-500',
+      textColor: 'text-red-700 dark:text-red-300'
+    }
+  } else {
+    return {
+      bgColor: 'bg-gray-50 dark:bg-gray-800',
+      dotColor: 'bg-gray-500',
+      textColor: 'text-gray-700 dark:text-gray-300'
+    }
+  }
+}
+
 export function StoreRequisitionListComponent() {
   const router = useRouter()
   const [statusFilter, setStatusFilter] = useState('all')
@@ -234,28 +298,34 @@ export function StoreRequisitionListComponent() {
   const [error, setError] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState('date')
   const [filters, setFilters] = useState<FilterCondition[]>([])
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
   // Sample data - would come from API in real implementation
   const requisitions: Requisition[] = [
-    { date: '2024-01-15', refNo: 'SR-2024-001', requestTo: 'M01', storeName: 'Main Store', description: 'Monthly supplies request', status: 'In Process', totalAmount: 1500.00 },
-    { date: '2024-01-14', refNo: 'SR-2024-002', requestTo: 'B01', storeName: 'Branch Store 1', description: 'Emergency stock replenishment', status: 'Complete', totalAmount: 2750.50 },
-    { date: '2024-01-13', refNo: 'SR-2024-003', requestTo: 'M02', storeName: 'Main Store', description: 'Draft Requisition', status: 'Draft', totalAmount: 1000.00 },
-    { date: '2024-01-12', refNo: 'SR-2024-004', requestTo: 'B02', storeName: 'Branch Store 2', description: 'Quarterly inventory update', status: 'In Process', totalAmount: 1200.00 },
-    { date: '2024-01-11', refNo: 'SR-2024-005', requestTo: 'M01', storeName: 'Main Store', description: 'Office supplies restock', status: 'Complete', totalAmount: 1800.00 },
-    { date: '2024-01-10', refNo: 'SR-2024-006', requestTo: 'B03', storeName: 'Branch Store 3', description: 'Emergency equipment request', status: 'Reject', totalAmount: 1500.00 },
-    { date: '2024-01-09', refNo: 'SR-2024-007', requestTo: 'M02', storeName: 'Main Store', description: 'IT department supplies', status: 'In Process', totalAmount: 1000.00 },
-    { date: '2024-01-08', refNo: 'SR-2024-008', requestTo: 'B01', storeName: 'Branch Store 1', description: 'Seasonal inventory preparation', status: 'Draft', totalAmount: 1100.00 },
-    { date: '2024-01-07', refNo: 'SR-2024-009', requestTo: 'M01', storeName: 'Main Store', description: 'Maintenance tools request', status: 'Complete', totalAmount: 1300.00 },
-    { date: '2024-01-06', refNo: 'SR-2024-010', requestTo: 'B02', storeName: 'Branch Store 2', description: 'Staff uniform order', status: 'In Process', totalAmount: 1200.00 },
-    { date: '2024-01-05', refNo: 'SR-2024-011', requestTo: 'M02', storeName: 'Main Store', description: 'Marketing materials request', status: 'Void', totalAmount: 1000.00 },
-    { date: '2024-01-04', refNo: 'SR-2024-012', requestTo: 'B03', storeName: 'Branch Store 3', description: 'Safety equipment restock', status: 'Complete', totalAmount: 1400.00 },
-    { date: '2024-01-03', refNo: 'SR-2024-013', requestTo: 'M01', storeName: 'Main Store', description: 'Cleaning supplies order', status: 'In Process', totalAmount: 1100.00 },
-    { date: '2024-01-02', refNo: 'SR-2024-014', requestTo: 'B01', storeName: 'Branch Store 1', description: 'New product samples request', status: 'Draft', totalAmount: 1000.00 },
-    { date: '2024-01-01', refNo: 'SR-2024-015', requestTo: 'M02', storeName: 'Main Store', description: 'Year-end inventory count supplies', status: 'Complete', totalAmount: 1600.00 },
+    { date: '2024-01-15', refNo: 'SR-2024-001', requestTo: 'M01', toLocation: 'Central Kitchen', storeName: 'Main Store', description: 'Monthly supplies request', status: 'In Process', workflowStage: 'Store Manager Approval', totalAmount: 566.25, currency: 'BHT' },
+    { date: '2024-01-14', refNo: 'SR-2024-002', requestTo: 'B01', toLocation: 'Front Bar', storeName: 'Branch Store 1', description: 'Emergency stock replenishment', status: 'Complete', workflowStage: 'Complete', totalAmount: 1038.44, currency: 'BHT' },
+    { date: '2024-01-13', refNo: 'SR-2024-003', requestTo: 'M02', toLocation: 'Banquet Hall', storeName: 'Main Store', description: 'Draft Requisition', status: 'Draft', totalAmount: 377.50, currency: 'BHT' },
+    { date: '2024-01-12', refNo: 'SR-2024-004', requestTo: 'B02', toLocation: 'Coffee Station', storeName: 'Branch Store 2', description: 'Quarterly inventory update', status: 'In Process', workflowStage: 'Submission', totalAmount: 453.00, currency: 'BHT' },
+    { date: '2024-01-11', refNo: 'SR-2024-005', requestTo: 'M01', toLocation: 'Admin Office', storeName: 'Main Store', description: 'Office supplies restock', status: 'Complete', workflowStage: 'Complete', totalAmount: 679.50, currency: 'BHT' },
+    { date: '2024-01-10', refNo: 'SR-2024-006', requestTo: 'B03', toLocation: 'Maintenance Room', storeName: 'Branch Store 3', description: 'Emergency equipment request', status: 'Reject', workflowStage: 'Rejected at HOD', totalAmount: 566.25, currency: 'BHT' },
+    { date: '2024-01-09', refNo: 'SR-2024-007', requestTo: 'M02', toLocation: 'IT Department', storeName: 'Main Store', description: 'IT department supplies', status: 'In Process', workflowStage: 'HOD Approval', totalAmount: 377.50, currency: 'BHT' },
+    { date: '2024-01-08', refNo: 'SR-2024-008', requestTo: 'B01', toLocation: 'Storage Area', storeName: 'Branch Store 1', description: 'Seasonal inventory preparation', status: 'Draft', totalAmount: 415.25, currency: 'BHT' },
+    { date: '2024-01-07', refNo: 'SR-2024-009', requestTo: 'M01', toLocation: 'Workshop', storeName: 'Main Store', description: 'Maintenance tools request', status: 'Complete', workflowStage: 'Complete', totalAmount: 490.75, currency: 'BHT' },
+    { date: '2024-01-06', refNo: 'SR-2024-010', requestTo: 'B02', toLocation: 'Staff Lounge', storeName: 'Branch Store 2', description: 'Staff uniform order', status: 'In Process', workflowStage: 'Store Manager Approval', totalAmount: 453.00, currency: 'BHT' },
+    { date: '2024-01-05', refNo: 'SR-2024-011', requestTo: 'M02', toLocation: 'Marketing Dept', storeName: 'Main Store', description: 'Marketing materials request', status: 'Void', totalAmount: 377.50, currency: 'BHT' },
+    { date: '2024-01-04', refNo: 'SR-2024-012', requestTo: 'B03', toLocation: 'Security Office', storeName: 'Branch Store 3', description: 'Safety equipment restock', status: 'Complete', workflowStage: 'Complete', totalAmount: 528.50, currency: 'BHT' },
+    { date: '2024-01-03', refNo: 'SR-2024-013', requestTo: 'M01', toLocation: 'Housekeeping', storeName: 'Main Store', description: 'Cleaning supplies order', status: 'In Process', workflowStage: 'Submission', totalAmount: 415.25, currency: 'BHT' },
+    { date: '2024-01-02', refNo: 'SR-2024-014', requestTo: 'B01', toLocation: 'R&D Lab', storeName: 'Branch Store 1', description: 'New product samples request', status: 'Draft', totalAmount: 377.50, currency: 'BHT' },
+    { date: '2024-01-01', refNo: 'SR-2024-015', requestTo: 'M02', toLocation: 'Warehouse', storeName: 'Main Store', description: 'Year-end inventory count supplies', status: 'Complete', workflowStage: 'Complete', totalAmount: 604.00, currency: 'BHT' },
   ]
 
   const itemsPerPage = 10
   const totalPages = Math.ceil(requisitions.length / itemsPerPage)
+
+  const paginatedRequisitions = requisitions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   const handleSearch = () => {
     setIsLoading(true)
@@ -282,121 +352,202 @@ export function StoreRequisitionListComponent() {
     router.push(`/store-operations/store-requisitions/${refNo}`)
   }
 
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+  }
+
+  const renderCardView = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+      {paginatedRequisitions.map((req) => (
+        <Card key={req.refNo} className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="p-3 sm:p-4 pb-3 bg-muted/30 border-b">
+            <div className="flex items-start justify-between">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-base sm:text-lg font-semibold mb-2 truncate">{req.refNo}</CardTitle>
+                <div className="flex items-center gap-2 mb-2">
+                  <StatusBadge status={req.status} />
+                  {req.workflowStage && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className={`flex items-center gap-1 px-2 py-1 rounded-full cursor-help ${getWorkflowStageStyle(req.workflowStage).bgColor}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${getWorkflowStageStyle(req.workflowStage).dotColor}`} />
+                            <span className={`text-xs ${getWorkflowStageStyle(req.workflowStage).textColor}`}>{req.workflowStage}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{getWorkflowStageTooltip(req.workflowStage)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="flex-shrink-0 ml-2"
+                    aria-label={`Actions for requisition ${req.refNo}`}
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleViewClick(req.refNo)}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    View
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-red-600">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </CardHeader>
+          <CardContent className="p-3 sm:p-4 pt-0">
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {req.description}
+              </p>
+              
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                <div>
+                  <div className="font-medium text-muted-foreground text-xs mb-1">Request To</div>
+                  <div className="truncate">{req.requestTo}</div>
+                </div>
+                <div>
+                  <div className="font-medium text-muted-foreground text-xs mb-1">To Location</div>
+                  <div className="truncate">{req.toLocation}</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 text-sm">
+                <div>
+                  <div className="font-medium text-muted-foreground text-xs mb-1">Store</div>
+                  <div className="truncate">{req.storeName}</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                <div>
+                  <div className="font-medium text-muted-foreground text-xs mb-1">Date</div>
+                  <div>{formatDate(req.date)}</div>
+                </div>
+                <div>
+                  <div className="font-medium text-muted-foreground text-xs mb-1">Amount</div>
+                  <div className="font-semibold text-green-600 truncate">
+                    {new Intl.NumberFormat('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    }).format(req.totalAmount)} {req.currency}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="p-3 sm:p-4 pt-3 bg-muted/20 border-t">
+            <div className="text-xs text-muted-foreground truncate">
+              Last updated: {formatDate(req.date)}
+            </div>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  )
+
   if (error) {
     return <div className="text-red-500">Error: {error}</div>
   }
 
-  const paginatedRequisitions = requisitions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
-
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-col gap-6 py-6">
-        <div className="flex flex-col gap-4 w-full">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between w-full">
-            <CardTitle>Store Requisition List</CardTitle>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Request
+    <div className="container mx-auto px-6 py-6 max-w-full">
+      {/* Store Requisitions Card with Header */}
+      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="p-4 pb-3 bg-muted/30 border-b space-y-6">
+          {/* Page Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle className="text-3xl font-bold">Store Requisition List</CardTitle>
+              <p className="text-sm text-muted-foreground mt-2">Manage and track store requisitions across all locations</p>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="border-muted-foreground/20 hover:bg-muted/50">
+                <Download className="w-4 h-4 mr-2" />
+                Export
               </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Printer className="h-4 w-4" />
-                Print
+              <Button size="sm" className="bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary/20">
+                <Plus className="w-4 h-4 mr-2" />
+                New Request
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
-            <div className="relative sm:col-span-5">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                className="pl-8 w-full"
-                placeholder="Search requisitions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                aria-label="Search requisitions"
-              />
-            </div>
-            <div className="sm:col-span-7 flex justify-end gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-[150px] justify-between">
-                    {statusFilter === 'all' ? 'All Status' : statusFilter}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[150px]">
-                  <DropdownMenuRadioGroup value={statusFilter} onValueChange={setStatusFilter}>
-                    <DropdownMenuRadioItem value="all">All Status</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="draft">Draft</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="in-process">In Process</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="complete">Complete</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="reject">Reject</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="void">Void</DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-[180px] justify-between">
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                    Sort by: {sortBy}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[150px]">
-                  <DropdownMenuRadioGroup value={sortBy} onValueChange={handleSort}>
-                    <DropdownMenuRadioItem value="date" className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Date
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="refNo" className="flex items-center">
-                      <Hash className="mr-2 h-4 w-4" />
-                      Ref #
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="requestTo" className="flex items-center">
-                      <Building2 className="mr-2 h-4 w-4" />
-                      Request To
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="storeName" className="flex items-center">
-                      <Store className="mr-2 h-4 w-4" />
-                      Store Name
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="description" className="flex items-center">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Description
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="status" className="flex items-center">
-                      <Tags className="mr-2 h-4 w-4" />
-                      Status
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="totalAmount" className="flex items-center">
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      Total Amount
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+          {/* Search, Filters and Controls Row */}
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            {/* Left Side - Search and Status Filter */}
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              {/* Search Bar */}
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search requisitions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full min-w-[350px]"
+                  aria-label="Search store requisitions"
+                />
+              </div>
+              
+              {/* Status Filter */}
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="in-process">In Process</SelectItem>
+                  <SelectItem value="complete">Complete</SelectItem>
+                  <SelectItem value="reject">Reject</SelectItem>
+                  <SelectItem value="void">Void</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Right Side - Filter Actions and View Toggle */}
+            <div className="flex gap-2 items-center">
+              <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                Saved Filters
+              </Button>
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-[150px] flex items-center justify-between"
-                  >
-                    <SlidersHorizontal className="h-4 w-4" />
-                    More filters
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Add Filters</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-auto">
+                <DialogContent className="sm:max-w-auto max-w-[95vw]">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                    <SlidersHorizontal className="h-4 w-4" />
+                      <SlidersHorizontal className="h-4 w-4" />
                       Filter Requisitions
                     </DialogTitle>
                   </DialogHeader>
@@ -406,105 +557,160 @@ export function StoreRequisitionListComponent() {
                   <Button onClick={applyFilters}>Apply Filters</Button>
                 </DialogContent>
               </Dialog>
+              
+              {/* View Toggle */}
+              <div className="flex border rounded-lg" role="group" aria-label="View mode selection">
+              <Button 
+                variant={viewMode === 'table' ? 'default' : 'ghost'} 
+                size="sm" 
+                className="border-r"
+                onClick={() => setViewMode('table')}
+                aria-label="Table view"
+                aria-pressed={viewMode === 'table'}
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button 
+                variant={viewMode === 'card' ? 'default' : 'ghost'} 
+                size="sm"
+                onClick={() => setViewMode('card')}
+                aria-label="Card view"
+                aria-pressed={viewMode === 'card'}
+              >
+                <Grid className="w-4 h-4" />
+              </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="py-6">
-        <div className="flex flex-col gap-4">
-          {/* Table */}
+        </CardHeader>
+        <CardContent className="p-4">
           {isLoading ? (
-            <div className="text-center py-4">Loading...</div>
-          ) : (
+            <div className="text-center py-12">
+              <div className="animate-pulse">
+                <div className="h-4 bg-muted rounded w-3/4 mb-2 mx-auto"></div>
+                <div className="h-4 bg-muted rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
+          ) : paginatedRequisitions.length === 0 ? (
+            <div className="text-center py-12">
+              <Search className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No requisitions found</h3>
+              <p className="text-muted-foreground mb-4">
+                Try adjusting your search or filter criteria
+              </p>
+              <Button variant="outline" onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}>
+                Clear Filters
+              </Button>
+            </div>
+          ) : viewMode === 'table' ? (
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="min-w-[800px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Ref #</TableHead>
-                    <TableHead>Request To</TableHead>
-                    <TableHead>Store Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Total Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Action</TableHead>
+                    <TableHead scope="col" className="min-w-[120px]">SR #</TableHead>
+                    <TableHead scope="col" className="min-w-[100px]">Date</TableHead>
+                    <TableHead scope="col" className="min-w-[80px]">Request To</TableHead>
+                    <TableHead scope="col" className="min-w-[120px]">To Location</TableHead>
+                    <TableHead scope="col" className="min-w-[120px]">Store Name</TableHead>
+                    <TableHead scope="col" className="min-w-[200px]">Description</TableHead>
+                    <TableHead scope="col" className="min-w-[100px] text-right">Amount</TableHead>
+                    <TableHead scope="col" className="min-w-[60px]">Currency</TableHead>
+                    <TableHead scope="col" className="min-w-[100px]">Status</TableHead>
+                    <TableHead scope="col" className="min-w-[120px]">Workflow Stage</TableHead>
+                    <TableHead scope="col" className="w-[50px]">
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paginatedRequisitions.map((req) => (
-                    <TableRow key={req.refNo} className="cursor-pointer hover:bg-gray-50">
-                      <TableCell>{req.date}</TableCell>
-                      <TableCell>{req.refNo}</TableCell>
+                    <TableRow key={req.refNo} className="hover:bg-muted/50">
+                      <TableCell className="font-medium">
+                        <button 
+                          onClick={() => handleViewClick(req.refNo)}
+                          className="text-primary hover:text-primary/80 hover:underline font-medium cursor-pointer"
+                        >
+                          {req.refNo}
+                        </button>
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">{formatDate(req.date)}</TableCell>
                       <TableCell>{req.requestTo}</TableCell>
-                      <TableCell>{req.storeName}</TableCell>
-                      <TableCell>{req.description}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="max-w-[120px] truncate">{req.toLocation}</TableCell>
+                      <TableCell className="max-w-[150px] truncate">{req.storeName}</TableCell>
+                      <TableCell className="max-w-[200px] truncate" title={req.description}>{req.description}</TableCell>
+                      <TableCell className="text-right font-medium">
                         {new Intl.NumberFormat('en-US', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2
                         }).format(req.totalAmount)}
                       </TableCell>
+                      <TableCell className="font-mono text-sm">{req.currency}</TableCell>
                       <TableCell>
                         <StatusBadge status={req.status} />
                       </TableCell>
                       <TableCell>
-                        <TooltipProvider>
-                          <div className="flex items-center gap-2">
+                        {req.workflowStage ? (
+                          <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleViewClick(req.refNo)
-                                  }}
-                                >
-                                  <FileText className="h-4 w-4" />
-                                  <span className="sr-only">View</span>
-                                </Button>
+                                <div className="flex items-center gap-2 cursor-help">
+                                  <div className={`w-2 h-2 rounded-full ${getWorkflowStageStyle(req.workflowStage).dotColor}`} />
+                                  <span className="text-sm">{req.workflowStage}</span>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>View</p>
+                                <p>{getWorkflowStageTooltip(req.workflowStage)}</p>
                               </TooltipContent>
                             </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <Edit className="h-4 w-4" />
-                                  <span className="sr-only">Edit</span>
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Edit</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <Trash2 className="h-4 w-4" />
-                                  <span className="sr-only">Delete</span>
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Delete</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        </TooltipProvider>
+                          </TooltipProvider>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              aria-label={`Actions for requisition ${req.refNo}`}
+                            >
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleViewClick(req.refNo)}>
+                              <FileText className="w-4 h-4 mr-2" />
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Edit className="w-4 h-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Download className="w-4 h-4 mr-2" />
+                              Export
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600">
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
+          ) : (
+            renderCardView()
           )}
-        </div>
-      </CardContent>
-      <CardFooter className="border-t pt-6">
-        {/* Pagination */}
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-      </CardFooter>
-    </Card>
+        </CardContent>
+        <CardFooter className="p-4 pt-3 bg-muted/20 border-t">
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        </CardFooter>
+      </Card>
+    </div>
   )
 }

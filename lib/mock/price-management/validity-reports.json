@@ -1,0 +1,220 @@
+[
+  {
+    "reportId": "validity-report-001",
+    "reportName": "Weekly Price Validity Summary",
+    "reportType": "validity_summary",
+    "generatedAt": "2024-05-30T09:00:00Z",
+    "generatedBy": "system",
+    "reportPeriod": {
+      "startDate": "2024-05-23T00:00:00Z",
+      "endDate": "2024-05-30T23:59:59Z"
+    },
+    "summary": {
+      "totalPricesTracked": 125,
+      "activePrices": 89,
+      "expiringSoon": 18,
+      "criticalExpirations": 5,
+      "expiredPrices": 8,
+      "renewalRate": 78.5,
+      "averageValidityPeriod": 165
+    },
+    "expirationBreakdown": {
+      "next7Days": 5,
+      "next15Days": 8,
+      "next30Days": 18,
+      "next60Days": 25,
+      "next90Days": 35
+    },
+    "vendorPerformance": [
+      {
+        "vendorId": "vendor-001",
+        "vendorName": "Premium Beverage Suppliers",
+        "totalPrices": 15,
+        "activeCount": 12,
+        "expiringCount": 2,
+        "expiredCount": 1,
+        "renewalRate": 85.7,
+        "averageResponseTime": 2.5
+      },
+      {
+        "vendorId": "vendor-002",
+        "vendorName": "CleanTech Solutions",
+        "totalPrices": 22,
+        "activeCount": 18,
+        "expiringCount": 3,
+        "expiredCount": 1,
+        "renewalRate": 90.9,
+        "averageResponseTime": 1.8
+      },
+      {
+        "vendorId": "vendor-003",
+        "vendorName": "Office Supplies Direct",
+        "totalPrices": 18,
+        "activeCount": 14,
+        "expiringCount": 2,
+        "expiredCount": 2,
+        "renewalRate": 77.8,
+        "averageResponseTime": 3.2
+      }
+    ],
+    "categoryBreakdown": [
+      {
+        "categoryId": "cat-001",
+        "categoryName": "Food & Beverage",
+        "totalPrices": 35,
+        "activeCount": 28,
+        "expiringCount": 4,
+        "expiredCount": 3,
+        "averageValidityPeriod": 120
+      },
+      {
+        "categoryId": "cat-002",
+        "categoryName": "Cleaning Supplies",
+        "totalPrices": 28,
+        "activeCount": 22,
+        "expiringCount": 4,
+        "expiredCount": 2,
+        "averageValidityPeriod": 180
+      },
+      {
+        "categoryId": "cat-003",
+        "categoryName": "Office Supplies",
+        "totalPrices": 32,
+        "activeCount": 25,
+        "expiringCount": 5,
+        "expiredCount": 2,
+        "averageValidityPeriod": 150
+      }
+    ],
+    "riskAssessment": {
+      "highRiskItems": 8,
+      "mediumRiskItems": 15,
+      "lowRiskItems": 102,
+      "businessImpactScore": 6.5,
+      "overallRiskLevel": "medium"
+    },
+    "recommendations": [
+      "Contact 5 vendors with critical expirations immediately",
+      "Review renewal process for vendors with low renewal rates",
+      "Consider extending validity periods for stable categories",
+      "Implement auto-renewal for high-performing vendors"
+    ]
+  },
+  {
+    "reportId": "validity-report-002",
+    "reportName": "Monthly Expiration Forecast",
+    "reportType": "expiration_forecast",
+    "generatedAt": "2024-05-30T10:30:00Z",
+    "generatedBy": "system",
+    "reportPeriod": {
+      "startDate": "2024-06-01T00:00:00Z",
+      "endDate": "2024-08-31T23:59:59Z"
+    },
+    "forecast": {
+      "june2024": {
+        "expectedExpirations": 22,
+        "criticalExpirations": 8,
+        "autoRenewalsScheduled": 12,
+        "manualRenewalsRequired": 10,
+        "riskLevel": "high"
+      },
+      "july2024": {
+        "expectedExpirations": 18,
+        "criticalExpirations": 5,
+        "autoRenewalsScheduled": 10,
+        "manualRenewalsRequired": 8,
+        "riskLevel": "medium"
+      },
+      "august2024": {
+        "expectedExpirations": 15,
+        "criticalExpirations": 3,
+        "autoRenewalsScheduled": 8,
+        "manualRenewalsRequired": 7,
+        "riskLevel": "low"
+      }
+    },
+    "actionPlan": [
+      {
+        "month": "june2024",
+        "actions": [
+          "Contact 8 vendors for critical renewals by June 5th",
+          "Review auto-renewal settings for 12 items",
+          "Prepare alternative vendor options for high-risk items"
+        ]
+      },
+      {
+        "month": "july2024",
+        "actions": [
+          "Monitor June renewal outcomes",
+          "Initiate early contact for July expirations",
+          "Review pricing trends for seasonal adjustments"
+        ]
+      }
+    ],
+    "budgetImpact": {
+      "estimatedPriceChanges": 5.2,
+      "potentialSavings": 12500.00,
+      "riskExposure": 8750.00
+    }
+  },
+  {
+    "reportId": "validity-report-003",
+    "reportName": "Vendor Renewal Performance Analysis",
+    "reportType": "vendor_performance",
+    "generatedAt": "2024-05-30T11:15:00Z",
+    "generatedBy": "procurement-manager-001",
+    "reportPeriod": {
+      "startDate": "2024-02-01T00:00:00Z",
+      "endDate": "2024-05-30T23:59:59Z"
+    },
+    "vendorMetrics": [
+      {
+        "vendorId": "vendor-001",
+        "vendorName": "Premium Beverage Suppliers",
+        "renewalMetrics": {
+          "totalRenewals": 12,
+          "onTimeRenewals": 10,
+          "lateRenewals": 2,
+          "missedRenewals": 0,
+          "averageResponseTime": 2.5,
+          "renewalRate": 100.0
+        },
+        "priceStability": {
+          "averagePriceChange": 3.2,
+          "priceIncreases": 8,
+          "priceDecreases": 2,
+          "priceStable": 2,
+          "volatilityScore": "low"
+        },
+        "communicationScore": 9.2,
+        "overallRating": "excellent"
+      },
+      {
+        "vendorId": "vendor-004",
+        "vendorName": "Unreliable Supplies Co",
+        "renewalMetrics": {
+          "totalRenewals": 8,
+          "onTimeRenewals": 4,
+          "lateRenewals": 2,
+          "missedRenewals": 2,
+          "averageResponseTime": 8.5,
+          "renewalRate": 75.0
+        },
+        "priceStability": {
+          "averagePriceChange": 12.8,
+          "priceIncreases": 6,
+          "priceDecreases": 0,
+          "priceStable": 2,
+          "volatilityScore": "high"
+        },
+        "communicationScore": 4.1,
+        "overallRating": "poor"
+      }
+    ],
+    "recommendations": [
+      "Consider preferred vendor status for Premium Beverage Suppliers",
+      "Implement performance improvement plan for Unreliable Supplies Co",
+      "Explore alternative vendors for high-volatility categories"
+    ]
+  }
+]

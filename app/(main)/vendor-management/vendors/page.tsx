@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Table,
@@ -43,7 +43,7 @@ import {
 } from '@/lib/types/vendor-price-management';
 import { formatDate } from '@/lib/utils';
 
-export default function VendorsPage() {
+function VendorsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -545,4 +545,12 @@ export default function VendorsPage() {
       </Card>
     </div>
   );
+}
+
+export default function VendorsPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <VendorsPageContent />
+    </Suspense>
+  )
 }

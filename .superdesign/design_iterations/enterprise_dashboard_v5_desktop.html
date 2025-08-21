@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Dashboard Card - Desktop Layout Variation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="enterprise_theme_v5.css">
+    <style>
+        /* Desktop-Optimized Layout System */
+        .desktop-dashboard-layout {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: var(--space-6);
+            background: hsl(var(--background));
+            min-height: 100vh;
+        }
+
+        /* Enhanced Desktop Grid */
+        .desktop-split-container {
+            display: grid;
+            grid-template-columns: 480px 4px 1fr 320px;
+            grid-template-rows: auto 1fr;
+            gap: var(--space-6);
+            height: calc(100vh - 48px);
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-split-elevated);
+            overflow: hidden;
+        }
+
+        /* Desktop Header Bar */
+        .desktop-header-bar {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, hsl(var(--split-primary)), hsl(var(--split-info)));
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: hsl(var(--split-primary-foreground));
+        }
+
+        .header-title-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .header-main-title {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .header-subtitle {
+            font-size: var(--text-sm);
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .header-status-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .header-status-badge {
+            background: rgba(255,255,255,0.2);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .header-timestamp {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            opacity: 0.8;
+        }
+
+        /* Enhanced Left Panel - Operational Data */
+        .desktop-operational-panel {
+            background: hsl(var(--split-left-bg));
+            padding: var(--space-6);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+            overflow-y: auto;
+        }
+
+        /* Central Divider Enhanced */
+        .desktop-divider {
+            background: linear-gradient(180deg, 
+                hsl(var(--split-primary)), 
+                hsl(var(--split-info)),
+                hsl(var(--split-primary)));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .divider-handle {
+            width: 32px;
+            height: 48px;
+            background: hsl(var(--card));
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-split);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: col-resize;
+            transition: all 0.2s ease;
+        }
+
+        .divider-handle:hover {
+            background: hsl(var(--hover-split));
+            transform: scale(1.1);
+            box-shadow: var(--shadow-split-hover);
+        }
+
+        /* Enhanced Right Panel - Financial Data */
+        .desktop-financial-panel {
+            background: hsl(var(--split-right-bg));
+            padding: var(--space-6);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+            overflow-y: auto;
+        }
+
+        /* Desktop Sidebar - Actions & Tools */
+        .desktop-sidebar {
+            background: linear-gradient(180deg, hsl(var(--financial-accent)), hsl(var(--financial-muted)));
+            padding: var(--space-5);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            border-left: var(--border-split);
+        }
+
+        /* Enhanced Inventory Metrics for Desktop */
+        .desktop-inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4);
+        }
+
+        .desktop-metric-card {
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .desktop-metric-card:hover {
+            background: hsl(var(--hover-operational));
+            border-color: hsl(var(--split-primary));
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-split-elevated);
+        }
+
+        .desktop-metric-value {
+            font-size: var(--text-4xl);
+            font-weight: 900;
+            color: hsl(var(--split-primary));
+            font-variant-numeric: tabular-nums;
+            line-height: var(--line-height-none);
+            display: block;
+            margin-bottom: var(--space-2);
+        }
+
+        .desktop-metric-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-1);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            margin-top: var(--space-2);
+        }
+
+        .trend-up {
+            color: hsl(var(--split-success));
+        }
+
+        .trend-down {
+            color: hsl(var(--split-critical));
+        }
+
+        /* Enhanced Status Alert for Desktop */
+        .desktop-status-alert {
+            background: linear-gradient(135deg, 
+                hsl(var(--split-critical) / 0.1), 
+                hsl(var(--split-warning) / 0.1));
+            border: 2px solid hsl(var(--split-critical));
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .desktop-alert-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+        }
+
+        .alert-main-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .alert-priority {
+            background: hsl(var(--split-critical));
+            color: hsl(var(--split-critical-foreground));
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius);
+            font-size: var(--text-2xs);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Enhanced Progress for Desktop */
+        .desktop-progress-container {
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+        }
+
+        .desktop-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .progress-main-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: hsl(var(--split-critical));
+        }
+
+        .progress-percentage-large {
+            font-size: var(--text-3xl);
+            font-weight: 900;
+            color: hsl(var(--foreground));
+            font-family: var(--font-mono);
+        }
+
+        .desktop-progress-bar {
+            width: 100%;
+            height: 20px;
+            background: hsl(var(--operational-muted));
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: var(--space-4);
+        }
+
+        .desktop-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                hsl(var(--split-critical)), 
+                hsl(var(--split-warning)),
+                hsl(var(--split-critical)));
+            border-radius: var(--radius-lg);
+            position: relative;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced Business Context for Desktop */
+        .desktop-business-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+        }
+
+        .desktop-context-card {
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            transition: all 0.2s ease;
+        }
+
+        .desktop-context-card:hover {
+            background: hsl(var(--hover-operational));
+            border-color: hsl(var(--split-primary));
+            transform: translateX(8px);
+        }
+
+        /* Enhanced Vendor Information for Desktop */
+        .desktop-vendor-card {
+            background: linear-gradient(135deg, 
+                hsl(var(--financial-accent)), 
+                hsl(var(--financial-muted)));
+            border: var(--border-split);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vendor-logo-placeholder {
+            width: 64px;
+            height: 64px;
+            background: hsl(var(--split-primary));
+            border-radius: var(--radius-lg);
+            margin: 0 auto var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: hsl(var(--split-primary-foreground));
+        }
+
+        .vendor-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-1);
+            margin-top: var(--space-3);
+        }
+
+        .rating-star {
+            width: 16px;
+            height: 16px;
+            color: hsl(var(--split-warning));
+        }
+
+        /* Enhanced Pricing Calculator for Desktop */
+        .desktop-pricing-calculator {
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-split);
+        }
+
+        .calculator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-5);
+            padding-bottom: var(--space-3);
+            border-bottom: var(--border-split-accent);
+        }
+
+        .calculator-main-title {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .calculator-currency {
+            background: hsl(var(--split-info));
+            color: hsl(var(--split-info-foreground));
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius);
+            font-size: var(--text-xs);
+            font-weight: 600;
+        }
+
+        .desktop-price-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid hsl(var(--financial-muted));
+            transition: all 0.2s ease;
+        }
+
+        .desktop-price-line:hover {
+            background: hsl(var(--hover-financial));
+            margin: 0 calc(-1 * var(--space-3));
+            padding-left: var(--space-3);
+            padding-right: var(--space-3);
+            border-radius: var(--radius);
+        }
+
+        .desktop-price-total {
+            border-top: 3px solid hsl(var(--split-primary));
+            border-bottom: none;
+            background: linear-gradient(135deg, 
+                hsl(var(--split-primary) / 0.1), 
+                hsl(var(--split-info) / 0.1));
+            margin: var(--space-4) calc(-1 * var(--space-6));
+            padding: var(--space-5) var(--space-6);
+            border-radius: var(--radius-lg);
+        }
+
+        .desktop-total-value {
+            font-size: var(--text-2xl);
+            font-weight: 900;
+            color: hsl(var(--split-total));
+        }
+
+        /* Desktop Sidebar Components */
+        .sidebar-section {
+            background: hsl(var(--card));
+            border: var(--border-split);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            box-shadow: var(--shadow-split);
+        }
+
+        .sidebar-title {
+            font-size: var(--text-sm);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .desktop-action-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-3);
+        }
+
+        .desktop-action-button {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            border: var(--border-split);
+            border-radius: var(--radius);
+            background: hsl(var(--card));
+            color: hsl(var(--foreground));
+            font-size: var(--text-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .desktop-action-button:hover {
+            background: hsl(var(--hover-financial));
+            border-color: hsl(var(--split-primary));
+            transform: translateX(4px);
+            box-shadow: var(--shadow-split-hover);
+        }
+
+        .desktop-action-button-primary {
+            background: hsl(var(--split-primary));
+            color: hsl(var(--split-primary-foreground));
+            border-color: hsl(var(--split-primary));
+        }
+
+        .desktop-action-button-primary:hover {
+            background: hsl(var(--split-primary) / 0.9);
+            transform: translateX(4px) translateY(-2px);
+        }
+
+        /* Quick Stats Sidebar */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-2);
+        }
+
+        .quick-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-2) 0;
+            font-size: var(--text-xs);
+        }
+
+        .quick-stat-label {
+            color: hsl(var(--financial-muted-foreground));
+            font-weight: 500;
+        }
+
+        .quick-stat-value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: hsl(var(--foreground));
+        }
+
+        /* Desktop Animations */
+        @keyframes desktopSlideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-60px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes desktopSlideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(60px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes desktopSlideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes desktopHeaderReveal {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation Classes */
+        .animate-desktop-slide-left {
+            animation: desktopSlideInLeft 0.8s ease-out;
+        }
+
+        .animate-desktop-slide-right {
+            animation: desktopSlideInRight 0.8s ease-out;
+        }
+
+        .animate-desktop-slide-up {
+            animation: desktopSlideInUp 0.6s ease-out;
+        }
+
+        .animate-desktop-header {
+            animation: desktopHeaderReveal 0.5s ease-out;
+        }
+
+        /* Responsive Adjustments for Desktop */
+        @media (max-width: 1400px) {
+            .desktop-split-container {
+                grid-template-columns: 420px 4px 1fr 280px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .desktop-split-container {
+                grid-template-columns: 1fr 4px 1fr;
+                grid-template-rows: auto auto 1fr;
+            }
+            
+            .desktop-sidebar {
+                grid-column: 1 / -1;
+                grid-row: 2;
+                border-left: none;
+                border-top: var(--border-split);
+                padding: var(--space-4);
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            
+            .desktop-action-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Enhanced Desktop Scrollbars */
+        .desktop-operational-panel::-webkit-scrollbar,
+        .desktop-financial-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .desktop-operational-panel::-webkit-scrollbar-track,
+        .desktop-financial-panel::-webkit-scrollbar-track {
+            background: hsl(var(--operational-muted));
+            border-radius: var(--radius);
+        }
+
+        .desktop-operational-panel::-webkit-scrollbar-thumb,
+        .desktop-financial-panel::-webkit-scrollbar-thumb {
+            background: hsl(var(--split-primary));
+            border-radius: var(--radius);
+        }
+
+        .desktop-operational-panel::-webkit-scrollbar-thumb:hover,
+        .desktop-financial-panel::-webkit-scrollbar-thumb:hover {
+            background: hsl(var(--split-primary) / 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop-dashboard-layout">
+        <div class="desktop-split-container">
+            
+            <!-- Desktop Header Bar -->
+            <div class="desktop-header-bar animate-desktop-header">
+                <div class="header-title-section">
+                    <i data-lucide="building-2" class="split-icon-xl"></i>
+                    <div>
+                        <h1 class="header-main-title">Enterprise Procurement Dashboard</h1>
+                        <p class="header-subtitle">Premium Chocolate Inventory • Critical Stock Alert</p>
+                    </div>
+                </div>
+                <div class="header-status-section">
+                    <div class="header-status-badge">
+                        <i data-lucide="alert-triangle" class="split-icon-sm"></i>
+                        REORDER REQUIRED
+                    </div>
+                    <div class="header-timestamp" id="currentTime">
+                        <!-- Time will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Left Panel: Enhanced Operational Data -->
+            <div class="desktop-operational-panel animate-desktop-slide-left">
+                
+                <!-- Enhanced Inventory Metrics -->
+                <div class="split-card">
+                    <h3 class="split-title" style="font-size: var(--text-lg); margin-bottom: var(--space-5);">
+                        <i data-lucide="package" class="split-icon"></i>
+                        Inventory Metrics Overview
+                    </h3>
+                    <div class="desktop-inventory-grid">
+                        <div class="desktop-metric-card animate-metric-count" style="animation-delay: 0.8s;" tabindex="0">
+                            <span class="metric-label">Stock on Hand</span>
+                            <span class="desktop-metric-value" id="onHand">12</span>
+                            <span class="metric-unit">kg Available</span>
+                            <div class="desktop-metric-trend trend-down">
+                                <i data-lucide="trending-down" class="split-icon-sm"></i>
+                                <span>-15% from last week</span>
+                            </div>
+                        </div>
+                        <div class="desktop-metric-card animate-metric-count" style="animation-delay: 0.9s;" tabindex="0">
+                            <span class="metric-label">On Order</span>
+                            <span class="desktop-metric-value" id="onOrder">20</span>
+                            <span class="metric-unit">kg Incoming</span>
+                            <div class="desktop-metric-trend trend-up">
+                                <i data-lucide="trending-up" class="split-icon-sm"></i>
+                                <span>ETA: 3 days</span>
+                            </div>
+                        </div>
+                        <div class="desktop-metric-card animate-metric-count" style="animation-delay: 1s;" tabindex="0">
+                            <span class="metric-label">Reorder Point</span>
+                            <span class="desktop-metric-value" id="reorderLevel">15</span>
+                            <span class="metric-unit">kg Threshold</span>
+                            <div class="desktop-metric-trend trend-down">
+                                <i data-lucide="alert-circle" class="split-icon-sm"></i>
+                                <span>Below threshold</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Status Alert -->
+                <div class="desktop-status-alert animate-alert-pulse" style="animation-delay: 1.2s;">
+                    <div class="desktop-alert-header">
+                        <div class="alert-main-info">
+                            <i data-lucide="alert-triangle" class="alert-icon split-icon-xl"></i>
+                            <div>
+                                <div class="alert-title">Critical Stock Level Detected</div>
+                                <div style="font-size: var(--text-sm); color: hsl(var(--split-warning)); font-weight: 500; margin-top: var(--space-1);">
+                                    Stock has fallen below minimum threshold
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert-priority">HIGH PRIORITY</div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Progress Container -->
+                <div class="desktop-progress-container">
+                    <div class="desktop-progress-header">
+                        <div class="progress-main-label">
+                            <i data-lucide="activity" class="split-icon"></i>
+                            Stock Depletion Analysis
+                        </div>
+                        <div class="progress-percentage-large animate-metric-count" style="animation-delay: 1.4s;">26.7%</div>
+                    </div>
+                    
+                    <div class="desktop-progress-bar">
+                        <div class="desktop-progress-fill animate-progress-sweep" style="width: 26.7%; animation-delay: 1.6s;"></div>
+                    </div>
+                    
+                    <div class="split-flex-between" style="font-size: var(--text-sm); color: hsl(var(--operational-muted-foreground));">
+                        <span><strong>Next Delivery:</strong> 08/02/2024</span>
+                        <span><strong>Destination:</strong> Pastry Kitchen Storage</span>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Business Context -->
+                <div class="split-card">
+                    <h3 class="split-title" style="font-size: var(--text-lg); margin-bottom: var(--space-4);">
+                        <i data-lucide="briefcase" class="split-icon"></i>
+                        Business Context & Project Details
+                    </h3>
+                    <div class="desktop-business-grid">
+                        <div class="desktop-context-card animate-context-slide" style="animation-delay: 1.8s;">
+                            <div class="context-label">Job Number</div>
+                            <div class="context-value">PASTRY-2024-Q1-001</div>
+                        </div>
+                        <div class="desktop-context-card animate-context-slide" style="animation-delay: 1.9s;">
+                            <div class="context-label">Event Code</div>
+                            <div class="context-value">DESSERT-UPGRADE</div>
+                        </div>
+                        <div class="desktop-context-card animate-context-slide" style="animation-delay: 2s;">
+                            <div class="context-label">Project ID</div>
+                            <div class="context-value">PROJ001</div>
+                        </div>
+                        <div class="desktop-context-card animate-context-slide" style="animation-delay: 2.1s;">
+                            <div class="context-label">Market Segment</div>
+                            <div class="context-value">HOSPITALITY</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Central Divider -->
+            <div class="desktop-divider animate-divider-reveal" style="animation-delay: 0.5s;">
+                <div class="divider-handle" title="Resize panels">
+                    <i data-lucide="grip-vertical" class="split-icon"></i>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Enhanced Financial Data -->
+            <div class="desktop-financial-panel animate-desktop-slide-right">
+                
+                <!-- Enhanced Vendor Information -->
+                <div class="desktop-vendor-card animate-vendor-fade" style="animation-delay: 1s;">
+                    <div class="vendor-logo-placeholder">
+                        <i data-lucide="building" class="split-icon-lg"></i>
+                    </div>
+                    <div class="vendor-title">Premium Food Suppliers Inc.</div>
+                    <div class="vendor-details">
+                        Pricelist: PL-2024-USD-CHOCOLATE<br>
+                        Contract: Active • Preferred Vendor<br>
+                        <span style="color: hsl(var(--split-info)); font-weight: 600;">Next Review: Q2 2024</span>
+                    </div>
+                    <div class="vendor-rating">
+                        <i data-lucide="star" class="rating-star" style="fill: currentColor;"></i>
+                        <i data-lucide="star" class="rating-star" style="fill: currentColor;"></i>
+                        <i data-lucide="star" class="rating-star" style="fill: currentColor;"></i>
+                        <i data-lucide="star" class="rating-star" style="fill: currentColor;"></i>
+                        <i data-lucide="star" class="rating-star"></i>
+                        <span style="margin-left: var(--space-2); font-size: var(--text-xs); font-weight: 600;">4.2/5.0</span>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Pricing Calculator -->
+                <div class="desktop-pricing-calculator">
+                    <div class="calculator-header">
+                        <div class="calculator-main-title">
+                            <i data-lucide="calculator" class="split-icon"></i>
+                            Financial Breakdown
+                        </div>
+                        <div class="calculator-currency">USD</div>
+                    </div>
+                    
+                    <div class="desktop-price-line animate-price-stagger" style="animation-delay: 1.3s;">
+                        <span class="price-label">
+                            <i data-lucide="package" class="split-icon-sm"></i>
+                            Subtotal (25kg × $22.00)
+                        </span>
+                        <span class="price-value price-neutral">USD 550.00</span>
+                    </div>
+                    
+                    <div class="desktop-price-line animate-price-stagger" style="animation-delay: 1.4s;">
+                        <span class="price-label">
+                            <input type="checkbox" class="split-checkbox" checked>
+                            Volume Discount (5%)
+                        </span>
+                        <span class="price-value price-negative">-USD 27.50</span>
+                    </div>
+                    
+                    <div class="desktop-price-line animate-price-stagger" style="animation-delay: 1.5s;">
+                        <span class="price-label">
+                            <i data-lucide="minus-circle" class="split-icon-sm"></i>
+                            Net Amount
+                        </span>
+                        <span class="price-value price-neutral">USD 522.50</span>
+                    </div>
+                    
+                    <div class="desktop-price-line animate-price-stagger" style="animation-delay: 1.6s;">
+                        <span class="price-label">
+                            <input type="checkbox" class="split-checkbox" checked>
+                            Tax (VAT 7%)
+                        </span>
+                        <span class="price-value price-positive">+USD 36.58</span>
+                    </div>
+                    
+                    <div class="desktop-price-line desktop-price-total animate-total-emphasize" style="animation-delay: 1.7s;">
+                        <span class="price-label">
+                            <i data-lucide="circle-dollar-sign" class="split-icon"></i>
+                            <strong>FINAL TOTAL AMOUNT</strong>
+                        </span>
+                        <span class="price-value desktop-total-value">USD 559.08</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Desktop Sidebar: Actions & Tools -->
+            <div class="desktop-sidebar animate-desktop-slide-up" style="animation-delay: 0.6s;">
+                
+                <!-- Primary Actions -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="zap" class="split-icon-sm"></i>
+                        Quick Actions
+                    </div>
+                    <div class="desktop-action-grid">
+                        <button class="desktop-action-button desktop-action-button-primary animate-button-ready" style="animation-delay: 2s;" tabindex="0">
+                            <i data-lucide="shopping-cart" class="split-icon"></i>
+                            <span>Reorder Now</span>
+                        </button>
+                        <button class="desktop-action-button animate-button-ready" style="animation-delay: 2.1s;" tabindex="0">
+                            <i data-lucide="bar-chart-3" class="split-icon"></i>
+                            <span>Compare Prices</span>
+                        </button>
+                        <button class="desktop-action-button animate-button-ready" style="animation-delay: 2.2s;" tabindex="0">
+                            <i data-lucide="history" class="split-icon"></i>
+                            <span>View History</span>
+                        </button>
+                        <button class="desktop-action-button animate-button-ready" style="animation-delay: 2.3s;" tabindex="0">
+                            <i data-lucide="download" class="split-icon"></i>
+                            <span>Export Report</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="trending-up" class="split-icon-sm"></i>
+                        Quick Stats
+                    </div>
+                    <div class="quick-stats">
+                        <div class="quick-stat-item">
+                            <span class="quick-stat-label">Unit Price:</span>
+                            <span class="quick-stat-value">$22.00/kg</span>
+                        </div>
+                        <div class="quick-stat-item">
+                            <span class="quick-stat-label">Total Value:</span>
+                            <span class="quick-stat-value">$264.00</span>
+                        </div>
+                        <div class="quick-stat-item">
+                            <span class="quick-stat-label">Days Until Empty:</span>
+                            <span class="quick-stat-value">4.2 days</span>
+                        </div>
+                        <div class="quick-stat-item">
+                            <span class="quick-stat-label">Monthly Usage:</span>
+                            <span class="quick-stat-value">45kg avg</span>
+                        </div>
+                        <div class="quick-stat-item">
+                            <span class="quick-stat-label">Last Order:</span>
+                            <span class="quick-stat-value">2 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tools & Settings -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="settings" class="split-icon-sm"></i>
+                        Tools
+                    </div>
+                    <div class="desktop-action-grid">
+                        <button class="desktop-action-button animate-button-ready" style="animation-delay: 2.4s;" tabindex="0">
+                            <i data-lucide="bell" class="split-icon"></i>
+                            <span>Set Alerts</span>
+                        </button>
+                        <button class="desktop-action-button animate-button-ready" style="animation-delay: 2.5s;" tabindex="0">
+                            <i data-lucide="calendar" class="split-icon"></i>
+                            <span>Schedule</span>
+                        </button>
+                        <button class="desktop-action-button animate-button-ready" style="animation-delay: 2.6s;" tabindex="0">
+                            <i data-lucide="share-2" class="split-icon"></i>
+                            <span>Share</span>
+                        </button>
+                        <button class="desktop-action-button animate-button-ready" style="animation-delay: 2.7s;" tabindex="0">
+                            <i data-lucide="more-horizontal" class="split-icon"></i>
+                            <span>More</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Desktop Dashboard System
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                lucide.createIcons();
+            }, 100);
+            
+            // Update current time
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // Animate numbers with enhanced desktop timing
+            setTimeout(() => {
+                animateDesktopNumber('onHand', 12, 1200);
+                animateDesktopNumber('onOrder', 20, 1400);
+                animateDesktopNumber('reorderLevel', 15, 1600);
+            }, 1000);
+        });
+
+        // Update current time in header
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // Enhanced desktop number animation
+        function animateDesktopNumber(elementId, targetValue, duration) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const startValue = 0;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Desktop-specific easing with enhanced bounce
+                const easeOut = 1 - Math.pow(1 - progress, 4);
+                const bounce = progress < 0.7 ? easeOut : easeOut + (Math.sin((progress - 0.7) * Math.PI * 7) * 0.15 * (1 - progress));
+                const currentValue = Math.round(startValue + (targetValue - startValue) * bounce);
+                
+                element.textContent = currentValue;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    // Enhanced completion effect for desktop
+                    element.style.color = 'hsl(var(--split-primary))';
+                    element.style.transform = 'scale(1.15) rotate(2deg)';
+                    element.style.textShadow = '0 0 20px hsl(var(--split-primary) / 0.5)';
+                    setTimeout(() => {
+                        element.style.color = '';
+                        element.style.transform = 'scale(1)';
+                        element.style.textShadow = '';
+                    }, 400);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // Enhanced desktop interactions (reusing and extending from original)
+        document.querySelectorAll('.split-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                this.classList.add('animate-checkbox-flip');
+                
+                // Enhanced ripple for desktop
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'hsl(var(--split-primary) / 0.4)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'desktopCheckboxRipple 0.8s ease-out';
+                ripple.style.left = ripple.style.top = '50%';
+                ripple.style.width = ripple.style.height = '40px';
+                ripple.style.marginLeft = ripple.style.marginTop = '-20px';
+                ripple.style.pointerEvents = 'none';
+                
+                this.parentElement.style.position = 'relative';
+                this.parentElement.appendChild(ripple);
+                
+                setTimeout(() => {
+                    this.classList.remove('animate-checkbox-flip');
+                    if (this.parentElement.contains(ripple)) {
+                        this.parentElement.removeChild(ripple);
+                    }
+                }, 800);
+            });
+        });
+
+        // Enhanced desktop button interactions
+        document.querySelectorAll('.desktop-action-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Enhanced button press for desktop
+                this.style.transform = 'translateX(4px) translateY(-2px) scale(0.98)';
+                this.style.boxShadow = 'var(--shadow-split-elevated)';
+                
+                // Create expanding wave effect
+                const wave = document.createElement('div');
+                wave.style.position = 'absolute';
+                wave.style.borderRadius = '50%';
+                wave.style.background = 'rgba(255,255,255,0.5)';
+                wave.style.transform = 'scale(0)';
+                wave.style.animation = 'desktopExpandWave 0.8s ease-out';
+                wave.style.left = wave.style.top = '50%';
+                wave.style.width = wave.style.height = '150px';
+                wave.style.marginLeft = wave.style.marginTop = '-75px';
+                wave.style.pointerEvents = 'none';
+                
+                this.style.position = 'relative';
+                this.appendChild(wave);
+                
+                setTimeout(() => {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                    if (this.contains(wave)) {
+                        this.removeChild(wave);
+                    }
+                }, 800);
+            });
+        });
+
+        // Enhanced desktop metric card interactions
+        document.querySelectorAll('.desktop-metric-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const value = this.querySelector('.desktop-metric-value');
+                const trend = this.querySelector('.desktop-metric-trend');
+                
+                if (value) {
+                    value.style.color = 'hsl(var(--split-primary))';
+                    value.style.transform = 'scale(1.1) rotate(1deg)';
+                    value.style.textShadow = '0 0 15px hsl(var(--split-primary) / 0.3)';
+                }
+                
+                if (trend) {
+                    trend.style.transform = 'translateY(-2px)';
+                    trend.style.opacity = '1';
+                }
+                
+                // Enhanced neighboring card effects
+                const allCards = document.querySelectorAll('.desktop-metric-card');
+                allCards.forEach(otherCard => {
+                    if (otherCard !== this) {
+                        otherCard.style.transform = 'scale(0.96)';
+                        otherCard.style.opacity = '0.8';
+                        otherCard.style.filter = 'blur(1px)';
+                    }
+                });
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                const value = this.querySelector('.desktop-metric-value');
+                const trend = this.querySelector('.desktop-metric-trend');
+                
+                if (value) {
+                    value.style.color = '';
+                    value.style.transform = '';
+                    value.style.textShadow = '';
+                }
+                
+                if (trend) {
+                    trend.style.transform = '';
+                    trend.style.opacity = '';
+                }
+                
+                // Reset all cards
+                const allCards = document.querySelectorAll('.desktop-metric-card');
+                allCards.forEach(otherCard => {
+                    otherCard.style.transform = '';
+                    otherCard.style.opacity = '';
+                    otherCard.style.filter = '';
+                });
+            });
+        });
+
+        // Desktop divider resize functionality
+        let isResizing = false;
+        
+        document.querySelector('.divider-handle').addEventListener('mousedown', function(e) {
+            isResizing = true;
+            document.body.style.cursor = 'col-resize';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+            
+            // Basic resize logic (simplified)
+            const container = document.querySelector('.desktop-split-container');
+            const rect = container.getBoundingClientRect();
+            const percentage = ((e.clientX - rect.left) / rect.width) * 100;
+            
+            if (percentage > 25 && percentage < 75) {
+                // Update grid template columns based on mouse position
+                // This is a simplified implementation
+                console.log('Resizing to:', percentage + '%');
+            }
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = '';
+            }
+        });
+
+        // Enhanced keyboard navigation for desktop
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const focused = document.activeElement;
+                if (focused.classList.contains('desktop-metric-card') || 
+                    focused.classList.contains('desktop-action-button')) {
+                    e.preventDefault();
+                    focused.click();
+                }
+            }
+            
+            // Desktop-specific shortcuts
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        document.querySelector('.desktop-action-button-primary').click();
+                        break;
+                    case 'p':
+                        e.preventDefault();
+                        document.querySelector('[data-action="compare"]')?.click();
+                        break;
+                }
+            }
+        });
+
+        // Add CSS for desktop-specific animations
+        const desktopStyle = document.createElement('style');
+        desktopStyle.textContent = `
+            @keyframes desktopCheckboxRipple {
+                to {
+                    transform: scale(2.5);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes desktopExpandWave {
+                to {
+                    transform: scale(1);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(desktopStyle);
+
+        // Desktop performance monitoring
+        const performanceObserver = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                if (entry.entryType === 'measure') {
+                    console.log(`Desktop Animation: ${entry.name} took ${entry.duration}ms`);
+                }
+            }
+        });
+
+        if ('PerformanceObserver' in window) {
+            performanceObserver.observe({ entryTypes: ['measure'] });
+        }
+    </script>
+</body>
+</html>

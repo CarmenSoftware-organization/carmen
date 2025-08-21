@@ -1,0 +1,246 @@
+{
+  "validationResults": [
+    {
+      "submissionId": "sub_001",
+      "vendorId": "vendor_001",
+      "isValid": false,
+      "errors": [
+        {
+          "field": "items[0].unitPrice",
+          "message": "Unit price must be positive",
+          "code": "PRICE_VALIDATION",
+          "severity": "error",
+          "suggestion": "Please enter a price greater than 0"
+        },
+        {
+          "field": "items[1].currency",
+          "message": "Currency must be 3-letter code",
+          "code": "SCHEMA_VALIDATION",
+          "severity": "error",
+          "suggestion": "Please use ISO currency codes like USD, EUR, GBP"
+        }
+      ],
+      "warnings": [
+        {
+          "field": "items[0].validTo",
+          "message": "Price validity period is less than 30 days",
+          "code": "SHORT_VALIDITY",
+          "severity": "warning",
+          "suggestion": "Consider extending validity period for better price stability"
+        }
+      ],
+      "qualityScore": 72,
+      "itemsValidated": 10,
+      "itemsWithErrors": 2,
+      "itemsWithWarnings": 1
+    }
+  ],
+  "qualityReports": [
+    {
+      "submissionId": "sub_001",
+      "vendorId": "vendor_001",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "metrics": {
+        "overallScore": 72,
+        "completenessScore": 85,
+        "accuracyScore": 68,
+        "consistencyScore": 75,
+        "timelinessScore": 90,
+        "validityScore": 70
+      },
+      "issues": [
+        {
+          "category": "accuracy",
+          "severity": "high",
+          "description": "2 items have validation errors",
+          "affectedItems": 2,
+          "recommendation": "Review and correct validation errors before resubmission"
+        },
+        {
+          "category": "validity",
+          "severity": "medium",
+          "description": "Some items have short validity periods",
+          "affectedItems": 1,
+          "recommendation": "Consider extending validity periods to at least 30 days"
+        }
+      ],
+      "recommendations": [
+        "Review and correct validation errors to improve data accuracy",
+        "Ensure all price validity periods are current and reasonable (30-365 days)",
+        "Good data quality. Minor improvements could enhance submission excellence"
+      ],
+      "status": "fair"
+    }
+  ],
+  "errorReports": [
+    {
+      "submissionId": "sub_001",
+      "vendorId": "vendor_001",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "errorSummary": {
+        "totalErrors": 2,
+        "totalWarnings": 1,
+        "criticalErrors": 2,
+        "itemsAffected": 2,
+        "categoriesAffected": ["items"],
+        "mostCommonError": "PRICE_VALIDATION"
+      },
+      "detailedErrors": [
+        {
+          "id": "error_0",
+          "field": "items[0].unitPrice",
+          "itemIndex": 0,
+          "errorType": "PRICE_VALIDATION",
+          "severity": "high",
+          "message": "Unit price must be positive",
+          "currentValue": -10.50,
+          "expectedFormat": "Positive price value",
+          "correctionSteps": [
+            "Ensure price is greater than 0",
+            "Check for missing decimal places",
+            "Verify currency conversion if applicable"
+          ],
+          "examples": [
+            "Instead of: -10.50, use: 10.50",
+            "Instead of: 0, use: actual price"
+          ]
+        }
+      ],
+      "correctionGuidance": [
+        {
+          "category": "Price Validation",
+          "priority": 1,
+          "title": "Resolve Price Validation Issues",
+          "description": "Address pricing-related validation problems",
+          "steps": [
+            {
+              "stepNumber": 1,
+              "instruction": "Unit price must be positive: Ensure price is greater than 0",
+              "example": "Instead of: -10.50, use: 10.50"
+            }
+          ],
+          "estimatedTime": 15,
+          "difficulty": "medium",
+          "preventionTips": [
+            "Double-check price calculations",
+            "Verify currency and decimal places",
+            "Ensure bulk pricing is logical"
+          ]
+        }
+      ],
+      "resubmissionRequired": true,
+      "estimatedFixTime": 15
+    }
+  ],
+  "qualityFlags": [
+    {
+      "id": "flag_001",
+      "submissionId": "sub_001",
+      "vendorId": "vendor_001",
+      "flagType": "error",
+      "severity": "high",
+      "reason": "Accuracy Issues",
+      "description": "Accuracy score 68 indicates validation errors requiring attention",
+      "flaggedAt": "2024-01-15T10:30:00Z",
+      "flaggedBy": "system",
+      "status": "active"
+    },
+    {
+      "id": "flag_002",
+      "submissionId": "sub_002",
+      "vendorId": "vendor_002",
+      "flagType": "quality",
+      "severity": "medium",
+      "reason": "Data Inconsistency",
+      "description": "Consistency score 60 indicates data formatting or value inconsistencies",
+      "flaggedAt": "2024-01-15T09:15:00Z",
+      "flaggedBy": "system",
+      "status": "active"
+    }
+  ],
+  "qualityAlerts": [
+    {
+      "id": "alert_001",
+      "type": "quality_decline",
+      "vendorId": "vendor_001",
+      "severity": "high",
+      "message": "Quality trend declining by 15% over 30 days",
+      "details": {
+        "trend": {
+          "improvement": -15,
+          "trend": "declining"
+        },
+        "currentScore": 72
+      },
+      "triggeredAt": "2024-01-15T10:30:00Z",
+      "acknowledged": false
+    }
+  ],
+  "resubmissionWorkflows": [
+    {
+      "id": "workflow_001",
+      "originalSubmissionId": "sub_001",
+      "vendorId": "vendor_001",
+      "status": "in_progress",
+      "currentAttempt": 2,
+      "maxAttempts": 3,
+      "requiredChanges": [
+        {
+          "id": "change_001",
+          "category": "error",
+          "priority": "critical",
+          "field": "items[0].unitPrice",
+          "itemIndex": 0,
+          "description": "Unit price must be positive",
+          "currentValue": -10.50,
+          "expectedValue": "Positive number",
+          "correctionInstructions": [
+            "Ensure price is greater than 0",
+            "Check for missing decimal places"
+          ],
+          "isCompleted": false
+        }
+      ],
+      "completedChanges": [],
+      "changeHistory": [
+        {
+          "id": "history_001",
+          "submissionId": "workflow_001",
+          "attemptNumber": 1,
+          "changesSummary": "2 modified",
+          "changesCount": 2,
+          "qualityScoreBefore": 65,
+          "qualityScoreAfter": 72,
+          "timestamp": "2024-01-15T09:00:00Z",
+          "status": "requires_changes"
+        }
+      ],
+      "createdAt": "2024-01-15T08:30:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z",
+      "statistics": {
+        "totalRequired": 2,
+        "totalCompleted": 0,
+        "completionRate": 0,
+        "byPriority": {
+          "critical": { "required": 2, "completed": 0 }
+        },
+        "byCategory": {
+          "error": { "required": 2, "completed": 0 }
+        }
+      }
+    }
+  ],
+  "qualityTrends": [
+    {
+      "vendorId": "vendor_001",
+      "period": "30 days",
+      "scoreHistory": [
+        { "date": "2024-01-01T00:00:00Z", "score": 85, "submissionCount": 2 },
+        { "date": "2024-01-08T00:00:00Z", "score": 82, "submissionCount": 1 },
+        { "date": "2024-01-15T00:00:00Z", "score": 72, "submissionCount": 1 }
+      ],
+      "improvement": -15,
+      "trend": "declining"
+    }
+  ]
+}

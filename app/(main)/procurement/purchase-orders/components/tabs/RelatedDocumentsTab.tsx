@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,19 @@ const mockDocuments: RelatedDocument[] = [
   },
 ];
 
+const getDocumentUrl = (doc: RelatedDocument): string => {
+  switch (doc.type) {
+    case 'Purchase Order':
+      return `/procurement/purchase-orders/${doc.number}?mode=view`;
+    case 'Goods Receive Note':
+      return `/procurement/goods-received-note/${doc.number}?mode=view`;
+    case 'Credit Note':
+      return `/procurement/credit-note/${doc.number}?mode=view`;
+    default:
+      return '#';
+  }
+};
+
 export default function RelatedDocumentsTab({ poData }: RelatedDocumentsTabProps) {
   return (
     <div>
@@ -94,7 +108,14 @@ export default function RelatedDocumentsTab({ poData }: RelatedDocumentsTabProps
           {mockDocuments.map((doc) => (
             <TableRow key={doc.id}>
               <TableCell>{doc.type}</TableCell>
-              <TableCell>{doc.number}</TableCell>
+              <TableCell>
+                <Link 
+                  href={getDocumentUrl(doc)}
+                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                >
+                  {doc.number}
+                </Link>
+              </TableCell>
               <TableCell>{doc.date}</TableCell>
               <TableCell>
                 <Badge variant={

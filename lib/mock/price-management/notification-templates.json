@@ -1,0 +1,199 @@
+{
+  "notificationTemplates": [
+    {
+      "id": "standard_expiration_warning",
+      "name": "Standard Expiration Warning",
+      "type": "email",
+      "category": "expiration_warning",
+      "subject": "Price Expiration Notice - {{productName}} ({{daysUntilExpiration}} days remaining)",
+      "htmlBody": "<html><body><h2>Price Expiration Notice</h2><p>Dear {{recipientName}},</p><p>This is to inform you that the pricing for <strong>{{productName}}</strong> from <strong>{{vendorName}}</strong> will expire in <strong>{{daysUntilExpiration}} days</strong>.</p><h3>Price Details:</h3><ul><li>Product: {{productName}}</li><li>Current Price: {{currency}} {{currentPrice}}</li><li>Expiration Date: {{expirationDate}}</li><li>Vendor: {{vendorName}}</li></ul><p>Please take appropriate action to renew or update the pricing before the expiration date.</p><p>Best regards,<br>Carmen Price Management System</p></body></html>",
+      "textBody": "Price Expiration Notice\n\nDear {{recipientName}},\n\nThis is to inform you that the pricing for {{productName}} from {{vendorName}} will expire in {{daysUntilExpiration}} days.\n\nPrice Details:\n- Product: {{productName}}\n- Current Price: {{currency}} {{currentPrice}}\n- Expiration Date: {{expirationDate}}\n- Vendor: {{vendorName}}\n\nPlease take appropriate action to renew or update the pricing before the expiration date.\n\nBest regards,\nCarmen Price Management System",
+      "variables": ["recipientName", "productName", "vendorName", "daysUntilExpiration", "currentPrice", "currency", "expirationDate"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-06-20T14:30:00Z"
+    },
+    {
+      "id": "critical_expiration_alert",
+      "name": "Critical Expiration Alert",
+      "type": "email",
+      "category": "critical_alert",
+      "subject": "URGENT: Price Expires in {{daysUntilExpiration}} Days - {{productName}}",
+      "htmlBody": "<html><body><div style='border: 2px solid #EF4444; padding: 20px; background-color: #FEF2F2;'><h2 style='color: #EF4444;'>🚨 URGENT: Price Expiration Alert</h2><p>Dear {{recipientName}},</p><p><strong>IMMEDIATE ACTION REQUIRED:</strong> The pricing for <strong>{{productName}}</strong> will expire in <strong>{{daysUntilExpiration}} days</strong>.</p><h3>Critical Details:</h3><ul><li>Product: {{productName}}</li><li>Current Price: {{currency}} {{currentPrice}}</li><li>Expiration Date: {{expirationDate}}</li><li>Vendor: {{vendorName}}</li><li>Affected PRs: {{affectedPRs}}</li><li>Total Value at Risk: {{currency}} {{totalValue}}</li></ul><p style='color: #EF4444; font-weight: bold;'>This expiration may impact ongoing purchase requests. Please contact the vendor immediately to renew or extend the pricing.</p><p>Best regards,<br>Carmen Price Management System</p></div></body></html>",
+      "textBody": "🚨 URGENT: Price Expiration Alert\n\nDear {{recipientName}},\n\nIMMEDIATE ACTION REQUIRED: The pricing for {{productName}} will expire in {{daysUntilExpiration}} days.\n\nCritical Details:\n- Product: {{productName}}\n- Current Price: {{currency}} {{currentPrice}}\n- Expiration Date: {{expirationDate}}\n- Vendor: {{vendorName}}\n- Affected PRs: {{affectedPRs}}\n- Total Value at Risk: {{currency}} {{totalValue}}\n\nThis expiration may impact ongoing purchase requests. Please contact the vendor immediately to renew or extend the pricing.\n\nBest regards,\nCarmen Price Management System",
+      "variables": ["recipientName", "productName", "vendorName", "daysUntilExpiration", "currentPrice", "currency", "expirationDate", "affectedPRs", "totalValue"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-06-20T14:30:00Z"
+    },
+    {
+      "id": "grace_period_active",
+      "name": "Grace Period Active",
+      "type": "email",
+      "category": "grace_period",
+      "subject": "Price Expired - Grace Period Active for {{productName}}",
+      "htmlBody": "<html><body><div style='border: 2px solid #F59E0B; padding: 20px; background-color: #FFFBEB;'><h2 style='color: #F59E0B;'>⚠️ Price Expired - Grace Period Active</h2><p>Dear {{recipientName}},</p><p>The pricing for <strong>{{productName}}</strong> has expired but is currently within the grace period.</p><h3>Grace Period Details:</h3><ul><li>Product: {{productName}}</li><li>Expired Price: {{currency}} {{currentPrice}}</li><li>Expiration Date: {{expirationDate}}</li><li>Grace Period Ends: {{gracePeriodEnd}}</li><li>Days Since Expiration: {{daysSinceExpiration}}</li><li>Vendor: {{vendorName}}</li></ul><p style='color: #F59E0B; font-weight: bold;'>Please renew the pricing before the grace period expires to avoid disruption to purchase requests.</p><p>Best regards,<br>Carmen Price Management System</p></div></body></html>",
+      "textBody": "⚠️ Price Expired - Grace Period Active\n\nDear {{recipientName}},\n\nThe pricing for {{productName}} has expired but is currently within the grace period.\n\nGrace Period Details:\n- Product: {{productName}}\n- Expired Price: {{currency}} {{currentPrice}}\n- Expiration Date: {{expirationDate}}\n- Grace Period Ends: {{gracePeriodEnd}}\n- Days Since Expiration: {{daysSinceExpiration}}\n- Vendor: {{vendorName}}\n\nPlease renew the pricing before the grace period expires to avoid disruption to purchase requests.\n\nBest regards,\nCarmen Price Management System",
+      "variables": ["recipientName", "productName", "vendorName", "currentPrice", "currency", "expirationDate", "gracePeriodEnd", "daysSinceExpiration"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-06-20T14:30:00Z"
+    },
+    {
+      "id": "bulk_expiration_warning",
+      "name": "Bulk Expiration Warning",
+      "type": "email",
+      "category": "bulk_expiration",
+      "subject": "Multiple Prices Expiring - {{vendorName}} ({{itemCount}} items)",
+      "htmlBody": "<html><body><h2>Multiple Price Expiration Notice</h2><p>Dear {{recipientName}},</p><p>Multiple pricing items from <strong>{{vendorName}}</strong> are scheduled to expire soon.</p><h3>Expiring Items ({{itemCount}} total):</h3><table border='1' style='border-collapse: collapse; width: 100%;'><tr><th>Product</th><th>Current Price</th><th>Expiration Date</th><th>Days Remaining</th></tr>{{#each items}}<tr><td>{{productName}}</td><td>{{currency}} {{currentPrice}}</td><td>{{expirationDate}}</td><td>{{daysUntilExpiration}}</td></tr>{{/each}}</table><h3>Bulk Renewal Options:</h3><ul><li>Total Value: {{currency}} {{totalValue}}</li><li>Bulk Discount Available: {{#if discountAvailable}}{{discountPercentage}}% off{{else}}No{{/if}}</li><li>Renewal Deadline: {{renewalDeadline}}</li></ul><p>Consider scheduling a meeting to discuss bulk renewal options and potential discounts.</p><p>Best regards,<br>Carmen Price Management System</p></body></html>",
+      "textBody": "Multiple Price Expiration Notice\n\nDear {{recipientName}},\n\nMultiple pricing items from {{vendorName}} are scheduled to expire soon.\n\nExpiring Items ({{itemCount}} total):\n{{#each items}}- {{productName}}: {{currency}} {{currentPrice}} (expires {{expirationDate}})\n{{/each}}\nBulk Renewal Options:\n- Total Value: {{currency}} {{totalValue}}\n- Bulk Discount Available: {{#if discountAvailable}}{{discountPercentage}}% off{{else}}No{{/if}}\n- Renewal Deadline: {{renewalDeadline}}\n\nConsider scheduling a meeting to discuss bulk renewal options and potential discounts.\n\nBest regards,\nCarmen Price Management System",
+      "variables": ["recipientName", "vendorName", "itemCount", "items", "totalValue", "currency", "discountAvailable", "discountPercentage", "renewalDeadline"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-06-20T14:30:00Z"
+    },
+    {
+      "id": "auto_renewal_success",
+      "name": "Auto-Renewal Success",
+      "type": "email",
+      "category": "renewal_confirmation",
+      "subject": "Price Auto-Renewed Successfully - {{productName}}",
+      "htmlBody": "<html><body><div style='border: 2px solid #10B981; padding: 20px; background-color: #F0FDF4;'><h2 style='color: #10B981;'>✅ Price Auto-Renewed Successfully</h2><p>Dear {{recipientName}},</p><p>The pricing for <strong>{{productName}}</strong> has been automatically renewed.</p><h3>Renewal Details:</h3><ul><li>Product: {{productName}}</li><li>Previous Price: {{currency}} {{previousPrice}}</li><li>New Price: {{currency}} {{newPrice}}</li><li>Price Change: {{#if priceIncrease}}+{{else}}-{{/if}}{{currency}} {{priceChange}} ({{priceChangePercentage}}%)</li><li>New Expiration Date: {{newExpirationDate}}</li><li>Vendor: {{vendorName}}</li><li>Renewal Date: {{renewalDate}}</li></ul><p>The new pricing is now active and will be used for future purchase requests.</p><p>Best regards,<br>Carmen Price Management System</p></div></body></html>",
+      "textBody": "✅ Price Auto-Renewed Successfully\n\nDear {{recipientName}},\n\nThe pricing for {{productName}} has been automatically renewed.\n\nRenewal Details:\n- Product: {{productName}}\n- Previous Price: {{currency}} {{previousPrice}}\n- New Price: {{currency}} {{newPrice}}\n- Price Change: {{#if priceIncrease}}+{{else}}-{{/if}}{{currency}} {{priceChange}} ({{priceChangePercentage}}%)\n- New Expiration Date: {{newExpirationDate}}\n- Vendor: {{vendorName}}\n- Renewal Date: {{renewalDate}}\n\nThe new pricing is now active and will be used for future purchase requests.\n\nBest regards,\nCarmen Price Management System",
+      "variables": ["recipientName", "productName", "vendorName", "previousPrice", "newPrice", "priceChange", "priceChangePercentage", "priceIncrease", "currency", "newExpirationDate", "renewalDate"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-06-20T14:30:00Z"
+    },
+    {
+      "id": "renewal_failure_alert",
+      "name": "Renewal Failure Alert",
+      "type": "email",
+      "category": "renewal_failure",
+      "subject": "URGENT: Price Renewal Failed - {{productName}}",
+      "htmlBody": "<html><body><div style='border: 2px solid #EF4444; padding: 20px; background-color: #FEF2F2;'><h2 style='color: #EF4444;'>❌ URGENT: Price Renewal Failed</h2><p>Dear {{recipientName}},</p><p><strong>IMMEDIATE ACTION REQUIRED:</strong> The automatic renewal for <strong>{{productName}}</strong> has failed.</p><h3>Failure Details:</h3><ul><li>Product: {{productName}}</li><li>Current Price: {{currency}} {{currentPrice}}</li><li>Expiration Date: {{expirationDate}}</li><li>Vendor: {{vendorName}}</li><li>Failure Reason: {{failureReason}}</li><li>Renewal Attempt Date: {{renewalAttemptDate}}</li></ul><h3>Impact Assessment:</h3><ul><li>Affected PRs: {{affectedPRs}}</li><li>Total Value at Risk: {{currency}} {{totalValue}}</li><li>Risk Level: {{riskLevel}}</li></ul><h3>Alternative Vendors:</h3>{{#if alternativeVendors}}<ul>{{#each alternativeVendors}}<li>{{vendorName}} - {{currency}} {{estimatedPrice}} ({{availability}}, {{leadTime}} days lead time)</li>{{/each}}</ul>{{else}}<p style='color: #EF4444;'>No alternative vendors found. Manual sourcing required.</p>{{/if}}<p style='color: #EF4444; font-weight: bold;'>Please take immediate action to secure alternative pricing or contact the vendor directly.</p><p>Best regards,<br>Carmen Price Management System</p></div></body></html>",
+      "textBody": "❌ URGENT: Price Renewal Failed\n\nDear {{recipientName}},\n\nIMMEDIATE ACTION REQUIRED: The automatic renewal for {{productName}} has failed.\n\nFailure Details:\n- Product: {{productName}}\n- Current Price: {{currency}} {{currentPrice}}\n- Expiration Date: {{expirationDate}}\n- Vendor: {{vendorName}}\n- Failure Reason: {{failureReason}}\n- Renewal Attempt Date: {{renewalAttemptDate}}\n\nImpact Assessment:\n- Affected PRs: {{affectedPRs}}\n- Total Value at Risk: {{currency}} {{totalValue}}\n- Risk Level: {{riskLevel}}\n\nAlternative Vendors:\n{{#if alternativeVendors}}{{#each alternativeVendors}}- {{vendorName}} - {{currency}} {{estimatedPrice}} ({{availability}}, {{leadTime}} days lead time)\n{{/each}}{{else}}No alternative vendors found. Manual sourcing required.{{/if}}\n\nPlease take immediate action to secure alternative pricing or contact the vendor directly.\n\nBest regards,\nCarmen Price Management System",
+      "variables": ["recipientName", "productName", "vendorName", "currentPrice", "currency", "expirationDate", "failureReason", "renewalAttemptDate", "affectedPRs", "totalValue", "riskLevel", "alternativeVendors"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-06-20T14:30:00Z"
+    }
+  ],
+  "notificationQueue": [
+    {
+      "id": "notification-001",
+      "templateId": "standard_expiration_warning",
+      "recipientEmail": "john.doe@company.com",
+      "recipientName": "John Doe",
+      "recipientType": "purchaser",
+      "status": "pending",
+      "scheduledAt": "2024-08-16T09:00:00Z",
+      "priority": "medium",
+      "data": {
+        "productName": "Industrial Steel Pipes - 2 inch",
+        "vendorName": "Steel Solutions Inc",
+        "daysUntilExpiration": 25,
+        "currentPrice": 48.75,
+        "currency": "USD",
+        "expirationDate": "2024-12-31"
+      },
+      "createdAt": "2024-08-15T14:30:00Z"
+    },
+    {
+      "id": "notification-002",
+      "templateId": "critical_expiration_alert",
+      "recipientEmail": "jane.smith@company.com",
+      "recipientName": "Jane Smith",
+      "recipientType": "purchaser",
+      "status": "sent",
+      "scheduledAt": "2024-08-15T08:00:00Z",
+      "sentAt": "2024-08-15T08:02:15Z",
+      "priority": "high",
+      "data": {
+        "productName": "Electrical Cables - 12 AWG",
+        "vendorName": "ElectroSupply Corp",
+        "daysUntilExpiration": 5,
+        "currentPrice": 2.85,
+        "currency": "USD",
+        "expirationDate": "2024-08-31",
+        "affectedPRs": 3,
+        "totalValue": 15750.00
+      },
+      "createdAt": "2024-08-15T07:45:00Z"
+    },
+    {
+      "id": "notification-003",
+      "templateId": "grace_period_active",
+      "recipientEmail": "mike.johnson@company.com",
+      "recipientName": "Mike Johnson",
+      "recipientType": "purchaser",
+      "status": "delivered",
+      "scheduledAt": "2024-08-14T10:00:00Z",
+      "sentAt": "2024-08-14T10:01:30Z",
+      "deliveredAt": "2024-08-14T10:02:45Z",
+      "priority": "medium",
+      "data": {
+        "productName": "Safety Helmets - Class E",
+        "vendorName": "Safety First Equipment",
+        "currentPrice": 35.00,
+        "currency": "USD",
+        "expirationDate": "2024-05-31",
+        "gracePeriodEnd": "2024-06-07",
+        "daysSinceExpiration": 3
+      },
+      "createdAt": "2024-08-14T09:30:00Z"
+    },
+    {
+      "id": "notification-004",
+      "templateId": "auto_renewal_success",
+      "recipientEmail": "sarah.wilson@company.com",
+      "recipientName": "Sarah Wilson",
+      "recipientType": "purchaser",
+      "status": "delivered",
+      "scheduledAt": "2024-07-16T11:00:00Z",
+      "sentAt": "2024-07-16T11:00:45Z",
+      "deliveredAt": "2024-07-16T11:01:20Z",
+      "priority": "low",
+      "data": {
+        "productName": "Industrial Lubricants - 5L",
+        "vendorName": "Lubrication Solutions",
+        "previousPrice": 85.00,
+        "newPrice": 87.50,
+        "priceChange": 2.50,
+        "priceChangePercentage": 2.94,
+        "priceIncrease": true,
+        "currency": "USD",
+        "newExpirationDate": "2025-02-15",
+        "renewalDate": "2024-07-16"
+      },
+      "createdAt": "2024-07-16T10:35:00Z"
+    }
+  ],
+  "notificationSettings": {
+    "defaultSender": "noreply@carmen-system.com",
+    "senderName": "Carmen Price Management",
+    "retryAttempts": 3,
+    "retryInterval": 300,
+    "batchSize": 50,
+    "enableSMS": true,
+    "enablePushNotifications": false,
+    "quietHours": {
+      "enabled": true,
+      "startTime": "22:00",
+      "endTime": "06:00",
+      "timezone": "UTC"
+    },
+    "escalationRules": [
+      {
+        "condition": "high_priority_undelivered_24h",
+        "action": "escalate_to_manager",
+        "enabled": true
+      },
+      {
+        "condition": "critical_alert_unread_2h",
+        "action": "send_sms",
+        "enabled": true
+      }
+    ]
+  }
+}

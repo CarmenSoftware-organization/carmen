@@ -1,0 +1,177 @@
+{
+  "timestamp": "2025-08-14T11:35:49.593Z",
+  "total_screens": 21,
+  "successful_captures": 21,
+  "failed_captures": 0,
+  "success_rate": "100.0",
+  "results": [
+    {
+      "screen": "main-dashboard",
+      "url": "http://localhost:3000/dashboard",
+      "status": "success",
+      "spec_file": "main-dashboard-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/main-dashboard/main-dashboard-default.png"
+    },
+    {
+      "screen": "operational-dashboard-fractional",
+      "url": "http://localhost:3000/operational-planning/dashboard",
+      "status": "success",
+      "spec_file": "operational-dashboard-fractional-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/operational-dashboard-fractional/operational-dashboard-fractional-default.png"
+    },
+    {
+      "screen": "purchase-requests-list",
+      "url": "http://localhost:3000/procurement/purchase-requests",
+      "status": "success",
+      "spec_file": "purchase-requests-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/purchase-requests-list/purchase-requests-list-default.png"
+    },
+    {
+      "screen": "purchase-request-detail",
+      "url": "http://localhost:3000/procurement/purchase-requests/PR-2024-001",
+      "status": "success",
+      "spec_file": "purchase-request-detail-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/purchase-request-detail/purchase-request-detail-default.png"
+    },
+    {
+      "screen": "purchase-orders-list",
+      "url": "http://localhost:3000/procurement/purchase-orders",
+      "status": "success",
+      "spec_file": "purchase-orders-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/purchase-orders-list/purchase-orders-list-default.png"
+    },
+    {
+      "screen": "purchase-order-detail",
+      "url": "http://localhost:3000/procurement/purchase-orders/PO-2024-001",
+      "status": "success",
+      "spec_file": "purchase-order-detail-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/purchase-order-detail/purchase-order-detail-default.png"
+    },
+    {
+      "screen": "goods-received-note-list",
+      "url": "http://localhost:3000/procurement/goods-received-note",
+      "status": "success",
+      "spec_file": "goods-received-note-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/goods-received-note-list/goods-received-note-list-default.png"
+    },
+    {
+      "screen": "goods-received-note-detail",
+      "url": "http://localhost:3000/procurement/goods-received-note/GRN-2024-001",
+      "status": "success",
+      "spec_file": "goods-received-note-detail-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/goods-received-note-detail/goods-received-note-detail-default.png"
+    },
+    {
+      "screen": "vendor-management-overview",
+      "url": "http://localhost:3000/vendor-management",
+      "status": "success",
+      "spec_file": "vendor-management-overview-screen.md",
+      "priority": "medium",
+      "screenshot": "docs/prd/output/screens/images/vendor-management-overview/vendor-management-overview-default.png"
+    },
+    {
+      "screen": "vendor-list",
+      "url": "http://localhost:3000/vendor-management/manage-vendors",
+      "status": "success",
+      "spec_file": "vendor-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/vendor-list/vendor-list-default.png"
+    },
+    {
+      "screen": "vendor-detail",
+      "url": "http://localhost:3000/vendor-management/manage-vendors/vendor-001",
+      "status": "success",
+      "spec_file": "vendor-detail-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/vendor-detail/vendor-detail-default.png"
+    },
+    {
+      "screen": "inventory-management-overview",
+      "url": "http://localhost:3000/inventory-management",
+      "status": "success",
+      "spec_file": "inventory-management-overview-screen.md",
+      "priority": "medium",
+      "screenshot": "docs/prd/output/screens/images/inventory-management-overview/inventory-management-overview-default.png"
+    },
+    {
+      "screen": "inventory-adjustments-list",
+      "url": "http://localhost:3000/inventory-management/inventory-adjustments",
+      "status": "success",
+      "spec_file": "inventory-adjustments-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/inventory-adjustments-list/inventory-adjustments-list-default.png"
+    },
+    {
+      "screen": "inventory-adjustment-detail",
+      "url": "http://localhost:3000/inventory-management/inventory-adjustments/ADJ-2024-001",
+      "status": "success",
+      "spec_file": "inventory-adjustment-detail-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/inventory-adjustment-detail/inventory-adjustment-detail-default.png"
+    },
+    {
+      "screen": "stock-balance-report",
+      "url": "http://localhost:3000/inventory-management/stock-balance-report",
+      "status": "success",
+      "spec_file": "stock-balance-report-screen.md",
+      "priority": "medium",
+      "screenshot": "docs/prd/output/screens/images/stock-balance-report/stock-balance-report-default.png"
+    },
+    {
+      "screen": "store-operations-overview",
+      "url": "http://localhost:3000/store-operations",
+      "status": "success",
+      "spec_file": "store-operations-overview-screen.md",
+      "priority": "medium",
+      "screenshot": "docs/prd/output/screens/images/store-operations-overview/store-operations-overview-default.png"
+    },
+    {
+      "screen": "store-requisitions-list",
+      "url": "http://localhost:3000/store-operations/store-requisitions",
+      "status": "success",
+      "spec_file": "store-requisitions-list-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/store-requisitions-list/store-requisitions-list-default.png"
+    },
+    {
+      "screen": "pos-integration-fractional",
+      "url": "http://localhost:3000/system-administration/system-integrations/pos",
+      "status": "success",
+      "spec_file": "pos-integration-fractional-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/pos-integration-fractional/pos-integration-fractional-default.png"
+    },
+    {
+      "screen": "pos-recipe-mapping",
+      "url": "http://localhost:3000/system-administration/system-integrations/pos/mapping/recipes",
+      "status": "success",
+      "spec_file": "pos-recipe-mapping-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/pos-recipe-mapping/pos-recipe-mapping-default.png"
+    },
+    {
+      "screen": "consumption-analytics-fractional",
+      "url": "http://localhost:3000/reporting-analytics/consumption-analytics",
+      "status": "success",
+      "spec_file": "consumption-analytics-fractional-screen.md",
+      "priority": "high",
+      "screenshot": "docs/prd/output/screens/images/consumption-analytics-fractional/consumption-analytics-fractional-default.png"
+    },
+    {
+      "screen": "my-approvals",
+      "url": "http://localhost:3000/my-approvals",
+      "status": "success",
+      "spec_file": "my-approvals-screen.md",
+      "priority": "medium",
+      "screenshot": "docs/prd/output/screens/images/my-approvals/my-approvals-default.png"
+    }
+  ]
+}

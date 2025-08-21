@@ -1,0 +1,178 @@
+[
+  {
+    "id": "prod-001",
+    "name": "Premium Coffee Beans",
+    "category": "Food & Beverage",
+    "subcategory": "Coffee",
+    "sku": "COF-001",
+    "description": "High-quality arabica coffee beans from Colombia",
+    "unit": "kg",
+    "status": "Active",
+    "assignedVendors": 3,
+    "lastPriceUpdate": "2024-01-15T10:30:00Z",
+    "averagePrice": 12.50,
+    "priceRange": {
+      "min": 10.00,
+      "max": 15.00
+    },
+    "specifications": {
+      "origin": "Colombia",
+      "roast": "Medium",
+      "certification": "Fair Trade"
+    }
+  },
+  {
+    "id": "prod-002",
+    "name": "Organic Milk",
+    "category": "Dairy",
+    "subcategory": "Milk Products",
+    "sku": "MLK-001",
+    "description": "Fresh organic whole milk from local farms",
+    "unit": "liter",
+    "status": "Active",
+    "assignedVendors": 2,
+    "lastPriceUpdate": "2024-01-14T08:15:00Z",
+    "averagePrice": 3.25,
+    "priceRange": {
+      "min": 2.80,
+      "max": 3.70
+    },
+    "specifications": {
+      "type": "Whole Milk",
+      "fatContent": "3.5%",
+      "certification": "Organic"
+    }
+  },
+  {
+    "id": "prod-003",
+    "name": "Fresh Salmon",
+    "category": "Meat & Seafood",
+    "subcategory": "Fish",
+    "sku": "FSH-001",
+    "description": "Fresh Atlantic salmon fillets",
+    "unit": "kg",
+    "status": "Active",
+    "assignedVendors": 1,
+    "lastPriceUpdate": "2024-01-13T16:45:00Z",
+    "averagePrice": 28.00,
+    "priceRange": {
+      "min": 25.00,
+      "max": 32.00
+    },
+    "specifications": {
+      "type": "Atlantic Salmon",
+      "cut": "Fillet",
+      "freshness": "Fresh"
+    }
+  },
+  {
+    "id": "prod-004",
+    "name": "Organic Tomatoes",
+    "category": "Fresh Produce",
+    "subcategory": "Vegetables",
+    "sku": "VEG-001",
+    "description": "Fresh organic tomatoes from local greenhouse",
+    "unit": "kg",
+    "status": "Active",
+    "assignedVendors": 4,
+    "lastPriceUpdate": "2024-01-16T09:20:00Z",
+    "averagePrice": 4.50,
+    "priceRange": {
+      "min": 3.80,
+      "max": 5.20
+    },
+    "specifications": {
+      "variety": "Roma",
+      "size": "Medium",
+      "certification": "Organic"
+    }
+  },
+  {
+    "id": "prod-005",
+    "name": "Sparkling Water",
+    "category": "Beverages",
+    "subcategory": "Water",
+    "sku": "BEV-001",
+    "description": "Natural sparkling mineral water",
+    "unit": "bottle",
+    "status": "Active",
+    "assignedVendors": 2,
+    "lastPriceUpdate": "2024-01-12T14:30:00Z",
+    "averagePrice": 1.25,
+    "priceRange": {
+      "min": 1.00,
+      "max": 1.50
+    },
+    "specifications": {
+      "volume": "500ml",
+      "type": "Sparkling",
+      "source": "Natural Spring"
+    }
+  },
+  {
+    "id": "prod-006",
+    "name": "Kitchen Knife Set",
+    "category": "Equipment",
+    "subcategory": "Kitchen Tools",
+    "sku": "EQP-001",
+    "description": "Professional chef knife set with 6 pieces",
+    "unit": "set",
+    "status": "Active",
+    "assignedVendors": 1,
+    "lastPriceUpdate": "2024-01-10T11:15:00Z",
+    "averagePrice": 89.99,
+    "priceRange": {
+      "min": 75.00,
+      "max": 105.00
+    },
+    "specifications": {
+      "pieces": 6,
+      "material": "Stainless Steel",
+      "brand": "Professional Chef"
+    }
+  },
+  {
+    "id": "prod-007",
+    "name": "Olive Oil Extra Virgin",
+    "category": "Food & Beverage",
+    "subcategory": "Oils",
+    "sku": "OIL-001",
+    "description": "Cold-pressed extra virgin olive oil",
+    "unit": "liter",
+    "status": "Active",
+    "assignedVendors": 3,
+    "lastPriceUpdate": "2024-01-11T13:45:00Z",
+    "averagePrice": 8.75,
+    "priceRange": {
+      "min": 7.50,
+      "max": 10.00
+    },
+    "specifications": {
+      "grade": "Extra Virgin",
+      "origin": "Italy",
+      "extraction": "Cold Pressed"
+    }
+  },
+  {
+    "id": "prod-008",
+    "name": "Chicken Breast",
+    "category": "Meat & Seafood",
+    "subcategory": "Poultry",
+    "sku": "PLT-001",
+    "description": "Fresh boneless chicken breast",
+    "unit": "kg",
+    "status": "Active",
+    "assignedVendors": 2,
+    "lastPriceUpdate": "2024-01-15T07:30:00Z",
+    "averagePrice": 12.00,
+    "priceRange": {
+      "min": 10.50,
+      "max": 13.50
+    },
+    "specifications": {
+      "cut": "Boneless Breast",
+      "grade": "Grade A",
+      "freshness": "Fresh"
+    }
+  }
+]

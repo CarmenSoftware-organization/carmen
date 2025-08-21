@@ -25,7 +25,7 @@ export default function GeneralInfoTab({ poData }: { poData: any }) {
       <h2 className="text-xl font-semibold mb-4">General Information</h2>
       <form className="grid grid-cols-4 gap-4">
         <div>
-          <Label htmlFor="poNumber">PO Reference Number</Label>
+          <Label htmlFor="poNumber">PO Requisition</Label>
           <Input id="poNumber" value={poData.id} readOnly={!isEditing} />
         </div>
         <div>

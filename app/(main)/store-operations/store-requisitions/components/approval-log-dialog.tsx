@@ -13,7 +13,7 @@ import { Clock, UserCircle2 } from "lucide-react"
 interface ApprovalLog {
   id: number
   date: string
-  status: 'Accept' | 'Reject' | 'Review'
+  status: 'Pending' | 'Approved' | 'Reject' | 'Review'
   by: string
   comments: string
 }
@@ -53,8 +53,9 @@ export function ApprovalLogDialog({ itemId, itemName, children, logs }: Approval
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      log.status === 'Accept' ? 'bg-green-100 text-green-800' :
+                      log.status === 'Approved' ? 'bg-green-100 text-green-800' :
                       log.status === 'Reject' ? 'bg-red-100 text-red-800' :
+                      log.status === 'Pending' ? 'bg-blue-100 text-blue-800' :
                       'bg-yellow-100 text-yellow-800'
                     }`}>
                       {log.status}

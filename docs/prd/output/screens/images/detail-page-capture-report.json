@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-08-14T11:45:52.524Z",
+  "capture_type": "detail_pages_with_populated_content",
+  "total_screens": 8,
+  "successful_captures": 0,
+  "failed_captures": 5,
+  "backup_routes_used": 0,
+  "success_rate": "0.0",
+  "results": [
+    {
+      "screen": "purchase-request-detail",
+      "url": "http://localhost:3000/procurement/purchase-requests/PR-2024-001",
+      "status": "error",
+      "error": "404 page found",
+      "spec_file": "purchase-request-detail-screen.md",
+      "priority": "high",
+      "is_backup": false
+    },
+    {
+      "screen": "purchase-order-detail",
+      "url": "http://localhost:3000/procurement/purchase-orders/PO-2024-001",
+      "status": "error",
+      "error": "404 page found",
+      "spec_file": "purchase-order-detail-screen.md",
+      "priority": "high",
+      "is_backup": false
+    },
+    {
+      "screen": "goods-received-note-detail",
+      "url": "http://localhost:3000/procurement/goods-received-note/GRN-2024-001",
+      "status": "error",
+      "error": "404 page found",
+      "spec_file": "goods-received-note-detail-screen.md",
+      "priority": "high",
+      "is_backup": false
+    },
+    {
+      "screen": "inventory-adjustment-detail",
+      "url": "http://localhost:3000/inventory-management/inventory-adjustments/ADJ-2024-001",
+      "status": "error",
+      "error": "404 page found",
+      "spec_file": "inventory-adjustment-detail-screen.md",
+      "priority": "high",
+      "is_backup": false
+    },
+    {
+      "screen": "vendor-detail",
+      "url": "http://localhost:3000/vendor-management/manage-vendors/vendor-001",
+      "status": "error",
+      "error": "404 page found",
+      "spec_file": "vendor-detail-screen.md",
+      "priority": "high",
+      "is_backup": false
+    }
+  ]
+}

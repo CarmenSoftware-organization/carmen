@@ -1,0 +1,184 @@
+[
+  {
+    "id": "camp-001",
+    "name": "Q1 2024 Price Collection",
+    "description": "Quarterly price collection for all active vendors across food and beverage categories",
+    "status": "active",
+    "campaignType": "recurring",
+    "selectedVendors": ["vendor-001", "vendor-002", "vendor-003", "vendor-004", "vendor-005"],
+    "selectedCategories": ["food-items", "beverages", "dairy-products"],
+    "scheduledStart": "2024-01-15T09:00:00Z",
+    "scheduledEnd": "2024-01-30T17:00:00Z",
+    "recurringPattern": {
+      "frequency": "quarterly",
+      "interval": 1,
+      "endDate": "2024-12-31T23:59:59Z",
+      "maxOccurrences": 4
+    },
+    "progress": {
+      "totalVendors": 5,
+      "invitedVendors": 5,
+      "respondedVendors": 3,
+      "completedSubmissions": 2,
+      "pendingSubmissions": 3,
+      "failedSubmissions": 0,
+      "completionRate": 40,
+      "responseRate": 60,
+      "averageResponseTime": 48,
+      "lastUpdated": "2024-01-20T14:30:00Z"
+    },
+    "settings": {
+      "portalAccessDuration": 14,
+      "allowedSubmissionMethods": ["manual", "upload"],
+      "requireApproval": true,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [7, 3, 1],
+        "escalationRules": [
+          {
+            "daysOverdue": 2,
+            "escalateTo": ["purchasing.manager@company.com"],
+            "messageTemplate": "escalation-template-1"
+          }
+        ]
+      },
+      "emailTemplate": "quarterly-collection-template",
+      "customInstructions": "Please ensure all prices include current market adjustments and seasonal variations.",
+      "priority": "high"
+    },
+    "createdBy": "john.doe@company.com",
+    "createdAt": "2024-01-10T10:00:00Z",
+    "updatedAt": "2024-01-20T14:30:00Z"
+  },
+  {
+    "id": "camp-002",
+    "name": "Emergency Price Update - Dairy Products",
+    "description": "Urgent price collection due to market volatility in dairy sector",
+    "status": "completed",
+    "campaignType": "one-time",
+    "selectedVendors": ["vendor-002", "vendor-006", "vendor-007"],
+    "selectedCategories": ["dairy-products"],
+    "scheduledStart": "2024-01-05T08:00:00Z",
+    "scheduledEnd": "2024-01-08T18:00:00Z",
+    "progress": {
+      "totalVendors": 3,
+      "invitedVendors": 3,
+      "respondedVendors": 3,
+      "completedSubmissions": 3,
+      "pendingSubmissions": 0,
+      "failedSubmissions": 0,
+      "completionRate": 100,
+      "responseRate": 100,
+      "averageResponseTime": 24,
+      "lastUpdated": "2024-01-08T16:45:00Z"
+    },
+    "settings": {
+      "portalAccessDuration": 3,
+      "allowedSubmissionMethods": ["manual", "upload"],
+      "requireApproval": false,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [1],
+        "escalationRules": []
+      },
+      "emailTemplate": "urgent-collection-template",
+      "customInstructions": "URGENT: Please submit updated dairy prices immediately due to market volatility.",
+      "priority": "urgent"
+    },
+    "createdBy": "sarah.smith@company.com",
+    "createdAt": "2024-01-05T07:30:00Z",
+    "updatedAt": "2024-01-08T16:45:00Z"
+  },
+  {
+    "id": "camp-003",
+    "name": "New Vendor Onboarding - Bakery Items",
+    "description": "Initial price collection for newly onboarded bakery vendors",
+    "status": "draft",
+    "campaignType": "one-time",
+    "selectedVendors": ["vendor-008", "vendor-009"],
+    "selectedCategories": ["bakery-items", "frozen-goods"],
+    "scheduledStart": "2024-02-01T09:00:00Z",
+    "scheduledEnd": "2024-02-15T17:00:00Z",
+    "progress": {
+      "totalVendors": 2,
+      "invitedVendors": 0,
+      "respondedVendors": 0,
+      "completedSubmissions": 0,
+      "pendingSubmissions": 0,
+      "failedSubmissions": 0,
+      "completionRate": 0,
+      "responseRate": 0,
+      "averageResponseTime": 0,
+      "lastUpdated": "2024-01-25T10:00:00Z"
+    },
+    "settings": {
+      "portalAccessDuration": 14,
+      "allowedSubmissionMethods": ["manual", "upload"],
+      "requireApproval": true,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [7, 3, 1],
+        "escalationRules": []
+      },
+      "emailTemplate": "onboarding-collection-template",
+      "customInstructions": "Welcome to our vendor network! Please provide comprehensive pricing for all items in your assigned categories.",
+      "priority": "medium"
+    },
+    "createdBy": "mike.johnson@company.com",
+    "createdAt": "2024-01-25T10:00:00Z",
+    "updatedAt": "2024-01-25T10:00:00Z"
+  },
+  {
+    "id": "camp-004",
+    "name": "Monthly Produce Price Update",
+    "description": "Regular monthly collection for fresh produce vendors",
+    "status": "paused",
+    "campaignType": "recurring",
+    "selectedVendors": ["vendor-010", "vendor-011", "vendor-012"],
+    "selectedCategories": ["fresh-produce", "organic-items"],
+    "scheduledStart": "2024-01-01T06:00:00Z",
+    "recurringPattern": {
+      "frequency": "monthly",
+      "interval": 1,
+      "dayOfMonth": 1,
+      "endDate": "2024-12-31T23:59:59Z"
+    },
+    "progress": {
+      "totalVendors": 3,
+      "invitedVendors": 3,
+      "respondedVendors": 1,
+      "completedSubmissions": 1,
+      "pendingSubmissions": 2,
+      "failedSubmissions": 0,
+      "completionRate": 33,
+      "responseRate": 33,
+      "averageResponseTime": 72,
+      "lastUpdated": "2024-01-18T12:00:00Z"
+    },
+    "settings": {
+      "portalAccessDuration": 7,
+      "allowedSubmissionMethods": ["upload"],
+      "requireApproval": false,
+      "autoReminders": true,
+      "reminderSchedule": {
+        "enabled": true,
+        "intervals": [3, 1],
+        "escalationRules": [
+          {
+            "daysOverdue": 1,
+            "escalateTo": ["produce.manager@company.com"],
+            "messageTemplate": "produce-escalation-template"
+          }
+        ]
+      },
+      "emailTemplate": "monthly-produce-template",
+      "priority": "medium"
+    },
+    "createdBy": "lisa.brown@company.com",
+    "createdAt": "2023-12-15T14:00:00Z",
+    "updatedAt": "2024-01-18T12:00:00Z"
+  }
+]

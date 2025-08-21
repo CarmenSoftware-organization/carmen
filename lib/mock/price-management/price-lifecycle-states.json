@@ -1,0 +1,186 @@
+{
+  "priceLifecycleStates": [
+    {
+      "id": "draft",
+      "name": "Draft",
+      "description": "Price is being prepared but not yet active",
+      "color": "#6B7280",
+      "isActive": false,
+      "allowTransitions": ["pending_approval", "cancelled"]
+    },
+    {
+      "id": "pending_approval",
+      "name": "Pending Approval",
+      "description": "Price is awaiting approval before becoming active",
+      "color": "#F59E0B",
+      "isActive": false,
+      "allowTransitions": ["active", "rejected", "cancelled"]
+    },
+    {
+      "id": "active",
+      "name": "Active",
+      "description": "Price is currently valid and in use",
+      "color": "#10B981",
+      "isActive": true,
+      "allowTransitions": ["expiring", "suspended", "cancelled"]
+    },
+    {
+      "id": "expiring",
+      "name": "Expiring Soon",
+      "description": "Price will expire within the warning period",
+      "color": "#F97316",
+      "isActive": true,
+      "allowTransitions": ["expired", "renewed", "extended"]
+    },
+    {
+      "id": "expired",
+      "name": "Expired",
+      "description": "Price validity period has ended",
+      "color": "#EF4444",
+      "isActive": false,
+      "allowTransitions": ["renewed", "archived"]
+    },
+    {
+      "id": "suspended",
+      "name": "Suspended",
+      "description": "Price is temporarily inactive",
+      "color": "#8B5CF6",
+      "isActive": false,
+      "allowTransitions": ["active", "cancelled"]
+    },
+    {
+      "id": "renewed",
+      "name": "Renewed",
+      "description": "Price has been renewed with new validity period",
+      "color": "#06B6D4",
+      "isActive": true,
+      "allowTransitions": ["active", "expiring"]
+    },
+    {
+      "id": "cancelled",
+      "name": "Cancelled",
+      "description": "Price has been cancelled and is no longer valid",
+      "color": "#64748B",
+      "isActive": false,
+      "allowTransitions": ["archived"]
+    },
+    {
+      "id": "archived",
+      "name": "Archived",
+      "description": "Price is archived for historical reference only",
+      "color": "#9CA3AF",
+      "isActive": false,
+      "allowTransitions": []
+    }
+  ],
+  "validityPeriods": [
+    {
+      "id": "validity-001",
+      "priceItemId": "price-item-001",
+      "vendorId": "vendor-001",
+      "productId": "product-001",
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "expirationDate": "2024-12-31T23:59:59Z",
+      "currentState": "active",
+      "warningDays": 30,
+      "autoRenewal": true,
+      "renewalNotificationSent": false,
+      "createdAt": "2023-12-15T10:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "validity-002",
+      "priceItemId": "price-item-002",
+      "vendorId": "vendor-002",
+      "productId": "product-002",
+      "effectiveDate": "2024-06-01T00:00:00Z",
+      "expirationDate": "2024-08-31T23:59:59Z",
+      "currentState": "expiring",
+      "warningDays": 15,
+      "autoRenewal": false,
+      "renewalNotificationSent": true,
+      "createdAt": "2024-05-15T14:30:00Z",
+      "updatedAt": "2024-08-15T09:00:00Z"
+    },
+    {
+      "id": "validity-003",
+      "priceItemId": "price-item-003",
+      "vendorId": "vendor-003",
+      "productId": "product-003",
+      "effectiveDate": "2024-03-01T00:00:00Z",
+      "expirationDate": "2024-05-31T23:59:59Z",
+      "currentState": "expired",
+      "warningDays": 30,
+      "autoRenewal": false,
+      "renewalNotificationSent": true,
+      "createdAt": "2024-02-15T11:15:00Z",
+      "updatedAt": "2024-06-01T00:00:00Z"
+    },
+    {
+      "id": "validity-004",
+      "priceItemId": "price-item-004",
+      "vendorId": "vendor-001",
+      "productId": "product-004",
+      "effectiveDate": "2024-09-01T00:00:00Z",
+      "expirationDate": "2025-02-28T23:59:59Z",
+      "currentState": "active",
+      "warningDays": 45,
+      "autoRenewal": true,
+      "renewalNotificationSent": false,
+      "createdAt": "2024-08-20T16:45:00Z",
+      "updatedAt": "2024-09-01T00:00:00Z"
+    },
+    {
+      "id": "validity-005",
+      "priceItemId": "price-item-005",
+      "vendorId": "vendor-004",
+      "productId": "product-005",
+      "effectiveDate": "2024-07-15T00:00:00Z",
+      "expirationDate": "2024-07-31T23:59:59Z",
+      "currentState": "suspended",
+      "warningDays": 7,
+      "autoRenewal": false,
+      "renewalNotificationSent": false,
+      "suspensionReason": "Quality issues reported",
+      "createdAt": "2024-07-10T13:20:00Z",
+      "updatedAt": "2024-07-25T10:30:00Z"
+    }
+  ],
+  "stateTransitionRules": [
+    {
+      "fromState": "draft",
+      "toState": "pending_approval",
+      "condition": "price_complete",
+      "requiredRole": "purchaser",
+      "autoTransition": false
+    },
+    {
+      "fromState": "pending_approval",
+      "toState": "active",
+      "condition": "approved",
+      "requiredRole": "approver",
+      "autoTransition": false
+    },
+    {
+      "fromState": "active",
+      "toState": "expiring",
+      "condition": "within_warning_period",
+      "requiredRole": "system",
+      "autoTransition": true
+    },
+    {
+      "fromState": "expiring",
+      "toState": "expired",
+      "condition": "past_expiration_date",
+      "requiredRole": "system",
+      "autoTransition": true
+    },
+    {
+      "fromState": "expired",
+      "toState": "renewed",
+      "condition": "renewal_submitted",
+      "requiredRole": "purchaser",
+      "autoTransition": false
+    }
+  ]
+}

@@ -1,0 +1,727 @@
+{
+  "pizzaSliceManagementRules": [
+    {
+      "id": "PSR-001",
+      "name": "Pizza Cutting Standards",
+      "description": "Defines standard cutting procedures for pizzas to ensure consistent slice sizes and food safety",
+      "priority": 9,
+      "isActive": true,
+      "category": "fractional-sales",
+      "fractionalType": "pizza-slice",
+      "foodSafetyLevel": "high",
+      "complianceRequirements": ["HACCP", "Local Health Department"],
+      "qualityStandards": [
+        {
+          "id": "QS-PS-001",
+          "standardName": "Slice Size Consistency",
+          "measurementType": "size",
+          "minimumValue": 85,
+          "maximumValue": 115,
+          "unit": "percent of standard",
+          "toleranceLevel": 15,
+          "criticalControl": true,
+          "monitoringFrequency": "shift"
+        },
+        {
+          "id": "QS-PS-002",
+          "standardName": "Cutting Tool Sanitization",
+          "measurementType": "time",
+          "maximumValue": 2,
+          "unit": "hours since last sanitization",
+          "toleranceLevel": 0.5,
+          "criticalControl": true,
+          "monitoringFrequency": "continuous"
+        }
+      ],
+      "conditions": [
+        {
+          "id": "C-PSR-001",
+          "field": "pizza_diameter",
+          "operator": "between",
+          "value": [10, 20],
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-PSR-002",
+          "field": "pizza_status",
+          "operator": "equals",
+          "value": "ready_for_cutting",
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-PSR-003",
+          "field": "cutting_tool_sanitized",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-PSR-001",
+          "type": "logCompliance",
+          "parameters": {
+            "logType": "cutting_standards",
+            "requiredFields": ["pizza_id", "slice_count", "cut_time", "staff_id"]
+          }
+        },
+        {
+          "id": "A-PSR-002",
+          "type": "updateInventory",
+          "parameters": {
+            "updateType": "create_fractional_units",
+            "sliceCount": "calculated"
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "PSR-002",
+      "name": "Pizza Slice Holding Time Limits",
+      "description": "Enforces maximum holding time for cut pizza slices to maintain food safety and quality",
+      "priority": 10,
+      "isActive": true,
+      "category": "food-safety",
+      "hazardType": "biological",
+      "riskLevel": "critical",
+      "haccp_point": "CCP-3 Hot Holding",
+      "monitoringRequired": true,
+      "corrective_actions": [
+        "Remove expired slices immediately",
+        "Check heating equipment temperature",
+        "Document disposal in waste log"
+      ],
+      "conditions": [
+        {
+          "id": "C-PSR-004",
+          "field": "slice_holding_time",
+          "operator": "greaterThan",
+          "value": 240,
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-PSR-005",
+          "field": "holding_temperature",
+          "operator": "lessThan",
+          "value": 140,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-PSR-003",
+          "type": "markExpired",
+          "parameters": {
+            "reason": "holding_time_exceeded",
+            "autoDispose": true
+          }
+        },
+        {
+          "id": "A-PSR-004",
+          "type": "notifyManager",
+          "parameters": {
+            "urgency": "high",
+            "messageTemplate": "Pizza slices have exceeded safe holding time"
+          }
+        },
+        {
+          "id": "A-PSR-005",
+          "type": "scheduleWasteCheck",
+          "parameters": {
+            "checkType": "food_safety_disposal",
+            "intervalMinutes": 30
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "PSR-003",
+      "name": "Pizza Slice Quality Assessment",
+      "description": "Continuous quality monitoring for pizza slices including appearance, temperature, and freshness",
+      "priority": 7,
+      "isActive": true,
+      "category": "quality-control",
+      "conditions": [
+        {
+          "id": "C-PSR-006",
+          "field": "slice_temperature",
+          "operator": "lessThan",
+          "value": 140,
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-PSR-007",
+          "field": "appearance_score",
+          "operator": "lessThan",
+          "value": 7,
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-PSR-008",
+          "field": "customer_complaint",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-PSR-006",
+          "type": "flagForReview",
+          "parameters": {
+            "reviewType": "quality_check",
+            "assignTo": "kitchen_supervisor"
+          }
+        },
+        {
+          "id": "A-PSR-007",
+          "type": "adjustPrice",
+          "parameters": {
+            "adjustmentType": "quality_discount",
+            "discountPercentage": 15
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "PSR-004",
+      "name": "Pizza Cross-Contamination Prevention",
+      "description": "Prevents cross-contamination between different pizza types and allergen management",
+      "priority": 10,
+      "isActive": true,
+      "category": "food-safety",
+      "hazardType": "cross-contamination",
+      "riskLevel": "critical",
+      "haccp_point": "CCP-4 Allergen Control",
+      "monitoringRequired": true,
+      "corrective_actions": [
+        "Sanitize cutting tools between different pizza types",
+        "Use separate cutting boards for allergen-containing pizzas",
+        "Label slices with allergen information"
+      ],
+      "conditions": [
+        {
+          "id": "C-PSR-009",
+          "field": "pizza_contains_allergens",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-PSR-010",
+          "field": "cutting_tool_allergen_status",
+          "operator": "not_equals",
+          "value": "clean",
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-PSR-008",
+          "type": "blockSale",
+          "parameters": {
+            "reason": "cross_contamination_risk",
+            "requiresApproval": true
+          }
+        },
+        {
+          "id": "A-PSR-009",
+          "type": "sendAlert",
+          "parameters": {
+            "alertType": "allergen_contamination_risk",
+            "recipients": ["kitchen_manager", "food_safety_officer"]
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    }
+  ],
+  "cakeSliceManagementRules": [
+    {
+      "id": "CSR-001",
+      "name": "Cake Cutting Standards",
+      "description": "Standardized cake cutting procedures for consistent portion control and presentation",
+      "priority": 8,
+      "isActive": true,
+      "category": "fractional-sales",
+      "fractionalType": "cake-slice",
+      "foodSafetyLevel": "medium",
+      "complianceRequirements": ["Food Safety Standards", "Portion Control Guidelines"],
+      "qualityStandards": [
+        {
+          "id": "QS-CS-001",
+          "standardName": "Slice Weight Consistency",
+          "measurementType": "weight",
+          "minimumValue": 90,
+          "maximumValue": 110,
+          "unit": "grams",
+          "toleranceLevel": 10,
+          "criticalControl": false,
+          "monitoringFrequency": "daily"
+        },
+        {
+          "id": "QS-CS-002",
+          "standardName": "Presentation Standards",
+          "measurementType": "appearance",
+          "minimumValue": 8,
+          "unit": "score out of 10",
+          "toleranceLevel": 2,
+          "criticalControl": false,
+          "monitoringFrequency": "shift"
+        }
+      ],
+      "conditions": [
+        {
+          "id": "C-CSR-001",
+          "field": "cake_type",
+          "operator": "in",
+          "value": ["layer_cake", "sheet_cake", "round_cake"],
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-CSR-002",
+          "field": "cake_temperature",
+          "operator": "between",
+          "value": [35, 45],
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-CSR-003",
+          "field": "cutting_knife_clean",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-CSR-001",
+          "type": "updateInventory",
+          "parameters": {
+            "updateType": "create_cake_slices",
+            "portionSize": "standard",
+            "trackingRequired": true
+          }
+        },
+        {
+          "id": "A-CSR-002",
+          "type": "logCompliance",
+          "parameters": {
+            "logType": "portion_control",
+            "requiredFields": ["cake_id", "slice_count", "slice_weight", "cut_by"]
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "CSR-002",
+      "name": "Cake Freshness Tracking",
+      "description": "Monitors cake freshness and enforces maximum display time for quality maintenance",
+      "priority": 6,
+      "isActive": true,
+      "category": "quality-control",
+      "conditions": [
+        {
+          "id": "C-CSR-004",
+          "field": "days_since_baked",
+          "operator": "greaterThan",
+          "value": 3,
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-CSR-005",
+          "field": "display_hours",
+          "operator": "greaterThan",
+          "value": 8,
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-CSR-006",
+          "field": "visual_quality_score",
+          "operator": "lessThan",
+          "value": 6,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-CSR-003",
+          "type": "adjustPrice",
+          "parameters": {
+            "adjustmentType": "freshness_discount",
+            "discountPercentage": 20
+          }
+        },
+        {
+          "id": "A-CSR-004",
+          "type": "flagForReview",
+          "parameters": {
+            "reviewType": "freshness_check",
+            "priority": "medium"
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "CSR-003",
+      "name": "Refrigerated Cake Storage Requirements",
+      "description": "Enforces proper refrigerated storage for cakes requiring temperature control",
+      "priority": 9,
+      "isActive": true,
+      "category": "food-safety",
+      "hazardType": "biological",
+      "riskLevel": "high",
+      "haccp_point": "CCP-2 Cold Storage",
+      "monitoringRequired": true,
+      "corrective_actions": [
+        "Check refrigeration equipment",
+        "Transfer to proper temperature storage",
+        "Monitor temperature for next 4 hours"
+      ],
+      "conditions": [
+        {
+          "id": "C-CSR-007",
+          "field": "cake_requires_refrigeration",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-CSR-008",
+          "field": "storage_temperature",
+          "operator": "greaterThan",
+          "value": 41,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-CSR-005",
+          "type": "sendAlert",
+          "parameters": {
+            "alertType": "temperature_violation",
+            "severity": "high",
+            "recipients": ["kitchen_manager"]
+          }
+        },
+        {
+          "id": "A-CSR-006",
+          "type": "quarantineItem",
+          "parameters": {
+            "reason": "temperature_abuse",
+            "requiresInspection": true
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "CSR-004",
+      "name": "Special Occasion Cake Pricing",
+      "description": "Dynamic pricing rules for special occasion cakes based on demand and customization",
+      "priority": 5,
+      "isActive": true,
+      "category": "pricing",
+      "conditions": [
+        {
+          "id": "C-CSR-009",
+          "field": "cake_category",
+          "operator": "equals",
+          "value": "custom_decorated",
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-CSR-010",
+          "field": "holiday_period",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-CSR-011",
+          "field": "labor_hours",
+          "operator": "greaterThan",
+          "value": 2,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-CSR-007",
+          "type": "adjustPrice",
+          "parameters": {
+            "adjustmentType": "premium_pricing",
+            "multiplier": 1.25
+          }
+        },
+        {
+          "id": "A-CSR-008",
+          "type": "requireApproval",
+          "parameters": {
+            "approvalLevel": "manager",
+            "reason": "premium_pricing_applied"
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    }
+  ],
+  "multiYieldRecipeRules": [
+    {
+      "id": "MYR-001",
+      "name": "Production Planning for Multi-Yield Items",
+      "description": "Optimizes production decisions between whole items vs partial/fractional production",
+      "priority": 7,
+      "isActive": true,
+      "category": "inventory-management",
+      "itemType": "fractional-item",
+      "thresholdType": "reorder-point",
+      "calculationMethod": "predictive",
+      "forecastingPeriod": 7,
+      "demandVariability": 0.15,
+      "leadTimeBuffer": 1,
+      "conditions": [
+        {
+          "id": "C-MYR-001",
+          "field": "historical_demand_ratio",
+          "operator": "greaterThan",
+          "value": 0.7,
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-MYR-002",
+          "field": "current_whole_inventory",
+          "operator": "lessThan",
+          "value": 3,
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-MYR-003",
+          "field": "prep_capacity_available",
+          "operator": "greaterThan",
+          "value": 2,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-MYR-001",
+          "type": "triggerReorder",
+          "parameters": {
+            "orderType": "production_request",
+            "quantity": "calculated_demand",
+            "priority": "normal"
+          }
+        },
+        {
+          "id": "A-MYR-002",
+          "type": "notifyManager",
+          "parameters": {
+            "notificationType": "production_planning",
+            "details": "multi_yield_optimization"
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "MYR-002",
+      "name": "Waste Minimization for Fractional Items",
+      "description": "Prevents overproduction and minimizes waste for items sold in fractions",
+      "priority": 8,
+      "isActive": true,
+      "category": "waste-management",
+      "wasteCategory": "overproduction",
+      "minimizationStrategy": "demand_based_production",
+      "costImpactThreshold": 50,
+      "trackingRequired": true,
+      "reportingFrequency": "daily",
+      "conditions": [
+        {
+          "id": "C-MYR-004",
+          "field": "waste_percentage_last_week",
+          "operator": "greaterThan",
+          "value": 15,
+          "logicalOperator": "OR"
+        },
+        {
+          "id": "C-MYR-005",
+          "field": "unsold_inventory_value",
+          "operator": "greaterThan",
+          "value": 200,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-MYR-003",
+          "type": "adjustPrice",
+          "parameters": {
+            "adjustmentType": "clearance_pricing",
+            "discountPercentage": 30,
+            "timeLimit": "end_of_day"
+          }
+        },
+        {
+          "id": "A-MYR-004",
+          "type": "scheduleWasteCheck",
+          "parameters": {
+            "checkType": "overproduction_analysis",
+            "frequency": "weekly"
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    }
+  ],
+  "inventoryThresholdRules": [
+    {
+      "id": "ITR-001",
+      "name": "Fractional Item Minimum Levels",
+      "description": "Maintains minimum inventory levels for fractional items to ensure availability",
+      "priority": 6,
+      "isActive": true,
+      "category": "inventory-management",
+      "itemType": "fractional-item",
+      "thresholdType": "minimum-level",
+      "calculationMethod": "dynamic-demand",
+      "forecastingPeriod": 3,
+      "demandVariability": 0.2,
+      "conditions": [
+        {
+          "id": "C-ITR-001",
+          "field": "current_slice_inventory",
+          "operator": "lessThan",
+          "value": 12,
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-ITR-002",
+          "field": "peak_hours_approaching",
+          "operator": "equals",
+          "value": true,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-ITR-001",
+          "type": "triggerReorder",
+          "parameters": {
+            "orderType": "internal_production",
+            "priority": "high",
+            "targetLevel": "optimal_inventory"
+          }
+        },
+        {
+          "id": "A-ITR-002",
+          "type": "sendAlert",
+          "parameters": {
+            "alertType": "low_inventory",
+            "urgency": "medium"
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    },
+    {
+      "id": "ITR-002",
+      "name": "Expiration Warning System",
+      "description": "Provides early warning for items approaching expiration to minimize waste",
+      "priority": 8,
+      "isActive": true,
+      "category": "inventory-management",
+      "itemType": "whole-item",
+      "thresholdType": "expiration-warning",
+      "calculationMethod": "static",
+      "conditions": [
+        {
+          "id": "C-ITR-003",
+          "field": "hours_until_expiration",
+          "operator": "lessThan",
+          "value": 4,
+          "logicalOperator": "AND"
+        },
+        {
+          "id": "C-ITR-004",
+          "field": "item_value",
+          "operator": "greaterThan",
+          "value": 25,
+          "logicalOperator": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "A-ITR-003",
+          "type": "adjustPrice",
+          "parameters": {
+            "adjustmentType": "quick_sale_discount",
+            "discountPercentage": 25
+          }
+        },
+        {
+          "id": "A-ITR-004",
+          "type": "notifyManager",
+          "parameters": {
+            "notificationType": "expiration_warning",
+            "actionRequired": true
+          }
+        }
+      ],
+      "createdBy": "system",
+      "createdAt": "2024-01-15T08:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "triggerCount": 0,
+      "successRate": 100
+    }
+  ]
+}

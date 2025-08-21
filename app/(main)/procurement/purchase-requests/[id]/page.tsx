@@ -1,5 +1,11 @@
 import PRDetailPage from '../components/PRDetailPage'
 
-export default function NewPRPage() {
-  return <PRDetailPage />
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function PRDetailByIdPage({ params }: PageProps) {
+  return <PRDetailPage prId={params.id} />
 }

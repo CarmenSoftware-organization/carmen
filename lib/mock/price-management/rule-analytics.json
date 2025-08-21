@@ -1,0 +1,292 @@
+{
+  "rulePerformanceMetrics": [
+    {
+      "ruleId": "rule-001",
+      "ruleName": "Preferred Vendor Priority",
+      "totalTriggers": 45,
+      "successfulTriggers": 42,
+      "failedTriggers": 3,
+      "successRate": 92.5,
+      "averageProcessingTime": 1.2,
+      "costSavings": 2450.75,
+      "timesSaved": 180,
+      "lastTriggered": "2024-01-25T09:15:00Z",
+      "trend": "stable",
+      "impactScore": 8.5,
+      "weeklyTriggers": [8, 12, 9, 16],
+      "monthlyTriggers": [45, 38, 52, 41],
+      "errorReasons": [
+        {
+          "reason": "Vendor unavailable",
+          "count": 2,
+          "percentage": 66.7
+        },
+        {
+          "reason": "Price validation failed",
+          "count": 1,
+          "percentage": 33.3
+        }
+      ]
+    },
+    {
+      "ruleId": "rule-002",
+      "ruleName": "Bulk Discount Application",
+      "totalTriggers": 28,
+      "successfulTriggers": 27,
+      "failedTriggers": 1,
+      "successRate": 96.4,
+      "averageProcessingTime": 0.8,
+      "costSavings": 5680.25,
+      "timesSaved": 84,
+      "lastTriggered": "2024-01-24T11:20:00Z",
+      "trend": "improving",
+      "impactScore": 9.2,
+      "weeklyTriggers": [6, 8, 7, 7],
+      "monthlyTriggers": [28, 22, 31, 25],
+      "errorReasons": [
+        {
+          "reason": "Bulk pricing not available",
+          "count": 1,
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "ruleId": "rule-003",
+      "ruleName": "High Value Manual Review",
+      "totalTriggers": 12,
+      "successfulTriggers": 12,
+      "failedTriggers": 0,
+      "successRate": 100,
+      "averageProcessingTime": 0.3,
+      "costSavings": 0,
+      "timesSaved": 0,
+      "lastTriggered": "2024-01-23T15:45:00Z",
+      "trend": "stable",
+      "impactScore": 7.8,
+      "weeklyTriggers": [3, 2, 4, 3],
+      "monthlyTriggers": [12, 8, 15, 10],
+      "errorReasons": []
+    },
+    {
+      "ruleId": "rule-004",
+      "ruleName": "Local Vendor Preference",
+      "totalTriggers": 0,
+      "successfulTriggers": 0,
+      "failedTriggers": 0,
+      "successRate": 0,
+      "averageProcessingTime": 0,
+      "costSavings": 0,
+      "timesSaved": 0,
+      "lastTriggered": null,
+      "trend": "inactive",
+      "impactScore": 0,
+      "weeklyTriggers": [0, 0, 0, 0],
+      "monthlyTriggers": [0, 0, 0, 0],
+      "errorReasons": []
+    },
+    {
+      "ruleId": "rule-005",
+      "ruleName": "Multi-Currency Normalization",
+      "totalTriggers": 67,
+      "successfulTriggers": 66,
+      "failedTriggers": 1,
+      "successRate": 98.5,
+      "averageProcessingTime": 2.1,
+      "costSavings": 1250.50,
+      "timesSaved": 268,
+      "lastTriggered": "2024-01-25T08:30:00Z",
+      "trend": "improving",
+      "impactScore": 8.9,
+      "weeklyTriggers": [15, 18, 16, 18],
+      "monthlyTriggers": [67, 58, 72, 61],
+      "errorReasons": [
+        {
+          "reason": "Exchange rate unavailable",
+          "count": 1,
+          "percentage": 100
+        }
+      ]
+    }
+  ],
+  "overallAnalytics": {
+    "totalRules": 5,
+    "activeRules": 4,
+    "inactiveRules": 1,
+    "totalTriggers": 152,
+    "successfulTriggers": 147,
+    "overallSuccessRate": 96.7,
+    "totalCostSavings": 9381.50,
+    "totalTimeSaved": 532,
+    "averageProcessingTime": 1.1,
+    "topPerformingRule": {
+      "id": "rule-003",
+      "name": "High Value Manual Review",
+      "successRate": 100
+    },
+    "mostTriggeredRule": {
+      "id": "rule-005",
+      "name": "Multi-Currency Normalization",
+      "triggers": 67
+    },
+    "highestImpactRule": {
+      "id": "rule-002",
+      "name": "Bulk Discount Application",
+      "impactScore": 9.2
+    }
+  },
+  "trendData": {
+    "weeklyTriggers": [32, 40, 36, 44],
+    "weeklySuccessRates": [95.2, 97.1, 96.8, 98.1],
+    "weeklyCostSavings": [2180.25, 2450.75, 2125.50, 2625.00],
+    "monthlyTriggers": [152, 126, 170, 137],
+    "monthlySuccessRates": [96.7, 94.8, 97.2, 95.6],
+    "monthlyCostSavings": [9381.50, 7825.25, 10250.75, 8450.00]
+  },
+  "categoryPerformance": [
+    {
+      "category": "vendor-selection",
+      "rulesCount": 2,
+      "totalTriggers": 45,
+      "successRate": 92.5,
+      "costSavings": 2450.75,
+      "averageImpact": 8.5
+    },
+    {
+      "category": "pricing",
+      "rulesCount": 1,
+      "totalTriggers": 28,
+      "successRate": 96.4,
+      "costSavings": 5680.25,
+      "averageImpact": 9.2
+    },
+    {
+      "category": "approval",
+      "rulesCount": 1,
+      "totalTriggers": 12,
+      "successRate": 100,
+      "costSavings": 0,
+      "averageImpact": 7.8
+    },
+    {
+      "category": "currency",
+      "rulesCount": 1,
+      "totalTriggers": 67,
+      "successRate": 98.5,
+      "costSavings": 1250.50,
+      "averageImpact": 8.9
+    }
+  ],
+  "testScenarios": [
+    {
+      "id": "scenario-001",
+      "name": "Office Supplies - Small Quantity",
+      "description": "Test preferred vendor selection for office supplies under 100 units",
+      "testData": {
+        "product": {
+          "id": "prod-001",
+          "name": "Office Pens",
+          "category": "office-supplies"
+        },
+        "request": {
+          "quantity": 50,
+          "urgency": "normal",
+          "department": "HR"
+        },
+        "vendor": {
+          "id": "vendor-001",
+          "name": "Office Depot",
+          "isPreferred": true,
+          "location": "local"
+        },
+        "price": {
+          "total": 125.50,
+          "currency": "USD"
+        }
+      },
+      "expectedResults": [
+        {
+          "ruleId": "rule-001",
+          "shouldTrigger": true,
+          "expectedAction": "assignVendor",
+          "confidence": 95
+        }
+      ]
+    },
+    {
+      "id": "scenario-002",
+      "name": "Bulk Purchase - Electronics",
+      "description": "Test bulk discount application for large quantity electronics",
+      "testData": {
+        "product": {
+          "id": "prod-002",
+          "name": "Laptops",
+          "category": "electronics"
+        },
+        "request": {
+          "quantity": 25,
+          "urgency": "normal",
+          "department": "IT"
+        },
+        "vendor": {
+          "id": "vendor-002",
+          "name": "Tech Solutions",
+          "hasBulkPricing": true,
+          "bulkMinQuantity": 20
+        },
+        "price": {
+          "total": 37500.00,
+          "currency": "USD"
+        }
+      },
+      "expectedResults": [
+        {
+          "ruleId": "rule-002",
+          "shouldTrigger": true,
+          "expectedAction": "setPrice",
+          "confidence": 98
+        },
+        {
+          "ruleId": "rule-003",
+          "shouldTrigger": true,
+          "expectedAction": "flagForReview",
+          "confidence": 100
+        }
+      ]
+    },
+    {
+      "id": "scenario-003",
+      "name": "Foreign Currency - Equipment",
+      "description": "Test currency conversion for EUR-priced equipment",
+      "testData": {
+        "product": {
+          "id": "prod-003",
+          "name": "Manufacturing Equipment",
+          "category": "equipment"
+        },
+        "request": {
+          "quantity": 1,
+          "urgency": "normal",
+          "department": "Production"
+        },
+        "vendor": {
+          "id": "vendor-003",
+          "name": "European Suppliers",
+          "location": "international"
+        },
+        "price": {
+          "total": 2500.00,
+          "currency": "EUR"
+        }
+      },
+      "expectedResults": [
+        {
+          "ruleId": "rule-005",
+          "shouldTrigger": true,
+          "expectedAction": "convertCurrency",
+          "confidence": 99
+        }
+      ]
+    }
+  ]
+}

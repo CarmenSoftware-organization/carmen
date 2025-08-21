@@ -1,0 +1,211 @@
+{
+  "reportTemplates": [
+    {
+      "id": "rpt-001",
+      "name": "Vendor Performance Summary",
+      "description": "Comprehensive vendor performance metrics and participation rates",
+      "category": "vendor_performance",
+      "frequency": "monthly",
+      "isActive": true,
+      "recipients": ["purchasing@company.com", "management@company.com"],
+      "lastGenerated": "2025-01-01T00:00:00Z",
+      "nextScheduled": "2025-02-01T00:00:00Z"
+    },
+    {
+      "id": "rpt-002",
+      "name": "Price Trend Analysis",
+      "description": "Market pricing trends and category-specific insights",
+      "category": "pricing_trends",
+      "frequency": "quarterly",
+      "isActive": true,
+      "recipients": ["purchasing@company.com", "finance@company.com"],
+      "lastGenerated": "2025-01-01T00:00:00Z",
+      "nextScheduled": "2025-04-01T00:00:00Z"
+    },
+    {
+      "id": "rpt-003",
+      "name": "Cost Savings Report",
+      "description": "Automated price assignment cost savings and efficiency metrics",
+      "category": "cost_savings",
+      "frequency": "monthly",
+      "isActive": true,
+      "recipients": ["finance@company.com", "cfo@company.com"],
+      "lastGenerated": "2025-01-01T00:00:00Z",
+      "nextScheduled": "2025-02-01T00:00:00Z"
+    },
+    {
+      "id": "rpt-004",
+      "name": "System Performance Dashboard",
+      "description": "Technical performance metrics and system health indicators",
+      "category": "system_performance",
+      "frequency": "weekly",
+      "isActive": true,
+      "recipients": ["it@company.com", "operations@company.com"],
+      "lastGenerated": "2025-01-08T00:00:00Z",
+      "nextScheduled": "2025-01-15T00:00:00Z"
+    }
+  ],
+  "customReports": [
+    {
+      "id": "custom-001",
+      "name": "Q4 2024 Vendor Analysis",
+      "dateRange": {
+        "start": "2024-10-01",
+        "end": "2024-12-31"
+      },
+      "filters": {
+        "categories": ["Office Supplies", "IT Equipment"],
+        "vendors": ["vendor-001", "vendor-003", "vendor-007"],
+        "minAmount": 1000,
+        "status": "active"
+      },
+      "metrics": {
+        "totalVendors": 3,
+        "totalOrders": 247,
+        "totalValue": 156789.45,
+        "averageResponseTime": 2.1,
+        "onTimeDeliveryRate": 94.2
+      },
+      "generatedAt": "2025-01-15T09:30:00Z",
+      "generatedBy": "user-001"
+    },
+    {
+      "id": "custom-002",
+      "name": "IT Equipment Price Comparison",
+      "dateRange": {
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      },
+      "filters": {
+        "categories": ["IT Equipment"],
+        "priceRange": {
+          "min": 100,
+          "max": 5000
+        }
+      },
+      "metrics": {
+        "totalItems": 1247,
+        "averagePrice": 847.32,
+        "priceVariance": 23.4,
+        "topVendors": 5,
+        "costSavings": 45678.90
+      },
+      "generatedAt": "2025-01-14T14:20:00Z",
+      "generatedBy": "user-002"
+    }
+  ],
+  "reportData": {
+    "vendorPerformance": [
+      {
+        "vendorId": "vendor-001",
+        "vendorName": "Global Office Solutions",
+        "responseRate": 95.2,
+        "onTimeRate": 89.3,
+        "priceCompetitiveness": 4.2,
+        "qualityScore": 4.5,
+        "totalSubmissions": 42,
+        "averageResponseTime": 1.8,
+        "costSavingsContribution": 15678.90
+      },
+      {
+        "vendorId": "vendor-002",
+        "vendorName": "TechPro Distributors",
+        "responseRate": 87.5,
+        "onTimeRate": 82.1,
+        "priceCompetitiveness": 3.8,
+        "qualityScore": 4.2,
+        "totalSubmissions": 38,
+        "averageResponseTime": 2.3,
+        "costSavingsContribution": 12456.78
+      },
+      {
+        "vendorId": "vendor-003",
+        "vendorName": "CleanCorp Supplies",
+        "responseRate": 92.1,
+        "onTimeRate": 91.7,
+        "priceCompetitiveness": 4.0,
+        "qualityScore": 4.3,
+        "totalSubmissions": 35,
+        "averageResponseTime": 1.9,
+        "costSavingsContribution": 8934.56
+      }
+    ],
+    "costSavingsBreakdown": [
+      {
+        "category": "Office Supplies",
+        "totalSavings": 45678.90,
+        "percentageOfTotal": 35.2,
+        "averageSavingsPerItem": 23.45,
+        "topSavingItems": [
+          {
+            "itemName": "A4 Paper Ream",
+            "savings": 1234.56,
+            "quantity": 500
+          },
+          {
+            "itemName": "Printer Cartridges",
+            "savings": 2345.67,
+            "quantity": 120
+          }
+        ]
+      },
+      {
+        "category": "IT Equipment",
+        "totalSavings": 67890.12,
+        "percentageOfTotal": 52.3,
+        "averageSavingsPerItem": 156.78,
+        "topSavingItems": [
+          {
+            "itemName": "Laptop Computer",
+            "savings": 15678.90,
+            "quantity": 25
+          },
+          {
+            "itemName": "Monitor 24-inch",
+            "savings": 8901.23,
+            "quantity": 45
+          }
+        ]
+      }
+    ],
+    "systemPerformance": {
+      "uptime": 99.7,
+      "averageResponseTime": 1.2,
+      "errorRate": 0.3,
+      "peakConcurrentUsers": 156,
+      "dataProcessingVolume": {
+        "dailyAverage": 2847,
+        "weeklyPeak": 4521,
+        "monthlyTotal": 89456
+      },
+      "storageUtilization": {
+        "used": 2.3,
+        "total": 10.0,
+        "unit": "GB"
+      }
+    }
+  },
+  "exportFormats": [
+    {
+      "format": "excel",
+      "label": "Excel (.xlsx)",
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "supportsCharts": true,
+      "maxRows": 1000000
+    },
+    {
+      "format": "pdf",
+      "label": "PDF Document",
+      "mimeType": "application/pdf",
+      "supportsCharts": true,
+      "maxRows": 10000
+    },
+    {
+      "format": "csv",
+      "label": "CSV File",
+      "mimeType": "text/csv",
+      "supportsCharts": false,
+      "maxRows": 1000000
+    }
+  ]
+}
