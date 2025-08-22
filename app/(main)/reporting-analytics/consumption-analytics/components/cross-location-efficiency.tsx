@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer, ComposedChart, ScatterChart, Scatter, RadarChart, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, Radar, HeatmapChart
+  PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts'
 import { 
   Download, Filter, RefreshCcw, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
@@ -453,7 +453,7 @@ export default function CrossLocationEfficiency({
         </div>
         
         <div className="flex items-center gap-3">
-          <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+          <Select value={selectedMetric} onValueChange={(value) => setSelectedMetric(value as typeof comparisonType)}>
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -465,7 +465,7 @@ export default function CrossLocationEfficiency({
             </SelectContent>
           </Select>
           
-          <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+          <Select value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as typeof timeRange)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

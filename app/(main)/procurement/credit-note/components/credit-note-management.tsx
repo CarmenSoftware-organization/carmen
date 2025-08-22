@@ -18,7 +18,7 @@ import { Search, Filter, Plus, Download, Printer, ChevronLeft, ChevronRight, Fil
 import { useRouter } from 'next/navigation'
 import StatusBadge from '@/components/ui/custom-status-badge'
 import { CreditNote } from '@/lib/types/credit-note'
-import { staticCreditNotes } from '@/lib/mock/static-credit-notes'
+import { mockCreditNotes } from '@/lib/mock-data'
 import {
   Table,
   TableBody,
@@ -30,7 +30,7 @@ import {
 
 export function CreditNoteManagement() {
   const router = useRouter()
-  const [creditNotes, setCreditNotes] = useState<CreditNote[]>(staticCreditNotes)
+  const [creditNotes, setCreditNotes] = useState<CreditNote[]>(mockCreditNotes)
   const [filterStatus, setFilterStatus] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')

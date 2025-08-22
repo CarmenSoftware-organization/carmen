@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockDepartments } from '@/lib/mock/inventory-data';
+import { mockDepartments } from '@/lib/mock-data';
 
 interface SetupProps {
   formData: {
@@ -80,7 +80,6 @@ export function PhysicalCountSetup({ formData, setFormData, onNext, onBack }: Se
             </SelectTrigger>
             <SelectContent>
               {mockDepartments
-                .filter(dept => dept.status === 'active')
                 .map((dept) => (
                   <SelectItem key={dept.id} value={dept.name}>
                     {dept.name}

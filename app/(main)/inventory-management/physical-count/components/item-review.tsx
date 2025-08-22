@@ -16,7 +16,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { mockProducts, getProductsByLocation, Product } from '@/lib/mock/inventory-data';
+import { mockProducts, getProductsByLocation } from '@/lib/mock-data';
+import type { Product } from '@/lib/types';
 
 interface ItemReviewProps {
   formData: {

@@ -80,7 +80,7 @@ export default function RequestForPricingDetailPage() {
       <div className="text-center py-12">
         <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h3 className="text-lg font-medium mb-2">Request for Pricing not found</h3>
-        <p className="text-muted-foreground mb-4">The request for pricing you're looking for doesn't exist.</p>
+        <p className="text-muted-foreground mb-4">The request for pricing you&apos;re looking for doesn&apos;t exist.</p>
         <Button onClick={() => router.push('/vendor-management/campaigns')}>
           <ChevronLeft className="h-4 w-4" />
         </Button>

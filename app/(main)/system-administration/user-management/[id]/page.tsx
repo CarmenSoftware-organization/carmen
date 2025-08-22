@@ -209,7 +209,7 @@ export default function UserDetailPage({
                 <UserCircle className="h-5 w-5" />
                 Basic Information
               </CardTitle>
-              <CardDescription>User's personal and contact details</CardDescription>
+              <CardDescription>User&apos;s personal and contact details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -251,7 +251,7 @@ export default function UserDetailPage({
                 <Building2 className="h-5 w-5" />
                 Organization Details
               </CardTitle>
-              <CardDescription>User's position and department information</CardDescription>
+              <CardDescription>User&apos;s position and department information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -319,7 +319,7 @@ export default function UserDetailPage({
                 <Shield className="h-5 w-5" />
                 Access Control
               </CardTitle>
-              <CardDescription>User's roles and permissions</CardDescription>
+              <CardDescription>User&apos;s roles and permissions</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -481,7 +481,7 @@ export default function UserDetailPage({
                 <ScrollText className="h-5 w-5" />
                 Account Status
               </CardTitle>
-              <CardDescription>User's account and invitation status</CardDescription>
+              <CardDescription>User&apos;s account and invitation status</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">

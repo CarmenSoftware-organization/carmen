@@ -23,7 +23,7 @@ import {
   Shield, FileText, AlertTriangle, CheckCircle, Clock,
   ThermometerSun, Droplets, Zap, Users, Eye,
   Download, Calendar, Filter, Search, RefreshCw,
-  Award, Target, TrendingUp, Warning, Info
+  Award, Target, TrendingUp, Info
 } from 'lucide-react';
 
 interface ComplianceStandard {
@@ -667,7 +667,7 @@ export default function ComplianceReports() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Warning className="h-5 w-5 mr-2" />
+                <AlertTriangle className="h-5 w-5 mr-2" />
                 Allergen Alerts
               </CardTitle>
             </CardHeader>
@@ -748,7 +748,7 @@ export default function ComplianceReports() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis domain={[80, 100]} />
-                    <Tooltip formatter={(value, name) => [`${value}%`, name.replace('_', ' ')]} />
+                    <Tooltip formatter={(value, name) => [`${value}%`, String(name).replace('_', ' ')]} />
                     <Legend />
                     <Line 
                       type="monotone" 

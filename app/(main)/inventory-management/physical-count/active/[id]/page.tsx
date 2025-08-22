@@ -20,7 +20,8 @@ import {
   Clock,
   Layers,
 } from 'lucide-react';
-import { mockCounts, mockProducts, mockLocations, Product, Count } from '@/lib/mock/inventory-data';
+import { mockInventoryProducts, mockLocations, mockCounts } from '@/lib/mock-data';
+import type { Product } from '@/lib/types';
 
 interface PageProps {
   params: {
@@ -39,9 +40,9 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
   const countSession = mockCounts.find(count => count.id === params.id && count.type === 'physical') || 
     mockCounts.find(count => count.type === 'physical')!;
     
-  const countLocations = countSession.locations.map(locId => 
+  const countLocations = countSession.locations.map((locId: string) => 
     mockLocations.find(loc => loc.id === locId)
-  ).filter(loc => loc) as typeof mockLocations;
+  ).filter((loc: any) => loc) as typeof mockLocations;
   
   // If no location is selected, use the first one
   if (!currentLocation && countLocations.length > 0) {
@@ -49,7 +50,7 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
   }
 
   // Get products for current location
-  const locationProducts = mockProducts.filter(product => 
+  const locationProducts = mockInventoryProducts.filter(product => 
     currentLocation ? product.locationId === currentLocation : countSession.locations.includes(product.locationId)
   );
 
@@ -113,7 +114,7 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
             >
               {loc.name}
               <Badge variant="secondary" className="ml-2">
-                {mockProducts.filter(p => p.locationId === loc.id).length} items
+                {mockInventoryProducts.filter(p => p.locationId === loc.id).length} items
               </Badge>
             </div>
           ))}

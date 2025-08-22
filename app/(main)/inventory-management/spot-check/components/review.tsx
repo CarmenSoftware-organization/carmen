@@ -6,12 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  getLocationsByDepartment, 
-  getProductsByDepartment,
-  type Location,
-  type Product
-} from '@/lib/mock/inventory-data';
+import { getLocationsByDepartment } from '@/lib/mock-data/users';
+import { getProductsByDepartment } from '@/lib/mock-data/inventory';
+import type { Location } from '@/lib/types/user';
+import type { Product } from '@/lib/types';
 
 interface ReviewProps {
   formData: {

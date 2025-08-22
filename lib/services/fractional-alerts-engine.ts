@@ -381,7 +381,7 @@ export class FractionalAlertsEngine {
 
     // Predict next grade and time
     const nextScore = currentScore - 1
-    const nextGrade = Object.keys(qualityScores).find(k => qualityScores[k] === nextScore) || 'POOR'
+    const nextGrade = Object.keys(qualityScores).find(k => qualityScores[k as keyof typeof qualityScores] === nextScore) || 'POOR'
     const timeToNextGrade = Math.max(0.5, 1 / degradationRate)
 
     return {
@@ -465,7 +465,7 @@ export class FractionalAlertsEngine {
             'Optimize revenue potential'
           ],
           potentialRisks: [
-            'Increased waste if demand doesn't materialize',
+            'Increased waste if demand does not materialize',
             'Quality degradation over time'
           ],
           estimatedWaste: Math.min(3, stock.wholeUnitsAvailable) * (item.wastePercentage / 100),

@@ -10,12 +10,12 @@ import { Progress } from '@/components/ui/progress'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
-  ResponsiveContainer, ComposedChart, AreaChart, Area, Heatmap
+  ResponsiveContainer, ComposedChart, AreaChart, Area
 } from 'recharts'
 import { 
   Download, Filter, RefreshCcw, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
   Clock, Calendar, Sun, Moon, Coffee, Utensils, Wine, Zap, AlertCircle, 
-  CheckCircle, Target, BarChart3, Activity, Timer, Gauge
+  CheckCircle, Target, BarChart3, Activity, Timer, Gauge, Star
 } from 'lucide-react'
 
 // Types for time-based pattern analysis
@@ -498,7 +498,7 @@ export default function TimePatternAnalysis({
         </div>
         
         <div className="flex items-center gap-3">
-          <Select value={selectedAnalysis} onValueChange={setSelectedAnalysis}>
+          <Select value={selectedAnalysis} onValueChange={(value) => setSelectedAnalysis(value as any)}>
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -511,7 +511,7 @@ export default function TimePatternAnalysis({
             </SelectContent>
           </Select>
           
-          <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+          <Select value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as any)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

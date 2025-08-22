@@ -72,7 +72,7 @@ import {
   PurchaseOrder,
   ActivityLogEntry
 } from "@/lib/types";
-import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";
+import { mockPurchaseOrders } from "@/lib/mock-data";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import TransactionSummary from "./TransactionSummary";
 
@@ -230,7 +230,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       setStatusHistory([]);
     } else {
       // Fetch existing PO
-      const foundPO = Mock_purchaseOrders.find(po => po.poId === params.id);
+      const foundPO = mockPurchaseOrders.find(po => po.poId === params.id);
       if (foundPO) {
         setPOData(foundPO);
         // Extract status-related entries from activity log

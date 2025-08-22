@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNoteComponent} from '../components/goods-receive-note'
 import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
-import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import { mockGoodsReceiveNotes } from '@/lib/mock-data'
 
 export default function EditGoodsReceiveNote({ params }: { params: { id: string } }) {
   const router = useRouter()

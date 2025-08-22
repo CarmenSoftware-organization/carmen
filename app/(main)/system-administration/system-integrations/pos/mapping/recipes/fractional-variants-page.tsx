@@ -226,7 +226,7 @@ export default function FractionalVariantsPage() {
                       >
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium">{variant.name}</h4>
-                          <Badge variant="outline" size="sm">
+                          <Badge variant="outline">
                             ${variant.sellingPrice}
                           </Badge>
                         </div>
@@ -387,7 +387,7 @@ function FractionalGroupCard({ group }: { group: FractionalMappingGroup }) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" size="sm">
+                  <Badge variant="outline">
                     {recipeVariant.name}
                   </Badge>
                   <div className="text-sm text-muted-foreground">

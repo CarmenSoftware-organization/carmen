@@ -72,7 +72,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
             </div>
             <h2 className="text-2xl font-semibold">Recipe Not Found</h2>
             <p className="text-muted-foreground max-w-md">
-              The recipe you're looking for doesn't exist or may have been deleted.
+              The recipe you&apos;re looking for doesn&apos;t exist or may have been deleted.
             </p>
             <Link href="/operational-planning/recipe-management/recipes">
               <Button>

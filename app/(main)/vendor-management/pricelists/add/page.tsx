@@ -484,7 +484,7 @@ export default function AddPricelistPage() {
             <div className="text-center py-8 text-gray-500">
               <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No items added yet</p>
-              <p className="text-sm">Click "Add Item" to start building your pricelist</p>
+              <p className="text-sm">Click &quot;Add Item&quot; to start building your pricelist</p>
             </div>
           ) : (
             <div className="space-y-6">

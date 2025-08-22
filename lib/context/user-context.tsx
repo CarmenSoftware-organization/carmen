@@ -1,32 +1,9 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import type { User, UserContextType, Role, Department, Location, UserContext } from '../types/user';
+import type { User, UserContextType, UserContext } from '../types/user';
+import { mockRoles, mockDepartments, mockLocations } from '../mock-data';
 
-const mockRoles: Role[] = [
-  { id: 'staff', name: 'Staff', permissions: ['create_pr', 'view_pr', 'edit_own_pr'] },
-  { id: 'department-manager', name: 'Department Manager', permissions: ['approve_pr', 'view_department_pr', 'manage_budget'] },
-  { id: 'financial-manager', name: 'Financial Manager', permissions: ['approve_pr', 'view_all_pr', 'manage_financials'] },
-  { id: 'purchasing-staff', name: 'Purchasing Staff', permissions: ['convert_to_po', 'manage_vendors', 'view_all_pr'] },
-  { id: 'counter', name: 'Counter Staff', permissions: ['process_orders', 'view_inventory'] },
-  { id: 'chef', name: 'Chef', permissions: ['create_recipes', 'manage_kitchen', 'view_inventory'] },
-];
-
-const mockDepartments: Department[] = [
-  { id: 'fb', name: 'Food & Beverage', code: 'F&B' },
-  { id: 'housekeeping', name: 'Housekeeping', code: 'HK' },
-  { id: 'administration', name: 'Administration', code: 'ADMIN' },
-  { id: 'maintenance', name: 'Maintenance', code: 'MAINT' },
-  { id: 'front-office', name: 'Front Office', code: 'FO' },
-];
-
-const mockLocations: Location[] = [
-  { id: 'main-hotel', name: 'Grand Hotel Main', type: 'hotel', address: '123 Main St, New York' },
-  { id: 'main-kitchen', name: 'Main Kitchen', type: 'restaurant', address: 'Ground Floor, Grand Hotel' },
-  { id: 'central-warehouse', name: 'Central Warehouse', type: 'warehouse', address: '456 Storage Ave, Queens' },
-  { id: 'admin-office', name: 'Administrative Office', type: 'office', address: '2nd Floor, Grand Hotel' },
-  { id: 'pool-bar', name: 'Pool Bar & Grill', type: 'restaurant', address: 'Pool Area, Grand Hotel' },
-];
 
 // Mock user data - replace with actual API call
 const createMockUser = (): User => {

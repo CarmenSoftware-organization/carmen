@@ -41,10 +41,15 @@ export class FractionalInventoryService {
     reason?: string
   ): Promise<ConversionRecord> {
     const stock = await this.getStockById(stockId)
+    
+    if (!stock) {
+      throw new Error('Stock not found')
+    }
+    
     const item = await this.getFractionalItemById(stock.itemId)
     
-    if (!stock || !item) {
-      throw new Error('Stock or item not found')
+    if (!item) {
+      throw new Error('Item not found')
     }
 
     if (!item.supportsFractional) {
@@ -113,13 +118,18 @@ export class FractionalInventoryService {
     reason?: string
   ): Promise<ConversionRecord> {
     const stock = await this.getStockById(stockId)
+    
+    if (!stock) {
+      throw new Error('Stock not found')
+    }
+    
     const item = await this.getFractionalItemById(stock.itemId)
     
-    if (!stock || !item) {
-      throw new Error('Stock or item not found')
+    if (!item) {
+      throw new Error('Item not found')
     }
 
-    if (stock.totalPortionsAvailable < portionsToRcombine) {
+    if (stock.totalPortionsAvailable < portionsTocombine) {
       throw new Error('Insufficient portions available')
     }
 
@@ -132,9 +142,9 @@ export class FractionalInventoryService {
     }
 
     // Calculate conversion
-    const wholeUnitsCreated = Math.floor(portionsToRombine / defaultPortion.portionsPerWhole)
-    const remainingPortions = portionsToombine % defaultPortion.portionsPerWhole
-    const wasteGenerated = portionsToombine * (item.wastePercentage / 100)
+    const wholeUnitsCreated = Math.floor(portionsTocombine / defaultPortion.portionsPerWhole)
+    const remainingPortions = portionsTocombine % defaultPortion.portionsPerWhole
+    const wasteGenerated = portionsTocombine * (item.wastePercentage / 100)
 
     const conversionRecord: ConversionRecord = {
       id: this.generateId(),
@@ -148,10 +158,10 @@ export class FractionalInventoryService {
       
       afterWholeUnits: stock.wholeUnitsAvailable + wholeUnitsCreated,
       afterPartialQuantity: stock.partialQuantityAvailable,
-      afterTotalPortions: stock.totalPortionsAvailable - portionsToombine + remainingPortions,
+      afterTotalPortions: stock.totalPortionsAvailable - portionsTocombine + remainingPortions,
       
       wasteGenerated,
-      conversionEfficiency: (wholeUnitsCreated * defaultPortion.portionsPerWhole + remainingPortions) / portionsToombine,
+      conversionEfficiency: (wholeUnitsCreated * defaultPortion.portionsPerWhole + remainingPortions) / portionsTocombine,
       conversionCost: wholeUnitsCreated * (item.conversionCostPerUnit || 0),
       
       performedBy,
@@ -178,10 +188,15 @@ export class FractionalInventoryService {
     preparationNotes?: string
   ): Promise<ConversionRecord> {
     const stock = await this.getStockById(stockId)
+    
+    if (!stock) {
+      throw new Error('Stock not found')
+    }
+    
     const item = await this.getFractionalItemById(stock.itemId)
     
-    if (!stock || !item) {
-      throw new Error('Stock or item not found')
+    if (!item) {
+      throw new Error('Item not found')
     }
 
     if (stock.currentState !== 'RAW') {
@@ -244,9 +259,12 @@ export class FractionalInventoryService {
     notes?: string
   ): Promise<void> {
     const stock = await this.getStockById(stockId)
+    
+    if (!stock) return
+    
     const item = await this.getFractionalItemById(stock.itemId)
     
-    if (!stock || !item) return
+    if (!item) return
 
     let newQualityGrade = stock.qualityGrade
 
@@ -378,9 +396,12 @@ export class FractionalInventoryService {
    */
   async evaluateAlertsForStock(stockId: string): Promise<void> {
     const stock = await this.getStockById(stockId)
+    
+    if (!stock) return
+    
     const item = await this.getFractionalItemById(stock.itemId)
     
-    if (!stock || !item) return
+    if (!item) return
 
     // Clear existing alerts for this stock
     this.activeAlerts = this.activeAlerts.filter(alert => alert.stockId !== stockId)
@@ -542,7 +563,7 @@ export class FractionalInventoryService {
 
   private getQualityScore(grade: string): number {
     const scores = { 'EXCELLENT': 5, 'GOOD': 4, 'FAIR': 3, 'POOR': 2, 'EXPIRED': 1 }
-    return scores[grade] || 0
+    return scores[grade as keyof typeof scores] || 0
   }
 
   private getAveragePortionsPerWhole(item: FractionalItem): number {

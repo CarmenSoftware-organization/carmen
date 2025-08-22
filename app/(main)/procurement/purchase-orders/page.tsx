@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder"
+import { mockPurchaseOrders } from "@/lib/mock-data"
 import { PurchaseRequest } from "@/lib/types"
 import CreatePOFromPR from "./components/createpofrompr"
 import { purchaseOrderColumns } from "./components/purchase-orders-columns"
@@ -124,10 +124,10 @@ export default function PurchaseOrdersPage() {
       {/* Data Table with integrated filtering */}
       <PurchaseOrdersDataTable
         columns={purchaseOrderColumns}
-        data={Mock_purchaseOrders}
+        data={mockPurchaseOrders}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        cardView={<PurchaseOrderCardView data={Mock_purchaseOrders} selectedIds={selectedPOs} onSelectionChange={() => {}} />}
+        cardView={<PurchaseOrderCardView data={mockPurchaseOrders} selectedIds={selectedPOs} onSelectionChange={() => {}} />}
       />
       
       <Dialog 

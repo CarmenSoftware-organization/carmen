@@ -261,6 +261,20 @@ export const mockRecipes: Recipe[] = [
     image: "/images/placeholder-recipe.jpg",
     yield: 6,
     yieldUnit: "portions",
+    yieldVariants: [
+      {
+        id: "beef-bourguignon-portion",
+        name: "Single Portion",
+        unit: "portion",
+        quantity: 1,
+        conversionRate: 0.167, // 1 portion = 1/6 of recipe
+        sellingPrice: 28.99,
+        costPerUnit: 8.50,
+        isDefault: true
+      }
+    ],
+    defaultVariantId: "beef-bourguignon-portion",
+    allowsFractionalSales: false,
     prepTime: 45,
     cookTime: 180,
     totalTime: 225,
@@ -338,6 +352,20 @@ export const mockRecipes: Recipe[] = [
     image: "/images/placeholder-recipe.jpg",
     yield: 8,
     yieldUnit: "portions",
+    yieldVariants: [
+      {
+        id: "tiramisu-portion",
+        name: "Single Portion",
+        unit: "portion",
+        quantity: 1,
+        conversionRate: 0.125, // 1 portion = 1/8 of recipe
+        sellingPrice: 8.99,
+        costPerUnit: 2.25,
+        isDefault: true
+      }
+    ],
+    defaultVariantId: "tiramisu-portion",
+    allowsFractionalSales: false,
     prepTime: 30,
     cookTime: 0,
     totalTime: 30,

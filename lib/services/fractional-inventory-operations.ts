@@ -52,10 +52,15 @@ export class FractionalInventoryOperations {
     context: OperationContext
   ): Promise<{ success: boolean; conversions: ConversionRecord[]; plan: ConversionPlan }> {
     const stock = await this.getStockById(stockId)
+    
+    if (!stock) {
+      throw new Error('Stock not found')
+    }
+    
     const item = await this.getFractionalItemById(stock.itemId)
     
-    if (!stock || !item) {
-      throw new Error('Stock or item not found')
+    if (!item) {
+      throw new Error('Item not found')
     }
 
     // Create conversion plan
@@ -147,7 +152,7 @@ export class FractionalInventoryOperations {
       } catch (error) {
         failed.push({
           stockId: operation.stockId,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         })
       }
     }
@@ -340,7 +345,7 @@ export class FractionalInventoryOperations {
       } catch (error) {
         failed.push({
           stockId,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         })
       }
     }
@@ -385,7 +390,7 @@ export class FractionalInventoryOperations {
       } else {
         rejected.push({
           stockId: stock.id,
-          reason: eligibilityCheck.reason
+          reason: eligibilityCheck.reason || 'Unknown reason'
         })
       }
     }
@@ -587,7 +592,7 @@ export class FractionalInventoryOperations {
 
   private getQualityScore(grade: string): number {
     const scores = { 'EXCELLENT': 5, 'GOOD': 4, 'FAIR': 3, 'POOR': 2, 'EXPIRED': 1 }
-    return scores[grade] || 0
+    return scores[grade as keyof typeof scores] || 0
   }
 
   private getDefaultPortionsPerWhole(item: FractionalItem): number {

@@ -8,7 +8,7 @@ export default function LoginPage() {
         {/* Implement your own login form here */}
         <p>Login form goes here</p>
         <Link href="/signup" className="text-blue-500 hover:underline mt-4 block">
-          Don't have an account? Sign up
+          Don&apos;t have an account? Sign up
         </Link>
       </div>
     </div>

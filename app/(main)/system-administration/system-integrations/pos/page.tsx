@@ -473,7 +473,7 @@ export default function POSIntegrationPage() {
               <div className="flex items-center">
                 <div className="space-y-2 w-full">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-medium">Today's Sales</h3>
+                    <h3 className="text-xs font-medium">Today&apos;s Sales</h3>
                     <span className="text-xs font-bold">$1,234.56</span>
                   </div>
                   <Progress value={65} className="h-1.5" />

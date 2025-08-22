@@ -700,7 +700,7 @@ export function UpdatedEnhancedItemsTab({
                                 <div className="text-xs text-gray-500">{stage.status}</div>
                                 {stage.comments && (
                                   <div className="text-xs text-gray-600 mt-1 italic">
-                                    "{stage.comments}"
+                                    &quot;{stage.comments}&quot;
                                   </div>
                                 )}
                               </div>

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNoteDetail, GRNDetailMode } from '@/app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail'
 import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
-import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import { mockGoodsReceiveNotes } from '@/lib/mock-data'
 
 export default function EditGoodsReceiveNote({ params }: { params: { id: string } }) {
   const router = useRouter()

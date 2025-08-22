@@ -446,16 +446,4 @@ export interface FractionalInventoryDeduction {
   validationStatus: 'pending' | 'validated' | 'disputed'
 }
 
-// Export all interfaces for easy importing
-export type {
-  ConsumptionPeriod,
-  FractionalSalesTransaction,
-  IngredientConsumptionRecord,
-  RecipeConsumptionSummary,
-  LocationConsumptionAnalytics,
-  ConsumptionCalculationContext,
-  RealTimeConsumptionMetrics,
-  ConsumptionVarianceAnalysis,
-  FractionalSalesEfficiencyReport,
-  FractionalInventoryDeduction
-}
+// All interfaces are already exported individually above

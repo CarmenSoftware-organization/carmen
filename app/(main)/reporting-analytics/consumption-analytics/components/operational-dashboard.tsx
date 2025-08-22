@@ -661,7 +661,7 @@ export default function OperationalDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Hourly Performance Trends</CardTitle>
-              <CardDescription>Today's operational performance metrics</CardDescription>
+              <CardDescription>Today&apos;s operational performance metrics</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-80">

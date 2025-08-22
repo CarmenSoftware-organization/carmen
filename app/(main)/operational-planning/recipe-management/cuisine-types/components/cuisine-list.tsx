@@ -952,7 +952,7 @@ export function CuisineList() {
           <DialogHeader>
             <DialogTitle>Delete Cuisine Type</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedCuisine?.name}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{selectedCuisine?.name}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

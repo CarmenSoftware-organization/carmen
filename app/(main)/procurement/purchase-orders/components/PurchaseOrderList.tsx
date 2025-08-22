@@ -61,7 +61,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ListPageTemplate from "@/components/templates/ListPageTemplate";
-import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder";  
+import { mockPurchaseOrders } from "@/lib/mock-data";  
 import StatusBadge from "@/components/ui/custom-status-badge";
 import CreatePOFromPR from "./createpofrompr";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -105,7 +105,7 @@ export function PurchaseOrderList() {
   // Memoize the filtered and sorted data
   const filteredPOs = useMemo(() => {
     // First apply search and status filters
-    let result = Mock_purchaseOrders.filter(
+    let result = mockPurchaseOrders.filter(
       (po) =>
         (po.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
           po.vendorName.toLowerCase().includes(searchTerm.toLowerCase())) &&

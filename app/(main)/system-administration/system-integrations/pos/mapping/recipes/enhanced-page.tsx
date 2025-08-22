@@ -214,11 +214,11 @@ export default function EnhancedRecipeMappingPage() {
       id: "actions",
       header: "",
       cell: ({ row }) => (
-        <RowActions
-          onEdit={() => handleRowAction("edit", row.original)}
-          onDelete={() => handleRowAction("delete", row.original)}
-          onView={() => handleRowAction("view", row.original)}
-        />
+        <div className="flex gap-2">
+          <button onClick={() => handleRowAction("edit", row.original)}>Edit</button>
+          <button onClick={() => handleRowAction("delete", row.original)}>Delete</button>
+          <button onClick={() => handleRowAction("edit", row.original)}>View</button>
+        </div>
       ),
     },
   ]

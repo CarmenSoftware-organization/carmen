@@ -517,21 +517,4 @@ export interface CostingDashboardMetrics {
   }[]
 }
 
-// Export all types for easy importing
-export type {
-  PortionCostingContext,
-  IngredientCostDetail,
-  OverheadCostFactors,
-  DemandAnalytics,
-  WasteAnalytics,
-  PricingOptimizationRequest,
-  PricingObjective,
-  PricingConstraint,
-  MarketCondition,
-  CompetitiveAnalysis,
-  PortionCostBreakdown,
-  DynamicPricingResult,
-  VariantProfitabilityAnalysis,
-  CostVarianceAlert,
-  CostingDashboardMetrics
-}
+// All types are already exported individually above

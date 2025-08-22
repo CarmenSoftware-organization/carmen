@@ -61,7 +61,13 @@
       "mcp__MCP_DOCKER__sequentialthinking",
       "Bash(chmod:*)",
       "Bash(npx playwright install:*)",
-      "Bash(npx playwright test:*)"
+      "Bash(npx playwright test:*)",
+      "Bash(BACKUP_DIR=\"backup_cleanup_20250822_131714\")",
+      "Bash(if [ -f \"next.config.mjs\" ])",
+      "Bash(then echo \"Found next.config.mjs, checking if it''s a duplicate...\")",
+      "Bash(else echo \"next.config.mjs not found or already moved\")",
+      "Bash(fi)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

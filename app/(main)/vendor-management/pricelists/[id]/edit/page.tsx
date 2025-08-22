@@ -152,49 +152,12 @@ export default function StaffPricelistEditPage() {
   const router = useRouter()
   const pricelistId = params.id as string
   
-  const currentUser = getCurrentUser()
-  
-  // Check permissions
-  if (!canEditPricelists(currentUser)) {
-    return (
-      <div className="p-6">
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-6 text-center">
-            <AlertCircle className="h-8 w-8 mx-auto mb-2 text-red-600" />
-            <div className="font-medium text-red-900">Access Denied</div>
-            <div className="text-sm text-red-700 mt-1">
-              You don't have permission to edit pricelists. Contact your administrator.
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="mt-4"
-              onClick={() => router.back()}
-            >
-              Go Back
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-  
+  // All hooks must be declared at the top before any conditional returns
   const [pricelist, setPricelist] = useState<VendorPricelist>(mockPricelistDetail)
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValidPricelist, setIsValidPricelist] = useState(false)
-
-  const vendor = mockVendors.find(v => v.id === pricelist.vendorId)
-
-  const handleUpdatePricelist = (field: keyof VendorPricelist, value: any) => {
-    setPricelist(prev => ({
-      ...prev,
-      [field]: value,
-      updatedAt: new Date()
-    }))
-  }
-
-
+  
   // Handle price data updates from the new component - memoized to prevent infinite loops
   const handlePriceDataChange = React.useCallback((priceData: PricelistItem[]) => {
     setPricelist(prev => ({
@@ -210,6 +173,43 @@ export default function StaffPricelistEditPage() {
   const handleValidationChange = React.useCallback((isValid: boolean) => {
     setIsValidPricelist(isValid)
   }, [])
+  
+  const currentUser = getCurrentUser()
+  
+  // Check permissions
+  if (!canEditPricelists(currentUser)) {
+    return (
+      <div className="p-6">
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-8 w-8 mx-auto mb-2 text-red-600" />
+            <div className="font-medium text-red-900">Access Denied</div>
+            <div className="text-sm text-red-700 mt-1">
+              You don&apos;t have permission to edit pricelists. Contact your administrator.
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-4"
+              onClick={() => router.back()}
+            >
+              Go Back
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const vendor = mockVendors.find(v => v.id === pricelist.vendorId)
+
+  const handleUpdatePricelist = (field: keyof VendorPricelist, value: any) => {
+    setPricelist(prev => ({
+      ...prev,
+      [field]: value,
+      updatedAt: new Date()
+    }))
+  }
 
   const handleSave = async (newStatus?: 'draft' | 'submitted' | 'approved') => {
     setIsSaving(true)

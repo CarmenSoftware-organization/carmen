@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation'
 import { GoodsReceiveNoteComponent } from '../components/goods-receive-note'
-import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import { mockGoodsReceiveNotes } from '@/lib/mock-data'
 import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
 import { useGRNCreationStore } from '@/lib/store/grn-creation.store'
 import { useEffect, useState } from 'react'

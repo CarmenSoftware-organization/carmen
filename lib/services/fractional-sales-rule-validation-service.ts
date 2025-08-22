@@ -181,7 +181,7 @@ export class FractionalSalesRuleValidationService {
           ruleId: `quality-${standard.id}`,
           ruleName: standard.standardName,
           violationType: standard.criticalControl ? 'critical' : 'minor',
-          description: result.message,
+          description: result.message || 'No description provided',
           location: context.location,
           timestamp: context.timestamp,
           detectedBy: 'system',

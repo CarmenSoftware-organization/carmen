@@ -42,7 +42,6 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
         name: "Copy Paper",
         description: "A4, 80gsm, 500 sheets per ream",
         convRate: 0.5,
-        conversionFactor: 0.5,
         orderedQuantity: 100,
         orderUnit: "reams",
         baseQuantity: 50,
@@ -76,14 +75,12 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
           lastOrderDate: new Date("2023-05-15"),
           lastVendor: "Office Supplies Inc."
         },
-        purchaseRequestIds: ["PR-001", "PR-002"]
       },
       {
         id: "POI-004",
         name: "Ballpoint Pens",
         description: "Blue ink, box of 50",
         convRate: 50,
-        conversionFactor: 50,
         orderedQuantity: 20,
         orderUnit: "boxes",
         baseQuantity: 1000,
@@ -117,14 +114,12 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
           lastOrderDate: new Date("2023-05-20"),
           lastVendor: "Office Supplies Inc."
         },
-        purchaseRequestIds: ["PR-001"]
       },
       {
         id: "POI-014",
         name: "Office Notebooks",
         description: "A5 spiral notebooks, 200 pages",
         convRate: 1,
-        conversionFactor: 1,
         orderedQuantity: 50,
         orderUnit: "pieces",
         baseQuantity: 50,
@@ -158,7 +153,6 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
           lastOrderDate: new Date("2023-05-10"),
           lastVendor: "Office Supplies Inc."
         },
-        purchaseRequestIds: ["PR-003"]
       }
     ],
     baseSubTotalPrice: 875.00,
@@ -296,7 +290,6 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
         name: "Organic Apples",
         description: "Red Delicious, 5lb bag",
         convRate: 2.27,
-        conversionFactor: 2.27,
         orderedQuantity: 50,
         orderUnit: "bags",
         baseQuantity: 113.5,
@@ -715,7 +708,6 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
         name: "Thai Rice Paper",
         description: "A4 size, 80gsm, 500 sheets",
         convRate: 1,
-        conversionFactor: 1,
         orderedQuantity: 100,
         orderUnit: "reams",
         baseQuantity: 100,
@@ -749,14 +741,12 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
           lastOrderDate: new Date("2023-06-20"),
           lastVendor: "Local Thai Suppliers Ltd."
         },
-        purchaseRequestIds: ["PR-005"]
       },
       {
         id: "POI-015",
         name: "Local Staplers",
         description: "Heavy duty stapler, 25 sheets capacity",
         convRate: 1,
-        conversionFactor: 1,
         orderedQuantity: 15,
         orderUnit: "pieces",
         baseQuantity: 15,
@@ -790,7 +780,6 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
           lastOrderDate: new Date("2023-06-20"),
           lastVendor: "Local Thai Suppliers Ltd."
         },
-        purchaseRequestIds: ["PR-005"]
       }
     ],
     baseSubTotalPrice: 14700.00,

@@ -673,7 +673,7 @@ export function EnhancedPOItemRow({
                   <div className="text-sm font-medium text-center">{(item.orderedQuantity || 0).toFixed(3)}</div>
                   <div className="text-xs text-gray-500 text-center">{item.orderUnit || 'Pcs'}</div>
                   {showBaseUnit && (
-                    <div className="text-xs text-gray-500 text-center">{((item.orderedQuantity || 0) * (item.conversionFactor || 1)).toFixed(3)} {item.baseUnit || 'kg'}</div>
+                    <div className="text-xs text-gray-500 text-center">{((item.orderedQuantity || 0) * (item.convRate || 1)).toFixed(3)} {item.baseUnit || 'kg'}</div>
                   )}
                 </>
               )}
@@ -700,7 +700,7 @@ export function EnhancedPOItemRow({
                       <div className="text-sm font-medium text-green-700 text-center">{item.receivedQuantity?.toFixed(3) || '0.000'}</div>
                       <div className="text-xs text-gray-500 text-center">{item.orderUnit || 'Pcs'}</div>
                       {showBaseUnit && (
-                        <div className="text-xs text-gray-500 text-center">{((item.receivedQuantity || 0) * (item.conversionFactor || 1)).toFixed(3)} {item.baseUnit || 'kg'}</div>
+                        <div className="text-xs text-gray-500 text-center">{((item.receivedQuantity || 0) * (item.convRate || 1)).toFixed(3)} {item.baseUnit || 'kg'}</div>
                       )}
                     </>
                   ) : (
@@ -974,14 +974,14 @@ export function EnhancedPOItemRow({
               className="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer"
             >
               <FileText className="h-3 w-3" />
-              Related PRs ({item.purchaseRequestIds?.length || 2})
+              Related PRs (2)
             </button>
             <button 
               onClick={() => setShowGRNModal(true)}
               className="text-green-600 hover:text-green-800 hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer"
             >
               <FileText className="h-3 w-3" />
-              Related GRNs ({item.goodsReceivedNoteIds?.length || 1})
+              Related GRNs (1)
             </button>
           </div>
         </div>

@@ -549,7 +549,7 @@ export class ConsumptionVarianceTrackingService {
           entityType: 'ingredient',
           variance: r.variancePercentage,
           zScore,
-          severity: Math.abs(zScore) > 3 ? 'extreme' : Math.abs(zScore) > 2 ? 'moderate' : 'mild'
+          severity: (Math.abs(zScore) > 3 ? 'extreme' : Math.abs(zScore) > 2 ? 'moderate' : 'mild') as 'extreme' | 'moderate' | 'mild'
         }
       })
 
@@ -850,4 +850,3 @@ export class ConsumptionVarianceTrackingService {
   }
 }
 
-export { ConsumptionVarianceTrackingService }

@@ -51,20 +51,20 @@ export class EnhancedConsumptionTrackingService {
 
     // Step 2: Calculate ingredient consumption records
     const ingredientRecords = await this.calculateIngredientConsumption(
-      processedTransactions,
+      processedTransactions.processedTransactions,
       context
     )
 
     // Step 3: Generate recipe consumption summaries
     const recipeSummaries = await this.generateRecipeSummaries(
-      processedTransactions,
+      processedTransactions.processedTransactions,
       ingredientRecords,
       context
     )
 
     // Step 4: Create location analytics
     const locationAnalytics = await this.generateLocationAnalytics(
-      processedTransactions,
+      processedTransactions.processedTransactions,
       ingredientRecords,
       recipeSummaries,
       context
@@ -79,7 +79,7 @@ export class EnhancedConsumptionTrackingService {
 
     // Step 6: Generate efficiency report
     const efficiencyReport = await this.generateEfficiencyReport(
-      processedTransactions,
+      processedTransactions.processedTransactions,
       recipeSummaries,
       context
     )
@@ -275,9 +275,12 @@ export class EnhancedConsumptionTrackingService {
 
       const existing = recipeSummaries.get(recipe.id) || {
         recipe,
-        transactions: [],
+        transactions: [] as FractionalSalesTransaction[],
         totalProduced: 0,
-        variantSales: new Map()
+        variantSales: new Map<string, {
+          variant: RecipeYieldVariant
+          transactions: FractionalSalesTransaction[]
+        }>()
       }
 
       existing.transactions.push(transaction)
@@ -830,4 +833,3 @@ export class EnhancedConsumptionTrackingService {
   }
 }
 
-export { EnhancedConsumptionTrackingService }

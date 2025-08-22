@@ -306,7 +306,7 @@ export default function FractionalComparisonReports({
             </SelectContent>
           </Select>
           
-          <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+          <Select value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as any)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

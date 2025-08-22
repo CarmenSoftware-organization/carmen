@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import ListPageTemplate from "@/components/templates/ListPageTemplate"
-import { Mock_purchaseOrders } from "@/lib/mock/mock_purchaseOrder"
+import { mockPurchaseOrders } from "@/lib/mock-data"
 import { PurchaseOrder, PurchaseRequest } from "@/lib/types"
 import CreatePOFromPR from "./createpofrompr"
 import { purchaseOrderColumns } from "./purchase-orders-columns"
@@ -28,7 +28,7 @@ export function ModernPurchaseOrderList() {
   const [showCreateFromPRDialog, setShowCreateFromPRDialog] = useState(false)
 
   // Filter the data based on table state
-  const data = useMemo(() => Mock_purchaseOrders, [])
+  const data = useMemo(() => mockPurchaseOrders, [])
 
   const handleSelectPO = (id: string, checked: boolean) => {
     if (checked) {

@@ -273,7 +273,7 @@ export default function TemplateDetailPage() {
       <div className="text-center py-12">
         <FileSpreadsheet className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h3 className="text-lg font-medium mb-2">Template not found</h3>
-        <p className="text-muted-foreground mb-4">The template you're looking for doesn't exist.</p>
+        <p className="text-muted-foreground mb-4">The template you&apos;re looking for doesn&apos;t exist.</p>
         <Button onClick={() => router.push('/vendor-management/templates')}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -687,7 +687,7 @@ export default function TemplateDetailPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Template</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{template.name}"? This action cannot be undone and will affect any campaigns using this template.
+              Are you sure you want to delete &quot;{template.name}&quot;? This action cannot be undone and will affect any campaigns using this template.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

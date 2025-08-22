@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { mockGoodsReceiveNotes } from '@/lib/mock/mock_goodsReceiveNotes'
+import { mockGoodsReceiveNotes } from '@/lib/mock-data'
 import { GRNShadcnDataTable } from './grn-shadcn-data-table'
 
 export function GoodsReceiveNoteList() {

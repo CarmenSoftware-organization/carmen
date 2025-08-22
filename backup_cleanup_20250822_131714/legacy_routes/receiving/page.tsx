@@ -65,7 +65,7 @@ export default function ReceivingPage() {
       <MobileNav />
       <div className="container max-w-md mx-auto pt-20 pb-20 px-4">
         <h1 className="text-2xl font-bold mb-4">Receiving</h1>
-        <h2 className="text-lg font-medium text-muted-foreground mb-6">Today's Deliveries</h2>
+        <h2 className="text-lg font-medium text-muted-foreground mb-6">Today&apos;s Deliveries</h2>
 
         <div className="flex items-center gap-2 mb-4">
           <div className="relative flex-1">

@@ -553,7 +553,7 @@ export class AdvancedConsumptionAnalyticsService {
           recommendedProduction: demandForecast,
           productionTiming: {
             startTime: this.calculateOptimalStartTime(recipe, schedulePeriod),
-            duration: recipe.preparationTime + recipe.cookingTime,
+            duration: recipe.prepTime + recipe.cookTime,
             priority: this.calculatePriority(recipe, demandForecast, variantDemands)
           },
           variants: recipe.yieldVariants.map(variant => ({
@@ -573,7 +573,7 @@ export class AdvancedConsumptionAnalyticsService {
           },
           constraints: {
             equipmentAvailability: this.getRequiredEquipment(recipe),
-            staffRequirements: Math.ceil(recipe.complexity / 10),
+            staffRequirements: Math.ceil((recipe.difficulty === 'easy' ? 1 : recipe.difficulty === 'medium' ? 2 : 3)),
             ingredientAvailability,
             storageCapacity: this.calculateStorageRequirement(recipe, demandForecast)
           }
@@ -627,8 +627,31 @@ export class AdvancedConsumptionAnalyticsService {
     location: string,
     period: { startDate: Date; endDate: Date }
   ): Promise<ComplianceReport> {
-    const complianceChecks = []
-    const violations = []
+    const complianceChecks: {
+      checkId: string
+      checkName: string
+      requirement: string
+      status: 'compliant' | 'non_compliant' | 'warning' | 'pending'
+      actualValue: number | string
+      requiredValue: number | string
+      deviation: number
+      severity: 'critical' | 'high' | 'medium' | 'low'
+      lastChecked: Date
+    }[] = []
+    const violations: {
+      violationId: string
+      violationType: string
+      description: string
+      severity: 'critical' | 'high' | 'medium' | 'low'
+      detectedAt: Date
+      affectedItems: string[]
+      correctiveActions: {
+        action: string
+        responsible: string
+        dueDate: Date
+        status: 'pending' | 'in_progress' | 'completed'
+      }[]
+    }[] = []
 
     // Define compliance checks based on report type
     switch (reportType) {
@@ -1040,11 +1063,3 @@ export class AdvancedConsumptionAnalyticsService {
   }
 }
 
-export {
-  AdvancedConsumptionAnalyticsService,
-  type PredictiveConsumptionModel,
-  type SeasonalTrendAnalysis,
-  type CustomerPreferenceInsights,
-  type OptimalProductionSchedule,
-  type ComplianceReport
-}

@@ -64,14 +64,14 @@ export class EnhancedCostingEngine {
     )
     
     // Calculate base recipe conversion
-    const baseRecipeUnitsUsed = variant.conversionRate || (variant.yield / recipe.baseYield)
+    const baseRecipeUnitsUsed = variant.conversionRate || (variant.quantity / recipe.yield)
     
     const breakdown: PortionCostBreakdown = {
       recipeId: recipe.id,
       recipeName: recipe.name,
       variantId: variant.id,
       variantName: variant.name,
-      portionSize: variant.portionSize || `${variant.yield} ${recipe.unit}`,
+      portionSize: `${variant.quantity} ${variant.unit}`,
       calculatedAt: new Date(),
       
       // Ingredient costs
@@ -195,12 +195,12 @@ export class EnhancedCostingEngine {
   }> {
     
     // Base time estimates (in minutes)
-    const basePreparationTime = recipe.preparationTime || 30
-    const baseCookingTime = recipe.cookingTime || 45
+    const basePreparationTime = recipe.prepTime || 30
+    const baseCookingTime = recipe.cookTime || 45
     const baseServiceTime = 3 // Average service time per portion
     
     // Apply variant-specific time adjustments
-    const variantTimeMultiplier = variant.complexityMultiplier || 1
+    const variantTimeMultiplier = 1 // Default complexity multiplier
     const variantPreparationTime = basePreparationTime * variantTimeMultiplier
     const variantCookingTime = baseCookingTime * variantTimeMultiplier
     const variantServiceTime = baseServiceTime
@@ -243,10 +243,10 @@ export class EnhancedCostingEngine {
   }> {
     
     const portionMultiplier = variant.conversionRate || 1
-    const complexityMultiplier = variant.complexityMultiplier || 1
+    const complexityMultiplier = 1 // Default complexity multiplier
     
-    // Calculate utility costs
-    const cookingTime = (variant.cookingTime || 45) * complexityMultiplier
+    // Calculate utility costs  
+    const cookingTime = 45 * complexityMultiplier // Default cooking time
     const utilitiesCost = (
       cookingTime * overheadFactors.energyCostPerMinute +
       overheadFactors.waterCostPerUnit * portionMultiplier +
@@ -341,7 +341,7 @@ export class EnhancedCostingEngine {
     
     // Analyze volume impact
     const volumeImpact = await this.predictVolumeImpact(
-      variant.currentPrice || 0,
+      variant.sellingPrice || 0,
       optimalPrice.recommendedPrice,
       demandElasticity
     )
@@ -359,11 +359,11 @@ export class EnhancedCostingEngine {
       optimizationId: `opt_${Date.now()}`,
       calculatedAt: new Date(),
       
-      currentPrice: variant.currentPrice || 0,
+      currentPrice: variant.sellingPrice || 0,
       recommendedPrice: optimalPrice.recommendedPrice,
-      priceChange: optimalPrice.recommendedPrice - (variant.currentPrice || 0),
-      priceChangePercentage: variant.currentPrice ? 
-        ((optimalPrice.recommendedPrice - variant.currentPrice) / variant.currentPrice) * 100 : 0,
+      priceChange: optimalPrice.recommendedPrice - (variant.sellingPrice || 0),
+      priceChangePercentage: variant.sellingPrice ? 
+        ((optimalPrice.recommendedPrice - variant.sellingPrice) / variant.sellingPrice) * 100 : 0,
       
       projectedMargin: optimalPrice.recommendedPrice - costBreakdown.totalCost,
       projectedMarginPercentage: ((optimalPrice.recommendedPrice - costBreakdown.totalCost) / optimalPrice.recommendedPrice) * 100,
@@ -428,7 +428,7 @@ export class EnhancedCostingEngine {
       const variantMargin = variantRevenue > 0 ? (variantProfit / variantRevenue) * 100 : 0
       
       // Calculate efficiency metrics
-      const preparationTime = recipe.preparationTime || 30
+      const preparationTime = recipe.prepTime || 30
       const revenuePerMinute = variantRevenue / preparationTime
       
       // Calculate strategic value
@@ -444,7 +444,7 @@ export class EnhancedCostingEngine {
       variantPerformance.push({
         variantId: variant.id,
         variantName: variant.name,
-        portionSize: variant.portionSize || `${variant.yield} ${recipe.unit}`,
+        portionSize: `${variant.quantity} ${variant.unit}`,
         
         unitsSold: variantTransactions.length,
         salesFrequency: variantTransactions.length / 30, // Assuming 30-day period

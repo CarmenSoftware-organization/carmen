@@ -53,7 +53,7 @@ export default function ComplianceMonitoringDashboard({}: ComplianceMonitoringDa
         location: 'Main Kitchen - Hot Food Station',
         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
         detectedBy: 'system',
-        status: 'in-progress',
+        status: 'acknowledged',
         assignedTo: 'kitchen-manager-001',
         correctiveActions: [
           {
@@ -86,7 +86,7 @@ export default function ComplianceMonitoringDashboard({}: ComplianceMonitoringDa
         description: 'Cake display case temperature exceeded 41°F threshold',
         location: 'Bakery Display Case 2',
         timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-        detectedBy: 'sensor',
+        detectedBy: 'system',
         status: 'acknowledged',
         assignedTo: 'bakery-supervisor-001',
         correctiveActions: [
@@ -129,7 +129,7 @@ export default function ComplianceMonitoringDashboard({}: ComplianceMonitoringDa
     majorViolations: violations.filter(v => v.violationType === 'major').length,
     minorViolations: violations.filter(v => v.violationType === 'minor').length,
     openViolations: violations.filter(v => v.status === 'open').length,
-    inProgressViolations: violations.filter(v => v.status === 'in-progress').length,
+    inProgressViolations: violations.filter(v => v.status === 'acknowledged').length,
     resolvedViolations: violations.filter(v => v.status === 'resolved').length,
     overallComplianceScore: 87.3,
     foodSafetyScore: 92.1,

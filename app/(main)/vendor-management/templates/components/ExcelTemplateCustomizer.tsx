@@ -148,7 +148,7 @@ export default function ExcelTemplateCustomizer({
                 Customize Excel Template
               </DialogTitle>
               <DialogDescription>
-                Configure how the Excel template will be generated for "{template.name}"
+                Configure how the Excel template will be generated for &quot;{template.name}&quot;
               </DialogDescription>
             </div>
             <Button variant="ghost" onClick={onClose}>

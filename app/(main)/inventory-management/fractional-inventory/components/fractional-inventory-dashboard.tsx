@@ -218,7 +218,7 @@ export function FractionalInventoryDashboard({
   }
 
   const getQualityColor = (grade: string) => {
-    const colors = {
+    const colors: { [key: string]: string } = {
       'EXCELLENT': 'text-green-600',
       'GOOD': 'text-blue-600',
       'FAIR': 'text-yellow-600',

@@ -623,7 +623,7 @@ function NewStaffPricelistPageContent() {
                 <span className="text-sm font-medium text-green-800">Ready to Create</span>
               </div>
               <p className="text-sm text-green-700 mt-1">
-                The pricelist will be created and you'll be redirected to the edit page to add products and pricing.
+                The pricelist will be created and you&apos;ll be redirected to the edit page to add products and pricing.
               </p>
             </div>
           </div>

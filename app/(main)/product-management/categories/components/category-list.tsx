@@ -254,7 +254,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{item.name}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{item.name}&quot;? This action cannot be undone.
               {item.children && item.children.length > 0 && (
                 <p className="mt-2 text-red-600">
                   Warning: This will also delete all child items!

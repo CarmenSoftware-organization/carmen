@@ -487,7 +487,7 @@ export default function EnhancedConsumptionDashboard({
 
             <Card>
               <CardHeader>
-                <CardTitle>Today's Fractional Sales</CardTitle>
+                <CardTitle>Today&apos;s Fractional Sales</CardTitle>
                 <CardDescription>Real-time fractional sales metrics</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">

@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer, ComposedChart, ScatterChart, Scatter, RadarChart, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, Radar, TreemapChart, Treemap
+  PolarAngleAxis, PolarRadiusAxis, Radar, Treemap, AreaChart, Area
 } from 'recharts'
 import { 
   Download, Filter, RefreshCcw, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
@@ -483,7 +483,7 @@ export default function RecipeVariantPerformance({
             </SelectContent>
           </Select>
           
-          <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+          <Select value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as any)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

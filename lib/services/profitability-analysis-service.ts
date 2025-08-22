@@ -169,7 +169,7 @@ export class ProfitabilityAnalysisService {
     const unitProfit = variantProfit / unitsSold
     
     // Calculate efficiency metrics
-    const preparationTime = recipe.preparationTime || 30
+    const preparationTime = recipe.prepTime || 30
     const revenuePerMinute = variantRevenue / preparationTime
     const profitPerMinute = variantProfit / preparationTime
     
@@ -218,7 +218,7 @@ export class ProfitabilityAnalysisService {
     return {
       variantId: variant.id,
       variantName: variant.name,
-      portionSize: variant.portionSize || `${variant.yield} ${recipe.unit}`,
+      portionSize: `${variant.quantity} ${variant.unit}`,
       
       // Volume metrics
       unitsSold,
@@ -296,9 +296,24 @@ export class ProfitabilityAnalysisService {
     variantPerformance: any[]
   ): Promise<CrossVariantAnalysis> {
     
-    const cannibalizedSales = []
-    const complementaryEffects = []
-    const substitutionPatterns = []
+    const cannibalizedSales: {
+      fromVariantId: string
+      toVariantId: string
+      impactPercentage: number
+      revenueImpact: number
+    }[] = []
+    const complementaryEffects: {
+      variantId1: string
+      variantId2: string
+      synergyEffect: number
+      combinedOrderFrequency: number
+    }[] = []
+    const substitutionPatterns: {
+      primaryVariant: string
+      substituteVariant: string
+      substitutionRate: number
+      priceElasticity: number
+    }[] = []
     
     // Analyze cannibalization between variants
     for (let i = 0; i < variantPerformance.length; i++) {
@@ -533,7 +548,7 @@ export class ProfitabilityAnalysisService {
     }
     
     // Portion size optimization
-    if (variant.yield && variant.conversionRate) {
+    if (variant.quantity && variant.conversionRate) {
       opportunities.push({
         opportunity: 'Portion size adjustment',
         potentialImpact: costBreakdown.ingredientCost * 0.05, // 5% ingredient savings
@@ -601,12 +616,12 @@ export class ProfitabilityAnalysisService {
   ): Promise<number> {
     // Mock calculation based on transaction patterns
     // Would analyze actual cross-selling data in real implementation
-    const portionSize = variant.portionSize || ''
+    const portionSize = variant.name || ''
     
     // Smaller portions typically have higher cross-selling potential
-    if (portionSize.includes('slice') || portionSize.includes('half')) {
+    if (portionSize.toLowerCase().includes('slice') || portionSize.toLowerCase().includes('half')) {
       return 0.8
-    } else if (portionSize.includes('full') || portionSize.includes('whole')) {
+    } else if (portionSize.toLowerCase().includes('full') || portionSize.toLowerCase().includes('whole')) {
       return 0.3
     }
     
@@ -693,7 +708,8 @@ export class ProfitabilityAnalysisService {
   private estimateInitialInvestment(variant: RecipeYieldVariant): number {
     // Mock calculation for recipe development and setup costs
     const baseInvestment = 2000 // Base recipe development cost
-    const complexityMultiplier = variant.complexityMultiplier || 1
+    // Infer complexity from conversion rate - smaller portions may need more setup
+    const complexityMultiplier = variant.conversionRate < 0.5 ? 1.5 : 1.0
     
     return baseInvestment * complexityMultiplier
   }

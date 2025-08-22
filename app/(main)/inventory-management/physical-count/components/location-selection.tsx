@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { mockLocations, getLocationsByDepartment, Location } from '@/lib/mock/inventory-data';
+import { mockLocations, getLocationsByDepartment } from '@/lib/mock-data/users';
+import type { Location } from '@/lib/types/user';
 
 interface LocationSelectionProps {
   formData: {

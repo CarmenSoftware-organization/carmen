@@ -356,7 +356,7 @@ export default function SystemSettingsPage() {
                 <div>
                   <Label htmlFor="approval-toggle" className="font-medium">Approval Process</Label>
                   <p className="text-sm text-muted-foreground">
-                    Require approval for stock-outs before they're finalized
+                    Require approval for stock-outs before they&apos;re finalized
                   </p>
                 </div>
                 <Switch 

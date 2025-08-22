@@ -27,7 +27,7 @@ export function NewItemRow({ onSave, onCancel, locations, products, units, showP
     currency: "USD",
     status: "Pending",
     comment: "",
-    deliveryDate: null,
+    deliveryDate: undefined,
     deliveryPoint: "",
   });
   

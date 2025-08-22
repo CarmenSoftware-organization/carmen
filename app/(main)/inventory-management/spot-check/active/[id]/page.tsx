@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CountDetailForm } from '../../components/count-detail-form';
-import { mockCounts, mockProducts, mockLocations } from '@/lib/mock/inventory-data';
+import { mockInventoryProducts, mockLocations, mockCounts } from '@/lib/mock-data';
 import { useRouter } from 'next/navigation';
 
 interface PageProps {
@@ -44,11 +44,11 @@ export default function ActiveCountPage({ params }: PageProps) {
 
   // Get count session from mock data
   const countSession = mockCounts.find(count => count.id === params.id) || mockCounts[0];
-  const countLocations = countSession.locations.map(locId => 
+  const countLocations = countSession.locations.map((locId: string) => 
     mockLocations.find(loc => loc.id === locId)
-  ).filter(loc => loc) as typeof mockLocations;
+  ).filter((loc: any) => loc) as typeof mockLocations;
   
-  const countProducts = mockProducts.filter(product => 
+  const countProducts = mockInventoryProducts.filter(product => 
     countSession.locations.includes(product.locationId)
   );
 
