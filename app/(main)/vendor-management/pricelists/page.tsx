@@ -25,9 +25,22 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { mockPricelists, mockCampaigns, mockVendors } from '@/lib/mock-data'
+import { formatDate } from '@/lib/utils'
 
-// Mock data for pricelists
-const mockPricelists = [
+// Helper function to get campaign name
+const getCampaignName = (campaignId: string) => {
+  const campaign = mockCampaigns.find(c => c.id === campaignId)
+  return campaign ? campaign.name : 'N/A'
+}
+
+// Helper function to get vendor name
+const getVendorName = (vendorId: string) => {
+  const vendor = mockVendors.find(v => v.id === vendorId)
+  return vendor ? vendor.companyName : 'Unknown Vendor'
+}
+
+const mockPricelistsLegacy = [
   {
     id: 'pl-001',
     pricelistNumber: 'PL-2024-001',
@@ -98,12 +111,33 @@ const mockPricelists = [
   }
 ]
 
+// Transform centralized data to legacy format for display
+const transformedPricelists = mockPricelists.map(pricelist => ({
+  id: pricelist.id,
+  pricelistNumber: pricelist.pricelistNumber,
+  vendorName: getVendorName(pricelist.vendorId),
+  vendorId: pricelist.vendorId,
+  campaignId: pricelist.campaignId,
+  campaignName: getCampaignName(pricelist.campaignId),
+  name: `${getCampaignName(pricelist.campaignId)} - ${getVendorName(pricelist.vendorId)}`,
+  status: pricelist.status,
+  currency: pricelist.currency,
+  itemCount: pricelist.totalItems,
+  totalValue: pricelist.totalItems * 100, // Mock calculation
+  taxProfile: 'VAT',
+  taxRate: 7,
+  validFrom: formatDate(pricelist.validFrom),
+  validTo: formatDate(pricelist.validTo),
+  lastUpdated: formatDate(pricelist.updatedAt),
+  categories: ['Equipment', 'Supplies'] // Mock categories
+}))
+
 export default function PriceListsPage() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [vendorFilter, setVendorFilter] = useState('all')
-  const [pricelists, setPricelists] = useState(mockPricelists)
+  const [pricelists, setPricelists] = useState(transformedPricelists)
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
   const filteredPricelists = pricelists.filter(pricelist => {
@@ -245,6 +279,16 @@ export default function PriceListsPage() {
               <div className="text-sm">
                 <div className="font-medium text-muted-foreground">Vendor</div>
                 <div className="font-medium">{pricelist.vendorName}</div>
+              </div>
+              
+              <div className="text-sm">
+                <div className="font-medium text-muted-foreground">Campaign</div>
+                <Link 
+                  href={`/vendor-management/campaigns/${pricelist.campaignId}`}
+                  className="font-medium hover:text-blue-600 transition-colors"
+                >
+                  {pricelist.campaignName}
+                </Link>
               </div>
               
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -406,6 +450,7 @@ export default function PriceListsPage() {
                 <TableRow>
                   <TableHead>Pricelist Number</TableHead>
                   <TableHead>Vendor</TableHead>
+                  <TableHead>Campaign</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Items</TableHead>
@@ -430,6 +475,19 @@ export default function PriceListsPage() {
                         <div className="font-medium">{pricelist.vendorName}</div>
                         <div className="text-sm text-muted-foreground">
                           {pricelist.categories.length} categories
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <Link 
+                          href={`/vendor-management/campaigns/${pricelist.campaignId}`}
+                          className="font-medium hover:text-blue-600 transition-colors"
+                        >
+                          {pricelist.campaignName}
+                        </Link>
+                        <div className="text-sm text-muted-foreground">
+                          Campaign origin
                         </div>
                       </div>
                     </TableCell>

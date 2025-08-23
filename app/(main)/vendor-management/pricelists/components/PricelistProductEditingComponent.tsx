@@ -47,6 +47,100 @@ import {
   PricelistProductWithStatus,
   PricelistEditingProgress
 } from '../types/PricelistEditingTypes'
+import { ProductInstance, Certification } from '../../types'
+import { 
+  validateProductPricing, 
+  calculateProductCompletionStatus, 
+  validatePricelist,
+  getSmartLeadTimeDefault
+} from '../utils/PriceValidation'
+import { mockProducts, mockCategories } from '../../lib/mock-data'
+import { fetchCertifications } from '@/app/lib/data'
+
+export default function PricelistProductEditingComponent({
+  preSelectedProducts = [],
+  existingPriceData,
+  currency,
+  onPriceDataChange,
+  onValidationChange,
+  readonly = false,
+  allowProductSelection = false
+}: PricelistProductEditingProps) {
+  // State for product selection and pricing data
+  const [selectedProducts, setSelectedProducts] = useState<ProductInstance[]>(preSelectedProducts)
+  const [productPricing, setProductPricing] = useState<Record<string, PricelistMOQTier[]>>({})
+  const [productNotes, setProductNotes] = useState<Record<string, string>>({})
+  const [productCertifications, setProductCertifications] = useState<Record<string, string[]>>({})
+  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set())
+  const [productSearch, setProductSearch] = useState<string>("")
+  const [certifications, setCertifications] = useState<Certification[]>([])
+  
+  // State for multi-unit management
+  const [productUnits, setProductUnits] = useState<Record<string, string[]>>({}) // productId -> selected units
+  
+  // State for Add Product modal
+  const [showProductModal, setShowProductModal] = useState<boolean>(false)
+  const [modalProductSearch, setModalProductSearch] = useState<string>("")
+  const [activeModalTab, setActiveModalTab] = useState<string>("quick-select")
+  const [modalSelectedProducts, setModalSelectedProducts] = useState<Set<string>>(new Set())
+  const [modalExpandedCategories, setModalExpandedCategories] = useState<string[]>([])
+  const [modalExpandedSubcategories, setModalExpandedSubcategories] = useState<string[]>([])
+  
+  // State for hierarchical product selection
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['food-beverage'])
+  const [expandedSubcategories, setExpandedSubcategories] = useState<string[]>([])
+  const [expandedItemGroups, setExpandedItemGroups] = useState<string[]>([])
+
+  useEffect(() => {
+    async function loadCertifications() {
+      const fetchedCertifications = await fetchCertifications();
+      setCertifications(fetchedCertifications);
+    }
+    loadCertifications();
+  }, []);
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Package,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  X,
+  AlertTriangle,
+  CheckCircle,
+  ShoppingCart,
+  Search,
+  DollarSign
+} from 'lucide-react'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs'
+import { 
+  PricelistProductEditingProps, 
+  PricelistMOQTier, 
+  PricelistProductWithStatus,
+  PricelistEditingProgress
+} from '../types/PricelistEditingTypes'
 import { ProductInstance } from '../../types'
 import { 
   validateProductPricing, 
@@ -229,7 +323,8 @@ export default function PricelistProductEditingComponent({
         customFieldValues: {},
         status: p.completionStatus === 'completed' ? 'approved' : 'draft' as 'draft' | 'submitted' | 'approved' | 'rejected',
         qualityScore: p.completionStatus === 'completed' ? 95 : 70,
-        lastModified: new Date()
+        lastModified: new Date(),
+        certifications: productCertifications[p.instance.id] || []
       }))
 
     onPriceDataChange(pricelistItems)
@@ -237,7 +332,7 @@ export default function PricelistProductEditingComponent({
     // Notify validation status
     const overallValidation = validatePricelist(getProductsWithStatus)
     onValidationChange?.(overallValidation.isValid)
-  }, [getProductsWithStatus, currency, onPriceDataChange, onValidationChange])
+  }, [getProductsWithStatus, currency, onPriceDataChange, onValidationChange, productCertifications])
 
   // Notify parent when pricing data changes
   useEffect(() => {
@@ -919,6 +1014,32 @@ export default function PricelistProductEditingComponent({
                                                         placeholder="Optional notes"
                                                         readOnly={readonly}
                                                       />
+                                                    </div>
+                                                  </div>
+                                                  <div className="col-span-3">
+                                                    <div className="space-y-1">
+                                                      <Label className="text-xs text-gray-600">Certifications:</Label>
+                                                      <Select
+                                                        multiple
+                                                        value={productCertifications[productStatus.instance.id] || []}
+                                                        onValueChange={(values) => {
+                                                          setProductCertifications(prev => ({
+                                                            ...prev,
+                                                            [productStatus.instance.id]: values
+                                                          }))
+                                                        }}
+                                                      >
+                                                        <SelectTrigger>
+                                                          <SelectValue placeholder="Select certifications" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                          {certifications.map(cert => (
+                                                            <SelectItem key={cert.id} value={cert.id}>
+                                                              {cert.name}
+                                                            </SelectItem>
+                                                          ))}
+                                                        </SelectContent>
+                                                      </Select>
                                                     </div>
                                                   </div>
                                                   

@@ -16,6 +16,8 @@ export * from './vendors'
 export * from './products'
 export * from './recipes'
 export * from './finance'
+export * from './campaigns'
+export * from './pricelists'
 
 // Mock data factories
 export * from './factories'

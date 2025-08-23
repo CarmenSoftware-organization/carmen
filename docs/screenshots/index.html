@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP Visual Documentation Hub</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --error-color: #dc2626;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--surface);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .title-section h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .title-section p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .main {
+            padding: 3rem 0;
+        }
+
+        .intro {
+            background: var(--background);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .intro h2 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .intro p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .quick-link {
+            display: inline-block;
+            padding: 0.75rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .quick-link:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--background);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .card-route {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            background: var(--surface);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--background);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .specifications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .spec-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .spec-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .spec-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .spec-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            background: var(--background);
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-success {
+            background: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: var(--warning-color);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+
+            .quick-links {
+                grid-template-columns: 1fr;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .specifications-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .error-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">C</div>
+                    <div class="title-section">
+                        <h1>Carmen ERP Visual Documentation</h1>
+                        <p>Comprehensive screenshot documentation for application replication</p>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Screenshots</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Modules</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Specifications</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="intro">
+                <h2>🎯 Documentation Overview</h2>
+                <p>
+                    This visual documentation system captures the current implementation state of the Carmen Hospitality ERP application. 
+                    All screenshots represent actual running application screens and provide essential reference material for development, 
+                    design, and business stakeholder review.
+                </p>
+                <p>
+                    <strong>Generated:</strong> January 22, 2025 | 
+                    <strong>Source:</strong> http://localhost:3006 | 
+                    <strong>Viewport:</strong> 1920×1080 Desktop
+                </p>
+                <div class="quick-links">
+                    <a href="#screenshots" class="quick-link">📸 Screenshots</a>
+                    <a href="#specifications" class="quick-link">📋 Specifications</a>
+                    <a href="README.md" class="quick-link">📖 Full Documentation</a>
+                    <a href="#workflow" class="quick-link">🔄 Workflows</a>
+                </div>
+            </section>
+
+            <section id="screenshots" class="section">
+                <div class="section-header">
+                    <div class="section-icon">📸</div>
+                    <h2 class="section-title">Application Screenshots</h2>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <img src="dashboard.png" alt="Dashboard" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Dashboard Screenshot<br>dashboard.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Dashboard</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/dashboard</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Executive overview dashboard with KPIs, business metrics, and operational status indicators across all Carmen ERP modules.
+                            </p>
+                            <div class="card-actions">
+                                <a href="specifications/dashboard-screen-spec.md" class="btn btn-primary">View Spec</a>
+                                <a href="dashboard.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="procurement-purchase-requests.png" alt="Purchase Requests" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Purchase Requests Screenshot<br>procurement-purchase-requests.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Purchase Requests</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/procurement/purchase-requests</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Comprehensive purchase request management with approval workflows, status tracking, and role-based access controls.
+                            </p>
+                            <div class="card-actions">
+                                <a href="specifications/purchase-requests-screen-spec.md" class="btn btn-primary">View Spec</a>
+                                <a href="procurement-purchase-requests.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="procurement-purchase-requests-new-pr.png" alt="New Purchase Request" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>New PR Screenshot<br>procurement-purchase-requests-new-pr.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">New Purchase Request</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/procurement/purchase-requests/new-pr</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Interactive form for creating purchase requests with dynamic item management, vendor selection, and approval routing.
+                            </p>
+                            <div class="card-actions">
+                                <a href="specifications/purchase-request-creation-screen-spec.md" class="btn btn-primary">View Spec</a>
+                                <a href="procurement-purchase-requests-new-pr.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="procurement-purchase-orders.png" alt="Purchase Orders" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Purchase Orders Screenshot<br>procurement-purchase-orders.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Purchase Orders</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/procurement/purchase-orders</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Purchase order management interface with vendor coordination, delivery tracking, and financial integration.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="procurement-purchase-orders.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="inventory-management-stock-overview.png" alt="Stock Overview" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Stock Overview Screenshot<br>inventory-management-stock-overview.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Stock Overview</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/inventory-management/stock-overview</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Real-time inventory monitoring with stock levels, movement tracking, and multi-location visibility.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="inventory-management-stock-overview.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="inventory-management-physical-count.png" alt="Physical Count" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Physical Count Screenshot<br>inventory-management-physical-count.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Physical Count</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/inventory-management/physical-count</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Physical inventory counting process management with variance tracking and audit trail.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="inventory-management-physical-count.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="vendor-management-vendors.png" alt="Vendor Management" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Vendor Management Screenshot<br>vendor-management-vendors.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Vendor Management</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/vendor-management/vendors</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Comprehensive vendor profile management with relationship tracking and performance analytics.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="vendor-management-vendors.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="vendor-management-vendors-new.png" alt="New Vendor" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>New Vendor Screenshot<br>vendor-management-vendors-new.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">New Vendor</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/vendor-management/vendors/new</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Vendor onboarding and registration interface with compliance validation and contact management.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="vendor-management-vendors-new.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="product-management-products.png" alt="Product Management" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Product Management Screenshot<br>product-management-products.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Product Management</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/product-management/products</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Product catalog management with specifications, pricing, and category organization.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="product-management-products.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="operational-planning-recipe-management-recipes.png" alt="Recipe Management" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Recipe Management Screenshot<br>operational-planning-recipe-management-recipes.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Recipe Management</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/operational-planning/recipe-management/recipes</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Recipe creation and management system with ingredient tracking and cost analysis.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="operational-planning-recipe-management-recipes.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="store-operations-store-requisitions.png" alt="Store Requisitions" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>Store Requisitions Screenshot<br>store-operations-store-requisitions.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">Store Requisitions</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/store-operations/store-requisitions</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                Inter-store inventory requisition management with transfer tracking and approval workflows.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="store-operations-store-requisitions.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <img src="system-administration-user-management.png" alt="User Management" class="card-image" onerror="this.parentNode.innerHTML='<div class=error-placeholder>User Management Screenshot<br>system-administration-user-management.png</div>'">
+                        <div class="card-content">
+                            <h3 class="card-title">User Management</h3>
+                            <div class="card-meta">
+                                <span class="card-route">/system-administration/user-management</span>
+                                <span class="status-badge status-success">Captured</span>
+                            </div>
+                            <p class="card-description">
+                                User account and role management interface with permission control and access administration.
+                            </p>
+                            <div class="card-actions">
+                                <a href="#" class="btn btn-primary">View Spec</a>
+                                <a href="system-administration-user-management.png" class="btn btn-secondary" target="_blank">Full Size</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="specifications" class="section">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <h2 class="section-title">Screen Specifications</h2>
+                </div>
+                <div class="specifications-grid">
+                    <div class="spec-card">
+                        <h3 class="spec-title">Dashboard Specification</h3>
+                        <div class="spec-meta">
+                            <span>Module: Dashboard</span>
+                            <span class="status-badge status-success">Complete</span>
+                        </div>
+                        <p class="spec-description">
+                            Comprehensive specification for the executive dashboard including KPIs, role-based data visibility, and interactive elements.
+                        </p>
+                        <a href="specifications/dashboard-screen-spec.md" class="btn btn-primary">Read Specification</a>
+                    </div>
+                    
+                    <div class="spec-card">
+                        <h3 class="spec-title">Purchase Requests Specification</h3>
+                        <div class="spec-meta">
+                            <span>Module: Procurement</span>
+                            <span class="status-badge status-success">Complete</span>
+                        </div>
+                        <p class="spec-description">
+                            Detailed specification for purchase request management including approval workflows, filtering, and role-based functionality.
+                        </p>
+                        <a href="specifications/purchase-requests-screen-spec.md" class="btn btn-primary">Read Specification</a>
+                    </div>
+                    
+                    <div class="spec-card">
+                        <h3 class="spec-title">PR Creation Specification</h3>
+                        <div class="spec-meta">
+                            <span>Module: Procurement</span>
+                            <span class="status-badge status-success">Complete</span>
+                        </div>
+                        <p class="spec-description">
+                            Complete specification for the purchase request creation form including dynamic item management and validation rules.
+                        </p>
+                        <a href="specifications/purchase-request-creation-screen-spec.md" class="btn btn-primary">Read Specification</a>
+                    </div>
+                    
+                    <div class="spec-card">
+                        <h3 class="spec-title">Additional Specifications</h3>
+                        <div class="spec-meta">
+                            <span>Status: Planned</span>
+                            <span class="status-badge status-warning">In Development</span>
+                        </div>
+                        <p class="spec-description">
+                            Additional screen specifications for remaining modules including inventory, vendor management, and system administration.
+                        </p>
+                        <a href="#" class="btn btn-secondary">Coming Soon</a>
+                    </div>
+                </div>
+            </section>
+
+            <section id="workflow" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🔄</div>
+                    <h2 class="section-title">Next Steps</h2>
+                </div>
+                <div class="intro">
+                    <h3>Expansion Opportunities</h3>
+                    <p>This initial documentation provides a solid foundation. Future enhancements should include:</p>
+                    <ul style="margin: 1rem 0; padding-left: 2rem; color: var(--text-secondary);">
+                        <li><strong>Role-Based Variations:</strong> Capture screenshots for all 6 user roles</li>
+                        <li><strong>Responsive Documentation:</strong> Add tablet and mobile viewport captures</li>
+                        <li><strong>Interactive States:</strong> Document modals, dropdowns, and form states</li>
+                        <li><strong>Workflow Documentation:</strong> Step-by-step process captures</li>
+                        <li><strong>Component Library:</strong> Individual component documentation</li>
+                        <li><strong>Error States:</strong> Document error handling and validation states</li>
+                        <li><strong>Complete Specifications:</strong> Detailed specs for all captured screens</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>
+                    <strong>Carmen ERP Visual Documentation</strong> • Generated January 22, 2025 • 
+                    12 screenshots captured • 100% success rate
+                </p>
+                <p style="margin-top: 0.5rem;">
+                    For updates, run: <code style="background: var(--surface); padding: 0.25rem 0.5rem; border-radius: 4px;">node scripts/simple-screenshot-capture.js</code>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced image error handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.card-image');
+            images.forEach(img => {
+                img.addEventListener('error', function() {
+                    const errorPlaceholder = document.createElement('div');
+                    errorPlaceholder.className = 'error-placeholder';
+                    errorPlaceholder.innerHTML = `${this.alt} Screenshot<br>${this.src.split('/').pop()}`;
+                    this.parentNode.replaceChild(errorPlaceholder, this);
+                });
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -22,7 +22,10 @@ import {
   VendorPriceManagement,
   VENDOR_STATUSES
 } from '@/lib/types/vendor-price-management';
+import { mockCampaigns } from '@/lib/mock-data';
 import { formatDate } from '@/lib/utils';
+import Link from 'next/link';
+import { Calendar, Users, Target, TrendingUp, Clock } from 'lucide-react';
 
 interface VendorDetailPageProps {
   params: {
@@ -292,6 +295,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
               <TabsList>
                 <TabsTrigger value="performance">Performance</TabsTrigger>
                 <TabsTrigger value="preferences">Price Collection</TabsTrigger>
+                <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
                 <TabsTrigger value="history">Submission History</TabsTrigger>
               </TabsList>
             </Tabs>
@@ -455,6 +459,135 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   Edit Price Collection Settings
                 </Button>
               </div>
+            </TabsContent>
+            
+            <TabsContent value="campaigns" className="space-y-4">
+              {(() => {
+                const vendorCampaigns = mockCampaigns.filter(campaign => 
+                  campaign.selectedVendors.includes(vendor.baseVendorId)
+                );
+                
+                if (vendorCampaigns.length === 0) {
+                  return (
+                    <div className="bg-gray-50 p-8 rounded-md text-center">
+                      <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                      <p className="text-gray-600">This vendor hasn't been invited to any campaigns yet.</p>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div className="space-y-4">
+                    {vendorCampaigns.map((campaign) => {
+                      const getStatusColor = (status: string) => {
+                        switch (status) {
+                          case 'active': return 'bg-green-100 text-green-800';
+                          case 'draft': return 'bg-gray-100 text-gray-800';
+                          case 'completed': return 'bg-blue-100 text-blue-800';
+                          default: return 'bg-gray-100 text-gray-800';
+                        }
+                      };
+                      
+                      const getPriorityColor = (priority: string) => {
+                        switch (priority) {
+                          case 'urgent': return 'bg-red-100 text-red-800';
+                          case 'high': return 'bg-orange-100 text-orange-800';
+                          case 'medium': return 'bg-yellow-100 text-yellow-800';
+                          case 'low': return 'bg-green-100 text-green-800';
+                          default: return 'bg-gray-100 text-gray-800';
+                        }
+                      };
+                      
+                      // Mock vendor progress for this campaign
+                      const vendorIndex = campaign.selectedVendors.indexOf(vendor.baseVendorId);
+                      const isResponded = vendorIndex < campaign.progress.respondedVendors;
+                      const isCompleted = vendorIndex < campaign.progress.completedSubmissions;
+                      const vendorProgress = isCompleted ? 100 : isResponded ? 50 : 0;
+                      
+                      return (
+                        <Card key={campaign.id} className="hover:shadow-md transition-shadow">
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex-1">
+                                <Link 
+                                  href={`/vendor-management/campaigns/${campaign.id}`}
+                                  className="text-lg font-semibold hover:text-blue-600 transition-colors"
+                                >
+                                  {campaign.name}
+                                </Link>
+                                <p className="text-gray-600 mt-1">{campaign.description}</p>
+                              </div>
+                              <div className="flex gap-2 ml-4">
+                                <Badge className={getStatusColor(campaign.status)}>
+                                  {campaign.status}
+                                </Badge>
+                                <Badge className={getPriorityColor(campaign.settings.priority)}>
+                                  {campaign.settings.priority}
+                                </Badge>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-gray-400" />
+                                <div>
+                                  <p className="text-sm text-gray-600">Started</p>
+                                  <p className="font-medium">{formatDate(campaign.scheduledStart)}</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-gray-400" />
+                                <div>
+                                  <p className="text-sm text-gray-600">Duration</p>
+                                  <p className="font-medium">{campaign.settings.portalAccessDuration} days</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <Target className="h-4 w-4 text-gray-400" />
+                                <div>
+                                  <p className="text-sm text-gray-600">Progress</p>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-12 bg-gray-200 rounded-full h-2">
+                                      <div 
+                                        className="bg-blue-600 h-2 rounded-full" 
+                                        style={{ width: `${vendorProgress}%` }}
+                                      />
+                                    </div>
+                                    <span className="text-sm font-medium">{vendorProgress}%</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <TrendingUp className="h-4 w-4 text-gray-400" />
+                                <div>
+                                  <p className="text-sm text-gray-600">Status</p>
+                                  <p className="font-medium">
+                                    {isCompleted ? 'Completed' : isResponded ? 'In Progress' : 'Pending'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-between pt-4 border-t">
+                              <div className="text-sm text-gray-500">
+                                Campaign Type: <span className="font-medium">{campaign.campaignType}</span>
+                              </div>
+                              <Link href={`/vendor-management/campaigns/${campaign.id}`}>
+                                <Button variant="outline" size="sm">
+                                  View Campaign
+                                </Button>
+                              </Link>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </TabsContent>
             
             <TabsContent value="history" className="space-y-4">
