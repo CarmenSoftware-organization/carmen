@@ -21,6 +21,24 @@ export {
   type PermissionValidationRule
 } from './use-permissions'
 
+// Enhanced ABAC Permission Hooks
+export {
+  useEnhancedPermission,
+  useUserAttributes,
+  useEnhancedBulkPermissions,
+  usePermissionMonitoring,
+  useConditionalPermissions,
+  usePermissionFeatureFlags,
+  useAdvancedPermissionValidation,
+  usePermissionAnalytics,
+  usePermissionSafeWrapper,
+  useHasEnhancedPermission,
+  useEnhancedResourcePermissions,
+  enhancedPermissionKeys,
+  type EnhancedPermissionCheckOptions,
+  type AttributeResolutionOptions
+} from './use-enhanced-permissions'
+
 // Price Management Permission Hooks
 export {
   usePermission as usePricePermission,
@@ -47,6 +65,14 @@ export default {
   usePermissionCache,
   useHasPermission,
   useResourcePermissions,
+  
+  // Enhanced ABAC Permissions
+  useEnhancedPermission,
+  useUserAttributes,
+  useEnhancedBulkPermissions,
+  useHasEnhancedPermission,
+  useEnhancedResourcePermissions,
+  usePermissionAnalytics,
   
   // Price Management  
   usePricePermission,

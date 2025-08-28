@@ -1,0 +1,205 @@
+[
+  {
+    "requestType": "access_evaluation",
+    "requestData": {
+      "subject": {
+        "userId": "david.staff",
+        "role": "staff",
+        "department": "kitchen",
+        "location": "main_restaurant"
+      },
+      "resource": {
+        "type": "purchase_request",
+        "id": "PR-2024-001",
+        "attributes": {
+          "value": 750,
+          "category": "food",
+          "department": "kitchen",
+          "requestedBy": "david.staff"
+        }
+      },
+      "action": "create",
+      "environment": {
+        "currentTime": "2024-01-15T14:30:00Z",
+        "location": "main_restaurant",
+        "networkZone": "internal",
+        "businessHours": true,
+        "threatLevel": "low"
+      }
+    },
+    "decision": "PERMIT",
+    "matchedPolicies": ["staff_basic_purchase_policy"],
+    "evaluationMetadata": {
+      "evaluationTime": "2024-01-15T14:30:01Z",
+      "processingTimeMs": 45,
+      "rulesEvaluated": 3,
+      "obligationCount": 1
+    }
+  },
+  {
+    "requestType": "access_evaluation",
+    "requestData": {
+      "subject": {
+        "userId": "david.staff",
+        "role": "staff",
+        "department": "kitchen",
+        "location": "main_restaurant"
+      },
+      "resource": {
+        "type": "purchase_request",
+        "id": "PR-2024-002",
+        "attributes": {
+          "value": 2500,
+          "category": "food",
+          "department": "kitchen",
+          "requestedBy": "david.staff"
+        }
+      },
+      "action": "create",
+      "environment": {
+        "currentTime": "2024-01-15T14:35:00Z",
+        "location": "main_restaurant",
+        "networkZone": "internal",
+        "businessHours": true,
+        "threatLevel": "low"
+      }
+    },
+    "decision": "DENY",
+    "matchedPolicies": ["staff_basic_purchase_policy"],
+    "evaluationMetadata": {
+      "evaluationTime": "2024-01-15T14:35:01Z",
+      "processingTimeMs": 32,
+      "rulesEvaluated": 3,
+      "obligationCount": 0,
+      "denyReason": "Purchase value ($2500) exceeds user approval limit ($500)"
+    }
+  },
+  {
+    "requestType": "access_evaluation", 
+    "requestData": {
+      "subject": {
+        "userId": "maria.chef",
+        "role": "executive_chef",
+        "department": "kitchen",
+        "location": "main_restaurant"
+      },
+      "resource": {
+        "type": "recipe",
+        "id": "RECIPE-001",
+        "attributes": {
+          "category": "appetizer",
+          "status": "draft",
+          "costPerServing": 8.50,
+          "allergens": ["gluten", "dairy"]
+        }
+      },
+      "action": "publish_recipe",
+      "environment": {
+        "currentTime": "2024-01-15T16:20:00Z",
+        "location": "main_restaurant",
+        "networkZone": "internal",
+        "businessHours": true,
+        "threatLevel": "low"
+      }
+    },
+    "decision": "PERMIT",
+    "matchedPolicies": ["chef_recipe_management_policy"],
+    "evaluationMetadata": {
+      "evaluationTime": "2024-01-15T16:20:01Z",
+      "processingTimeMs": 58,
+      "rulesEvaluated": 5,
+      "obligationCount": 2,
+      "obligations": ["cost_validation", "allergen_verification"]
+    }
+  },
+  {
+    "requestType": "emergency_override",
+    "requestData": {
+      "subject": {
+        "userId": "john.manager",
+        "role": "general_manager",
+        "department": "operations",
+        "location": "main_restaurant"
+      },
+      "resource": {
+        "type": "inventory_item", 
+        "id": "INV-FOOD-001",
+        "attributes": {
+          "category": "food",
+          "currentStock": 0,
+          "criticalLevel": 5,
+          "location": "main_restaurant"
+        }
+      },
+      "action": "emergency_override",
+      "environment": {
+        "currentTime": "2024-01-15T22:45:00Z",
+        "location": "main_restaurant",
+        "networkZone": "internal",
+        "businessHours": false,
+        "emergencyMode": true,
+        "threatLevel": "medium"
+      },
+      "justification": "Critical food item out of stock during dinner service - need immediate procurement approval"
+    },
+    "decision": "PERMIT",
+    "matchedPolicies": ["emergency_override_policy"],
+    "evaluationMetadata": {
+      "evaluationTime": "2024-01-15T22:45:02Z",
+      "processingTimeMs": 78,
+      "rulesEvaluated": 4,
+      "obligationCount": 3,
+      "obligations": ["emergency_audit_log", "manager_notification", "review_required"]
+    }
+  },
+  {
+    "requestType": "bulk_evaluation",
+    "requestData": {
+      "subject": {
+        "userId": "sarah.purchasing",
+        "role": "department_manager",
+        "department": "procurement", 
+        "location": "main_restaurant"
+      },
+      "resources": [
+        {
+          "type": "purchase_request",
+          "id": "PR-2024-003",
+          "attributes": {"value": 5000, "category": "equipment"}
+        },
+        {
+          "type": "purchase_request", 
+          "id": "PR-2024-004",
+          "attributes": {"value": 1200, "category": "supplies"}
+        },
+        {
+          "type": "vendor",
+          "id": "VENDOR-001",
+          "attributes": {"status": "active", "category": "food_supplier"}
+        }
+      ],
+      "action": "batch_approval",
+      "environment": {
+        "currentTime": "2024-01-16T09:15:00Z",
+        "location": "main_restaurant",
+        "networkZone": "internal", 
+        "businessHours": true,
+        "threatLevel": "low",
+        "financialPeriod": {"periodEndApproaching": false}
+      }
+    },
+    "decision": "PERMIT",
+    "matchedPolicies": ["department_manager_approval_policy"],
+    "evaluationMetadata": {
+      "evaluationTime": "2024-01-16T09:15:03Z",
+      "processingTimeMs": 156,
+      "rulesEvaluated": 12,
+      "obligationCount": 4,
+      "bulkResults": [
+        {"resourceId": "PR-2024-003", "decision": "PERMIT"},
+        {"resourceId": "PR-2024-004", "decision": "PERMIT"},
+        {"resourceId": "VENDOR-001", "decision": "PERMIT"}
+      ]
+    }
+  }
+]

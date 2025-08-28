@@ -79,18 +79,35 @@ export default function PolicyManagementPage() {
   }, [filters]);
 
   const handleCreatePolicy = () => {
-    // Navigate to policy builder or open modal
-    console.log('Create new policy');
+    // Navigate to policy builder
+    window.location.href = '/system-administration/permission-management/policies/builder';
   };
 
   const handleEditPolicy = (policyId: string) => {
-    // Navigate to policy editor
-    console.log('Edit policy:', policyId);
+    // Navigate to policy builder with edit mode
+    window.location.href = `/system-administration/permission-management/policies/builder?edit=${policyId}`;
   };
 
   const handleViewPolicy = (policyId: string) => {
     // Navigate to policy details view
-    console.log('View policy:', policyId);
+    window.location.href = `/system-administration/permission-management/policies/${policyId}`;
+  };
+
+  const handleTestPolicy = (policyId: string) => {
+    // Navigate to policy testing
+    console.log('Test policy:', policyId);
+    // Could open a modal or navigate to test page
+  };
+
+  const handleClonePolicy = (policyId: string) => {
+    // Navigate to policy builder with clone mode
+    window.location.href = `/system-administration/permission-management/policies/builder?clone=${policyId}`;
+  };
+
+  const handleToggleStatus = (policyId: string, enabled: boolean) => {
+    // In a real app, this would call an API to update policy status
+    console.log('Toggle policy status:', policyId, enabled);
+    // Would update local state or refetch data
   };
 
   const handleSavePreset = (name: string, filters: PolicyFilters) => {
@@ -142,6 +159,9 @@ export default function PolicyManagementPage() {
         onCreatePolicy={handleCreatePolicy}
         onEditPolicy={handleEditPolicy}
         onViewPolicy={handleViewPolicy}
+        onTestPolicy={handleTestPolicy}
+        onClonePolicy={handleClonePolicy}
+        onToggleStatus={handleToggleStatus}
       />
     </div>
   );

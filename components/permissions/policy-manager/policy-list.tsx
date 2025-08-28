@@ -13,7 +13,17 @@ import {
   CheckSquare,
   Square,
   Eye,
-  EyeOff
+  EyeOff,
+  Play,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Zap,
+  Shield,
+  Activity
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -56,6 +66,9 @@ interface PolicyListProps {
   onCreatePolicy?: () => void;
   onEditPolicy?: (policyId: string) => void;
   onViewPolicy?: (policyId: string) => void;
+  onTestPolicy?: (policyId: string) => void;
+  onClonePolicy?: (policyId: string) => void;
+  onToggleStatus?: (policyId: string, enabled: boolean) => void;
 }
 
 interface SortConfig {
@@ -63,7 +76,14 @@ interface SortConfig {
   direction: 'asc' | 'desc';
 }
 
-export function PolicyList({ onCreatePolicy, onEditPolicy, onViewPolicy }: PolicyListProps) {
+export function PolicyList({ 
+  onCreatePolicy, 
+  onEditPolicy, 
+  onViewPolicy, 
+  onTestPolicy,
+  onClonePolicy,
+  onToggleStatus 
+}: PolicyListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPolicies, setSelectedPolicies] = useState<string[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'name', direction: 'asc' });
@@ -171,8 +191,61 @@ export function PolicyList({ onCreatePolicy, onEditPolicy, onViewPolicy }: Polic
   };
 
   const handleDuplicatePolicy = (policyId: string) => {
-    // In a real app, this would create a copy of the policy
-    console.log('Duplicating policy:', policyId);
+    onClonePolicy?.(policyId);
+  };
+
+  const handleTestPolicy = (policyId: string) => {
+    onTestPolicy?.(policyId);
+  };
+
+  const handleTogglePolicyStatus = (policyId: string) => {
+    const policy = allMockPolicies.find(p => p.id === policyId);
+    if (policy) {
+      onToggleStatus?.(policyId, !policy.enabled);
+    }
+  };
+
+  // Mock health indicators - in real app would come from API
+  const getPolicyHealth = (policy: Policy) => {
+    // Mock performance data based on policy characteristics
+    const baseScore = policy.enabled ? 85 : 50;
+    const priorityBonus = Math.min(policy.priority / 10, 15);
+    const complexityPenalty = policy.rules.length > 3 ? -10 : 0;
+    const score = Math.max(0, Math.min(100, baseScore + priorityBonus + complexityPenalty));
+    
+    return {
+      score,
+      status: score >= 80 ? 'healthy' : score >= 60 ? 'warning' : 'critical',
+      evaluations: Math.floor(Math.random() * 1000) + 100,
+      avgResponseTime: Math.floor(Math.random() * 50) + 5,
+      successRate: Math.floor(Math.random() * 10) + 90
+    };
+  };
+
+  const getHealthIcon = (status: string) => {
+    switch (status) {
+      case 'healthy':
+        return <CheckCircle className="w-3 h-3 text-green-600" />;
+      case 'warning':
+        return <AlertTriangle className="w-3 h-3 text-yellow-600" />;
+      case 'critical':
+        return <AlertTriangle className="w-3 h-3 text-red-600" />;
+      default:
+        return <Minus className="w-3 h-3 text-gray-400" />;
+    }
+  };
+
+  const getPerformanceTrend = () => {
+    const trends = ['up', 'down', 'stable'];
+    const trend = trends[Math.floor(Math.random() * trends.length)];
+    switch (trend) {
+      case 'up':
+        return <TrendingUp className="w-3 h-3 text-green-500" />;
+      case 'down':
+        return <TrendingDown className="w-3 h-3 text-red-500" />;
+      default:
+        return <Minus className="w-3 h-3 text-gray-500" />;
+    }
   };
 
   const handleDeletePolicy = (policyId: string) => {
@@ -350,22 +423,24 @@ export function PolicyList({ onCreatePolicy, onEditPolicy, onViewPolicy }: Polic
                       <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </TableHead>
+                  <TableHead>Health</TableHead>
+                  <TableHead>Performance</TableHead>
                   <TableHead 
                     className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => handleSort('createdAt')}
+                    onClick={() => handleSort('enabled')}
                   >
-                    Created
-                    {sortConfig.field === 'createdAt' && (
+                    Status
+                    {sortConfig.field === 'enabled' && (
                       <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </TableHead>
-                  <TableHead className="w-12"></TableHead>
+                  <TableHead className="w-24">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredAndSortedPolicies.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                       {searchTerm ? 'No policies found matching your search.' : 'No policies created yet.'}
                     </TableCell>
                   </TableRow>
@@ -410,47 +485,101 @@ export function PolicyList({ onCreatePolicy, onEditPolicy, onViewPolicy }: Polic
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {getStatusBadge(policy.enabled)}
+                        {(() => {
+                          const health = getPolicyHealth(policy);
+                          return (
+                            <div className="flex items-center space-x-2">
+                              {getHealthIcon(health.status)}
+                              <span className="text-xs text-muted-foreground">
+                                {health.score}/100
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(policy.createdAt).toLocaleDateString()}
-                          <br />
-                          <span className="text-xs">by {policy.createdBy}</span>
+                        {(() => {
+                          const health = getPolicyHealth(policy);
+                          return (
+                            <div className="flex items-center space-x-2">
+                              {getPerformanceTrend()}
+                              <div className="text-xs">
+                                <div>{health.evaluations} evals</div>
+                                <div className="text-muted-foreground">{health.avgResponseTime}ms</div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
+                      <TableCell>
+                        <button
+                          onClick={() => handleTogglePolicyStatus(policy.id)}
+                          className="inline-flex"
+                        >
+                          {getStatusBadge(policy.enabled)}
+                        </button>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onViewPolicy?.(policy.id)}
+                            className="h-8 w-8 p-0"
+                            title="View Details"
+                          >
+                            <Eye className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTestPolicy(policy.id)}
+                            className="h-8 w-8 p-0"
+                            title="Test Policy"
+                          >
+                            <Play className="h-3 w-3" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">More actions</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => onEditPolicy?.(policy.id)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDuplicatePolicy(policy.id)}>
+                                <Copy className="mr-2 h-4 w-4" />
+                                Clone
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleTogglePolicyStatus(policy.id)}>
+                                {policy.enabled ? (
+                                  <>
+                                    <EyeOff className="mr-2 h-4 w-4" />
+                                    Disable
+                                  </>
+                                ) : (
+                                  <>
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Enable
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleDeletePolicy(policy.id)}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Open menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => onViewPolicy?.(policy.id)}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onEditPolicy?.(policy.id)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDuplicatePolicy(policy.id)}>
-                              <Copy className="mr-2 h-4 w-4" />
-                              Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              onClick={() => handleDeletePolicy(policy.id)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))

@@ -1,0 +1,1248 @@
+// ABAC (Attribute-Based Access Control) Permission Management Schema
+// Dynamic JSON-based approach for flexible resource types, actions, and environments
+// Based on ADR-003: Attribute-Based Access Control Permission System
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions", "relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Example: "postgresql://username:password@localhost:5435/carmen_abac_db"
+}
+
+
+// =============================================================================
+// ABAC CORE ENUMS - Minimal set for system operations
+// =============================================================================
+
+enum PolicyEffect {
+  PERMIT
+  DENY
+}
+
+enum PolicyStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum CombiningAlgorithm {
+  DENY_OVERRIDES
+  PERMIT_OVERRIDES
+  FIRST_APPLICABLE
+  ONLY_ONE_APPLICABLE
+}
+
+enum SubscriptionPackage {
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+  CUSTOM
+}
+
+enum AccessDecisionStatus {
+  PERMIT
+  DENY
+  NOT_APPLICABLE
+  INDETERMINATE
+}
+
+// =============================================================================
+// DYNAMIC RESOURCE AND ACTION DEFINITIONS
+// =============================================================================
+
+// Dynamic resource type definitions - stored as JSON
+model ResourceDefinition {
+  id              String   @id @default(cuid())
+  resourceType    String   @unique // e.g., "purchase_request", "inventory_item"
+  displayName     String   // Human-readable name
+  description     String?
+  category        String   // e.g., "procurement", "inventory", "financial"
+  
+  definition      Json     // Complete resource definition
+  // JSON Structure:
+  // {
+  //   "actions": [
+  //     {"id": "view", "name": "View", "description": "View resource details"},
+  //     {"id": "create", "name": "Create", "description": "Create new resource"},
+  //     {"id": "approve", "name": "Approve", "description": "Approve resource", "requiresApprovalLimit": true}
+  //   ],
+  //   "attributes": [
+  //     {"name": "value", "type": "number", "description": "Monetary value"},
+  //     {"name": "status", "type": "string", "description": "Current status"},
+  //     {"name": "owner", "type": "string", "description": "Resource owner"}
+  //   ],
+  //   "workflows": [
+  //     {"name": "approval", "stages": ["draft", "submitted", "approved", "rejected"]}
+  //   ],
+  //   "classification": {
+  //     "levels": ["public", "internal", "confidential", "restricted"],
+  //     "defaultLevel": "internal"
+  //   }
+  // }
+  
+  isActive        Boolean  @default(true)
+  version         String   @default("1.0")
+  
+  // Audit fields
+  createdBy       String
+  updatedBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("abac_resource_definitions")
+  @@index([resourceType, isActive])
+  @@index([category, isActive])
+}
+
+// Dynamic environment definitions
+model EnvironmentDefinition {
+  id              String   @id @default(cuid())
+  name            String   @unique // e.g., "time_constraints", "location_access"
+  displayName     String
+  description     String?
+  
+  definition      Json     // Environment definition
+  // JSON Structure:
+  // {
+  //   "attributes": [
+  //     {"name": "current_time", "type": "datetime", "source": "system"},
+  //     {"name": "business_hours", "type": "timerange", "source": "config"},
+  //     {"name": "location", "type": "string", "source": "user_context"},
+  //     {"name": "threat_level", "type": "string", "source": "security_system"}
+  //   ],
+  //   "constraints": [
+  //     {"name": "office_hours_only", "condition": "current_time within business_hours"},
+  //     {"name": "secure_location", "condition": "location in secure_zones"}
+  //   ]
+  // }
+  
+  isActive        Boolean  @default(true)
+  
+  // Audit fields
+  createdBy       String
+  updatedBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("abac_environment_definitions")
+  @@index([name, isActive])
+}
+
+// =============================================================================
+// DYNAMIC POLICY SYSTEM
+// =============================================================================
+
+// Complete dynamic policy definition
+model Policy {
+  id                String        @id @default(cuid())
+  name              String        @unique
+  description       String?
+  version           String        @default("1.0")
+  priority          Int           @default(500) // 0-1000, higher = evaluated first
+  effect            PolicyEffect
+  status            PolicyStatus  @default(DRAFT)
+  combiningAlgorithm CombiningAlgorithm @default(DENY_OVERRIDES)
+  
+  policyData        Json          // Complete policy structure
+  // JSON Structure:
+  // {
+  //   "target": {
+  //     "subjects": [
+  //       {"type": "role", "values": ["manager", "chef"]},
+  //       {"type": "department", "values": ["kitchen", "procurement"]},
+  //       {"type": "user", "values": ["user123"]}
+  //     ],
+  //     "resources": [
+  //       {"type": "purchase_request", "attributes": {"value": {"operator": "less_than", "value": 10000}}},
+  //       {"type": "inventory_item", "attributes": {"category": {"operator": "equals", "value": "food"}}}
+  //     ],
+  //     "actions": ["create", "approve", "view"],
+  //     "environment": [
+  //       {"attribute": "time", "operator": "within", "value": "business_hours"},
+  //       {"attribute": "location", "operator": "in", "value": ["main_kitchen", "prep_area"]}
+  //     ]
+  //   },
+  //   "rules": [
+  //     {
+  //       "id": "rule_1",
+  //       "name": "Value Limit Check",
+  //       "priority": 100,
+  //       "condition": {
+  //         "type": "AND",
+  //         "expressions": [
+  //           {
+  //             "type": "simple",
+  //             "attribute": "subject.role",
+  //             "operator": "EQUALS",
+  //             "value": "department_manager"
+  //           },
+  //           {
+  //             "type": "simple", 
+  //             "attribute": "resource.value",
+  //             "operator": "LESS_THAN_OR_EQUAL",
+  //             "value": 5000
+  //           }
+  //         ]
+  //       }
+  //     }
+  //   ],
+  //   "obligations": [
+  //     {
+  //       "type": "LOG_ACCESS",
+  //       "description": "Log all access attempts",
+  //       "parameters": {
+  //         "level": "info",
+  //         "includeDetails": true,
+  //         "auditTrail": true
+  //       }
+  //     },
+  //     {
+  //       "type": "REQUIRE_APPROVAL",
+  //       "description": "Require manager approval for high-value items",
+  //       "parameters": {
+  //         "approverRole": "finance_manager",
+  //         "threshold": 25000
+  //       }
+  //     }
+  //   ],
+  //   "advice": [
+  //     {
+  //       "type": "WARNING",
+  //       "message": "High value transaction - consider additional verification",
+  //       "parameters": {
+  //         "threshold": 10000,
+  //         "suggestedActions": ["verify_vendor", "check_budget"]
+  //       }
+  //     }
+  //   ]
+  // }
+  
+  // Metadata
+  createdBy         String
+  updatedBy         String
+  validFrom         DateTime?
+  validTo           DateTime?
+  tags              String[]      @default([])
+  
+  metadata          Json?         // Additional metadata and configuration
+  
+  // Audit fields
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relationships
+  assignedRoles     RolePolicyAssignment[]
+  evaluationLogs    PolicyEvaluationLog[]
+  testResults       PolicyTestResult[]
+  performanceMetrics PolicyPerformanceMetric[]
+  
+  @@map("abac_policies")
+  @@index([priority, status])
+  @@index([effect, status])
+  @@index([status, validFrom, validTo])
+  @@index([tags])
+}
+
+// =============================================================================
+// DYNAMIC ROLE SYSTEM
+// =============================================================================
+
+// Enhanced dynamic role model
+model Role {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  displayName       String
+  description       String?
+  
+  // Role hierarchy
+  parentId          String?
+  parent            Role?    @relation("RoleHierarchy", fields: [parentId], references: [id])
+  children          Role[]   @relation("RoleHierarchy")
+  level             Int      @default(0)
+  path              String   // Hierarchical path like "/admin/manager/supervisor"
+  
+  roleData          Json     @default("{}")  // Complete role definition
+  // JSON Structure:
+  // {
+  //   "attributes": {
+  //     "department": "kitchen",
+  //     "clearanceLevel": "confidential",
+  //     "approvalLimit": 15000,
+  //     "workShifts": ["morning", "evening"],
+  //     "locations": ["main_kitchen", "prep_area"],
+  //     "specialPermissions": ["recipe_modification", "cost_analysis"]
+  //   },
+  //   "basePermissions": [
+  //     {
+  //       "resource": "purchase_request", 
+  //       "actions": ["view", "create", "submit"],
+  //       "conditions": {"department": "same"}
+  //     },
+  //     {
+  //       "resource": "inventory_item",
+  //       "actions": ["view", "adjust"],
+  //       "conditions": {"location": "assigned"}
+  //     }
+  //   ],
+  //   "inheritance": {
+  //     "inheritsFrom": ["staff", "department_user"],
+  //     "overrides": ["approval_limit"],
+  //     "additions": ["special_reports"]
+  //   },
+  //   "constraints": {
+  //     "timeRestrictions": {
+  //       "allowedHours": "06:00-22:00",
+  //       "allowedDays": ["monday", "tuesday", "wednesday", "thursday", "friday"]
+  //     },
+  //     "locationRestrictions": {
+  //       "allowedLocations": ["main_building", "warehouse"],
+  //       "deniedLocations": ["server_room"]
+  //     }
+  //   }
+  // }
+  
+  // Metadata
+  isSystemRole      Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  priority          Int      @default(0)
+  color             String?  // UI color code
+  icon              String?  // UI icon name
+  
+  // Audit fields
+  createdBy         String
+  updatedBy         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relationships
+  userAssignments   UserRoleAssignment[] @relation("UserRoles")
+  policyAssignments RolePolicyAssignment[]
+  
+  @@map("abac_roles")
+  @@index([parentId, level])
+  @@index([isActive, isSystemRole])
+  @@index([path])
+}
+
+// Dynamic User model for ABAC subjects
+model User {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  email           String   @unique
+  
+  userData        Json     @default("{}")  // Complete user profile and attributes
+  // JSON Structure:
+  // {
+  //   "profile": {
+  //     "firstName": "John",
+  //     "lastName": "Doe",
+  //     "phoneNumber": "+1-555-0123",
+  //     "emergencyContact": "+1-555-0124",
+  //     "employeeId": "EMP-001",
+  //     "dateOfBirth": "1985-01-01",
+  //     "hireDate": "2020-01-01"
+  //   },
+  //   "context": {
+  //     "primaryRole": "chef",
+  //     "department": "kitchen",
+  //     "location": "main_restaurant",
+  //     "clearanceLevel": "internal",
+  //     "activeShift": "day",
+  //     "timezone": "America/New_York"
+  //   },
+  //   "attributes": {
+  //     "approvalLimit": 5000,
+  //     "weekendAccess": true,
+  //     "mobileAccess": true,
+  //     "specializations": ["recipe_development"],
+  //     "certifications": ["haccp", "food_safety"]
+  //   },
+  //   "preferences": {
+  //     "language": "en",
+  //     "dateFormat": "MM/dd/yyyy",
+  //     "timeFormat": "12h",
+  //     "currency": "USD",
+  //     "notifications": {"email": true, "sms": false, "push": true}
+  //   }
+  // }
+  
+  // User status
+  isActive        Boolean  @default(true)
+  lastLoginAt     DateTime?
+  
+  // Audit fields
+  createdBy       String
+  updatedBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  roleAssignments UserRoleAssignment[]
+  
+  @@map("abac_users")
+  @@index([name, isActive])
+  @@index([email])
+  @@index([isActive, lastLoginAt])
+}
+
+// User-Role Assignment with dynamic context
+model UserRoleAssignment {
+  id              String    @id @default(cuid())
+  userId          String
+  roleId          String
+  
+  // Contextual assignment stored as JSON
+  context         Json      @default("{}")
+  // JSON Structure:
+  // {
+  //   "isPrimary": true,
+  //   "scope": {
+  //     "departments": ["kitchen", "procurement"],
+  //     "locations": ["main_building", "warehouse_1"],
+  //     "resources": ["purchase_request", "inventory_item"]
+  //   },
+  //   "constraints": {
+  //     "effectiveFrom": "2024-01-01T00:00:00Z",
+  //     "effectiveTo": "2024-12-31T23:59:59Z",
+  //     "workShifts": ["day", "evening"],
+  //     "maxApprovalValue": 10000
+  //   },
+  //   "customAttributes": {
+  //     "trainingCompleted": ["food_safety", "inventory_management"],
+  //     "certifications": ["haccp", "allergen_awareness"],
+  //     "delegatedAuthorities": ["approve_overtime", "schedule_maintenance"]
+  //   }
+  // }
+  
+  // Assignment metadata
+  assignedBy      String
+  assignedAt      DateTime  @default(now())
+  reason          String?
+  isActive        Boolean   @default(true)
+  
+  // Audit fields  
+  createdBy       String
+  updatedBy       String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relationships
+  user            User      @relation(fields: [userId], references: [id])
+  role            Role      @relation("UserRoles", fields: [roleId], references: [id])
+  
+  @@unique([userId, roleId])
+  @@map("abac_user_role_assignments")
+  @@index([userId])
+  @@index([roleId])
+  @@index([isActive])
+}
+
+// Role-Policy Assignment
+model RolePolicyAssignment {
+  id          String   @id @default(cuid())
+  roleId      String
+  policyId    String
+  
+  context     Json     @default("{}")
+  // JSON Structure:
+  // {
+  //   "priority": 100,
+  //   "isInherited": false,
+  //   "scope": {
+  //     "departments": ["kitchen"],
+  //     "locations": ["main_building"],
+  //     "effectiveFrom": "2024-01-01T00:00:00Z",
+  //     "effectiveTo": "2024-12-31T23:59:59Z"
+  //   },
+  //   "conditions": {
+  //     "timeRestrictions": "business_hours_only",
+  //     "approvalRequired": true,
+  //     "auditLevel": "detailed"
+  //   }
+  // }
+  
+  // Metadata
+  assignedBy  String
+  assignedAt  DateTime @default(now())
+  reason      String?
+  
+  // Audit fields
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  role        Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  policy      Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  
+  @@unique([roleId, policyId])
+  @@map("abac_role_policy_assignments")
+  @@index([roleId])
+  @@index([policyId])
+}
+
+// =============================================================================
+// DYNAMIC ATTRIBUTE MANAGEMENT
+// =============================================================================
+
+// Universal attribute storage for subjects, resources, and environment
+model Attribute {
+  id              String   @id @default(cuid())
+  
+  // Attribute classification
+  attributeType   String   // "subject", "resource", "environment"
+  entityType      String   // "user", "purchase_request", "time_constraint"
+  entityId        String?  // Specific entity ID (null for global environment attributes)
+  
+  // Attribute definition
+  name            String   // e.g., 'department', 'value', 'current_time'
+  
+  value           Json     // Flexible attribute value with metadata
+  // JSON Structure:
+  // {
+  //   "rawValue": "kitchen",
+  //   "dataType": "string",
+  //   "computedValue": "kitchen",
+  //   "confidence": 1.0,
+  //   "source": "user_profile",
+  //   "metadata": {
+  //     "lastVerified": "2024-01-15T10:00:00Z",
+  //     "verificationMethod": "manual_entry"
+  //   },
+  //   "constraints": {
+  //     "allowedValues": ["kitchen", "front_office", "maintenance"],
+  //     "validationRules": ["must_be_active_department"]
+  //   }
+  // }
+  
+  // Context and scope
+  context         Json?    @default("{}")
+  // JSON Structure:
+  // {
+  //   "scope": {
+  //     "departments": ["kitchen"],
+  //     "locations": ["main_building"],
+  //     "workShifts": ["day", "evening"]
+  //   },
+  //   "temporal": {
+  //     "effectiveFrom": "2024-01-01T00:00:00Z",
+  //     "effectiveTo": "2024-12-31T23:59:59Z",
+  //     "recurringPattern": "daily",
+  //     "timezone": "America/New_York"
+  //   },
+  //   "conditions": {
+  //     "requiresApproval": false,
+  //     "auditRequired": true,
+  //     "inheritFromParent": true
+  //   }
+  // }
+  
+  // Audit fields
+  createdBy       String
+  updatedBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([attributeType, entityType, entityId, name])
+  @@map("abac_attributes")
+  @@index([attributeType, entityType])
+  @@index([entityId, name])
+  @@index([name])
+}
+
+// =============================================================================
+// ACCESS CONTROL AND EVALUATION
+// =============================================================================
+
+// Dynamic access request with full context
+model AccessRequest {
+  id                String            @id @default(cuid())
+  
+  // Request identification
+  requestType       String            // Type of access request (access_evaluation, emergency_override, bulk_evaluation)
+  sessionId         String?
+  
+  requestData       Json              // Complete request context
+  // JSON Structure:
+  // {
+  //   "subject": {
+  //     "userId": "user123",
+  //     "attributes": {
+  //       "roles": ["chef", "department_manager"],
+  //       "department": "kitchen",
+  //       "clearanceLevel": "confidential",
+  //       "approvalLimit": 15000,
+  //       "currentLocation": "main_kitchen",
+  //       "workShift": "day"
+  //     }
+  //   },
+  //   "resource": {
+  //     "resourceType": "purchase_request",
+  //     "resourceId": "pr_12345",
+  //     "attributes": {
+  //       "value": 8500,
+  //       "status": "draft",
+  //       "department": "kitchen",
+  //       "vendor": "vendor_456",
+  //       "category": "food_ingredients",
+  //       "urgency": "normal"
+  //     }
+  //   },
+  //   "action": {
+  //     "actionType": "approve",
+  //     "attributes": {
+  //       "approvalLevel": "department",
+  //       "bypassReview": false,
+  //       "reason": "routine_approval"
+  //     }
+  //   },
+  //   "environment": {
+  //     "timestamp": "2024-01-15T14:30:00Z",
+  //     "location": "main_kitchen",
+  //     "networkZone": "internal",
+  //     "deviceType": "desktop",
+  //     "threatLevel": "low",
+  //     "businessHours": true
+  //   }
+  // }
+  
+  evaluationResult  Json              // Complete evaluation result
+  // JSON Structure:
+  // {
+  //   "decision": "PERMIT",
+  //   "confidence": 0.95,
+  //   "applicablePolicies": ["policy_123", "policy_456"],
+  //   "evaluatedRules": [
+  //     {
+  //       "policyId": "policy_123",
+  //       "ruleId": "rule_1",
+  //       "result": "PERMIT",
+  //       "matchedConditions": ["department_match", "value_limit_ok"]
+  //     }
+  //   ],
+  //   "obligations": [
+  //     {
+  //       "type": "LOG_ACCESS",
+  //       "parameters": {"level": "info", "auditRequired": true},
+  //       "fulfilled": false
+  //     }
+  //   ],
+  //   "advice": [
+  //     {
+  //       "type": "RECOMMENDATION",
+  //       "message": "Consider bulk ordering to reduce costs",
+  //       "parameters": {"suggestedVendor": "vendor_789"}
+  //     }
+  //   ],
+  //   "debugInfo": {
+  //     "evaluationTime": 45,
+  //     "policiesEvaluated": 3,
+  //     "cacheHit": false,
+  //     "errorMessages": []
+  //   }
+  // }
+  
+  // Request metadata
+  ipAddress         String?
+  userAgent         String?
+  
+  // Performance metrics
+  evaluationTime    Int?              // milliseconds
+  processingTime    Int?              // milliseconds
+  
+  // Final decision
+  decision          AccessDecisionStatus
+  matchedPolicies   String[]          @default([])  // List of policy IDs that matched
+  
+  // Evaluation metadata
+  evaluationMetadata Json?            // Additional evaluation metadata
+  
+  // Error handling
+  errorCode         String?
+  errorMessage      String?
+  
+  // Audit fields
+  createdAt         DateTime          @default(now())
+  
+  // Relationships
+  evaluationLogs    PolicyEvaluationLog[]
+  
+  @@map("abac_access_requests")
+  @@index([requestType])
+  @@index([decision])
+  @@index([createdAt])
+}
+
+// Policy evaluation log with dynamic data
+model PolicyEvaluationLog {
+  id              String            @id @default(cuid())
+  accessRequestId String
+  policyId        String
+  
+  evaluationData  Json              // Complete evaluation details
+  // JSON Structure:
+  // {
+  //   "policyName": "Kitchen Department Access",
+  //   "policyVersion": "1.2",
+  //   "evaluationSteps": [
+  //     {
+  //       "step": "target_matching",
+  //       "result": "MATCH",
+  //       "details": {
+  //         "subjectMatch": true,
+  //         "resourceMatch": true,
+  //         "actionMatch": true,
+  //         "environmentMatch": true
+  //       }
+  //     },
+  //     {
+  //       "step": "rule_evaluation",
+  //       "result": "PERMIT",
+  //       "ruleResults": [
+  //         {
+  //           "ruleId": "rule_1",
+  //           "ruleName": "Department Access",
+  //           "result": "PERMIT",
+  //           "conditionResults": [
+  //             {"condition": "subject.department == 'kitchen'", "result": true},
+  //             {"condition": "resource.value <= 10000", "result": true}
+  //           ]
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   "finalDecision": "PERMIT",
+  //   "obligationsTriggered": ["LOG_ACCESS"],
+  //   "adviceGenerated": ["COST_OPTIMIZATION"],
+  //   "debugInfo": {
+  //     "attributesResolved": 15,
+  //     "expressionsEvaluated": 8,
+  //     "cacheHits": 3,
+  //     "totalTime": 45
+  //   }
+  // }
+  
+  finalDecision   AccessDecisionStatus
+  evaluationTime  Int               // milliseconds
+  
+  // Audit fields
+  createdAt       DateTime          @default(now())
+  
+  // Relationships
+  accessRequest   AccessRequest     @relation(fields: [accessRequestId], references: [id], onDelete: Cascade)
+  policy          Policy            @relation(fields: [policyId], references: [id])
+  
+  @@map("abac_policy_evaluation_logs")
+  @@index([accessRequestId])
+  @@index([policyId, finalDecision])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// SUBSCRIPTION AND PACKAGE MANAGEMENT
+// =============================================================================
+
+// Dynamic subscription configuration
+model SubscriptionConfig {
+  id                    String              @id @default(cuid())
+  organizationId        String              @unique
+  
+  // Package information
+  packageType           SubscriptionPackage
+  packageName           String
+  packageDescription    String?
+  
+  subscriptionData      Json                // Complete subscription configuration
+  // JSON Structure:
+  // {
+  //   "limits": {
+  //     "maxUsers": 100,
+  //     "maxLocations": 5,
+  //     "maxDepartments": 20,
+  //     "maxPolicies": 500,
+  //     "maxRoles": 50,
+  //     "maxResourceTypes": 30
+  //   },
+  //   "features": {
+  //     "enabledModules": [
+  //       {"module": "procurement", "version": "1.0", "features": ["purchase_requests", "approvals"]},
+  //       {"module": "inventory", "version": "1.2", "features": ["stock_management", "counts"]},
+  //       {"module": "reporting", "version": "1.0", "features": ["basic_reports"]}
+  //     ],
+  //     "customFeatures": {
+  //       "advancedAnalytics": true,
+  //       "apiAccess": true,
+  //       "customIntegrations": false,
+  //       "whiteLabeling": false
+  //     },
+  //     "resourceAccess": {
+  //       "allowedResourceTypes": ["purchase_request", "inventory_item", "vendor"],
+  //       "restrictedActions": ["bulk_delete", "mass_approval"],
+  //       "auditLevel": "full"
+  //     }
+  //   },
+  //   "usage": {
+  //     "currentUsers": 45,
+  //     "currentLocations": 3,
+  //     "currentPolicies": 127,
+  //     "currentRoles": 12,
+  //     "storageUsed": "2.1GB",
+  //     "apiCallsThisMonth": 15420
+  //   },
+  //   "billing": {
+  //     "billingContact": "admin@company.com",
+  //     "technicalContact": "it@company.com",
+  //     "billingCycle": "monthly",
+  //     "autoRenewal": true
+  //   }
+  // }
+  
+  // Subscription timeline
+  subscriptionStart     DateTime
+  subscriptionEnd       DateTime?
+  isActive              Boolean             @default(true)
+  
+  // Audit fields
+  createdBy             String
+  updatedBy             String
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  @@map("abac_subscription_configs")
+  @@index([organizationId, isActive])
+  @@index([packageType])
+}
+
+// =============================================================================
+// TESTING AND VALIDATION
+// =============================================================================
+
+// Dynamic policy test scenarios
+model PolicyTestScenario {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  
+  scenarioData      Json     // Complete test scenario
+  // JSON Structure:
+  // {
+  //   "testInput": {
+  //     "subject": {
+  //       "userId": "test_user_1",
+  //       "attributes": {
+  //         "roles": ["chef"],
+  //         "department": "kitchen",
+  //         "clearanceLevel": "internal"
+  //       }
+  //     },
+  //     "resource": {
+  //       "resourceType": "purchase_request",
+  //       "resourceId": "test_pr_1",
+  //       "attributes": {
+  //         "value": 5000,
+  //         "status": "draft",
+  //         "department": "kitchen"
+  //       }
+  //     },
+  //     "action": {
+  //       "actionType": "approve",
+  //       "attributes": {
+  //         "approvalLevel": "department"
+  //       }
+  //     },
+  //     "environment": {
+  //       "timestamp": "2024-01-15T10:00:00Z",
+  //       "location": "main_kitchen",
+  //       "businessHours": true
+  //     }
+  //   },
+  //   "expectedOutput": {
+  //     "decision": "PERMIT",
+  //     "expectedObligations": ["LOG_ACCESS"],
+  //     "expectedAdvice": [],
+  //     "minimumConfidence": 0.9
+  //   },
+  //   "testMetadata": {
+  //     "category": "approval_workflow",
+  //     "tags": ["kitchen", "approval", "department_manager"],
+  //     "priority": "high",
+  //     "complexity": "medium"
+  //   }
+  // }
+  
+  // Test metadata
+  category          String?  // e.g., 'smoke', 'regression', 'edge-case'
+  tags              String[] @default([])
+  
+  // Audit fields
+  createdBy         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relationships
+  testResults       PolicyTestResult[]
+  
+  @@map("abac_policy_test_scenarios")
+  @@index([category])
+  @@index([tags])
+  @@index([createdBy])
+}
+
+// Dynamic policy test results
+model PolicyTestResult {
+  id              String                @id @default(cuid())
+  scenarioId      String
+  policyId        String
+  
+  // Test execution
+  testRunId       String                // Groups multiple tests together
+  executedAt      DateTime              @default(now())
+  executedBy      String
+  
+  resultData      Json                  // Complete test result
+  // JSON Structure:
+  // {
+  //   "actualResult": {
+  //     "decision": "PERMIT",
+  //     "actualObligations": ["LOG_ACCESS", "NOTIFY_MANAGER"],
+  //     "actualAdvice": ["COST_OPTIMIZATION"],
+  //     "confidence": 0.95,
+  //     "evaluationTime": 45
+  //   },
+  //   "comparison": {
+  //     "decisionMatch": true,
+  //     "obligationMatch": false,
+  //     "adviceMatch": true,
+  //     "confidenceMatch": true,
+  //     "unexpectedObligations": ["NOTIFY_MANAGER"],
+  //     "missingAdvice": []
+  //   },
+  //   "testOutcome": {
+  //     "passed": false,
+  //     "score": 0.8,
+  //     "failureReasons": ["unexpected_obligation"],
+  //     "warnings": ["execution_time_high"]
+  //   },
+  //   "debugInfo": {
+  //     "policiesEvaluated": 3,
+  //     "rulesMatched": 2,
+  //     "attributesResolved": 12,
+  //     "errorMessages": []
+  //   }
+  // }
+  
+  // Test outcome
+  passed          Boolean
+  score           Float                 // 0.0 to 1.0
+  executionTime   Int                   // milliseconds
+  
+  // Relationships
+  scenario        PolicyTestScenario    @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  policy          Policy                @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  
+  @@map("abac_policy_test_results")
+  @@index([testRunId])
+  @@index([scenarioId, policyId])
+  @@index([passed, executedAt])
+  @@index([score])
+}
+
+// =============================================================================
+// PERFORMANCE AND ANALYTICS
+// =============================================================================
+
+// Dynamic policy performance metrics
+model PolicyPerformanceMetric {
+  id                    String   @id @default(cuid())
+  policyId              String
+  
+  // Time period
+  metricDate            DateTime
+  periodType            String   @default("daily") // 'hourly', 'daily', 'weekly', 'monthly'
+  
+  performanceData       Json     // Complete performance metrics
+  // JSON Structure:
+  // {
+  //   "evaluation": {
+  //     "totalEvaluations": 1250,
+  //     "averageEvaluationTime": 23,
+  //     "maxEvaluationTime": 89,
+  //     "minEvaluationTime": 5,
+  //     "timeoutCount": 0
+  //   },
+  //   "decisions": {
+  //     "permitCount": 980,
+  //     "denyCount": 270,
+  //     "errorCount": 0,
+  //     "notApplicableCount": 15
+  //   },
+  //   "cache": {
+  //     "cacheHitRate": 0.76,
+  //     "cacheSize": 2048,
+  //     "cacheEvictions": 125
+  //   },
+  //   "resources": {
+  //     "topResources": [
+  //       {"resourceType": "purchase_request", "count": 450},
+  //       {"resourceType": "inventory_item", "count": 320}
+  //     ],
+  //     "topActions": [
+  //       {"action": "view", "count": 670},
+  //       {"action": "approve", "count": 280}
+  //     ]
+  //   },
+  //   "quality": {
+  //     "ruleEffectiveness": 0.92,
+  //     "policyRelevance": 0.88,
+  //     "obligationFulfillment": 0.95
+  //   }
+  // }
+  
+  // Relationships
+  policy                Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  
+  @@unique([policyId, metricDate, periodType])
+  @@map("abac_policy_performance_metrics")
+  @@index([metricDate, periodType])
+  @@index([policyId])
+}
+
+// Dynamic user access analytics
+model UserAccessAnalytic {
+  id                  String            @id @default(cuid())
+  userId              String
+  
+  // Time period
+  analyticDate        DateTime
+  periodType          String            @default("daily")
+  
+  analyticData        Json              // Complete access analytics
+  // JSON Structure:
+  // {
+  //   "requests": {
+  //     "total": 450,
+  //     "approved": 380,
+  //     "denied": 65,
+  //     "errors": 5
+  //   },
+  //   "performance": {
+  //     "averageResponseTime": 35,
+  //     "maxResponseTime": 120,
+  //     "cacheHitRate": 0.72
+  //   },
+  //   "resources": {
+  //     "accessByType": [
+  //       {"resourceType": "purchase_request", "requests": 180, "approvals": 165},
+  //       {"resourceType": "inventory_item", "requests": 125, "approvals": 120}
+  //     ],
+  //     "actionBreakdown": [
+  //       {"action": "view", "requests": 200, "approvals": 195},
+  //       {"action": "create", "requests": 80, "approvals": 72}
+  //     ]
+  //   },
+  //   "patterns": {
+  //     "peakHours": ["09:00", "14:00", "16:00"],
+  //     "commonDenialReasons": ["insufficient_clearance", "outside_business_hours"],
+  //     "frequentResources": ["purchase_request", "inventory_item"],
+  //     "unusualActivity": []
+  //   },
+  //   "compliance": {
+  //     "obligationsFulfilled": 0.98,
+  //     "auditableActions": 445,
+  //     "privacyCompliance": true
+  //   }
+  // }
+  
+  @@unique([userId, analyticDate, periodType])
+  @@map("abac_user_access_analytics")
+  @@index([userId, analyticDate])
+  @@index([analyticDate, periodType])
+}
+
+// =============================================================================
+// AUDIT AND COMPLIANCE
+// =============================================================================
+
+// Comprehensive dynamic audit log
+model AuditLog {
+  id                String   @id @default(cuid())
+  
+  // Event classification
+  eventType         String   // e.g., 'POLICY_CREATED', 'ACCESS_GRANTED', 'ROLE_ASSIGNED'
+  eventCategory     String   // e.g., 'POLICY', 'ACCESS', 'ROLE', 'USER', 'SYSTEM'
+  
+  eventData         Json     // Complete event data
+  // JSON Structure:
+  // {
+  //   "actor": {
+  //     "userId": "user123",
+  //     "sessionId": "session_456",
+  //     "ipAddress": "192.168.1.100",
+  //     "userAgent": "Mozilla/5.0...",
+  //     "roles": ["admin", "policy_manager"]
+  //   },
+  //   "action": {
+  //     "actionType": "CREATE",
+  //     "resource": "policy",
+  //     "resourceId": "policy_789",
+  //     "resourceName": "Kitchen Access Policy",
+  //     "details": {
+  //       "policyVersion": "1.0",
+  //       "effect": "PERMIT",
+  //       "priority": 500
+  //     }
+  //   },
+  //   "context": {
+  //     "requestId": "req_12345",
+  //     "businessContext": "New employee onboarding",
+  //     "location": "main_office",
+  //     "timestamp": "2024-01-15T10:30:00Z"
+  //   },
+  //   "changes": {
+  //     "changeType": "CREATE",
+  //     "oldValues": null,
+  //     "newValues": {
+  //       "name": "Kitchen Access Policy",
+  //       "effect": "PERMIT",
+  //       "status": "DRAFT"
+  //     },
+  //     "fieldsChanged": ["name", "effect", "status"]
+  //   },
+  //   "result": {
+  //     "success": true,
+  //     "errorCode": null,
+  //     "errorMessage": null,
+  //     "warnings": []
+  //   },
+  //   "compliance": {
+  //     "complianceFlags": ["GDPR", "AUDIT_REQUIRED"],
+  //     "retentionPeriod": "7_years",
+  //     "dataClassification": "internal",
+  //     "privacyImpact": "none"
+  //   }
+  // }
+  
+  // Result status
+  success           Boolean  @default(true)
+  
+  // Compliance and retention
+  complianceFlags   String[] @default([]) // e.g., ['GDPR', 'HIPAA', 'SOX']
+  retentionDate     DateTime?              // When this log can be purged
+  
+  // Audit metadata
+  timestamp         DateTime @default(now())
+  source            String   @default("system") // 'system', 'api', 'ui', 'batch'
+  
+  @@map("abac_audit_logs")
+  @@index([eventType, eventCategory])
+  @@index([timestamp])
+  @@index([complianceFlags])
+}
+
+// =============================================================================
+// CACHE AND OPTIMIZATION
+// =============================================================================
+
+// Dynamic permission cache
+model PermissionCache {
+  id                String   @id @default(cuid())
+  
+  // Cache key components
+  userId            String
+  contextHash       String   // Hash of complete request context
+  
+  decisionData      Json     // Complete cached decision
+  // JSON Structure:
+  // {
+  //   "request": {
+  //     "resourceType": "purchase_request",
+  //     "resourceId": "pr_123",
+  //     "action": "approve",
+  //     "contextHash": "abc123def456"
+  //   },
+  //   "decision": {
+  //     "result": "PERMIT",
+  //     "confidence": 0.95,
+  //     "obligations": ["LOG_ACCESS"],
+  //     "advice": ["COST_OPTIMIZATION"],
+  //     "policyVersions": ["policy_1:v1.2", "policy_2:v2.0"]
+  //   },
+  //   "metadata": {
+  //     "sourceRequestId": "req_12345",
+  //     "evaluationTime": 45,
+  //     "policiesEvaluated": 3,
+  //     "attributesResolved": 15
+  //   }
+  // }
+  
+  // Cache metadata
+  createdAt         DateTime @default(now())
+  expiresAt         DateTime
+  hitCount          Int      @default(0)
+  lastAccessed      DateTime @default(now())
+  
+  @@unique([userId, contextHash])
+  @@map("abac_permission_cache")
+  @@index([userId, expiresAt])
+  @@index([expiresAt]) // For cache cleanup
+  @@index([lastAccessed]) // For LRU eviction
+}
+
+// =============================================================================
+// MIGRATION AND SYSTEM MANAGEMENT
+// =============================================================================
+
+// Dynamic policy migration tracking
+model PolicyMigration {
+  id                String   @id @default(cuid())
+  migrationName     String   @unique
+  description       String
+  
+  // Migration details
+  fromVersion       String
+  toVersion         String
+  migrationType     String   // e.g., 'SCHEMA', 'DATA', 'POLICY'
+  
+  migrationData     Json?    // Complete migration data
+  // JSON Structure:
+  // {
+  //   "migrationPlan": {
+  //     "steps": [
+  //       {"step": 1, "action": "backup_policies", "description": "Backup existing policies"},
+  //       {"step": 2, "action": "update_schema", "description": "Update policy schema"},
+  //       {"step": 3, "action": "migrate_data", "description": "Convert policy data"}
+  //     ],
+  //     "estimatedDuration": "30_minutes",
+  //     "rollbackPlan": "automatic"
+  //   },
+  //   "execution": {
+  //     "executedSteps": [1, 2],
+  //     "failedSteps": [],
+  //     "warnings": ["policy_123_deprecated_field"],
+  //     "affectedRecords": 450
+  //   },
+  //   "results": {
+  //     "policiesMigrated": 125,
+  //     "policiesSkipped": 5,
+  //     "policiesFailed": 0,
+  //     "dataIntegrityChecks": "passed"
+  //   }
+  // }
+  
+  // Execution status
+  executedAt        DateTime?
+  executedBy        String?
+  success           Boolean  @default(false)
+  
+  // Audit fields
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("abac_policy_migrations")
+  @@index([migrationName, success])
+  @@index([migrationType])
+}

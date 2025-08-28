@@ -1,0 +1,434 @@
+[
+  {
+    "name": "time_constraints",
+    "displayName": "Time Constraints",
+    "description": "Time-based access control constraints",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "attributes": [
+        {
+          "name": "current_time",
+          "type": "datetime",
+          "description": "Current system time",
+          "source": "system",
+          "updateFrequency": "realtime"
+        },
+        {
+          "name": "business_hours",
+          "type": "timerange",
+          "description": "Standard business operating hours",
+          "source": "config",
+          "defaultValue": {
+            "monday": {"start": "06:00", "end": "23:00"},
+            "tuesday": {"start": "06:00", "end": "23:00"},
+            "wednesday": {"start": "06:00", "end": "23:00"},
+            "thursday": {"start": "06:00", "end": "23:00"},
+            "friday": {"start": "06:00", "end": "23:00"},
+            "saturday": {"start": "07:00", "end": "22:00"},
+            "sunday": {"start": "08:00", "end": "21:00"}
+          }
+        },
+        {
+          "name": "shift_pattern",
+          "type": "object",
+          "description": "Current shift information",
+          "source": "hr_system",
+          "attributes": {
+            "current_shift": {"type": "string", "values": ["morning", "afternoon", "evening", "night"]},
+            "shift_start": {"type": "time"},
+            "shift_end": {"type": "time"},
+            "shift_supervisor": {"type": "string"}
+          }
+        },
+        {
+          "name": "weekend_mode",
+          "type": "boolean",
+          "description": "Whether current time is weekend",
+          "source": "computed",
+          "computation": "dayOfWeek >= 6"
+        },
+        {
+          "name": "holiday_schedule",
+          "type": "object",
+          "description": "Holiday and special hours information",
+          "source": "config",
+          "updateFrequency": "daily"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "business_hours_only",
+          "condition": "current_time within business_hours",
+          "description": "Restrict access to business hours only",
+          "severity": "deny"
+        },
+        {
+          "name": "extended_hours",
+          "condition": "current_time within extended_business_hours OR user.role contains 'manager'",
+          "description": "Extended hours access for managers",
+          "severity": "warn"
+        },
+        {
+          "name": "weekend_restrictions",
+          "condition": "NOT weekend_mode OR user.weekend_access == true",
+          "description": "Weekend access restrictions",
+          "severity": "deny"
+        },
+        {
+          "name": "shift_based_access",
+          "condition": "user.shift == shift_pattern.current_shift OR user.role contains 'supervisor'",
+          "description": "Access based on current shift",
+          "severity": "warn"
+        }
+      ]
+    }
+  },
+  {
+    "name": "location_access",
+    "displayName": "Location Access Control",
+    "description": "Location-based access restrictions",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "attributes": [
+        {
+          "name": "user_location",
+          "type": "string",
+          "description": "User's current physical location",
+          "source": "user_context",
+          "updateFrequency": "realtime"
+        },
+        {
+          "name": "network_zone",
+          "type": "string",
+          "description": "Network security zone",
+          "source": "network_detection",
+          "allowedValues": ["internal", "dmz", "external", "guest"],
+          "updateFrequency": "realtime"
+        },
+        {
+          "name": "device_location",
+          "type": "object",
+          "description": "Device-based location information",
+          "source": "device_detection",
+          "attributes": {
+            "ip_address": {"type": "string"},
+            "mac_address": {"type": "string"},
+            "registered_location": {"type": "string"},
+            "is_mobile": {"type": "boolean"}
+          }
+        },
+        {
+          "name": "secure_zones",
+          "type": "array",
+          "description": "List of secure zones requiring special access",
+          "source": "config",
+          "defaultValue": ["server_room", "finance_office", "manager_office", "safe", "wine_cellar"]
+        },
+        {
+          "name": "restricted_areas",
+          "type": "array",
+          "description": "Areas with access restrictions",
+          "source": "config",
+          "defaultValue": ["kitchen_prep", "storage_room", "office", "basement"]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "internal_network_only",
+          "condition": "network_zone == 'internal'",
+          "description": "Access only from internal network",
+          "severity": "deny"
+        },
+        {
+          "name": "location_match",
+          "condition": "user_location == user.assigned_location OR user.role contains 'manager'",
+          "description": "User must be at assigned location",
+          "severity": "warn"
+        },
+        {
+          "name": "secure_zone_access",
+          "condition": "user_location NOT IN secure_zones OR user.clearance_level >= 'confidential'",
+          "description": "Secure zones require high clearance",
+          "severity": "deny"
+        },
+        {
+          "name": "mobile_device_restrictions",
+          "condition": "device_location.is_mobile == false OR user.mobile_access == true",
+          "description": "Mobile device access restrictions",
+          "severity": "warn"
+        }
+      ]
+    }
+  },
+  {
+    "name": "security_context",
+    "displayName": "Security Context",
+    "description": "Security-related environmental factors",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "attributes": [
+        {
+          "name": "threat_level",
+          "type": "string",
+          "description": "Current security threat level",
+          "source": "security_system",
+          "allowedValues": ["low", "medium", "high", "critical"],
+          "updateFrequency": "realtime"
+        },
+        {
+          "name": "failed_login_attempts",
+          "type": "number",
+          "description": "Recent failed login attempts for user",
+          "source": "authentication_system",
+          "updateFrequency": "realtime"
+        },
+        {
+          "name": "session_risk_score",
+          "type": "number",
+          "description": "Risk score for current session",
+          "source": "risk_engine",
+          "range": {"min": 0, "max": 100},
+          "updateFrequency": "periodic"
+        },
+        {
+          "name": "device_trust_level",
+          "type": "string",
+          "description": "Trust level of current device",
+          "source": "device_management",
+          "allowedValues": ["trusted", "known", "unknown", "blocked"]
+        },
+        {
+          "name": "mfa_status",
+          "type": "object",
+          "description": "Multi-factor authentication status",
+          "source": "authentication_system",
+          "attributes": {
+            "enabled": {"type": "boolean"},
+            "last_verified": {"type": "datetime"},
+            "method": {"type": "string", "values": ["sms", "app", "hardware_key"]}
+          }
+        },
+        {
+          "name": "compliance_mode",
+          "type": "boolean",
+          "description": "Whether system is in compliance audit mode",
+          "source": "compliance_system",
+          "updateFrequency": "hourly"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "high_security_requirements",
+          "condition": "threat_level != 'critical' AND session_risk_score < 80",
+          "description": "High security requirements during elevated threat",
+          "severity": "deny"
+        },
+        {
+          "name": "mfa_required",
+          "condition": "mfa_status.enabled == true AND (current_time - mfa_status.last_verified) < 8_hours",
+          "description": "MFA verification required",
+          "severity": "deny"
+        },
+        {
+          "name": "device_trust_check",
+          "condition": "device_trust_level IN ['trusted', 'known']",
+          "description": "Only trusted devices allowed",
+          "severity": "deny"
+        },
+        {
+          "name": "failed_login_protection",
+          "condition": "failed_login_attempts < 5",
+          "description": "Account lockout after failed attempts",
+          "severity": "deny"
+        },
+        {
+          "name": "compliance_audit_mode",
+          "condition": "compliance_mode == false OR user.audit_exempt == true",
+          "description": "Enhanced logging during compliance audit",
+          "severity": "warn",
+          "obligations": ["detailed_audit_logging", "compliance_notification"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "operational_context",
+    "displayName": "Operational Context",
+    "description": "Business operational context and constraints",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "attributes": [
+        {
+          "name": "service_period",
+          "type": "object",
+          "description": "Current service period information",
+          "source": "pos_system",
+          "attributes": {
+            "current_period": {"type": "string", "values": ["breakfast", "lunch", "dinner", "late_night", "closed"]},
+            "covers_count": {"type": "number"},
+            "peak_hours": {"type": "boolean"}
+          }
+        },
+        {
+          "name": "inventory_status",
+          "type": "object",
+          "description": "Current inventory status",
+          "source": "inventory_system",
+          "attributes": {
+            "low_stock_items": {"type": "number"},
+            "out_of_stock_items": {"type": "number"},
+            "pending_deliveries": {"type": "number"},
+            "last_count_date": {"type": "date"}
+          }
+        },
+        {
+          "name": "financial_period",
+          "type": "object",
+          "description": "Current financial period information",
+          "source": "financial_system",
+          "attributes": {
+            "period_end_approaching": {"type": "boolean"},
+            "budget_utilization": {"type": "number"},
+            "pending_approvals": {"type": "number"}
+          }
+        },
+        {
+          "name": "system_load",
+          "type": "object",
+          "description": "Current system performance metrics",
+          "source": "monitoring_system",
+          "attributes": {
+            "cpu_usage": {"type": "number"},
+            "concurrent_users": {"type": "number"},
+            "response_time": {"type": "number"}
+          }
+        },
+        {
+          "name": "emergency_mode",
+          "type": "boolean",
+          "description": "Whether system is in emergency operation mode",
+          "source": "operations_center",
+          "updateFrequency": "realtime"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "peak_hours_restrictions",
+          "condition": "service_period.peak_hours == false OR user.peak_access == true",
+          "description": "Limit non-essential access during peak service",
+          "severity": "warn"
+        },
+        {
+          "name": "inventory_critical_state",
+          "condition": "inventory_status.out_of_stock_items < 10 OR user.role contains 'manager'",
+          "description": "Restricted access when inventory critical",
+          "severity": "warn"
+        },
+        {
+          "name": "period_end_controls",
+          "condition": "financial_period.period_end_approaching == false OR user.role contains 'finance'",
+          "description": "Enhanced controls near period end",
+          "severity": "warn",
+          "obligations": ["financial_audit_log"]
+        },
+        {
+          "name": "system_performance_protection",
+          "condition": "system_load.cpu_usage < 90 AND system_load.concurrent_users < 100",
+          "description": "Protect system performance under high load",
+          "severity": "deny"
+        },
+        {
+          "name": "emergency_operations",
+          "condition": "emergency_mode == false OR user.emergency_access == true",
+          "description": "Emergency mode access controls",
+          "severity": "deny"
+        }
+      ]
+    }
+  },
+  {
+    "name": "data_sensitivity",
+    "displayName": "Data Sensitivity Context",
+    "description": "Data classification and sensitivity context",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "attributes": [
+        {
+          "name": "data_classification_level",
+          "type": "string",
+          "description": "Overall data classification for current context",
+          "source": "classification_engine",
+          "allowedValues": ["public", "internal", "confidential", "restricted"]
+        },
+        {
+          "name": "pii_present",
+          "type": "boolean",
+          "description": "Whether personally identifiable information is present",
+          "source": "data_scanner"
+        },
+        {
+          "name": "financial_data_present",
+          "type": "boolean",
+          "description": "Whether financial data is present",
+          "source": "data_scanner"
+        },
+        {
+          "name": "gdpr_applicable",
+          "type": "boolean",
+          "description": "Whether GDPR regulations apply",
+          "source": "compliance_engine"
+        },
+        {
+          "name": "retention_policy",
+          "type": "object",
+          "description": "Data retention policy requirements",
+          "source": "policy_engine",
+          "attributes": {
+            "retention_period": {"type": "number"},
+            "archive_required": {"type": "boolean"},
+            "secure_deletion": {"type": "boolean"}
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "confidential_data_access",
+          "condition": "data_classification_level != 'restricted' OR user.clearance_level == 'restricted'",
+          "description": "Restricted data requires highest clearance",
+          "severity": "deny"
+        },
+        {
+          "name": "pii_handling_requirements",
+          "condition": "pii_present == false OR user.pii_training_current == true",
+          "description": "PII access requires current training",
+          "severity": "deny",
+          "obligations": ["pii_access_log", "privacy_notice"]
+        },
+        {
+          "name": "financial_data_controls",
+          "condition": "financial_data_present == false OR user.financial_access == true",
+          "description": "Financial data access controls",
+          "severity": "deny",
+          "obligations": ["financial_audit_log"]
+        },
+        {
+          "name": "gdpr_compliance",
+          "condition": "gdpr_applicable == false OR user.gdpr_training_current == true",
+          "description": "GDPR compliance requirements",
+          "severity": "warn",
+          "obligations": ["gdpr_audit_log", "data_subject_notification"]
+        }
+      ]
+    }
+  }
+]

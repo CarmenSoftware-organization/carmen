@@ -1,0 +1,953 @@
+[
+  {
+    "resourceType": "purchase_request",
+    "displayName": "Purchase Request",
+    "description": "Purchase requests for procurement of goods and services",
+    "category": "procurement",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view",
+          "name": "View",
+          "description": "View purchase request details",
+          "group": "read",
+          "requiresApprovalLimit": false,
+          "auditLevel": "basic"
+        },
+        {
+          "id": "create",
+          "name": "Create",
+          "description": "Create new purchase request",
+          "group": "write",
+          "requiresApprovalLimit": false,
+          "auditLevel": "standard"
+        },
+        {
+          "id": "edit",
+          "name": "Edit",
+          "description": "Edit existing purchase request",
+          "group": "write",
+          "requiresApprovalLimit": false,
+          "auditLevel": "standard",
+          "conditions": ["status == 'draft'"]
+        },
+        {
+          "id": "submit",
+          "name": "Submit for Approval",
+          "description": "Submit purchase request for approval",
+          "group": "workflow",
+          "requiresApprovalLimit": false,
+          "auditLevel": "high"
+        },
+        {
+          "id": "approve_department",
+          "name": "Approve - Department Level",
+          "description": "Approve purchase request at department level",
+          "group": "approval",
+          "requiresApprovalLimit": true,
+          "approvalLimitAttribute": "departmentLimit",
+          "auditLevel": "high"
+        },
+        {
+          "id": "approve_finance",
+          "name": "Approve - Finance Level",
+          "description": "Approve purchase request at finance level",
+          "group": "approval",
+          "requiresApprovalLimit": true,
+          "approvalLimitAttribute": "financeLimit",
+          "auditLevel": "critical"
+        },
+        {
+          "id": "approve_gm",
+          "name": "Approve - General Manager",
+          "description": "Approve purchase request at GM level",
+          "group": "approval",
+          "requiresApprovalLimit": true,
+          "approvalLimitAttribute": "gmLimit",
+          "auditLevel": "critical"
+        },
+        {
+          "id": "reject",
+          "name": "Reject",
+          "description": "Reject purchase request",
+          "group": "workflow",
+          "requiresApprovalLimit": false,
+          "auditLevel": "high"
+        },
+        {
+          "id": "recall",
+          "name": "Recall",
+          "description": "Recall submitted purchase request",
+          "group": "workflow",
+          "requiresApprovalLimit": false,
+          "auditLevel": "standard"
+        },
+        {
+          "id": "convert_to_po",
+          "name": "Convert to Purchase Order",
+          "description": "Convert approved PR to purchase order",
+          "group": "workflow",
+          "requiresApprovalLimit": false,
+          "auditLevel": "high"
+        },
+        {
+          "id": "export",
+          "name": "Export",
+          "description": "Export purchase request data",
+          "group": "utility",
+          "requiresApprovalLimit": false,
+          "auditLevel": "standard"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "value",
+          "type": "number",
+          "description": "Total monetary value of the request",
+          "required": true,
+          "sensitive": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "description": "Current status of the request",
+          "required": true,
+          "allowedValues": ["draft", "submitted", "department_approved", "finance_approved", "gm_approved", "rejected", "converted"],
+          "sensitive": false
+        },
+        {
+          "name": "department",
+          "type": "string",
+          "description": "Requesting department",
+          "required": true,
+          "sensitive": false
+        },
+        {
+          "name": "location",
+          "type": "string",
+          "description": "Requesting location",
+          "required": true,
+          "sensitive": false
+        },
+        {
+          "name": "requestedBy",
+          "type": "string",
+          "description": "User who created the request",
+          "required": true,
+          "sensitive": false
+        },
+        {
+          "name": "priority",
+          "type": "string",
+          "description": "Priority level",
+          "allowedValues": ["low", "normal", "high", "urgent"],
+          "sensitive": false
+        },
+        {
+          "name": "vendor",
+          "type": "string",
+          "description": "Preferred vendor",
+          "required": false,
+          "sensitive": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "description": "Purchase category",
+          "allowedValues": ["food", "beverage", "supplies", "equipment", "service", "maintenance"],
+          "sensitive": false
+        }
+      ],
+      "workflows": [
+        {
+          "name": "approval",
+          "description": "Standard approval workflow",
+          "stages": [
+            {
+              "name": "draft",
+              "displayName": "Draft",
+              "description": "Initial creation stage",
+              "allowedActions": ["edit", "submit", "delete"]
+            },
+            {
+              "name": "submitted",
+              "displayName": "Submitted",
+              "description": "Submitted for approval",
+              "allowedActions": ["approve_department", "reject", "recall"]
+            },
+            {
+              "name": "department_approved",
+              "displayName": "Department Approved",
+              "description": "Approved by department manager",
+              "allowedActions": ["approve_finance", "reject"]
+            },
+            {
+              "name": "finance_approved",
+              "displayName": "Finance Approved",
+              "description": "Approved by finance team",
+              "allowedActions": ["approve_gm", "convert_to_po", "reject"]
+            },
+            {
+              "name": "gm_approved",
+              "displayName": "GM Approved",
+              "description": "Approved by general manager",
+              "allowedActions": ["convert_to_po"]
+            }
+          ]
+        }
+      ],
+      "classification": {
+        "levels": ["public", "internal", "confidential", "restricted"],
+        "defaultLevel": "internal",
+        "rules": [
+          {
+            "condition": "value > 25000",
+            "level": "confidential"
+          },
+          {
+            "condition": "category == 'equipment'",
+            "level": "confidential"
+          }
+        ]
+      },
+      "approvalLimits": {
+        "departmentLimit": 5000,
+        "financeLimit": 25000,
+        "gmLimit": 100000
+      }
+    }
+  },
+  {
+    "resourceType": "purchase_order",
+    "displayName": "Purchase Order",
+    "description": "Purchase orders for vendor transactions",
+    "category": "procurement",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view",
+          "name": "View",
+          "description": "View purchase order details",
+          "group": "read",
+          "auditLevel": "basic"
+        },
+        {
+          "id": "create",
+          "name": "Create",
+          "description": "Create new purchase order",
+          "group": "write",
+          "auditLevel": "high"
+        },
+        {
+          "id": "edit",
+          "name": "Edit",
+          "description": "Edit purchase order",
+          "group": "write",
+          "auditLevel": "high",
+          "conditions": ["status IN ['draft', 'pending']"]
+        },
+        {
+          "id": "send_to_vendor",
+          "name": "Send to Vendor",
+          "description": "Send PO to vendor",
+          "group": "workflow",
+          "auditLevel": "critical"
+        },
+        {
+          "id": "acknowledge_receipt",
+          "name": "Acknowledge Receipt",
+          "description": "Acknowledge vendor receipt of PO",
+          "group": "workflow",
+          "auditLevel": "standard"
+        },
+        {
+          "id": "cancel",
+          "name": "Cancel",
+          "description": "Cancel purchase order",
+          "group": "workflow",
+          "auditLevel": "critical"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "value",
+          "type": "number",
+          "description": "Total order value",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "description": "Current status",
+          "allowedValues": ["draft", "sent", "acknowledged", "partially_received", "fully_received", "cancelled"]
+        },
+        {
+          "name": "vendor",
+          "type": "string",
+          "description": "Vendor identifier",
+          "required": true
+        },
+        {
+          "name": "expectedDelivery",
+          "type": "date",
+          "description": "Expected delivery date"
+        }
+      ],
+      "classification": {
+        "defaultLevel": "internal"
+      }
+    }
+  },
+  {
+    "resourceType": "inventory_item",
+    "displayName": "Inventory Item",
+    "description": "Inventory items and stock management",
+    "category": "inventory",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view_basic",
+          "name": "View Basic Info",
+          "description": "View basic inventory information",
+          "group": "read",
+          "auditLevel": "basic"
+        },
+        {
+          "id": "view_costs",
+          "name": "View Costs",
+          "description": "View cost information and pricing",
+          "group": "read",
+          "auditLevel": "standard",
+          "sensitive": true
+        },
+        {
+          "id": "view_stock",
+          "name": "View Stock Levels",
+          "description": "View current stock levels",
+          "group": "read",
+          "auditLevel": "basic"
+        },
+        {
+          "id": "adjust_quantity",
+          "name": "Adjust Quantity",
+          "description": "Adjust stock quantities",
+          "group": "write",
+          "auditLevel": "high"
+        },
+        {
+          "id": "transfer_stock",
+          "name": "Transfer Stock",
+          "description": "Transfer stock between locations",
+          "group": "write",
+          "auditLevel": "high"
+        },
+        {
+          "id": "perform_count",
+          "name": "Perform Physical Count",
+          "description": "Perform physical inventory count",
+          "group": "count",
+          "auditLevel": "high"
+        },
+        {
+          "id": "write_off",
+          "name": "Write Off",
+          "description": "Write off damaged or expired items",
+          "group": "write",
+          "auditLevel": "critical"
+        },
+        {
+          "id": "set_reorder_levels",
+          "name": "Set Reorder Levels",
+          "description": "Set minimum and maximum stock levels",
+          "group": "config",
+          "auditLevel": "standard"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "category",
+          "type": "string",
+          "description": "Item category",
+          "allowedValues": ["food", "beverage", "supplies", "equipment", "cleaning"]
+        },
+        {
+          "name": "location",
+          "type": "string",
+          "description": "Storage location",
+          "required": true
+        },
+        {
+          "name": "unitCost",
+          "type": "number",
+          "description": "Unit cost",
+          "sensitive": true
+        },
+        {
+          "name": "currentStock",
+          "type": "number",
+          "description": "Current stock quantity"
+        },
+        {
+          "name": "perishable",
+          "type": "boolean",
+          "description": "Whether item is perishable"
+        },
+        {
+          "name": "allergens",
+          "type": "array",
+          "description": "Allergen information",
+          "sensitive": false
+        }
+      ],
+      "classification": {
+        "defaultLevel": "internal",
+        "rules": [
+          {
+            "condition": "unitCost > 100",
+            "level": "confidential"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "resourceType": "vendor",
+    "displayName": "Vendor",
+    "description": "Vendor profiles and management",
+    "category": "vendor",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view_basic",
+          "name": "View Basic Info",
+          "description": "View basic vendor information",
+          "group": "read",
+          "auditLevel": "basic"
+        },
+        {
+          "id": "view_financial",
+          "name": "View Financial Info",
+          "description": "View financial and contract details",
+          "group": "read",
+          "auditLevel": "standard",
+          "sensitive": true
+        },
+        {
+          "id": "create",
+          "name": "Create Vendor",
+          "description": "Create new vendor profile",
+          "group": "write",
+          "auditLevel": "high"
+        },
+        {
+          "id": "edit",
+          "name": "Edit Vendor",
+          "description": "Edit vendor information",
+          "group": "write",
+          "auditLevel": "standard"
+        },
+        {
+          "id": "activate",
+          "name": "Activate Vendor",
+          "description": "Activate vendor for transactions",
+          "group": "status",
+          "auditLevel": "high"
+        },
+        {
+          "id": "deactivate",
+          "name": "Deactivate Vendor",
+          "description": "Deactivate vendor",
+          "group": "status",
+          "auditLevel": "high"
+        },
+        {
+          "id": "manage_pricelist",
+          "name": "Manage Pricelist",
+          "description": "Manage vendor pricing",
+          "group": "pricing",
+          "auditLevel": "standard",
+          "sensitive": true
+        },
+        {
+          "id": "send_rfq",
+          "name": "Send RFQ",
+          "description": "Send request for quotation",
+          "group": "communication",
+          "auditLevel": "standard"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "category",
+          "type": "string",
+          "description": "Vendor category",
+          "allowedValues": ["food_supplier", "beverage_supplier", "equipment", "service", "maintenance"]
+        },
+        {
+          "name": "isActive",
+          "type": "boolean",
+          "description": "Active status"
+        },
+        {
+          "name": "paymentTerms",
+          "type": "string",
+          "description": "Payment terms",
+          "sensitive": true
+        },
+        {
+          "name": "creditLimit",
+          "type": "number",
+          "description": "Credit limit",
+          "sensitive": true
+        },
+        {
+          "name": "location",
+          "type": "string",
+          "description": "Vendor location"
+        }
+      ],
+      "classification": {
+        "defaultLevel": "internal",
+        "rules": [
+          {
+            "condition": "creditLimit > 50000",
+            "level": "confidential"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "resourceType": "recipe",
+    "displayName": "Recipe",
+    "description": "Recipe management and costing",
+    "category": "operations",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view_recipe",
+          "name": "View Recipe",
+          "description": "View recipe details and ingredients",
+          "group": "read",
+          "auditLevel": "basic"
+        },
+        {
+          "id": "view_costs",
+          "name": "View Recipe Costs",
+          "description": "View recipe costing information",
+          "group": "read",
+          "auditLevel": "standard",
+          "sensitive": true
+        },
+        {
+          "id": "create_recipe",
+          "name": "Create Recipe",
+          "description": "Create new recipe",
+          "group": "write",
+          "auditLevel": "standard"
+        },
+        {
+          "id": "edit_recipe",
+          "name": "Edit Recipe",
+          "description": "Edit recipe details",
+          "group": "write",
+          "auditLevel": "standard"
+        },
+        {
+          "id": "modify_ingredients",
+          "name": "Modify Ingredients",
+          "description": "Modify recipe ingredients and quantities",
+          "group": "write",
+          "auditLevel": "high"
+        },
+        {
+          "id": "calculate_cost",
+          "name": "Calculate Cost",
+          "description": "Calculate recipe cost",
+          "group": "calculation",
+          "auditLevel": "standard",
+          "sensitive": true
+        },
+        {
+          "id": "approve_recipe",
+          "name": "Approve Recipe",
+          "description": "Approve recipe for production",
+          "group": "approval",
+          "auditLevel": "high"
+        },
+        {
+          "id": "publish_recipe",
+          "name": "Publish Recipe",
+          "description": "Publish recipe to menu",
+          "group": "workflow",
+          "auditLevel": "high"
+        },
+        {
+          "id": "scale_recipe",
+          "name": "Scale Recipe",
+          "description": "Scale recipe quantities",
+          "group": "calculation",
+          "auditLevel": "basic"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "category",
+          "type": "string",
+          "description": "Recipe category",
+          "allowedValues": ["appetizer", "main_course", "dessert", "beverage", "sauce", "base_preparation"]
+        },
+        {
+          "name": "cuisineType",
+          "type": "string",
+          "description": "Cuisine type"
+        },
+        {
+          "name": "cost",
+          "type": "number",
+          "description": "Recipe cost",
+          "sensitive": true
+        },
+        {
+          "name": "portionSize",
+          "type": "number",
+          "description": "Standard portion size"
+        },
+        {
+          "name": "allergens",
+          "type": "array",
+          "description": "Allergen information"
+        },
+        {
+          "name": "dietaryRestrictions",
+          "type": "array",
+          "description": "Dietary restrictions",
+          "allowedValues": ["vegetarian", "vegan", "gluten_free", "dairy_free", "nut_free"]
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "description": "Recipe status",
+          "allowedValues": ["draft", "testing", "approved", "published", "archived"]
+        }
+      ],
+      "classification": {
+        "defaultLevel": "internal",
+        "rules": [
+          {
+            "condition": "cost > 25",
+            "level": "confidential"
+          },
+          {
+            "condition": "status == 'draft'",
+            "level": "confidential"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "resourceType": "invoice",
+    "displayName": "Invoice",
+    "description": "Financial invoices and billing",
+    "category": "financial",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view",
+          "name": "View Invoice",
+          "description": "View invoice details",
+          "group": "read",
+          "auditLevel": "standard",
+          "sensitive": true
+        },
+        {
+          "id": "create",
+          "name": "Create Invoice",
+          "description": "Create new invoice",
+          "group": "write",
+          "auditLevel": "high",
+          "sensitive": true
+        },
+        {
+          "id": "approve",
+          "name": "Approve Payment",
+          "description": "Approve invoice for payment",
+          "group": "approval",
+          "auditLevel": "critical",
+          "sensitive": true,
+          "requiresApprovalLimit": true
+        },
+        {
+          "id": "process_payment",
+          "name": "Process Payment",
+          "description": "Process invoice payment",
+          "group": "workflow",
+          "auditLevel": "critical",
+          "sensitive": true
+        },
+        {
+          "id": "dispute",
+          "name": "Dispute Invoice",
+          "description": "Dispute invoice charges",
+          "group": "workflow",
+          "auditLevel": "high"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "amount",
+          "type": "number",
+          "description": "Invoice amount",
+          "required": true,
+          "sensitive": true
+        },
+        {
+          "name": "vendor",
+          "type": "string",
+          "description": "Vendor identifier",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "description": "Payment status",
+          "allowedValues": ["pending", "approved", "paid", "disputed", "cancelled"]
+        },
+        {
+          "name": "dueDate",
+          "type": "date",
+          "description": "Payment due date"
+        },
+        {
+          "name": "department",
+          "type": "string",
+          "description": "Responsible department"
+        }
+      ],
+      "classification": {
+        "defaultLevel": "confidential",
+        "rules": [
+          {
+            "condition": "amount > 10000",
+            "level": "restricted"
+          }
+        ]
+      },
+      "approvalLimits": {
+        "departmentLimit": 1000,
+        "financeLimit": 10000,
+        "gmLimit": 50000
+      }
+    }
+  },
+  {
+    "resourceType": "user",
+    "displayName": "User",
+    "description": "System users and profiles",
+    "category": "system",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view_profile",
+          "name": "View Profile",
+          "description": "View user profile information",
+          "group": "read",
+          "auditLevel": "basic"
+        },
+        {
+          "id": "view_sensitive",
+          "name": "View Sensitive Info",
+          "description": "View sensitive user information",
+          "group": "read",
+          "auditLevel": "high",
+          "sensitive": true
+        },
+        {
+          "id": "create",
+          "name": "Create User",
+          "description": "Create new user account",
+          "group": "write",
+          "auditLevel": "critical"
+        },
+        {
+          "id": "edit",
+          "name": "Edit User",
+          "description": "Edit user information",
+          "group": "write",
+          "auditLevel": "high"
+        },
+        {
+          "id": "activate",
+          "name": "Activate User",
+          "description": "Activate user account",
+          "group": "status",
+          "auditLevel": "high"
+        },
+        {
+          "id": "deactivate",
+          "name": "Deactivate User",
+          "description": "Deactivate user account",
+          "group": "status",
+          "auditLevel": "critical"
+        },
+        {
+          "id": "assign_role",
+          "name": "Assign Role",
+          "description": "Assign roles to user",
+          "group": "permission",
+          "auditLevel": "critical"
+        },
+        {
+          "id": "reset_password",
+          "name": "Reset Password",
+          "description": "Reset user password",
+          "group": "security",
+          "auditLevel": "high",
+          "sensitive": true
+        }
+      ],
+      "attributes": [
+        {
+          "name": "department",
+          "type": "string",
+          "description": "User's department"
+        },
+        {
+          "name": "location",
+          "type": "string",
+          "description": "User's primary location"
+        },
+        {
+          "name": "isActive",
+          "type": "boolean",
+          "description": "Account active status"
+        },
+        {
+          "name": "clearanceLevel",
+          "type": "string",
+          "description": "Security clearance level",
+          "allowedValues": ["public", "internal", "confidential", "restricted"],
+          "sensitive": true
+        },
+        {
+          "name": "approvalLimit",
+          "type": "number",
+          "description": "Approval limit",
+          "sensitive": true
+        }
+      ],
+      "classification": {
+        "defaultLevel": "confidential",
+        "rules": [
+          {
+            "condition": "clearanceLevel == 'restricted'",
+            "level": "restricted"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "resourceType": "report",
+    "displayName": "Report",
+    "description": "System reports and analytics",
+    "category": "reporting",
+    "version": "1.0",
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "definition": {
+      "actions": [
+        {
+          "id": "view",
+          "name": "View Report",
+          "description": "View report data",
+          "group": "read",
+          "auditLevel": "standard"
+        },
+        {
+          "id": "generate",
+          "name": "Generate Report",
+          "description": "Generate new report",
+          "group": "create",
+          "auditLevel": "standard"
+        },
+        {
+          "id": "export",
+          "name": "Export Report",
+          "description": "Export report data",
+          "group": "utility",
+          "auditLevel": "high"
+        },
+        {
+          "id": "schedule",
+          "name": "Schedule Report",
+          "description": "Schedule automated report generation",
+          "group": "automation",
+          "auditLevel": "standard"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "reportType",
+          "type": "string",
+          "description": "Type of report",
+          "allowedValues": ["financial", "inventory", "procurement", "operations", "compliance"]
+        },
+        {
+          "name": "sensitivity",
+          "type": "string",
+          "description": "Data sensitivity level",
+          "allowedValues": ["public", "internal", "confidential", "restricted"]
+        },
+        {
+          "name": "department",
+          "type": "string",
+          "description": "Related department"
+        }
+      ],
+      "classification": {
+        "defaultLevel": "internal",
+        "rules": [
+          {
+            "condition": "reportType == 'financial'",
+            "level": "confidential"
+          },
+          {
+            "condition": "sensitivity == 'restricted'",
+            "level": "restricted"
+          }
+        ]
+      }
+    }
+  }
+]

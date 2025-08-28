@@ -1,0 +1,360 @@
+[
+  {
+    "name": "system_administrator",
+    "displayName": "System Administrator",
+    "description": "Full system access and administration privileges",
+    "parentId": null,
+    "level": 0,
+    "path": "/system_administrator",
+    "isSystemRole": true,
+    "isActive": true,
+    "priority": 1000,
+    "color": "#dc2626",
+    "icon": "shield",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "roleData": {
+      "attributes": {
+        "clearanceLevel": "restricted",
+        "approvalLimit": 1000000,
+        "canBypassRestrictions": true,
+        "emergencyAccess": true,
+        "auditExempt": false,
+        "systemAccess": true,
+        "locations": ["all"],
+        "departments": ["all"]
+      },
+      "basePermissions": [
+        {
+          "resource": "*",
+          "actions": ["*"],
+          "conditions": {}
+        }
+      ],
+      "inheritance": {
+        "inheritsFrom": [],
+        "overrides": ["all"],
+        "additions": ["system_administration", "emergency_access"]
+      },
+      "constraints": {
+        "timeRestrictions": {
+          "allowedHours": "00:00-23:59",
+          "allowedDays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        },
+        "locationRestrictions": {
+          "allowedLocations": ["all"],
+          "deniedLocations": []
+        },
+        "auditRequirements": {
+          "allActionsAudited": true,
+          "detailedLogging": true,
+          "realTimeAlerts": true
+        }
+      }
+    }
+  },
+  {
+    "name": "general_manager",
+    "displayName": "General Manager",
+    "description": "Executive level management with broad operational authority",
+    "parentId": null,
+    "level": 0,
+    "path": "/general_manager",
+    "isSystemRole": false,
+    "isActive": true,
+    "priority": 900,
+    "color": "#7c3aed",
+    "icon": "crown",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "roleData": {
+      "attributes": {
+        "clearanceLevel": "confidential",
+        "approvalLimit": 100000,
+        "canOverrideApprovals": true,
+        "emergencyAccess": true,
+        "weekendAccess": true,
+        "mobileAccess": true,
+        "locations": ["all"],
+        "departments": ["all"]
+      },
+      "basePermissions": [
+        {
+          "resource": "purchase_request",
+          "actions": ["view", "create", "edit", "approve_gm", "reject", "export"],
+          "conditions": {}
+        },
+        {
+          "resource": "purchase_order",
+          "actions": ["view", "create", "edit", "send_to_vendor", "cancel"],
+          "conditions": {}
+        },
+        {
+          "resource": "inventory_item",
+          "actions": ["view_basic", "view_costs", "view_stock", "adjust_quantity", "set_reorder_levels"],
+          "conditions": {}
+        },
+        {
+          "resource": "vendor",
+          "actions": ["view_basic", "view_financial", "create", "edit", "activate", "deactivate"],
+          "conditions": {}
+        },
+        {
+          "resource": "recipe",
+          "actions": ["view_recipe", "view_costs", "approve_recipe", "publish_recipe"],
+          "conditions": {}
+        },
+        {
+          "resource": "invoice",
+          "actions": ["view", "approve", "dispute"],
+          "conditions": {}
+        },
+        {
+          "resource": "user",
+          "actions": ["view_profile", "create", "edit", "activate", "deactivate", "assign_role"],
+          "conditions": {}
+        },
+        {
+          "resource": "report",
+          "actions": ["view", "generate", "export", "schedule"],
+          "conditions": {}
+        }
+      ],
+      "inheritance": {
+        "inheritsFrom": [],
+        "overrides": ["approval_limits"],
+        "additions": ["executive_reports", "override_authority"]
+      },
+      "constraints": {
+        "timeRestrictions": {
+          "allowedHours": "00:00-23:59",
+          "allowedDays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        },
+        "auditRequirements": {
+          "allActionsAudited": true,
+          "detailedLogging": true
+        }
+      }
+    }
+  },
+  {
+    "name": "department_manager",
+    "displayName": "Department Manager",
+    "description": "Departmental operations and staff management",
+    "parentId": null,
+    "level": 1,
+    "path": "/department_manager",
+    "isSystemRole": false,
+    "isActive": true,
+    "priority": 700,
+    "color": "#ea580c",
+    "icon": "users",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "roleData": {
+      "attributes": {
+        "clearanceLevel": "internal",
+        "approvalLimit": 10000,
+        "staffManagement": true,
+        "scheduleManagement": true,
+        "departmentBudget": true
+      },
+      "basePermissions": [
+        {
+          "resource": "purchase_request",
+          "actions": ["view", "create", "edit", "submit", "approve_department", "reject"],
+          "conditions": {"department": {"operator": "equals", "value": "user.department"}}
+        },
+        {
+          "resource": "inventory_item",
+          "actions": ["view_basic", "view_stock", "adjust_quantity", "perform_count"],
+          "conditions": {"location": {"operator": "equals", "value": "user.location"}}
+        },
+        {
+          "resource": "recipe",
+          "actions": ["view_recipe", "create_recipe", "edit_recipe", "approve_recipe"],
+          "conditions": {"category": {"operator": "equals", "value": "user.department"}}
+        },
+        {
+          "resource": "user",
+          "actions": ["view_profile", "edit", "assign_role"],
+          "conditions": {"department": {"operator": "equals", "value": "user.department"}}
+        },
+        {
+          "resource": "report",
+          "actions": ["view", "generate"],
+          "conditions": {"department": {"operator": "equals", "value": "user.department"}}
+        }
+      ],
+      "inheritance": {
+        "inheritsFrom": ["staff"],
+        "overrides": ["approval_limits", "staff_management"],
+        "additions": ["department_reports", "schedule_management"]
+      }
+    }
+  },
+  {
+    "name": "executive_chef",
+    "displayName": "Executive Chef",
+    "description": "Kitchen operations, menu development, and recipe management",
+    "parentId": "department_manager",
+    "level": 2,
+    "path": "/department_manager/executive_chef",
+    "isSystemRole": false,
+    "isActive": true,
+    "priority": 750,
+    "color": "#dc2626",
+    "icon": "chef-hat",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "roleData": {
+      "attributes": {
+        "clearanceLevel": "internal",
+        "approvalLimit": 15000,
+        "kitchenAuthority": true,
+        "menuDevelopment": true,
+        "foodSafetyCertified": true,
+        "departments": ["kitchen", "food_service"],
+        "specializations": ["recipe_development", "cost_control", "food_safety"]
+      },
+      "basePermissions": [
+        {
+          "resource": "recipe",
+          "actions": ["view_recipe", "view_costs", "create_recipe", "edit_recipe", "modify_ingredients", "calculate_cost", "approve_recipe", "publish_recipe", "scale_recipe"],
+          "conditions": {}
+        },
+        {
+          "resource": "inventory_item",
+          "actions": ["view_basic", "view_stock", "adjust_quantity", "transfer_stock", "perform_count", "write_off"],
+          "conditions": {"category": {"operator": "in", "value": ["food", "beverage"]}}
+        },
+        {
+          "resource": "purchase_request",
+          "actions": ["view", "create", "edit", "submit", "approve_department"],
+          "conditions": {"category": {"operator": "in", "value": ["food", "beverage"]}}
+        },
+        {
+          "resource": "vendor",
+          "actions": ["view_basic", "edit", "send_rfq"],
+          "conditions": {"category": {"operator": "in", "value": ["food_supplier", "beverage_supplier"]}}
+        }
+      ],
+      "inheritance": {
+        "inheritsFrom": ["department_manager"],
+        "overrides": ["recipe_authority", "kitchen_management"],
+        "additions": ["menu_engineering", "cost_analysis"]
+      },
+      "constraints": {
+        "foodSafetyCompliance": {
+          "haccp_certified": true,
+          "allergen_training": true,
+          "temperature_monitoring": true
+        }
+      }
+    }
+  },
+  {
+    "name": "chef",
+    "displayName": "Chef",
+    "description": "Kitchen operations and food preparation",
+    "parentId": "executive_chef",
+    "level": 3,
+    "path": "/department_manager/executive_chef/chef",
+    "isSystemRole": false,
+    "isActive": true,
+    "priority": 600,
+    "color": "#b91c1c",
+    "icon": "chef-hat",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "roleData": {
+      "attributes": {
+        "clearanceLevel": "internal",
+        "approvalLimit": 2000,
+        "kitchenAccess": true,
+        "foodPreparation": true,
+        "departments": ["kitchen"]
+      },
+      "basePermissions": [
+        {
+          "resource": "recipe",
+          "actions": ["view_recipe", "create_recipe", "edit_recipe", "scale_recipe"],
+          "conditions": {}
+        },
+        {
+          "resource": "inventory_item",
+          "actions": ["view_basic", "view_stock", "adjust_quantity"],
+          "conditions": {"category": {"operator": "in", "value": ["food", "beverage"]}}
+        },
+        {
+          "resource": "purchase_request",
+          "actions": ["view", "create", "edit", "submit"],
+          "conditions": {"category": {"operator": "in", "value": ["food", "beverage"]}, "value": {"operator": "less_than_or_equal", "value": 2000}}
+        }
+      ],
+      "inheritance": {
+        "inheritsFrom": ["staff"],
+        "overrides": ["recipe_creation"],
+        "additions": ["menu_contribution"]
+      }
+    }
+  },
+  {
+    "name": "staff",
+    "displayName": "Staff",
+    "description": "Basic staff member with standard access",
+    "parentId": null,
+    "level": 0,
+    "path": "/staff",
+    "isSystemRole": false,
+    "isActive": true,
+    "priority": 100,
+    "color": "#6b7280",
+    "icon": "user",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "roleData": {
+      "attributes": {
+        "clearanceLevel": "internal",
+        "approvalLimit": 500,
+        "basicAccess": true
+      },
+      "basePermissions": [
+        {
+          "resource": "purchase_request",
+          "actions": ["view", "create", "edit"],
+          "conditions": {
+            "requestedBy": {"operator": "equals", "value": "user.id"},
+            "value": {"operator": "less_than_or_equal", "value": 500}
+          }
+        },
+        {
+          "resource": "inventory_item",
+          "actions": ["view_basic"],
+          "conditions": {"location": {"operator": "equals", "value": "user.location"}}
+        },
+        {
+          "resource": "recipe",
+          "actions": ["view_recipe"],
+          "conditions": {"status": {"operator": "equals", "value": "published"}}
+        },
+        {
+          "resource": "user",
+          "actions": ["view_profile"],
+          "conditions": {"id": {"operator": "equals", "value": "user.id"}}
+        }
+      ],
+      "inheritance": {
+        "inheritsFrom": [],
+        "overrides": [],
+        "additions": ["basic_reporting"]
+      },
+      "constraints": {
+        "timeRestrictions": {
+          "allowedHours": "06:00-22:00",
+          "allowedDays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        }
+      }
+    }
+  }
+]

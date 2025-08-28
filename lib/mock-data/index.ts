@@ -24,3 +24,15 @@ export * from './factories'
 
 // Test scenarios
 export * from './test-scenarios'
+
+// Policy builder and ABAC system mock data
+export * from './policy-builder-attributes'
+export * from './policy-builder-sample-actions'
+export * from './policy-builder-templates'
+export * from './policy-builder-sample-policies'
+
+// Permission system mock data
+export * from './permission-index'
+export * from './permission-policies'
+export * from './permission-roles'
+export * from './permission-subscriptions'

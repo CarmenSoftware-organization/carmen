@@ -16,6 +16,27 @@ export {
   type BulkPermissionRequest,
   type BulkPermissionResult
 } from './permission-service'
+export { 
+  AttributeResolver, 
+  attributeResolver,
+  resolveSubjectAttributes,
+  resolveResourceAttributes,
+  resolveActionAttributes,
+  resolveEnvironmentAttributes,
+  resolveAllAttributes,
+  type AttributeRequest,
+  type AttributeResult,
+  type AttributeResolverConfig
+} from './attribute-resolver'
+export { 
+  EnhancedPermissionService, 
+  enhancedPermissionService,
+  checkEnhancedPermission,
+  hasEnhancedPermission,
+  getEnhancedUserPermissions,
+  type EnhancedPermissionCheckRequest,
+  type EnhancedPermissionResult
+} from './enhanced-permission-service'
 
 // Utility services
 export {

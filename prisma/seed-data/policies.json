@@ -1,0 +1,513 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "ABAC Policies for Carmen ERP Permission Management",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "lastUpdated": "2024-08-28T00:00:00.000Z",
+    "totalPolicies": 20,
+    "categories": ["procurement", "inventory", "vendor"],
+    "note": "Policies cover 37+ common hospitality scenarios with ABAC framework"
+  },
+  "policies": {
+    "procurement": [
+      {
+        "id": "pol-proc-001",
+        "name": "PR Creation by Department Staff",
+        "description": "Department staff can create purchase requests for their assigned departments within budget limits",
+        "priority": 100,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "IN", "value": ["role-005", "role-011", "role-012", "role-013"] }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "PURCHASE_REQUEST" }
+          ],
+          "actions": ["create_draft", "add_items", "submit_for_approval"]
+        },
+        "rules": [
+          {
+            "id": "rule-proc-001-1",
+            "description": "Same department and within budget",
+            "condition": {
+              "type": "composite",
+              "logicalOperator": "AND",
+              "expressions": [
+                {
+                  "type": "simple",
+                  "attribute": "subject.department.id",
+                  "operator": "EQUALS",
+                  "value": "resource.ownerDepartment"
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.totalValue.amount",
+                  "operator": "LESS_THAN_OR_EQUAL",
+                  "value": 5000
+                }
+              ]
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "obligations": [
+          {
+            "id": "obl-proc-001",
+            "type": "audit",
+            "attributes": { "logLevel": "INFO", "category": "PROCUREMENT_CREATE" },
+            "description": "Log PR creation for audit trail"
+          }
+        ],
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "procurement",
+        "tags": ["purchase-request", "creation", "department"]
+      },
+      {
+        "id": "pol-proc-002",
+        "name": "PR Approval - Department Level",
+        "description": "Department managers can approve PRs from their department up to $10,000",
+        "priority": 110,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "EQUALS", "value": "role-005" }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "PURCHASE_REQUEST" }
+          ],
+          "actions": ["approve_department"]
+        },
+        "rules": [
+          {
+            "id": "rule-proc-002-1",
+            "description": "Same department and within approval limit",
+            "condition": {
+              "type": "composite",
+              "logicalOperator": "AND",
+              "expressions": [
+                {
+                  "type": "simple",
+                  "attribute": "subject.department.id",
+                  "operator": "EQUALS",
+                  "value": "resource.ownerDepartment"
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.totalValue.amount",
+                  "operator": "LESS_THAN_OR_EQUAL",
+                  "value": 10000
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.documentStatus.status",
+                  "operator": "EQUALS",
+                  "value": "pending_department_approval"
+                }
+              ]
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "obligations": [
+          {
+            "id": "obl-proc-002",
+            "type": "notification",
+            "attributes": { 
+              "recipients": ["finance-team"], 
+              "template": "pr_approved_dept",
+              "priority": "normal"
+            },
+            "description": "Notify finance team of department approval"
+          }
+        ],
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "procurement",
+        "tags": ["purchase-request", "approval", "department-manager"]
+      },
+      {
+        "id": "pol-proc-003",
+        "name": "PR Approval - Finance Level",
+        "description": "Finance managers can approve PRs between $5,000-$25,000",
+        "priority": 120,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "IN", "value": ["role-003", "role-008"] }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "PURCHASE_REQUEST" }
+          ],
+          "actions": ["approve_finance"]
+        },
+        "rules": [
+          {
+            "id": "rule-proc-003-1",
+            "description": "Within finance approval range",
+            "condition": {
+              "type": "composite",
+              "logicalOperator": "AND",
+              "expressions": [
+                {
+                  "type": "simple",
+                  "attribute": "resource.totalValue.amount",
+                  "operator": "GREATER_THAN_OR_EQUAL",
+                  "value": 5000
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.totalValue.amount",
+                  "operator": "LESS_THAN_OR_EQUAL",
+                  "value": 25000
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.documentStatus.status",
+                  "operator": "EQUALS",
+                  "value": "pending_finance_approval"
+                }
+              ]
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "procurement",
+        "tags": ["purchase-request", "approval", "finance"]
+      },
+      {
+        "id": "pol-proc-004",
+        "name": "PR Approval - GM Level",
+        "description": "General Manager can approve PRs over $25,000",
+        "priority": 130,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "EQUALS", "value": "role-002" }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "PURCHASE_REQUEST" }
+          ],
+          "actions": ["approve_gm", "approve_final"]
+        },
+        "rules": [
+          {
+            "id": "rule-proc-004-1",
+            "description": "High value PR requiring GM approval",
+            "condition": {
+              "type": "composite",
+              "logicalOperator": "AND",
+              "expressions": [
+                {
+                  "type": "simple",
+                  "attribute": "resource.totalValue.amount",
+                  "operator": "GREATER_THAN",
+                  "value": 25000
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.documentStatus.status",
+                  "operator": "EQUALS",
+                  "value": "pending_gm_approval"
+                }
+              ]
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "obligations": [
+          {
+            "id": "obl-proc-004",
+            "type": "approval",
+            "attributes": { 
+              "requiresSecondApproval": false,
+              "escalationRequired": true,
+              "boardNotification": true
+            },
+            "description": "High-value approval requires board notification"
+          }
+        ],
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "procurement",
+        "tags": ["purchase-request", "approval", "general-manager", "high-value"]
+      },
+      {
+        "id": "pol-proc-005",
+        "name": "PO Creation from Approved PR",
+        "description": "Procurement staff can create POs from fully approved PRs",
+        "priority": 100,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "IN", "value": ["role-004", "role-009"] }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "PURCHASE_ORDER" }
+          ],
+          "actions": ["create", "convert_from_pr"]
+        },
+        "rules": [
+          {
+            "id": "rule-proc-005-1",
+            "description": "PR must be fully approved",
+            "condition": {
+              "type": "simple",
+              "attribute": "resource.parentResource.documentStatus.status",
+              "operator": "EQUALS",
+              "value": "approved"
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "procurement",
+        "tags": ["purchase-order", "creation", "procurement-staff"]
+      }
+    ],
+    "inventory": [
+      {
+        "id": "pol-inv-001",
+        "name": "Stock View by Location",
+        "description": "Staff can view stock levels for their assigned locations only",
+        "priority": 80,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "IN", "value": ["role-011", "role-012", "role-013"] }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "INVENTORY_ITEM" }
+          ],
+          "actions": ["view_stock", "view_availability"]
+        },
+        "rules": [
+          {
+            "id": "rule-inv-001-1",
+            "description": "Location access restriction",
+            "condition": {
+              "type": "simple",
+              "attribute": "resource.location",
+              "operator": "IN",
+              "value": "subject.locations"
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "inventory",
+        "tags": ["inventory", "view", "location-based"]
+      },
+      {
+        "id": "pol-inv-002",
+        "name": "Stock Adjustment by Warehouse Manager",
+        "description": "Warehouse managers can perform stock adjustments with approval workflow",
+        "priority": 120,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "EQUALS", "value": "role-006" }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "STOCK_ADJUSTMENT" }
+          ],
+          "actions": ["create", "approve", "execute"]
+        },
+        "rules": [
+          {
+            "id": "rule-inv-002-1",
+            "description": "Warehouse manager for assigned locations",
+            "condition": {
+              "type": "composite",
+              "logicalOperator": "AND",
+              "expressions": [
+                {
+                  "type": "simple",
+                  "attribute": "resource.location",
+                  "operator": "IN",
+                  "value": "subject.locations"
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.adjustmentValue.amount",
+                  "operator": "LESS_THAN_OR_EQUAL",
+                  "value": 5000
+                }
+              ]
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "obligations": [
+          {
+            "id": "obl-inv-002",
+            "type": "approval",
+            "attributes": { 
+              "requiresSecondApproval": true,
+              "approver": "general-manager",
+              "thresholdAmount": 5000
+            },
+            "description": "High-value adjustments require GM approval"
+          }
+        ],
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "inventory",
+        "tags": ["stock-adjustment", "warehouse-manager", "approval"]
+      }
+    ],
+    "vendor": [
+      {
+        "id": "pol-vnd-001",
+        "name": "Vendor Creation and Activation",
+        "description": "Procurement managers can create and activate new vendors",
+        "priority": 120,
+        "enabled": true,
+        "target": {
+          "subjects": [
+            { "attribute": "role.id", "operator": "IN", "value": ["role-004", "role-009"] }
+          ],
+          "resources": [
+            { "attribute": "resourceType", "operator": "EQUALS", "value": "VENDOR" }
+          ],
+          "actions": ["create", "activate", "update_profile"]
+        },
+        "rules": [
+          {
+            "id": "rule-vnd-001-1",
+            "description": "Complete vendor profile required",
+            "condition": {
+              "type": "composite",
+              "logicalOperator": "AND",
+              "expressions": [
+                {
+                  "type": "simple",
+                  "attribute": "resource.profileCompleteness",
+                  "operator": "GREATER_THAN_OR_EQUAL",
+                  "value": 80
+                },
+                {
+                  "type": "simple",
+                  "attribute": "resource.complianceStatus",
+                  "operator": "EQUALS",
+                  "value": "compliant"
+                }
+              ]
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "obligations": [
+          {
+            "id": "obl-vnd-001",
+            "type": "audit",
+            "attributes": { 
+              "logLevel": "INFO",
+              "category": "VENDOR_MANAGEMENT",
+              "requiresApproval": true
+            },
+            "description": "New vendor activation requires audit trail"
+          }
+        ],
+        "version": "1.0",
+        "createdBy": "system",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "category": "vendor",
+        "tags": ["vendor", "creation", "procurement"]
+      }
+    ]
+  },
+  "policyTemplates": [
+    {
+      "id": "tpl-dept-access",
+      "name": "Department-Based Access",
+      "description": "Template for department-restricted resource access",
+      "category": "access-control",
+      "template": {
+        "name": "Department Access Template",
+        "description": "Restrict access to department resources",
+        "priority": 100,
+        "enabled": true,
+        "target": {
+          "subjects": [],
+          "resources": [],
+          "actions": ["view", "create", "update"]
+        },
+        "rules": [
+          {
+            "id": "tpl-rule-dept",
+            "description": "Same department access",
+            "condition": {
+              "type": "simple",
+              "attribute": "subject.department.id",
+              "operator": "EQUALS",
+              "value": "resource.ownerDepartment"
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "version": "1.0",
+        "category": "access-control",
+        "tags": ["department", "template"]
+      }
+    },
+    {
+      "id": "tpl-approval-workflow",
+      "name": "Approval Workflow",
+      "description": "Template for multi-level approval processes",
+      "category": "workflow",
+      "template": {
+        "name": "Approval Workflow Template",
+        "description": "Multi-level approval process",
+        "priority": 110,
+        "enabled": true,
+        "target": {
+          "subjects": [],
+          "resources": [],
+          "actions": ["approve"]
+        },
+        "rules": [
+          {
+            "id": "tpl-rule-approval",
+            "description": "Approval authority check",
+            "condition": {
+              "type": "simple",
+              "attribute": "subject.approvalLimit.amount",
+              "operator": "GREATER_THAN_OR_EQUAL",
+              "value": "resource.totalValue.amount"
+            }
+          }
+        ],
+        "effect": "PERMIT",
+        "obligations": [
+          {
+            "id": "tpl-obl-approval",
+            "type": "notification",
+            "attributes": { "template": "approval_notification" },
+            "description": "Notify stakeholders of approval"
+          }
+        ],
+        "version": "1.0",
+        "category": "workflow",
+        "tags": ["approval", "workflow", "template"]
+      }
+    }
+  ],
+  "enums": {
+    "effectTypes": ["PERMIT", "DENY", "NOT_APPLICABLE"],
+    "operators": ["EQUALS", "NOT_EQUALS", "IN", "NOT_IN", "GREATER_THAN", "LESS_THAN", "GREATER_THAN_OR_EQUAL", "LESS_THAN_OR_EQUAL", "CONTAINS", "STARTS_WITH", "ENDS_WITH", "REGEX_MATCH"],
+    "logicalOperators": ["AND", "OR", "NOT"],
+    "resourceTypes": ["PURCHASE_REQUEST", "PURCHASE_ORDER", "INVENTORY_ITEM", "VENDOR", "STOCK_ADJUSTMENT", "PHYSICAL_COUNT", "GOODS_RECEIPT_NOTE", "CREDIT_NOTE", "WASTAGE_REPORT", "STOCK_TRANSFER", "SPOT_CHECK", "FRACTIONAL_INVENTORY", "VENDOR_PRICE_LIST", "VENDOR_CAMPAIGN", "VENDOR_PORTAL"]
+  }
+}

@@ -1,0 +1,233 @@
+[
+  {
+    "name": "admin",
+    "email": "admin@carmen-erp.com", 
+    "isActive": true,
+    "createdBy": "system",
+    "updatedBy": "system",
+    "userData": {
+      "profile": {
+        "firstName": "System",
+        "lastName": "Administrator", 
+        "phoneNumber": "+1-555-0001",
+        "emergencyContact": "+1-555-0002",
+        "employeeId": "EMP-001",
+        "dateOfBirth": "1980-01-01",
+        "hireDate": "2020-01-01"
+      },
+      "context": {
+        "primaryRole": "system_administrator",
+        "department": "administration",
+        "location": "headquarters", 
+        "clearanceLevel": "restricted",
+        "activeShift": "day",
+        "timezone": "America/New_York"
+      },
+      "attributes": {
+        "approvalLimit": 1000000,
+        "canBypassRestrictions": true,
+        "emergencyAccess": true,
+        "auditExempt": false,
+        "systemAccess": true,
+        "weekendAccess": true,
+        "mobileAccess": true,
+        "piiTrainingCurrent": true,
+        "financialAccess": true,
+        "gdprTrainingCurrent": true
+      },
+      "preferences": {
+        "language": "en",
+        "dateFormat": "MM/dd/yyyy",
+        "timeFormat": "12h",
+        "currency": "USD",
+        "notifications": {
+          "email": true,
+          "sms": false,
+          "push": true
+        }
+      }
+    }
+  },
+  {
+    "name": "john.manager",
+    "email": "john.manager@carmen-erp.com",
+    "isActive": true, 
+    "createdBy": "admin",
+    "updatedBy": "admin",
+    "userData": {
+      "profile": {
+        "firstName": "John",
+        "lastName": "Manager",
+        "phoneNumber": "+1-555-0101",
+        "emergencyContact": "+1-555-0102", 
+        "employeeId": "EMP-101",
+        "dateOfBirth": "1985-03-15",
+        "hireDate": "2021-06-01"
+      },
+      "context": {
+        "primaryRole": "general_manager",
+        "department": "operations",
+        "location": "main_restaurant",
+        "clearanceLevel": "confidential",
+        "activeShift": "day",
+        "timezone": "America/New_York"
+      },
+      "attributes": {
+        "approvalLimit": 100000,
+        "canOverrideApprovals": true,
+        "emergencyAccess": true,
+        "weekendAccess": true,
+        "mobileAccess": true,
+        "piiTrainingCurrent": true,
+        "financialAccess": true,
+        "gdprTrainingCurrent": true
+      },
+      "preferences": {
+        "language": "en",
+        "dateFormat": "MM/dd/yyyy", 
+        "timeFormat": "12h",
+        "currency": "USD",
+        "notifications": {
+          "email": true,
+          "sms": true,
+          "push": true
+        }
+      }
+    }
+  },
+  {
+    "name": "maria.chef",
+    "email": "maria.chef@carmen-erp.com",
+    "isActive": true,
+    "createdBy": "john.manager",
+    "updatedBy": "john.manager", 
+    "userData": {
+      "profile": {
+        "firstName": "Maria",
+        "lastName": "Rodriguez",
+        "phoneNumber": "+1-555-0201",
+        "emergencyContact": "+1-555-0202",
+        "employeeId": "EMP-201",
+        "dateOfBirth": "1988-07-22",
+        "hireDate": "2022-01-15"
+      },
+      "context": {
+        "primaryRole": "executive_chef",
+        "department": "kitchen",
+        "location": "main_restaurant",
+        "clearanceLevel": "internal", 
+        "activeShift": "day",
+        "timezone": "America/New_York"
+      },
+      "attributes": {
+        "approvalLimit": 15000,
+        "kitchenAuthority": true,
+        "menuDevelopment": true,
+        "foodSafetyCertified": true,
+        "weekendAccess": true,
+        "mobileAccess": true,
+        "specializations": ["recipe_development", "cost_control", "food_safety"]
+      },
+      "preferences": {
+        "language": "es",
+        "dateFormat": "dd/MM/yyyy",
+        "timeFormat": "24h", 
+        "currency": "USD",
+        "notifications": {
+          "email": true,
+          "sms": false,
+          "push": true
+        }
+      }
+    }
+  },
+  {
+    "name": "david.staff",
+    "email": "david.staff@carmen-erp.com",
+    "isActive": true,
+    "createdBy": "maria.chef",
+    "updatedBy": "maria.chef",
+    "userData": {
+      "profile": {
+        "firstName": "David",
+        "lastName": "Johnson",
+        "phoneNumber": "+1-555-0301",
+        "emergencyContact": "+1-555-0302",
+        "employeeId": "EMP-301", 
+        "dateOfBirth": "1995-11-08",
+        "hireDate": "2023-03-01"
+      },
+      "context": {
+        "primaryRole": "staff",
+        "department": "kitchen",
+        "location": "main_restaurant",
+        "clearanceLevel": "internal",
+        "activeShift": "day",
+        "timezone": "America/New_York"
+      },
+      "attributes": {
+        "approvalLimit": 500,
+        "basicAccess": true,
+        "weekendAccess": false,
+        "mobileAccess": false
+      },
+      "preferences": {
+        "language": "en",
+        "dateFormat": "MM/dd/yyyy",
+        "timeFormat": "12h",
+        "currency": "USD", 
+        "notifications": {
+          "email": true,
+          "sms": false,
+          "push": false
+        }
+      }
+    }
+  },
+  {
+    "name": "sarah.purchasing",
+    "email": "sarah.purchasing@carmen-erp.com",
+    "isActive": true,
+    "createdBy": "john.manager", 
+    "updatedBy": "john.manager",
+    "userData": {
+      "profile": {
+        "firstName": "Sarah",
+        "lastName": "Wilson",
+        "phoneNumber": "+1-555-0401",
+        "emergencyContact": "+1-555-0402",
+        "employeeId": "EMP-401",
+        "dateOfBirth": "1987-04-18",
+        "hireDate": "2021-09-01"
+      },
+      "context": {
+        "primaryRole": "department_manager",
+        "department": "procurement",
+        "location": "main_restaurant",
+        "clearanceLevel": "internal",
+        "activeShift": "day",
+        "timezone": "America/New_York"
+      },
+      "attributes": {
+        "approvalLimit": 10000,
+        "staffManagement": true,
+        "scheduleManagement": true,
+        "departmentBudget": true,
+        "weekendAccess": true,
+        "mobileAccess": true,
+        "financialAccess": true
+      },
+      "preferences": {
+        "language": "en",
+        "dateFormat": "MM/dd/yyyy",
+        "timeFormat": "12h",
+        "currency": "USD",
+        "notifications": {
+          "email": true,
+          "sms": true,
+          "push": true
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,709 @@
+[
+  {
+    "name": "purchase_request_creation_basic",
+    "description": "Allow staff to create purchase requests for basic items within their approval limit",
+    "version": "1.0",
+    "priority": 100,
+    "effect": "PERMIT",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["procurement", "staff", "basic"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["staff", "chef", "department_manager"]}
+        ],
+        "resources": [
+          {"type": "purchase_request", "attributes": {}}
+        ],
+        "actions": ["create", "edit"],
+        "environment": [
+          {"attribute": "current_time", "operator": "within", "value": "business_hours"}
+        ]
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Value Limit Check",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "resource.value",
+                "operator": "LESS_THAN_OR_EQUAL",
+                "value": "subject.approvalLimit"
+              },
+              {
+                "type": "simple",
+                "attribute": "resource.department",
+                "operator": "EQUALS",
+                "value": "subject.department"
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Log purchase request creation",
+          "parameters": {
+            "level": "info",
+            "includeDetails": true
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "RECOMMENDATION",
+          "message": "Consider bundling small requests to reduce processing overhead",
+          "parameters": {
+            "threshold": 100,
+            "suggestedAction": "bundle_requests"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "purchase_request_approval_department",
+    "description": "Department manager approval for purchase requests within limit",
+    "version": "1.0",
+    "priority": 200,
+    "effect": "PERMIT",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["procurement", "approval", "department"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["department_manager", "executive_chef"]}
+        ],
+        "resources": [
+          {"type": "purchase_request", "attributes": {"status": {"operator": "equals", "value": "submitted"}}}
+        ],
+        "actions": ["approve_department", "reject"],
+        "environment": [
+          {"attribute": "current_time", "operator": "within", "value": "business_hours"}
+        ]
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Department Authority Check",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "resource.value",
+                "operator": "LESS_THAN_OR_EQUAL",
+                "value": "subject.approvalLimit"
+              },
+              {
+                "type": "simple",
+                "attribute": "resource.department",
+                "operator": "EQUALS",
+                "value": "subject.department"
+              },
+              {
+                "type": "simple",
+                "attribute": "resource.value",
+                "operator": "LESS_THAN",
+                "value": 25000
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Log approval decision with reasoning",
+          "parameters": {
+            "level": "standard",
+            "includeReasoning": true,
+            "notifyRequester": true
+          }
+        },
+        {
+          "type": "WORKFLOW_TRANSITION",
+          "description": "Update request status based on decision",
+          "parameters": {
+            "approveStatus": "department_approved",
+            "rejectStatus": "rejected"
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "WARNING",
+          "message": "High value request - verify budget availability",
+          "parameters": {
+            "threshold": 10000,
+            "suggestedAction": "check_budget"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "purchase_request_approval_finance",
+    "description": "Finance team approval for high-value purchase requests",
+    "version": "1.0",
+    "priority": 300,
+    "effect": "PERMIT",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["procurement", "approval", "finance"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["finance_director"]}
+        ],
+        "resources": [
+          {"type": "purchase_request", "attributes": {"status": {"operator": "equals", "value": "department_approved"}}}
+        ],
+        "actions": ["approve_finance", "reject"],
+        "environment": []
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Finance Approval Authority",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "resource.value",
+                "operator": "GREATER_THAN",
+                "value": 5000
+              },
+              {
+                "type": "simple",
+                "attribute": "resource.value",
+                "operator": "LESS_THAN_OR_EQUAL",
+                "value": 50000
+              },
+              {
+                "type": "simple",
+                "attribute": "subject.financialAccess",
+                "operator": "EQUALS",
+                "value": true
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Log finance approval with financial impact analysis",
+          "parameters": {
+            "level": "high",
+            "includeFinancialAnalysis": true,
+            "notifyStakeholders": ["requester", "department_manager"]
+          }
+        },
+        {
+          "type": "BUDGET_CHECK",
+          "description": "Verify budget availability before approval",
+          "parameters": {
+            "checkType": "department_budget",
+            "enforceLimit": true
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "INFORMATION",
+          "message": "Consider vendor alternatives for cost optimization",
+          "parameters": {
+            "threshold": 15000,
+            "suggestedAction": "vendor_comparison"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "inventory_view_location_based",
+    "description": "Staff can view inventory for their assigned location",
+    "version": "1.0",
+    "priority": 150,
+    "effect": "PERMIT",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["inventory", "location", "basic"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["staff", "chef", "department_manager"]}
+        ],
+        "resources": [
+          {"type": "inventory_item", "attributes": {}}
+        ],
+        "actions": ["view_basic", "view_stock"],
+        "environment": []
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Location Access Control",
+          "priority": 100,
+          "condition": {
+            "type": "OR",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "resource.location",
+                "operator": "EQUALS",
+                "value": "subject.location"
+              },
+              {
+                "type": "simple",
+                "attribute": "subject.role",
+                "operator": "IN",
+                "value": ["department_manager", "warehouse_manager"]
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Log inventory access for audit trail",
+          "parameters": {
+            "level": "basic",
+            "includeLocation": true
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "inventory_cost_restricted_access",
+    "description": "Restrict inventory cost information to authorized roles",
+    "version": "1.0",
+    "priority": 400,
+    "effect": "DENY",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["inventory", "costs", "security"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["staff", "chef"]}
+        ],
+        "resources": [
+          {"type": "inventory_item", "attributes": {}}
+        ],
+        "actions": ["view_costs"],
+        "environment": []
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Cost Information Access Restriction",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "subject.clearanceLevel",
+                "operator": "NOT_EQUALS",
+                "value": "confidential"
+              },
+              {
+                "type": "simple",
+                "attribute": "resource.unitCost",
+                "operator": "GREATER_THAN",
+                "value": 50
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Log denied access attempts to cost information",
+          "parameters": {
+            "level": "warning",
+            "alertSecurity": true,
+            "includeContext": true
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "INFORMATION",
+          "message": "Cost information requires higher clearance level",
+          "parameters": {
+            "requiredClearance": "confidential",
+            "contactRole": "department_manager"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "recipe_creation_chef_only",
+    "description": "Only chefs can create and modify recipes",
+    "version": "1.0",
+    "priority": 250,
+    "effect": "PERMIT",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["recipe", "creation", "chef"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["chef", "executive_chef"]}
+        ],
+        "resources": [
+          {"type": "recipe", "attributes": {}}
+        ],
+        "actions": ["create_recipe", "edit_recipe", "modify_ingredients"],
+        "environment": [
+          {"attribute": "current_time", "operator": "within", "value": "business_hours"}
+        ]
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Chef Authorization Check",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "subject.kitchenAccess",
+                "operator": "EQUALS",
+                "value": true
+              },
+              {
+                "type": "simple",
+                "attribute": "subject.departments",
+                "operator": "CONTAINS",
+                "value": "kitchen"
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Log recipe modifications for kitchen management",
+          "parameters": {
+            "level": "standard",
+            "notifyKitchenManager": true,
+            "includeCostImpact": true
+          }
+        },
+        {
+          "type": "COST_CALCULATION",
+          "description": "Automatically recalculate recipe costs",
+          "parameters": {
+            "triggerRecalc": true,
+            "notifyIfSignificantChange": true,
+            "threshold": 10
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "RECOMMENDATION",
+          "message": "Test recipe changes before updating production versions",
+          "parameters": {
+            "suggestedAction": "create_test_version"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "financial_data_weekend_restriction",
+    "description": "Restrict financial data access during weekends except for emergencies",
+    "version": "1.0",
+    "priority": 500,
+    "effect": "DENY",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["financial", "weekend", "security"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["staff", "department_manager", "chef"]}
+        ],
+        "resources": [
+          {"type": "invoice", "attributes": {}},
+          {"type": "purchase_request", "attributes": {"value": {"operator": "greater_than", "value": 5000}}}
+        ],
+        "actions": ["view", "approve", "process_payment"],
+        "environment": [
+          {"attribute": "weekend_mode", "operator": "equals", "value": true}
+        ]
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Weekend Financial Restriction",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "environment.weekend_mode",
+                "operator": "EQUALS",
+                "value": true
+              },
+              {
+                "type": "simple",
+                "attribute": "subject.emergencyAccess",
+                "operator": "NOT_EQUALS",
+                "value": true
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Log weekend access attempts to financial data",
+          "parameters": {
+            "level": "high",
+            "alertSecurity": true,
+            "notifyFinanceTeam": true
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "INFORMATION",
+          "message": "Financial operations are restricted during weekends. Contact finance team for emergencies.",
+          "parameters": {
+            "emergencyContact": "finance_director",
+            "alternativeAction": "schedule_for_monday"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "high_value_transaction_controls",
+    "description": "Enhanced controls for high-value transactions",
+    "version": "1.0",
+    "priority": 600,
+    "effect": "PERMIT",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "DENY_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["high_value", "controls", "approval"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["general_manager", "finance_director"]}
+        ],
+        "resources": [
+          {"type": "purchase_request", "attributes": {"value": {"operator": "greater_than", "value": 25000}}},
+          {"type": "invoice", "attributes": {"amount": {"operator": "greater_than", "value": 25000}}}
+        ],
+        "actions": ["approve_gm", "approve", "process_payment"],
+        "environment": []
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "High Value Authorization",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "OR",
+                "expressions": [
+                  {
+                    "type": "simple",
+                    "attribute": "resource.value",
+                    "operator": "GREATER_THAN",
+                    "value": 25000
+                  },
+                  {
+                    "type": "simple",
+                    "attribute": "resource.amount",
+                    "operator": "GREATER_THAN",
+                    "value": 25000
+                  }
+                ]
+              },
+              {
+                "type": "simple",
+                "attribute": "subject.approvalLimit",
+                "operator": "GREATER_THAN_OR_EQUAL",
+                "value": 25000
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Comprehensive audit logging for high-value transactions",
+          "parameters": {
+            "level": "critical",
+            "detailedAudit": true,
+            "notifyBoard": true,
+            "includeJustification": true
+          }
+        },
+        {
+          "type": "DUAL_APPROVAL",
+          "description": "Require secondary approval for very high values",
+          "parameters": {
+            "threshold": 50000,
+            "secondaryApprover": "board_member"
+          }
+        },
+        {
+          "type": "VENDOR_VERIFICATION",
+          "description": "Enhanced vendor verification for high-value transactions",
+          "parameters": {
+            "verifyCredentials": true,
+            "checkReferences": true,
+            "validateContracts": true
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "WARNING",
+          "message": "High-value transaction requires enhanced due diligence",
+          "parameters": {
+            "suggestedChecks": ["vendor_verification", "competitive_quotes", "budget_impact"],
+            "escalationRequired": true
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "emergency_access_override",
+    "description": "Emergency access override during system emergencies",
+    "version": "1.0",
+    "priority": 1000,
+    "effect": "PERMIT",
+    "status": "ACTIVE",
+    "combiningAlgorithm": "PERMIT_OVERRIDES",
+    "createdBy": "system",
+    "updatedBy": "system",
+    "validFrom": "2024-01-01T00:00:00Z",
+    "tags": ["emergency", "override", "critical"],
+    "policyData": {
+      "target": {
+        "subjects": [
+          {"type": "role", "values": ["general_manager", "system_administrator"]}
+        ],
+        "resources": [
+          {"type": "*", "attributes": {}}
+        ],
+        "actions": ["*"],
+        "environment": [
+          {"attribute": "emergency_mode", "operator": "equals", "value": true}
+        ]
+      },
+      "rules": [
+        {
+          "id": "rule_1",
+          "name": "Emergency Override Authorization",
+          "priority": 100,
+          "condition": {
+            "type": "AND",
+            "expressions": [
+              {
+                "type": "simple",
+                "attribute": "environment.emergency_mode",
+                "operator": "EQUALS",
+                "value": true
+              },
+              {
+                "type": "simple",
+                "attribute": "subject.emergencyAccess",
+                "operator": "EQUALS",
+                "value": true
+              }
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "type": "LOG_ACCESS",
+          "description": "Critical logging for emergency access",
+          "parameters": {
+            "level": "critical",
+            "realTimeAlert": true,
+            "notifyAllManagement": true,
+            "emergencyAudit": true,
+            "requireJustification": true
+          }
+        },
+        {
+          "type": "TIME_LIMIT",
+          "description": "Limit emergency access duration",
+          "parameters": {
+            "maxDuration": "4_hours",
+            "extensionRequiresApproval": true,
+            "periodicRevalidation": "30_minutes"
+          }
+        }
+      ],
+      "advice": [
+        {
+          "type": "WARNING",
+          "message": "Emergency access granted - use responsibly and document all actions",
+          "parameters": {
+            "reminderFrequency": "15_minutes",
+            "documentationRequired": true,
+            "reviewRequired": true
+          }
+        }
+      ]
+    }
+  }
+]
