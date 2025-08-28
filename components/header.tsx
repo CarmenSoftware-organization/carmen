@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,7 +68,7 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
 
   return (
     <header className="backdrop-blur supports-[backdrop-filter]:bg-background dark:supports-[backdrop-filter]:bg-gray-800 shadow-sm fixed top-0 left-0 right-0 z-40 border-b border-gray-200 dark:border-gray-500">
-      <div className="w-full px-4 py-1 sm:px-6">
+      <div className="w-full px-4 py-2 sm:px-6">
         <div className="flex items-center h-12">
           <div className="flex items-center">
             <Button
@@ -92,7 +91,7 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
               >
                 CARMEN
               </Link>
-              <span className="text-xs md:text-sm text-muted-foreground">
+              <span className="text-xs md:text-sm text-primary">
                 Hospitality Supply Chain
               </span>
             </div>
@@ -142,13 +141,7 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
                   variant="ghost"
                   className="relative h-8 w-8 rounded-full"
                 >
-                  <Avatar className="h-8 w-8 text-foreground dark:text-gray-100">
-                    <AvatarImage
-                      src="/avatars/placeholder.svg?height=32&width=32"
-                      alt="@johndoe"
-                    />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
+                  <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-72 bg-background dark:bg-gray-700" align="end" forceMount>

@@ -1,10 +1,23 @@
 import { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Source_Serif_4, JetBrains_Mono } from 'next/font/google'
 import { UserProvider } from '@/lib/context/user-context'
 import { Providers } from './providers'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-sans'
+})
+
+const sourceSerif = Source_Serif_4({ 
+  subsets: ['latin'],
+  variable: '--font-serif'
+})
+
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ['latin'],
+  variable: '--font-mono'
+})
 
 export const metadata: Metadata = {
   title: 'Carmen-HSC',
@@ -18,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${sourceSerif.variable} ${jetbrainsMono.variable} font-sans`}>
         <Providers>
           <UserProvider>
             {children}

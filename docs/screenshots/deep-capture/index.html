@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP Deep Capture Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .module-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .module-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+        }
+        
+        .module-body {
+            padding: 1.5rem;
+        }
+        
+        .route-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+        
+        .route-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        .module-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        
+        h1, h2, h3 { color: #1e293b; }
+        
+        .search-box {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Carmen ERP Deep Capture Documentation</h1>
+        <p>Comprehensive screenshot documentation covering 262 screens across 12 business modules</p>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">262</div>
+                <div>Screenshots</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">105</div>
+                <div>Routes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div>Modules</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">96%</div>
+                <div>Success Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <input type="text" class="search-box" placeholder="Search modules and routes..." id="searchBox">
+
+    <div class="modules" id="moduleContainer">
+        
+            <div class="module-card" data-module="dashboard">
+                <div class="module-header">
+                    <h2>Dashboard</h2>
+                    <div>2 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/dashboard">/dashboard</div>
+                        
+                            <div class="route-item" data-route="/edit-profile">/edit-profile</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 2</span>
+                        <span><strong>Screenshots:</strong> 7</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="inventory">
+                <div class="module-header">
+                    <h2>Inventory</h2>
+                    <div>19 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/inventory-management">/inventory-management</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/stock-overview">/inventory-management/stock-overview</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/stock-overview/stock-card">/inventory-management/stock-overview/stock-card</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/stock-overview/stock-cards">/inventory-management/stock-overview/stock-cards</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/stock-overview/inventory-aging">/inventory-management/stock-overview/inventory-aging</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/stock-overview/inventory-balance">/inventory-management/stock-overview/inventory-balance</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/stock-overview/slow-moving">/inventory-management/stock-overview/slow-moving</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/physical-count">/inventory-management/physical-count</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/physical-count/dashboard">/inventory-management/physical-count/dashboard</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/physical-count-management">/inventory-management/physical-count-management</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/spot-check">/inventory-management/spot-check</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/spot-check/dashboard">/inventory-management/spot-check/dashboard</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/spot-check/new">/inventory-management/spot-check/new</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/spot-check/active">/inventory-management/spot-check/active</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/spot-check/completed">/inventory-management/spot-check/completed</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/fractional-inventory">/inventory-management/fractional-inventory</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/inventory-adjustments">/inventory-management/inventory-adjustments</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/stock-in">/inventory-management/stock-in</div>
+                        
+                            <div class="route-item" data-route="/inventory-management/period-end">/inventory-management/period-end</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 19</span>
+                        <span><strong>Screenshots:</strong> 51</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="procurement">
+                <div class="module-header">
+                    <h2>Procurement</h2>
+                    <div>20 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/procurement">/procurement</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-requests">/procurement/purchase-requests</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-requests/new-pr">/procurement/purchase-requests/new-pr</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-requests/enhanced-demo">/procurement/purchase-requests/enhanced-demo</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-orders">/procurement/purchase-orders</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-orders/create">/procurement/purchase-orders/create</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-orders/create/bulk">/procurement/purchase-orders/create/bulk</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-orders/create/from-pr">/procurement/purchase-orders/create/from-pr</div>
+                        
+                            <div class="route-item" data-route="/procurement/goods-received-note">/procurement/goods-received-note</div>
+                        
+                            <div class="route-item" data-route="/procurement/goods-received-note/new">/procurement/goods-received-note/new</div>
+                        
+                            <div class="route-item" data-route="/procurement/goods-received-note/new/po-selection">/procurement/goods-received-note/new/po-selection</div>
+                        
+                            <div class="route-item" data-route="/procurement/goods-received-note/new/manual-entry">/procurement/goods-received-note/new/manual-entry</div>
+                        
+                            <div class="route-item" data-route="/procurement/goods-received-note/new/item-location-selection">/procurement/goods-received-note/new/item-location-selection</div>
+                        
+                            <div class="route-item" data-route="/procurement/goods-received-note/new/confirmation">/procurement/goods-received-note/new/confirmation</div>
+                        
+                            <div class="route-item" data-route="/procurement/goods-received-note/new/vendor-selection">/procurement/goods-received-note/new/vendor-selection</div>
+                        
+                            <div class="route-item" data-route="/procurement/credit-note">/procurement/credit-note</div>
+                        
+                            <div class="route-item" data-route="/procurement/credit-note/new">/procurement/credit-note/new</div>
+                        
+                            <div class="route-item" data-route="/procurement/my-approvals">/procurement/my-approvals</div>
+                        
+                            <div class="route-item" data-route="/procurement/purchase-request-templates">/procurement/purchase-request-templates</div>
+                        
+                            <div class="route-item" data-route="/procurement/vendor-comparison">/procurement/vendor-comparison</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 20</span>
+                        <span><strong>Screenshots:</strong> 44</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="vendor">
+                <div class="module-header">
+                    <h2>Vendor</h2>
+                    <div>14 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/vendor-management">/vendor-management</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/vendors">/vendor-management/vendors</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/vendors/new">/vendor-management/vendors/new</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/manage-vendors">/vendor-management/manage-vendors</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/manage-vendors/new">/vendor-management/manage-vendors/new</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/pricelists">/vendor-management/pricelists</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/pricelists/new">/vendor-management/pricelists/new</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/pricelists/add">/vendor-management/pricelists/add</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/campaigns">/vendor-management/campaigns</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/campaigns/new">/vendor-management/campaigns/new</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/templates">/vendor-management/templates</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/templates/new">/vendor-management/templates/new</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/vendor-portal">/vendor-management/vendor-portal</div>
+                        
+                            <div class="route-item" data-route="/vendor-management/vendor-portal/sample">/vendor-management/vendor-portal/sample</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 14</span>
+                        <span><strong>Screenshots:</strong> 41</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="product">
+                <div class="module-header">
+                    <h2>Product</h2>
+                    <div>4 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/product-management">/product-management</div>
+                        
+                            <div class="route-item" data-route="/product-management/products">/product-management/products</div>
+                        
+                            <div class="route-item" data-route="/product-management/categories">/product-management/categories</div>
+                        
+                            <div class="route-item" data-route="/product-management/units">/product-management/units</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 4</span>
+                        <span><strong>Screenshots:</strong> 9</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="recipe">
+                <div class="module-header">
+                    <h2>Recipe</h2>
+                    <div>8 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/operational-planning">/operational-planning</div>
+                        
+                            <div class="route-item" data-route="/operational-planning/recipe-management">/operational-planning/recipe-management</div>
+                        
+                            <div class="route-item" data-route="/operational-planning/recipe-management/recipes">/operational-planning/recipe-management/recipes</div>
+                        
+                            <div class="route-item" data-route="/operational-planning/recipe-management/recipes/new">/operational-planning/recipe-management/recipes/new</div>
+                        
+                            <div class="route-item" data-route="/operational-planning/recipe-management/recipes/create">/operational-planning/recipe-management/recipes/create</div>
+                        
+                            <div class="route-item" data-route="/operational-planning/recipe-management/categories">/operational-planning/recipe-management/categories</div>
+                        
+                            <div class="route-item" data-route="/operational-planning/recipe-management/cuisine-types">/operational-planning/recipe-management/cuisine-types</div>
+                        
+                            <div class="route-item" data-route="/recipe-management/recipes">/recipe-management/recipes</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 8</span>
+                        <span><strong>Screenshots:</strong> 20</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="store">
+                <div class="module-header">
+                    <h2>Store</h2>
+                    <div>4 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/store-operations">/store-operations</div>
+                        
+                            <div class="route-item" data-route="/store-operations/store-requisitions">/store-operations/store-requisitions</div>
+                        
+                            <div class="route-item" data-route="/store-operations/wastage-reporting">/store-operations/wastage-reporting</div>
+                        
+                            <div class="route-item" data-route="/store-operations/stock-replenishment">/store-operations/stock-replenishment</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 4</span>
+                        <span><strong>Screenshots:</strong> 10</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="system">
+                <div class="module-header">
+                    <h2>System</h2>
+                    <div>25 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/system-administration">/system-administration</div>
+                        
+                            <div class="route-item" data-route="/system-administration/user-management">/system-administration/user-management</div>
+                        
+                            <div class="route-item" data-route="/system-administration/user-dashboard">/system-administration/user-dashboard</div>
+                        
+                            <div class="route-item" data-route="/system-administration/location-management">/system-administration/location-management</div>
+                        
+                            <div class="route-item" data-route="/system-administration/location-management/new">/system-administration/location-management/new</div>
+                        
+                            <div class="route-item" data-route="/system-administration/workflow">/system-administration/workflow</div>
+                        
+                            <div class="route-item" data-route="/system-administration/workflow/workflow-configuration">/system-administration/workflow/workflow-configuration</div>
+                        
+                            <div class="route-item" data-route="/system-administration/workflow/role-assignment">/system-administration/workflow/role-assignment</div>
+                        
+                            <div class="route-item" data-route="/system-administration/business-rules">/system-administration/business-rules</div>
+                        
+                            <div class="route-item" data-route="/system-administration/business-rules/compliance-monitoring">/system-administration/business-rules/compliance-monitoring</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations">/system-administration/system-integrations</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos">/system-administration/system-integrations/pos</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/mapping">/system-administration/system-integrations/pos/mapping</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/mapping/units">/system-administration/system-integrations/pos/mapping/units</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/mapping/recipes">/system-administration/system-integrations/pos/mapping/recipes</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/mapping/recipes/fractional-variants">/system-administration/system-integrations/pos/mapping/recipes/fractional-variants</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/mapping/locations">/system-administration/system-integrations/pos/mapping/locations</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/settings">/system-administration/system-integrations/pos/settings</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/settings/config">/system-administration/system-integrations/pos/settings/config</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/settings/system">/system-administration/system-integrations/pos/settings/system</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/transactions">/system-administration/system-integrations/pos/transactions</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/reports">/system-administration/system-integrations/pos/reports</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/reports/gross-profit">/system-administration/system-integrations/pos/reports/gross-profit</div>
+                        
+                            <div class="route-item" data-route="/system-administration/system-integrations/pos/reports/consumption">/system-administration/system-integrations/pos/reports/consumption</div>
+                        
+                            <div class="route-item" data-route="/system-administration/account-code-mapping">/system-administration/account-code-mapping</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 25</span>
+                        <span><strong>Screenshots:</strong> 68</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="finance">
+                <div class="module-header">
+                    <h2>Finance</h2>
+                    <div>5 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/finance">/finance</div>
+                        
+                            <div class="route-item" data-route="/finance/account-code-mapping">/finance/account-code-mapping</div>
+                        
+                            <div class="route-item" data-route="/finance/department-list">/finance/department-list</div>
+                        
+                            <div class="route-item" data-route="/finance/currency-management">/finance/currency-management</div>
+                        
+                            <div class="route-item" data-route="/finance/exchange-rates">/finance/exchange-rates</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 5</span>
+                        <span><strong>Screenshots:</strong> 5</span>
+                        <span><strong>Success:</strong> 40%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="reporting">
+                <div class="module-header">
+                    <h2>Reporting</h2>
+                    <div>2 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/reporting-analytics">/reporting-analytics</div>
+                        
+                            <div class="route-item" data-route="/reporting-analytics/consumption-analytics">/reporting-analytics/consumption-analytics</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 2</span>
+                        <span><strong>Screenshots:</strong> 3</span>
+                        <span><strong>Success:</strong> 50%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="production">
+                <div class="module-header">
+                    <h2>Production</h2>
+                    <div>1 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/production">/production</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 1</span>
+                        <span><strong>Screenshots:</strong> 2</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="module-card" data-module="support">
+                <div class="module-header">
+                    <h2>Support</h2>
+                    <div>1 routes documented</div>
+                </div>
+                <div class="module-body">
+                    <div class="route-list">
+                        
+                            <div class="route-item" data-route="/help-support">/help-support</div>
+                        
+                    </div>
+                    <div class="module-stats">
+                        <span><strong>Routes:</strong> 1</span>
+                        <span><strong>Screenshots:</strong> 2</span>
+                        <span><strong>Success:</strong> 100%</span>
+                    </div>
+                </div>
+            </div>
+        
+    </div>
+
+    <script>
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const moduleCards = document.querySelectorAll('.module-card');
+            
+            moduleCards.forEach(card => {
+                const moduleName = card.dataset.module.toLowerCase();
+                const routes = Array.from(card.querySelectorAll('.route-item'))
+                    .map(item => item.dataset.route.toLowerCase());
+                
+                const moduleMatch = moduleName.includes(searchTerm);
+                const routeMatch = routes.some(route => route.includes(searchTerm));
+                
+                if (moduleMatch || routeMatch) {
+                    card.classList.remove('filter-hidden');
+                    
+                    // Highlight matching routes
+                    card.querySelectorAll('.route-item').forEach(routeItem => {
+                        if (routeItem.dataset.route.toLowerCase().includes(searchTerm)) {
+                            routeItem.style.background = '#fef3c7';
+                        } else {
+                            routeItem.style.background = '';
+                        }
+                    });
+                } else {
+                    card.classList.add('filter-hidden');
+                }
+            });
+        });
+
+        // Module navigation
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const moduleName = this.dataset.module;
+                // Could navigate to module-specific documentation
+                console.log('Navigate to module:', moduleName);
+            });
+        });
+    </script>
+</body>
+</html>

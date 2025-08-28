@@ -53,7 +53,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { mockCampaigns, mockTemplates, mockVendors } from '../lib/mock-data'
+import { mockCampaigns, mockCampaignTemplates, mockVendors } from '@/lib/mock-data'
 import Link from 'next/link'
 
 export default function CampaignsPage() {
@@ -69,7 +69,7 @@ export default function CampaignsPage() {
       const matchesSearch = campaign.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            campaign.description?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter
-      const matchesPriority = priorityFilter === 'all' || campaign.priority === priorityFilter
+      const matchesPriority = priorityFilter === 'all' || campaign.settings.priority === priorityFilter
       
       return matchesSearch && matchesStatus && matchesPriority
     })
@@ -131,8 +131,8 @@ export default function CampaignsPage() {
   }
 
   const getProgress = (campaign: any) => {
-    if (campaign.analytics.totalVendors === 0) return 0
-    return Math.round((campaign.analytics.submissionsCompleted / campaign.analytics.totalVendors) * 100)
+    if (campaign.progress.totalVendors === 0) return 0
+    return Math.round((campaign.progress.completedSubmissions / campaign.progress.totalVendors) * 100)
   }
 
   const renderCardView = () => (
@@ -147,8 +147,8 @@ export default function CampaignsPage() {
                   <Badge className={getStatusColor(campaign.status)}>
                     {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
                   </Badge>
-                  <Badge className={getPriorityColor(campaign.priority)}>
-                    {campaign.priority}
+                  <Badge className={getPriorityColor(campaign.settings.priority)}>
+                    {campaign.settings.priority}
                   </Badge>
                 </div>
               </div>
@@ -211,22 +211,22 @@ export default function CampaignsPage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="font-medium text-muted-foreground">Created</div>
-                  <div>{formatDate(campaign.schedule.startDate)}</div>
+                  <div>{formatDate(campaign.scheduledStart)}</div>
                 </div>
                 <div>
                   <div className="font-medium text-muted-foreground">Updated</div>
-                  <div>{formatDate(campaign.schedule.startDate)}</div>
+                  <div>{formatDate(campaign.scheduledStart)}</div>
                 </div>
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t">
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Users className="h-4 w-4" />
-                  <span>{campaign.analytics.totalVendors} vendors</span>
+                  <span>{campaign.progress.totalVendors} vendors</span>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <CheckCircle className="h-4 w-4" />
-                  <span>{campaign.analytics.submissionsCompleted} completed</span>
+                  <span>{campaign.progress.completedSubmissions} completed</span>
                 </div>
               </div>
             </div>
@@ -359,10 +359,10 @@ export default function CampaignsPage() {
                       90 days
                     </TableCell>
                     <TableCell>
-                      {formatDate(campaign.schedule.startDate)}
+                      {formatDate(campaign.scheduledStart)}
                     </TableCell>
                     <TableCell>
-                      {formatDate(campaign.schedule.startDate)}
+                      {formatDate(campaign.scheduledStart)}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

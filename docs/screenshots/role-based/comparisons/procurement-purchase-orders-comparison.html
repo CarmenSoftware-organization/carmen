@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Comparison: /procurement/purchase-orders</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .route-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+            font-family: monospace;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .role-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .role-header {
+            padding: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .role-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .role-info {
+            padding: 1rem;
+        }
+        
+        .role-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        .permissions {
+            margin-top: 1rem;
+        }
+        
+        .permission-tag {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin: 0.125rem;
+        }
+        
+        .timestamp {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="route-title">/procurement/purchase-orders</div>
+        <p>Interface variations across user roles</p>
+    </div>
+    
+    <div class="comparison-grid">
+        
+            <div class="role-card">
+                <div class="role-header" style="background: #64748b;">
+                    Staff User
+                </div>
+                <img src="../staff/procurement-purchase-orders-staff.png" alt="Staff User view" class="role-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.innerHTML='Screenshot not available';">
+                <div class="role-info">
+                    <div class="role-description">Basic operational access with limited permissions</div>
+                    <div class="permissions">
+                        
+                            <span class="permission-tag">read</span>
+                        
+                            <span class="permission-tag">basic-operations</span>
+                        
+                    </div>
+                </div>
+            </div>
+          
+            <div class="role-card">
+                <div class="role-header" style="background: #059669;">
+                    Department Manager
+                </div>
+                <img src="../department-manager/procurement-purchase-orders-department-manager.png" alt="Department Manager view" class="role-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.innerHTML='Screenshot not available';">
+                <div class="role-info">
+                    <div class="role-description">Department-level management with approval capabilities</div>
+                    <div class="permissions">
+                        
+                            <span class="permission-tag">read</span>
+                        
+                            <span class="permission-tag">write</span>
+                        
+                            <span class="permission-tag">approve-departmental</span>
+                        
+                            <span class="permission-tag">manage-team</span>
+                        
+                    </div>
+                </div>
+            </div>
+          
+            <div class="role-card">
+                <div class="role-header" style="background: #dc2626;">
+                    Financial Manager
+                </div>
+                <img src="../financial-manager/procurement-purchase-orders-financial-manager.png" alt="Financial Manager view" class="role-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.innerHTML='Screenshot not available';">
+                <div class="role-info">
+                    <div class="role-description">Financial oversight with budget and cost controls</div>
+                    <div class="permissions">
+                        
+                            <span class="permission-tag">read</span>
+                        
+                            <span class="permission-tag">write</span>
+                        
+                            <span class="permission-tag">financial-approve</span>
+                        
+                            <span class="permission-tag">budget-control</span>
+                        
+                    </div>
+                </div>
+            </div>
+          
+            <div class="role-card">
+                <div class="role-header" style="background: #2563eb;">
+                    Purchasing Staff
+                </div>
+                <img src="../purchasing-staff/procurement-purchase-orders-purchasing-staff.png" alt="Purchasing Staff view" class="role-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.innerHTML='Screenshot not available';">
+                <div class="role-info">
+                    <div class="role-description">Procurement specialization with vendor management</div>
+                    <div class="permissions">
+                        
+                            <span class="permission-tag">read</span>
+                        
+                            <span class="permission-tag">write</span>
+                        
+                            <span class="permission-tag">vendor-manage</span>
+                        
+                            <span class="permission-tag">procurement-full</span>
+                        
+                    </div>
+                </div>
+            </div>
+          
+            <div class="role-card">
+                <div class="role-header" style="background: #7c3aed;">
+                    Counter Staff
+                </div>
+                <img src="../counter/procurement-purchase-orders-counter.png" alt="Counter Staff view" class="role-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.innerHTML='Screenshot not available';">
+                <div class="role-info">
+                    <div class="role-description">Inventory operations with counting and stock management</div>
+                    <div class="permissions">
+                        
+                            <span class="permission-tag">read</span>
+                        
+                            <span class="permission-tag">write</span>
+                        
+                            <span class="permission-tag">inventory-operations</span>
+                        
+                            <span class="permission-tag">count-manage</span>
+                        
+                    </div>
+                </div>
+            </div>
+          
+            <div class="role-card">
+                <div class="role-header" style="background: #ea580c;">
+                    Chef
+                </div>
+                <img src="../chef/procurement-purchase-orders-chef.png" alt="Chef view" class="role-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.innerHTML='Screenshot not available';">
+                <div class="role-info">
+                    <div class="role-description">Recipe management with ingredient and menu control</div>
+                    <div class="permissions">
+                        
+                            <span class="permission-tag">read</span>
+                        
+                            <span class="permission-tag">write</span>
+                        
+                            <span class="permission-tag">recipe-manage</span>
+                        
+                            <span class="permission-tag">menu-plan</span>
+                        
+                    </div>
+                </div>
+            </div>
+          
+    </div>
+    
+    <div class="timestamp">
+        Generated: 2025-08-22T09:57:17.638Z
+    </div>
+</body>
+</html>

@@ -36,21 +36,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { mockCampaigns, mockTemplates, mockVendors } from '../../lib/mock-data'
-import { RequestForPricing } from '../../types'
+import { mockCampaigns, mockCampaignTemplates, mockVendors } from '@/lib/mock-data'
+import { PriceCollectionCampaign } from '@/lib/types'
 
 export default function RequestForPricingDetailPage() {
   const params = useParams()
   const router = useRouter()
   const requestId = params.id as string
   
-  const [requestForPricing, setRequestForPricing] = useState<RequestForPricing | null>(null)
+  const [campaign, setCampaign] = useState<PriceCollectionCampaign | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate loading request for pricing data
-    const foundRequest = mockCampaigns.find(c => c.id === requestId)
-    setRequestForPricing(foundRequest || null)
+    // Simulate loading campaign data
+    const foundCampaign = mockCampaigns.find(c => c.id === requestId)
+    setCampaign(foundCampaign || null)
     setIsLoading(false)
   }, [requestId])
 
@@ -75,12 +75,12 @@ export default function RequestForPricingDetailPage() {
     )
   }
 
-  if (!requestForPricing) {
+  if (!campaign) {
     return (
       <div className="text-center py-12">
         <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2">Request for Pricing not found</h3>
-        <p className="text-muted-foreground mb-4">The request for pricing you&apos;re looking for doesn&apos;t exist.</p>
+        <h3 className="text-lg font-medium mb-2">Campaign not found</h3>
+        <p className="text-muted-foreground mb-4">The campaign you&apos;re looking for doesn&apos;t exist.</p>
         <Button onClick={() => router.push('/vendor-management/campaigns')}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -118,18 +118,18 @@ export default function RequestForPricingDetailPage() {
   }
 
   const getTemplate = () => {
-    return mockTemplates.find(t => t.id === requestForPricing.templateId)
+    return campaign.template || mockCampaignTemplates.find(t => t.id === 'template-001')
   }
 
   const getVendorDetails = () => {
-    return requestForPricing.vendorIds.map(vendorId => 
+    return campaign.selectedVendors.map(vendorId => 
       mockVendors.find(v => v.id === vendorId)
     ).filter(Boolean)
   }
 
   const getProgress = () => {
-    if (requestForPricing.analytics.totalVendors === 0) return 0
-    return Math.round((requestForPricing.analytics.submissionsCompleted / requestForPricing.analytics.totalVendors) * 100)
+    if (campaign.progress.totalVendors === 0) return 0
+    return Math.round((campaign.progress.completedSubmissions / campaign.progress.totalVendors) * 100)
   }
 
   const template = getTemplate()
@@ -147,15 +147,15 @@ export default function RequestForPricingDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold">{requestForPricing.name}</h1>
-              <Badge className={getStatusColor(requestForPricing.status)}>
-                {requestForPricing.status}
+              <h1 className="text-2xl font-semibold">{campaign.name}</h1>
+              <Badge className={getStatusColor(campaign.status)}>
+                {campaign.status}
               </Badge>
-              <Badge className={getPriorityColor(requestForPricing.priority)}>
-                {requestForPricing.priority}
+              <Badge className={getPriorityColor(campaign.settings.priority)}>
+                {campaign.settings.priority}
               </Badge>
             </div>
-            <p className="text-muted-foreground">{requestForPricing.description}</p>
+            <p className="text-muted-foreground">{campaign.description}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -192,13 +192,13 @@ export default function RequestForPricingDetailPage() {
                 <div>
                   <div className="text-sm font-medium">Schedule</div>
                   <div className="text-sm text-muted-foreground">
-                    {formatDate(requestForPricing.schedule.startDate)} - {requestForPricing.schedule.endDate ? formatDate(requestForPricing.schedule.endDate) : 'Ongoing'}
+                    {formatDate(campaign.scheduledStart)} - {campaign.scheduledEnd ? formatDate(campaign.scheduledEnd) : 'Ongoing'}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm font-medium">Created</div>
                   <div className="text-sm text-muted-foreground">
-                    {formatDate(requestForPricing.createdAt)} by {requestForPricing.createdBy}
+                    {formatDate(campaign.createdAt)} by {campaign.createdBy}
                   </div>
                 </div>
               </CardContent>
@@ -211,19 +211,19 @@ export default function RequestForPricingDetailPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Response Rate</span>
-                  <span className="text-sm font-medium">{requestForPricing.analytics.responseRate}%</span>
+                  <span className="text-sm font-medium">{campaign.progress.responseRate}%</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Avg Response Time</span>
-                  <span className="text-sm font-medium">{requestForPricing.analytics.averageResponseTime}h</span>
+                  <span className="text-sm font-medium">{campaign.progress.averageResponseTime}h</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Completion Rate</span>
-                  <span className="text-sm font-medium">{requestForPricing.analytics.completionRate}%</span>
+                  <span className="text-sm font-medium">{campaign.progress.completionRate}%</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Quality Score</span>
-                  <span className="text-sm font-medium">{(requestForPricing.analytics.qualityScore/20).toFixed(1)}/5</span>
+                  <span className="text-sm">Submissions</span>
+                  <span className="text-sm font-medium">{campaign.progress.completedSubmissions}/{campaign.progress.totalVendors}</span>
                 </div>
               </CardContent>
             </Card>
@@ -247,19 +247,24 @@ export default function RequestForPricingDetailPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {vendorDetails.map((vendor) => {
-                    const engagement = requestForPricing.analytics.vendorEngagement.find(e => e.vendorId === vendor?.id)
+                  {vendorDetails.map((vendor, index) => {
+                    // Mock vendor status based on campaign progress
+                    const isResponded = index < campaign.progress.respondedVendors
+                    const isCompleted = index < campaign.progress.completedSubmissions
+                    const completionPercentage = isCompleted ? 100 : isResponded ? 50 : 0
+                    const lastActivity = isResponded ? new Date(Date.now() - (index * 24 * 60 * 60 * 1000)) : null
+                    
                     return (
                       <TableRow key={vendor?.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{vendor?.name}</div>
-                            <div className="text-sm text-muted-foreground">{vendor?.contactEmail}</div>
+                            <div className="font-medium">{vendor?.companyName}</div>
+                            <div className="text-sm text-muted-foreground">{vendor?.email}</div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={engagement ? 'default' : 'secondary'}>
-                            {engagement ? 'Active' : 'Pending'}
+                          <Badge variant={isCompleted ? 'default' : isResponded ? 'secondary' : 'outline'}>
+                            {isCompleted ? 'Completed' : isResponded ? 'In Progress' : 'Pending'}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -267,21 +272,21 @@ export default function RequestForPricingDetailPage() {
                             <div className="w-16 bg-gray-200 rounded-full h-2">
                               <div 
                                 className="bg-blue-600 h-2 rounded-full" 
-                                style={{ width: `${engagement?.completionPercentage || 0}%` }}
+                                style={{ width: `${completionPercentage}%` }}
                               />
                             </div>
-                            <span className="text-sm">{engagement?.completionPercentage || 0}%</span>
+                            <span className="text-sm">{completionPercentage}%</span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            {engagement?.lastActivity ? formatDate(engagement.lastActivity) : 'No activity'}
+                            {lastActivity ? formatDate(lastActivity) : 'No activity'}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" disabled={isCompleted}>
                             <Mail className="h-4 w-4 mr-2" />
-                            Send Reminder
+                            {isCompleted ? 'Completed' : 'Send Reminder'}
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -300,16 +305,72 @@ export default function RequestForPricingDetailPage() {
               <CardTitle>Campaign Settings</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="text-sm font-medium">Deadline Buffer</div>
-                  <div className="text-sm text-muted-foreground">{requestForPricing.deadlineBuffer} hours</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-sm font-medium">Portal Access Duration</div>
+                    <div className="text-sm text-muted-foreground">{campaign.settings.portalAccessDuration} days</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Submission Methods</div>
+                    <div className="text-sm text-muted-foreground">{campaign.settings.allowedSubmissionMethods.join(', ')}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Requires Approval</div>
+                    <div className="text-sm text-muted-foreground">{campaign.settings.requireApproval ? 'Yes' : 'No'}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Auto Reminders</div>
+                    <div className="text-sm text-muted-foreground">{campaign.settings.autoReminders ? 'Enabled' : 'Disabled'}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-sm font-medium">Max Submission Attempts</div>
-                  <div className="text-sm text-muted-foreground">{requestForPricing.maxSubmissionAttempts}</div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-sm font-medium">Campaign Type</div>
+                    <div className="text-sm text-muted-foreground">{campaign.campaignType}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Email Template</div>
+                    <div className="text-sm text-muted-foreground">{campaign.settings.emailTemplate}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Priority</div>
+                    <Badge className={getPriorityColor(campaign.settings.priority)}>
+                      {campaign.settings.priority}
+                    </Badge>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">Custom Instructions</div>
+                    <div className="text-sm text-muted-foreground">{campaign.settings.customInstructions || 'None'}</div>
+                  </div>
                 </div>
               </div>
+                
+                {campaign.settings.reminderSchedule?.enabled && (
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="text-sm font-medium mb-4">Reminder Schedule</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <div className="text-sm font-medium">Reminder Intervals</div>
+                        <div className="text-sm text-muted-foreground">
+                          {campaign.settings.reminderSchedule.intervals.join(', ')} days before deadline
+                        </div>
+                      </div>
+                      {campaign.settings.reminderSchedule.escalationRules.length > 0 && (
+                        <div>
+                          <div className="text-sm font-medium">Escalation Rules</div>
+                          <div className="text-sm text-muted-foreground">
+                            {campaign.settings.reminderSchedule.escalationRules.map((rule, index) => (
+                              <div key={index}>
+                                After {rule.daysOverdue} days overdue → {rule.escalateTo.join(', ')}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
             </CardContent>
           </Card>
         </TabsContent>

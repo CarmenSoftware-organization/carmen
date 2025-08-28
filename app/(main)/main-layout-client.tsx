@@ -46,7 +46,7 @@ export default function MainLayoutClient({
   // Calculate dynamic padding based on sidebar state
   const getContentPadding = () => {
     if (!isLargeScreen) return "" // No padding on mobile
-    return isSidebarCollapsed ? "lg:pl-[60px]" : "lg:pl-[280px]"
+    return isSidebarCollapsed ? "sm:pl-[60px]" : "sm:pl-[280px]"
   }
 
   return (

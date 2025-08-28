@@ -1,6 +1,36 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { PurchaseRequestsDataTable } from "./purchase-requests-data-table"
+import { PurchaseRequestsCardView } from "./purchase-requests-card-view"
+import { purchaseRequestColumns } from "./purchase-requests-columns"
+import { PurchaseRequest } from "@/lib/types"
+import { Button } from "@/components/ui/button"
+import { Plus, Download, Printer } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { fetchPurchaseRequests } from "@/app/lib/data"
+
+export function ModernPurchaseRequestList() {
+  const router = useRouter()
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [data, setData] = useState<PurchaseRequest[]>([])
+
+  useEffect(() => {
+    async function fetchData() {
+      const purchaseRequests = await fetchPurchaseRequests();
+      setData(purchaseRequests);
+    }
+    fetchData();
+  }, []);
 import { useRouter } from "next/navigation"
 import { PurchaseRequestsDataTable } from "./purchase-requests-data-table"
 import { PurchaseRequestsCardView } from "./purchase-requests-card-view"

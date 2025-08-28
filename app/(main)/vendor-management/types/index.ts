@@ -208,6 +208,14 @@ export interface PricelistItem {
   qualityScore?: number
   validationErrors?: ValidationError[]
   lastModified: Date
+  certifications?: string[]
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  description?: string;
+  icon_url?: string;
 }
 
 export interface VendorPricelist {
