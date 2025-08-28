@@ -73,7 +73,11 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [
+          { id: 1, name: "Sarah Chen", department: "Housekeeping", location: "Main Building" },
+          { id: 3, name: "Lisa Thompson", department: "Front Office", location: "Lobby" }
+        ],
+        roleType: "requester"
       },
       { 
         id: 2, 
@@ -86,7 +90,11 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [
+          { id: 5, name: "Emily Wong", department: "Purchasing", location: "Admin Office" },
+          { id: 6, name: "John Martinez", department: "Purchasing", location: "Admin Office" }
+        ],
+        roleType: "purchaser"
       },
       { 
         id: 3, 
@@ -99,7 +107,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "approver"
       },
       { 
         id: 4, 
@@ -112,7 +121,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "reviewer"
       },
       { 
         id: 5, 
@@ -125,7 +135,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "approver"
       },
       { 
         id: 6, 
@@ -138,7 +149,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "reviewer"
       },
     ],
     routingRules: [
@@ -218,7 +230,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "requester"
       },
       { 
         id: 2, 
@@ -231,7 +244,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "approver"
       },
       { 
         id: 3, 
@@ -244,7 +258,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "purchaser"
       },
       { 
         id: 4, 
@@ -257,7 +272,8 @@ export const sampleWorkflows: Workflow[] = [
           pricePerUnit: false,
           totalPrice: false
         },
-        assignedUsers: []
+        assignedUsers: [],
+        roleType: "reviewer"
       },
     ],
     routingRules: [

@@ -47,8 +47,8 @@ const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
                     {actionButtons}
                   </div>
                 </div>
-                {isEditing ? editableDetails : details && (
-                  <div className="grid grid-cols-3 gap-4 text-sm border-t pt-6">
+                {details && (
+                  <div className="border-t pt-6">
                     {details}
                   </div>
                 )}

@@ -330,7 +330,7 @@ export function CategoryList() {
 
     return (
       <>
-        <TableRow key={category.id}>
+        <TableRow key={category.id} role="treeitem" aria-expanded={hasChildren ? isExpanded : undefined}>
           <TableCell>
             <Checkbox
               checked={selectedCategories.includes(category.id)}
@@ -343,8 +343,9 @@ export function CategoryList() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="mr-2 p-0"
+                  className="mr-2 p-2 h-11 w-11"
                   onClick={() => toggleExpand(category.id)}
+                  aria-label={isExpanded ? `Collapse ${category.name}` : `Expand ${category.name}`}
                 >
                   {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
@@ -371,7 +372,12 @@ export function CategoryList() {
           <TableCell>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-11 w-11 p-2"
+                  aria-label={`Actions for ${category.name}`}
+                >
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -434,19 +440,19 @@ export function CategoryList() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Recipe Categories</h1>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" className="h-11 px-4">
             <FileUp className="h-4 w-4 mr-2" />
             Import
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" className="h-11 px-4">
             <FileDown className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" className="h-11 px-4">
             <Printer className="h-4 w-4 mr-2" />
             Print
           </Button>
-          <Button onClick={handleCreate}>
+          <Button onClick={handleCreate} className="h-11 px-4">
             <Plus className="h-4 w-4 mr-2" />
             New Category
           </Button>
@@ -470,28 +476,36 @@ export function CategoryList() {
               <Button
                 variant={quickFilters.includes('noRecipes') ? 'default' : 'outline'}
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleQuickFilter('noRecipes')}
+                aria-pressed={quickFilters.includes('noRecipes')}
               >
                 No Recipes
               </Button>
               <Button
                 variant={quickFilters.includes('hasRecipes') ? 'default' : 'outline'}
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleQuickFilter('hasRecipes')}
+                aria-pressed={quickFilters.includes('hasRecipes')}
               >
                 Has Recipes
               </Button>
               <Button
                 variant={quickFilters.includes('topLevel') ? 'default' : 'outline'}
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleQuickFilter('topLevel')}
+                aria-pressed={quickFilters.includes('topLevel')}
               >
                 Top Level
               </Button>
               <Button
                 variant={quickFilters.includes('subLevel') ? 'default' : 'outline'}
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleQuickFilter('subLevel')}
+                aria-pressed={quickFilters.includes('subLevel')}
               >
                 Sub Level
               </Button>
@@ -499,7 +513,12 @@ export function CategoryList() {
 
             <Popover open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-11 px-4"
+                  aria-expanded={isAdvancedFilterOpen}
+                >
                   <SlidersHorizontal className="h-4 w-4 mr-2" />
                   More Filters {filterConditions.length > 0 && `(${filterConditions.length})`}
                 </Button>
@@ -563,7 +582,9 @@ export function CategoryList() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-11 w-11 p-2"
                         onClick={() => removeFilterCondition(condition.id)}
+                        aria-label="Remove filter condition"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -571,17 +592,17 @@ export function CategoryList() {
                   ))}
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full h-11"
                     onClick={addFilterCondition}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add filter
                   </Button>
                   <div className="flex justify-between pt-2">
-                    <Button variant="outline" size="sm" onClick={clearFilters}>
+                    <Button variant="outline" size="sm" className="h-11 px-4" onClick={clearFilters}>
                       Clear All
                     </Button>
-                    <Button size="sm" onClick={() => setIsAdvancedFilterOpen(false)}>
+                    <Button size="sm" className="h-11 px-4" onClick={() => setIsAdvancedFilterOpen(false)}>
                       Apply Filters
                     </Button>
                   </div>
@@ -594,7 +615,7 @@ export function CategoryList() {
                 variant="ghost"
                 size="sm"
                 onClick={clearFilters}
-                className="text-muted-foreground"
+                className="text-muted-foreground h-11 px-4"
               >
                 <X className="h-4 w-4 mr-1" />
                 Clear Filters
@@ -610,6 +631,7 @@ export function CategoryList() {
               <Button
                 variant="outline"
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleBulkAction('activate')}
               >
                 <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -618,6 +640,7 @@ export function CategoryList() {
               <Button
                 variant="outline"
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleBulkAction('deactivate')}
               >
                 <XCircle className="h-4 w-4 mr-2" />
@@ -626,6 +649,7 @@ export function CategoryList() {
               <Button
                 variant="outline"
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleBulkAction('export')}
               >
                 <FileDown className="h-4 w-4 mr-2" />
@@ -634,6 +658,7 @@ export function CategoryList() {
               <Button
                 variant="destructive"
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => handleBulkAction('delete')}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -647,6 +672,7 @@ export function CategoryList() {
               <Button
                 variant="outline"
                 size="sm"
+                className="h-11 px-4"
                 onClick={() => setSelectedCategories([])}
               >
                 Clear Selection
@@ -657,7 +683,7 @@ export function CategoryList() {
       </div>
 
       {/* Categories Table */}
-      <div className="border rounded-lg">
+      <div className="border rounded-lg" role="tree" aria-label="Recipe categories table">
         <Table>
           <TableHeader>
             <TableRow>

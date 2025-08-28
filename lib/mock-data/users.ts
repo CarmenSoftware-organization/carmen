@@ -4,132 +4,20 @@
  * Centralized mock data for users, roles, departments, and locations.
  */
 
-import { User, Role, Department, Location } from '../types'
+import { User, Role, Department, Location, Money } from '../types'
+import { mockRoles as permissionRoles, mockDepartments as permissionDepartments, mockLocations as permissionLocations } from './permission-roles'
 
 // ====== ROLES ======
-
-export const mockRoles: Role[] = [
-  { 
-    id: 'staff', 
-    name: 'Staff', 
-    permissions: ['create_pr', 'view_pr', 'edit_own_pr', 'view_inventory'] 
-  },
-  { 
-    id: 'department-manager', 
-    name: 'Department Manager', 
-    permissions: ['approve_pr', 'view_department_pr', 'manage_budget', 'view_department_reports'] 
-  },
-  { 
-    id: 'financial-manager', 
-    name: 'Financial Manager', 
-    permissions: ['approve_pr', 'view_all_pr', 'manage_financials', 'view_financial_reports', 'manage_budgets'] 
-  },
-  { 
-    id: 'purchasing-staff', 
-    name: 'Purchasing Staff', 
-    permissions: ['convert_to_po', 'manage_vendors', 'view_all_pr', 'create_po', 'manage_supplier_relationships'] 
-  },
-  { 
-    id: 'counter', 
-    name: 'Counter Staff', 
-    permissions: ['process_orders', 'view_inventory', 'handle_sales', 'manage_pos'] 
-  },
-  { 
-    id: 'chef', 
-    name: 'Chef', 
-    permissions: ['create_recipes', 'manage_kitchen', 'view_inventory', 'manage_menu', 'food_costing'] 
-  },
-  { 
-    id: 'warehouse-manager', 
-    name: 'Warehouse Manager', 
-    permissions: ['manage_inventory', 'physical_counts', 'stock_adjustments', 'inventory_reports'] 
-  },
-  { 
-    id: 'admin', 
-    name: 'System Administrator', 
-    permissions: ['full_access', 'user_management', 'system_configuration', 'data_backup'] 
-  }
-];
+// Re-export roles from permission system for compatibility
+export const mockRoles: Role[] = permissionRoles;
 
 // ====== DEPARTMENTS ======
-
-export const mockDepartments: Department[] = [
-  { id: 'fb', name: 'Food & Beverage', code: 'F&B' },
-  { id: 'housekeeping', name: 'Housekeeping', code: 'HK' },
-  { id: 'administration', name: 'Administration', code: 'ADMIN' },
-  { id: 'maintenance', name: 'Maintenance', code: 'MAINT' },
-  { id: 'front-office', name: 'Front Office', code: 'FO' },
-  { id: 'kitchen', name: 'Kitchen Operations', code: 'KITCHEN' },
-  { id: 'procurement', name: 'Procurement', code: 'PROC' },
-  { id: 'finance', name: 'Finance', code: 'FIN' },
-  { id: 'hr', name: 'Human Resources', code: 'HR' },
-  { id: 'security', name: 'Security', code: 'SEC' }
-];
+// Re-export departments from permission system for compatibility
+export const mockDepartments: Department[] = permissionDepartments;
 
 // ====== LOCATIONS ======
-
-export const mockLocations: Location[] = [
-  { 
-    id: 'main-hotel', 
-    name: 'Grand Hotel Main', 
-    type: 'hotel', 
-    address: '123 Main St, New York, NY 10001' 
-  },
-  { 
-    id: 'main-kitchen', 
-    name: 'Main Kitchen', 
-    type: 'restaurant', 
-    address: 'Ground Floor, Grand Hotel' 
-  },
-  { 
-    id: 'central-warehouse', 
-    name: 'Central Warehouse', 
-    type: 'warehouse', 
-    address: '456 Storage Ave, Queens, NY 11101' 
-  },
-  { 
-    id: 'admin-office', 
-    name: 'Administrative Office', 
-    type: 'office', 
-    address: '2nd Floor, Grand Hotel' 
-  },
-  { 
-    id: 'pool-bar', 
-    name: 'Pool Bar & Grill', 
-    type: 'restaurant', 
-    address: 'Pool Area, Grand Hotel' 
-  },
-  { 
-    id: 'rooftop-restaurant', 
-    name: 'Rooftop Fine Dining', 
-    type: 'restaurant', 
-    address: 'Rooftop Level, Grand Hotel' 
-  },
-  { 
-    id: 'banquet-hall', 
-    name: 'Grand Banquet Hall', 
-    type: 'office', 
-    address: '3rd Floor, Grand Hotel' 
-  },
-  { 
-    id: 'dry-store', 
-    name: 'Dry Storage', 
-    type: 'warehouse', 
-    address: 'Basement Level 1, Grand Hotel' 
-  },
-  { 
-    id: 'cold-storage', 
-    name: 'Cold Storage Room', 
-    type: 'warehouse', 
-    address: 'Basement Level 1, Grand Hotel' 
-  },
-  { 
-    id: 'receiving-dock', 
-    name: 'Receiving Dock', 
-    type: 'warehouse', 
-    address: 'Loading Bay, Grand Hotel' 
-  }
-];
+// Re-export locations from permission system for compatibility
+export const mockLocations: Location[] = permissionLocations;
 
 // ====== USERS ======
 
@@ -142,14 +30,33 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
-    role: 'Chef',
-    department: 'Food & Beverage',
-    location: 'Main Kitchen',
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'role-007')!, mockRoles.find(r => r.id === 'role-011')!],
+    primaryRole: mockRoles.find(r => r.id === 'role-007')!,
+    departments: [mockDepartments.find(d => d.id === 'dept-003')!],
+    locations: [mockLocations.find(l => l.id === 'loc-002')!, mockLocations.find(l => l.id === 'loc-003')!],
+    approvalLimit: { amount: 15000, currency: 'USD' } as Money,
+    clearanceLevel: 'confidential',
+    effectiveFrom: new Date('2023-01-15'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: true,
+    businessUnit: 'operations',
+    specialPermissions: ['recipe-confidential-access'],
+    delegatedAuthorities: ['recipe-modifications', 'kitchen-operations-override'],
+    effectivePermissions: [
+      'recipe:*', 'menu_item:*', 'recipe_category:*', 'cuisine_type:*',
+      'production_order:*', 'batch_production:*', 'quality_control:*'
+    ],
+    // Legacy compatibility fields
+    role: 'role-007',
+    department: 'dept-003',
+    location: 'loc-002',
     assignedWorkflowStages: ['departmentHeadApproval'],
     context: {
-      currentRole: mockRoles.find(r => r.id === 'chef')!,
-      currentDepartment: mockDepartments.find(d => d.id === 'fb')!,
-      currentLocation: mockLocations.find(l => l.id === 'main-kitchen')!,
+      currentRole: mockRoles.find(r => r.id === 'role-007')!,
+      currentDepartment: mockDepartments.find(d => d.id === 'dept-003')!,
+      currentLocation: mockLocations.find(l => l.id === 'loc-002')!,
       showPrices: true,
     },
     createdAt: new Date('2023-01-15'),
@@ -165,14 +72,33 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
-    role: 'Department Manager',
-    department: 'Food & Beverage',
-    location: 'Grand Hotel Main',
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'role-002')!],
+    primaryRole: mockRoles.find(r => r.id === 'role-002')!,
+    departments: [mockDepartments.find(d => d.id === 'dept-001')!],
+    locations: [mockLocations.find(l => l.id === 'loc-001')!, mockLocations.find(l => l.id === 'loc-002')!],
+    approvalLimit: { amount: 50000, currency: 'USD' } as Money,
+    clearanceLevel: 'secret',
+    effectiveFrom: new Date('2022-06-01'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: true,
+    businessUnit: 'management',
+    specialPermissions: ['emergency-access-override', 'cross-department-access'],
+    delegatedAuthorities: ['purchase-request-approval', 'user-management', 'budget-approval'],
+    effectivePermissions: [
+      'purchase_request:*', 'purchase_order:*', 'budget:*', 'financial_report:*',
+      'user:create', 'user:update', 'user:assign_role', 'workflow:configure'
+    ],
+    // Legacy compatibility fields
+    role: 'role-002',
+    department: 'dept-001',
+    location: 'loc-001',
     assignedWorkflowStages: ['departmentHeadApproval', 'financeManagerApproval'],
     context: {
-      currentRole: mockRoles.find(r => r.id === 'department-manager')!,
-      currentDepartment: mockDepartments.find(d => d.id === 'fb')!,
-      currentLocation: mockLocations.find(l => l.id === 'main-hotel')!,
+      currentRole: mockRoles.find(r => r.id === 'role-002')!,
+      currentDepartment: mockDepartments.find(d => d.id === 'dept-001')!,
+      currentLocation: mockLocations.find(l => l.id === 'loc-001')!,
       showPrices: true,
     },
     createdAt: new Date('2022-06-01'),
@@ -188,14 +114,33 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
-    role: 'Purchasing Staff',
-    department: 'Procurement',
-    location: 'Administrative Office',
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'role-009')!],
+    primaryRole: mockRoles.find(r => r.id === 'role-009')!,
+    departments: [mockDepartments.find(d => d.id === 'dept-002')!],
+    locations: [mockLocations.find(l => l.id === 'loc-001')!, mockLocations.find(l => l.id === 'loc-004')!],
+    approvalLimit: { amount: 10000, currency: 'USD' } as Money,
+    clearanceLevel: 'basic',
+    effectiveFrom: new Date('2023-03-10'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: false,
+    businessUnit: 'operations',
+    specialPermissions: [],
+    delegatedAuthorities: ['purchase-order-creation'],
+    effectivePermissions: [
+      'purchase_order:create', 'purchase_order:update', 'purchase_order:send',
+      'vendor:view', 'vendor_quotation:create', 'goods_receipt_note:create'
+    ],
+    // Legacy compatibility fields
+    role: 'role-009',
+    department: 'dept-002',
+    location: 'loc-001',
     assignedWorkflowStages: ['purchaseReview'],
     context: {
-      currentRole: mockRoles.find(r => r.id === 'purchasing-staff')!,
-      currentDepartment: mockDepartments.find(d => d.id === 'procurement')!,
-      currentLocation: mockLocations.find(l => l.id === 'admin-office')!,
+      currentRole: mockRoles.find(r => r.id === 'role-009')!,
+      currentDepartment: mockDepartments.find(d => d.id === 'dept-002')!,
+      currentLocation: mockLocations.find(l => l.id === 'loc-001')!,
       showPrices: true,
     },
     createdAt: new Date('2023-03-10'),
@@ -211,14 +156,33 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
-    role: 'Financial Manager',
-    department: 'Finance',
-    location: 'Administrative Office',
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'role-008')!],
+    primaryRole: mockRoles.find(r => r.id === 'role-008')!,
+    departments: [mockDepartments.find(d => d.id === 'dept-005')!],
+    locations: [mockLocations.find(l => l.id === 'loc-001')!, mockLocations.find(l => l.id === 'loc-006')!],
+    approvalLimit: { amount: 25000, currency: 'USD' } as Money,
+    clearanceLevel: 'confidential',
+    effectiveFrom: new Date('2022-01-20'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: true,
+    businessUnit: 'finance',
+    specialPermissions: ['financial-data-access'],
+    delegatedAuthorities: ['financial-approval', 'payment-authorization'],
+    effectivePermissions: [
+      'invoice:*', 'payment:create', 'payment:approve',
+      'journal_entry:*', 'account_code:*', 'financial_report:view'
+    ],
+    // Legacy compatibility fields
+    role: 'role-008',
+    department: 'dept-005',
+    location: 'loc-006',
     assignedWorkflowStages: ['financeManagerApproval'],
     context: {
-      currentRole: mockRoles.find(r => r.id === 'financial-manager')!,
-      currentDepartment: mockDepartments.find(d => d.id === 'finance')!,
-      currentLocation: mockLocations.find(l => l.id === 'admin-office')!,
+      currentRole: mockRoles.find(r => r.id === 'role-008')!,
+      currentDepartment: mockDepartments.find(d => d.id === 'dept-005')!,
+      currentLocation: mockLocations.find(l => l.id === 'loc-006')!,
       showPrices: true,
     },
     createdAt: new Date('2022-01-20'),

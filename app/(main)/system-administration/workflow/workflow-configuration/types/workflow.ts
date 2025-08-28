@@ -2,6 +2,7 @@ export type OperatorType = "eq" | "lt" | "gt" | "lte" | "gte"
 export type ActionType = "SKIP_STAGE" | "NEXT_STAGE"
 export type NotificationChannel = "Email" | "System"
 export type NotificationEventTrigger = "onSubmit" | "onApprove" | "onReject" | "onSendBack" | "onSLA"
+export type WorkflowRoleType = 'requester' | 'purchaser' | 'approver' | 'reviewer'
 
 export interface Product {
   id: number
@@ -29,6 +30,7 @@ export interface Stage {
     department: string
     location: string
   }[]
+  roleType: WorkflowRoleType
 }
 
 export interface RoutingCondition {

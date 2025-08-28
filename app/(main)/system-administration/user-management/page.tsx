@@ -1,62 +1,27 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { UserDataTable } from "./components/user-data-table"
+import { UserCardView } from "./components/user-card-view"
+import { createUserColumns } from "./components/user-columns"
 import { BulkActions } from "./components/bulk-actions"
-import { UserFormDialog } from "./components/user-form-dialog"
+import { EnhancedUserFormDialog } from "./components/enhanced-user-form-dialog"
 import { 
-  PlusCircle, 
-  X, 
   UserPlus, 
-  Search, 
-  Filter,
-  SlidersHorizontal,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  FileText
+  Download,
+  Printer,
+  Shield,
 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-
-interface FilterCondition {
-  id: string
-  field: string
-  operator: string
-  value: string
-}
 
 interface User {
   id: string
@@ -65,358 +30,346 @@ interface User {
   businessUnit: string
   department: string
   roles: string[]
+  primaryRole?: string
   hodStatus: boolean
   inviteStatus?: string
   lastLogin?: string
   accountStatus: string
+  approvalLimit?: {
+    amount: number
+    currency: string
+  }
+  clearanceLevel?: string
+  locations?: string[]
+  effectivePermissions?: string[]
+  departments?: string[]
+  specialPermissions?: string[]
+  delegatedAuthorities?: string[]
+  effectiveFrom?: Date
+  effectiveTo?: Date
+  isHod?: boolean
+  businessUnitName?: string
 }
 
-const FILTER_FIELDS = [
-  { label: "Name", value: "name" },
-  { label: "Email", value: "email" },
-  { label: "Business Unit", value: "businessUnit" },
-  { label: "Department", value: "department" },
-  { label: "Role", value: "roles" },
-  { label: "HOD Status", value: "hodStatus" },
-  { label: "Invite Status", value: "inviteStatus" },
-  { label: "Account Status", value: "accountStatus" },
-]
-
-const FILTER_OPERATORS = [
-  { label: "Contains", value: "contains" },
-  { label: "Equals", value: "equals" },
-  { label: "Not equals", value: "notEquals" },
-  { label: "Is empty", value: "isEmpty" },
-  { label: "Is not empty", value: "isNotEmpty" },
-]
-
-// Mock data for demonstration
+// Mock data for demonstration  
 const mockUsers: User[] = [
   {
     id: "1",
     name: "John Doe",
     email: "john.doe@example.com",
-    businessUnit: "Sales",
-    department: "Enterprise Sales",
-    roles: ["sales_manager", "user"],
+    businessUnit: "management",
+    businessUnitName: "Management",
+    department: "Administration",
+    departments: ["dept-001", "dept-006"],
+    roles: ["role-002", "role-005"],
+    primaryRole: "role-002",
     hodStatus: true,
+    isHod: true,
     inviteStatus: "accepted",
     lastLogin: "2024-02-20T10:00:00Z",
     accountStatus: "active",
+    approvalLimit: {
+      amount: 50000,
+      currency: "USD"
+    },
+    clearanceLevel: "confidential",
+    locations: ["loc-001", "loc-002"],
+    effectivePermissions: [
+      "purchase_request:*", "purchase_order:*", "budget:*", "financial_report:*",
+      "user:create", "user:update", "user:assign_role", "workflow:configure"
+    ],
+    specialPermissions: ["emergency-access-override", "cross-department-access"],
+    delegatedAuthorities: ["purchase-request-approval", "user-management"],
+    effectiveFrom: new Date('2024-01-01'),
+    effectiveTo: new Date('2025-12-31')
   },
   {
     id: "2",
     name: "Jane Smith",
     email: "jane.smith@example.com",
-    businessUnit: "Engineering",
-    department: "Frontend",
-    roles: ["developer", "user"],
+    businessUnit: "operations",
+    businessUnitName: "Operations",
+    department: "Procurement",
+    departments: ["dept-002"],
+    roles: ["role-009"],
+    primaryRole: "role-009",
     hodStatus: false,
+    isHod: false,
     inviteStatus: "accepted",
     lastLogin: "2024-02-19T15:30:00Z",
     accountStatus: "active",
+    approvalLimit: {
+      amount: 10000,
+      currency: "USD"
+    },
+    clearanceLevel: "basic",
+    locations: ["loc-001", "loc-004"],
+    effectivePermissions: [
+      "purchase_order:create", "purchase_order:update", "purchase_order:send",
+      "vendor:view", "vendor_quotation:create", "goods_receipt_note:create"
+    ],
+    effectiveFrom: new Date('2024-01-15'),
+    effectiveTo: new Date('2025-12-31')
   },
+  {
+    id: "3",
+    name: "Mike Johnson",
+    email: "mike.johnson@example.com",
+    businessUnit: "operations",
+    businessUnitName: "Operations",
+    department: "Kitchen Operations",
+    departments: ["dept-003"],
+    roles: ["role-007", "role-011"],
+    primaryRole: "role-007",
+    hodStatus: true,
+    isHod: true,
+    inviteStatus: "accepted",
+    lastLogin: "2024-02-21T08:00:00Z",
+    accountStatus: "active",
+    approvalLimit: {
+      amount: 25000,
+      currency: "USD"
+    },
+    clearanceLevel: "confidential",
+    locations: ["loc-002", "loc-003"],
+    effectivePermissions: [
+      "recipe:*", "menu_item:*", "recipe_category:*", "cuisine_type:*",
+      "production_order:*", "batch_production:*", "quality_control:*",
+      "recipe_report:*"
+    ],
+    specialPermissions: ["recipe-confidential-access"],
+    delegatedAuthorities: ["recipe-modifications", "quality-control-override"],
+    effectiveFrom: new Date('2024-01-01')
+  },
+  {
+    id: "4",
+    name: "Sarah Wilson",
+    email: "sarah.wilson@example.com",
+    businessUnit: "finance",
+    businessUnitName: "Finance",
+    department: "Accounting",
+    departments: ["dept-005"],
+    roles: ["role-006"],
+    primaryRole: "role-006",
+    hodStatus: false,
+    isHod: false,
+    inviteStatus: "accepted",
+    lastLogin: "2024-02-22T09:30:00Z",
+    accountStatus: "active",
+    approvalLimit: {
+      amount: 15000,
+      currency: "USD"
+    },
+    clearanceLevel: "confidential",
+    locations: ["loc-001"],
+    effectivePermissions: [
+      "financial_report:view", "budget:view", "invoice:*", "payment:*"
+    ],
+    effectiveFrom: new Date('2024-01-10'),
+    effectiveTo: new Date('2025-12-31')
+  },
+  {
+    id: "5",
+    name: "David Chen",
+    email: "david.chen@example.com",
+    businessUnit: "operations",
+    businessUnitName: "Operations",
+    department: "IT Support",
+    departments: ["dept-007"],
+    roles: ["role-012"],
+    primaryRole: "role-012",
+    hodStatus: false,
+    isHod: false,
+    inviteStatus: "pending",
+    lastLogin: "2024-02-18T14:00:00Z",
+    accountStatus: "pending",
+    approvalLimit: {
+      amount: 5000,
+      currency: "USD"
+    },
+    clearanceLevel: "basic",
+    locations: ["loc-001", "loc-002"],
+    effectivePermissions: [
+      "system:maintenance", "user:support", "equipment:*"
+    ],
+    effectiveFrom: new Date('2024-02-01'),
+    effectiveTo: new Date('2025-12-31')
+  }
 ]
 
 export default function UserManagementPage() {
   const router = useRouter()
   const [users, setUsers] = useState<User[]>(mockUsers)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string | null>(null)
-  const [filterConditions, setFilterConditions] = useState<FilterCondition[]>([])
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
-  const addFilterCondition = () => {
-    const newCondition: FilterCondition = {
-      id: Math.random().toString(36).substr(2, 9),
-      field: FILTER_FIELDS[0].value,
-      operator: FILTER_OPERATORS[0].value,
-      value: "",
-    }
-    setFilterConditions([...filterConditions, newCondition])
-  }
+  // Use the existing mock data
+  const data = useMemo(() => users, [users])
 
-  const removeFilterCondition = (id: string) => {
-    setFilterConditions(filterConditions.filter((condition) => condition.id !== id))
-  }
-
-  const updateFilterCondition = (
-    id: string,
-    field: keyof FilterCondition,
-    value: string
-  ) => {
-    setFilterConditions(
-      filterConditions.map((condition) =>
-        condition.id === id ? { ...condition, [field]: value } : condition
-      )
+  const handleSelectItem = (id: string) => {
+    setSelectedUsers(prev =>
+      prev.includes(id)
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
     )
+  }
+
+  const handleSelectAll = () => {
+    setSelectedUsers(prev =>
+      prev.length === data.length ? [] : data.map(item => item.id)
+    )
+  }
+
+  const handleView = (user: User) => {
+    router.push(`/system-administration/user-management/${user.id}?mode=view`)
+  }
+
+  const handleEdit = (user: User) => {
+    router.push(`/system-administration/user-management/${user.id}?mode=edit`)
+  }
+
+  const handleDelete = (user: User) => {
+    if (window.confirm(`Are you sure you want to delete ${user.name}?`)) {
+      setUsers(users.filter(u => u.id !== user.id))
+      setSelectedUsers(selectedUsers.filter(id => id !== user.id))
+    }
   }
 
   const handleBulkAction = async (action: string, data: any) => {
     // Implement bulk action logic here
     console.log("Bulk action:", action, data, "for users:", selectedUsers)
+    
+    switch (action) {
+      case 'role':
+        // Open role assignment dialog for selected users
+        const selectedRoles = prompt('Enter role IDs (comma separated):');
+        if (selectedRoles) {
+          const roleIds = selectedRoles.split(',').map(r => r.trim());
+          setUsers(users.map(user => 
+            selectedUsers.includes(user.id) 
+              ? { ...user, roles: [...new Set([...user.roles, ...roleIds])] }
+              : user
+          ));
+          setSelectedUsers([]);
+        }
+        break;
+      case 'status':
+        const newStatus = prompt('Enter new status (active/inactive/suspended/pending):');
+        if (newStatus && ['active', 'inactive', 'suspended', 'pending'].includes(newStatus)) {
+          setUsers(users.map(user => 
+            selectedUsers.includes(user.id) 
+              ? { ...user, accountStatus: newStatus }
+              : user
+          ));
+          setSelectedUsers([]);
+        }
+        break;
+      case 'delete':
+        if (window.confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) {
+          setUsers(users.filter(user => !selectedUsers.includes(user.id)));
+          setSelectedUsers([]);
+        }
+        break;
+      default:
+        console.log("Action not implemented:", action);
+    }
   }
 
   const handleUserSubmit = async (userData: Omit<User, "id">) => {
     // In a real application, this would be an API call
-    router.push("/system-administration/user-management/new")
+    const newUser: User = {
+      ...userData,
+      id: Math.random().toString(36).substr(2, 9),
+    };
+    setUsers([...users, newUser]);
   }
 
-  const applyFilters = (user: User) => {
-    return filterConditions.every((condition) => {
-      const fieldValue = user[condition.field as keyof User]
-      
-      switch (condition.operator) {
-        case "contains":
-          return String(fieldValue)
-            .toLowerCase()
-            .includes(condition.value.toLowerCase())
-        case "equals":
-          return String(fieldValue).toLowerCase() === condition.value.toLowerCase()
-        case "notEquals":
-          return String(fieldValue).toLowerCase() !== condition.value.toLowerCase()
-        case "isEmpty":
-          return !fieldValue || String(fieldValue).trim() === ""
-        case "isNotEmpty":
-          return fieldValue && String(fieldValue).trim() !== ""
-        default:
-          return true
-      }
-    })
-  }
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = !statusFilter || user.accountStatus === statusFilter
-    const matchesAdvancedFilters = filterConditions.length === 0 || applyFilters(user)
-    return matchesSearch && matchesStatus && matchesAdvancedFilters
+  const columns = createUserColumns({
+    onView: handleView,
+    onEdit: handleEdit,
+    onDelete: handleDelete
   })
 
-  const handleDelete = async (userId: string) => {
-    // In a real application, this would be an API call
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      setUsers(users.filter(user => user.id !== userId))
-      setSelectedUsers(selectedUsers.filter(id => id !== userId))
-    }
-  }
-
-  const handleView = (userId: string) => {
-    router.push(`/system-administration/user-management/${userId}?mode=view`)
-  }
-
-  const handleEdit = (userId: string) => {
-    router.push(`/system-administration/user-management/${userId}?mode=edit`)
-  }
+  const cardView = (
+    <UserCardView
+      data={data}
+      selectedItems={selectedUsers}
+      onSelectItem={handleSelectItem}
+      onSelectAll={handleSelectAll}
+      onView={handleView}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+    />
+  )
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="space-y-4 mb-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <Button onClick={() => router.push("/system-administration/user-management/new")}>
-            <UserPlus className="h-4 w-4 mr-2" />
-            Add New User
+    <div className="container mx-auto py-6 px-6 space-y-6">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
+          <p className="text-muted-foreground">
+            Manage users, roles, and permissions across the Carmen ERP system.
+          </p>
+        </div>
+        
+        {/* Action Buttons - Top aligned with title */}
+        <div className="flex items-center space-x-2 md:mt-0">
+          <Button variant="outline" onClick={() => router.push("/system-administration/permission-management/roles")}>
+            <Shield className="h-4 w-4 mr-2" />
+            Manage Roles
           </Button>
-        </div>
-
-        <div className="flex justify-between items-center">
-          <div className="relative w-[300px]">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-            <Input
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Select
-              value={statusFilter || "all"}
-              onValueChange={(value) => setStatusFilter(value === "all" ? null : value)}
-            >
-              <SelectTrigger className="w-[160px]">
-                {/* <Filter className="h-4 w-4 mr-2" /> */}
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  <div className="flex items-center">
-                    <Filter className="h-4 w-4 mr-2" />
-                    All Status
-                  </div>
-                </SelectItem>
-                <SelectItem value="active">
-                  <div className="flex items-center">
-                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                    Active
-                  </div>
-                </SelectItem>
-                <SelectItem value="inactive">
-                  <div className="flex items-center">
-                    <XCircle className="h-4 w-4 mr-2 text-gray-500" />
-                    Inactive
-                  </div>
-                </SelectItem>
-                <SelectItem value="suspended">
-                  <div className="flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-2 text-yellow-500" />
-                    Suspended
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline">
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
-                  More Filters {filterConditions.length > 0 && `(${filterConditions.length})`}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-4" align="end">
-                <div className="space-y-4">
-                  <div className="font-medium flex items-center">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filters
-                  </div>
-                  {filterConditions.map((condition) => (
-                    <div key={condition.id} className="flex items-center gap-2">
-                      <Select
-                        value={condition.field}
-                        onValueChange={(value) =>
-                          updateFilterCondition(condition.id, "field", value)
-                        }
-                      >
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FILTER_FIELDS.map((field) => (
-                            <SelectItem key={field.value} value={field.value}>
-                              {field.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={condition.operator}
-                        onValueChange={(value) =>
-                          updateFilterCondition(condition.id, "operator", value)
-                        }
-                      >
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FILTER_OPERATORS.map((operator) => (
-                            <SelectItem key={operator.value} value={operator.value}>
-                              {operator.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {!["isEmpty", "isNotEmpty"].includes(condition.operator) && (
-                        <Input
-                          value={condition.value}
-                          onChange={(e) =>
-                            updateFilterCondition(
-                              condition.id,
-                              "value",
-                              e.target.value
-                            )
-                          }
-                          className="flex-1"
-                          placeholder="Value"
-                        />
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeFilterCondition(condition.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={addFilterCondition}
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Add filter
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-
-        <div className="flex items-center">
-          <BulkActions
-            selectedCount={selectedUsers.length}
-            onAction={handleBulkAction}
-          />
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <UserPlus className="mr-2 h-4 w-4" />
+                New User
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <EnhancedUserFormDialog
+                onSubmit={handleUserSubmit}
+                trigger={
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    Create New User
+                  </DropdownMenuItem>
+                }
+              />
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
+              <DropdownMenuItem>Invite User</DropdownMenuItem>
+              <DropdownMenuItem>Import from CSV</DropdownMenuItem>
+              <DropdownMenuItem>Bulk User Setup</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <Button variant="outline" size="sm">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+          
+          <Button variant="outline" size="sm">
+            <Printer className="mr-2 h-4 w-4" />
+            Print
+          </Button>
         </div>
       </div>
 
-      <Card className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted">
-              <TableHead className="font-bold text-base py-3">Username</TableHead>
-              <TableHead className="font-bold text-base py-3">Email</TableHead>
-              <TableHead className="font-bold text-base py-3">Role</TableHead>
-              <TableHead className="font-bold text-base py-3">Status</TableHead>
-              <TableHead className="font-bold text-base py-3 text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user, idx) => (
-              <TableRow key={user.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-muted/50'}>
-                <TableCell className="font-semibold text-primary py-3 align-middle">{user.name}</TableCell>
-                <TableCell className="py-3 align-middle">{user.email}</TableCell>
-                <TableCell className="py-3 align-middle">{user.roles.join(', ')}</TableCell>
-                <TableCell className="py-3 align-middle">
-                  <Badge className={`bg-${user.accountStatus === 'active' ? 'green' : user.accountStatus === 'inactive' ? 'gray' : 'yellow'}-100 text-${user.accountStatus === 'active' ? 'green-800' : user.accountStatus === 'inactive' ? 'gray-600' : 'yellow-800'} border-${user.accountStatus === 'active' ? 'green-200' : user.accountStatus === 'inactive' ? 'gray-200' : 'yellow-200'}`}>
-                    {user.accountStatus.charAt(0).toUpperCase() + user.accountStatus.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="flex items-center gap-1 py-3 align-middle justify-end">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label="View" onClick={() => handleView(user.id)}>
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>View</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label="Edit" onClick={() => handleEdit(user.id)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Edit</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label="Delete" onClick={() => handleDelete(user.id)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Delete</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+      {/* Bulk Actions */}
+      {selectedUsers.length > 0 && (
+        <BulkActions
+          selectedCount={selectedUsers.length}
+          onAction={handleBulkAction}
+        />
+      )}
+
+      <UserDataTable
+        columns={columns}
+        data={data}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        cardView={cardView}
+      />
     </div>
   )
 } 

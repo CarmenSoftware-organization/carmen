@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useCallback, useRef } from 'react';
-import { Search, ChevronRight, ChevronDown, Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { Search, ChevronRight, ChevronDown, Plus, Edit, Trash2 } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { 
@@ -14,6 +14,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type CategoryType = 'CATEGORY' | 'SUBCATEGORY' | 'ITEM_GROUP';
 
@@ -133,7 +135,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
 
   const getIndentStyle = (level: number) => {
     return {
-      paddingLeft: `${level * 7.2 + 4.8}px` // Reduced from 24px to 7.2px per level, and from 16px to 4.8px base padding
+      paddingLeft: `${level * 4 + 4}px` // Mobile-first: minimal indentation for narrow screens
     }
   }
 
@@ -142,15 +144,15 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
     drag(drop(node));
   };
 
-  // Update the level-specific styling
+  // Update the level-specific styling with design system tokens
   const getLevelStyles = (type: CategoryType) => {
     switch (type) {
       case 'CATEGORY':
-        return 'bg-gray-50 font-semibold border-l-4 border-gray-400'
+        return 'bg-muted font-semibold border-l-4 border-border'
       case 'SUBCATEGORY':
-        return 'bg-white border-l-4 border-blue-400'
+        return 'bg-card border-l-4 border-primary'
       case 'ITEM_GROUP':
-        return 'bg-white border-l-4 border-green-400'
+        return 'bg-card border-l-4 border-success'
       default:
         return ''
     }
@@ -176,59 +178,82 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
       <div 
         style={getIndentStyle(level)}
         className={`
-          flex items-center py-2 px-1.5 hover:bg-gray-100 
+          flex flex-col sm:flex-row sm:items-center py-2 px-1.5 hover:bg-accent/50 
           ${getLevelStyles(item.type)}
-          transition-all duration-200
+          transition-all duration-200 min-h-[44px] gap-2 sm:gap-0
         `}
+        role="treeitem"
+        aria-expanded={item.children ? isExpanded : undefined}
+        aria-selected={false}
+        aria-label={`${item.name} - ${CATEGORY_LEVELS[item.type]} with ${item.itemCount} items`}
       >
-        {item.children && (
-          <button onClick={() => setIsExpanded(!isExpanded)} className="p-1">
-            {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-          </button>
-        )}
+        {/* Mobile Layout: Main content row */}
+        <div className="flex items-center w-full sm:flex-grow">
+          {item.children && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setIsExpanded(!isExpanded)} 
+              className="h-10 w-10 p-2 hover:bg-accent flex-shrink-0"
+              aria-label={isExpanded ? 'Collapse category' : 'Expand category'}
+            >
+              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </Button>
+          )}
+          
+          {isEditing ? (
+            <Input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onBlur={handleEdit}
+              onKeyDown={(e) => e.key === 'Enter' && handleEdit()}
+              className="mr-2 h-8 flex-grow"
+              autoFocus
+            />
+          ) : (
+            <div className="flex-grow min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <span className="font-medium truncate">{item.name}</span>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{CATEGORY_LEVELS[item.type]}</span>
+                  <span>({item.itemCount} items)</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         
-        {isEditing ? (
-          <input
-            type="text"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onBlur={handleEdit}
-            onKeyPress={(e) => e.key === 'Enter' && handleEdit()}
-            className="border rounded px-2 py-1 mr-2"
-            autoFocus
-          />
-        ) : (
-          <div className="flex-grow">
-            <span className="font-medium">{item.name}</span>
-            <span className="text-xs text-gray-500 ml-2">
-              {CATEGORY_LEVELS[item.type]}
-            </span>
-          </div>
-        )}
-        
-        <span className="text-gray-500 text-sm mr-4">({item.itemCount})</span>
-        
-        <div className="flex space-x-2">
-          <button
+        {/* Mobile Layout: Action buttons row */}
+        <div className="flex justify-end gap-1 sm:gap-1 w-full sm:w-auto">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsEditing(true)}
-            className="p-1 hover:text-blue-600"
+            className="h-10 w-10 p-2 hover:bg-accent hover:text-primary"
+            aria-label={`Edit ${item.name}`}
           >
             <Edit size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setShowDeleteDialog(true)}
-            className="p-1 hover:text-red-600"
+            className="h-10 w-10 p-2 hover:bg-destructive/10 hover:text-destructive"
+            aria-label={`Delete ${item.name}`}
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
           {getNextLevelType(item.type) && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => onAdd(item.id, getNextLevelType(item.type)!)}
-              className="p-1 hover:text-green-600"
-              title={`Add ${CATEGORY_LEVELS[getNextLevelType(item.type)!]}`}
+              className="h-10 w-10 p-2 hover:bg-accent hover:text-success"
+              aria-label={`Add ${CATEGORY_LEVELS[getNextLevelType(item.type)!]} to ${item.name}`}
             >
               <Plus size={16} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -283,15 +308,14 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, level, onMove, onDelete, onEd
 export default function ProductCategoryTree() {
   const [categories, setCategories] = useState<CategoryItem[]>(initialCategories);
   const [searchQuery, setSearchQuery] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null);
 
   // Helper function to generate unique ID
   const generateId = () => {
-    return Math.random().toString(36).substr(2, 9);
+    return Math.random().toString(36).slice(2, 11);
   };
 
   // Helper function to find and update category in tree
-  const updateCategoryTree = (
+  const updateCategoryTree = useCallback((
     items: CategoryItem[],
     id: string,
     updateFn: (item: CategoryItem) => CategoryItem
@@ -308,10 +332,10 @@ export default function ProductCategoryTree() {
       }
       return item;
     });
-  };
+  }, []);
 
   // Helper function to find category by id
-  const findCategory = (items: CategoryItem[], id: string): CategoryItem | null => {
+  const findCategory = useCallback((items: CategoryItem[], id: string): CategoryItem | null => {
     for (const item of items) {
       if (item.id === id) return item;
       if (item.children) {
@@ -320,7 +344,7 @@ export default function ProductCategoryTree() {
       }
     }
     return null;
-  };
+  }, []);
 
   // Add new category
   const handleAdd = useCallback((parentId: string, type: CategoryType) => {
@@ -341,7 +365,7 @@ export default function ProductCategoryTree() {
 
       return updateCategoryTree(prevCategories, parentId, updateParent);
     });
-  }, []);
+  }, [updateCategoryTree]);
 
   // Edit category name
   const handleEdit = useCallback((id: string, newName: string) => {
@@ -353,7 +377,7 @@ export default function ProductCategoryTree() {
         name: newName.trim()
       }))
     );
-  }, []);
+  }, [updateCategoryTree]);
 
   // Delete category and its children
   const handleDelete = useCallback((id: string) => {
@@ -411,7 +435,7 @@ export default function ProductCategoryTree() {
       const categoriesWithoutDraggedItem = removeItem(prevCategories);
       return addItem(categoriesWithoutDraggedItem);
     });
-  }, []);
+  }, [findCategory]);
 
   const filterCategories = useCallback((items: CategoryItem[], query: string): CategoryItem[] => {
     return items.map(item => ({
@@ -443,27 +467,29 @@ export default function ProductCategoryTree() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="flex justify-between items-center mb-4 w-full">
-        <div className="relative flex-1 mr-4">
-          <Search className="absolute left-3 top-3 text-gray-400" size={18} />
-          <input
+      <div className="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center mb-4 w-full">
+        <div className="relative flex-1 sm:mr-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+          <Input
             type="text"
             placeholder="Search categories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg"
+            className="pl-10 h-11 w-full"
+            aria-label="Search categories"
           />
         </div>
-        <button
+        <Button
           onClick={handleAddTopLevel}
-          className="flex items-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
+          className="h-11 px-6 w-full sm:w-auto flex-shrink-0"
+          aria-label="Add new top-level category"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Category
-        </button>
+          <span className="sm:inline">Add Category</span>
+        </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow w-full">
+      <div className="bg-card rounded-lg shadow w-full" role="tree" aria-label="Product categories tree">
         {filteredCategories.map((category) => (
           <TreeNode
             key={category.id}

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ChevronLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, CalendarIcon, PanelRightClose, PanelRightOpen, Download, Share, Send, Archive } from "lucide-react";
+import { ChevronLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, CalendarIcon, PanelRightClose, PanelRightOpen, Download, Share, Send, Archive, TagIcon, UserIcon, BuildingIcon, DollarSign as DollarSignIcon, TrendingUp as TrendingUpIcon, CreditCard as CreditCardIcon, FileText as FileTextIcon } from "lucide-react";
 import {
   GoodsReceiveNote,
   GoodsReceiveNoteMode,
@@ -328,18 +329,30 @@ export function GoodsReceiveNoteComponent({
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
         <div className={`flex-grow space-y-4 ${isSidebarVisible ? 'lg:w-3/4' : 'w-full'}`}>
-          <Card>
-            <CardHeader className="pb-6">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="icon" onClick={handleGoBack}>
-                    <ChevronLeft className="h-4 w-4" />
-                    <span className="sr-only">Go back</span>
-                  </Button>
-                  <CardTitle className="text-xl font-bold">Goods Receive Note</CardTitle>
-                  <StatusBadge status={formData.status} />
+          <Card className="shadow-sm overflow-hidden">
+            <CardHeader className="pb-4 border-b bg-muted/10">
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 rounded-full p-0 mr-1"
+                      onClick={handleGoBack}
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                      <span className="sr-only">Back to Goods Receive Notes</span>
+                    </Button>
+                    <div className="flex flex-col">
+                      <h1 className="text-2xl font-bold">
+                        {formData.ref || "Goods Receive Note"}
+                      </h1>
+                      <p className="text-sm text-muted-foreground mt-1">Goods Receive Note</p>
+                    </div>
+                    <StatusBadge status={formData.status} className="h-6" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap justify-end">
                   {/* Mode-based Actions */}
                   {internalMode === "view" ? (
                     <>
@@ -365,16 +378,6 @@ export function GoodsReceiveNoteComponent({
                   ) : (
                     <>
                       <Button 
-                        variant="outline" 
-                        onClick={handleCancel} 
-                        size="sm" 
-                        className="h-9"
-                        disabled={isLoading}
-                      >
-                        <X className="mr-2 h-4 w-4" />
-                        Cancel
-                      </Button>
-                      <Button 
                         onClick={handleSave} 
                         size="sm" 
                         className="h-9"
@@ -387,13 +390,19 @@ export function GoodsReceiveNoteComponent({
                         )}
                         Save
                       </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleCancel} 
+                        size="sm" 
+                        className="h-9"
+                        disabled={isLoading}
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
                     </>
                   )}
                   
-                  {/* Separator */}
-                  <div className="w-px h-6 bg-gray-300 mx-1" />
-                  
-                  {/* Utility Actions */}
                   <Button variant="outline" size="sm" className="h-9">
                     <Printer className="mr-2 h-4 w-4" />
                     Print
@@ -411,9 +420,9 @@ export function GoodsReceiveNoteComponent({
                       <TooltipTrigger asChild>
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="sm"
                           onClick={toggleSidebar}
-                          className="h-8 w-8"
+                          className="h-9 w-9 p-0"
                         >
                           {isSidebarVisible ? (
                             <PanelRightClose className="h-4 w-4" />
@@ -431,247 +440,277 @@ export function GoodsReceiveNoteComponent({
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ref" className="text-sm font-medium">
-                   GRN #
-                  </Label>
-                  <Input
-                    id="ref"
-                    name="ref"
-                    value={formData.ref}
-                    onChange={handleInputChange}
-                    readOnly={!isEditable}
-                    className="h-8 text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-sm font-medium">
-                    Date
-                  </Label>
-                  <Input
-                    id="date"
-                    name="date"
-                    type="date"
-                    value={formData.date.toISOString().split("T")[0]}
-                    onChange={handleInputChange}
-                    readOnly={!isEditable}
-                    className="h-8 text-sm"
-                  />
-                </div>
-               
-               
-                 <div className="space-y-2 col-span-2">
-                  <Label htmlFor="vendor" className="text-sm font-medium">
-                    Vendor
-                  </Label>
-                  <Select
-                    value={formData.vendor || undefined}
-                    onValueChange={(value) => handleSelectChange("vendor", value)}
-                    disabled={!isEditable}
-                  >
-                    <SelectTrigger id="vendor" className="h-8 text-sm">
-                      <SelectValue placeholder="Select vendor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formData.vendor ? (
-                        <SelectItem value={formData.vendor}>
-                          {formData.vendor}
-                        </SelectItem>
+            
+            {/* Main Content */}
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 gap-6">
+                {/* Main Details */}
+                <div className="space-y-6">
+                  {/* Main Details Grid - Date, GRN#, Vendor, Invoice# */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="date" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <CalendarIcon className="h-4 w-4" />
+                        Date
+                      </Label>
+                      {isEditable ? (
+                        <Input
+                          id="date"
+                          name="date"
+                          type="date"
+                          value={formData.date.toISOString().split("T")[0]}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
                       ) : (
-                        <SelectItem value="no-vendor">No vendor selected</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 col-start-1" >
-                  <Label htmlFor="invoice" className="text-sm font-medium">
-                    Invoice#
-                  </Label>
-                  <Input
-                    id="invoice"
-                    name="invoiceNumber"
-                    value={formData.invoiceNumber}
-                    onChange={handleInputChange}
-                    readOnly={!isEditable}
-                    className="h-8 text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="invoice-date" className="text-sm font-medium">
-                    Invoice Date
-                  </Label>
-                  <Input
-                    id="invoice-date"
-                    name="invoiceDate"
-                    type="date"
-                    value={formData.invoiceDate.toISOString().split("T")[0]}
-                    onChange={handleInputChange}
-                    readOnly={!isEditable}
-                    className="h-8 text-sm"
-                  />
-                </div>
-                <div className="space-y-2 col-span-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="description" className="text-sm font-medium">
-                      Description
-                    </Label>
-                  </div>
-                    <Input
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      readOnly={!isEditable}
-                      className="h-8 text-sm w-full mt-2"
-                    />
-                </div>
-                <div className="space-y-2 col-start-1">
-                  <Label htmlFor="currency" className="text-sm font-medium">
-                    Currency
-                  </Label>
-                  <Select
-                    value={formData.currency || undefined}
-                    onValueChange={(value) => handleSelectChange("currency", value)}
-                    disabled={!isEditable}
-                  >
-                    <SelectTrigger id="currency" className="h-8 text-sm">
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formData.currency ? (
-                        <SelectItem value={formData.currency}>
-                          {formData.currency}
-                        </SelectItem>
-                      ) : (
-                        <SelectItem value="no-currency">No currency selected</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="exchangeRate" className="text-sm font-medium">
-                    Exchange Rate
-                  </Label>
-                  <Input
-                    id="exchangeRate"
-                    name="exchangeRate"
-                    type="number"
-                    value={formData.exchangeRate}
-                    onChange={handleInputChange}
-                    readOnly={!isEditable}
-                    className="h-8 text-sm"
-                    step="0.0001"
-                    min="0"
-                  />
-                </div>
-
-                <div className="flex flex-col justify-end space-y-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="consignment"
-                            checked={formData.isConsignment}
-                            onCheckedChange={(checked) =>
-                              handleCheckboxChange(
-                                "isConsignment",
-                                checked as boolean
-                              )
-                            }
-                            disabled={!isEditable}
-                          />
-                          <Label
-                            htmlFor="consignment"
-                            className="text-sm font-medium flex items-center"
-                          >
-                            Consignment
-                            <HelpCircle className="w-4 h-4 ml-1" />
-                          </Label>
+                        <div className="text-gray-900 font-medium">
+                          {formData.date.toLocaleDateString('en-GB')}
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          Goods sent for sale with the expectation of future payment
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="cash"
-                      checked={formData.isCash}
-                      onCheckedChange={(checked) =>
-                        handleCheckboxChange("isCash", checked as boolean)
-                      }
-                      disabled={!isEditable}
-                    />
-                    <Label htmlFor="cash" className="text-sm font-medium">
-                      Cash
-                    </Label>
-                  </div>
-                </div>
-                <div className="space-y-2 hidden">
-                  <Label htmlFor="cash-book" className="text-sm font-medium">
-                    Cash Book
-                  </Label>
-                  <Select
-                    value={formData.cashBook || undefined}
-                    onValueChange={(value) => handleSelectChange("cashBook", value)}
-                    disabled={!isEditable}
-                    
-                  >
-                    <SelectTrigger id="cash-book" className="h-8 text-sm w-full">
-                      <SelectValue placeholder="Select cash book" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formData.cashBook ? (
-                        <SelectItem value={formData.cashBook}>
-                          {formData.cashBook}
-                        </SelectItem>
-                      ) : (
-                        <SelectItem value="no-cashbook">No cash book selected</SelectItem>
                       )}
-                    </SelectContent>
-                  </Select>
-                </div>
-                               <div className="space-y-2">
-                  <Label htmlFor="creditTerms" className="text-sm font-medium">Credit Terms</Label>
-                  <Select 
-                    defaultValue="net30"
-                    onValueChange={(value) => handleSelectChange("creditTerms", value)}
-                    disabled={!isEditable}
-                  >
-                    <SelectTrigger id="creditTerms" className="h-8 text-sm">
-                      <SelectValue placeholder="Select credit terms" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="net30">Net 30</SelectItem>
-                      <SelectItem value="net60">Net 60</SelectItem>
-                      <SelectItem value="net90">Net 90</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="dueDate" className="text-sm font-medium">Due Date</Label>
-                  <div className="relative">
-                    <Input 
-                      id="dueDate" 
-                      name="dueDate"
-                      type="date" 
-                      value={formData.dueDate ? formData.dueDate.toISOString().split('T')[0] : ''}
-                      onChange={handleInputChange}
-                      readOnly={!isEditable}
-                      className="h-8 text-sm"
-                    />
-                    <CalendarIcon className="absolute right-3 top-2 h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="ref" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <TagIcon className="h-4 w-4" />
+                        GRN #
+                      </Label>
+                      {isEditable ? (
+                        <Input
+                          id="ref"
+                          name="ref"
+                          value={formData.ref}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium">{formData.ref}</div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="vendor" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <UserIcon className="h-4 w-4" />
+                        Vendor
+                      </Label>
+                      {isEditable ? (
+                        <Select
+                          value={formData.vendor || undefined}
+                          onValueChange={(value) => handleSelectChange("vendor", value)}
+                        >
+                          <SelectTrigger id="vendor" className="w-full">
+                            <SelectValue placeholder="Select vendor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {formData.vendor ? (
+                              <SelectItem value={formData.vendor}>
+                                {formData.vendor}
+                              </SelectItem>
+                            ) : (
+                              <SelectItem value="no-vendor">No vendor selected</SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="text-gray-900 font-medium">{formData.vendor || "Not specified"}</div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <BuildingIcon className="h-4 w-4" />
+                        Invoice #
+                      </Label>
+                      {isEditable ? (
+                        <Input
+                          id="invoice"
+                          name="invoiceNumber"
+                          value={formData.invoiceNumber}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium">{formData.invoiceNumber || "Not specified"}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Secondary Details Grid - Invoice Date, Currency, Exchange Rate, Credit Terms */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice-date" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <CalendarIcon className="h-4 w-4" />
+                        Invoice Date
+                      </Label>
+                      {isEditable ? (
+                        <Input
+                          id="invoice-date"
+                          name="invoiceDate"
+                          type="date"
+                          value={formData.invoiceDate.toISOString().split("T")[0]}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium">
+                          {formData.invoiceDate.toLocaleDateString('en-GB')}
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="currency" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <DollarSignIcon className="h-4 w-4" />
+                        Currency
+                      </Label>
+                      {isEditable ? (
+                        <Select
+                          value={formData.currency || undefined}
+                          onValueChange={(value) => handleSelectChange("currency", value)}
+                        >
+                          <SelectTrigger id="currency" className="w-full">
+                            <SelectValue placeholder="Select currency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {formData.currency ? (
+                              <SelectItem value={formData.currency}>
+                                {formData.currency}
+                              </SelectItem>
+                            ) : (
+                              <SelectItem value="no-currency">No currency selected</SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="text-gray-900 font-medium">{formData.currency || ""}</div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="exchangeRate" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <TrendingUpIcon className="h-4 w-4" />
+                        Exchange Rate
+                      </Label>
+                      {isEditable ? (
+                        <Input
+                          id="exchangeRate"
+                          name="exchangeRate"
+                          type="number"
+                          value={formData.exchangeRate}
+                          onChange={handleInputChange}
+                          className="w-full"
+                          step="0.0001"
+                          min="0"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium">{formData.exchangeRate || "1"}</div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="creditTerms" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <CreditCardIcon className="h-4 w-4" />
+                        Credit Terms
+                      </Label>
+                      {isEditable ? (
+                        <Select 
+                          defaultValue="net30"
+                          onValueChange={(value) => handleSelectChange("creditTerms", value)}
+                        >
+                          <SelectTrigger id="creditTerms" className="w-full">
+                            <SelectValue placeholder="Select credit terms" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="net30">Net 30</SelectItem>
+                            <SelectItem value="net60">Net 60</SelectItem>
+                            <SelectItem value="net90">Net 90</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="text-gray-900 font-medium">Net 30</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Third row - Description and Due Date */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="description" className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
+                        <FileTextIcon className="h-4 w-4" />
+                        Description
+                      </Label>
+                      {isEditable ? (
+                        <Textarea 
+                          name="description"
+                          value={formData.description || ""}
+                          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                          className="w-full h-20"
+                          placeholder="Add goods receive note description..."
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
+                          {formData.description || "No description"}
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="dueDate" className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
+                        <CalendarIcon className="h-4 w-4" />
+                        Due Date
+                      </Label>
+                      {isEditable ? (
+                        <Input 
+                          id="dueDate" 
+                          name="dueDate"
+                          type="date" 
+                          value={formData.dueDate ? formData.dueDate.toISOString().split('T')[0] : ''}
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center">
+                          {formData.dueDate ? formData.dueDate.toLocaleDateString('en-GB') : "No due date set"}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Additional Options - Consignment and Cash checkboxes */}
+                  <div className="flex items-center gap-8 pt-4 border-t border-gray-200">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="consignment"
+                              checked={formData.isConsignment}
+                              onCheckedChange={(checked) =>
+                                handleCheckboxChange("isConsignment", checked as boolean)
+                              }
+                              disabled={!isEditable}
+                            />
+                            <Label
+                              htmlFor="consignment"
+                              className="text-sm font-medium flex items-center"
+                            >
+                              Consignment
+                              <HelpCircle className="w-4 h-4 ml-1" />
+                            </Label>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Goods sent for sale with the expectation of future payment</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="cash"
+                        checked={formData.isCash}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange("isCash", checked as boolean)
+                        }
+                        disabled={!isEditable}
+                      />
+                      <Label htmlFor="cash" className="text-sm font-medium">
+                        Cash
+                      </Label>
+                    </div>
                   </div>
                 </div>
-                
-
- 
               </div>
             </CardContent>
           </Card>

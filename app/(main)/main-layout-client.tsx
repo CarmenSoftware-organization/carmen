@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Header from '@/components/header'
 import Sidebar from '@/components/Sidebar'
+import { WorkflowProvider } from '@/lib/context/workflow-context'
 
 export default function MainLayoutClient({
   children,
@@ -49,18 +50,20 @@ export default function MainLayoutClient({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar 
-        isOpen={isSidebarOpen || isLargeScreen} 
-        onClose={() => setIsSidebarOpen(false)}
-        onCollapseToggle={handleSidebarCollapseToggle}
-      />
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${getContentPadding()}`}>
-        <Header onSidebarToggle={handleSidebarToggle} isSidebarOpen={isSidebarOpen} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 pt-16">
-          {children}
-        </main>
+    <WorkflowProvider>
+      <div className="flex h-screen overflow-hidden">
+        <Sidebar 
+          isOpen={isSidebarOpen || isLargeScreen} 
+          onClose={() => setIsSidebarOpen(false)}
+          onCollapseToggle={handleSidebarCollapseToggle}
+        />
+        <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${getContentPadding()}`}>
+          <Header onSidebarToggle={handleSidebarToggle} isSidebarOpen={isSidebarOpen} />
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 pt-16">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </WorkflowProvider>
   )
 } 

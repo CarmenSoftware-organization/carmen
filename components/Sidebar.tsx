@@ -199,7 +199,31 @@ const menuItems: MenuItem[] = [
       { name: "General Settings", path: "/system-administration/general-settings" },
       { name: "Notification Preferences", path: "/system-administration/notification-preferences" },
       { name: "License Management", path: "/system-administration/license-management" },
-      { name: "Security Settings", path: "/system-administration/security-settings" },
+      { 
+        name: "Permission Management", 
+        path: "/system-administration/permission-management",
+        description: "Manage policies, roles, and access control",
+        subItems: [
+          { 
+            name: "Policy Management", 
+            path: "/system-administration/permission-management/policies",
+            icon: "FileText",
+            description: "Create and manage access control policies"
+          },
+          { 
+            name: "Role Management", 
+            path: "/system-administration/permission-management/roles",
+            icon: "Users",
+            description: "Create and manage user roles"
+          },
+          { 
+            name: "Subscription Settings", 
+            path: "/system-administration/permission-management/subscription",
+            icon: "CreditCard",
+            description: "Manage subscription packages and features"
+          }
+        ]
+      },
       { name: "Data Backup and Recovery", path: "/system-administration/data-backup-and-recovery" },
       { 
         name: "System Integrations", 

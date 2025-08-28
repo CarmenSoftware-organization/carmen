@@ -18,6 +18,10 @@ export interface FieldPermissions {
   description: boolean;
 }
 
+/**
+ * @deprecated Use getWorkflowFieldPermissions from workflow-permissions.ts instead
+ * This function is kept for backward compatibility but should not be used for new code
+ */
 export function getFieldPermissions(userRole: string): FieldPermissions {
   const permissions: FieldPermissions = {
     location: false,
@@ -82,12 +86,19 @@ export function getFieldPermissions(userRole: string): FieldPermissions {
   }
 }
 
+/**
+ * @deprecated Use canEditWorkflowField from workflow-permissions.ts instead
+ * This function is kept for backward compatibility but should not be used for new code
+ */
 export function canEditField(fieldName: keyof FieldPermissions, userRole: string): boolean {
   const permissions = getFieldPermissions(userRole);
   return permissions[fieldName];
 }
 
-// Function to check if user can view financial information (pricing, totals, transaction summary)
+/**
+ * @deprecated Use canViewWorkflowFinancialInfo from workflow-permissions.ts instead
+ * This function is kept for backward compatibility but should not be used for new code
+ */
 export function canViewFinancialInfo(userRole: string): boolean {
   const restrictedRoles = ['Requestor', 'Staff'];
   return !restrictedRoles.includes(userRole);

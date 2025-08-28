@@ -67,7 +67,17 @@
       "Bash(then echo \"Found next.config.mjs, checking if it''s a duplicate...\")",
       "Bash(else echo \"next.config.mjs not found or already moved\")",
       "Bash(fi)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(docker:*)",
+      "Bash(open:*)",
+      "mcp__n8n-mcp__search_nodes",
+      "mcp__n8n-mcp__get_node_info",
+      "mcp__n8n-mcp__n8n_create_workflow",
+      "mcp__n8n-mcp__n8n_validate_workflow",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot",
+      "mcp__puppeteer__puppeteer_click",
+      "mcp__puppeteer__puppeteer_evaluate"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

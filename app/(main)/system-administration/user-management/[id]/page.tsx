@@ -38,6 +38,7 @@ import {
   ScrollText,
   Edit
 } from "lucide-react"
+import { useRoleStore } from "@/lib/stores/role-store"
 
 // Mock data
 const businessUnits = ["Sales", "Engineering", "Marketing", "Finance", "HR"]
@@ -48,7 +49,7 @@ const departments = {
   Finance: ["Accounting", "Treasury", "Tax"],
   HR: ["Recruitment", "Training", "Employee Relations"],
 }
-const roles = ["admin", "user", "manager", "developer", "sales_manager"]
+// Roles will be loaded dynamically from role store
 const locations = ["HQ", "Branch 1", "Branch 2", "Branch 3", "Remote"]
 
 // Mock data for demonstration
@@ -59,7 +60,7 @@ const mockUsers = {
     email: "john.doe@example.com",
     businessUnit: "Sales",
     department: "Enterprise Sales",
-    roles: ["sales_manager", "user"],
+    roles: ["role-010", "role-011"], // Financial Manager, Purchasing Staff
     locations: ["HQ", "Branch 1"],
     hodStatus: true,
     hodDepartments: ["Enterprise Sales", "SMB Sales"],
@@ -73,7 +74,7 @@ const mockUsers = {
     email: "jane.smith@example.com",
     businessUnit: "Engineering",
     department: "Frontend",
-    roles: ["developer", "user"],
+    roles: ["role-012", "role-020"], // IT Support, Contractor
     locations: ["HQ", "Remote"],
     hodStatus: true,
     hodDepartments: ["Frontend", "QA"],
@@ -93,6 +94,7 @@ export default function UserDetailPage({
   const mode = searchParams.get("mode") || "view"
   const isNewUser = params.id === "new"
   const isViewMode = mode === "view" && !isNewUser
+  const { roles } = useRoleStore()
 
   const [formData, setFormData] = useState(() => {
     if (isNewUser) {
@@ -337,30 +339,33 @@ export default function UserDetailPage({
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                      <SelectItem key={role.id} value={role.id}>
+                        {role.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.roles.map((role) => (
-                    <Badge
-                      key={role}
-                      variant="secondary"
-                      className={isViewMode ? undefined : "cursor-pointer pr-1.5"}
-                    >
-                      {role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      {!isViewMode && (
-                        <button
-                          onClick={() => removeItem("roles", role)}
-                          className="ml-1 hover:text-red-500"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </Badge>
-                  ))}
+                  {formData.roles.map((roleId) => {
+                    const role = roles.find(r => r.id === roleId);
+                    return role ? (
+                      <Badge
+                        key={roleId}
+                        variant="secondary"
+                        className={isViewMode ? undefined : "cursor-pointer pr-1.5"}
+                      >
+                        {role.name}
+                        {!isViewMode && (
+                          <button
+                            onClick={() => removeItem("roles", roleId)}
+                            className="ml-1 hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </Badge>
+                    ) : null;
+                  })}
                 </div>
               </div>
 

@@ -81,6 +81,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import { canEditField, getFieldPermissions, canViewFinancialInfo } from "@/lib/utils/field-permissions";
+import { useWorkflow } from "@/lib/context/workflow-context";
+import { canViewWorkflowFinancialInfo } from "@/lib/services/workflow-permissions";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -132,7 +134,8 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   const [isReturnStepSelectorOpen, setIsReturnStepSelectorOpen] = useState(false);
   const [returnComment, setReturnComment] = useState("");
   const [selectedReturnStep, setSelectedReturnStep] = useState<any>(null);
-  const { user } = useUser(); // Get current user from context</invoke>
+  const { user } = useUser(); // Get current user from context
+  const { workflowPermissions, getUserWorkflowRoles } = useWorkflow(); // Get workflow permissions</invoke>
 
   useEffect(() => {
     setIsMounted(true);
@@ -324,10 +327,9 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     );
   };
 
-  // Check if user has any edit permissions
-  const hasEditPermissions = (userRole: string): boolean => {
-    const permissions = getFieldPermissions(userRole);
-    return Object.values(permissions).some(permission => permission === true);
+  // Check if user has any edit permissions based on workflow roles
+  const hasEditPermissions = (): boolean => {
+    return Object.values(workflowPermissions.canEditFields).some(permission => permission === true);
   };
 
   // Toggle sidebar visibility
@@ -393,7 +395,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                     <div className="flex items-center gap-2 flex-wrap justify-end">
                       {/* All action buttons in one consistent group */}
                       {mode === "view" ? (
-                        (user && hasEditPermissions(user.role) || isAddMode) && (
+                        (user && hasEditPermissions() || isAddMode) && (
                           <Button onClick={() => handleModeChange("edit")} size="sm" className="h-9">
                     <Edit className="mr-2 h-4 w-4" />
                     Edit
@@ -649,7 +651,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
       </Card>
       
           {/* Transaction Summary - Hidden from Requestors */}
-          {user && canViewFinancialInfo(user.role) && (
+          {user && workflowPermissions.canViewFinancialInfo && (
             <Card className="shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg">Transaction Summary ({formData.baseCurrencyCode || 'USD'})</CardTitle>
