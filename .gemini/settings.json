@@ -16,5 +16,16 @@
     "agents/game-developer.md",
     "agents/game-designer.md",
     "GEMINI.md"
-  ]
+  ],
+  "mcpServers": {
+    "Ref": {
+      "httpUrl": "https://api.ref.tools/mcp?apiKey=ref-68fb79c67fba9ed3c959"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
 }

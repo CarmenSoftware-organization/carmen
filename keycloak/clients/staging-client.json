@@ -1,0 +1,92 @@
+{
+  "id": "carmen-web-staging",
+  "clientId": "carmen-web-staging",
+  "name": "Carmen ERP Web Application (Staging)",
+  "description": "Staging environment client for Carmen ERP web application",
+  "enabled": true,
+  "clientAuthenticatorType": "client-secret",
+  "secret": "staging-client-secret-must-be-secure",
+  "registrationAccessToken": "",
+  "redirectUris": [
+    "https://staging.carmen-erp.com/api/auth/callback/keycloak",
+    "https://staging.carmen-erp.com/auth/callback",
+    "https://carmen-erp-staging.herokuapp.com/api/auth/callback/keycloak",
+    "https://carmen-erp-staging.herokuapp.com/auth/callback"
+  ],
+  "webOrigins": [
+    "https://staging.carmen-erp.com",
+    "https://carmen-erp-staging.herokuapp.com"
+  ],
+  "baseUrl": "https://staging.carmen-erp.com",
+  "adminUrl": "https://staging.carmen-erp.com",
+  "rootUrl": "https://staging.carmen-erp.com",
+  "protocol": "openid-connect",
+  "access": {
+    "view": true,
+    "configure": true,
+    "manage": true
+  },
+  "standardFlowEnabled": true,
+  "implicitFlowEnabled": false,
+  "directAccessGrantsEnabled": false,
+  "serviceAccountsEnabled": false,
+  "publicClient": false,
+  "frontchannelLogout": true,
+  "fullScopeAllowed": false,
+  "nodeReRegistrationTimeout": 0,
+  "defaultClientScopes": [
+    "web-origins",
+    "acr",
+    "profile",
+    "roles",
+    "email",
+    "carmen-erp"
+  ],
+  "optionalClientScopes": [
+    "address",
+    "phone",
+    "offline_access",
+    "microprofile-jwt"
+  ],
+  "attributes": {
+    "access.token.lifespan": "900",
+    "client.secret.creation.time": "1640000000",
+    "oauth2.device.authorization.grant.enabled": "false",
+    "oidc.ciba.grant.enabled": "false",
+    "backchannel.logout.session.required": "true",
+    "backchannel.logout.revoke.offline.tokens": "false",
+    "display.on.consent.screen": "false",
+    "post.logout.redirect.uris": "https://staging.carmen-erp.com/auth/signout",
+    "tls.client.certificate.bound.access.tokens": "false",
+    "pkce.code.challenge.method": "S256"
+  },
+  "authenticationFlowBindingOverrides": {},
+  "protocolMappers": [
+    {
+      "id": "audience-mapper",
+      "name": "audience-mapper",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-audience-mapper",
+      "consentRequired": false,
+      "config": {
+        "included.client.audience": "carmen-web-staging",
+        "id.token.claim": "false",
+        "access.token.claim": "true"
+      }
+    },
+    {
+      "id": "groups-mapper",
+      "name": "groups-mapper",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-group-membership-mapper",
+      "consentRequired": false,
+      "config": {
+        "full.path": "false",
+        "id.token.claim": "true",
+        "access.token.claim": "true",
+        "claim.name": "groups",
+        "userinfo.token.claim": "true"
+      }
+    }
+  ]
+}

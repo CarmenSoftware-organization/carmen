@@ -35,19 +35,17 @@ import {
 } from "lucide-react";
 import { QuickAccessNav } from "@/components/quick-access-nav";
 import { UserContextSwitcher } from "@/components/user-context-switcher";
-import { useUser } from "@/lib/context/user-context";
+import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
-interface HeaderProps {
-  onSidebarToggle: () => void;
-  isSidebarOpen: boolean;
-}
+interface HeaderProps {}
 
-export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) {
+export default function Header({}: HeaderProps = {}) {
   const [businessUnit, setBusinessUnit] = useState("BU1");
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { user } = useUser();
+  const { user, signOut } = useKeycloakUser();
 
   useEffect(() => {
     setMounted(true);
@@ -59,7 +57,10 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    console.log('Current theme:', theme);
+    const newTheme = theme === "dark" ? "light" : "dark";
+    console.log('Setting theme to:', newTheme);
+    setTheme(newTheme);
   };
 
   if (!mounted) {
@@ -67,27 +68,15 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
   }
 
   return (
-    <header className="backdrop-blur supports-[backdrop-filter]:bg-background dark:supports-[backdrop-filter]:bg-gray-800 shadow-sm fixed top-0 left-0 right-0 z-40 border-b border-gray-200 dark:border-gray-500">
+    <header className="backdrop-blur supports-[backdrop-filter]:bg-background dark:supports-[backdrop-filter]:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-500">
       <div className="w-full px-4 py-2 sm:px-6">
         <div className="flex items-center h-12">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onSidebarToggle}
-              className="lg:hover:bg-accent lg:hover:text-accent-foreground block lg:hidden mr-2"
-              aria-label={isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
-            >
-              {isSidebarOpen ? (
-                <ChevronLeft className="h-5 w-5" />
-              ) : (
-                <ChevronRight className="h-5 w-5" />
-              )}
-            </Button>
+            <SidebarTrigger className="mr-4 md:mr-6" />
             <div className="flex flex-col">
               <Link
                 href="/dashboard"
-                className="text-xl md:text-2xl lg:text-2xl font-bold text-foreground dark:text-gray-100"
+                className="text-lg md:text-xl lg:text-xl font-bold text-foreground dark:text-gray-100"
               >
                 CARMEN
               </Link>
@@ -131,9 +120,12 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
               </DropdownMenuContent>
             </DropdownMenu>
             
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-foreground dark:text-gray-100">
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Theme: {theme || 'loading'}</span>
+              <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-foreground dark:text-gray-100">
+                {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </Button>
+            </div>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -190,7 +182,10 @@ export default function Header({ onSidebarToggle, isSidebarOpen }: HeaderProps) 
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-foreground dark:text-gray-100">
+                <DropdownMenuItem 
+                  onSelect={() => signOut()}
+                  className="text-foreground dark:text-gray-100"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

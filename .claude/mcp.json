@@ -3,6 +3,30 @@
       "@21st-dev/magic": {
          "command": "npx",
          "args": [ "-y", "@21st-dev/magic@latest", "API_KEY=fe8dd7802d095d3378169973ac8313628679f4155e87bc81cb7d8958492f2642"]
-      }
+      },
+      "shadcn": {
+         "command": "npx",
+         "args": ["-y", "@shadcn/mcp"],
+         "env": {
+           "GITHUB_TOKEN": "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"
+         }
+       },
+      "postgres-mcp": {
+         "command": "docker",
+         "args": [
+            "run",
+            "--rm",
+            "-i",
+            "--network", "host",
+            "crystaldba/postgres-mcp"
+         ],
+         "env": {
+           "PGHOST": "localhost",
+           "PGPORT": "5435",
+           "PGDATABASE": "carmen_abac_db",
+           "PGUSER": "postgres",
+           "PGPASSWORD": "password"
+         }
+       }
    }
 }

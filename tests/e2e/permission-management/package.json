@@ -1,0 +1,75 @@
+{
+  "name": "permission-management-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Carmen ERP Permission Management system",
+  "main": "runner/test-runner.ts",
+  "scripts": {
+    "test": "playwright test --config=playwright.config.ts",
+    "test:headed": "playwright test --config=playwright.config.ts --headed",
+    "test:debug": "playwright test --config=playwright.config.ts --debug",
+    "test:permission-management": "npx ts-node runner/execute-tests.ts --suite=permission-management-complete",
+    "test:toggle": "npx ts-node runner/execute-tests.ts --suite=toggle-functionality",
+    "test:policy": "npx ts-node runner/execute-tests.ts --suite=policy-management",
+    "test:performance": "npx ts-node runner/execute-tests.ts --suite=performance-benchmarks",
+    "test:parallel": "npx ts-node runner/execute-tests.ts --parallel=true",
+    "test:sequential": "npx ts-node runner/execute-tests.ts --parallel=false",
+    "test:ci": "npx ts-node runner/execute-tests.ts --suite=permission-management-complete --parallel=true --headless=true",
+    "test:chrome": "playwright test --config=playwright.config.ts --project=chromium",
+    "test:firefox": "playwright test --config=playwright.config.ts --project=firefox",
+    "test:safari": "playwright test --config=playwright.config.ts --project=webkit",
+    "test:mobile": "playwright test --config=playwright.config.ts --project=mobile-chrome",
+    "test:responsive": "npx ts-node runner/execute-tests.ts --responsive=true",
+    "test:accessibility": "npx ts-node runner/execute-tests.ts --accessibility=true",
+    "test:smoke": "npx ts-node runner/execute-tests.ts --suite=smoke-tests",
+    "report": "playwright show-report",
+    "report:html": "playwright show-report reports/html",
+    "report:json": "cat reports/json/results.json | jq",
+    "clean": "rimraf reports/ && rimraf test-results/",
+    "setup": "npx playwright install",
+    "setup:deps": "npx playwright install-deps",
+    "validate": "npx ts-node runner/validate-environment.ts",
+    "monitor": "npx ts-node runner/monitor-resources.ts",
+    "benchmark": "npx ts-node runner/benchmark-system.ts"
+  },
+  "keywords": [
+    "e2e",
+    "testing",
+    "playwright",
+    "puppeteer",
+    "permission-management",
+    "rbac",
+    "abac",
+    "carmen-erp"
+  ],
+  "author": "Carmen ERP Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "playwright": "^1.40.0",
+    "puppeteer": "^24.17.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "rimraf": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "chalk": "^5.0.0",
+    "ora": "^7.0.0",
+    "table": "^6.8.0",
+    "inquirer": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carmen-erp/carmen.git",
+    "directory": "tests/e2e/permission-management"
+  },
+  "bugs": {
+    "url": "https://github.com/carmen-erp/carmen/issues"
+  },
+  "homepage": "https://github.com/carmen-erp/carmen#readme"
+}

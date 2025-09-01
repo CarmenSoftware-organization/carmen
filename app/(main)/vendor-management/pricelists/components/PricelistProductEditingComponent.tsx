@@ -98,57 +98,6 @@ export default function PricelistProductEditingComponent({
     }
     loadCertifications();
   }, []);
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Package,
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  X,
-  AlertTriangle,
-  CheckCircle,
-  ShoppingCart,
-  Search,
-  DollarSign
-} from 'lucide-react'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
-import { 
-  PricelistProductEditingProps, 
-  PricelistMOQTier, 
-  PricelistProductWithStatus,
-  PricelistEditingProgress
-} from '../types/PricelistEditingTypes'
-import { ProductInstance } from '../../types'
-import { 
-  validateProductPricing, 
-  calculateProductCompletionStatus, 
-  validatePricelist,
-  getSmartLeadTimeDefault
-} from '../utils/PriceValidation'
-import { mockProducts, mockCategories } from '../../lib/mock-data'
 
 export default function PricelistProductEditingComponent({
   preSelectedProducts = [],

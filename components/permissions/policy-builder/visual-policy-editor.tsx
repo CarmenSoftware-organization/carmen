@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Save,
   X,
@@ -17,7 +17,22 @@ import {
   Download,
   Upload,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  Trash2,
+  Copy,
+  Link,
+  MousePointer,
+  Move,
+  Grid,
+  Layout,
+  TestTube,
+  BarChart3,
+  RefreshCw,
+  Minimize2,
+  Maximize2,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';

@@ -1,4 +1,20 @@
+/**
+ * Price Management API Routes - Main price management endpoints
+ * 
+ * GET /api/price-management - Get price management overview and data by type
+ * POST /api/price-management - Create price management entities
+ * 
+ * Security Features:
+ * - JWT authentication required
+ * - Role-based access control (RBAC)
+ * - Rate limiting
+ * - Input validation and sanitization
+ * - Security headers
+ * - Audit logging
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 // Mock data imports
 import vendorsData from '@/lib/mock/price-management/vendors.json';
@@ -8,154 +24,488 @@ import businessRulesData from '@/lib/mock/price-management/business-rules.json';
 import portalSessionsData from '@/lib/mock/price-management/portal-sessions.json';
 import analyticsData from '@/lib/mock/price-management/analytics.json';
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
+// Security imports
+import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection';
+import { withAuthorization, checkPermission } from '@/lib/middleware/rbac';
+import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security';
+import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter';
+import { validateInput, SecureSchemas, type ValidationResult } from '@/lib/security/input-validator';
+import { SecurityEventType } from '@/lib/security/audit-logger';
 
-    // Return overview data by default
-    if (!type || type === 'overview') {
-      return NextResponse.json({
-        success: true,
-        data: {
-          overview: analyticsData.overview,
-          recentActivity: [
+// Security-enhanced validation schemas
+const priceManagementQuerySchema = z.object({
+  type: z.enum(['overview', 'vendors', 'pricelists', 'assignments', 'rules', 'sessions', 'analytics']).optional().default('overview')
+});
+
+const createVendorSchema = z.object({
+  name: SecureSchemas.safeString(255).min(1),
+  contactEmail: z.string().email().max(255),
+  status: z.enum(['active', 'inactive', 'suspended']).optional().default('active'),
+  settings: z.object({
+    autoAssign: z.boolean().optional().default(false),
+    priority: z.number().min(1).max(10).optional().default(5)
+  }).optional()
+});
+
+const createPortalSessionSchema = z.object({
+  vendorId: SecureSchemas.uuid,
+  expiryDays: z.number().min(1).max(30).optional().default(7),
+  permissions: z.array(z.enum(['view_prices', 'submit_prices', 'view_analytics'])).optional().default(['view_prices', 'submit_prices'])
+});
+
+const createBusinessRuleSchema = z.object({
+  name: SecureSchemas.safeString(255).min(1),
+  description: SecureSchemas.safeString(1000).optional(),
+  conditions: z.array(z.object({
+    field: SecureSchemas.safeString(100),
+    operator: z.enum(['equals', 'contains', 'greater_than', 'less_than']),
+    value: SecureSchemas.safeString(255)
+  })).min(1).max(10),
+  actions: z.array(z.object({
+    type: z.enum(['assign_price', 'flag_review', 'auto_approve', 'reject']),
+    parameters: z.record(z.any()).optional()
+  })).min(1).max(5),
+  isActive: z.boolean().optional().default(true)
+});
+
+const assignPriceSchema = z.object({
+  itemId: SecureSchemas.uuid,
+  vendorId: SecureSchemas.uuid,
+  price: z.number().positive(),
+  currency: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code').optional().default('USD'),
+  validFrom: z.coerce.date(),
+  validTo: z.coerce.date().optional()
+});
+
+const priceManagementActionSchema = z.object({
+  action: z.enum(['create_vendor', 'update_vendor_settings', 'create_portal_session', 'create_business_rule', 'assign_price']),
+  data: z.any() // Will be validated based on action type
+});
+
+/**
+ * GET /api/price-management - Get price management data
+ * Requires authentication and 'read:price_management' permission
+ */
+const getPriceManagementData = withSecurity(
+  authStrategies.hybrid(
+    withAuthorization('price_management', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+      try {
+        const { searchParams } = new URL(request.url);
+        
+        // Parse and validate query parameters
+        const rawQuery = {
+          type: searchParams.get('type') || 'overview'
+        };
+
+        const queryValidation = await validateInput(rawQuery, priceManagementQuerySchema, {
+          maxLength: 100,
+          trimWhitespace: true,
+          removeSuspiciousPatterns: true
+        });
+
+        if (!queryValidation.success) {
+          await auditSecurityEvent(SecurityEventType.MALICIOUS_REQUEST, request, user.id, {
+            reason: 'Invalid query parameters',
+            threats: queryValidation.threats,
+            riskLevel: queryValidation.riskLevel
+          });
+
+          return createSecureResponse(
             {
-              type: 'vendor_submission',
-              message: 'ABC Food Supplies submitted new pricing',
-              timestamp: '2024-01-16T14:35:00Z',
-              status: 'success'
+              success: false,
+              error: 'Invalid query parameters',
+              details: queryValidation.errors
             },
-            {
-              type: 'price_assignment',
-              message: 'Auto-assigned 23 PR items',
-              timestamp: '2024-01-16T11:20:00Z',
-              status: 'success'
-            },
-            {
-              type: 'price_expiry',
-              message: '5 price lists expiring this week',
-              timestamp: '2024-01-16T09:00:00Z',
-              status: 'warning'
-            }
-          ],
-          quickStats: {
-            totalVendors: vendorsData.vendors.length,
-            activeVendors: vendorsData.vendors.filter(v => v.status === 'active').length,
-            totalPriceLists: pricelistsData.length,
-            activePriceLists: pricelistsData.filter(p => p.status === 'Active').length,
-            totalAssignments: priceAssignmentsData.priceAssignments.length,
-            successfulAssignments: priceAssignmentsData.priceAssignments.filter(a => !a.isManualOverride).length,
-            pendingAssignments: 0, // No pending assignments in current data structure
-            activeRules: businessRulesData.businessRules.filter(r => r.isActive).length
-          }
+            400
+          );
         }
-      });
+
+        const { type } = queryValidation.sanitized || queryValidation.data!;
+
+        // Log data access for sensitive operations
+        await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {
+          resource: 'price_management',
+          action: 'read',
+          dataType: type,
+          role: user.role
+        });
+
+        // Return overview data by default
+        if (type === 'overview') {
+          const overviewData = {
+            overview: analyticsData.overview,
+            recentActivity: [
+              {
+                type: 'vendor_submission',
+                message: 'ABC Food Supplies submitted new pricing',
+                timestamp: '2024-01-16T14:35:00Z',
+                status: 'success'
+              },
+              {
+                type: 'price_assignment',
+                message: 'Auto-assigned 23 PR items',
+                timestamp: '2024-01-16T11:20:00Z',
+                status: 'success'
+              },
+              {
+                type: 'price_expiry',
+                message: '5 price lists expiring this week',
+                timestamp: '2024-01-16T09:00:00Z',
+                status: 'warning'
+              }
+            ],
+            quickStats: {
+              totalVendors: vendorsData.vendors.length,
+              activeVendors: vendorsData.vendors.filter(v => v.status === 'active').length,
+              totalPriceLists: pricelistsData.length,
+              activePriceLists: pricelistsData.filter(p => p.status === 'Active').length,
+              totalAssignments: priceAssignmentsData.priceAssignments.length,
+              successfulAssignments: priceAssignmentsData.priceAssignments.filter(a => !a.isManualOverride).length,
+              pendingAssignments: 0,
+              activeRules: businessRulesData.businessRules.filter(r => r.isActive).length
+            }
+          };
+
+          return createSecureResponse({
+            success: true,
+            data: overviewData
+          });
+        }
+
+        // Return specific data type based on user permissions
+        let responseData: any;
+        
+        switch (type) {
+          case 'vendors':
+            responseData = vendorsData;
+            break;
+          case 'pricelists':
+            responseData = pricelistsData;
+            break;
+          case 'assignments':
+            responseData = priceAssignmentsData.priceAssignments;
+            break;
+          case 'rules':
+            // Check if user can view business rules
+            if (!await checkPermission(user, 'read', 'business_rules')) {
+              return createSecureResponse(
+                {
+                  success: false,
+                  error: 'Insufficient permissions to view business rules'
+                },
+                403
+              );
+            }
+            responseData = businessRulesData.businessRules;
+            break;
+          case 'sessions':
+            // Only allow admin users to view portal sessions
+            if (!['admin', 'super-admin', 'purchasing-staff'].includes(user.role)) {
+              return createSecureResponse(
+                {
+                  success: false,
+                  error: 'Insufficient permissions to view portal sessions'
+                },
+                403
+              );
+            }
+            responseData = portalSessionsData;
+            break;
+          case 'analytics':
+            responseData = analyticsData;
+            break;
+          default:
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid data type requested'
+              },
+              400
+            );
+        }
+
+        return createSecureResponse({
+          success: true,
+          data: responseData
+        });
+
+      } catch (error) {
+        console.error('Error in GET /api/price-management:', error);
+        
+        await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          operation: 'get_price_management_data',
+          stack: error instanceof Error ? error.stack : undefined
+        });
+
+        return createSecureResponse(
+          {
+            success: false,
+            error: 'Internal server error'
+          },
+          500
+        );
+      }
+    })
+  ),
+  {
+    validationConfig: {
+      maxBodySize: 0, // No body for GET requests
+      validateOrigin: false // Allow cross-origin GET requests
+    },
+    corsConfig: {
+      methods: ['GET']
     }
-
-    // Return specific data type
-    switch (type) {
-      case 'vendors':
-        return NextResponse.json({
-          success: true,
-          data: vendorsData
-        });
-
-      case 'pricelists':
-        return NextResponse.json({
-          success: true,
-          data: pricelistsData
-        });
-
-      case 'assignments':
-        return NextResponse.json({
-          success: true,
-          data: priceAssignmentsData.priceAssignments
-        });
-
-      case 'rules':
-        return NextResponse.json({
-          success: true,
-          data: businessRulesData.businessRules
-        });
-
-      case 'sessions':
-        return NextResponse.json({
-          success: true,
-          data: portalSessionsData
-        });
-
-      case 'analytics':
-        return NextResponse.json({
-          success: true,
-          data: analyticsData
-        });
-
-      default:
-        return NextResponse.json({
-          success: false,
-          error: 'Invalid data type requested'
-        }, { status: 400 });
-    }
-  } catch (error) {
-    console.error('Price Management API Error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Internal server error'
-    }, { status: 500 });
   }
-}
+);
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { action, data } = body;
+// Apply rate limiting
+export const GET = withRateLimit(RateLimitPresets.API)(getPriceManagementData);
 
-    // Simulate different actions
-    switch (action) {
-      case 'create_vendor':
-        return NextResponse.json({
-          success: true,
-          message: 'Vendor created successfully',
-          data: {
+/**
+ * POST /api/price-management - Create price management entities
+ * Requires authentication and appropriate permissions based on action
+ */
+const createPriceManagementData = withSecurity(
+  authStrategies.hybrid(async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    try {
+      const body = await request.json();
+
+      // Basic structure validation
+      const structureValidation = await validateInput(body, priceManagementActionSchema, {
+        maxLength: 10000,
+        trimWhitespace: true,
+        removeSuspiciousPatterns: true,
+        allowHtml: false
+      });
+
+      if (!structureValidation.success) {
+        await auditSecurityEvent(SecurityEventType.MALICIOUS_REQUEST, request, user.id, {
+          reason: 'Invalid request structure',
+          threats: structureValidation.threats,
+          riskLevel: structureValidation.riskLevel,
+          dataType: 'price_management_action'
+        });
+
+        return createSecureResponse(
+          {
+            success: false,
+            error: 'Invalid request structure',
+            details: structureValidation.errors
+          },
+          400
+        );
+      }
+
+      const { action, data } = structureValidation.sanitized || structureValidation.data!;
+
+      // Permission checks and action-specific validation
+      switch (action) {
+        case 'create_vendor': {
+          // Check permissions
+          if (!await checkPermission(user, 'create', 'vendors')) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Insufficient permissions to create vendors'
+              },
+              403
+            );
+          }
+
+          // Validate vendor data
+          const vendorValidation = await validateInput(data, createVendorSchema, {
+            maxLength: 5000,
+            trimWhitespace: true,
+            removeSuspiciousPatterns: true,
+            allowHtml: false
+          });
+
+          if (!vendorValidation.success) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid vendor data',
+                details: vendorValidation.errors
+              },
+              400
+            );
+          }
+
+          const vendorData = vendorValidation.sanitized || vendorValidation.data!;
+
+          // Log data modification
+          await auditSecurityEvent(SecurityEventType.DATA_MODIFICATION, request, user.id, {
+            resource: 'vendors',
+            action: 'create',
+            vendorName: vendorData.name,
+            vendorEmail: vendorData.contactEmail
+          });
+
+          const createdVendor = {
             id: `vendor-${Date.now()}`,
-            ...data,
-            createdAt: new Date().toISOString()
-          }
-        });
-
-      case 'update_vendor_settings':
-        return NextResponse.json({
-          success: true,
-          message: 'Vendor settings updated successfully',
-          data: {
-            ...data,
-            updatedAt: new Date().toISOString()
-          }
-        });
-
-      case 'create_portal_session':
-        return NextResponse.json({
-          success: true,
-          message: 'Portal session created successfully',
-          data: {
-            id: `session-${Date.now()}`,
-            sessionToken: `token-${Math.random().toString(36).substring(2, 15)}`,
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
-            portalUrl: `/price-management/vendor-portal/token-${Math.random().toString(36).substring(2, 15)}`,
-            ...data,
-            createdAt: new Date().toISOString()
-          }
-        });
-
-      case 'create_business_rule':
-        return NextResponse.json({
-          success: true,
-          message: 'Business rule created successfully',
-          data: {
-            id: `rule-${Date.now()}`,
-            ...data,
+            ...vendorData,
+            createdBy: user.id,
             createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+
+          return createSecureResponse(
+            {
+              success: true,
+              message: 'Vendor created successfully',
+              data: createdVendor
+            },
+            201
+          );
+        }
+
+        case 'update_vendor_settings': {
+          // Check permissions
+          if (!await checkPermission(user, 'update', 'vendors')) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Insufficient permissions to update vendor settings'
+              },
+              403
+            );
+          }
+
+          // Log data modification
+          await auditSecurityEvent(SecurityEventType.DATA_MODIFICATION, request, user.id, {
+            resource: 'vendor_settings',
+            action: 'update',
+            vendorId: data.vendorId
+          });
+
+          return createSecureResponse({
+            success: true,
+            message: 'Vendor settings updated successfully',
+            data: {
+              ...data,
+              updatedBy: user.id,
+              updatedAt: new Date().toISOString()
+            }
+          });
+        }
+
+        case 'create_portal_session': {
+          // Check permissions - only admin and purchasing staff can create portal sessions
+          if (!['admin', 'super-admin', 'purchasing-staff'].includes(user.role)) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Insufficient permissions to create portal sessions'
+              },
+              403
+            );
+          }
+
+          // Validate portal session data
+          const sessionValidation = await validateInput(data, createPortalSessionSchema, {
+            maxLength: 1000,
+            trimWhitespace: true,
+            removeSuspiciousPatterns: true
+          });
+
+          if (!sessionValidation.success) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid portal session data',
+                details: sessionValidation.errors
+              },
+              400
+            );
+          }
+
+          const sessionData = sessionValidation.sanitized || sessionValidation.data!;
+
+          // Generate secure tokens
+          const sessionId = crypto.randomUUID();
+          const sessionToken = crypto.randomUUID() + '-' + Date.now().toString(36);
+          const expiresAt = new Date(Date.now() + sessionData.expiryDays * 24 * 60 * 60 * 1000);
+
+          // Log sensitive operation
+          await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {
+            resource: 'vendor_portal_sessions',
+            action: 'create',
+            vendorId: sessionData.vendorId,
+            expiryDays: sessionData.expiryDays,
+            permissions: sessionData.permissions
+          });
+
+          const portalSession = {
+            id: sessionId,
+            sessionToken,
+            expiresAt: expiresAt.toISOString(),
+            portalUrl: `/price-management/vendor-portal/${sessionToken}`,
+            ...sessionData,
+            createdBy: user.id,
+            createdAt: new Date().toISOString(),
+            isActive: true
+          };
+
+          return createSecureResponse(
+            {
+              success: true,
+              message: 'Portal session created successfully',
+              data: portalSession
+            },
+            201
+          );
+        }
+
+        case 'create_business_rule': {
+          // Check permissions - only admin and purchasing staff can create business rules
+          if (!await checkPermission(user, 'create', 'business_rules')) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Insufficient permissions to create business rules'
+              },
+              403
+            );
+          }
+
+          // Validate business rule data
+          const ruleValidation = await validateInput(data, createBusinessRuleSchema, {
+            maxLength: 10000,
+            trimWhitespace: true,
+            removeSuspiciousPatterns: true,
+            allowHtml: false
+          });
+
+          if (!ruleValidation.success) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid business rule data',
+                details: ruleValidation.errors
+              },
+              400
+            );
+          }
+
+          const ruleData = ruleValidation.sanitized || ruleValidation.data!;
+
+          // Log sensitive operation
+          await auditSecurityEvent(SecurityEventType.DATA_MODIFICATION, request, user.id, {
+            resource: 'business_rules',
+            action: 'create',
+            ruleName: ruleData.name,
+            conditionsCount: ruleData.conditions.length,
+            actionsCount: ruleData.actions.length,
+            isActive: ruleData.isActive
+          });
+
+          const businessRule = {
+            id: `rule-${Date.now()}`,
+            ...ruleData,
+            createdBy: user.id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
             performance: {
               executionsCount: 0,
               successfulExecutions: 0,
@@ -166,32 +516,135 @@ export async function POST(request: NextRequest) {
               manualOverrides: 0,
               lastTriggered: null
             }
-          }
-        });
+          };
 
-      case 'assign_price':
-        return NextResponse.json({
-          success: true,
-          message: 'Price assigned successfully',
-          data: {
+          return createSecureResponse(
+            {
+              success: true,
+              message: 'Business rule created successfully',
+              data: businessRule
+            },
+            201
+          );
+        }
+
+        case 'assign_price': {
+          // Check permissions
+          if (!await checkPermission(user, 'assign', 'price_assignments')) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Insufficient permissions to assign prices'
+              },
+              403
+            );
+          }
+
+          // Validate price assignment data
+          const priceValidation = await validateInput(data, assignPriceSchema, {
+            maxLength: 1000,
+            trimWhitespace: true,
+            removeSuspiciousPatterns: true
+          });
+
+          if (!priceValidation.success) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid price assignment data',
+                details: priceValidation.errors
+              },
+              400
+            );
+          }
+
+          const priceData = priceValidation.sanitized || priceValidation.data!;
+
+          // Validate date logic
+          if (priceData.validTo && priceData.validFrom >= priceData.validTo) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Valid from date must be before valid to date'
+              },
+              400
+            );
+          }
+
+          // Log price assignment (sensitive financial operation)
+          await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {
+            resource: 'price_assignments',
+            action: 'assign_price',
+            itemId: priceData.itemId,
+            vendorId: priceData.vendorId,
+            price: priceData.price,
+            currency: priceData.currency
+          });
+
+          const priceAssignment = {
             id: `assignment-${Date.now()}`,
-            ...data,
+            ...priceData,
+            assignedBy: user.id,
             assignedAt: new Date().toISOString(),
-            status: 'Assigned'
-          }
-        });
+            status: 'Assigned',
+            isManualOverride: false,
+            approvalRequired: priceData.price > 10000 // Require approval for high-value prices
+          };
 
-      default:
-        return NextResponse.json({
+          return createSecureResponse(
+            {
+              success: true,
+              message: 'Price assigned successfully',
+              data: priceAssignment
+            },
+            201
+          );
+        }
+
+        default:
+          return createSecureResponse(
+            {
+              success: false,
+              error: 'Invalid action specified'
+            },
+            400
+          );
+      }
+
+    } catch (error) {
+      console.error('Error in POST /api/price-management:', error);
+      
+      await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        operation: 'create_price_management_data',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+
+      return createSecureResponse(
+        {
           success: false,
-          error: 'Invalid action specified'
-        }, { status: 400 });
+          error: 'Internal server error'
+        },
+        500
+      );
     }
-  } catch (error) {
-    console.error('Price Management API POST Error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Internal server error'
-    }, { status: 500 });
+  }),
+  {
+    validationConfig: {
+      maxBodySize: 100 * 1024, // 100KB max body size
+      allowedContentTypes: ['application/json'],
+      requireContentType: true,
+      validateOrigin: true
+    },
+    corsConfig: {
+      methods: ['POST']
+    }
   }
-}
+);
+
+// Apply stricter rate limiting for creation endpoints
+export const POST = withRateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 100, // 100 operations per hour
+  skipSuccessfulRequests: false
+})(createPriceManagementData);

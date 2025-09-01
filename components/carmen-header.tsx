@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useKeycloakUser } from "@/lib/context/keycloak-user-context"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import { Bell, Search, Menu as MenuIcon, X, Bookmark, Star, Clock, Settings, Use
 
 export function CarmenHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, signOut } = useKeycloakUser()
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -26,7 +28,7 @@ export function CarmenHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
-            <a href="#" className="text-xl font-bold text-primary mr-8">
+            <a href="#" className="text-lg font-bold text-primary mr-8">
               Carmen
             </a>
             <nav className="hidden md:flex space-x-4">
@@ -85,8 +87,8 @@ export function CarmenHeader() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">John Doe</p>
-                    <p className="text-xs leading-none text-muted-foreground">john@example.com</p>
+                    <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email || "user@example.com"}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -103,7 +105,7 @@ export function CarmenHeader() {
                   <span>Billing</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => signOut()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
@@ -155,8 +157,8 @@ export function CarmenHeader() {
                 />
               </div>
               <div className="ml-3">
-                <div className="text-base font-medium text-gray-800">John Doe</div>
-                <div className="text-sm font-medium text-gray-500">john@example.com</div>
+                <div className="text-base font-medium text-gray-800">{user?.name || "User"}</div>
+                <div className="text-sm font-medium text-gray-500">{user?.email || "user@example.com"}</div>
               </div>
               <Button variant="ghost" size="icon" className="ml-auto">
                 <Bell size={20} />
@@ -176,7 +178,11 @@ export function CarmenHeader() {
                 <CreditCard className="mr-2 h-4 w-4" />
                 <span>Billing</span>
               </Button>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => signOut()}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </Button>

@@ -75,49 +75,50 @@ export default function PurchaseOrdersPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 px-6 space-y-6">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+    <div className="container mx-auto py-6 px-6 space-y-8">
+      {/* Header Section - following size guide pattern */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Purchase Orders</h1>
-          <p className="text-muted-foreground">
-            Manage and track all purchase orders from creation to fulfillment
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">Purchase Orders</h1>
         </div>
         
-        {/* Action Buttons - Top aligned with title */}
-        <div className="flex items-center space-x-2 md:mt-0">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="h-8 px-3 text-xs">
+            <Download className="h-3 w-3 mr-1" />
+            Export
+          </Button>
+          
+          <Button variant="outline" className="h-8 px-3 text-xs">
+            <Printer className="h-3 w-3 mr-1" />
+            Print
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Purchase Order
-                <ChevronDown className="ml-2 h-4 w-4" />
+              <Button className="h-8 px-3 text-xs font-medium">
+                <Plus className="h-3 w-3 mr-1" />
+                New PO
+                <ChevronDown className="h-3 w-3 ml-1" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => router.push("/procurement/purchase-orders/create")}>
-                Create Blank PO
+                <span className="text-xs">Create Blank PO</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>PO Templates</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs">PO Templates</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => setShowCreateFromPRDialog(true)}>
-                Create from Purchase Requests
+                <span className="text-xs">Create from Purchase Requests</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>Create from Template</DropdownMenuItem>
-              <DropdownMenuItem>Create Recurring PO</DropdownMenuItem>
+              <DropdownMenuItem>
+                <span className="text-xs">Create from Template</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span className="text-xs">Create Recurring PO</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          
-          <Button variant="outline" size="sm">
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
         </div>
       </div>
 

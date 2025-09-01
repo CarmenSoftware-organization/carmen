@@ -160,6 +160,43 @@ export interface ProductDocument {
 // ====== PRODUCT CATEGORIES ======
 
 /**
+ * Product category hierarchy types
+ */
+export type CategoryType = 'CATEGORY' | 'SUBCATEGORY' | 'ITEM_GROUP';
+
+/**
+ * Category hierarchy item for tree operations
+ */
+export interface CategoryItem {
+  id: string;
+  name: string;
+  type: CategoryType;
+  itemCount: number;
+  children?: CategoryItem[];
+  parentId?: string;
+  isExpanded?: boolean; // UI state for tree expansion
+  isEditing?: boolean; // UI state for inline editing
+}
+
+/**
+ * Category drag and drop operations
+ */
+export interface CategoryDragItem {
+  id: string;
+  type: string;
+}
+
+/**
+ * Category tree operations
+ */
+export interface CategoryTreeOperations {
+  onMove: (dragId: string, hoverId: string) => void;
+  onDelete: (id: string) => void;
+  onEdit: (id: string, newName: string) => void;
+  onAdd: (parentId: string, type: CategoryType) => void;
+}
+
+/**
  * Extended product category with additional properties
  */
 export interface ProductCategory extends Category {

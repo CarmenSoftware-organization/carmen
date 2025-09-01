@@ -196,9 +196,9 @@ export default function EnhancedItemsTab({
             />
           )}
           <div>
-            <h2 className="text-lg font-semibold">Purchase Order Items</h2>
+            <h2 className="text-base font-semibold">Purchase Order Items</h2>
             {selectedItems.length > 0 && (
-              <p className="text-sm text-gray-500">
+              <p className="text-xs text-gray-500">
                 <span className="text-blue-600 font-medium">
                   {selectedItems.length} selected
                 </span>
@@ -211,9 +211,9 @@ export default function EnhancedItemsTab({
           {editable && (
             <Button 
               onClick={() => setIsAddItemFormOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="h-8 px-3 text-xs bg-blue-600 hover:bg-blue-700"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-3 w-3 mr-2" />
               Add Item
             </Button>
           )}
@@ -225,7 +225,7 @@ export default function EnhancedItemsTab({
       {selectedItems.length > 0 && (
         <Card className="p-3 bg-white border-gray-200">
           <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium">
+            <span className="text-xs font-medium">
               {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected:
             </span>
             
@@ -233,14 +233,16 @@ export default function EnhancedItemsTab({
               <Button 
                 size="sm" 
                 variant="outline"
+                className="h-6 px-2 text-xs"
                 onClick={() => handleBulkAction('edit')}
               >
-                <Edit className="h-4 w-4 mr-1" />
+                <Edit className="h-3 w-3 mr-1" />
                 Edit
               </Button>
               <Button 
                 size="sm" 
                 variant="outline"
+                className="h-6 px-2 text-xs"
                 onClick={() => handleBulkAction('expand')}
               >
                 Expand All
@@ -248,6 +250,7 @@ export default function EnhancedItemsTab({
               <Button 
                 size="sm" 
                 variant="outline"
+                className="h-6 px-2 text-xs"
                 onClick={() => handleBulkAction('collapse')}
               >
                 Collapse All
@@ -255,18 +258,19 @@ export default function EnhancedItemsTab({
               <Button 
                 size="sm" 
                 variant="outline"
+                className="h-6 px-2 text-xs"
                 onClick={() => handleBulkAction('export')}
               >
-                <FileText className="h-4 w-4 mr-1" />
+                <FileText className="h-3 w-3 mr-1" />
                 Export Selected
               </Button>
               <Button 
                 size="sm" 
                 variant="outline"
                 onClick={() => handleBulkAction('delete')}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Trash2 className="h-4 w-4 mr-1" />
+                <Trash2 className="h-3 w-3 mr-1" />
                 Delete Selected
               </Button>
             </div>
@@ -279,17 +283,17 @@ export default function EnhancedItemsTab({
         {filteredItems.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="text-gray-500">
-              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">No items found</h3>
-              <p className="text-sm">
+              <FileText className="h-8 w-8 mx-auto mb-4 opacity-50" />
+              <h3 className="text-base font-medium mb-2">No items found</h3>
+              <p className="text-xs">
                 {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first item.'}
               </p>
               {editable && !searchTerm && (
                 <Button 
-                  className="mt-4"
+                  className="mt-4 h-8 px-3 text-xs"
                   onClick={() => setIsAddItemFormOpen(true)}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-3 w-3 mr-2" />
                   Add First Item
                 </Button>
               )}

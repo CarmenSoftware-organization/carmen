@@ -1,0 +1,554 @@
+<testsuites id="" name="" tests="6" failures="6" skipped="0" errors="0" time="62.927225">
+<testsuite name="toggle.test.ts" timestamp="2025-08-29T06:08:59.799Z" hostname="chromium" tests="1" failures="1" skipped="0" time="29.936" errors="0">
+<testcase name="RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode" classname="toggle.test.ts" time="29.936">
+<failure message="toggle.test.ts:38:7 should switch from RBAC to ABAC mode" type="FAILURE">
+<![CDATA[  [chromium] › toggle.test.ts:38:7 › RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode › Switch to ABAC mode 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2347
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2338
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2301ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium/trace.zip]]
+Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2291ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium-retry1/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium-retry1/trace.zip]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[Tab switch took 2301ms, which exceeds 500ms benchmark
+Tab switch took 2291ms, which exceeds 500ms benchmark
+]]>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="toggle.test.ts" timestamp="2025-08-29T06:08:59.799Z" hostname="firefox" tests="1" failures="1" skipped="0" time="34.603" errors="0">
+<testcase name="RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode" classname="toggle.test.ts" time="34.603">
+<failure message="toggle.test.ts:38:7 should switch from RBAC to ABAC mode" type="FAILURE">
+<![CDATA[  [firefox] › toggle.test.ts:38:7 › RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode › Switch to ABAC mode 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2491
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2487
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2360ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox/trace.zip]]
+Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2408ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox-retry1/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox-retry1/trace.zip]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[Tab switch took 2360ms, which exceeds 500ms benchmark
+Tab switch took 2408ms, which exceeds 500ms benchmark
+]]>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="toggle.test.ts" timestamp="2025-08-29T06:08:59.799Z" hostname="webkit" tests="1" failures="1" skipped="0" time="31.659" errors="0">
+<testcase name="RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode" classname="toggle.test.ts" time="31.659">
+<failure message="toggle.test.ts:38:7 should switch from RBAC to ABAC mode" type="FAILURE">
+<![CDATA[  [webkit] › toggle.test.ts:38:7 › RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode › Switch to ABAC mode 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2364
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2429
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2311ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit/trace.zip]]
+Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2337ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit-retry1/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit-retry1/trace.zip]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[Tab switch took 2311ms, which exceeds 500ms benchmark
+Tab switch took 2337ms, which exceeds 500ms benchmark
+]]>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="toggle.test.ts" timestamp="2025-08-29T06:08:59.799Z" hostname="mobile-chrome" tests="1" failures="1" skipped="0" time="33.771" errors="0">
+<testcase name="RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode" classname="toggle.test.ts" time="33.771">
+<failure message="toggle.test.ts:38:7 should switch from RBAC to ABAC mode" type="FAILURE">
+<![CDATA[  [mobile-chrome] › toggle.test.ts:38:7 › RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('h1:has-text("Policy Management")')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('h1:has-text("Policy Management")')
+
+
+       at ../page-objects/base/BasePage.ts:114
+
+      112 |   async expectElementVisible(selector: string, timeout: number = 5000): Promise<void> {
+      113 |     const element = this.page.locator(selector);
+    > 114 |     await expect(element).toBeVisible({ timeout });
+          |                           ^
+      115 |   }
+      116 |
+      117 |   async expectElementHidden(selector: string, timeout: number = 5000): Promise<void> {
+        at PermissionManagementPage.expectElementVisible (/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/base/BasePage.ts:114:27)
+        at PermissionManagementPage.navigateToPermissionManagement (/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/pages/PermissionManagementPage.ts:51:12)
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:20:5
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2442
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome/trace.zip]]
+Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2325ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome-retry1/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome-retry1/trace.zip]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[Tab switch took 2325ms, which exceeds 500ms benchmark
+]]>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="toggle.test.ts" timestamp="2025-08-29T06:08:59.799Z" hostname="mobile-safari" tests="1" failures="1" skipped="0" time="27.874" errors="0">
+<testcase name="RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode" classname="toggle.test.ts" time="27.874">
+<failure message="toggle.test.ts:38:7 should switch from RBAC to ABAC mode" type="FAILURE">
+<![CDATA[  [mobile-safari] › toggle.test.ts:38:7 › RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode › Switch to ABAC mode 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2348
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2397
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2298ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari/trace.zip]]
+Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2336ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari-retry1/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari-retry1/trace.zip]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[Tab switch took 2298ms, which exceeds 500ms benchmark
+Tab switch took 2336ms, which exceeds 500ms benchmark
+]]>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="toggle.test.ts" timestamp="2025-08-29T06:08:59.799Z" hostname="tablet-chrome" tests="1" failures="1" skipped="0" time="27.882" errors="0">
+<testcase name="RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode" classname="toggle.test.ts" time="27.882">
+<failure message="toggle.test.ts:38:7 should switch from RBAC to ABAC mode" type="FAILURE">
+<![CDATA[  [tablet-chrome] › toggle.test.ts:38:7 › RBAC/ABAC Toggle Functionality › should switch from RBAC to ABAC mode › Switch to ABAC mode 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2348
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   2422
+
+      45 |     await test.step('Switch to ABAC mode', async () => {
+      46 |       const responseTime = await permissionPage.measureToggleResponseTime();
+    > 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);
+         |                            ^
+      48 |       
+      49 |       await permissionPage.toggleToABAC();
+      50 |       const mode = await permissionPage.getCurrentMode();
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28
+        at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5
+
+    Error Context: ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2306ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome/trace.zip]]
+Navigating to: http://localhost:3005/system-administration/permission-management/policies
+Page loaded indicator not found, checking for basic page elements
+Page loaded indicator not found, checking for basic page elements
+Already in RBAC mode, skipping switch
+Switching from RBAC to ABAC mode
+No migration dialog appeared, direct tab switch completed
+Tab switch took 2351ms
+Successfully switched to ABAC mode
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome-retry1/error-context.md]]
+
+[[ATTACHMENT|../test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome-retry1/trace.zip]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[Tab switch took 2306ms, which exceeds 500ms benchmark
+Tab switch took 2351ms, which exceeds 500ms benchmark
+]]>
+</system-err>
+</testcase>
+</testsuite>
+</testsuites>

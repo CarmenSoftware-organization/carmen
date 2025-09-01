@@ -1,0 +1,94 @@
+{
+  "id": "carmen-web-prod",
+  "clientId": "carmen-web-prod",
+  "name": "Carmen ERP Web Application (Production)",
+  "description": "Production environment client for Carmen ERP web application",
+  "enabled": true,
+  "clientAuthenticatorType": "client-secret",
+  "secret": "production-client-secret-must-be-very-secure-and-rotated",
+  "registrationAccessToken": "",
+  "redirectUris": [
+    "https://app.carmen-erp.com/api/auth/callback/keycloak",
+    "https://app.carmen-erp.com/auth/callback",
+    "https://carmen-erp.com/api/auth/callback/keycloak",
+    "https://carmen-erp.com/auth/callback"
+  ],
+  "webOrigins": [
+    "https://app.carmen-erp.com",
+    "https://carmen-erp.com"
+  ],
+  "baseUrl": "https://app.carmen-erp.com",
+  "adminUrl": "https://app.carmen-erp.com",
+  "rootUrl": "https://app.carmen-erp.com",
+  "protocol": "openid-connect",
+  "access": {
+    "view": true,
+    "configure": false,
+    "manage": false
+  },
+  "standardFlowEnabled": true,
+  "implicitFlowEnabled": false,
+  "directAccessGrantsEnabled": false,
+  "serviceAccountsEnabled": false,
+  "publicClient": false,
+  "frontchannelLogout": true,
+  "fullScopeAllowed": false,
+  "nodeReRegistrationTimeout": 0,
+  "defaultClientScopes": [
+    "web-origins",
+    "acr",
+    "profile",
+    "roles",
+    "email",
+    "carmen-erp"
+  ],
+  "optionalClientScopes": [
+    "address",
+    "phone",
+    "offline_access",
+    "microprofile-jwt"
+  ],
+  "attributes": {
+    "access.token.lifespan": "600",
+    "client.secret.creation.time": "1640000000",
+    "oauth2.device.authorization.grant.enabled": "false",
+    "oidc.ciba.grant.enabled": "false",
+    "backchannel.logout.session.required": "true",
+    "backchannel.logout.revoke.offline.tokens": "true",
+    "display.on.consent.screen": "false",
+    "post.logout.redirect.uris": "https://app.carmen-erp.com/auth/signout+https://carmen-erp.com/auth/signout",
+    "tls.client.certificate.bound.access.tokens": "true",
+    "pkce.code.challenge.method": "S256",
+    "use.refresh.tokens": "true",
+    "client_credentials.use_refresh_token": "false"
+  },
+  "authenticationFlowBindingOverrides": {},
+  "protocolMappers": [
+    {
+      "id": "audience-mapper",
+      "name": "audience-mapper",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-audience-mapper",
+      "consentRequired": false,
+      "config": {
+        "included.client.audience": "carmen-web-prod",
+        "id.token.claim": "false",
+        "access.token.claim": "true"
+      }
+    },
+    {
+      "id": "groups-mapper",
+      "name": "groups-mapper",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-group-membership-mapper",
+      "consentRequired": false,
+      "config": {
+        "full.path": "false",
+        "id.token.claim": "true",
+        "access.token.claim": "true",
+        "claim.name": "groups",
+        "userinfo.token.claim": "true"
+      }
+    }
+  ]
+}

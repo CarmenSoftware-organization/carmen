@@ -29,6 +29,9 @@ export * from './product'
 // Recipe and operational planning types
 export * from './recipe'
 
+// Menu engineering types
+export * from './menu-engineering'
+
 // Finance types
 export * from './finance'
 

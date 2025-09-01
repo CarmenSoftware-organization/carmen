@@ -24,7 +24,7 @@ import {
   type BulkPermissionRequest,
   type BulkPermissionResult
 } from '@/lib/services/permissions'
-import { useUser } from '@/lib/context/user-context'
+import { useKeycloakUser } from '@/lib/context/keycloak-user-context'
 import type { User } from '@/lib/types/user'
 import type { Permission } from '@/lib/types/permissions'
 
@@ -66,7 +66,7 @@ export interface PermissionValidationRule {
  * Uses React Query for caching and automatic refetching
  */
 export function usePermission(options: PermissionCheckOptions) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const { enabled = true, staleTime = 5 * 60 * 1000, cacheTime = 10 * 60 * 1000, ...checkOptions } = options
 
   return useQuery({
@@ -102,7 +102,7 @@ export function usePermission(options: PermissionCheckOptions) {
  * Optimizes performance by batching permission checks
  */
 export function useBulkPermissions(options: BulkPermissionOptions) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const { enabled = true, staleTime = 5 * 60 * 1000, cacheTime = 10 * 60 * 1000, ...bulkOptions } = options
 
   return useQuery({
@@ -141,7 +141,7 @@ export function useUserPermissions(options?: {
   staleTime?: number
   cacheTime?: number
 }) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const { enabled = true, staleTime = 10 * 60 * 1000, cacheTime = 30 * 60 * 1000, context } = options || {}
 
   return useQuery({
@@ -170,7 +170,7 @@ export function useUserResourcePermissions(
     cacheTime?: number
   }
 ) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const { enabled = true, staleTime = 5 * 60 * 1000, cacheTime = 10 * 60 * 1000, context } = options || {}
 
   return useQuery({
@@ -190,7 +190,7 @@ export function useUserResourcePermissions(
  * Provides validation functions and error handling
  */
 export function usePermissionValidation(rules: PermissionValidationRule[]) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [isValidating, setIsValidating] = useState(false)
 
@@ -503,7 +503,7 @@ export function useFormPermissionGuard(validationRules: PermissionValidationRule
  * Useful for admin dashboards and monitoring
  */
 export function usePermissionStats() {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const cacheStats = usePermissionCache().getCacheStats()
   const [runtimeStats, setRuntimeStats] = useState({
     totalChecks: 0,

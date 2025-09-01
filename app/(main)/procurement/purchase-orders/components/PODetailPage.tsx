@@ -417,15 +417,15 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         variant="ghost" 
         size="icon" 
         onClick={() => router.push('/procurement/purchase-orders')}
-        className="mr-2 h-8 w-8"
+        className="mr-2 h-6 w-6"
       >
-        <ChevronLeft className="h-5 w-5" />
+        <ChevronLeft className="h-3 w-3" />
         <span className="sr-only">Back to Purchase Orders</span>
       </Button>
       <div className="flex flex-col">
-        <h1 className="text-xl md:text-2xl font-bold">{poData?.number || 'Purchase Order'}</h1>
+        <h1 className="text-lg font-bold">{poData?.number || 'Purchase Order'}</h1>
         {poData?.number && poData.number !== 'New PO' && (
-          <p className="text-sm text-muted-foreground mt-1">Purchase Order</p>
+          <p className="text-xs text-muted-foreground mt-1">Purchase Order</p>
         )}
       </div>
     </div>
@@ -436,12 +436,12 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       {/* Status Change for Editing Mode */}
       {isEditing && (
         <div className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Update Status</Label>
+          <Label className="text-xs font-medium text-muted-foreground mb-2 block">Update Status</Label>
           <Select 
             value={poData.status} 
             onValueChange={handleStatusChange}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 h-8 text-xs">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
@@ -458,8 +458,8 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       {/* Key Information Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <CalendarIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <CalendarIcon className="h-3 w-3" />
             Date
           </Label>
           {isEditing ? (
@@ -468,24 +468,24 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               name="orderDate"
               value={poData?.orderDate?.toISOString().split("T")[0] || ""}
               onChange={handleInputChange}
-              className="w-full"
+              className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-gray-900 font-medium">
+            <div className="text-xs text-gray-900 font-medium">
               {poData?.orderDate ? new Date(poData.orderDate).toLocaleDateString('en-GB') : ""}
             </div>
           )}
         </div>
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <TagIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <TagIcon className="h-3 w-3" />
             PO Type
           </Label>
           <div className="text-gray-900 font-medium">General Purchase</div>
         </div>
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <UserIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <UserIcon className="h-3 w-3" />
             Requestor
           </Label>
           {isEditing ? (
@@ -494,15 +494,15 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               name="buyer"
               value={poData?.buyer || ""}
               onChange={handleInputChange}
-              className="w-full"
+              className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-gray-900 font-medium">{poData?.buyer || ""}</div>
+            <div className="text-xs text-gray-900 font-medium">{poData?.buyer || ""}</div>
           )}
         </div>
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <BuildingIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <BuildingIcon className="h-3 w-3" />
             Department
           </Label>
           {isEditing ? (
@@ -511,10 +511,10 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               name="vendorName"
               value={poData?.vendorName || ""}
               onChange={handleInputChange}
-              className="w-full"
+              className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-gray-900 font-medium">{poData?.vendorName || "Not specified"}</div>
+            <div className="text-xs text-gray-900 font-medium">{poData?.vendorName || "Not specified"}</div>
           )}
         </div>
       </div>
@@ -522,8 +522,8 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       {/* Additional Details Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <TruckIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <TruckIcon className="h-3 w-3" />
             Delivery Date
           </Label>
           {isEditing ? (
@@ -532,17 +532,17 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               name="DeliveryDate"
               value={poData?.DeliveryDate?.toISOString().split("T")[0] || ""}
               onChange={handleInputChange}
-              className="w-full"
+              className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-gray-900 font-medium">
+            <div className="text-xs text-gray-900 font-medium">
               {poData?.DeliveryDate?.toISOString().split("T")[0] || "Not set"}
             </div>
           )}
         </div>
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <DollarSignIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <DollarSignIcon className="h-3 w-3" />
             Currency
           </Label>
           {isEditing ? (
@@ -550,15 +550,15 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               name="currencyCode"
               value={poData?.currencyCode || ""}
               onChange={handleInputChange}
-              className="w-full"
+              className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-gray-900 font-medium">{poData?.currencyCode || ""}</div>
+            <div className="text-xs text-gray-900 font-medium">{poData?.currencyCode || ""}</div>
           )}
         </div>
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <TrendingUpIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <TrendingUpIcon className="h-3 w-3" />
             Exchange Rate
           </Label>
           {isEditing ? (
@@ -568,15 +568,15 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               name="exchangeRate"
               value={poData?.exchangeRate || "1"}
               onChange={handleInputChange}
-              className="w-full"
+              className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-gray-900 font-medium">{poData?.exchangeRate || "1"}</div>
+            <div className="text-xs text-gray-900 font-medium">{poData?.exchangeRate || "1"}</div>
           )}
         </div>
         <div>
-          <Label className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-            <CreditCardIcon className="h-4 w-4" />
+          <Label className="text-xs font-medium text-muted-foreground mb-1 block flex items-center gap-1">
+            <CreditCardIcon className="h-3 w-3" />
             Credit Terms
           </Label>
           {isEditing ? (
@@ -584,10 +584,10 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               name="creditTerms"
               value={poData?.creditTerms || ""}
               onChange={handleInputChange}
-              className="w-full"
+              className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-gray-900 font-medium">{poData?.creditTerms || "Not specified"}</div>
+            <div className="text-xs text-gray-900 font-medium">{poData?.creditTerms || "Not specified"}</div>
           )}
         </div>
       </div>
@@ -596,7 +596,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <Label className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
-            <FileTextIcon className="h-4 w-4" />
+            <FileTextIcon className="h-3 w-3" />
             Description
           </Label>
           {isEditing ? (
@@ -615,7 +615,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         </div>
         <div>
           <Label className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
-            <MessageSquareIcon className="h-4 w-4" />
+            <MessageSquareIcon className="h-3 w-3" />
             Remarks
           </Label>
           {isEditing ? (
@@ -640,35 +640,35 @@ export default function PODetailPage({ params }: PODetailPageProps) {
     <div className="flex flex-wrap gap-2 items-center">
       {isEditing ? (
         <>
-          <Button variant="default" onClick={handleSave}>
-            <CheckSquare className="mr-2 h-4 w-4" />
+          <Button variant="default" className="h-8 px-3 text-xs" onClick={handleSave}>
+            <CheckSquare className="mr-2 h-3 w-3" />
             Save
           </Button>
-          <Button variant="outline" onClick={handleCancel}>
-            <X className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleCancel}>
+            <X className="mr-2 h-3 w-3" />
             Cancel
           </Button>
         </>
       ) : (
         <>
           <Button variant="default" onClick={handleEdit}>
-            <Edit className="mr-2 h-4 w-4" />
+            <Edit className="mr-2 h-3 w-3" />
             Edit
           </Button>
-          <Button variant="outline" onClick={handleDelete}>
-            <Trash2 className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleDelete}>
+            <Trash2 className="mr-2 h-3 w-3" />
             Delete
           </Button>
-          <Button variant="outline" onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handlePrint}>
+            <Printer className="mr-2 h-3 w-3" />
             Print
           </Button>
-          <Button variant="outline" onClick={handleEmail}>
-            <Mail className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleEmail}>
+            <Mail className="mr-2 h-3 w-3" />
             Email
           </Button>
-          <Button variant="outline" onClick={handleExport}>
-            <FileDown className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleExport}>
+            <FileDown className="mr-2 h-3 w-3" />
             Export
           </Button>
         </>
@@ -682,12 +682,12 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               variant="outline" 
               size="icon" 
               onClick={toggleSidebar}
-              className="h-9 w-9"
+              className="h-6 w-6"
             >
               {isSidebarCollapsed ? (
-                <PanelRight className="h-4 w-4" />
+                <PanelRight className="h-3 w-3" />
               ) : (
-                <PanelRightClose className="h-4 w-4" />
+                <PanelRightClose className="h-3 w-3" />
               )}
             </Button>
           </TooltipTrigger>
@@ -781,7 +781,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               {/* Activity Log */}
               <Card className="bg-white dark:bg-gray-800">
                 <CardHeader className="py-3">
-                  <CardTitle>Activity Log</CardTitle>
+                  <CardTitle className="text-base">Activity Log</CardTitle>
                 </CardHeader>
                 <CardContent className="py-2">
                   {params.id !== 'new' && <ActivityLogTab poData={poData} />}
@@ -796,8 +796,8 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+            <DialogTitle className="text-lg flex items-center gap-2">
+              <AlertTriangle className="h-3 w-3 text-yellow-500" />
               Confirm Status Change
             </DialogTitle>
             <DialogDescription>
@@ -807,7 +807,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
           
           {requiresReason() && (
             <div className="py-4">
-              <Label htmlFor="status-reason" className="text-right mb-2">
+              <Label htmlFor="status-reason" className="text-xs font-medium mb-2">
                 Reason <span className="text-red-500">*</span>
               </Label>
               <Textarea
@@ -815,7 +815,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                 value={statusReason}
                 onChange={(e) => setStatusReason(e.target.value)}
                 placeholder="Please provide a reason for this status change"
-                className="w-full"
+                className="w-full h-8 text-xs"
               />
             </div>
           )}
@@ -843,7 +843,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
       <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Export Purchase Order</DialogTitle>
+            <DialogTitle className="text-lg">Export Purchase Order</DialogTitle>
             <DialogDescription>
               Select the format and sections to include in the export.
             </DialogDescription>
@@ -851,26 +851,26 @@ export default function PODetailPage({ params }: PODetailPageProps) {
           
           <div className="py-4 space-y-4">
             <div className="space-y-2">
-              <h3 className="text-sm font-medium">Export Format</h3>
+              <h3 className="text-xs font-medium">Export Format</h3>
               <RadioGroup value={exportFormat} onValueChange={setExportFormat} className="flex flex-col space-y-1">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="pdf" id="pdf" />
                   <Label htmlFor="pdf" className="flex items-center">
-                    <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <FileText className="mr-2 h-3 w-3 text-muted-foreground" />
                     PDF Document
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="excel" id="excel" />
                   <Label htmlFor="excel" className="flex items-center">
-                    <TableIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <TableIcon className="mr-2 h-3 w-3 text-muted-foreground" />
                     Excel Spreadsheet
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="csv" id="csv" />
                   <Label htmlFor="csv" className="flex items-center">
-                    <Download className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Download className="mr-2 h-3 w-3 text-muted-foreground" />
                     CSV File
                   </Label>
                 </div>
@@ -878,7 +878,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             </div>
             
             <div className="space-y-2">
-              <h3 className="text-sm font-medium">Include Sections</h3>
+              <h3 className="text-xs font-medium">Include Sections</h3>
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
                   <Checkbox 

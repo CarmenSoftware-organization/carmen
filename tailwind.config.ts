@@ -13,9 +13,24 @@ const config: Config = {
   			xxs: '0.5rem'
   		},
   		fontFamily: {
-  			sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-  			serif: ['var(--font-serif)', 'ui-serif', 'Georgia', 'serif'],
-  			mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace']
+  			sans: [
+  				'var(--font-sans)',
+  				'ui-sans-serif',
+  				'system-ui',
+  				'sans-serif'
+  			],
+  			serif: [
+  				'var(--font-serif)',
+  				'ui-serif',
+  				'Georgia',
+  				'serif'
+  			],
+  			mono: [
+  				'var(--font-mono)',
+  				'ui-monospace',
+  				'SFMono-Regular',
+  				'monospace'
+  			]
   		},
   		boxShadow: {
   			'2xs': 'var(--shadow-2xs)',
@@ -31,7 +46,7 @@ const config: Config = {
   			normal: 'var(--tracking-normal)'
   		},
   		spacing: {
-  			'spacing': 'var(--spacing)'
+  			spacing: 'var(--spacing)'
   		},
   		colors: {
   			background: 'var(--background)',
@@ -68,14 +83,14 @@ const config: Config = {
   			input: 'var(--input)',
   			ring: 'var(--ring)',
   			sidebar: {
-  				DEFAULT: 'var(--sidebar)',
-  				foreground: 'var(--sidebar-foreground)',
-  				primary: 'var(--sidebar-primary)',
-  				'primary-foreground': 'var(--sidebar-primary-foreground)',
-  				accent: 'var(--sidebar-accent)',
-  				'accent-foreground': 'var(--sidebar-accent-foreground)',
-  				border: 'var(--sidebar-border)',
-  				ring: 'var(--sidebar-ring)'
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
   			},
   			chart: {
   				'1': 'var(--chart-1)',

@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { Inter, Source_Serif_4, JetBrains_Mono } from 'next/font/google'
-import { UserProvider } from '@/lib/context/user-context'
+import { KeycloakUserProvider } from '@/lib/context/keycloak-user-context'
 import { Providers } from './providers'
 import './globals.css'
 
@@ -33,9 +33,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${sourceSerif.variable} ${jetbrainsMono.variable} font-sans`}>
         <Providers>
-          <UserProvider>
+          <KeycloakUserProvider>
             {children}
-          </UserProvider>
+          </KeycloakUserProvider>
         </Providers>
       </body>
     </html>

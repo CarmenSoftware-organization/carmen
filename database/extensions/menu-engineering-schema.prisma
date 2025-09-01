@@ -1,0 +1,279 @@
+// =============================================================================
+// MENU ENGINEERING MODULE DATABASE SCHEMA EXTENSIONS
+// Phase 13.1: Sales Transactions and Menu Analysis Tables
+// =============================================================================
+
+// Add new enums for menu engineering classification
+enum enum_menu_classification {
+  STAR         // High popularity, high profitability
+  PLOWHORSES   // High popularity, low profitability
+  PUZZLE       // Low popularity, high profitability  
+  DOG          // Low popularity, low profitability
+}
+
+enum enum_analysis_period {
+  daily
+  weekly
+  monthly
+  quarterly
+  yearly
+  custom
+}
+
+// =============================================================================
+// TABLE 1: SALES TRANSACTIONS
+// Purpose: Store POS sales data linked to recipes for menu performance analysis
+// =============================================================================
+
+model tb_sales_transaction {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Recipe reference (will link to future recipe table)
+  recipe_id            String    @db.Uuid
+  recipe_name          String?   @db.VarChar(255)  // Denormalized for performance
+  recipe_code          String?   @db.VarChar(50)   // Denormalized for performance
+  
+  // Sale details
+  sale_date            DateTime  @db.Timestamptz(6)
+  quantity_sold        Decimal   @db.Decimal(20, 5)
+  revenue              Decimal   @db.Decimal(20, 5)
+  discounts            Decimal?  @default(0) @db.Decimal(20, 5)
+  net_revenue          Decimal   @db.Decimal(20, 5) // revenue - discounts
+  
+  // Location and operational context
+  location_id          String?   @db.Uuid
+  location_name        String?   @db.VarChar(255)
+  department_id        String?   @db.Uuid
+  department_name      String?   @db.VarChar(255)
+  
+  // POS transaction details
+  pos_transaction_id   String    @db.VarChar(100)
+  pos_transaction_no   String?   @db.VarChar(50)
+  shift_id             String?   @db.VarChar(50)
+  shift_name           String?   @db.VarChar(100)
+  
+  // Staff and customer context
+  served_by_id         String?   @db.Uuid
+  served_by_name       String?   @db.VarChar(255)
+  customer_id          String?   @db.Uuid
+  customer_type        String?   @db.VarChar(50)   // walk-in, member, vip, etc.
+  
+  // Business context
+  day_of_week          Int?      // 1=Monday, 7=Sunday
+  meal_period          String?   @db.VarChar(50)   // breakfast, lunch, dinner, snack
+  weather_condition    String?   @db.VarChar(50)   // sunny, rainy, etc. (for analysis)
+  special_event        String?   @db.VarChar(100)  // holiday, promotion, etc.
+  
+  // Financial breakdown
+  base_price           Decimal?  @db.Decimal(20, 5)
+  tax_amount           Decimal?  @default(0) @db.Decimal(20, 5)
+  service_charge       Decimal?  @default(0) @db.Decimal(20, 5)
+  
+  // Menu engineering calculated fields
+  calculated_food_cost Decimal?  @db.Decimal(20, 5) // From recipe at time of sale
+  gross_profit         Decimal?  @db.Decimal(20, 5) // net_revenue - calculated_food_cost
+  profit_margin        Decimal?  @db.Decimal(8, 4)  // (gross_profit / net_revenue) * 100
+  
+  // Integration fields
+  note                 String?   @db.VarChar(500)
+  info                 Json?     @db.Json
+  dimension            Json?     @db.Json
+  
+  // Audit fields
+  created_at           DateTime  @default(now()) @db.Timestamptz(6)
+  created_by_id        String?   @db.Uuid
+  updated_at           DateTime  @default(now()) @db.Timestamptz(6)
+  updated_by_id        String?   @db.Uuid
+  
+  // Foreign key relationships (will be added when recipe table exists)
+  tb_location          tb_location?    @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  // tb_recipe            tb_recipe       @relation(fields: [recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  @@map("tb_sales_transactions")
+  
+  // Performance indexes
+  @@index([recipe_id, sale_date], map: "salestxn_recipe_date_idx")
+  @@index([sale_date], map: "salestxn_sale_date_idx") 
+  @@index([location_id, sale_date], map: "salestxn_location_date_idx")
+  @@index([pos_transaction_id], map: "salestxn_pos_txn_id_idx")
+  @@index([shift_id, sale_date], map: "salestxn_shift_date_idx")
+  @@index([meal_period, sale_date], map: "salestxn_meal_period_idx")
+  @@index([day_of_week], map: "salestxn_day_of_week_idx")
+}
+
+// =============================================================================
+// TABLE 2: MENU ANALYSES
+// Purpose: Store calculated menu performance snapshots for efficient reporting
+// =============================================================================
+
+model tb_menu_analysis {
+  id                          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Recipe reference (will link to future recipe table)
+  recipe_id                   String                   @db.Uuid
+  recipe_name                 String?                  @db.VarChar(255)  // Denormalized for performance
+  recipe_code                 String?                  @db.VarChar(50)   // Denormalized for performance
+  
+  // Analysis period
+  analysis_date               DateTime                 @db.Timestamptz(6)
+  period_type                 enum_analysis_period     @default(daily)
+  period_start                DateTime                 @db.Timestamptz(6)
+  period_end                  DateTime                 @db.Timestamptz(6)
+  
+  // Location context
+  location_id                 String?                  @db.Uuid
+  location_name               String?                  @db.VarChar(255)
+  department_id               String?                  @db.Uuid
+  department_name             String?                  @db.VarChar(255)
+  
+  // Sales performance metrics
+  total_quantity_sold         Decimal                  @db.Decimal(20, 5)
+  total_revenue               Decimal                  @db.Decimal(20, 5)
+  total_discounts             Decimal                  @default(0) @db.Decimal(20, 5)
+  net_revenue                 Decimal                  @db.Decimal(20, 5)
+  average_selling_price       Decimal                  @db.Decimal(20, 5)
+  
+  // Cost and profitability metrics
+  current_food_cost           Decimal                  @db.Decimal(20, 5)  // Per unit
+  total_food_cost             Decimal                  @db.Decimal(20, 5)  // Total cost for period
+  gross_profit_per_unit       Decimal                  @db.Decimal(20, 5)
+  total_gross_profit          Decimal                  @db.Decimal(20, 5)
+  profit_margin_percentage    Decimal                  @db.Decimal(8, 4)   // (gross_profit / revenue) * 100
+  
+  // Menu engineering scores and classification
+  popularity_score            Decimal                  @db.Decimal(8, 4)   // 0-100 scale
+  profitability_score         Decimal                  @db.Decimal(8, 4)   // 0-100 scale
+  popularity_rank             Int?                     // Rank within period
+  profitability_rank          Int?                     // Rank within period
+  classification              enum_menu_classification
+  
+  // Trend analysis
+  quantity_trend              String?                  @db.VarChar(20)     // increasing, decreasing, stable
+  revenue_trend               String?                  @db.VarChar(20)     // increasing, decreasing, stable  
+  profit_trend                String?                  @db.VarChar(20)     // increasing, decreasing, stable
+  
+  // Comparative metrics
+  market_share_percentage     Decimal?                 @db.Decimal(8, 4)   // % of total location sales
+  contribution_margin         Decimal?                 @db.Decimal(20, 5)  // Revenue - variable costs
+  velocity                    Decimal?                 @db.Decimal(8, 4)   // Sales per day
+  
+  // Statistical analysis
+  sales_variance              Decimal?                 @db.Decimal(20, 5)  // Variance in daily sales
+  sales_coefficient_variation Decimal?                 @db.Decimal(8, 4)   // CV = std_dev / mean
+  peak_sales_day              String?                  @db.VarChar(20)     // Day with highest sales
+  peak_sales_amount           Decimal?                 @db.Decimal(20, 5)
+  
+  // AI-generated insights and recommendations
+  recommendations             Json?                    @db.Json
+  // JSON Structure example:
+  // {
+  //   "actionItems": [
+  //     {
+  //       "priority": "high",
+  //       "action": "increase_promotion",
+  //       "reason": "High profitability but declining popularity",
+  //       "expected_impact": "15% sales increase"
+  //     }
+  //   ],
+  //   "insights": [
+  //     "Sales peak on weekends",
+  //     "Strong performance during dinner hours"
+  //   ],
+  //   "competitorAnalysis": {
+  //     "similarItems": ["competitor_dish_1", "competitor_dish_2"],
+  //     "pricingGap": 5.50,
+  //     "recommendation": "Consider 10% price increase"
+  //   },
+  //   "seasonalPattern": {
+  //     "peakSeason": "winter",
+  //     "lowSeason": "summer", 
+  //     "seasonalityIndex": 1.25
+  //   }
+  // }
+  
+  // Quality and operational metrics
+  customer_satisfaction_score Decimal?                 @db.Decimal(3, 2)   // 1-5 scale
+  return_rate_percentage      Decimal?                 @db.Decimal(8, 4)   // % of items returned
+  preparation_time_avg        Decimal?                 @db.Decimal(8, 2)   // Average prep time in minutes
+  ingredient_waste_percentage Decimal?                 @db.Decimal(8, 4)   // % waste in preparation
+  
+  // Integration fields
+  analysis_version            String                   @default("1.0") @db.VarChar(10)
+  analysis_algorithm          String?                  @db.VarChar(50)    // algorithm used for analysis
+  confidence_level            Decimal?                 @db.Decimal(3, 2)   // Confidence in analysis (0-1)
+  data_completeness_score     Decimal?                 @db.Decimal(3, 2)   // Data quality score (0-1)
+  
+  note                        String?                  @db.VarChar(500)
+  info                        Json?                    @db.Json
+  dimension                   Json?                    @db.Json
+  
+  // Audit fields
+  created_at                  DateTime                 @default(now()) @db.Timestamptz(6)
+  created_by_id               String?                  @db.Uuid
+  updated_at                  DateTime                 @default(now()) @db.Timestamptz(6)
+  updated_by_id               String?                  @db.Uuid
+  
+  // Foreign key relationships (will be added when recipe table exists)
+  tb_location                 tb_location?             @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  // tb_recipe                   tb_recipe                @relation(fields: [recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  @@map("tb_menu_analyses")
+  
+  // Performance indexes
+  @@index([recipe_id, analysis_date], map: "menuanalysis_recipe_date_idx")
+  @@index([classification], map: "menuanalysis_classification_idx") 
+  @@index([period_start, period_end], map: "menuanalysis_period_range_idx")
+  @@index([location_id, analysis_date], map: "menuanalysis_location_date_idx")
+  @@index([period_type, analysis_date], map: "menuanalysis_period_type_idx")
+  @@index([popularity_score], map: "menuanalysis_popularity_idx")
+  @@index([profitability_score], map: "menuanalysis_profitability_idx")
+  @@index([popularity_rank, profitability_rank], map: "menuanalysis_ranks_idx")
+  
+  // Unique constraint to prevent duplicate analyses
+  @@unique([recipe_id, period_start, period_end, location_id, period_type], map: "menuanalysis_unique_analysis")
+}
+
+// =============================================================================
+// VIEWS AND MATERIALIZED VIEWS (for database implementation)
+// =============================================================================
+
+/*
+-- High-performance view for real-time menu performance dashboard
+CREATE MATERIALIZED VIEW mv_menu_performance_summary AS
+SELECT 
+  recipe_id,
+  recipe_name,
+  location_id,
+  location_name,
+  classification,
+  popularity_score,
+  profitability_score,
+  total_quantity_sold,
+  net_revenue,
+  profit_margin_percentage,
+  analysis_date,
+  period_type
+FROM tb_menu_analyses 
+WHERE analysis_date >= CURRENT_DATE - INTERVAL '30 days'
+  AND period_type = 'daily';
+
+CREATE UNIQUE INDEX idx_mv_menu_performance_summary 
+ON mv_menu_performance_summary (recipe_id, location_id, analysis_date);
+
+-- View for trending analysis
+CREATE VIEW v_menu_trending AS
+SELECT 
+  recipe_id,
+  recipe_name,
+  location_id,
+  classification,
+  quantity_trend,
+  revenue_trend, 
+  profit_trend,
+  LAG(popularity_score) OVER (PARTITION BY recipe_id, location_id ORDER BY analysis_date) as prev_popularity,
+  LAG(profitability_score) OVER (PARTITION BY recipe_id, location_id ORDER BY analysis_date) as prev_profitability,
+  analysis_date
+FROM tb_menu_analyses
+WHERE period_type = 'daily'
+ORDER BY analysis_date DESC;
+*/

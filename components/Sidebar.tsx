@@ -1,14 +1,32 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ChevronDown, ChevronRight, Menu, PanelLeftClose, PanelLeftOpen, Cog } from "lucide-react";
 import * as LucideIcons from "lucide-react";
+import { ChevronDown, ChevronRight, Collapsible } from "lucide-react";
+import { Collapsible as CollapsibleRoot, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface MenuItem {
   title: string;
@@ -144,7 +162,6 @@ const menuItems: MenuItem[] = [
           { name: "Recipe Library", path: "/operational-planning/recipe-management/recipes" },
           { name: "Categories", path: "/operational-planning/recipe-management/categories" },
           { name: "Cuisine Types", path: "/operational-planning/recipe-management/cuisine-types" },
-         
         ]
       },
       { name: "Menu Engineering", path: "/operational-planning/menu-engineering" },
@@ -202,25 +219,21 @@ const menuItems: MenuItem[] = [
       { 
         name: "Permission Management", 
         path: "/system-administration/permission-management",
-        description: "Manage policies, roles, and access control",
         subItems: [
           { 
             name: "Policy Management", 
             path: "/system-administration/permission-management/policies",
-            icon: "FileText",
-            description: "Create and manage access control policies"
+            icon: "FileText"
           },
           { 
             name: "Role Management", 
             path: "/system-administration/permission-management/roles",
-            icon: "Users",
-            description: "Create and manage user roles"
+            icon: "Users"
           },
           { 
             name: "Subscription Settings", 
             path: "/system-administration/permission-management/subscription",
-            icon: "CreditCard",
-            description: "Manage subscription packages and features"
+            icon: "CreditCard"
           }
         ]
       },
@@ -265,289 +278,129 @@ const menuItems: MenuItem[] = [
       { name: "Reports", path: "/products/reports" },
     ],
   },
+  {
+    title: "Style Guide",
+    path: "/style-guide",
+    icon: "Palette",
+    subItems: [],
+  },
 ];
 
-interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onCollapseToggle?: (collapsed: boolean) => void;
-}
-
-export function Sidebar({ isOpen, onClose, onCollapseToggle }: SidebarProps) {
+// Recursive component for nested menu items
+function MenuItemComponent({ item, level = 0 }: { item: MenuItem | SubMenuItem; level?: number }) {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
+  
+  const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
+  const isActive = pathname === item.path;
+  const hasSubItems = 'subItems' in item && item.subItems && item.subItems.length > 0;
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1024);
-    };
+  // Check if any sub-item is active to keep parent expanded
+  const isParentOfActive = hasSubItems && item.subItems?.some((subItem: any) => 
+    pathname === subItem.path || 
+    (subItem.subItems && subItem.subItems.some((subSubItem: any) => pathname === subSubItem.path))
+  );
 
-    handleResize();
+  React.useEffect(() => {
+    if (isParentOfActive) {
+      setIsOpen(true);
+    }
+  }, [isParentOfActive]);
 
-    window.addEventListener('resize', handleResize);
+  if (!hasSubItems) {
+    // Simple menu item without sub-items
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={isActive} tooltip={item.title || item.name}>
+          <Link href={item.path} className="flex items-center gap-2">
+            {level === 0 && <IconComponent className="w-4 h-4" />}
+            <span>{item.title || item.name}</span>
+            {'description' in item && item.description && (
+              <span className="text-xs text-muted-foreground ml-auto max-w-[100px] truncate">
+                {item.description}
+              </span>
+            )}
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  }
 
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
+  // Menu item with sub-items
   return (
-    <>
-      <Sheet open={isOpen && !isLargeScreen} onOpenChange={onClose}>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            className="lg:hidden"
-            size="icon"
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-[280px] top-[64px]">
-          <SidebarContent menuItems={menuItems} />
-        </SheetContent>
-      </Sheet>
-
-      <aside className={cn(
-        "fixed z-40 h-[calc(100vh-64px)] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300 ease-in-out",
-        "top-[64px]",
-        isOpen ? "translate-x-0" : "-translate-x-full",
-        "lg:translate-x-0",
-        isCollapsed ? "w-[60px]" : "w-[280px]"
-      )}>
-        <SidebarContent 
-          menuItems={menuItems} 
-          isCollapsed={isCollapsed}
-          onToggleCollapse={() => {
-            const newCollapsedState = !isCollapsed;
-            setIsCollapsed(newCollapsedState);
-            onCollapseToggle?.(newCollapsedState);
-          }}
-        />
-      </aside>
-    </>
+    <SidebarMenuItem>
+      <CollapsibleRoot open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton isActive={isActive} className="w-full justify-between">
+            <div className="flex items-center gap-2">
+              {level === 0 && <IconComponent className="w-4 h-4" />}
+              <span>{item.title || item.name}</span>
+            </div>
+            {isOpen ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {item.subItems?.map((subItem, index) => (
+              <MenuItemComponent key={index} item={subItem} level={level + 1} />
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </CollapsibleRoot>
+    </SidebarMenuItem>
   );
 }
 
-interface SidebarContentProps {
-  menuItems: MenuItem[];
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
-}
-
-function SidebarContent({ menuItems, isCollapsed, onToggleCollapse }: SidebarContentProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [expandedSubItems, setExpandedSubItems] = useState<string[]>([]);
-
-  const isExpanded = (title: string) => expandedItems.includes(title);
-  const isSubExpanded = (name: string) => expandedSubItems.includes(name);
-
-  const toggleExpand = (title: string) => {
-    setExpandedItems((prev) =>
-      prev.includes(title)
-        ? prev.filter((item) => item !== title)
-        : [...prev, title]
-    );
-  };
-
-  const toggleSubExpand = (name: string) => {
-    setExpandedSubItems((prev) =>
-      prev.includes(name)
-        ? prev.filter((item) => item !== name)
-        : [...prev, name]
-    );
-  };
-
-  const handleItemClick = (item: MenuItem) => {
-    if (item.subItems?.length > 0) {
-      toggleExpand(item.title);
-    } else {
-      router.push(item.path);
-    }
-  };
-
-  const handleSubItemClick = (subItem: SubMenuItem, event: React.MouseEvent) => {
-    if (subItem.subItems?.length) {
-      event.preventDefault();
-      toggleSubExpand(subItem.name);
-    }
-  };
-
-  // Find and remove Dashboard from menuItems
-  const dashboardItem = menuItems.find(item => item.title === "Dashboard");
-  const otherItems = menuItems.filter(item => item.title !== "Dashboard");
-
+// App Sidebar Component
+export function AppSidebar() {
   return (
-    <ScrollArea className="h-full">
-      <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
-          <div className="space-y-1">
-            {/* Dashboard as the first item */}
-            {dashboardItem && (
-              <div className="space-y-1">
-                <Button
-                  variant={pathname === dashboardItem.path ? "secondary" : "ghost"}
-                  className={cn("w-full justify-between", {
-                    "h-9": !isCollapsed,
-                    "h-9 w-9 p-0": isCollapsed,
-                  })}
-                  onClick={() => handleItemClick(dashboardItem)}
-                >
-                  <span className="flex items-center">
-                    <LucideIcons.LayoutDashboard className="h-4 w-4" />
-                    {!isCollapsed && <span className="ml-1">{dashboardItem.title}</span>}
-                  </span>
-                  {!isCollapsed && (
-                    isCollapsed ? (
-                      <PanelLeftOpen className="h-4 w-4" />
-                    ) : (
-                      <PanelLeftClose className="h-4 w-4" />
-                    )
-                  )}
-                </Button>
-
-                {/* Show sub-items when expanded and not collapsed */}
-                {!isCollapsed && isExpanded(dashboardItem.title) && dashboardItem.subItems?.length > 0 && (
-                  <div className="pl-6 space-y-1">
-                    {dashboardItem.subItems.map((subItem, subIndex) => {
-                      const SubIconComponent = subItem.icon ? (LucideIcons as any)[subItem.icon] : undefined;
-                      const isSubActive = pathname === subItem.path;
-
-                      return (
-                        <Button
-                          key={subIndex}
-                          variant={isSubActive ? "secondary" : "ghost"}
-                          className="w-full justify-start h-auto p-2"
-                          asChild
-                        >
-                          <Link href={subItem.path} className="flex items-center gap-3">
-                            {SubIconComponent && <SubIconComponent className="h-4 w-4 flex-shrink-0" />}
-                            <div className="text-left">
-                              <span>{subItem.name}</span>
-                              {subItem.description && (
-                                <p className="text-xs text-muted-foreground">{subItem.description}</p>
-                              )}
-                            </div>
-                          </Link>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Rest of the menu items */}
-            {otherItems.map((item, index) => {
-              const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
-              const isActive = pathname === item.path;
-              const isItemExpanded = isExpanded(item.title);
-
-              return (
-                <div key={index} className="space-y-1">
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    className={cn("w-full justify-between", {
-                      "h-9": !isCollapsed,
-                      "h-9 w-9 p-0": isCollapsed,
-                    })}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <span className="flex items-center">
-                      <IconComponent className="h-4 w-4" />
-                      {!isCollapsed && <span className="ml-1">{item.title}</span>}
-                    </span>
-                    {!isCollapsed && item.subItems?.length > 0 && (
-                      isItemExpanded ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )
-                    )}
-                  </Button>
-
-                  {!isCollapsed && isItemExpanded && item.subItems?.length > 0 && (
-                    <div className="pl-6 space-y-1">
-                      {item.subItems.map((subItem, subIndex) => {
-                        const SubIconComponent = subItem.icon ? (LucideIcons as any)[subItem.icon] : undefined;
-                        const isSubActive = pathname === subItem.path;
-                        const isSubItemExpanded = isSubExpanded(subItem.name);
-
-                        return (
-                          <div key={subIndex} className="space-y-1">
-                            <Button
-                              variant={isSubActive ? "secondary" : "ghost"}
-                              className="w-full justify-start h-auto p-2"
-                              onClick={(e) => handleSubItemClick(subItem, e)}
-                              asChild={!subItem.subItems}
-                            >
-                              {subItem.subItems ? (
-                                <div className="flex items-center justify-between w-full">
-                                  <span className="flex items-center gap-3">
-                                    {SubIconComponent && <SubIconComponent className="h-4 w-4 flex-shrink-0" />}
-                                    <div className="text-left">
-                                      <span>{subItem.name}</span>
-                                      {subItem.description && (
-                                        <p className="text-xs text-muted-foreground">{subItem.description}</p>
-                                      )}
-                                    </div>
-                                  </span>
-                                  {isSubItemExpanded ? (
-                                    <ChevronDown className="h-4 w-4" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4" />
-                                  )}
-                                </div>
-                              ) : (
-                                <Link href={subItem.path} className="flex items-center gap-3">
-                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 flex-shrink-0" />}
-                                  <div className="text-left">
-                                    <span>{subItem.name}</span>
-                                    {subItem.description && (
-                                      <p className="text-xs text-muted-foreground">{subItem.description}</p>
-                                    )}
-                                  </div>
-                                </Link>
-                              )}
-                            </Button>
-
-                            {subItem.subItems && isSubItemExpanded && (
-                              <div className="pl-6 space-y-1">
-                                {subItem.subItems.map((subSubItem, subSubIndex) => {
-                                  const SubSubIconComponent = subSubItem.icon ? (LucideIcons as any)[subSubItem.icon] : undefined;
-                                  const isSubSubActive = pathname === subSubItem.path;
-
-                                  return (
-                                    <Button
-                                      key={subSubIndex}
-                                      variant={isSubSubActive ? "secondary" : "ghost"}
-                                      className="w-full justify-start h-auto p-2"
-                                      asChild
-                                    >
-                                      <Link href={subSubItem.path} className="flex items-center gap-3">
-                                        {SubSubIconComponent && <SubSubIconComponent className="h-4 w-4 flex-shrink-0" />}
-                                        <span>{subSubItem.name}</span>
-                                      </Link>
-                                    </Button>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+    <Sidebar>
+      <SidebarHeader className="border-b border-sidebar-border">
+        <div className="flex items-center gap-2 px-2 py-1">
+          <div className="text-sm font-medium text-muted-foreground">
+            Navigation
           </div>
         </div>
-      </div>
-    </ScrollArea>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            {menuItems.map((item, index) => (
+              <MenuItemComponent key={index} item={item} />
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border">
+        <div className="px-2 py-1">
+          <div className="text-xs text-muted-foreground">
+            © 2024 Carmen ERP
+          </div>
+        </div>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
 
-export default Sidebar;
+// Layout wrapper with SidebarProvider
+export function SidebarLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <SidebarInset className="flex flex-1 flex-col">
+          {children}
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  );
+}
+
+// Default export for backward compatibility
+export default AppSidebar;

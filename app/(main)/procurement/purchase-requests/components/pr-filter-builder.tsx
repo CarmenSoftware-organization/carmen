@@ -222,9 +222,9 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
     <div className="flex items-center space-x-2">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8 px-2 lg:px-3">
+          <Button variant="outline" className="h-8 px-2 text-xs">
             <span>Saved Filters</span>
-            <ChevronDown className="ml-2 h-4 w-4" />
+            <ChevronDown className="ml-2 h-3 w-3" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-72">
@@ -243,7 +243,7 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
                       onClick={() => handleToggleStar(filter)}
                       className="h-6 w-6"
                     >
-                      <Star className={`h-4 w-4 ${filter.isDefault ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                      <Star className={`h-3 w-3 ${filter.isDefault ? 'fill-yellow-400 text-yellow-400' : ''}`} />
                     </Button>
                     <span className="text-sm">{filter.name}</span>
                   </div>
@@ -254,7 +254,7 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
                       onClick={() => applyFilter(filter)}
                       className="h-6 w-6"
                     >
-                      <Filter className="h-4 w-4" />
+                      <Filter className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -262,7 +262,7 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
                       onClick={() => handleDeleteSavedFilter(filter.id)}
                       className="h-6 w-6"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
@@ -275,11 +275,10 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button 
-            variant="outline" 
-            size="sm"
-            className={`h-8 ${activeFiltersCount > 0 ? 'bg-primary/10 border-primary/20' : ''}`}
+            variant="outline"
+            className={`h-8 px-2 text-xs ${activeFiltersCount > 0 ? 'bg-primary/10 border-primary/20' : ''}`}
           >
-            <Filter className="mr-2 h-4 w-4" />
+            <Filter className="mr-2 h-3 w-3" />
             <span>Filter</span>
             {activeFiltersCount > 0 && (
               <span className="ml-1 px-1.5 py-0.5 bg-primary text-primary-foreground text-xs rounded-full">
@@ -376,15 +375,15 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
                             onClick={() => removeFilter(index)}
                             className="h-8 w-8"
                           >
-                            <X className="h-4 w-4" />
+                            <X className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
                     </div>
                   ))}
                   
-                  <Button variant="outline" size="sm" onClick={addFilter}>
-                    <Plus className="h-4 w-4 mr-1" />
+                  <Button variant="outline" className="h-8 px-2 text-xs" onClick={addFilter}>
+                    <Plus className="h-3 w-3 mr-1" />
                     Add Condition
                   </Button>
                 </div>
@@ -400,12 +399,12 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
           
           <div className="mt-6 flex justify-between items-center">
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <History className="h-4 w-4 mr-1" />
+              <Button variant="outline" className="h-8 px-2 text-xs">
+                <History className="h-3 w-3 mr-1" />
                 History
               </Button>
-              <Button size="sm" variant="outline">
-                <Code className="h-4 w-4 mr-1" />
+              <Button variant="outline" className="h-8 px-2 text-xs">
+                <Code className="h-3 w-3 mr-1" />
                 Test
               </Button>
             </div>
@@ -418,8 +417,8 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
           <div className="mt-4 border-t pt-4">
             <div className="flex justify-between items-center">
               <h3 className="text-sm font-medium">Save this filter</h3>
-              <Button size="sm" variant="outline" onClick={handleSaveFilter}>
-                <Save className="h-4 w-4 mr-1" />
+              <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleSaveFilter}>
+                <Save className="h-3 w-3 mr-1" />
                 Save
               </Button>
             </div>

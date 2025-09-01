@@ -1,0 +1,924 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e9]:
+        - button "Dashboard" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12] [cursor=pointer]:
+            - img
+            - generic [ref=e13] [cursor=pointer]: Dashboard
+          - img
+        - button "Procurement" [ref=e15] [cursor=pointer]:
+          - generic [ref=e16] [cursor=pointer]:
+            - img
+            - generic [ref=e17] [cursor=pointer]: Procurement
+          - img
+        - button "Product Management" [ref=e19] [cursor=pointer]:
+          - generic [ref=e20] [cursor=pointer]:
+            - img
+            - generic [ref=e21] [cursor=pointer]: Product Management
+          - img
+        - button "Vendor Management" [ref=e23] [cursor=pointer]:
+          - generic [ref=e24] [cursor=pointer]:
+            - img
+            - generic [ref=e25] [cursor=pointer]: Vendor Management
+          - img
+        - button "Store Operations" [ref=e27] [cursor=pointer]:
+          - generic [ref=e28] [cursor=pointer]:
+            - img
+            - generic [ref=e29] [cursor=pointer]: Store Operations
+          - img
+        - button "Inventory Management" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32] [cursor=pointer]:
+            - img
+            - generic [ref=e33] [cursor=pointer]: Inventory Management
+          - img
+        - button "Operational Planning" [ref=e35] [cursor=pointer]:
+          - generic [ref=e36] [cursor=pointer]:
+            - img
+            - generic [ref=e37] [cursor=pointer]: Operational Planning
+          - img
+        - button "Production" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40] [cursor=pointer]:
+            - img
+            - generic [ref=e41] [cursor=pointer]: Production
+          - img
+        - button "Reporting & Analytics" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44] [cursor=pointer]:
+            - img
+            - generic [ref=e45] [cursor=pointer]: Reporting & Analytics
+          - img
+        - button "Finance" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48] [cursor=pointer]:
+            - img
+            - generic [ref=e49] [cursor=pointer]: Finance
+          - img
+        - button "System Administration" [ref=e51] [cursor=pointer]:
+          - generic [ref=e52] [cursor=pointer]:
+            - img
+            - generic [ref=e53] [cursor=pointer]: System Administration
+          - img
+        - button "Help & Support" [ref=e55] [cursor=pointer]:
+          - generic [ref=e56] [cursor=pointer]:
+            - img
+            - generic [ref=e57] [cursor=pointer]: Help & Support
+          - img
+        - button "Products" [ref=e59] [cursor=pointer]:
+          - generic [ref=e60] [cursor=pointer]:
+            - img
+            - generic [ref=e61] [cursor=pointer]: Products
+          - img
+    - generic [ref=e62]:
+      - banner [ref=e63]:
+        - generic [ref=e65]:
+          - generic [ref=e67]:
+            - link "CARMEN" [ref=e68]:
+              - /url: /dashboard
+            - generic [ref=e69]: Hospitality Supply Chain
+          - generic [ref=e70]:
+            - combobox [ref=e71] [cursor=pointer]:
+              - generic: Business Unit 1
+              - img [ref=e72] [cursor=pointer]
+            - button "Quick Access" [ref=e74] [cursor=pointer]:
+              - img
+              - text: Quick Access
+            - button [ref=e75] [cursor=pointer]:
+              - img
+            - button [ref=e76] [cursor=pointer]:
+              - img
+            - button [ref=e77] [cursor=pointer]:
+              - img
+            - button [ref=e78] [cursor=pointer]:
+              - img
+      - main [ref=e79]:
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - heading "Policy Management" [level=1] [ref=e84]
+                - paragraph [ref=e85]: Create and manage access control policies for Carmen ERP resources.
+              - tablist [ref=e87]:
+                - tab "Role-Based (RBAC) Recommended" [ref=e88] [cursor=pointer]:
+                  - text: Role-Based (RBAC)
+                  - generic [ref=e89] [cursor=pointer]: Recommended
+                - tab "Attribute-Based (ABAC)" [active] [selected] [ref=e90] [cursor=pointer]
+            - generic [ref=e91]:
+              - button "Filters" [ref=e92] [cursor=pointer]
+              - button "Simple Creator" [ref=e93] [cursor=pointer]:
+                - img
+                - text: Simple Creator
+              - button "Advanced Builder" [ref=e94] [cursor=pointer]:
+                - img
+                - text: Advanced Builder
+          - generic [ref=e96]:
+            - generic [ref=e99]:
+              - img [ref=e100]
+              - textbox "Search policies..." [ref=e103]
+            - generic [ref=e104]:
+              - table [ref=e107]:
+                - rowgroup [ref=e108]:
+                  - row "Policy Name↑ Category Resource Type Effect Priority Status Health Performance Status Actions" [ref=e109]:
+                    - cell [ref=e110]:
+                      - checkbox [ref=e111] [cursor=pointer]
+                    - cell "Policy Name↑" [ref=e112] [cursor=pointer]:
+                      - text: Policy Name
+                      - generic [ref=e113] [cursor=pointer]: ↑
+                    - cell "Category" [ref=e114]
+                    - cell "Resource Type" [ref=e115] [cursor=pointer]
+                    - cell "Effect" [ref=e116] [cursor=pointer]
+                    - cell "Priority" [ref=e117] [cursor=pointer]
+                    - cell "Status" [ref=e118] [cursor=pointer]
+                    - cell "Health" [ref=e119]
+                    - cell "Performance" [ref=e120]
+                    - cell "Status" [ref=e121] [cursor=pointer]
+                    - cell "Actions" [ref=e122]
+                - rowgroup [ref=e123]:
+                  - row "Credit Note Processing Finance and procurement managers can process credit notes procurement Credit Note PERMIT 110 96/100 472 evals 44ms Enabled More actions" [ref=e124]:
+                    - cell [ref=e125]:
+                      - checkbox [ref=e126] [cursor=pointer]
+                    - cell "Credit Note Processing Finance and procurement managers can process credit notes" [ref=e127]:
+                      - generic [ref=e128]:
+                        - button "Credit Note Processing" [ref=e129] [cursor=pointer]
+                        - paragraph [ref=e130]: Finance and procurement managers can process credit notes
+                    - cell "procurement" [ref=e131]:
+                      - generic [ref=e132]: procurement
+                    - cell "Credit Note" [ref=e133]:
+                      - generic [ref=e134]: Credit Note
+                    - cell "PERMIT" [ref=e135]:
+                      - generic [ref=e136]: PERMIT
+                    - cell "110" [ref=e137]:
+                      - generic [ref=e138]: "110"
+                    - cell "96/100" [ref=e139]:
+                      - generic [ref=e140]:
+                        - img [ref=e141]
+                        - generic [ref=e144]: 96/100
+                    - cell "472 evals 44ms" [ref=e145]:
+                      - generic [ref=e146]:
+                        - img [ref=e147]
+                        - generic [ref=e150]:
+                          - generic [ref=e151]: 472 evals
+                          - generic [ref=e152]: 44ms
+                    - cell "Enabled" [ref=e153]:
+                      - button "Enabled" [ref=e154] [cursor=pointer]:
+                        - generic [ref=e156] [cursor=pointer]:
+                          - img [ref=e157] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e160]:
+                      - generic [ref=e161]:
+                        - button "View Details" [ref=e162] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e163] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e164] [cursor=pointer]:
+                          - img
+                          - generic [ref=e165] [cursor=pointer]: More actions
+                  - row "Fractional Inventory Management Kitchen staff can manage fractional inventory for recipe costing inventory Fractional Inventory PERMIT 90 94/100 441 evals 37ms Enabled More actions" [ref=e166]:
+                    - cell [ref=e167]:
+                      - checkbox [ref=e168] [cursor=pointer]
+                    - cell "Fractional Inventory Management Kitchen staff can manage fractional inventory for recipe costing" [ref=e169]:
+                      - generic [ref=e170]:
+                        - button "Fractional Inventory Management" [ref=e171] [cursor=pointer]
+                        - paragraph [ref=e172]: Kitchen staff can manage fractional inventory for recipe costing
+                    - cell "inventory" [ref=e173]:
+                      - generic [ref=e174]: inventory
+                    - cell "Fractional Inventory" [ref=e175]:
+                      - generic [ref=e176]: Fractional Inventory
+                    - cell "PERMIT" [ref=e177]:
+                      - generic [ref=e178]: PERMIT
+                    - cell "90" [ref=e179]:
+                      - generic [ref=e180]: "90"
+                    - cell "94/100" [ref=e181]:
+                      - generic [ref=e182]:
+                        - img [ref=e183]
+                        - generic [ref=e186]: 94/100
+                    - cell "441 evals 37ms" [ref=e187]:
+                      - generic [ref=e188]:
+                        - img [ref=e189]
+                        - generic [ref=e190]:
+                          - generic [ref=e191]: 441 evals
+                          - generic [ref=e192]: 37ms
+                    - cell "Enabled" [ref=e193]:
+                      - button "Enabled" [ref=e194] [cursor=pointer]:
+                        - generic [ref=e196] [cursor=pointer]:
+                          - img [ref=e197] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e200]:
+                      - generic [ref=e201]:
+                        - button "View Details" [ref=e202] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e203] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e204] [cursor=pointer]:
+                          - img
+                          - generic [ref=e205] [cursor=pointer]: More actions
+                  - row "GRN Creation by Warehouse Staff Warehouse staff can create Goods Receipt Notes for incoming deliveries procurement Goods Receipt Note PERMIT 100 95/100 472 evals 44ms Enabled More actions" [ref=e206]:
+                    - cell [ref=e207]:
+                      - checkbox [ref=e208] [cursor=pointer]
+                    - cell "GRN Creation by Warehouse Staff Warehouse staff can create Goods Receipt Notes for incoming deliveries" [ref=e209]:
+                      - generic [ref=e210]:
+                        - button "GRN Creation by Warehouse Staff" [ref=e211] [cursor=pointer]
+                        - paragraph [ref=e212]: Warehouse staff can create Goods Receipt Notes for incoming deliveries
+                    - cell "procurement" [ref=e213]:
+                      - generic [ref=e214]: procurement
+                    - cell "Goods Receipt Note" [ref=e215]:
+                      - generic [ref=e216]: Goods Receipt Note
+                    - cell "PERMIT" [ref=e217]:
+                      - generic [ref=e218]: PERMIT
+                    - cell "100" [ref=e219]:
+                      - generic [ref=e220]: "100"
+                    - cell "95/100" [ref=e221]:
+                      - generic [ref=e222]:
+                        - img [ref=e223]
+                        - generic [ref=e226]: 95/100
+                    - cell "472 evals 44ms" [ref=e227]:
+                      - generic [ref=e228]:
+                        - img [ref=e229]
+                        - generic [ref=e232]:
+                          - generic [ref=e233]: 472 evals
+                          - generic [ref=e234]: 44ms
+                    - cell "Enabled" [ref=e235]:
+                      - button "Enabled" [ref=e236] [cursor=pointer]:
+                        - generic [ref=e238] [cursor=pointer]:
+                          - img [ref=e239] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e242]:
+                      - generic [ref=e243]:
+                        - button "View Details" [ref=e244] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e245] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e246] [cursor=pointer]:
+                          - img
+                          - generic [ref=e247] [cursor=pointer]: More actions
+                  - row "Physical Count Initiation Warehouse managers and supervisors can initiate physical inventory counts inventory Physical Count PERMIT 110 96/100 441 evals 37ms Enabled More actions" [ref=e248]:
+                    - cell [ref=e249]:
+                      - checkbox [ref=e250] [cursor=pointer]
+                    - cell "Physical Count Initiation Warehouse managers and supervisors can initiate physical inventory counts" [ref=e251]:
+                      - generic [ref=e252]:
+                        - button "Physical Count Initiation" [ref=e253] [cursor=pointer]
+                        - paragraph [ref=e254]: Warehouse managers and supervisors can initiate physical inventory counts
+                    - cell "inventory" [ref=e255]:
+                      - generic [ref=e256]: inventory
+                    - cell "Physical Count" [ref=e257]:
+                      - generic [ref=e258]: Physical Count
+                    - cell "PERMIT" [ref=e259]:
+                      - generic [ref=e260]: PERMIT
+                    - cell "110" [ref=e261]:
+                      - generic [ref=e262]: "110"
+                    - cell "96/100" [ref=e263]:
+                      - generic [ref=e264]:
+                        - img [ref=e265]
+                        - generic [ref=e268]: 96/100
+                    - cell "441 evals 37ms" [ref=e269]:
+                      - generic [ref=e270]:
+                        - img [ref=e271]
+                        - generic [ref=e272]:
+                          - generic [ref=e273]: 441 evals
+                          - generic [ref=e274]: 37ms
+                    - cell "Enabled" [ref=e275]:
+                      - button "Enabled" [ref=e276] [cursor=pointer]:
+                        - generic [ref=e278] [cursor=pointer]:
+                          - img [ref=e279] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e282]:
+                      - generic [ref=e283]:
+                        - button "View Details" [ref=e284] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e285] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e286] [cursor=pointer]:
+                          - img
+                          - generic [ref=e287] [cursor=pointer]: More actions
+                  - row "PO Creation from Approved PR Procurement staff can create POs from fully approved PRs procurement Purchase Order PERMIT 100 95/100 472 evals 44ms Enabled More actions" [ref=e288]:
+                    - cell [ref=e289]:
+                      - checkbox [ref=e290] [cursor=pointer]
+                    - cell "PO Creation from Approved PR Procurement staff can create POs from fully approved PRs" [ref=e291]:
+                      - generic [ref=e292]:
+                        - button "PO Creation from Approved PR" [ref=e293] [cursor=pointer]
+                        - paragraph [ref=e294]: Procurement staff can create POs from fully approved PRs
+                    - cell "procurement" [ref=e295]:
+                      - generic [ref=e296]: procurement
+                    - cell "Purchase Order" [ref=e297]:
+                      - generic [ref=e298]: Purchase Order
+                    - cell "PERMIT" [ref=e299]:
+                      - generic [ref=e300]: PERMIT
+                    - cell "100" [ref=e301]:
+                      - generic [ref=e302]: "100"
+                    - cell "95/100" [ref=e303]:
+                      - generic [ref=e304]:
+                        - img [ref=e305]
+                        - generic [ref=e308]: 95/100
+                    - cell "472 evals 44ms" [ref=e309]:
+                      - generic [ref=e310]:
+                        - img [ref=e311]
+                        - generic [ref=e314]:
+                          - generic [ref=e315]: 472 evals
+                          - generic [ref=e316]: 44ms
+                    - cell "Enabled" [ref=e317]:
+                      - button "Enabled" [ref=e318] [cursor=pointer]:
+                        - generic [ref=e320] [cursor=pointer]:
+                          - img [ref=e321] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e324]:
+                      - generic [ref=e325]:
+                        - button "View Details" [ref=e326] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e327] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e328] [cursor=pointer]:
+                          - img
+                          - generic [ref=e329] [cursor=pointer]: More actions
+                  - row "PO Modification by Procurement Team Procurement team can modify POs before vendor confirmation procurement Purchase Order PERMIT 100 95/100 472 evals 44ms Enabled More actions" [ref=e330]:
+                    - cell [ref=e331]:
+                      - checkbox [ref=e332] [cursor=pointer]
+                    - cell "PO Modification by Procurement Team Procurement team can modify POs before vendor confirmation" [ref=e333]:
+                      - generic [ref=e334]:
+                        - button "PO Modification by Procurement Team" [ref=e335] [cursor=pointer]
+                        - paragraph [ref=e336]: Procurement team can modify POs before vendor confirmation
+                    - cell "procurement" [ref=e337]:
+                      - generic [ref=e338]: procurement
+                    - cell "Purchase Order" [ref=e339]:
+                      - generic [ref=e340]: Purchase Order
+                    - cell "PERMIT" [ref=e341]:
+                      - generic [ref=e342]: PERMIT
+                    - cell "100" [ref=e343]:
+                      - generic [ref=e344]: "100"
+                    - cell "95/100" [ref=e345]:
+                      - generic [ref=e346]:
+                        - img [ref=e347]
+                        - generic [ref=e350]: 95/100
+                    - cell "472 evals 44ms" [ref=e351]:
+                      - generic [ref=e352]:
+                        - img [ref=e353]
+                        - generic [ref=e356]:
+                          - generic [ref=e357]: 472 evals
+                          - generic [ref=e358]: 44ms
+                    - cell "Enabled" [ref=e359]:
+                      - button "Enabled" [ref=e360] [cursor=pointer]:
+                        - generic [ref=e362] [cursor=pointer]:
+                          - img [ref=e363] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e366]:
+                      - generic [ref=e367]:
+                        - button "View Details" [ref=e368] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e369] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e370] [cursor=pointer]:
+                          - img
+                          - generic [ref=e371] [cursor=pointer]: More actions
+                  - row "PR Approval - Department Level Department managers can approve PRs from their department up to $10,000 procurement Purchase Request PERMIT 110 96/100 472 evals 44ms Enabled More actions" [ref=e372]:
+                    - cell [ref=e373]:
+                      - checkbox [ref=e374] [cursor=pointer]
+                    - cell "PR Approval - Department Level Department managers can approve PRs from their department up to $10,000" [ref=e375]:
+                      - generic [ref=e376]:
+                        - button "PR Approval - Department Level" [ref=e377] [cursor=pointer]
+                        - paragraph [ref=e378]: Department managers can approve PRs from their department up to $10,000
+                    - cell "procurement" [ref=e379]:
+                      - generic [ref=e380]: procurement
+                    - cell "Purchase Request" [ref=e381]:
+                      - generic [ref=e382]: Purchase Request
+                    - cell "PERMIT" [ref=e383]:
+                      - generic [ref=e384]: PERMIT
+                    - cell "110" [ref=e385]:
+                      - generic [ref=e386]: "110"
+                    - cell "96/100" [ref=e387]:
+                      - generic [ref=e388]:
+                        - img [ref=e389]
+                        - generic [ref=e392]: 96/100
+                    - cell "472 evals 44ms" [ref=e393]:
+                      - generic [ref=e394]:
+                        - img [ref=e395]
+                        - generic [ref=e398]:
+                          - generic [ref=e399]: 472 evals
+                          - generic [ref=e400]: 44ms
+                    - cell "Enabled" [ref=e401]:
+                      - button "Enabled" [ref=e402] [cursor=pointer]:
+                        - generic [ref=e404] [cursor=pointer]:
+                          - img [ref=e405] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e408]:
+                      - generic [ref=e409]:
+                        - button "View Details" [ref=e410] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e411] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e412] [cursor=pointer]:
+                          - img
+                          - generic [ref=e413] [cursor=pointer]: More actions
+                  - row "PR Approval - Finance Level Finance managers can approve PRs between $5,000-$25,000 procurement Purchase Request PERMIT 120 97/100 472 evals 44ms Enabled More actions" [ref=e414]:
+                    - cell [ref=e415]:
+                      - checkbox [ref=e416] [cursor=pointer]
+                    - cell "PR Approval - Finance Level Finance managers can approve PRs between $5,000-$25,000" [ref=e417]:
+                      - generic [ref=e418]:
+                        - button "PR Approval - Finance Level" [ref=e419] [cursor=pointer]
+                        - paragraph [ref=e420]: Finance managers can approve PRs between $5,000-$25,000
+                    - cell "procurement" [ref=e421]:
+                      - generic [ref=e422]: procurement
+                    - cell "Purchase Request" [ref=e423]:
+                      - generic [ref=e424]: Purchase Request
+                    - cell "PERMIT" [ref=e425]:
+                      - generic [ref=e426]: PERMIT
+                    - cell "120" [ref=e427]:
+                      - generic [ref=e428]: "120"
+                    - cell "97/100" [ref=e429]:
+                      - generic [ref=e430]:
+                        - img [ref=e431]
+                        - generic [ref=e434]: 97/100
+                    - cell "472 evals 44ms" [ref=e435]:
+                      - generic [ref=e436]:
+                        - img [ref=e437]
+                        - generic [ref=e440]:
+                          - generic [ref=e441]: 472 evals
+                          - generic [ref=e442]: 44ms
+                    - cell "Enabled" [ref=e443]:
+                      - button "Enabled" [ref=e444] [cursor=pointer]:
+                        - generic [ref=e446] [cursor=pointer]:
+                          - img [ref=e447] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e450]:
+                      - generic [ref=e451]:
+                        - button "View Details" [ref=e452] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e453] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e454] [cursor=pointer]:
+                          - img
+                          - generic [ref=e455] [cursor=pointer]: More actions
+                  - row "PR Approval - GM Level General Manager can approve PRs over $25,000 procurement Purchase Request PERMIT 130 98/100 472 evals 44ms Enabled More actions" [ref=e456]:
+                    - cell [ref=e457]:
+                      - checkbox [ref=e458] [cursor=pointer]
+                    - cell "PR Approval - GM Level General Manager can approve PRs over $25,000" [ref=e459]:
+                      - generic [ref=e460]:
+                        - button "PR Approval - GM Level" [ref=e461] [cursor=pointer]
+                        - paragraph [ref=e462]: General Manager can approve PRs over $25,000
+                    - cell "procurement" [ref=e463]:
+                      - generic [ref=e464]: procurement
+                    - cell "Purchase Request" [ref=e465]:
+                      - generic [ref=e466]: Purchase Request
+                    - cell "PERMIT" [ref=e467]:
+                      - generic [ref=e468]: PERMIT
+                    - cell "130" [ref=e469]:
+                      - generic [ref=e470]: "130"
+                    - cell "98/100" [ref=e471]:
+                      - generic [ref=e472]:
+                        - img [ref=e473]
+                        - generic [ref=e476]: 98/100
+                    - cell "472 evals 44ms" [ref=e477]:
+                      - generic [ref=e478]:
+                        - img [ref=e479]
+                        - generic [ref=e482]:
+                          - generic [ref=e483]: 472 evals
+                          - generic [ref=e484]: 44ms
+                    - cell "Enabled" [ref=e485]:
+                      - button "Enabled" [ref=e486] [cursor=pointer]:
+                        - generic [ref=e488] [cursor=pointer]:
+                          - img [ref=e489] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e492]:
+                      - generic [ref=e493]:
+                        - button "View Details" [ref=e494] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e495] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e496] [cursor=pointer]:
+                          - img
+                          - generic [ref=e497] [cursor=pointer]: More actions
+                  - row "PR Creation by Department Staff Department staff can create purchase requests for their assigned departments within budget limits procurement Purchase Request PERMIT 100 95/100 472 evals 44ms Enabled More actions" [ref=e498]:
+                    - cell [ref=e499]:
+                      - checkbox [ref=e500] [cursor=pointer]
+                    - cell "PR Creation by Department Staff Department staff can create purchase requests for their assigned departments within budget limits" [ref=e501]:
+                      - generic [ref=e502]:
+                        - button "PR Creation by Department Staff" [ref=e503] [cursor=pointer]
+                        - paragraph [ref=e504]: Department staff can create purchase requests for their assigned departments within budget limits
+                    - cell "procurement" [ref=e505]:
+                      - generic [ref=e506]: procurement
+                    - cell "Purchase Request" [ref=e507]:
+                      - generic [ref=e508]: Purchase Request
+                    - cell "PERMIT" [ref=e509]:
+                      - generic [ref=e510]: PERMIT
+                    - cell "100" [ref=e511]:
+                      - generic [ref=e512]: "100"
+                    - cell "95/100" [ref=e513]:
+                      - generic [ref=e514]:
+                        - img [ref=e515]
+                        - generic [ref=e518]: 95/100
+                    - cell "472 evals 44ms" [ref=e519]:
+                      - generic [ref=e520]:
+                        - img [ref=e521]
+                        - generic [ref=e524]:
+                          - generic [ref=e525]: 472 evals
+                          - generic [ref=e526]: 44ms
+                    - cell "Enabled" [ref=e527]:
+                      - button "Enabled" [ref=e528] [cursor=pointer]:
+                        - generic [ref=e530] [cursor=pointer]:
+                          - img [ref=e531] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e534]:
+                      - generic [ref=e535]:
+                        - button "View Details" [ref=e536] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e537] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e538] [cursor=pointer]:
+                          - img
+                          - generic [ref=e539] [cursor=pointer]: More actions
+                  - row "Price List Management Procurement staff can manage vendor price lists and contracts vendor Vendor Price List PERMIT 110 96/100 441 evals 37ms Enabled More actions" [ref=e540]:
+                    - cell [ref=e541]:
+                      - checkbox [ref=e542] [cursor=pointer]
+                    - cell "Price List Management Procurement staff can manage vendor price lists and contracts" [ref=e543]:
+                      - generic [ref=e544]:
+                        - button "Price List Management" [ref=e545] [cursor=pointer]
+                        - paragraph [ref=e546]: Procurement staff can manage vendor price lists and contracts
+                    - cell "vendor" [ref=e547]:
+                      - generic [ref=e548]: vendor
+                    - cell "Vendor Price List" [ref=e549]:
+                      - generic [ref=e550]: Vendor Price List
+                    - cell "PERMIT" [ref=e551]:
+                      - generic [ref=e552]: PERMIT
+                    - cell "110" [ref=e553]:
+                      - generic [ref=e554]: "110"
+                    - cell "96/100" [ref=e555]:
+                      - generic [ref=e556]:
+                        - img [ref=e557]
+                        - generic [ref=e560]: 96/100
+                    - cell "441 evals 37ms" [ref=e561]:
+                      - generic [ref=e562]:
+                        - img [ref=e563]
+                        - generic [ref=e564]:
+                          - generic [ref=e565]: 441 evals
+                          - generic [ref=e566]: 37ms
+                    - cell "Enabled" [ref=e567]:
+                      - button "Enabled" [ref=e568] [cursor=pointer]:
+                        - generic [ref=e570] [cursor=pointer]:
+                          - img [ref=e571] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e574]:
+                      - generic [ref=e575]:
+                        - button "View Details" [ref=e576] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e577] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e578] [cursor=pointer]:
+                          - img
+                          - generic [ref=e579] [cursor=pointer]: More actions
+                  - row "RFQ Campaign Management Procurement team can create and manage Request for Quotation campaigns vendor Vendor Campaign PERMIT 100 95/100 441 evals 37ms Enabled More actions" [ref=e580]:
+                    - cell [ref=e581]:
+                      - checkbox [ref=e582] [cursor=pointer]
+                    - cell "RFQ Campaign Management Procurement team can create and manage Request for Quotation campaigns" [ref=e583]:
+                      - generic [ref=e584]:
+                        - button "RFQ Campaign Management" [ref=e585] [cursor=pointer]
+                        - paragraph [ref=e586]: Procurement team can create and manage Request for Quotation campaigns
+                    - cell "vendor" [ref=e587]:
+                      - generic [ref=e588]: vendor
+                    - cell "Vendor Campaign" [ref=e589]:
+                      - generic [ref=e590]: Vendor Campaign
+                    - cell "PERMIT" [ref=e591]:
+                      - generic [ref=e592]: PERMIT
+                    - cell "100" [ref=e593]:
+                      - generic [ref=e594]: "100"
+                    - cell "95/100" [ref=e595]:
+                      - generic [ref=e596]:
+                        - img [ref=e597]
+                        - generic [ref=e600]: 95/100
+                    - cell "441 evals 37ms" [ref=e601]:
+                      - generic [ref=e602]:
+                        - img [ref=e603]
+                        - generic [ref=e604]:
+                          - generic [ref=e605]: 441 evals
+                          - generic [ref=e606]: 37ms
+                    - cell "Enabled" [ref=e607]:
+                      - button "Enabled" [ref=e608] [cursor=pointer]:
+                        - generic [ref=e610] [cursor=pointer]:
+                          - img [ref=e611] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e614]:
+                      - generic [ref=e615]:
+                        - button "View Details" [ref=e616] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e617] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e618] [cursor=pointer]:
+                          - img
+                          - generic [ref=e619] [cursor=pointer]: More actions
+                  - row "Spot Check Execution Warehouse staff can execute spot checks for quality control inventory Spot Check PERMIT 90 94/100 441 evals 37ms Enabled More actions" [ref=e620]:
+                    - cell [ref=e621]:
+                      - checkbox [ref=e622] [cursor=pointer]
+                    - cell "Spot Check Execution Warehouse staff can execute spot checks for quality control" [ref=e623]:
+                      - generic [ref=e624]:
+                        - button "Spot Check Execution" [ref=e625] [cursor=pointer]
+                        - paragraph [ref=e626]: Warehouse staff can execute spot checks for quality control
+                    - cell "inventory" [ref=e627]:
+                      - generic [ref=e628]: inventory
+                    - cell "Spot Check" [ref=e629]:
+                      - generic [ref=e630]: Spot Check
+                    - cell "PERMIT" [ref=e631]:
+                      - generic [ref=e632]: PERMIT
+                    - cell "90" [ref=e633]:
+                      - generic [ref=e634]: "90"
+                    - cell "94/100" [ref=e635]:
+                      - generic [ref=e636]:
+                        - img [ref=e637]
+                        - generic [ref=e640]: 94/100
+                    - cell "441 evals 37ms" [ref=e641]:
+                      - generic [ref=e642]:
+                        - img [ref=e643]
+                        - generic [ref=e644]:
+                          - generic [ref=e645]: 441 evals
+                          - generic [ref=e646]: 37ms
+                    - cell "Enabled" [ref=e647]:
+                      - button "Enabled" [ref=e648] [cursor=pointer]:
+                        - generic [ref=e650] [cursor=pointer]:
+                          - img [ref=e651] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e654]:
+                      - generic [ref=e655]:
+                        - button "View Details" [ref=e656] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e657] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e658] [cursor=pointer]:
+                          - img
+                          - generic [ref=e659] [cursor=pointer]: More actions
+                  - row "Stock Adjustment by Warehouse Manager Warehouse managers can perform stock adjustments with approval workflow inventory Stock Adjustment PERMIT 120 97/100 441 evals 37ms Enabled More actions" [ref=e660]:
+                    - cell [ref=e661]:
+                      - checkbox [ref=e662] [cursor=pointer]
+                    - cell "Stock Adjustment by Warehouse Manager Warehouse managers can perform stock adjustments with approval workflow" [ref=e663]:
+                      - generic [ref=e664]:
+                        - button "Stock Adjustment by Warehouse Manager" [ref=e665] [cursor=pointer]
+                        - paragraph [ref=e666]: Warehouse managers can perform stock adjustments with approval workflow
+                    - cell "inventory" [ref=e667]:
+                      - generic [ref=e668]: inventory
+                    - cell "Stock Adjustment" [ref=e669]:
+                      - generic [ref=e670]: Stock Adjustment
+                    - cell "PERMIT" [ref=e671]:
+                      - generic [ref=e672]: PERMIT
+                    - cell "120" [ref=e673]:
+                      - generic [ref=e674]: "120"
+                    - cell "97/100" [ref=e675]:
+                      - generic [ref=e676]:
+                        - img [ref=e677]
+                        - generic [ref=e680]: 97/100
+                    - cell "441 evals 37ms" [ref=e681]:
+                      - generic [ref=e682]:
+                        - img [ref=e683]
+                        - generic [ref=e684]:
+                          - generic [ref=e685]: 441 evals
+                          - generic [ref=e686]: 37ms
+                    - cell "Enabled" [ref=e687]:
+                      - button "Enabled" [ref=e688] [cursor=pointer]:
+                        - generic [ref=e690] [cursor=pointer]:
+                          - img [ref=e691] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e694]:
+                      - generic [ref=e695]:
+                        - button "View Details" [ref=e696] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e697] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e698] [cursor=pointer]:
+                          - img
+                          - generic [ref=e699] [cursor=pointer]: More actions
+                  - row "Stock Transfer Between Locations Authorized staff can transfer stock between approved locations inventory Stock Transfer PERMIT 100 95/100 441 evals 37ms Enabled More actions" [ref=e700]:
+                    - cell [ref=e701]:
+                      - checkbox [ref=e702] [cursor=pointer]
+                    - cell "Stock Transfer Between Locations Authorized staff can transfer stock between approved locations" [ref=e703]:
+                      - generic [ref=e704]:
+                        - button "Stock Transfer Between Locations" [ref=e705] [cursor=pointer]
+                        - paragraph [ref=e706]: Authorized staff can transfer stock between approved locations
+                    - cell "inventory" [ref=e707]:
+                      - generic [ref=e708]: inventory
+                    - cell "Stock Transfer" [ref=e709]:
+                      - generic [ref=e710]: Stock Transfer
+                    - cell "PERMIT" [ref=e711]:
+                      - generic [ref=e712]: PERMIT
+                    - cell "100" [ref=e713]:
+                      - generic [ref=e714]: "100"
+                    - cell "95/100" [ref=e715]:
+                      - generic [ref=e716]:
+                        - img [ref=e717]
+                        - generic [ref=e720]: 95/100
+                    - cell "441 evals 37ms" [ref=e721]:
+                      - generic [ref=e722]:
+                        - img [ref=e723]
+                        - generic [ref=e724]:
+                          - generic [ref=e725]: 441 evals
+                          - generic [ref=e726]: 37ms
+                    - cell "Enabled" [ref=e727]:
+                      - button "Enabled" [ref=e728] [cursor=pointer]:
+                        - generic [ref=e730] [cursor=pointer]:
+                          - img [ref=e731] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e734]:
+                      - generic [ref=e735]:
+                        - button "View Details" [ref=e736] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e737] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e738] [cursor=pointer]:
+                          - img
+                          - generic [ref=e739] [cursor=pointer]: More actions
+                  - row "Stock View by Location Staff can view stock levels for their assigned locations only inventory Inventory Item PERMIT 80 93/100 441 evals 37ms Enabled More actions" [ref=e740]:
+                    - cell [ref=e741]:
+                      - checkbox [ref=e742] [cursor=pointer]
+                    - cell "Stock View by Location Staff can view stock levels for their assigned locations only" [ref=e743]:
+                      - generic [ref=e744]:
+                        - button "Stock View by Location" [ref=e745] [cursor=pointer]
+                        - paragraph [ref=e746]: Staff can view stock levels for their assigned locations only
+                    - cell "inventory" [ref=e747]:
+                      - generic [ref=e748]: inventory
+                    - cell "Inventory Item" [ref=e749]:
+                      - generic [ref=e750]: Inventory Item
+                    - cell "PERMIT" [ref=e751]:
+                      - generic [ref=e752]: PERMIT
+                    - cell "80" [ref=e753]:
+                      - generic [ref=e754]: "80"
+                    - cell "93/100" [ref=e755]:
+                      - generic [ref=e756]:
+                        - img [ref=e757]
+                        - generic [ref=e760]: 93/100
+                    - cell "441 evals 37ms" [ref=e761]:
+                      - generic [ref=e762]:
+                        - img [ref=e763]
+                        - generic [ref=e764]:
+                          - generic [ref=e765]: 441 evals
+                          - generic [ref=e766]: 37ms
+                    - cell "Enabled" [ref=e767]:
+                      - button "Enabled" [ref=e768] [cursor=pointer]:
+                        - generic [ref=e770] [cursor=pointer]:
+                          - img [ref=e771] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e774]:
+                      - generic [ref=e775]:
+                        - button "View Details" [ref=e776] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e777] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e778] [cursor=pointer]:
+                          - img
+                          - generic [ref=e779] [cursor=pointer]: More actions
+                  - row "Vendor Creation and Activation Procurement managers can create and activate new vendors vendor Vendor PERMIT 120 97/100 441 evals 37ms Enabled More actions" [ref=e780]:
+                    - cell [ref=e781]:
+                      - checkbox [ref=e782] [cursor=pointer]
+                    - cell "Vendor Creation and Activation Procurement managers can create and activate new vendors" [ref=e783]:
+                      - generic [ref=e784]:
+                        - button "Vendor Creation and Activation" [ref=e785] [cursor=pointer]
+                        - paragraph [ref=e786]: Procurement managers can create and activate new vendors
+                    - cell "vendor" [ref=e787]:
+                      - generic [ref=e788]: vendor
+                    - cell "Vendor" [ref=e789]:
+                      - generic [ref=e790]: Vendor
+                    - cell "PERMIT" [ref=e791]:
+                      - generic [ref=e792]: PERMIT
+                    - cell "120" [ref=e793]:
+                      - generic [ref=e794]: "120"
+                    - cell "97/100" [ref=e795]:
+                      - generic [ref=e796]:
+                        - img [ref=e797]
+                        - generic [ref=e800]: 97/100
+                    - cell "441 evals 37ms" [ref=e801]:
+                      - generic [ref=e802]:
+                        - img [ref=e803]
+                        - generic [ref=e804]:
+                          - generic [ref=e805]: 441 evals
+                          - generic [ref=e806]: 37ms
+                    - cell "Enabled" [ref=e807]:
+                      - button "Enabled" [ref=e808] [cursor=pointer]:
+                        - generic [ref=e810] [cursor=pointer]:
+                          - img [ref=e811] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e814]:
+                      - generic [ref=e815]:
+                        - button "View Details" [ref=e816] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e817] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e818] [cursor=pointer]:
+                          - img
+                          - generic [ref=e819] [cursor=pointer]: More actions
+                  - row "Vendor Performance Review Quality controllers and procurement managers can review vendor performance vendor Vendor PERMIT 95 94.5/100 441 evals 37ms Enabled More actions" [ref=e820]:
+                    - cell [ref=e821]:
+                      - checkbox [ref=e822] [cursor=pointer]
+                    - cell "Vendor Performance Review Quality controllers and procurement managers can review vendor performance" [ref=e823]:
+                      - generic [ref=e824]:
+                        - button "Vendor Performance Review" [ref=e825] [cursor=pointer]
+                        - paragraph [ref=e826]: Quality controllers and procurement managers can review vendor performance
+                    - cell "vendor" [ref=e827]:
+                      - generic [ref=e828]: vendor
+                    - cell "Vendor" [ref=e829]:
+                      - generic [ref=e830]: Vendor
+                    - cell "PERMIT" [ref=e831]:
+                      - generic [ref=e832]: PERMIT
+                    - cell "95" [ref=e833]:
+                      - generic [ref=e834]: "95"
+                    - cell "94.5/100" [ref=e835]:
+                      - generic [ref=e836]:
+                        - img [ref=e837]
+                        - generic [ref=e840]: 94.5/100
+                    - cell "441 evals 37ms" [ref=e841]:
+                      - generic [ref=e842]:
+                        - img [ref=e843]
+                        - generic [ref=e844]:
+                          - generic [ref=e845]: 441 evals
+                          - generic [ref=e846]: 37ms
+                    - cell "Enabled" [ref=e847]:
+                      - button "Enabled" [ref=e848] [cursor=pointer]:
+                        - generic [ref=e850] [cursor=pointer]:
+                          - img [ref=e851] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e854]:
+                      - generic [ref=e855]:
+                        - button "View Details" [ref=e856] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e857] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e858] [cursor=pointer]:
+                          - img
+                          - generic [ref=e859] [cursor=pointer]: More actions
+                  - row "Vendor Portal Access Vendors can access their dedicated portal areas vendor Vendor Portal PERMIT 70 92/100 441 evals 37ms Enabled More actions" [ref=e860]:
+                    - cell [ref=e861]:
+                      - checkbox [ref=e862] [cursor=pointer]
+                    - cell "Vendor Portal Access Vendors can access their dedicated portal areas" [ref=e863]:
+                      - generic [ref=e864]:
+                        - button "Vendor Portal Access" [ref=e865] [cursor=pointer]
+                        - paragraph [ref=e866]: Vendors can access their dedicated portal areas
+                    - cell "vendor" [ref=e867]:
+                      - generic [ref=e868]: vendor
+                    - cell "Vendor Portal" [ref=e869]:
+                      - generic [ref=e870]: Vendor Portal
+                    - cell "PERMIT" [ref=e871]:
+                      - generic [ref=e872]: PERMIT
+                    - cell "70" [ref=e873]:
+                      - generic [ref=e874]: "70"
+                    - cell "92/100" [ref=e875]:
+                      - generic [ref=e876]:
+                        - img [ref=e877]
+                        - generic [ref=e880]: 92/100
+                    - cell "441 evals 37ms" [ref=e881]:
+                      - generic [ref=e882]:
+                        - img [ref=e883]
+                        - generic [ref=e884]:
+                          - generic [ref=e885]: 441 evals
+                          - generic [ref=e886]: 37ms
+                    - cell "Enabled" [ref=e887]:
+                      - button "Enabled" [ref=e888] [cursor=pointer]:
+                        - generic [ref=e890] [cursor=pointer]:
+                          - img [ref=e891] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e894]:
+                      - generic [ref=e895]:
+                        - button "View Details" [ref=e896] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e897] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e898] [cursor=pointer]:
+                          - img
+                          - generic [ref=e899] [cursor=pointer]: More actions
+                  - row "Wastage Reporting Kitchen and warehouse staff can report wastage and damages inventory Wastage Report PERMIT 85 93.5/100 441 evals 37ms Enabled More actions" [ref=e900]:
+                    - cell [ref=e901]:
+                      - checkbox [ref=e902] [cursor=pointer]
+                    - cell "Wastage Reporting Kitchen and warehouse staff can report wastage and damages" [ref=e903]:
+                      - generic [ref=e904]:
+                        - button "Wastage Reporting" [ref=e905] [cursor=pointer]
+                        - paragraph [ref=e906]: Kitchen and warehouse staff can report wastage and damages
+                    - cell "inventory" [ref=e907]:
+                      - generic [ref=e908]: inventory
+                    - cell "Wastage Report" [ref=e909]:
+                      - generic [ref=e910]: Wastage Report
+                    - cell "PERMIT" [ref=e911]:
+                      - generic [ref=e912]: PERMIT
+                    - cell "85" [ref=e913]:
+                      - generic [ref=e914]: "85"
+                    - cell "93.5/100" [ref=e915]:
+                      - generic [ref=e916]:
+                        - img [ref=e917]
+                        - generic [ref=e920]: 93.5/100
+                    - cell "441 evals 37ms" [ref=e921]:
+                      - generic [ref=e922]:
+                        - img [ref=e923]
+                        - generic [ref=e924]:
+                          - generic [ref=e925]: 441 evals
+                          - generic [ref=e926]: 37ms
+                    - cell "Enabled" [ref=e927]:
+                      - button "Enabled" [ref=e928] [cursor=pointer]:
+                        - generic [ref=e930] [cursor=pointer]:
+                          - img [ref=e931] [cursor=pointer]
+                          - text: Enabled
+                    - cell "More actions" [ref=e934]:
+                      - generic [ref=e935]:
+                        - button "View Details" [ref=e936] [cursor=pointer]:
+                          - img
+                        - button "Test Policy" [ref=e937] [cursor=pointer]:
+                          - img
+                        - button "More actions" [ref=e938] [cursor=pointer]:
+                          - img
+                          - generic [ref=e939] [cursor=pointer]: More actions
+              - generic [ref=e940]:
+                - generic [ref=e941]: Showing 20 of 20 policies
+                - generic [ref=e942]:
+                  - generic [ref=e943]: 20 enabled
+                  - generic [ref=e944]: 0 disabled
+  - alert [ref=e945]
+```

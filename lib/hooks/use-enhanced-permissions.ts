@@ -18,7 +18,7 @@ import {
   type EnhancedPermissionResult,
   type AttributeRequest
 } from '@/lib/services/permissions'
-import { useUser } from '@/lib/context/user-context'
+import { useKeycloakUser } from '@/lib/context/keycloak-user-context'
 import type { User } from '@/lib/types/user'
 import type { Permission } from '@/lib/types/permissions'
 
@@ -58,7 +58,7 @@ export interface AttributeResolutionOptions {
  * Enhanced hook for checking a single permission with full ABAC features
  */
 export function useEnhancedPermission(options: EnhancedPermissionCheckOptions) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const { 
     enabled = true, 
     staleTime = 5 * 60 * 1000, 
@@ -114,7 +114,7 @@ export function useEnhancedPermission(options: EnhancedPermissionCheckOptions) {
  * Hook to resolve and cache user attributes
  */
 export function useUserAttributes(options: AttributeResolutionOptions = {}) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const { 
     enabled = true, 
     cacheTime = 10 * 60 * 1000, 
@@ -162,7 +162,7 @@ export function useEnhancedBulkPermissions(
     auditEnabled?: boolean
   } = {}
 ) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const { 
     enabled = true, 
     staleTime = 5 * 60 * 1000, 
@@ -263,7 +263,7 @@ export function useConditionalPermissions(
   }>,
   globalContext: any = {}
 ) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const [activeConditions, setActiveConditions] = useState<typeof conditions>([])
 
   // Evaluate conditions when context changes
@@ -360,7 +360,7 @@ export function useAdvancedPermissionValidation(
     onValidationComplete?: (results: any) => void
   }
 ) {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const [validationState, setValidationState] = useState({
     isValidating: false,
     errors: [] as Array<{ id: string; message: string; level: 'error' | 'warning' | 'info' }>,
@@ -443,7 +443,7 @@ export function useAdvancedPermissionValidation(
  * Hook for permission analytics and insights
  */
 export function usePermissionAnalytics() {
-  const { user } = useUser()
+  const { user } = useKeycloakUser()
   const queryClient = useQueryClient()
 
   const statsQuery = useQuery({

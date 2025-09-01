@@ -1,0 +1,258 @@
+{
+  "users": [
+    {
+      "id": "admin-user-001",
+      "username": "admin",
+      "email": "admin@carmen-erp.com",
+      "firstName": "System",
+      "lastName": "Administrator",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP001"],
+        "department": ["Administration"],
+        "location": ["Administrative Office"],
+        "approvalLimit": ["unlimited"],
+        "clearanceLevel": ["restricted"]
+      },
+      "realmRoles": [
+        "carmen-admin",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Administration",
+        "/Locations/Administrative Office",
+        "/Clearance Levels/Restricted"
+      ]
+    },
+    {
+      "id": "super-admin-001",
+      "username": "superadmin",
+      "email": "superadmin@carmen-erp.com",
+      "firstName": "Super",
+      "lastName": "Administrator",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "superadmin123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP000"],
+        "department": ["Administration"],
+        "location": ["Administrative Office"],
+        "approvalLimit": ["unlimited"],
+        "clearanceLevel": ["restricted"]
+      },
+      "realmRoles": [
+        "carmen-super-admin",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Administration",
+        "/Locations/Administrative Office",
+        "/Clearance Levels/Restricted"
+      ]
+    },
+    {
+      "id": "financial-manager-001",
+      "username": "finance.manager",
+      "email": "finance.manager@carmen-erp.com",
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "finance123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP002"],
+        "department": ["Finance"],
+        "location": ["Administrative Office"],
+        "approvalLimit": ["unlimited"],
+        "clearanceLevel": ["confidential"]
+      },
+      "realmRoles": [
+        "carmen-financial-manager",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Finance",
+        "/Locations/Administrative Office",
+        "/Clearance Levels/Confidential"
+      ]
+    },
+    {
+      "id": "dept-manager-001",
+      "username": "dept.manager",
+      "email": "dept.manager@carmen-erp.com",
+      "firstName": "Michael",
+      "lastName": "Thompson",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "manager123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP003"],
+        "department": ["Procurement"],
+        "location": ["Administrative Office"],
+        "approvalLimit": ["50000"],
+        "clearanceLevel": ["internal"]
+      },
+      "realmRoles": [
+        "carmen-department-manager",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Procurement",
+        "/Locations/Administrative Office",
+        "/Clearance Levels/Internal"
+      ]
+    },
+    {
+      "id": "purchasing-staff-001",
+      "username": "purchasing.staff",
+      "email": "purchasing.staff@carmen-erp.com",
+      "firstName": "Emily",
+      "lastName": "Davis",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "purchasing123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP004"],
+        "department": ["Procurement"],
+        "location": ["Administrative Office"],
+        "approvalLimit": ["10000"],
+        "clearanceLevel": ["internal"]
+      },
+      "realmRoles": [
+        "carmen-purchasing-staff",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Procurement",
+        "/Locations/Administrative Office",
+        "/Clearance Levels/Internal"
+      ]
+    },
+    {
+      "id": "chef-001",
+      "username": "head.chef",
+      "email": "head.chef@carmen-erp.com",
+      "firstName": "James",
+      "lastName": "Rodriguez",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "chef123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP005"],
+        "department": ["Kitchen"],
+        "location": ["Main Kitchen"],
+        "approvalLimit": ["5000"],
+        "clearanceLevel": ["internal"]
+      },
+      "realmRoles": [
+        "carmen-chef",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Kitchen",
+        "/Locations/Main Hotel/Main Kitchen",
+        "/Clearance Levels/Internal"
+      ]
+    },
+    {
+      "id": "counter-staff-001",
+      "username": "counter.staff",
+      "email": "counter.staff@carmen-erp.com",
+      "firstName": "Lisa",
+      "lastName": "Wang",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "counter123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP006"],
+        "department": ["Food & Beverage"],
+        "location": ["Hotel Restaurant"],
+        "clearanceLevel": ["public"]
+      },
+      "realmRoles": [
+        "carmen-counter",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Food & Beverage",
+        "/Locations/Main Hotel/Hotel Restaurant",
+        "/Clearance Levels/Public"
+      ]
+    },
+    {
+      "id": "general-staff-001",
+      "username": "general.staff",
+      "email": "general.staff@carmen-erp.com",
+      "firstName": "David",
+      "lastName": "Brown",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "staff123!",
+          "temporary": true
+        }
+      ],
+      "attributes": {
+        "employeeId": ["EMP007"],
+        "department": ["Housekeeping"],
+        "location": ["Main Hotel"],
+        "clearanceLevel": ["public"]
+      },
+      "realmRoles": [
+        "carmen-staff",
+        "default-roles-carmen"
+      ],
+      "groups": [
+        "/Departments/Housekeeping",
+        "/Locations/Main Hotel",
+        "/Clearance Levels/Public"
+      ]
+    }
+  ]
+}

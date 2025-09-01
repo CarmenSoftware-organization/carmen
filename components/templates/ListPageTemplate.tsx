@@ -16,16 +16,23 @@ const ListPageTemplate: React.FC<ListPageTemplateProps> = ({
   bulkActions,
 }) => {
   return (
-    <div className="container mx-auto p-4 bg-white dark:bg-gray-800">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">{title}</h1>
-        {actionButtons && <div className="space-x-2">{actionButtons}</div>}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+        </div>
+        {actionButtons && <div>{actionButtons}</div>}
       </div>
-      {filters && <div className="mb-4">{filters}</div>}
-      {bulkActions && <div className="mb-4">{bulkActions}</div>}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-        {content}
-      </div>
+      
+      {/* Search and Filters */}
+      {filters && <div>{filters}</div>}
+      
+      {/* Bulk Actions */}
+      {bulkActions && <div>{bulkActions}</div>}
+      
+      {/* Content */}
+      {content}
     </div>
   );
 };

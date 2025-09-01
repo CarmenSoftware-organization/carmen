@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { fetchPurchaseRequests } from "@/app/lib/data"
+import { mockPRListData } from "./mockPRListData"
 
 export function ModernPurchaseRequestList() {
   const router = useRouter()
@@ -31,30 +32,9 @@ export function ModernPurchaseRequestList() {
     }
     fetchData();
   }, []);
-import { useRouter } from "next/navigation"
-import { PurchaseRequestsDataTable } from "./purchase-requests-data-table"
-import { PurchaseRequestsCardView } from "./purchase-requests-card-view"
-import { purchaseRequestColumns } from "./purchase-requests-columns"
-import { mockPRListData } from "./mockPRListData"
-import { PurchaseRequest } from "@/lib/types"
-import { Button } from "@/components/ui/button"
-import { Plus, Download, Printer } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
-export function ModernPurchaseRequestList() {
-  const router = useRouter()
-  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
-
-  // Use the existing mock data
-  const data = useMemo(() => mockPRListData, [])
+  // Use the existing mock data instead of fetched data for now
+  const displayData = useMemo(() => mockPRListData, [])
 
   const handleSelectItem = (id: string) => {
     setSelectedItems(prev =>
@@ -66,7 +46,7 @@ export function ModernPurchaseRequestList() {
 
   const handleSelectAll = () => {
     setSelectedItems(prev =>
-      prev.length === data.length ? [] : data.map(item => item.id)
+      prev.length === displayData.length ? [] : displayData.map(item => item.id)
     )
   }
 
@@ -95,7 +75,7 @@ export function ModernPurchaseRequestList() {
 
   const cardView = (
     <PurchaseRequestsCardView
-      data={data}
+      data={displayData}
       selectedItems={selectedItems}
       onSelectItem={handleSelectItem}
       onSelectAll={handleSelectAll}
@@ -108,52 +88,58 @@ export function ModernPurchaseRequestList() {
   )
 
   return (
-    <div className="container mx-auto py-6 px-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+    <div className="container mx-auto py-6 px-6 space-y-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Purchase Requests</h1>
-          <p className="text-muted-foreground">
-            Manage and track all purchase requests across your organization.
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">Purchase Requests</h1>
         </div>
         
-        {/* Action Buttons - Top aligned with title */}
-        <div className="flex items-center space-x-2 md:mt-0">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="h-8 px-3 text-xs">
+            <Download className="h-3 w-3 mr-1" />
+            Export
+          </Button>
+          
+          <Button variant="outline" className="h-8 px-3 text-xs">
+            <Printer className="h-3 w-3 mr-1" />
+            Print
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Purchase Request
+              <Button className="h-8 px-3 text-xs font-medium">
+                <Plus className="h-3 w-3 mr-1" />
+                New PR
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
-                Create Blank PR
+                <span className="text-xs">Create Blank PR</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>PR Templates</DropdownMenuLabel>
-              <DropdownMenuItem>Office Supplies</DropdownMenuItem>
-              <DropdownMenuItem>IT Equipment</DropdownMenuItem>
-              <DropdownMenuItem>Kitchen Supplies</DropdownMenuItem>
-              <DropdownMenuItem>Maintenance</DropdownMenuItem>
+              <DropdownMenuLabel>
+                <span className="text-xs">PR Templates</span>
+              </DropdownMenuLabel>
+              <DropdownMenuItem>
+                <span className="text-xs">Office Supplies</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span className="text-xs">IT Equipment</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span className="text-xs">Kitchen Supplies</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span className="text-xs">Maintenance</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          
-          <Button variant="outline" size="sm">
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
         </div>
       </div>
 
       <PurchaseRequestsDataTable
         columns={purchaseRequestColumns}
-        data={data}
+        data={displayData}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         cardView={cardView}

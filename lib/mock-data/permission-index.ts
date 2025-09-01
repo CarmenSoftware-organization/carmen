@@ -29,6 +29,18 @@ export {
   type PolicyTemplate
 } from './permission-policies';
 
+// Role-based access control data
+export {
+  rolePermissionMappings,
+  roleBasedPolicies,
+  roleBasedTemplates,
+  getRolePermissions,
+  roleHasPermission,
+  getRoleRestrictions,
+  getRoleApprovalLimit,
+  type RolePermissions
+} from './role-based-policies';
+
 // Subscription and package data
 export {
   mockSubscriptionPackages,

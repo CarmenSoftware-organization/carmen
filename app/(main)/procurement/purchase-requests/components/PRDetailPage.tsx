@@ -63,7 +63,7 @@ import {
 } from "./utils";
 import { samplePRData, samplePRItems } from "./sampleData";
 import { mockPRListData } from "./mockPRListData";
-import { useUser } from "@/lib/context/user-context";
+import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -134,7 +134,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   const [isReturnStepSelectorOpen, setIsReturnStepSelectorOpen] = useState(false);
   const [returnComment, setReturnComment] = useState("");
   const [selectedReturnStep, setSelectedReturnStep] = useState<any>(null);
-  const { user } = useUser(); // Get current user from context
+  const { user } = useKeycloakUser(); // Get current user from context
   const { workflowPermissions, getUserWorkflowRoles } = useWorkflow(); // Get workflow permissions</invoke>
 
   useEffect(() => {

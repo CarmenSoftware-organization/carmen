@@ -1,0 +1,1915 @@
+openapi: 3.0.3
+info:
+  title: Carmen ERP - Menu Engineering API
+  description: |
+    Comprehensive Menu Engineering API for sales data integration, performance analysis, 
+    and recipe optimization using Boston Matrix methodology.
+    
+    ## Features
+    - **POS Integration**: Import and synchronize sales data from Point of Sale systems
+    - **Menu Analysis**: Comprehensive performance analysis using Boston Matrix (Stars, Plowhorses, Puzzles, Dogs)
+    - **AI Recommendations**: Intelligent optimization suggestions based on performance data
+    - **Real-time Costing**: Dynamic recipe cost calculations with current ingredient prices
+    - **Cost Monitoring**: Active alerts and threshold monitoring for cost variations
+    - **Performance Metrics**: Detailed analytics for recipe performance and trends
+    
+    ## Security
+    All endpoints require authentication via JWT or Keycloak tokens and implement:
+    - Role-based access control (RBAC)
+    - Rate limiting and DDoS protection
+    - Input validation and sanitization
+    - Comprehensive audit logging
+    - Security headers and CORS policies
+    
+    ## Rate Limits
+    - Sales Import: 50 requests/hour
+    - POS Sync: 20 requests/hour
+    - Analytics: 100-300 requests/hour
+    - Recipe APIs: 200-500 requests/hour
+    
+  version: 1.0.0
+  termsOfService: https://carmen-erp.com/terms
+  contact:
+    name: Carmen ERP API Support
+    url: https://carmen-erp.com/support
+    email: api-support@carmen-erp.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.carmen-erp.com/v1
+    description: Production server
+  - url: https://staging-api.carmen-erp.com/v1
+    description: Staging server
+  - url: http://localhost:3000/api
+    description: Development server
+
+security:
+  - BearerAuth: []
+  - KeycloakAuth: []
+
+paths:
+  # ====== POS INTEGRATION ENDPOINTS ======
+  
+  /menu-engineering/sales/import:
+    post:
+      tags:
+        - POS Integration
+      summary: Import sales data from POS systems
+      description: |
+        Import sales transaction data from Point of Sale systems with comprehensive validation.
+        Supports bulk import with progress tracking and duplicate detection.
+      operationId: importSalesData
+      security:
+        - BearerAuth: []
+        - KeycloakAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesImportRequest'
+            examples:
+              basic_import:
+                summary: Basic sales data import
+                value:
+                  source: "POS System 1"
+                  transactions:
+                    - posTransactionId: "TXN001"
+                      saleDate: "2024-01-15T14:30:00Z"
+                      quantitySold: 2
+                      revenue: 25.00
+                      discounts: 2.50
+                      netRevenue: 22.50
+                      dayOfWeek: 1
+                      basePrice: 25.00
+                      taxAmount: 2.25
+                      serviceCharge: 0.00
+                  batchSize: 1000
+                  validateOnly: false
+                  skipDuplicates: true
+      responses:
+        '201':
+          description: Sales data imported successfully
+          headers:
+            X-Import-Batch-Id:
+              schema:
+                type: string
+              description: Unique batch identifier for tracking
+            X-Processing-Time:
+              schema:
+                type: string
+              description: Processing time in milliseconds
+            X-Success-Rate:
+              schema:
+                type: string
+              description: Success percentage of import
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SalesImportResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /menu-engineering/sales/summary:
+    get:
+      tags:
+        - POS Integration
+      summary: Get sales analytics summary
+      description: |
+        Retrieve aggregated sales analytics data for menu engineering analysis.
+        Supports various time periods, groupings, and filtering options.
+      operationId: getSalesSummary
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, yesterday, last_7_days, last_30_days, this_month, last_month, custom]
+            default: last_7_days
+          description: Pre-defined time period for analysis
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date for custom period (required if period=custom)
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date for custom period (required if period=custom)
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by specific location
+        - name: categoryId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by recipe category
+        - name: groupBy
+          in: query
+          schema:
+            type: string
+            enum: [date, location, category, recipe, hour, day_of_week]
+            default: date
+          description: Group results by specified dimension
+        - name: includeComparisons
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include comparison with previous periods
+        - name: includeTrends
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include trend analysis data
+      responses:
+        '200':
+          description: Sales summary retrieved successfully
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              description: Cache control directives
+            X-Data-Source:
+              schema:
+                type: string
+              description: Data source identifier
+            X-Query-Period:
+              schema:
+                type: string
+              description: Query period used
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SalesSummaryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /menu-engineering/pos/sync:
+    post:
+      tags:
+        - POS Integration
+      summary: Synchronize POS data
+      description: |
+        Synchronize data with Point of Sale systems with real-time sync capabilities.
+        Supports retry logic, multiple sources, and configurable batch processing.
+      operationId: syncPOSData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/POSSyncRequest'
+            examples:
+              daily_sync:
+                summary: Daily synchronization
+                value:
+                  date: "2024-01-15"
+                  syncType: "incremental"
+                  retryFailedRecords: true
+                  maxRetries: 3
+                  batchSize: 1000
+      responses:
+        '200':
+          description: Synchronization completed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/POSSyncResponse'
+        '202':
+          description: Synchronization completed with some errors
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          description: Synchronization failed
+
+  # ====== MENU ANALYSIS ENDPOINTS ======
+  
+  /menu-engineering/analysis:
+    get:
+      tags:
+        - Menu Analysis
+      summary: Get comprehensive menu performance analysis
+      description: |
+        Perform comprehensive menu analysis using Boston Matrix methodology.
+        Classifies menu items as Stars, Plowhorses, Puzzles, or Dogs based on popularity and profitability.
+      operationId: getMenuAnalysis
+      parameters:
+        - name: periodStart
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Analysis period start date
+        - name: periodEnd
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Analysis period end date
+        - name: locationIds
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of location UUIDs
+          example: "loc1,loc2,loc3"
+        - name: recipeIds
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of recipe UUIDs
+        - name: classification
+          in: query
+          schema:
+            type: string
+            enum: [stars, plowhorses, puzzles, dogs, all]
+            default: all
+          description: Filter by specific classification
+        - name: includeRecommendations
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include AI-generated recommendations
+        - name: includeInsights
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include analytical insights
+        - name: maxRecommendations
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+          description: Maximum number of recommendations to return
+        - name: popularityThreshold
+          in: query
+          schema:
+            type: number
+            minimum: 50
+            maximum: 95
+          description: Percentile threshold for high popularity
+        - name: profitabilityThreshold
+          in: query
+          schema:
+            type: number
+            minimum: 50
+            maximum: 95
+          description: Percentile threshold for high profitability
+      responses:
+        '200':
+          description: Menu analysis completed successfully
+          headers:
+            X-Analysis-Id:
+              schema:
+                type: string
+              description: Unique analysis identifier
+            X-Data-Quality:
+              schema:
+                type: string
+              description: Data quality score (0-1)
+            X-Confidence:
+              schema:
+                type: string
+              description: Analysis confidence score (0-1)
+            X-Total-Items:
+              schema:
+                type: string
+              description: Total items analyzed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenuAnalysisResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /menu-engineering/classification:
+    get:
+      tags:
+        - Menu Analysis
+      summary: Get menu items by classification
+      description: |
+        Retrieve menu items filtered by Boston Matrix classification with pagination and sorting.
+      operationId: getClassifiedItems
+      parameters:
+        - name: classification
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [STAR, PLOWHORSES, PUZZLE, DOG]
+          description: Menu item classification to filter by
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Number of items per page
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [popularityScore, profitabilityScore, recipeName, totalRevenue, totalSales]
+            default: popularityScore
+          description: Field to sort by
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction
+        - name: minPopularityScore
+          in: query
+          schema:
+            type: number
+            minimum: 0
+            maximum: 100
+          description: Minimum popularity score filter
+        - name: maxPopularityScore
+          in: query
+          schema:
+            type: number
+            minimum: 0
+            maximum: 100
+          description: Maximum popularity score filter
+        - name: includeMetrics
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include detailed metrics in response
+      responses:
+        '200':
+          description: Classified items retrieved successfully
+          headers:
+            X-Total-Count:
+              schema:
+                type: string
+              description: Total number of items
+            X-Page-Count:
+              schema:
+                type: string
+              description: Total number of pages
+            X-Current-Page:
+              schema:
+                type: string
+              description: Current page number
+            X-Classification:
+              schema:
+                type: string
+              description: Classification filter applied
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ClassificationResponse'
+                      pagination:
+                        $ref: '#/components/schemas/PaginationInfo'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /menu-engineering/recommendations/{recipeId}:
+    get:
+      tags:
+        - Menu Analysis
+      summary: Get AI recommendations for specific recipe
+      description: |
+        Get AI-powered optimization recommendations for a specific recipe based on performance analysis.
+      operationId: getRecipeRecommendations
+      parameters:
+        - name: recipeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Recipe identifier
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [high, medium, low, all]
+            default: all
+          description: Filter by recommendation priority
+        - name: impact
+          in: query
+          schema:
+            type: string
+            enum: [high, medium, low, all]
+            default: all
+          description: Filter by expected impact
+        - name: effort
+          in: query
+          schema:
+            type: string
+            enum: [high, medium, low, all]
+            default: all
+          description: Filter by implementation effort
+        - name: maxRecommendations
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+          description: Maximum number of recommendations
+        - name: includeActionSteps
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include detailed action steps
+        - name: includeImpactEstimates
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include estimated impact on revenue/profit
+      responses:
+        '200':
+          description: Recommendations retrieved successfully
+          headers:
+            X-Recipe-Id:
+              schema:
+                type: string
+              description: Recipe identifier
+            X-Recommendation-Count:
+              schema:
+                type: string
+              description: Number of recommendations returned
+            X-High-Priority-Count:
+              schema:
+                type: string
+              description: Number of high-priority recommendations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RecommendationsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ====== RECIPE ENHANCEMENT ENDPOINTS ======
+  
+  /recipes/{id}/real-time-cost:
+    get:
+      tags:
+        - Recipe Enhancement
+      summary: Get real-time recipe cost calculation
+      description: |
+        Calculate current recipe costs using real-time ingredient prices with comprehensive breakdown.
+      operationId: getRealTimeCost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Recipe identifier
+        - name: quantity
+          in: query
+          schema:
+            type: number
+            minimum: 0.1
+            default: 1
+          description: Recipe quantity multiplier
+        - name: currency
+          in: query
+          schema:
+            type: string
+            pattern: '^[A-Z]{3}$'
+            default: USD
+          description: Currency code for pricing
+        - name: includeLabor
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include labor costs in calculation
+        - name: includeOverhead
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include overhead costs in calculation
+        - name: useLatestPrices
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Use latest ingredient prices
+        - name: includeIngredientBreakdown
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include detailed ingredient cost breakdown
+        - name: includeAlternatives
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include alternative supplier options
+        - name: compareToTarget
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Compare actual cost to target cost
+      responses:
+        '200':
+          description: Real-time cost calculated successfully
+          headers:
+            X-Recipe-Id:
+              schema:
+                type: string
+              description: Recipe identifier
+            X-Calculation-Id:
+              schema:
+                type: string
+              description: Unique calculation identifier
+            X-Total-Cost:
+              schema:
+                type: string
+              description: Total calculated cost
+            X-Gross-Margin:
+              schema:
+                type: string
+              description: Gross margin percentage
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RealTimeCostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /recipes/{id}/performance-metrics:
+    get:
+      tags:
+        - Recipe Enhancement
+      summary: Get recipe performance metrics
+      description: |
+        Retrieve detailed performance metrics and analytics for a specific recipe.
+      operationId: getRecipePerformanceMetrics
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Recipe identifier
+        - name: timeframe
+          in: query
+          schema:
+            type: string
+            enum: [today, yesterday, last_7_days, last_30_days, last_90_days, this_month, last_month, this_year, custom]
+            default: last_30_days
+          description: Analysis timeframe
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date for custom timeframe
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date for custom timeframe
+        - name: compareWith
+          in: query
+          schema:
+            type: string
+            enum: [previous_period, same_period_last_year, category_average, none]
+            default: previous_period
+          description: Comparison baseline
+        - name: includeBenchmarks
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include industry benchmarks
+        - name: includeForecasting
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include performance forecasting
+        - name: analysisDepth
+          in: query
+          schema:
+            type: string
+            enum: [basic, detailed, comprehensive]
+            default: detailed
+          description: Analysis depth level
+      responses:
+        '200':
+          description: Performance metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RecipePerformanceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /recipes/{id}/cost-alerts:
+    get:
+      tags:
+        - Recipe Enhancement
+      summary: Get recipe cost monitoring alerts
+      description: |
+        Retrieve active cost monitoring alerts and threshold breaches for a specific recipe.
+      operationId: getRecipeCostAlerts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Recipe identifier
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [critical, high, medium, low, all]
+            default: all
+          description: Filter by alert severity
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, acknowledged, resolved, all]
+            default: active
+          description: Filter by alert status
+        - name: alertType
+          in: query
+          schema:
+            type: string
+            enum: [price_increase, price_decrease, threshold_breach, variance, availability, quality, all]
+            default: all
+          description: Filter by alert type
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, last_24h, last_7d, last_30d, custom]
+            default: last_7d
+          description: Alert time period
+        - name: includeRecommendations
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include cost optimization recommendations
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Maximum number of alerts to return
+      responses:
+        '200':
+          description: Cost alerts retrieved successfully
+          headers:
+            X-Total-Alerts:
+              schema:
+                type: string
+              description: Total number of alerts
+            X-Critical-Alerts:
+              schema:
+                type: string
+              description: Number of critical alerts
+            X-Total-Impact:
+              schema:
+                type: string
+              description: Total financial impact
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CostAlertsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+# ====== COMPONENTS ======
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token authentication
+    KeycloakAuth:
+      type: oauth2
+      description: Keycloak OAuth2 authentication
+      flows:
+        authorizationCode:
+          authorizationUrl: https://keycloak.carmen-erp.com/auth/realms/carmen/protocol/openid-connect/auth
+          tokenUrl: https://keycloak.carmen-erp.com/auth/realms/carmen/protocol/openid-connect/token
+          scopes:
+            read:menu_engineering: Read menu engineering data
+            write:menu_engineering: Write menu engineering data
+            read:recipes: Read recipe data
+            write:recipes: Write recipe data
+
+  schemas:
+    # ====== COMMON SCHEMAS ======
+    
+    ApiResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          description: Response data (present on success)
+        error:
+          type: string
+          description: Error message (present on failure)
+        message:
+          type: string
+          description: Additional message or context
+        details:
+          description: Additional error details or validation errors
+        metadata:
+          $ref: '#/components/schemas/ApiMetadata'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    ApiMetadata:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        requestId:
+          type: string
+        version:
+          type: string
+        cacheTtl:
+          type: integer
+          description: Cache TTL in seconds
+        generatedAt:
+          type: string
+          format: date-time
+
+    PaginationInfo:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - totalPages
+        - hasNext
+        - hasPrev
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        hasNext:
+          type: boolean
+        hasPrev:
+          type: boolean
+
+    Money:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+          format: decimal
+          description: Monetary amount
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: ISO 4217 currency code
+
+    ValidationError:
+      type: object
+      required:
+        - recordIndex
+        - field
+        - error
+        - severity
+      properties:
+        recordIndex:
+          type: integer
+          description: Index of the record with error
+        field:
+          type: string
+          description: Field name with error
+        value:
+          description: Invalid value
+        error:
+          type: string
+          description: Error message
+        severity:
+          type: string
+          enum: [warning, error]
+
+    # ====== SALES DATA SCHEMAS ======
+    
+    SalesTransaction:
+      type: object
+      required:
+        - posTransactionId
+        - saleDate
+        - quantitySold
+        - revenue
+        - discounts
+        - netRevenue
+        - dayOfWeek
+        - basePrice
+        - taxAmount
+        - serviceCharge
+      properties:
+        id:
+          type: string
+          description: Internal transaction ID
+        posTransactionId:
+          type: string
+          description: POS system transaction identifier
+        posTransactionNo:
+          type: string
+          description: POS transaction number
+        saleDate:
+          type: string
+          format: date-time
+        quantitySold:
+          type: number
+          minimum: 0.001
+        revenue:
+          type: number
+          minimum: 0
+        discounts:
+          type: number
+          minimum: 0
+        netRevenue:
+          type: number
+          minimum: 0
+        locationId:
+          type: string
+          format: uuid
+        locationName:
+          type: string
+        departmentId:
+          type: string
+          format: uuid
+        dayOfWeek:
+          type: integer
+          minimum: 1
+          maximum: 7
+        basePrice:
+          type: number
+          minimum: 0
+        taxAmount:
+          type: number
+          minimum: 0
+        serviceCharge:
+          type: number
+          minimum: 0
+        calculatedFoodCost:
+          type: number
+          minimum: 0
+        grossProfit:
+          type: number
+        profitMargin:
+          type: number
+
+    SalesImportRequest:
+      type: object
+      required:
+        - source
+        - transactions
+      properties:
+        source:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Data source identifier
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesTransaction'
+          minItems: 1
+          maxItems: 10000
+        batchSize:
+          type: integer
+          minimum: 100
+          maximum: 5000
+          default: 1000
+        validateOnly:
+          type: boolean
+          default: false
+          description: Only validate without importing
+        skipDuplicates:
+          type: boolean
+          default: true
+          description: Skip duplicate transactions
+        metadata:
+          type: object
+          properties:
+            posSystemName:
+              type: string
+              maxLength: 100
+            posVersion:
+              type: string
+              maxLength: 50
+            exportedAt:
+              type: string
+              format: date-time
+            fileSize:
+              type: integer
+              minimum: 1
+            checksum:
+              type: string
+              maxLength: 256
+            notes:
+              type: string
+              maxLength: 1000
+
+    SalesImportResponse:
+      type: object
+      required:
+        - batchId
+        - totalRecords
+        - successfulRecords
+        - failedRecords
+        - duplicatesSkipped
+        - processingTimeMs
+        - validationErrors
+      properties:
+        batchId:
+          type: string
+          description: Unique batch identifier
+        totalRecords:
+          type: integer
+          minimum: 0
+        successfulRecords:
+          type: integer
+          minimum: 0
+        failedRecords:
+          type: integer
+          minimum: 0
+        duplicatesSkipped:
+          type: integer
+          minimum: 0
+        processingTimeMs:
+          type: integer
+          minimum: 0
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+        hasMore:
+          type: boolean
+          description: True if there are more validation errors than returned
+
+    SalesSummaryResponse:
+      type: object
+      properties:
+        summary:
+          type: object
+          properties:
+            period:
+              type: object
+              properties:
+                from:
+                  type: string
+                  format: date-time
+                to:
+                  type: string
+                  format: date-time
+                type:
+                  type: string
+            totals:
+              type: object
+              properties:
+                revenue:
+                  $ref: '#/components/schemas/Money'
+                transactions:
+                  type: integer
+                itemsSold:
+                  type: integer
+                averageOrderValue:
+                  $ref: '#/components/schemas/Money'
+                grossProfit:
+                  $ref: '#/components/schemas/Money'
+                grossMargin:
+                  type: number
+        trends:
+          type: object
+        comparisons:
+          type: object
+
+    # ====== POS SYNC SCHEMAS ======
+    
+    POSSyncRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date to synchronize (defaults to today)
+        sources:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          description: Specific sources to sync
+        syncType:
+          type: string
+          enum: [full, incremental, retry_failed]
+          default: incremental
+        retryFailedRecords:
+          type: boolean
+          default: true
+        maxRetries:
+          type: integer
+          minimum: 1
+          maximum: 5
+          default: 3
+        batchSize:
+          type: integer
+          minimum: 100
+          maximum: 5000
+          default: 1000
+        forceSync:
+          type: boolean
+          default: false
+          description: Force sync even if recent sync exists
+        configuration:
+          type: object
+          properties:
+            posSystemName:
+              type: string
+              maxLength: 100
+            apiEndpoint:
+              type: string
+              maxLength: 500
+            timeout:
+              type: integer
+              minimum: 5000
+              maximum: 300000
+            compression:
+              type: boolean
+              default: true
+            encryption:
+              type: boolean
+              default: true
+
+    POSSyncResponse:
+      type: object
+      required:
+        - date
+        - status
+        - recordsProcessed
+        - errorCount
+        - processingTimeMs
+        - sources
+        - summary
+      properties:
+        date:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [completed, partial, failed]
+        recordsProcessed:
+          type: integer
+          minimum: 0
+        errorCount:
+          type: integer
+          minimum: 0
+        processingTimeMs:
+          type: integer
+          minimum: 0
+        sources:
+          type: array
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+              recordsProcessed:
+                type: integer
+              errors:
+                type: integer
+              status:
+                type: string
+                enum: [completed, failed]
+        nextSyncTime:
+          type: string
+          format: date-time
+        summary:
+          type: object
+          properties:
+            successRate:
+              type: string
+              description: Success percentage
+            avgProcessingSpeed:
+              type: string
+              description: Average processing speed
+
+    # ====== MENU ANALYSIS SCHEMAS ======
+    
+    MenuItemPerformance:
+      type: object
+      required:
+        - recipeId
+        - recipeName
+        - recipeCode
+        - popularityScore
+        - profitabilityScore
+        - classification
+      properties:
+        recipeId:
+          type: string
+          format: uuid
+        recipeName:
+          type: string
+        recipeCode:
+          type: string
+        category:
+          type: string
+        totalSales:
+          type: integer
+        totalRevenue:
+          $ref: '#/components/schemas/Money'
+        totalQuantitySold:
+          type: integer
+        averagePrice:
+          $ref: '#/components/schemas/Money'
+        totalFoodCost:
+          $ref: '#/components/schemas/Money'
+        averageFoodCost:
+          $ref: '#/components/schemas/Money'
+        totalGrossProfit:
+          $ref: '#/components/schemas/Money'
+        averageProfitMargin:
+          type: number
+        popularityScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        profitabilityScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        popularityRank:
+          type: integer
+          minimum: 1
+        profitabilityRank:
+          type: integer
+          minimum: 1
+        classification:
+          type: string
+          enum: [STAR, PLOWHORSES, PUZZLE, DOG]
+        dataQuality:
+          type: number
+          minimum: 0
+          maximum: 1
+        sampleSize:
+          type: integer
+          minimum: 0
+        salesTrend:
+          type: string
+          enum: [increasing, decreasing, stable]
+        profitabilityTrend:
+          type: string
+          enum: [increasing, decreasing, stable]
+
+    MenuAnalysisResponse:
+      type: object
+      required:
+        - analysisId
+        - analysisDate
+        - periodType
+        - period
+        - overview
+        - classifications
+      properties:
+        analysisId:
+          type: string
+        analysisDate:
+          type: string
+          format: date-time
+        periodType:
+          type: string
+          enum: [daily, weekly, monthly, quarterly, yearly, custom]
+        period:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        location:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+        overview:
+          type: object
+          properties:
+            totalItems:
+              type: integer
+            totalSales:
+              type: integer
+            totalRevenue:
+              $ref: '#/components/schemas/Money'
+            totalGrossProfit:
+              $ref: '#/components/schemas/Money'
+            overallProfitMargin:
+              type: number
+            averagePopularityScore:
+              type: number
+            averageProfitabilityScore:
+              type: number
+            dataQuality:
+              type: number
+            confidence:
+              type: number
+        classifications:
+          type: object
+          properties:
+            stars:
+              type: object
+              properties:
+                count:
+                  type: integer
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MenuItemPerformance'
+            plowhorses:
+              type: object
+              properties:
+                count:
+                  type: integer
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MenuItemPerformance'
+            puzzles:
+              type: object
+              properties:
+                count:
+                  type: integer
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MenuItemPerformance'
+            dogs:
+              type: object
+              properties:
+                count:
+                  type: integer
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MenuItemPerformance'
+        recommendations:
+          type: object
+          properties:
+            total:
+              type: integer
+            highPriority:
+              type: array
+              items:
+                $ref: '#/components/schemas/MenuRecommendation'
+            quickWins:
+              type: array
+              items:
+                $ref: '#/components/schemas/MenuRecommendation'
+            strategicInitiatives:
+              type: array
+              items:
+                $ref: '#/components/schemas/MenuRecommendation'
+        insights:
+          type: array
+          items:
+            type: object
+
+    MenuRecommendation:
+      type: object
+      required:
+        - recipeId
+        - recipeName
+        - currentClassification
+        - type
+        - priority
+        - impact
+        - effort
+        - title
+        - description
+      properties:
+        id:
+          type: string
+        recipeId:
+          type: string
+          format: uuid
+        recipeName:
+          type: string
+        currentClassification:
+          type: string
+          enum: [STAR, PLOWHORSES, PUZZLE, DOG]
+        type:
+          type: string
+          enum: [promote, reposition, reprice, reformulate, remove, feature, bundle, investigate]
+        priority:
+          type: string
+          enum: [high, medium, low]
+        impact:
+          type: string
+          enum: [high, medium, low]
+        effort:
+          type: string
+          enum: [high, medium, low]
+        title:
+          type: string
+        description:
+          type: string
+        rationale:
+          type: string
+        expectedOutcome:
+          type: string
+        timeframe:
+          type: string
+        actionSteps:
+          type: array
+          items:
+            type: string
+        metrics:
+          type: array
+          items:
+            type: string
+        impactEstimates:
+          type: object
+          properties:
+            revenueImpact:
+              $ref: '#/components/schemas/Money'
+            profitImpact:
+              $ref: '#/components/schemas/Money'
+        tags:
+          type: array
+          items:
+            type: string
+
+    ClassificationResponse:
+      type: object
+      properties:
+        classification:
+          type: string
+          enum: [STAR, PLOWHORSES, PUZZLE, DOG]
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItemPerformance'
+        statistics:
+          type: object
+          properties:
+            averagePopularityScore:
+              type: number
+            averageProfitabilityScore:
+              type: number
+            totalRevenue:
+              type: number
+            totalSales:
+              type: integer
+            totalQuantity:
+              type: integer
+
+    RecommendationsResponse:
+      type: object
+      properties:
+        recipeId:
+          type: string
+          format: uuid
+        recipeName:
+          type: string
+        analysisDate:
+          type: string
+          format: date-time
+        totalRecommendations:
+          type: integer
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuRecommendation'
+        summary:
+          type: object
+          properties:
+            highPriority:
+              type: integer
+            mediumPriority:
+              type: integer
+            lowPriority:
+              type: integer
+            quickWins:
+              type: integer
+            strategicInitiatives:
+              type: integer
+
+    # ====== RECIPE ENHANCEMENT SCHEMAS ======
+    
+    RealTimeCostResponse:
+      type: object
+      properties:
+        recipeId:
+          type: string
+          format: uuid
+        recipeName:
+          type: string
+        recipeCode:
+          type: string
+        calculatedAt:
+          type: string
+          format: date-time
+        calculationId:
+          type: string
+        parameters:
+          type: object
+        costBreakdown:
+          type: object
+          properties:
+            ingredients:
+              type: array
+              items:
+                type: object
+                properties:
+                  ingredientId:
+                    type: string
+                  ingredientName:
+                    type: string
+                  quantity:
+                    type: number
+                  unit:
+                    type: string
+                  unitCost:
+                    $ref: '#/components/schemas/Money'
+                  totalCost:
+                    $ref: '#/components/schemas/Money'
+                  vendor:
+                    type: string
+                  priceDate:
+                    type: string
+                    format: date-time
+                  variance:
+                    type: object
+                    properties:
+                      amount:
+                        type: number
+                      currency:
+                        type: string
+                      percentage:
+                        type: number
+                  alternatives:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vendor:
+                          type: string
+                        unitCost:
+                          $ref: '#/components/schemas/Money'
+            totals:
+              type: object
+              properties:
+                ingredientCost:
+                  $ref: '#/components/schemas/Money'
+                laborCost:
+                  $ref: '#/components/schemas/Money'
+                overheadCost:
+                  $ref: '#/components/schemas/Money'
+                totalDirectCost:
+                  $ref: '#/components/schemas/Money'
+                costPerUnit:
+                  $ref: '#/components/schemas/Money'
+        pricing:
+          type: object
+          properties:
+            currentSellingPrice:
+              $ref: '#/components/schemas/Money'
+            suggestedSellingPrice:
+              $ref: '#/components/schemas/Money'
+            grossMargin:
+              $ref: '#/components/schemas/Money'
+            grossMarginPercentage:
+              type: number
+        alerts:
+          type: array
+          items:
+            type: object
+
+    RecipePerformanceResponse:
+      type: object
+      properties:
+        recipeId:
+          type: string
+          format: uuid
+        recipeName:
+          type: string
+        recipeCode:
+          type: string
+        category:
+          type: string
+        classification:
+          type: string
+          enum: [STAR, PLOWHORSES, PUZZLE, DOG]
+        analysisDate:
+          type: string
+          format: date-time
+        period:
+          type: object
+          properties:
+            from:
+              type: string
+              format: date-time
+            to:
+              type: string
+              format: date-time
+            type:
+              type: string
+            days:
+              type: integer
+        overview:
+          type: object
+          properties:
+            totalSales:
+              type: integer
+            totalRevenue:
+              $ref: '#/components/schemas/Money'
+            totalQuantitySold:
+              type: integer
+            averagePrice:
+              $ref: '#/components/schemas/Money'
+            totalProfit:
+              $ref: '#/components/schemas/Money'
+            profitMargin:
+              type: number
+            popularityScore:
+              type: number
+            profitabilityScore:
+              type: number
+            customerRating:
+              type: number
+            repeatOrderRate:
+              type: number
+        trends:
+          type: object
+        operational:
+          type: object
+        alerts:
+          type: array
+          items:
+            type: object
+
+    CostAlertsResponse:
+      type: object
+      properties:
+        recipeId:
+          type: string
+          format: uuid
+        recipeName:
+          type: string
+        recipeCode:
+          type: string
+        period:
+          type: object
+        summary:
+          type: object
+          properties:
+            totalAlerts:
+              type: integer
+            bySeverity:
+              type: object
+              additionalProperties:
+                type: integer
+            byStatus:
+              type: object
+              additionalProperties:
+                type: integer
+            byType:
+              type: object
+              additionalProperties:
+                type: integer
+            totalImpact:
+              type: number
+            averageVariance:
+              type: number
+        alerts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              type:
+                type: string
+              severity:
+                type: string
+                enum: [critical, high, medium, low]
+              status:
+                type: string
+                enum: [active, acknowledged, resolved]
+              timestamp:
+                type: string
+                format: date-time
+              title:
+                type: string
+              message:
+                type: string
+              impactAmount:
+                $ref: '#/components/schemas/Money'
+              variancePercent:
+                type: number
+              actions:
+                type: array
+                items:
+                  type: string
+
+  responses:
+    BadRequest:
+      description: Bad Request - Invalid input parameters
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid request parameters"
+
+    Unauthorized:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Authentication required"
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Insufficient permissions"
+
+    NotFound:
+      description: Not Found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Resource not found"
+
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Rate limit exceeded"
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+tags:
+  - name: POS Integration
+    description: Point of Sale system integration endpoints for sales data import and synchronization
+  - name: Menu Analysis
+    description: Menu performance analysis using Boston Matrix methodology with AI recommendations
+  - name: Recipe Enhancement
+    description: Enhanced recipe APIs with real-time costing, performance metrics, and cost monitoring

@@ -39,8 +39,8 @@ export function PurchaseOrderCardView({
     return (
       <div className="col-span-full h-48 flex flex-col items-center justify-center text-muted-foreground">
         <div className="text-center">
-          <h3 className="text-lg font-semibold">No purchase orders found</h3>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h3 className="text-sm font-semibold">No purchase orders found</h3>
+          <p className="text-xs text-muted-foreground mt-1">
             Try adjusting your search or filter criteria
           </p>
         </div>
@@ -70,12 +70,12 @@ export function PurchaseOrderCardView({
                 <div className="min-w-0 flex-1">
                   <Link 
                     href={`/procurement/purchase-orders/${po.poId}`}
-                    className="text-lg font-semibold text-primary hover:text-primary/80 hover:underline block truncate"
+                    className="text-sm font-semibold text-primary hover:text-primary/80 hover:underline block truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {po.number}
                   </Link>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {po.orderDate.toLocaleDateString()}
                   </p>
                 </div>
@@ -93,7 +93,7 @@ export function PurchaseOrderCardView({
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                   Vendor
                 </p>
-                <p className="font-medium text-sm">{po.vendorName}</p>
+                <p className="font-medium text-xs">{po.vendorName}</p>
               </div>
               
               {/* Key Metrics Grid */}
@@ -102,7 +102,7 @@ export function PurchaseOrderCardView({
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                     Delivery Date
                   </p>
-                  <p className="text-sm font-medium">
+                  <p className="text-xs font-medium">
                     {po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "Not set"}
                   </p>
                 </div>
@@ -110,7 +110,7 @@ export function PurchaseOrderCardView({
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                     Currency
                   </p>
-                  <p className="text-sm font-medium">{po.currencyCode}</p>
+                  <p className="text-xs font-medium">{po.currencyCode}</p>
                 </div>
               </div>
               
@@ -121,7 +121,7 @@ export function PurchaseOrderCardView({
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Net Amount
                     </p>
-                    <p className="text-sm font-medium">
+                    <p className="text-xs font-medium">
                       {po.netAmount.toLocaleString(undefined, { 
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2 
@@ -132,7 +132,7 @@ export function PurchaseOrderCardView({
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Tax Amount
                     </p>
-                    <p className="text-sm font-medium">
+                    <p className="text-xs font-medium">
                       {po.taxAmount.toLocaleString(undefined, { 
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2 
@@ -146,7 +146,7 @@ export function PurchaseOrderCardView({
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Total Amount
                     </p>
-                    <p className="text-lg font-bold text-foreground">
+                    <p className="text-sm font-bold text-foreground">
                       {po.totalAmount.toLocaleString(undefined, { 
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2 
@@ -161,25 +161,25 @@ export function PurchaseOrderCardView({
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHorizontal className="h-3 w-3" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                          <Printer className="mr-2 h-4 w-4" />
-                          Print
+                          <Printer className="mr-2 h-3 w-3" />
+                          <span className="text-xs">Print</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <FileDown className="mr-2 h-4 w-4" />
-                          Download PDF
+                          <FileDown className="mr-2 h-3 w-3" />
+                          <span className="text-xs">Download PDF</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive focus:text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          <Trash2 className="mr-2 h-3 w-3" />
+                          <span className="text-xs">Delete</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

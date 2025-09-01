@@ -11,6 +11,7 @@ import { PurchaseOrder, PurchaseRequest, GoodsReceiveNote } from '../types'
 export { Mock_purchaseOrders as mockPurchaseOrders } from '../mock/mock_purchaseOrder'
 export { mockGoodsReceiveNotes } from '../mock/mock_goodsReceiveNotes'
 export { staticCreditNotes as mockCreditNotes } from '../mock/static-credit-notes'
+export { mockPRListData as mockPurchaseRequests } from '../../app/(main)/procurement/purchase-requests/components/mockPRListData'
 
 // TODO: Move the actual data from these mock files here
 // and convert it to use our centralized type system

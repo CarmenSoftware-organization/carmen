@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Paperclip, Send } from 'lucide-react';
 import { PurchaseRequest, Comment } from '@/lib/types';
-import { useUser } from '@/lib/context/user-context';
+import { useKeycloakUser } from '@/lib/context/keycloak-user-context';
 
 interface PRCommentsAttachmentsTabProps {
   prData: PurchaseRequest;
@@ -45,7 +45,7 @@ export default function PRCommentsAttachmentsTab({ prData }: PRCommentsAttachmen
     // Use actual PR comments if available, otherwise use mock data
     return prData.comments && prData.comments.length > 0 ? prData.comments : mockComments;
   });
-  const { user } = useUser();
+  const { user } = useKeycloakUser();
 
   const handleAddComment = () => {
     if (newComment.trim() && user) {

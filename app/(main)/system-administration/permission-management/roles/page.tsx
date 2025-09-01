@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, ArrowLeft, Settings } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { PermissionBreadcrumbs } from '../components/permission-breadcrumbs';
 import { RoleDataTable } from './components/role-data-table';
 import { RoleCardView } from './components/role-card-view';
 import { createRoleColumns } from './components/role-columns';
@@ -120,6 +121,9 @@ export default function RoleManagementPage() {
 
   return (
     <div className="container mx-auto py-6 px-6 space-y-6">
+      {/* Breadcrumbs */}
+      <PermissionBreadcrumbs />
+      
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">

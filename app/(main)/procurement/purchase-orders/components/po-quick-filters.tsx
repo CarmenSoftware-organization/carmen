@@ -49,9 +49,9 @@ export function POQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
       {/* Status Filter */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8">
+          <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
             {activeFilter?.type === 'status' ? activeFilter.label : 'All Status'}
-            <ChevronDown className="ml-2 h-4 w-4" />
+            <ChevronDown className="ml-1 h-3 w-3" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-40">
@@ -60,7 +60,7 @@ export function POQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
               key={option.value}
               onClick={() => onQuickFilter({ type: 'status', value: option.value, label: option.label })}
             >
-              {option.label}
+              <span className="text-xs">{option.label}</span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
@@ -69,9 +69,9 @@ export function POQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
       {/* Delivery Date Filter */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8">
+          <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
             {activeFilter?.type === 'delivery-date' ? activeFilter.label : 'All Delivery Dates'}
-            <ChevronDown className="ml-2 h-4 w-4" />
+            <ChevronDown className="ml-1 h-3 w-3" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-40">
@@ -80,7 +80,7 @@ export function POQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
               key={option.value}
               onClick={() => onQuickFilter({ type: 'delivery-date', value: option.value, label: option.label })}
             >
-              {option.label}
+              <span className="text-xs">{option.label}</span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

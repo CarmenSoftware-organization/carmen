@@ -151,3 +151,6 @@ dev-debug.log
 tasks.json
 tasks/ 
 .vercel
+
+# Serena cache files
+.serena/

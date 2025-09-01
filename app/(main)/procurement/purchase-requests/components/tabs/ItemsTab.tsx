@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/lib/context/user-context";
+import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
 import {
   Eye,
   Edit,
@@ -80,7 +80,7 @@ interface ItemsTabProps {
 
 export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, formMode = "view" }: ItemsTabProps) {
   // Get user context for price visibility setting
-  const { user } = useUser();
+  const { user } = useKeycloakUser();
   
   // Local state for items to ensure UI updates immediately
   const [localItems, setLocalItems] = useState<PurchaseRequestItem[]>(items);

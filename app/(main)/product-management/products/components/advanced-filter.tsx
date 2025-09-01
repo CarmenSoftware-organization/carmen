@@ -323,47 +323,47 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
     <div className="flex items-center space-x-2">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="h-8 px-2 lg:px-3">
+          <Button variant="outline" className="h-8 px-2 text-xs">
             <span>Saved Filters</span>
-            <ChevronDown className="ml-2 h-4 w-4" />
+            <ChevronDown className="ml-1 h-3 w-3" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-72">
           <div className="space-y-2">
-            <h3 className="font-medium">Saved Filters</h3>
+            <h3 className="text-sm font-medium">Saved Filters</h3>
             <div className="space-y-1">
               {savedFilters.length === 0 && (
-                <p className="text-sm text-muted-foreground">No saved filters yet</p>
+                <p className="text-xs text-muted-foreground">No saved filters yet</p>
               )}
               {savedFilters.map((filter) => (
                 <div key={filter.id} className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-100">
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => handleToggleStar(filter)}
-                      className="h-6 w-6"
+                      className="h-6 w-6 p-0"
                     >
-                      <Star className={`h-4 w-4 ${filter.isDefault ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                      <Star className={`h-3 w-3 ${filter.isDefault ? 'fill-yellow-400 text-yellow-400' : ''}`} />
                     </Button>
-                    <span className="text-sm">{filter.name}</span>
+                    <span className="text-xs">{filter.name}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => applyFilter(filter)}
-                      className="h-6 w-6"
+                      className="h-6 w-6 p-0"
                     >
-                      <Filter className="h-4 w-4" />
+                      <Filter className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => handleDeleteSavedFilter(filter.id)}
-                      className="h-6 w-6"
+                      className="h-6 w-6 p-0"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
@@ -375,8 +375,8 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
       
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button className="h-8">
-            <Filter className="mr-2 h-4 w-4" />
+          <Button className="h-8 px-2 text-xs">
+            <Filter className="mr-1 h-3 w-3" />
             <span>Add Filter</span>
           </Button>
         </SheetTrigger>
@@ -463,19 +463,19 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
                         <div className="col-span-1 flex items-center justify-center">
                           <Button
                             variant="ghost"
-                            size="icon"
+                            size="sm"
                             onClick={() => removeFilter(index)}
-                            className="h-8 w-8"
+                            className="h-6 w-6 p-0"
                           >
-                            <X className="h-4 w-4" />
+                            <X className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
                     </div>
                   ))}
                   
-                  <Button variant="outline" size="sm" onClick={addFilter}>
-                    <Plus className="h-4 w-4 mr-1" />
+                  <Button variant="outline" className="h-8 px-2 text-xs" onClick={addFilter}>
+                    <Plus className="h-3 w-3 mr-1" />
                     Add Condition
                   </Button>
                 </div>
@@ -490,27 +490,27 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
           </Tabs>
           
           <div className="mt-6 flex justify-between items-center">
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <History className="h-4 w-4 mr-1" />
+            <div className="flex gap-2">
+              <Button variant="outline" className="h-8 px-2 text-xs">
+                <History className="h-3 w-3 mr-1" />
                 History
               </Button>
-              <Button size="sm" variant="outline">
-                <Code className="h-4 w-4 mr-1" />
+              <Button className="h-8 px-2 text-xs" variant="outline">
+                <Code className="h-3 w-3 mr-1" />
                 Test
               </Button>
             </div>
-            <div className="space-x-2">
-              <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-              <Button onClick={handleApplyFilters}>Apply</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" className="h-8 px-2 text-xs" onClick={() => setIsOpen(false)}>Cancel</Button>
+              <Button className="h-8 px-2 text-xs" onClick={handleApplyFilters}>Apply</Button>
             </div>
           </div>
           
           <div className="mt-4 border-t pt-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-sm font-medium">Save this filter</h3>
-              <Button size="sm" variant="outline" onClick={handleSaveFilter}>
-                <Save className="h-4 w-4 mr-1" />
+              <h3 className="text-xs font-medium">Save this filter</h3>
+              <Button className="h-8 px-2 text-xs" variant="outline" onClick={handleSaveFilter}>
+                <Save className="h-3 w-3 mr-1" />
                 Save
               </Button>
             </div>
@@ -529,7 +529,7 @@ export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilte
               </button>
             </Badge>
           ))}
-          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={onClearFilters}>
+          <Button variant="ghost" className="h-8 px-2 text-xs" onClick={onClearFilters}>
             Clear all
           </Button>
         </div>

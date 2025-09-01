@@ -1,0 +1,509 @@
+{
+  "realm": "carmen",
+  "displayName": "Carmen ERP",
+  "displayNameHtml": "<h1>Carmen ERP</h1><p>Hospitality Management System</p>",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": true,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 30,
+  "defaultSignatureAlgorithm": "RS256",
+  "revokeRefreshToken": false,
+  "refreshTokenMaxReuse": 0,
+  "accessTokenLifespan": 300,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "ssoSessionIdleTimeoutRememberMe": 0,
+  "ssoSessionMaxLifespanRememberMe": 0,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespanEnabled": false,
+  "offlineSessionMaxLifespan": 5184000,
+  "clientSessionIdleTimeout": 0,
+  "clientSessionMaxLifespan": 0,
+  "clientOfflineSessionIdleTimeout": 0,
+  "clientOfflineSessionMaxLifespan": 0,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "accessCodeLifespanLogin": 1800,
+  "actionTokenGeneratedByAdminLifespan": 43200,
+  "actionTokenGeneratedByUserLifespan": 300,
+  "oauth2DeviceCodeLifespan": 600,
+  "oauth2DevicePollingInterval": 5,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["en", "es", "fr"],
+  "defaultLocale": "en",
+  "smtpServer": {
+    "password": "",
+    "starttls": "false",
+    "port": "1025",
+    "auth": "false",
+    "ssl": "false",
+    "host": "mailhog",
+    "replyToDisplayName": "Carmen ERP",
+    "replyTo": "noreply@carmen-erp.com",
+    "fromDisplayName": "Carmen ERP",
+    "from": "noreply@carmen-erp.com",
+    "envelopeFrom": "",
+    "user": ""
+  },
+  "loginTheme": "carmen",
+  "accountTheme": "carmen",
+  "adminTheme": "keycloak",
+  "emailTheme": "carmen",
+  "eventsEnabled": true,
+  "eventsListeners": ["jboss-logging"],
+  "enabledEventTypes": [
+    "SEND_RESET_PASSWORD",
+    "UPDATE_CONSENT_ERROR",
+    "GRANT_CONSENT",
+    "VERIFY_PROFILE",
+    "REMOVE_TOTP",
+    "REVOKE_GRANT",
+    "UPDATE_TOTP",
+    "LOGIN_ERROR",
+    "CLIENT_LOGIN",
+    "RESET_PASSWORD_ERROR",
+    "IMPERSONATE_ERROR",
+    "CODE_TO_TOKEN_ERROR",
+    "CUSTOM_REQUIRED_ACTION",
+    "OAUTH2_DEVICE_CODE_TO_TOKEN_ERROR",
+    "RESTART_AUTHENTICATION",
+    "IMPERSONATE",
+    "UPDATE_PROFILE_ERROR",
+    "LOGIN",
+    "UPDATE_PASSWORD_ERROR",
+    "CLIENT_INITIATED_ACCOUNT_LINKING",
+    "TOKEN_EXCHANGE",
+    "AUTHREQID_TO_TOKEN",
+    "LOGOUT",
+    "REGISTER",
+    "DELETE_ACCOUNT_ERROR",
+    "CLIENT_REGISTER",
+    "IDENTITY_PROVIDER_LINK_ACCOUNT",
+    "DELETE_ACCOUNT",
+    "CLIENT_DELETE",
+    "IDENTITY_PROVIDER_LOGIN",
+    "IDENTITY_PROVIDER_FIRST_LOGIN",
+    "CLIENT_DELETE_ERROR",
+    "VERIFY_EMAIL",
+    "CLIENT_LOGIN_ERROR",
+    "RESTART_AUTHENTICATION_ERROR",
+    "EXECUTE_ACTIONS",
+    "REMOVE_FEDERATED_IDENTITY_ERROR",
+    "TOKEN_EXCHANGE_ERROR",
+    "PERMISSION_TOKEN",
+    "SEND_IDENTITY_PROVIDER_LINK_ERROR",
+    "EXECUTE_ACTION_TOKEN_ERROR",
+    "SEND_VERIFY_EMAIL",
+    "OAUTH2_DEVICE_VERIFY_USER_CODE",
+    "EXECUTE_ACTIONS_ERROR",
+    "REMOVE_FEDERATED_IDENTITY",
+    "OAUTH2_DEVICE_CODE_TO_TOKEN",
+    "IDENTITY_PROVIDER_POST_LOGIN",
+    "IDENTITY_PROVIDER_LINK_ACCOUNT_ERROR",
+    "UPDATE_EMAIL",
+    "OAUTH2_DEVICE_VERIFY_USER_CODE_ERROR",
+    "REGISTER_ERROR",
+    "REVOKE_GRANT_ERROR",
+    "LOGOUT_ERROR",
+    "UPDATE_EMAIL_ERROR",
+    "CLIENT_UPDATE_ERROR",
+    "UPDATE_PASSWORD",
+    "CLIENT_REGISTER_ERROR",
+    "SEND_IDENTITY_PROVIDER_LINK",
+    "SEND_VERIFY_EMAIL_ERROR",
+    "RESET_PASSWORD",
+    "CLIENT_INITIATED_ACCOUNT_LINKING_ERROR",
+    "OAUTH2_DEVICE_AUTH",
+    "UPDATE_CONSENT",
+    "REMOVE_TOTP_ERROR",
+    "VERIFY_EMAIL_ERROR",
+    "SEND_RESET_PASSWORD_ERROR",
+    "CLIENT_UPDATE",
+    "CUSTOM_REQUIRED_ACTION_ERROR",
+    "IDENTITY_PROVIDER_POST_LOGIN_ERROR",
+    "UPDATE_PROFILE",
+    "AUTHREQID_TO_TOKEN_ERROR",
+    "CLIENT_AUTHREQID_TO_TOKEN",
+    "IDENTITY_PROVIDER_FIRST_LOGIN_ERROR",
+    "CLIENT_AUTHREQID_TO_TOKEN_ERROR"
+  ],
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true,
+  "identityProviders": [],
+  "identityProviderMappers": [],
+  "components": {
+    "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy": [
+      {
+        "name": "Allowed Protocol Mapper Types",
+        "providerId": "allowed-protocol-mappers",
+        "subType": "anonymous",
+        "config": {
+          "allowed-protocol-mapper-types": [
+            "oidc-full-name-mapper",
+            "oidc-address-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "saml-user-property-mapper",
+            "saml-role-list-mapper",
+            "saml-user-attribute-mapper"
+          ]
+        }
+      },
+      {
+        "name": "Allowed Client Scopes",
+        "providerId": "allowed-client-templates",
+        "subType": "anonymous",
+        "config": {
+          "allow-default-scopes": ["true"]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "default-roles-carmen",
+        "description": "${role_default-roles}",
+        "composite": true,
+        "composites": {
+          "realm": ["offline_access", "uma_authorization"],
+          "client": {
+            "account": ["view-profile", "manage-account"]
+          }
+        }
+      },
+      {
+        "name": "carmen-admin",
+        "description": "Carmen ERP System Administrator",
+        "composite": false
+      },
+      {
+        "name": "carmen-super-admin",
+        "description": "Carmen ERP Super Administrator",
+        "composite": false
+      },
+      {
+        "name": "carmen-financial-manager",
+        "description": "Carmen ERP Financial Manager",
+        "composite": false
+      },
+      {
+        "name": "carmen-department-manager",
+        "description": "Carmen ERP Department Manager",
+        "composite": false
+      },
+      {
+        "name": "carmen-purchasing-staff",
+        "description": "Carmen ERP Purchasing Staff",
+        "composite": false
+      },
+      {
+        "name": "carmen-chef",
+        "description": "Carmen ERP Chef",
+        "composite": false
+      },
+      {
+        "name": "carmen-counter",
+        "description": "Carmen ERP Counter Staff",
+        "composite": false
+      },
+      {
+        "name": "carmen-staff",
+        "description": "Carmen ERP General Staff",
+        "composite": false
+      },
+      {
+        "name": "offline_access",
+        "description": "${role_offline-access}",
+        "composite": false
+      },
+      {
+        "name": "uma_authorization",
+        "description": "${role_uma_authorization}",
+        "composite": false
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "Carmen Departments",
+      "path": "/Carmen Departments",
+      "subGroups": [
+        {
+          "name": "Kitchen",
+          "path": "/Carmen Departments/Kitchen"
+        },
+        {
+          "name": "Procurement",
+          "path": "/Carmen Departments/Procurement"
+        },
+        {
+          "name": "Finance",
+          "path": "/Carmen Departments/Finance"
+        },
+        {
+          "name": "Inventory",
+          "path": "/Carmen Departments/Inventory"
+        },
+        {
+          "name": "Operations",
+          "path": "/Carmen Departments/Operations"
+        }
+      ]
+    },
+    {
+      "name": "Carmen Locations",
+      "path": "/Carmen Locations",
+      "subGroups": [
+        {
+          "name": "Main Restaurant",
+          "path": "/Carmen Locations/Main Restaurant"
+        },
+        {
+          "name": "Catering Kitchen",
+          "path": "/Carmen Locations/Catering Kitchen"
+        },
+        {
+          "name": "Central Warehouse",
+          "path": "/Carmen Locations/Central Warehouse"
+        }
+      ]
+    }
+  ],
+  "defaultRoles": ["default-roles-carmen", "offline_access", "uma_authorization"],
+  "clients": [
+    {
+      "clientId": "carmen-web",
+      "name": "Carmen ERP Web Application",
+      "description": "Main web application for Carmen ERP",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "your-client-secret-here",
+      "redirectUris": [
+        "http://localhost:3000/api/auth/callback/keycloak",
+        "http://localhost:3000/*",
+        "https://your-domain.com/api/auth/callback/keycloak",
+        "https://your-domain.com/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "https://your-domain.com"
+      ],
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "attributes": {
+        "saml.assertion.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.encrypt": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "saml.authnstatement": "false",
+        "display.on.consent.screen": "false",
+        "saml.onetimeuse.condition": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "email",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "email",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true"
+          }
+        },
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups"
+          }
+        },
+        {
+          "name": "profile",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "profile",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "profile",
+            "jsonType.label": "String"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "clientId": "carmen-api",
+      "name": "Carmen ERP API Client",
+      "description": "API access for Carmen ERP services",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "your-api-client-secret-here",
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@carmen-erp.com",
+      "firstName": "System",
+      "lastName": "Administrator",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-carmen",
+        "carmen-super-admin"
+      ],
+      "groups": [
+        "/Carmen Departments/Operations"
+      ]
+    },
+    {
+      "username": "chef.maria",
+      "email": "maria.rodriguez@carmen-erp.com",
+      "firstName": "Maria",
+      "lastName": "Rodriguez",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "chef123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-carmen",
+        "carmen-chef"
+      ],
+      "groups": [
+        "/Carmen Departments/Kitchen",
+        "/Carmen Locations/Main Restaurant"
+      ]
+    },
+    {
+      "username": "finance.manager",
+      "email": "finance.manager@carmen-erp.com",
+      "firstName": "Robert",
+      "lastName": "Chen",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "finance123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-carmen",
+        "carmen-financial-manager"
+      ],
+      "groups": [
+        "/Carmen Departments/Finance",
+        "/Carmen Locations/Main Restaurant"
+      ]
+    },
+    {
+      "username": "procurement.staff",
+      "email": "procurement@carmen-erp.com",
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "procurement123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-carmen",
+        "carmen-purchasing-staff"
+      ],
+      "groups": [
+        "/Carmen Departments/Procurement",
+        "/Carmen Locations/Central Warehouse"
+      ]
+    }
+  ]
+}

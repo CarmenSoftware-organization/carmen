@@ -47,10 +47,10 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-4 h-8"
+          className="-ml-4 h-8 text-xs"
         >
           PO Number
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       )
     },
@@ -74,14 +74,14 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-4 h-8"
+          className="-ml-4 h-8 text-xs"
         >
           Vendor
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="font-medium">{row.getValue("vendorName")}</div>,
+    cell: ({ row }) => <div className="font-medium text-xs">{row.getValue("vendorName")}</div>,
   },
   {
     accessorKey: "orderDate",
@@ -90,16 +90,16 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-4 h-8"
+          className="-ml-4 h-8 text-xs"
         >
           Order Date
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       )
     },
     cell: ({ row }) => {
       const date = row.getValue("orderDate") as Date
-      return <div>{date.toLocaleDateString()}</div>
+      return <div className="text-xs">{date.toLocaleDateString()}</div>
     },
   },
   {
@@ -109,21 +109,23 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-4 h-8"
+          className="-ml-4 h-8 text-xs"
         >
           Delivery Date
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       )
     },
     cell: ({ row }) => {
       const date = row.getValue("DeliveryDate") as Date | null
-      return <div>{date ? date.toLocaleDateString() : "N/A"}</div>
+      return <div className="text-xs">{date ? date.toLocaleDateString() : "N/A"}</div>
     },
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: ({ column }) => (
+      <span className="text-xs">Status</span>
+    ),
     cell: ({ row }) => {
       const status = row.getValue("status") as string
       return <StatusBadge status={status} />
@@ -137,10 +139,10 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="-mr-4 h-8"
+            className="-mr-4 h-8 text-xs"
           >
             Amount
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="ml-2 h-3 w-3" />
           </Button>
         </div>
       )
@@ -152,7 +154,7 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         maximumFractionDigits: 2,
       }).format(amount)
 
-      return <div className="text-right font-medium">{formatted}</div>
+      return <div className="text-right font-medium text-xs">{formatted}</div>
     },
   },
   {
@@ -162,14 +164,14 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-4 h-8"
+          className="-ml-4 h-8 text-xs"
         >
           Currency
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="font-medium">{row.getValue("currencyCode")}</div>,
+    cell: ({ row }) => <div className="font-medium text-xs">{row.getValue("currencyCode")}</div>,
   },
   {
     id: "actions",
@@ -183,29 +185,29 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
-                className="h-8 w-8 p-0"
+                className="h-6 w-6 p-0"
                 onClick={(e) => e.stopPropagation()}
               >
                 <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                <Printer className="mr-2 h-4 w-4" />
-                Print
+                <Printer className="mr-2 h-3 w-3" />
+                <span className="text-xs">Print</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                <FileDown className="mr-2 h-4 w-4" />
-                Download PDF
+                <FileDown className="mr-2 h-3 w-3" />
+                <span className="text-xs">Download PDF</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={(e) => e.stopPropagation()}
                 className="text-destructive focus:text-destructive"
               >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                <Trash2 className="mr-2 h-3 w-3" />
+                <span className="text-xs">Delete</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

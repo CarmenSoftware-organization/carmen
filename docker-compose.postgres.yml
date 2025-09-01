@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: carmen-postgres
+    environment:
+      POSTGRES_DB: carmen
+      POSTGRES_USER: carmen_user
+      POSTGRES_PASSWORD: carmen_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carmen_user -d carmen"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-mcp:
+    image: crystaldba/postgres-mcp
+    container_name: carmen-postgres-mcp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: carmen
+      PGUSER: carmen_user
+      PGPASSWORD: carmen_password
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:

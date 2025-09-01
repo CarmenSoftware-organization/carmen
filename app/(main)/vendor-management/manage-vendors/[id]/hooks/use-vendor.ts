@@ -1,101 +1,90 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/use-toast'
-import { updateVendor } from '../../actions'
-import { Vendor } from '../../../types'
-import { mockVendors } from '../../../lib/mock-data'
-
-type VendorWithEnvironmental = Vendor
+import { useVendor as useVendorQuery, useUpdateVendor, useDeleteVendor } from '@/lib/hooks'
+import type { Vendor } from '@/lib/types/vendor'
 
 export function useVendor(id: string) {
   const router = useRouter()
-  const [vendor, setVendor] = useState<VendorWithEnvironmental | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [vendorData, setVendorData] = useState<Vendor | null>(null)
 
-  useEffect(() => {
-    async function fetchVendor() {
-      try {
-        setIsLoading(true)
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Use centralized mock data
-        const mockVendor = mockVendors.find(v => v.id === id) || mockVendors[0]
-        
-        setVendor(mockVendor)
-        setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch vendor')
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  // Use React Query hooks for data fetching and mutations
+  const { 
+    data: vendor, 
+    isLoading, 
+    error,
+    refetch
+  } = useVendorQuery(id, { enabled: !!id })
 
-    if (id) {
-      fetchVendor()
+  const updateVendorMutation = useUpdateVendor()
+  const deleteVendorMutation = useDeleteVendor()
+
+  // Update local state when vendor data changes
+  React.useEffect(() => {
+    if (vendor && !vendorData) {
+      setVendorData(vendor)
     }
-  }, [id])
+  }, [vendor, vendorData])
 
   const handleEdit = () => setIsEditing(true)
-  const handleCancel = () => setIsEditing(false)
+  const handleCancel = () => {
+    setIsEditing(false)
+    // Reset changes by reverting to original data
+    setVendorData(vendor || null)
+  }
 
   const handleSave = async () => {
-    if (!vendor) return
+    if (!vendorData || !vendor) return
 
-    const result = await updateVendor(vendor)
-    
-    if (!result.success) {
-      const errorMessage = typeof result.error === 'string' ? result.error : "Failed to update vendor"
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
+    try {
+      await updateVendorMutation.mutateAsync({
+        id: vendor.id,
+        ...vendorData
       })
-      return
+      
+      setIsEditing(false)
+      // Refresh data to get latest from server
+      refetch()
+    } catch (error) {
+      // Error handling is done in the mutation hook
+      console.error('Failed to update vendor:', error)
     }
-
-    toast({
-      title: "Success",
-      description: "Vendor updated successfully"
-    })
-    
-    setIsEditing(false)
-    router.refresh()
   }
 
   const handleDelete = async () => {
+    if (!vendor) return
+
     try {
-      // Mock delete success
-      toast({
-        title: "Success",
-        description: "Vendor deleted successfully"
-      })
+      setIsDeleting(true)
+      await deleteVendorMutation.mutateAsync(vendor.id)
+      
+      // Navigate back to vendor list after successful deletion
       router.push('/vendor-management/manage-vendors')
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete vendor",
-        variant: "destructive"
-      })
+      // Error handling is done in the mutation hook
+      console.error('Failed to delete vendor:', error)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
   const handleFieldChange = (name: string, value: any) => {
-    setVendor(prev => {
+    setVendorData(prev => {
       if (!prev) return prev
       return { ...prev, [name]: value }
     })
   }
 
+  const isLoadingMutation = updateVendorMutation.isPending || deleteVendorMutation.isPending
+
   return {
-    vendor,
-    isLoading,
-    error,
+    vendor: vendorData || vendor,
+    isLoading: isLoading || isLoadingMutation,
+    error: error?.message,
     isEditing,
     isDeleting,
     handleEdit,
@@ -103,6 +92,10 @@ export function useVendor(id: string) {
     handleSave,
     handleDelete,
     handleFieldChange,
-    setIsDeleting
+    setIsDeleting,
+    refetch,
+    // Additional state for mutations
+    isSaving: updateVendorMutation.isPending,
+    isDeleting: isDeleting || deleteVendorMutation.isPending
   }
 } 

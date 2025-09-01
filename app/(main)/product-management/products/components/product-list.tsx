@@ -530,57 +530,55 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   if (error) return <div>Error: {error}</div>;
 
   const actionButtons = (
-    <div className="flex items-center space-x-2">
-      <Button onClick={handleAddProduct}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add Product
-      </Button>
-      <Button variant="outline" onClick={handleImport}>
-        <Upload className="mr-2 h-4 w-4" />
+    <div className="flex flex-wrap gap-2">
+      <Button variant="outline" className="h-8 px-3 text-xs" onClick={handleImport}>
+        <Upload className="h-3 w-3 mr-1" />
         Import
       </Button>
-      <Button variant="outline" onClick={handleGenerateReport}>
-        <FileText className="mr-2 h-4 w-4" />
+      <Button variant="outline" className="h-8 px-3 text-xs" onClick={handleGenerateReport}>
+        <FileText className="h-3 w-3 mr-1" />
         Report
+      </Button>
+      <Button className="h-8 px-3 text-xs font-medium" onClick={handleAddProduct}>
+        <Plus className="h-3 w-3 mr-1" />
+        Add Product
       </Button>
     </div>
   );
 
   const filters = (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div className="w-full sm:w-1/2 flex space-x-2">
+    <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+      <div className="relative flex-1 sm:flex-initial sm:w-80">
+        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
         <Input
           placeholder="Search products..."
-          className="w-full"
+          className="pl-7 h-8 text-xs"
           onChange={handleSearchChange}
           value={searchQuery}
         />
-        <Button variant="secondary" size="icon">
-          <Search className="h-4 w-4" />
-        </Button>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap gap-2">
         <AdvancedFilter 
           onApplyFilters={handleApplyFilters}
           onClearFilters={handleClearFilters}
         />
         
-        <div className="flex items-center border rounded-md ml-2">
+        <div className="flex items-center border rounded-md ml-auto">
           <Button
             variant={viewMode === 'table' ? 'default' : 'ghost'}
             size="sm"
-            className="rounded-r-none"
+            className="h-8 px-2 rounded-r-none border-0"
             onClick={() => setViewMode('table')}
           >
-            <List className="h-4 w-4" />
+            <List className="h-3 w-3" />
           </Button>
           <Button
             variant={viewMode === 'card' ? 'default' : 'ghost'}
             size="sm"
-            className="rounded-l-none"
+            className="h-8 px-2 rounded-l-none border-0"
             onClick={() => setViewMode('card')}
           >
-            <LayoutGrid className="h-4 w-4" />
+            <LayoutGrid className="h-3 w-3" />
           </Button>
         </div>
       </div>
@@ -591,10 +589,9 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     <div className="rounded-md border">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50/75">
-            <TableHead className="w-12 py-3">
+          <TableRow className="bg-muted/30">
+            <TableHead className="font-semibold text-xs py-2">
               <Checkbox 
-                className="ml-3"
                 checked={
                   getCurrentPageData().length > 0 &&
                   getCurrentPageData().every(product => 
@@ -605,98 +602,98 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
               />
             </TableHead>
             <TableHead 
-              className="py-3 font-medium text-gray-600 cursor-pointer"
+              className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('name')}
             >
               <div className="flex items-center gap-1">
                 Name
                 {sortField === 'name' && (
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 )}
               </div>
             </TableHead>
             <TableHead 
-              className="py-3 font-medium text-gray-600 cursor-pointer"
+              className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('categoryName')}
             >
               <div className="flex items-center gap-1">
                 Category
                 {sortField === 'categoryName' && (
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 )}
               </div>
             </TableHead>
             <TableHead 
-              className="py-3 font-medium text-gray-600 cursor-pointer"
+              className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('subCategoryName')}
             >
               <div className="flex items-center gap-1">
                 Subcategory
                 {sortField === 'subCategoryName' && (
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 )}
               </div>
             </TableHead>
             <TableHead 
-              className="py-3 font-medium text-gray-600 cursor-pointer"
+              className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('itemGroupName')}
             >
               <div className="flex items-center gap-1">
                 Item Group
                 {sortField === 'itemGroupName' && (
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 )}
               </div>
             </TableHead>
             <TableHead 
-              className="py-3 font-medium text-gray-600 cursor-pointer"
+              className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('primaryUnitName')}
             >
               <div className="flex items-center gap-1">
                 Inventory Unit
                 {sortField === 'primaryUnitName' && (
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 )}
               </div>
             </TableHead>
             <TableHead 
-              className="py-3 font-medium text-gray-600 cursor-pointer"
+              className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('basePrice')}
             >
               <div className="flex items-center gap-1">
                 Base Price
                 {sortField === 'basePrice' && (
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 )}
               </div>
             </TableHead>
             <TableHead 
-              className="py-3 font-medium text-gray-600 cursor-pointer"
+              className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('isActive')}
             >
               <div className="flex items-center gap-1">
                 Status
                 {sortField === 'isActive' && (
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3 w-3" />
                 )}
               </div>
             </TableHead>
-            <TableHead className="py-3 text-right font-medium text-gray-600">Actions</TableHead>
+            <TableHead className="font-semibold text-xs py-2 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {getCurrentPageData().map((product) => (
             <TableRow 
               key={product.id}
-              className="group hover:bg-gray-50/50 cursor-pointer border-b last:border-b-0"
+              className="hover:bg-muted/30 transition-colors"
             >
-              <TableCell className="py-4 pl-4" onClick={(e) => e.stopPropagation()}>
+              <TableCell className="py-2" onClick={(e) => e.stopPropagation()}>
                 <Checkbox 
                   checked={selectedItems.includes(product.id)}
                   onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
                 />
               </TableCell>
-              <TableCell className="py-4">
+              <TableCell className="py-2 text-xs">
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{product.name}</span>
@@ -704,50 +701,51 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                       {product.productCode}
                     </Badge>
                   </div>
-                  <span className="text-sm text-gray-500 mt-0.5">
+                  <span className="text-xs text-muted-foreground mt-0.5">
                     {product.description || 'No description available'}
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="py-4 text-gray-600">{product.categoryName || product.categoryId}</TableCell>
-              <TableCell className="py-4 text-gray-600">{product.subCategoryName || product.subCategoryId}</TableCell>
-              <TableCell className="py-4 text-gray-600">{product.itemGroupName || product.itemGroupId}</TableCell>
-              <TableCell className="py-4 text-gray-600">{product.primaryUnitName || '-'}</TableCell>
-              <TableCell className="py-4 text-gray-600">
+              <TableCell className="py-2 text-xs">{product.categoryName || product.categoryId}</TableCell>
+              <TableCell className="py-2 text-xs">{product.subCategoryName || product.subCategoryId}</TableCell>
+              <TableCell className="py-2 text-xs">{product.itemGroupName || product.itemGroupId}</TableCell>
+              <TableCell className="py-2 text-xs">{product.primaryUnitName || '-'}</TableCell>
+              <TableCell className="py-2 text-xs">
                 {product.basePrice ? `${product.basePrice} ${product.currency || ''}` : '-'}
               </TableCell>
-              <TableCell className="py-4">
+              <TableCell className="py-2">
                 <StatusBadge 
                   status={product.isActive ? 'Active' : 'Inactive'}
                 />
               </TableCell>
-              <TableCell className="py-4 text-right">
-                <div className="flex items-center space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleViewProduct(product.id)}
-                    title="View Product"
-                  >
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleEditProduct(product.id)}
-                    title="Edit Product"
-                  >
-                    <Edit className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteProduct(product.id)}
-                    title="Delete Product"
-                  >
-                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </div>
+              <TableCell className="py-2 text-right">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleViewProduct(product.id)}
+                  title="View Product"
+                >
+                  <FileText className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleEditProduct(product.id)}
+                  title="Edit Product"
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleDeleteProduct(product.id)}
+                  title="Delete Product"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
@@ -791,16 +789,16 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
             </div>
 
             {/* Card Header */}
-            <div className="p-5 pb-3 bg-muted/30 border-b">
+            <div className="p-4 pb-3 bg-muted/30 border-b">
               <div className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <Checkbox
                     checked={selectedItems.includes(product.id)}
                     onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
                   />
                   <div>
-                    <h3 className="text-lg font-semibold text-primary">{product.name}</h3>
-                    <Badge variant="secondary" className="mt-1">
+                    <h3 className="text-sm font-semibold text-primary">{product.name}</h3>
+                    <Badge variant="secondary" className="mt-1 text-xs px-2 py-0.5">
                       {product.productCode}
                     </Badge>
                   </div>
@@ -810,75 +808,75 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
             </div>
             
             {/* Card Content */}
-            <div className="p-5 flex-grow">
+            <div className="p-4 flex-grow">
               <div className="mb-3">
-                <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
-                <p className="text-sm line-clamp-2">{product.description || 'No description available'}</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Description</p>
+                <p className="text-xs line-clamp-2">{product.description || 'No description available'}</p>
               </div>
               
-              <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2 mt-3">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Category</p>
-                  <p className="text-sm font-medium">{product.categoryName || product.categoryId}</p>
+                  <p className="text-xs font-medium">{product.categoryName || product.categoryId}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Subcategory</p>
-                  <p className="text-sm font-medium">{product.subCategoryName || product.subCategoryId}</p>
+                  <p className="text-xs font-medium">{product.subCategoryName || product.subCategoryId}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Item Group</p>
-                  <p className="text-sm font-medium">{product.itemGroupName || product.itemGroupId}</p>
+                  <p className="text-xs font-medium">{product.itemGroupName || product.itemGroupId}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Inventory Unit</p>
-                  <p className="text-sm font-medium">{product.primaryUnitName || '-'}</p>
+                  <p className="text-xs font-medium">{product.primaryUnitName || '-'}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Base Price</p>
-                  <p className="text-sm font-medium">{product.basePrice ? `${product.basePrice} ${product.currency || ''}` : '-'}</p>
+                  <p className="text-xs font-medium">{product.basePrice ? `${product.basePrice} ${product.currency || ''}` : '-'}</p>
                 </div>
                 {product.taxType && (
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Tax Type</p>
-                  <p className="text-sm font-medium">{product.taxType}</p>
+                  <p className="text-xs font-medium">{product.taxType}</p>
                 </div>
                 )}
                 {product.barcode && (
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Barcode</p>
-                  <p className="text-sm font-medium">{product.barcode}</p>
+                  <p className="text-xs font-medium">{product.barcode}</p>
                 </div>
                 )}
               </div>
             </div>
             
             {/* Card Actions */}
-            <div className="flex justify-end px-4 py-3 bg-muted/20 border-t space-x-1">
+            <div className="flex justify-end px-4 py-3 bg-muted/20 border-t gap-1">
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={() => handleViewProduct(product.id)}
-                className="h-8 w-8 rounded-full"
+                className="h-6 w-6 p-0"
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="h-3 w-3" />
                 <span className="sr-only">View</span>
               </Button>
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={() => handleEditProduct(product.id)}
-                className="h-8 w-8 rounded-full"
+                className="h-6 w-6 p-0"
               >
-                <Edit className="h-4 w-4" />
+                <Edit className="h-3 w-3" />
                 <span className="sr-only">Edit</span>
               </Button>
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={() => handleDeleteProduct(product.id)}
-                className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3 w-3" />
                 <span className="sr-only">Delete</span>
               </Button>
             </div>
@@ -892,24 +890,24 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     <div className="flex-1 space-y-4">
       {selectedItems.length > 0 && (
         <div className="flex items-center gap-2 p-4 bg-muted/50 rounded-lg">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {selectedItems.length} items selected
           </p>
           <div className="flex-1" />
-          <Button variant="outline" size="sm" onClick={handleBulkExport}>
-            <Download className="h-4 w-4 mr-2" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleBulkExport}>
+            <Download className="h-3 w-3 mr-1" />
             Export Selected
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleBulkStatusUpdate(true)}>
-            <CheckCircle className="h-4 w-4 mr-2" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={() => handleBulkStatusUpdate(true)}>
+            <CheckCircle className="h-3 w-3 mr-1" />
             Set Active
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleBulkStatusUpdate(false)}>
-            <XCircle className="h-4 w-4 mr-2" />
+          <Button variant="outline" className="h-8 px-2 text-xs" onClick={() => handleBulkStatusUpdate(false)}>
+            <XCircle className="h-3 w-3 mr-1" />
             Set Inactive
           </Button>
-          <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-            <Trash2 className="h-4 w-4 mr-2" />
+          <Button variant="destructive" className="h-8 px-2 text-xs" onClick={handleBulkDelete}>
+            <Trash2 className="h-3 w-3 mr-1" />
             Delete Selected
           </Button>
         </div>
@@ -918,16 +916,19 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
       {getCurrentPageData().length > 0 ? (
         viewMode === 'table' ? renderTableView() : renderCardView()
       ) : (
-        <div className="text-center py-10 border rounded-lg bg-gray-50">
-          <p className="text-gray-600 mb-4">No products found</p>
-          <Button onClick={handleAddProduct}>Add Your First Product</Button>
+        <div className="text-center py-10 border rounded-lg bg-muted/30">
+          <p className="text-muted-foreground text-xs mb-4">No products found</p>
+          <Button className="h-8 px-3 text-xs font-medium" onClick={handleAddProduct}>
+            <Plus className="h-3 w-3 mr-1" />
+            Add Your First Product
+          </Button>
         </div>
       )}
 
       {/* Pagination */}
       {getCurrentPageData().length > 0 && (
-        <div className="flex items-center justify-between border-t pt-6 pb-4 px-2">
-          <p className="text-sm text-gray-500">
+        <div className="flex items-center justify-between border-t pt-4 pb-4 px-2">
+          <p className="text-xs text-muted-foreground">
             Page {currentPage} of {totalPages}
           </p>
           <div className="flex gap-2">
@@ -935,7 +936,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
               <Button
                 key={page}
                 variant={currentPage === page ? "default" : "outline"}
-                size="sm"
+                className="h-8 px-2 text-xs"
                 onClick={() => setCurrentPage(page)}
               >
                 {page}

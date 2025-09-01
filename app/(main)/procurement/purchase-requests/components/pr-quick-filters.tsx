@@ -72,7 +72,7 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
           variant={primaryFilter === 'my-pending' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => handlePrimaryFilter('my-pending')}
-          className="h-8 px-3"
+          className="h-8 px-3 text-xs"
         >
           My Pending
         </Button>
@@ -80,7 +80,7 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
           variant={primaryFilter === 'all-documents' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => handlePrimaryFilter('all-documents')}
-          className="h-8 px-3"
+          className="h-8 px-3 text-xs"
         >
           All Documents
         </Button>
@@ -92,9 +92,9 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
         {primaryFilter === 'all-documents' && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8">
+              <Button variant="outline" className="h-8 px-2 text-xs">
                 {activeFilter?.type === 'status' ? activeFilter.label : 'All Status'}
-                <ChevronDown className="ml-2 h-4 w-4" />
+                <ChevronDown className="ml-2 h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
@@ -103,7 +103,7 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
                   key={option.value}
                   onClick={() => onQuickFilter({ type: 'status', value: option.value, label: option.label })}
                 >
-                  {option.label}
+                  <span className="text-xs">{option.label}</span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -114,9 +114,9 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
         {primaryFilter === 'my-pending' && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8">
+              <Button variant="outline" className="h-8 px-2 text-xs">
                 {activeFilter?.type === 'stage' ? activeFilter.label : 'All Stage'}
-                <ChevronDown className="ml-2 h-4 w-4" />
+                <ChevronDown className="ml-2 h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
@@ -125,7 +125,7 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
                   key={option.value}
                   onClick={() => onQuickFilter({ type: 'stage', value: option.value, label: option.label })}
                 >
-                  {option.label}
+                  <span className="text-xs">{option.label}</span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -135,9 +135,9 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
         {/* Requester Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8">
+            <Button variant="outline" className="h-8 px-2 text-xs">
               {activeFilter?.type === 'requester' ? activeFilter.label : 'All Requester'}
-              <ChevronDown className="ml-2 h-4 w-4" />
+              <ChevronDown className="ml-2 h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-40">
@@ -146,7 +146,7 @@ export function PRQuickFilters({ onQuickFilter, activeFilter }: QuickFiltersProp
                 key={option.value}
                 onClick={() => onQuickFilter({ type: 'requester', value: option.value, label: option.label })}
               >
-                {option.label}
+                <span className="text-xs">{option.label}</span>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

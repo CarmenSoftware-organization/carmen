@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUser } from '@/lib/context/user-context';
+import { useKeycloakUser } from '@/lib/context/keycloak-user-context';
 
 interface SpotCheckSetupProps {
   formData: {
@@ -48,7 +48,7 @@ const departments = [
 ];
 
 export function SpotCheckSetup({ formData, setFormData, onNext, onBack, onStartCount }: SpotCheckSetupProps) {
-  const { user } = useUser();
+  const { user } = useKeycloakUser();
 
   useEffect(() => {
     if (user) {

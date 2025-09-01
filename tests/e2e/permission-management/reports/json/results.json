@@ -1,0 +1,1446 @@
+{
+  "config": {
+    "configFile": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/playwright.config.ts",
+    "rootDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "reports/html"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "reports/json/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "reports/junit.xml"
+        }
+      ],
+      [
+        "line",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "mobile-safari",
+        "name": "mobile-safari",
+        "testDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "tablet-chrome",
+        "name": "tablet-chrome",
+        "testDir": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 4,
+    "webServer": {
+      "command": "npm run dev",
+      "port": 3004,
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "toggle.test.ts",
+      "file": "toggle.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "RBAC/ABAC Toggle Functionality",
+          "file": "toggle.test.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should switch from RBAC to ABAC mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15850,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2347\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2347\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2347\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2301ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2301ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 44
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2375,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2347\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2347\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:00.119Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    },
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14086,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2338\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2338\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2338\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2291ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2291ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 1,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 48
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2356,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2338\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2338\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:17.386Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b5350cd01ef4c26aa5a1-1f9971bcf1642a145f19",
+              "file": "toggle.test.ts",
+              "line": 38,
+              "column": 7
+            },
+            {
+              "title": "should switch from RBAC to ABAC mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 18670,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2491\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2491\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2491\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2360ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2360ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 63
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2515,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2491\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2491\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:00.114Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    },
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 15933,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2487\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2487\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2487\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2408ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2408ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 1,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 168
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2596,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2487\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2487\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:20.590Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-firefox-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b5350cd01ef4c26aa5a1-833b27ee341829c0c81f",
+              "file": "toggle.test.ts",
+              "line": 38,
+              "column": 7
+            },
+            {
+              "title": "should switch from RBAC to ABAC mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 17013,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2364\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2364\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2364\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2311ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2311ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 71
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2385,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2364\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2364\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:00.103Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 14646,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2429\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2429\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2429\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2337ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2337ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 1,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 51
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2449,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2429\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2429\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:17.960Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-webkit-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b5350cd01ef4c26aa5a1-33ce0a4509ae6d5781e5",
+              "file": "toggle.test.ts",
+              "line": 38,
+              "column": 7
+            },
+            {
+              "title": "should switch from RBAC to ABAC mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 18969,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('h1:has-text(\"Policy Management\")')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Policy Management\")')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('h1:has-text(\"Policy Management\")')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Policy Management\")')\u001b[22m\n\n    at PermissionManagementPage.expectElementVisible (/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/base/BasePage.ts:114:27)\n    at PermissionManagementPage.navigateToPermissionManagement (/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/pages/PermissionManagementPage.ts:51:12)\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:20:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/base/BasePage.ts",
+                          "column": 27,
+                          "line": 114
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/base/BasePage.ts:114\n\n  112 |   async expectElementVisible(selector: string, timeout: number = 5000): Promise<void> {\n  113 |     const element = this.page.locator(selector);\n> 114 |     await expect(element).toBeVisible({ timeout });\n      |                           ^\n  115 |   }\n  116 |\n  117 |   async expectElementHidden(selector: string, timeout: number = 5000): Promise<void> {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/base/BasePage.ts",
+                            "column": 27,
+                            "line": 114
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('h1:has-text(\"Policy Management\")')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1:has-text(\"Policy Management\")')\u001b[22m\n\n\n   at ../page-objects/base/BasePage.ts:114\n\n  112 |   async expectElementVisible(selector: string, timeout: number = 5000): Promise<void> {\n  113 |     const element = this.page.locator(selector);\n> 114 |     await expect(element).toBeVisible({ timeout });\n      |                           ^\n  115 |   }\n  116 |\n  117 |   async expectElementHidden(selector: string, timeout: number = 5000): Promise<void> {\n    at PermissionManagementPage.expectElementVisible (/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/base/BasePage.ts:114:27)\n    at PermissionManagementPage.navigateToPermissionManagement (/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/pages/PermissionManagementPage.ts:51:12)\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:20:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-29T06:09:00.132Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/page-objects/base/BasePage.ts",
+                        "column": 27,
+                        "line": 114
+                      }
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 14802,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2442\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2442\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2442\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2325ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2325ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 1,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 71
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2479,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2442\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2442\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:20.605Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-chrome-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b5350cd01ef4c26aa5a1-41769e1e47b3be7a2914",
+              "file": "toggle.test.ts",
+              "line": 38,
+              "column": 7
+            },
+            {
+              "title": "should switch from RBAC to ABAC mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14105,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2298ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2298ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 48
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2372,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:32.225Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    },
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 13769,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2397\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2397\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2397\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2336ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2336ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 1,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 48
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2417,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2397\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2397\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:46.815Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-mobile-safari-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b5350cd01ef4c26aa5a1-dc448a66ed6a55fa20da",
+              "file": "toggle.test.ts",
+              "line": 38,
+              "column": 7
+            },
+            {
+              "title": "should switch from RBAC to ABAC mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-chrome",
+                  "projectName": "tablet-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 14104,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2306ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2306ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 37
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2369,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2348\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:33.655Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    },
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 13778,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2422\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2422\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                        "location": {
+                          "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                          "column": 28,
+                          "line": 47
+                        },
+                        "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                            "column": 28,
+                            "line": 47
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2422\u001b[39m\n\n  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Navigating to: http://localhost:3005/system-administration/permission-management/policies\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Page loaded indicator not found, checking for basic page elements\n"
+                        },
+                        {
+                          "text": "Already in RBAC mode, skipping switch\n"
+                        },
+                        {
+                          "text": "Switching from RBAC to ABAC mode\n"
+                        },
+                        {
+                          "text": "No migration dialog appeared, direct tab switch completed\n"
+                        },
+                        {
+                          "text": "Tab switch took 2351ms\n"
+                        },
+                        {
+                          "text": "Successfully switched to ABAC mode\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "Tab switch took 2351ms, which exceeds 500ms benchmark\n"
+                        }
+                      ],
+                      "retry": 1,
+                      "steps": [
+                        {
+                          "title": "Switch to RBAC mode first",
+                          "duration": 38
+                        },
+                        {
+                          "title": "Switch to ABAC mode",
+                          "duration": 2443,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2422\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m500\u001b[39m\nReceived:   \u001b[31m2422\u001b[39m\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:47:28\n    at /Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts:45:5",
+                            "location": {
+                              "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                              "column": 28,
+                              "line": 47
+                            },
+                            "snippet": "  45 |     await test.step('Switch to ABAC mode', async () => {\n  46 |       const responseTime = await permissionPage.measureToggleResponseTime();\n> 47 |       expect(responseTime).toBeLessThan(testConfig.performance.toggleResponseBenchmark);\n     |                            ^\n  48 |       \n  49 |       await permissionPage.toggleToABAC();\n  50 |       const mode = await permissionPage.getCurrentMode();"
+                          }
+                        }
+                      ],
+                      "startTime": "2025-08-29T06:09:48.514Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/test-results/toggle-RBAC-ABAC-Toggle-Fu-0c44c-itch-from-RBAC-to-ABAC-mode-tablet-chrome-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/peak/Documents/GitHub/carmen/tests/e2e/permission-management/specs/toggle.test.ts",
+                        "column": 28,
+                        "line": 47
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b5350cd01ef4c26aa5a1-8a09b298798e0c0ddebf",
+              "file": "toggle.test.ts",
+              "line": 38,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-29T06:08:59.782Z",
+    "duration": 62927.225,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 6,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "id": "carmen-web-dev",
+  "clientId": "carmen-web-dev",
+  "name": "Carmen ERP Web Application (Development)",
+  "description": "Development environment client for Carmen ERP web application",
+  "enabled": true,
+  "clientAuthenticatorType": "client-secret",
+  "secret": "dev-client-secret-change-in-production",
+  "registrationAccessToken": "",
+  "redirectUris": [
+    "http://localhost:3000/api/auth/callback/keycloak",
+    "http://localhost:3000/auth/callback",
+    "http://127.0.0.1:3000/api/auth/callback/keycloak",
+    "http://127.0.0.1:3000/auth/callback",
+    "http://dev.carmen-erp.local:3000/api/auth/callback/keycloak",
+    "http://dev.carmen-erp.local:3000/auth/callback"
+  ],
+  "webOrigins": [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://dev.carmen-erp.local:3000"
+  ],
+  "baseUrl": "http://localhost:3000",
+  "adminUrl": "http://localhost:3000",
+  "rootUrl": "http://localhost:3000",
+  "protocol": "openid-connect",
+  "access": {
+    "view": true,
+    "configure": true,
+    "manage": true
+  },
+  "standardFlowEnabled": true,
+  "implicitFlowEnabled": false,
+  "directAccessGrantsEnabled": true,
+  "serviceAccountsEnabled": false,
+  "publicClient": false,
+  "frontchannelLogout": true,
+  "fullScopeAllowed": false,
+  "nodeReRegistrationTimeout": 0,
+  "defaultClientScopes": [
+    "web-origins",
+    "acr",
+    "profile",
+    "roles",
+    "email",
+    "carmen-erp"
+  ],
+  "optionalClientScopes": [
+    "address",
+    "phone",
+    "offline_access",
+    "microprofile-jwt"
+  ],
+  "attributes": {
+    "access.token.lifespan": "1800",
+    "client.secret.creation.time": "1640000000",
+    "oauth2.device.authorization.grant.enabled": "false",
+    "oidc.ciba.grant.enabled": "false",
+    "backchannel.logout.session.required": "true",
+    "backchannel.logout.revoke.offline.tokens": "false",
+    "display.on.consent.screen": "false",
+    "post.logout.redirect.uris": "http://localhost:3000/auth/signout+http://127.0.0.1:3000/auth/signout+http://dev.carmen-erp.local:3000/auth/signout"
+  },
+  "authenticationFlowBindingOverrides": {},
+  "protocolMappers": [
+    {
+      "id": "audience-mapper",
+      "name": "audience-mapper",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-audience-mapper",
+      "consentRequired": false,
+      "config": {
+        "included.client.audience": "carmen-web-dev",
+        "id.token.claim": "false",
+        "access.token.claim": "true"
+      }
+    },
+    {
+      "id": "groups-mapper",
+      "name": "groups-mapper",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-group-membership-mapper",
+      "consentRequired": false,
+      "config": {
+        "full.path": "false",
+        "id.token.claim": "true",
+        "access.token.claim": "true",
+        "claim.name": "groups",
+        "userinfo.token.claim": "true"
+      }
+    }
+  ]
+}

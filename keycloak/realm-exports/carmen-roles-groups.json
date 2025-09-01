@@ -1,0 +1,423 @@
+{
+  "roles": {
+    "realm": [
+      {
+        "id": "carmen-super-admin",
+        "name": "carmen-super-admin",
+        "description": "Super Administrator - Full system access",
+        "composite": true,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["100"],
+          "permissions": [
+            "system:*",
+            "user:*",
+            "vendor:*",
+            "product:*",
+            "inventory:*",
+            "procurement:*",
+            "financial:*",
+            "reporting:*",
+            "admin:*"
+          ]
+        }
+      },
+      {
+        "id": "carmen-admin",
+        "name": "carmen-admin",
+        "description": "System Administrator - System configuration and user management",
+        "composite": true,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["90"],
+          "permissions": [
+            "system:read",
+            "system:write",
+            "user:read",
+            "user:write",
+            "vendor:read",
+            "vendor:write",
+            "product:read",
+            "product:write",
+            "inventory:read",
+            "procurement:read",
+            "reporting:read"
+          ]
+        }
+      },
+      {
+        "id": "carmen-financial-manager",
+        "name": "carmen-financial-manager",
+        "description": "Financial Manager - Financial oversight and approval authority",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["80"],
+          "permissions": [
+            "financial:read",
+            "financial:write",
+            "financial:approve",
+            "procurement:read",
+            "procurement:approve",
+            "vendor:read",
+            "reporting:read",
+            "reporting:financial"
+          ],
+          "approvalLimit": ["unlimited"],
+          "clearanceLevel": ["confidential"]
+        }
+      },
+      {
+        "id": "carmen-department-manager",
+        "name": "carmen-department-manager",
+        "description": "Department Manager - Departmental oversight and approval",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["70"],
+          "permissions": [
+            "procurement:read",
+            "procurement:write",
+            "procurement:approve_department",
+            "inventory:read",
+            "inventory:write",
+            "vendor:read",
+            "product:read",
+            "reporting:read",
+            "reporting:department"
+          ],
+          "approvalLimit": ["50000"],
+          "clearanceLevel": ["internal"]
+        }
+      },
+      {
+        "id": "carmen-purchasing-staff",
+        "name": "carmen-purchasing-staff",
+        "description": "Purchasing Staff - Procurement operations and vendor management",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["60"],
+          "permissions": [
+            "procurement:read",
+            "procurement:write",
+            "procurement:create",
+            "vendor:read",
+            "vendor:write",
+            "vendor:create",
+            "product:read",
+            "inventory:read",
+            "reporting:read"
+          ],
+          "approvalLimit": ["10000"],
+          "clearanceLevel": ["internal"]
+        }
+      },
+      {
+        "id": "carmen-chef",
+        "name": "carmen-chef",
+        "description": "Chef - Kitchen operations and recipe management",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["50"],
+          "permissions": [
+            "operational-planning:read",
+            "operational-planning:write",
+            "inventory:read",
+            "inventory:write",
+            "procurement:read",
+            "procurement:create_request",
+            "product:read",
+            "reporting:read"
+          ],
+          "approvalLimit": ["5000"],
+          "clearanceLevel": ["internal"]
+        }
+      },
+      {
+        "id": "carmen-counter",
+        "name": "carmen-counter",
+        "description": "Counter Staff - Point of sale and inventory counting",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["30"],
+          "permissions": [
+            "inventory:read",
+            "inventory:count",
+            "product:read",
+            "store-operations:read",
+            "store-operations:write"
+          ],
+          "clearanceLevel": ["public"]
+        }
+      },
+      {
+        "id": "carmen-staff",
+        "name": "carmen-staff",
+        "description": "General Staff - Basic system access",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "carmen",
+        "attributes": {
+          "hierarchy": ["10"],
+          "permissions": [
+            "inventory:read",
+            "product:read",
+            "procurement:read_own",
+            "store-operations:read"
+          ],
+          "clearanceLevel": ["public"]
+        }
+      }
+    ],
+    "client": {}
+  },
+  "groups": [
+    {
+      "id": "departments",
+      "name": "Departments",
+      "path": "/Departments",
+      "attributes": {
+        "description": ["Organizational departments"]
+      },
+      "subGroups": [
+        {
+          "id": "dept-procurement",
+          "name": "Procurement",
+          "path": "/Departments/Procurement",
+          "attributes": {
+            "department_code": ["PROC"],
+            "cost_center": ["CC-PROC-001"],
+            "description": ["Procurement and purchasing operations"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "dept-finance",
+          "name": "Finance",
+          "path": "/Departments/Finance",
+          "attributes": {
+            "department_code": ["FIN"],
+            "cost_center": ["CC-FIN-001"],
+            "description": ["Financial management and accounting"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "dept-kitchen",
+          "name": "Kitchen",
+          "path": "/Departments/Kitchen",
+          "attributes": {
+            "department_code": ["KITCH"],
+            "cost_center": ["CC-KITCH-001"],
+            "description": ["Food preparation and kitchen operations"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "dept-fb",
+          "name": "Food & Beverage",
+          "path": "/Departments/Food & Beverage",
+          "attributes": {
+            "department_code": ["F&B"],
+            "cost_center": ["CC-FB-001"],
+            "description": ["Food and beverage service operations"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "dept-housekeeping",
+          "name": "Housekeeping",
+          "path": "/Departments/Housekeeping",
+          "attributes": {
+            "department_code": ["HK"],
+            "cost_center": ["CC-HK-001"],
+            "description": ["Housekeeping and maintenance operations"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "dept-admin",
+          "name": "Administration",
+          "path": "/Departments/Administration",
+          "attributes": {
+            "department_code": ["ADMIN"],
+            "cost_center": ["CC-ADMIN-001"],
+            "description": ["Administrative and management functions"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        }
+      ],
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "locations",
+      "name": "Locations",
+      "path": "/Locations",
+      "attributes": {
+        "description": ["Physical locations and facilities"]
+      },
+      "subGroups": [
+        {
+          "id": "loc-main-hotel",
+          "name": "Main Hotel",
+          "path": "/Locations/Main Hotel",
+          "attributes": {
+            "location_code": ["HOTEL-MAIN"],
+            "location_type": ["hotel"],
+            "address": ["123 Hospitality Avenue, City, State 12345"],
+            "description": ["Primary hotel facility"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": [
+            {
+              "id": "loc-main-kitchen",
+              "name": "Main Kitchen",
+              "path": "/Locations/Main Hotel/Main Kitchen",
+              "attributes": {
+                "location_code": ["KITCHEN-MAIN"],
+                "location_type": ["kitchen"],
+                "parent_location": ["HOTEL-MAIN"],
+                "description": ["Main hotel kitchen"]
+              },
+              "realmRoles": [],
+              "clientRoles": {},
+              "subGroups": []
+            },
+            {
+              "id": "loc-restaurant",
+              "name": "Hotel Restaurant",
+              "path": "/Locations/Main Hotel/Hotel Restaurant",
+              "attributes": {
+                "location_code": ["REST-MAIN"],
+                "location_type": ["restaurant"],
+                "parent_location": ["HOTEL-MAIN"],
+                "description": ["Main hotel restaurant"]
+              },
+              "realmRoles": [],
+              "clientRoles": {},
+              "subGroups": []
+            }
+          ]
+        },
+        {
+          "id": "loc-warehouse",
+          "name": "Central Warehouse",
+          "path": "/Locations/Central Warehouse",
+          "attributes": {
+            "location_code": ["WAREHOUSE-CENTRAL"],
+            "location_type": ["warehouse"],
+            "address": ["456 Storage Drive, City, State 12345"],
+            "description": ["Central storage and distribution facility"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "loc-office",
+          "name": "Administrative Office",
+          "path": "/Locations/Administrative Office",
+          "attributes": {
+            "location_code": ["OFFICE-ADMIN"],
+            "location_type": ["office"],
+            "address": ["789 Business Plaza, City, State 12345"],
+            "description": ["Administrative headquarters"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        }
+      ],
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
+      "id": "clearance-levels",
+      "name": "Clearance Levels",
+      "path": "/Clearance Levels",
+      "attributes": {
+        "description": ["Security clearance levels for data access"]
+      },
+      "subGroups": [
+        {
+          "id": "clearance-public",
+          "name": "Public",
+          "path": "/Clearance Levels/Public",
+          "attributes": {
+            "clearance_level": ["public"],
+            "access_level": ["1"],
+            "description": ["Public information access"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "clearance-internal",
+          "name": "Internal",
+          "path": "/Clearance Levels/Internal",
+          "attributes": {
+            "clearance_level": ["internal"],
+            "access_level": ["2"],
+            "description": ["Internal information access"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "clearance-confidential",
+          "name": "Confidential",
+          "path": "/Clearance Levels/Confidential",
+          "attributes": {
+            "clearance_level": ["confidential"],
+            "access_level": ["3"],
+            "description": ["Confidential information access"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "clearance-restricted",
+          "name": "Restricted",
+          "path": "/Clearance Levels/Restricted",
+          "attributes": {
+            "clearance_level": ["restricted"],
+            "access_level": ["4"],
+            "description": ["Restricted information access"]
+          },
+          "realmRoles": [],
+          "clientRoles": {},
+          "subGroups": []
+        }
+      ],
+      "realmRoles": [],
+      "clientRoles": {}
+    }
+  ]
+}

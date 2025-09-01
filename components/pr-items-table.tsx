@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ItemDetailsEditForm } from "@/app/(main)/procurement/purchase-requests/components/item-details-edit-form";
-import { useUser } from "@/lib/context/user-context";
+import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
 
 const mockRelatedPRItems = [
   {
@@ -55,7 +55,7 @@ const mockRelatedPRItems = [
 ];
 
 export function PrItemsTable() {
-  const { user } = useUser();
+  const { user } = useKeycloakUser();
   const [items, setItems] = useState(mockRelatedPRItems);
   const [editMode, setEditMode] = useState(false);
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);

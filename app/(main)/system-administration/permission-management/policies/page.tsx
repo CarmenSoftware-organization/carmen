@@ -1,17 +1,19 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PolicyList } from '@/components/permissions/policy-manager/policy-list';
 import { PolicyFiltersComponent, PolicyFilters } from '@/components/permissions/policy-manager/policy-filters';
-import { allMockPolicies } from '@/lib/mock-data/permission-index';
+import { allMockPolicies, roleBasedPolicies } from '@/lib/mock-data/permission-index';
 import { Policy, EffectType } from '@/lib/types/permissions';
 import { ResourceType } from '@/lib/types/permission-resources';
 
 export default function PolicyManagementPage() {
   const [showFilters, setShowFilters] = useState(false);
+  const [policyType, setPolicyType] = useState<'rbac' | 'abac'>('rbac'); // Default to role-based
   const [filters, setFilters] = useState<PolicyFilters>({
     search: '',
     effect: 'all',
@@ -46,7 +48,8 @@ export default function PolicyManagementPage() {
 
   // Filter policies based on current filters
   const filteredPolicies = useMemo(() => {
-    return allMockPolicies.filter(policy => {
+    const policies = policyType === 'rbac' ? roleBasedPolicies : allMockPolicies;
+    return policies.filter(policy => {
       // Search filter
       if (filters.search && !policy.name.toLowerCase().includes(filters.search.toLowerCase()) &&
           !policy.description.toLowerCase().includes(filters.search.toLowerCase())) {
@@ -76,7 +79,7 @@ export default function PolicyManagementPage() {
 
       return true;
     });
-  }, [filters]);
+  }, [filters, policyType]);
 
   const handleCreatePolicy = () => {
     // Navigate to policy builder
@@ -122,11 +125,14 @@ export default function PolicyManagementPage() {
   return (
     <div className="container mx-auto py-6 px-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Policy Management</h1>
-          <p className="text-muted-foreground">
-            Create and manage attribute-based access control policies for Carmen ERP resources.
-          </p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">Policy Management</h1>
+            <p className="text-muted-foreground">
+              Create and manage access control policies for Carmen ERP resources.
+            </p>
+          </div>
+          
         </div>
         
         <div className="flex items-center space-x-2 md:mt-0">
@@ -136,9 +142,16 @@ export default function PolicyManagementPage() {
           >
             Filters
           </Button>
+          <Button 
+            variant="outline"
+            onClick={() => window.location.href = '/system-administration/permission-management/policies/simple'}
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Simple Creator
+          </Button>
           <Button onClick={handleCreatePolicy}>
             <Plus className="mr-2 h-4 w-4" />
-            Create Policy
+            Advanced Builder
           </Button>
         </div>
       </div>
@@ -156,6 +169,8 @@ export default function PolicyManagementPage() {
 
       {/* Policy List */}
       <PolicyList
+        policyType={policyType}
+        onPolicyTypeChange={setPolicyType}
         onCreatePolicy={handleCreatePolicy}
         onEditPolicy={handleEditPolicy}
         onViewPolicy={handleViewPolicy}

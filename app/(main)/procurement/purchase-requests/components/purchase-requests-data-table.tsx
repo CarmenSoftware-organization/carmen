@@ -213,36 +213,35 @@ export function PurchaseRequestsDataTable<TData, TValue>({
 
   return (
     <div className="w-full space-y-4">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search purchase requests..."
-              value={globalFilter ?? ""}
-              onChange={(event) => setGlobalFilter(event.target.value)}
-              className="pl-8 h-9 w-[250px] lg:w-[300px]"
-            />
-          </div>
-          
+      {/* Search and Filter Row */}
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+        <div className="relative flex-1 sm:flex-initial sm:w-80">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+          <Input
+            placeholder="Search purchase requests..."
+            value={globalFilter ?? ""}
+            onChange={(event) => setGlobalFilter(event.target.value)}
+            className="pl-7 h-8 text-xs"
+          />
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
           <PRQuickFilters 
             onQuickFilter={handleQuickFilter}
             activeFilter={quickFilter}
           />
-        </div>
-        
-        <div className="flex items-center space-x-2">
+          
           <PRAdvancedFilter 
             onApplyFilters={handleApplyFilters}
             onClearFilters={handleClearFilters}
             activeFiltersCount={appliedFilters.length}
           />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" className="h-8 px-2 text-xs">
                 Columns
-                <ChevronDown className="ml-2 h-4 w-4" />
+                <ChevronDown className="ml-2 h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[150px]">
@@ -256,7 +255,7 @@ export function PurchaseRequestsDataTable<TData, TValue>({
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className="capitalize text-xs"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
@@ -269,25 +268,23 @@ export function PurchaseRequestsDataTable<TData, TValue>({
             </DropdownMenuContent>
           </DropdownMenu>
           
-          {/* View Mode Toggle */}
-          <div className="flex border rounded-md overflow-hidden">
+          {/* View Mode Toggle - positioned at far right */}
+          <div className="flex items-center border rounded-md ml-auto">
             <Button
               variant={viewMode === 'table' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewModeChange('table')}
-              className="rounded-none h-8 px-2"
+              className="h-8 px-2 rounded-r-none border-0"
             >
-              <List className="h-4 w-4" />
-              <span className="sr-only">Table View</span>
+              <List className="h-3 w-3" />
             </Button>
             <Button
               variant={viewMode === 'card' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onViewModeChange('card')}
-              className="rounded-none h-8 px-2"
+              className="h-8 px-2 rounded-l-none border-0"
             >
-              <LayoutGrid className="h-4 w-4" />
-              <span className="sr-only">Card View</span>
+              <LayoutGrid className="h-3 w-3" />
             </Button>
           </div>
         </div>
@@ -297,7 +294,7 @@ export function PurchaseRequestsDataTable<TData, TValue>({
       {appliedFilters.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center">
           {appliedFilters.map((filter, index) => (
-            <Badge key={index} variant="outline" className="flex items-center gap-1 px-2 py-1">
+            <Badge key={index} variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
               {`${filter.field} ${filter.operator} ${filter.value}`}
               <button 
                 onClick={() => {
@@ -310,7 +307,7 @@ export function PurchaseRequestsDataTable<TData, TValue>({
               </button>
             </Badge>
           ))}
-          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={handleClearFilters}>
+          <Button variant="ghost" size="sm" className="text-xs h-6" onClick={handleClearFilters}>
             Clear all
           </Button>
         </div>
@@ -323,10 +320,10 @@ export function PurchaseRequestsDataTable<TData, TValue>({
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow key={headerGroup.id} className="bg-muted/30">
                     {headerGroup.headers.map((header) => {
                       return (
-                        <TableHead key={header.id} className="h-12">
+                        <TableHead key={header.id} className="font-semibold text-xs py-2">
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -345,10 +342,10 @@ export function PurchaseRequestsDataTable<TData, TValue>({
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-muted/50"
+                      className="hover:bg-muted/30 transition-colors"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="py-4">
+                        <TableCell key={cell.id} className="py-2 text-xs">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -361,7 +358,7 @@ export function PurchaseRequestsDataTable<TData, TValue>({
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center"
+                      className="h-24 text-center text-xs"
                     >
                       No results.
                     </TableCell>
@@ -377,47 +374,47 @@ export function PurchaseRequestsDataTable<TData, TValue>({
 
       {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+        <div className="flex-1 text-xs text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="flex items-center space-x-2">
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-1">
             <Button
               variant="outline"
-              size="sm"
+              className="h-8 px-2"
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <ChevronsLeft className="h-4 w-4" />
+              <ChevronsLeft className="h-3 w-3" />
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              className="h-8 px-2"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3 w-3" />
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              className="h-8 px-2"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3 w-3" />
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              className="h-8 px-2"
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <ChevronsRight className="h-4 w-4" />
+              <ChevronsRight className="h-3 w-3" />
             </Button>
           </div>
         </div>

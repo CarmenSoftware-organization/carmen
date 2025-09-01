@@ -8,8 +8,8 @@
  * import { mockUsers, mockVendors, mockProducts } from '@/lib/mock-data'
  */
 
-// Core entity mock data
-export * from './users'
+// Core entity mock data - excluding conflicting exports from users
+export { mockUsers } from './users'
 export * from './inventory'
 export * from './procurement'
 export * from './vendors'
@@ -18,6 +18,20 @@ export * from './recipes'
 export * from './finance'
 export * from './campaigns'
 export * from './pricelists'
+
+// Export roles, departments, locations and helper functions from users for compatibility
+export { 
+  mockRoles,
+  mockDepartments,
+  mockLocations,
+  getMockUserById,
+  getMockUsersByRole,
+  getMockUsersByDepartment,
+  getMockRoleById,
+  getMockDepartmentById,
+  getMockLocationById,
+  getLocationsByDepartment
+} from './users'
 
 // Mock data factories
 export * from './factories'
@@ -31,8 +45,30 @@ export * from './policy-builder-sample-actions'
 export * from './policy-builder-templates'
 export * from './policy-builder-sample-policies'
 
-// Permission system mock data
-export * from './permission-index'
+// Permission system mock data - explicit exports to avoid conflicts
+export {
+  // Permission roles and policies
+  allMockPolicies,
+  roleBasedPolicies,
+  roleBasedTemplates,
+  rolePermissionMappings,
+  getRolePermissions,
+  roleHasPermission,
+  getRoleRestrictions,
+  getRoleApprovalLimit,
+  type RolePermissions
+} from './permission-index'
+
+// Export additional permission functionality
+export {
+  mockRoleAssignments,
+  getRoleHierarchy,
+  getInheritedPermissions,
+  getUserRoles,
+  getUserDepartments,
+  getUserLocations,
+  type RoleAssignment
+} from './permission-roles'
+
 export * from './permission-policies'
-export * from './permission-roles'
 export * from './permission-subscriptions'
