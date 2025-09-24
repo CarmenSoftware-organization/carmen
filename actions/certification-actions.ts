@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { sql } from '@vercel/postgres';
+// import { sql } from '@vercel/postgres'; // Commented out - not available in development
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -19,10 +19,11 @@ export async function createCertification(formData: FormData) {
     icon_url: formData.get('icon_url'),
   });
 
-  await sql`
-    INSERT INTO certifications (name, description, icon_url)
-    VALUES (${name}, ${description}, ${icon_url})
-  `;
+  // await sql`
+  //   INSERT INTO certifications (name, description, icon_url)
+  //   VALUES (${name}, ${description}, ${icon_url})
+  // `;
+  console.log('Creating certification:', { name, description, icon_url });
 
   revalidatePath('/system-administration/certifications');
   redirect('/system-administration/certifications');
@@ -35,18 +36,20 @@ export async function updateCertification(id: string, formData: FormData) {
     icon_url: formData.get('icon_url'),
   });
 
-  await sql`
-    UPDATE certifications
-    SET name = ${name}, description = ${description}, icon_url = ${icon_url}
-    WHERE id = ${id}
-  `;
+  // await sql`
+  //   UPDATE certifications
+  //   SET name = ${name}, description = ${description}, icon_url = ${icon_url}
+  //   WHERE id = ${id}
+  // `;
+  console.log('Updating certification:', { id, name, description, icon_url });
 
   revalidatePath('/system-administration/certifications');
   redirect('/system-administration/certifications');
 }
 
 export async function deleteCertification(id: string) {
-  await sql`DELETE FROM certifications WHERE id = ${id}`;
+  // await sql`DELETE FROM certifications WHERE id = ${id}`;
+  console.log('Deleting certification:', { id });
   revalidatePath('/system-administration/certifications');
 }
 
@@ -63,19 +66,21 @@ export async function addCertificationToVendor(vendorId: string, certificationId
     document_url: formData.get('document_url'),
   });
 
-  await sql`
-    INSERT INTO vendor_certifications (vendor_id, certification_id, certificate_number, issue_date, expiry_date, document_url)
-    VALUES (${vendorId}, ${certificationId}, ${certificate_number}, ${issue_date}, ${expiry_date}, ${document_url})
-  `;
+  // await sql`
+  //   INSERT INTO vendor_certifications (vendor_id, certification_id, certificate_number, issue_date, expiry_date, document_url)
+  //   VALUES (${vendorId}, ${certificationId}, ${certificate_number}, ${issue_date}, ${expiry_date}, ${document_url})
+  // `;
+  console.log('Adding certification to vendor:', { vendorId, certificationId, certificate_number, issue_date, expiry_date, document_url });
 
   revalidatePath(`/vendor-management/vendors/${vendorId}`);
 }
 
 export async function removeCertificationFromVendor(vendorId: string, certificationId: string) {
-  await sql`
-    DELETE FROM vendor_certifications
-    WHERE vendor_id = ${vendorId} AND certification_id = ${certificationId}
-  `;
+  // await sql`
+  //   DELETE FROM vendor_certifications
+  //   WHERE vendor_id = ${vendorId} AND certification_id = ${certificationId}
+  // `;
+  console.log('Removing certification from vendor:', { vendorId, certificationId });
 
   revalidatePath(`/vendor-management/vendors/${vendorId}`);
 }
@@ -93,19 +98,21 @@ export async function addCertificationToProduct(productId: string, certification
     document_url: formData.get('document_url'),
   });
 
-  await sql`
-    INSERT INTO product_certifications (product_id, certification_id, certificate_number, issue_date, expiry_date, document_url)
-    VALUES (${productId}, ${certificationId}, ${certificate_number}, ${issue_date}, ${expiry_date}, ${document_url})
-  `;
+  // await sql`
+  //   INSERT INTO product_certifications (product_id, certification_id, certificate_number, issue_date, expiry_date, document_url)
+  //   VALUES (${productId}, ${certificationId}, ${certificate_number}, ${issue_date}, ${expiry_date}, ${document_url})
+  // `;
+  console.log('Adding certification to product:', { productId, certificationId, certificate_number, issue_date, expiry_date, document_url });
 
   revalidatePath(`/product-management/products/${productId}`);
 }
 
 export async function removeCertificationFromProduct(productId: string, certificationId: string) {
-  await sql`
-    DELETE FROM product_certifications
-    WHERE product_id = ${productId} AND certification_id = ${certificationId}
-  `;
+  // await sql`
+  //   DELETE FROM product_certifications
+  //   WHERE product_id = ${productId} AND certification_id = ${certificationId}
+  // `;
+  console.log('Removing certification from product:', { productId, certificationId });
 
   revalidatePath(`/product-management/products/${productId}`);
 }

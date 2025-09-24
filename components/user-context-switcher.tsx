@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
+import { useSimpleUser } from "@/lib/context/simple-user-context";
 import type { Role, Department, Location, User } from "@/lib/types/user";
 
 // Demo users based on PR mock data requestorIds
@@ -96,7 +96,7 @@ const demoUsers = [
 ];
 
 export function UserContextSwitcher() {
-  const { user, setUser, updateUserContext } = useKeycloakUser();
+  const { user, setUser, updateUserContext } = useSimpleUser();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;

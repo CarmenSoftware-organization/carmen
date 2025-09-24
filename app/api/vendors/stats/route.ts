@@ -81,16 +81,3 @@ const getVendorStats = withSecurity(
 )
 
 export const GET = withRateLimit(RateLimitPresets.API)(getVendorStats)
-    })
-
-  } catch (error) {
-    console.error('Error in GET /api/vendors/stats:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error'
-      },
-      { status: 500 }
-    )
-  }
-}

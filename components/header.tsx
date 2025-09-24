@@ -35,7 +35,8 @@ import {
 } from "lucide-react";
 import { QuickAccessNav } from "@/components/quick-access-nav";
 import { UserContextSwitcher } from "@/components/user-context-switcher";
-import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
+import { useSimpleUser } from "@/lib/context/simple-user-context";
+// Force refresh
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface HeaderProps {}
@@ -45,7 +46,7 @@ export default function Header({}: HeaderProps = {}) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { user, signOut } = useKeycloakUser();
+  const { user } = useSimpleUser();
 
   useEffect(() => {
     setMounted(true);
@@ -183,7 +184,7 @@ export default function Header({}: HeaderProps = {}) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  onSelect={() => signOut()}
+                  onSelect={() => router.push('/')}
                   className="text-foreground dark:text-gray-100"
                 >
                   <LogOut className="mr-2 h-4 w-4" />

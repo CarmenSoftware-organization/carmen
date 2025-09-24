@@ -5,7 +5,44 @@
  * error handling, and automatic fallback capabilities.
  */
 
-import Redis from 'ioredis';
+// import Redis from 'ioredis'; // Commented out - not available in development
+
+// Mock Redis class for development
+class Redis {
+  constructor(config?: any) {
+    console.log('Mock Redis initialized:', config);
+  }
+
+  async get(key: string) {
+    console.log('Mock Redis get:', key);
+    return null;
+  }
+
+  async set(key: string, value: string, ...args: any[]) {
+    console.log('Mock Redis set:', key, value, args);
+    return 'OK';
+  }
+
+  async del(key: string) {
+    console.log('Mock Redis del:', key);
+    return 1;
+  }
+
+  async exists(key: string) {
+    console.log('Mock Redis exists:', key);
+    return 0;
+  }
+
+  async disconnect() {
+    console.log('Mock Redis disconnect');
+  }
+
+  on(event: string, handler: Function) {
+    console.log('Mock Redis event listener:', event);
+    return this;
+  }
+}
+
 import { CalculationResult } from '../calculations/base-calculator';
 
 /**

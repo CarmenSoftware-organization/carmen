@@ -50,7 +50,7 @@ import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 import { PricingFormComponent } from "./pricing-form";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import { PurchaseRequestItemStatus, PurchaseRequestItem, ConsolidatedButtonState } from "@/lib/types";
-import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
+import { useSimpleUser } from "@/lib/context/simple-user-context";
 
 // Delivery point options for dropdown
 const deliveryPointOptions = [
@@ -223,7 +223,7 @@ export function ItemDetailsEditForm({
   mode,
   onModeChange,
 }: ItemDetailsFormProps) {
-  const { user } = useKeycloakUser();
+  const { user } = useSimpleUser();
   const userRole = user?.role || 'Requestor';
   const fieldPermissions = getFieldPermissions(userRole);
   

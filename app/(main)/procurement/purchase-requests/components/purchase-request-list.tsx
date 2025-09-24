@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { PRRBACService } from "../services/rbac-service";
-import { useKeycloakUser } from "@/lib/context/keycloak-user-context";
+import { useSimpleUser } from "@/lib/context/simple-user-context";
 import {
   Table,
   TableBody,
@@ -273,7 +273,7 @@ export function PurchaseRequestList() {
   const [toggleMode, setToggleMode] = useState<'myPending' | 'allDocument'>('allDocument');
   const [selectedRequestor, setSelectedRequestor] = React.useState<string>('');
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState('all');
-  const { user } = useKeycloakUser(); // Get current user from context
+  const { user } = useSimpleUser(); // Get current user from context
   const currentUserId = user?.id || 'demo-user'; // Use actual user ID from context
   
   // RBAC state

@@ -51,7 +51,7 @@ interface RouteParams {
  * GET /api/vendors/[id] - Get vendor by ID with calculated metrics
  * Requires authentication and 'read:vendors' permission
  */
-const getVendor = withSecurity(
+const getVendorWithAuth = withSecurity(
   authStrategies.hybrid(
     withAuthorization('vendors', 'read', async (
       request: NextRequest,
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/vendors/[id] - Update vendor
  * Requires authentication and 'update:vendors' permission
  */
-const updateVendor = withSecurity(
+const updateVendorWithAuth = withSecurity(
   authStrategies.hybrid(
     withAuthorization('vendors', 'update', async (
       request: NextRequest,
@@ -348,7 +348,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/vendors/[id] - Soft delete vendor (mark as inactive)
  * Requires authentication and 'delete:vendors' permission
  */
-const deleteVendor = withSecurity(
+const deleteVendorWithAuth = withSecurity(
   authStrategies.hybrid(
     withAuthorization('vendors', 'delete', async (
       request: NextRequest,

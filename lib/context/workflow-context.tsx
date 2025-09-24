@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { sampleWorkflows } from '@/app/(main)/system-administration/workflow/workflow-configuration/data/mockData';
 import { users } from '@/app/(main)/system-administration/workflow/role-assignment/data/mockData';
-import { useKeycloakUser } from './keycloak-user-context';
+import { useSimpleUser } from './simple-user-context';
 import type { WorkflowRoleType } from '@/app/(main)/system-administration/workflow/workflow-configuration/types/workflow';
 
 interface WorkflowStage {
@@ -45,7 +45,7 @@ interface WorkflowProviderProps {
 }
 
 export function WorkflowProvider({ children }: WorkflowProviderProps) {
-  const { user } = useKeycloakUser();
+  const { user } = useSimpleUser();
   const [currentWorkflowId, setCurrentWorkflowId] = useState<string | null>('WF-001'); // Default to General Purchase Workflow
   const [userWorkflowStages, setUserWorkflowStages] = useState<WorkflowStage[]>([]);
   const [workflowPermissions, setWorkflowPermissions] = useState<WorkflowPermissions>({

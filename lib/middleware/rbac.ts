@@ -616,5 +616,4 @@ export function getEffectivePermissions(user: AuthenticatedUser): string[] {
   return Array.from(new Set([...rolePermissions, ...explicitPermissions]))
 }
 
-// Export permission constants for use in frontend
-export { ROLE_HIERARCHY, DEFAULT_ROLE_PERMISSIONS }
+// Permission constants already exported above

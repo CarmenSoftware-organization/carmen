@@ -32,7 +32,7 @@ async function testConnection() {
       console.log('✅ Database info query successful')
       console.log('   Database:', Array.isArray(result) ? result[0] : result)
     } catch (error) {
-      console.log('ℹ️  Database info query failed (this is normal if tables don't exist yet):', error instanceof Error ? error.message : error)
+      console.log('ℹ️  Database info query failed (this is normal if tables don\'t exist yet):', error instanceof Error ? error.message : error)
     }
     
     // Test 3: Transaction capability with reliable client

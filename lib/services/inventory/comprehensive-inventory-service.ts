@@ -367,7 +367,8 @@ export class ComprehensiveInventoryService {
       const totalValue = classifications.reduce((sum, item) => sum + item.annualValue.amount, 0)
       let cumulativeValue = 0
 
-      classifications.forEach((item, index) => {
+      for (let index = 0; index < classifications.length; index++) {
+        const item = classifications[index];
         cumulativeValue += item.annualValue.amount
         item.cumulativePercentage = (cumulativeValue / totalValue) * 100
 
@@ -398,7 +399,7 @@ export class ComprehensiveInventoryService {
             item.recommendedMaxLevel = Math.ceil(avgDailyUsage * 90) // 12 weeks
             break
         }
-      })
+      }
 
       // Cache the results
       await this.cacheABCAnalysis(classifications)
