@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP - System Architecture Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Architecture</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Architecture</a> / System Architecture</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Carmen ERP - System Architecture Documentation\n\n> **Document Type:** Technical Architecture\n> **Audience:** Senior Developers, System Architects, Technical Leads\n> **Last Updated:** October 9, 2025\n> **Version:** 1.0\n\n---\n\n## 📋 Table of Contents\n\n1. [System Overview](#system-overview)\n2. [Technology Stack](#technology-stack)\n3. [Architecture Layers](#architecture-layers)\n4. [Module Architecture](#module-architecture)\n5. [Data Architecture](#data-architecture)\n6. [Component Architecture](#component-architecture)\n7. [State Management](#state-management)\n8. [Security Architecture](#security-architecture)\n9. [Integration Architecture](#integration-architecture)\n10. [Deployment Architecture](#deployment-architecture)\n\n---\n\n## 🎯 System Overview\n\nCarmen ERP is a modern, cloud-ready hospitality management system built on Next.js 14 with TypeScript, implementing a server-side rendering strategy with client-side hydration for optimal performance.\n\n### Architecture Principles\n\n1. **Component-Based Architecture:** Modular, reusable React components\n2. **Type Safety:** Strict TypeScript throughout\n3. **Server-First:** Leverage Next.js App Router and Server Components\n4. **Centralized Data:** Unified type system and mock data layer\n5. **Role-Based Security:** Comprehensive RBAC implementation\n6. **Responsive Design:** Mobile-first, accessible UI\n\n---\n\n## 🏗️ Technology Stack\n\n### Frontend Layer\n\n```mermaid\ngraph TB\n    subgraph \"Frontend Technologies\"\n        A[Next.js 14.0+]\n        B[React 18]\n        C[TypeScript 5.8+]\n        D[Tailwind CSS 3.4+]\n        E[Shadcn/ui Components]\n    end\n\n    subgraph \"Component Library\"\n        F[Radix UI Primitives]\n        G[Lucide Icons]\n        H[React Hook Form]\n        I[Zod Validation]\n    end\n\n    subgraph \"State Management\"\n        J[Zustand]\n        K[React Query/TanStack Query]\n        L[React Context API]\n    end\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    E --> G\n    B --> H\n    H --> I\n    B --> J\n    B --> K\n    B --> L\n```\n\n### Technology Stack Details\n\n| Layer | Technology | Version | Purpose |\n|-------|------------|---------|----------|\n| **Framework** | Next.js | 14.0+ | Full-stack React framework |\n| **Language** | TypeScript | 5.8+ | Type-safe development |\n| **UI Library** | React | 18 | Component-based UI |\n| **Styling** | Tailwind CSS | 3.4+ | Utility-first CSS |\n| **Components** | Shadcn/ui | Latest | Pre-built accessible components |\n| **Primitives** | Radix UI | Latest | Headless UI components |\n| **Icons** | Lucide React | Latest | Icon library |\n| **Forms** | React Hook Form | Latest | Form state management |\n| **Validation** | Zod | Latest | Schema validation |\n| **State (Global)** | Zustand | Latest | Global state management |\n| **State (Server)** | React Query | Latest | Server state & caching |\n| **Date Utils** | date-fns | Latest | Date manipulation |\n| **Testing** | Vitest | Latest | Unit testing |\n\n---\n\n## 🏛️ Architecture Layers\n\n### High-Level System Architecture\n\n```mermaid\ngraph TB\n    subgraph \"Presentation Layer\"\n        A[Web Browser]\n        B[Mobile Browser]\n    end\n\n    subgraph \"Application Layer\"\n        C[Next.js App Router]\n        D[Page Components]\n        E[Server Components]\n        F[Client Components]\n    end\n\n    subgraph \"Business Logic Layer\"\n        G[Server Actions]\n        H[API Route Handlers]\n        I[Business Rules]\n        J[Workflow Engine]\n    end\n\n    subgraph \"Data Access Layer\"\n        K[Type System]\n        L[Mock Data Services]\n        M[Data Validators]\n        N[Type Guards]\n        O[Type Converters]\n    end\n\n    subgraph \"Cross-Cutting Concerns\"\n        P[Authentication]\n        Q[Authorization RBAC]\n        R[Logging]\n        S[Error Handling]\n    end\n\n    A --> C\n    B --> C\n    C --> D\n    D --> E\n    D --> F\n    E --> G\n    F --> G\n    G --> I\n    H --> I\n    I --> J\n    I --> L\n    L --> K\n    L --> M\n    L --> N\n    L --> O\n    P --> G\n    Q --> G\n    R --> G\n    S --> G\n```\n\n### Layer Responsibilities\n\n#### 1. Presentation Layer\n- **Responsibility:** User interface rendering\n- **Technologies:** HTML, CSS (Tailwind), React Components\n- **Pattern:** Component-based, responsive design\n\n#### 2. Application Layer\n- **Responsibility:** Application routing and component orchestration\n- **Technologies:** Next.js App Router, React Server Components\n- **Pattern:** File-system based routing, server-first rendering\n\n#### 3. Business Logic Layer\n- **Responsibility:** Business rules, validations, workflows\n- **Technologies:** TypeScript, Server Actions, Zod\n- **Pattern:** Domain-driven design, service-oriented\n\n#### 4. Data Access Layer\n- **Responsibility:** Data management, type safety, validation\n- **Technologies:** TypeScript interfaces, Mock data, Validators\n- **Pattern:** Repository pattern, type-safe data access\n\n#### 5. Cross-Cutting Concerns\n- **Responsibility:** Security, logging, error handling\n- **Technologies:** User Context, RBAC, Error boundaries\n- **Pattern:** Aspect-oriented programming\n\n---\n\n## 📦 Module Architecture\n\n### Module Structure\n\n```mermaid\ngraph LR\n    subgraph \"Core Business Modules\"\n        A[Procurement]\n        B[Inventory Management]\n        C[Vendor Management]\n        D[Product Management]\n    end\n\n    subgraph \"Operational Modules\"\n        E[Store Operations]\n        F[Recipe Management]\n        G[Production]\n    end\n\n    subgraph \"Support Modules\"\n        H[Finance]\n        I[Reporting & Analytics]\n        J[System Administration]\n    end\n\n    subgraph \"Foundation Modules\"\n        K[User Context]\n        L[RBAC Engine]\n        M[Workflow Engine]\n    end\n\n    A <-->|Stock Updates| B\n    A <-->|Vendor Orders| C\n    B <-->|Product Data| D\n    B <-->|Transfers| E\n    C <-->|Pricing| D\n    D <-->|Recipes| F\n    E <-->|Inventory| B\n    F <-->|Production| G\n    H <-->|Transactions| A\n    H <-->|Valuation| B\n    I <-->|Data| A\n    I <-->|Data| B\n    I <-->|Data| C\n    J <-->|Config| K\n    J <-->|Permissions| L\n    J <-->|Workflows| M\n    K --> A\n    K --> B\n    K --> C\n    L --> A\n    L --> B\n    M --> A\n```\n\n### Module Dependencies\n\n```mermaid\ngraph TD\n    subgraph \"Independent Modules No Dependencies\"\n        A[Product Management]\n        B[Vendor Management]\n        C[User Management]\n    end\n\n    subgraph \"Low Dependency Modules\"\n        D[Recipe Management]\n        E[Finance Configuration]\n    end\n\n    subgraph \"Medium Dependency Modules\"\n        F[Store Operations]\n        G[Inventory Management]\n    end\n\n    subgraph \"High Dependency Modules\"\n        H[Procurement]\n        I[Reporting & Analytics]\n        J[Production]\n    end\n\n    A --> D\n    A --> G\n    A --> H\n    B --> H\n    C --> H\n    D --> J\n    E --> H\n    E --> G\n    G --> F\n    G --> H\n    G --> I\n    H --> I\n    F --> I\n    D --> I\n```\n\n---\n\n## 💾 Data Architecture\n\n### Centralized Type System\n\nAll types are centralized in `/lib/types/`:\n\n```mermaid\ngraph TB\n    subgraph \"Type System Structure\"\n        A[index.ts - Barrel Export]\n\n        subgraph \"Domain Types\"\n            B[common.ts]\n            C[user.ts]\n            D[inventory.ts]\n            E[procurement.ts]\n            F[vendor.ts]\n            G[product.ts]\n            H[recipe.ts]\n            I[finance.ts]\n        end\n\n        subgraph \"Utility Types\"\n            J[guards.ts]\n            K[converters.ts]\n            L[validators.ts]\n        end\n    end\n\n    A --> B\n    A --> C\n    A --> D\n    A --> E\n    A --> F\n    A --> G\n    A --> H\n    A --> I\n    A --> J\n    A --> K\n    A --> L\n```\n\n### Data Flow Architecture\n\n```mermaid\nsequenceDiagram\n    participant U as User\n    participant C as Component\n    participant S as Server Action\n    participant V as Validator\n    participant D as Data Service\n    participant M as Mock Data\n    participant T as Type Guards\n\n    U->>C: User Action\n    C->>S: Call Server Action\n    S->>V: Validate Input (Zod)\n    V-->>S: Validation Result\n\n    alt Valid Input\n        S->>D: Request Data Operation\n        D->>M: Access Mock Data\n        M-->>D: Return Data\n        D->>T: Type Guard Check\n        T-->>D: Type Confirmed\n        D-->>S: Typed Data\n        S-->>C: Success Response\n        C-->>U: Update UI\n    else Invalid Input\n        V-->>S: Validation Errors\n        S-->>C: Error Response\n        C-->>U: Show Errors\n    end\n```\n\n### Mock Data Architecture\n\nCentralized mock data in `/lib/mock-data/`:\n\n```mermaid\ngraph TB\n    subgraph \"Mock Data Structure\"\n        A[index.ts - Barrel Export]\n\n        subgraph \"Entity Data\"\n            B[users.ts]\n            C[vendors.ts]\n            D[products.ts]\n            E[inventory.ts]\n            F[procurement.ts]\n            G[recipes.ts]\n            H[finance.ts]\n        end\n\n        subgraph \"Factories\"\n            I[factories.ts]\n            J[test-scenarios/]\n        end\n    end\n\n    A --> B\n    A --> C\n    A --> D\n    A --> E\n    A --> F\n    A --> G\n    A --> H\n    A --> I\n    A --> J\n    I --> B\n    I --> C\n    I --> D\n```\n\n---\n\n## 🧩 Component Architecture\n\n### Component Hierarchy\n\n```mermaid\ngraph TB\n    subgraph \"Layout Components\"\n        A[RootLayout]\n        B[MainLayout]\n        C[AuthLayout]\n    end\n\n    subgraph \"Navigation Components\"\n        D[AppSidebar]\n        E[TopNav]\n        F[Breadcrumbs]\n    end\n\n    subgraph \"Page Components\"\n        G[List Pages]\n        H[Detail Pages]\n        I[Form Pages]\n        J[Dashboard Pages]\n    end\n\n    subgraph \"Feature Components\"\n        K[Module-Specific Components]\n        L[Shared Components]\n    end\n\n    subgraph \"UI Components\"\n        M[Shadcn/ui Components]\n        N[Custom Components]\n    end\n\n    A --> B\n    A --> C\n    B --> D\n    B --> E\n    B --> F\n    B --> G\n    B --> H\n    B --> I\n    B --> J\n    G --> K\n    G --> L\n    H --> K\n    H --> L\n    I --> K\n    I --> L\n    J --> K\n    J --> L\n    K --> M\n    K --> N\n    L --> M\n    L --> N\n```\n\n### Component Patterns\n\n#### 1. Server Component Pattern (Default)\n\n```typescript\n// app/(main)/procurement/purchase-requests/page.tsx\nimport { getPurchaseRequests } from '@/lib/data/procurement'\n\nexport default async function PurchaseRequestsPage() {\n  const requests = await getPurchaseRequests()\n\n  return (\n    <div>\n      <PurchaseRequestList requests={requests} />\n    </div>\n  )\n}\n```\n\n#### 2. Client Component Pattern\n\n```typescript\n'use client'\n\n// components/procurement/PurchaseRequestList.tsx\nimport { useState, useMemo } from 'react'\n\nexport function PurchaseRequestList({ requests }) {\n  const [filter, setFilter] = useState('')\n\n  const filtered = useMemo(() =>\n    requests.filter(r => r.title.includes(filter)),\n    [requests, filter]\n  )\n\n  return (\n    // Component JSX\n  )\n}\n```\n\n#### 3. Form Component Pattern\n\n```typescript\n'use client'\n\nimport { useForm } from 'react-hook-form'\nimport { zodResolver } from '@hookform/resolvers/zod'\nimport * as z from 'zod'\n\nconst schema = z.object({\n  title: z.string().min(1),\n  // ... other fields\n})\n\nexport function PurchaseRequestForm() {\n  const form = useForm<z.infer<typeof schema>>({\n    resolver: zodResolver(schema),\n  })\n\n  async function onSubmit(data) {\n    // Server action call\n  }\n\n  return (\n    // Form JSX\n  )\n}\n```\n\n---\n\n## 🔄 State Management\n\n### State Management Architecture\n\n```mermaid\ngraph TB\n    subgraph \"Local Component State\"\n        A[useState]\n        B[useReducer]\n        C[useRef]\n    end\n\n    subgraph \"Form State\"\n        D[React Hook Form]\n        E[Zod Validation]\n    end\n\n    subgraph \"Global UI State\"\n        F[Zustand Store]\n        G[sidebar state]\n        H[theme state]\n        I[filter state]\n    end\n\n    subgraph \"Server State\"\n        J[React Query]\n        K[Cache Management]\n        L[Optimistic Updates]\n    end\n\n    subgraph \"Context State\"\n        M[UserContext]\n        N[ThemeContext]\n    end\n\n    D --> E\n    F --> G\n    F --> H\n    F --> I\n    J --> K\n    J --> L\n```\n\n### User Context Architecture\n\n```mermaid\ngraph TB\n    subgraph \"User Context Provider\"\n        A[UserContextProvider]\n\n        subgraph \"User State\"\n            B[Current User]\n            C[Active Role]\n            D[Active Department]\n            E[Active Location]\n        end\n\n        subgraph \"Permission State\"\n            F[User Permissions]\n            G[Role Permissions]\n            H[Feature Flags]\n        end\n\n        subgraph \"Actions\"\n            I[Switch Role]\n            J[Switch Department]\n            K[Switch Location]\n            L[Check Permission]\n        end\n    end\n\n    A --> B\n    A --> C\n    A --> D\n    A --> E\n    A --> F\n    A --> G\n    A --> H\n    A --> I\n    A --> J\n    A --> K\n    A --> L\n\n    C --> F\n    C --> G\n    B --> F\n```\n\n---\n\n## 🔐 Security Architecture\n\n### Role-Based Access Control (RBAC)\n\n```mermaid\ngraph TB\n    subgraph \"RBAC Components\"\n        A[User]\n        B[Role Assignment]\n        C[Role]\n        D[Permissions]\n        E[Resources]\n    end\n\n    subgraph \"Permission Check Flow\"\n        F[Request]\n        G[Extract User]\n        H[Load Permissions]\n        I[Check Permission]\n        J[Allow/Deny]\n    end\n\n    A -->|has| B\n    B -->|defines| C\n    C -->|grants| D\n    D -->|to access| E\n\n    F --> G\n    G --> H\n    H --> I\n    I --> J\n```\n\n### User Roles & Permissions\n\n```mermaid\ngraph LR\n    subgraph \"User Roles\"\n        A[System Administrator]\n        B[Financial Manager]\n        C[Department Manager]\n        D[Purchasing Staff]\n        E[Chef]\n        F[Counter Staff]\n        G[Staff]\n    end\n\n    subgraph \"Permission Levels\"\n        H[Full Access]\n        I[Departmental Access]\n        J[Limited Access]\n        K[View Only]\n    end\n\n    A --> H\n    B --> I\n    C --> I\n    D --> J\n    E --> J\n    F --> K\n    G --> K\n```\n\n### Authentication Flow\n\n```mermaid\nsequenceDiagram\n    participant U as User\n    participant L as Login Page\n    participant A as Auth Service\n    participant S as Session Manager\n    participant C as UserContext\n\n    U->>L: Enter Credentials\n    L->>A: Validate Credentials\n    A->>A: Check User DB\n\n    alt Valid Credentials\n        A->>S: Create Session\n        S->>C: Set User Context\n        C->>U: Redirect to Dashboard\n    else Invalid Credentials\n        A->>L: Return Error\n        L->>U: Show Error\n    end\n```\n\n---\n\n## 🔌 Integration Architecture\n\n### Module Integration Points\n\n```mermaid\ngraph TB\n    subgraph \"Procurement Module\"\n        A[Purchase Requests]\n        B[Purchase Orders]\n        C[GRN]\n    end\n\n    subgraph \"Inventory Module\"\n        D[Stock Levels]\n        E[Stock Transactions]\n        F[Physical Counts]\n    end\n\n    subgraph \"Vendor Module\"\n        G[Vendor Profiles]\n        H[Price Lists]\n    end\n\n    subgraph \"Finance Module\"\n        I[Account Codes]\n        J[Cost Centers]\n        K[Transactions]\n    end\n\n    A -->|Creates| B\n    B -->|References| G\n    B -->|Uses| H\n    B -->|Generates| C\n    C -->|Updates| D\n    C -->|Creates| E\n    E -->|Maps to| I\n    E -->|Allocates to| J\n    F -->|Adjusts| D\n    F -->|Creates| E\n```\n\n### External Integration Architecture\n\n```mermaid\ngraph TB\n    subgraph \"Carmen ERP\"\n        A[POS Integration Module]\n        B[System Integrations]\n    end\n\n    subgraph \"External Systems\"\n        C[POS System]\n        D[Accounting System]\n        E[E-commerce Platform]\n    end\n\n    subgraph \"Integration Layer\"\n        F[API Gateway]\n        G[Data Transformation]\n        H[Error Handling]\n        I[Logging]\n    end\n\n    C <-->|Recipe/Product Mapping| A\n    C <-->|Sales Transactions| A\n    D <-->|Financial Data| B\n    E <-->|Product Data| B\n\n    A --> F\n    B --> F\n    F --> G\n    G --> H\n    G --> I\n```\n\n---\n\n## 🚀 Deployment Architecture\n\n### Deployment Model\n\n```mermaid\ngraph TB\n    subgraph \"CDN Edge Network\"\n        A[Static Assets]\n        B[Images]\n        C[CSS/JS Bundles]\n    end\n\n    subgraph \"Next.js Application\"\n        D[Server Components]\n        E[API Routes]\n        F[Server Actions]\n    end\n\n    subgraph \"Database Layer Future\"\n        G[PostgreSQL/Supabase]\n        H[Redis Cache]\n    end\n\n    subgraph \"Storage Layer Future\"\n        I[File Storage]\n        J[Document Storage]\n    end\n\n    A -->|Serves| D\n    B -->|Serves| D\n    C -->|Serves| D\n    D --> E\n    D --> F\n    E --> G\n    F --> G\n    E --> H\n    F --> H\n    E --> I\n    F --> J\n```\n\n### File System Architecture\n\n```\ncarmen/\n├── app/                          # Next.js App Router\n│   ├── (auth)/                   # Authentication routes\n│   ├── (main)/                   # Main application routes\n│   │   ├── dashboard/\n│   │   ├── procurement/\n│   │   ├── inventory-management/\n│   │   ├── vendor-management/\n│   │   ├── product-management/\n│   │   ├── store-operations/\n│   │   ├── operational-planning/\n│   │   ├── production/\n│   │   ├── reporting-analytics/\n│   │   ├── finance/\n│   │   └── system-administration/\n│   ├── layout.tsx                # Root layout\n│   └── page.tsx                  # Home page\n│\n├── components/                   # React components\n│   ├── ui/                       # Shadcn/ui components\n│   ├── procurement/              # Procurement components\n│   ├── inventory/                # Inventory components\n│   ├── vendor/                   # Vendor components\n│   └── ...                       # Other module components\n│\n├── lib/                          # Utility libraries\n│   ├── types/                    # Centralized type system\n│   │   ├── index.ts              # Barrel export\n│   │   ├── common.ts             # Common types\n│   │   ├── user.ts               # User types\n│   │   ├── inventory.ts          # Inventory types\n│   │   ├── procurement.ts        # Procurement types\n│   │   ├── guards.ts             # Type guards\n│   │   ├── converters.ts         # Type converters\n│   │   └── validators.ts         # Validators\n│   │\n│   ├── mock-data/                # Centralized mock data\n│   │   ├── index.ts              # Barrel export\n│   │   ├── users.ts\n│   │   ├── vendors.ts\n│   │   ├── products.ts\n│   │   ├── factories.ts\n│   │   └── test-scenarios/\n│   │\n│   ├── context/                  # React contexts\n│   │   └── user-context.tsx     # User context & RBAC\n│   │\n│   └── utils/                    # Utility functions\n│       ├── formatters.ts\n│       └── validators.ts\n│\n├── public/                       # Static assets\n└── docs/                         # Documentation\n    └── documents/                # System documentation\n```\n\n---\n\n## 📊 Performance Architecture\n\n### Rendering Strategy\n\n```mermaid\ngraph TB\n    subgraph \"Server-Side Rendering\"\n        A[Initial Page Load]\n        B[Server Component Render]\n        C[Static HTML Generation]\n        D[Stream to Client]\n    end\n\n    subgraph \"Client-Side Hydration\"\n        E[Client Component Hydration]\n        F[Event Handlers Attachment]\n        G[State Initialization]\n    end\n\n    subgraph \"Subsequent Navigation\"\n        H[Client-Side Routing]\n        I[Partial Revalidation]\n        J[Optimistic Updates]\n    end\n\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    F --> G\n    G --> H\n    H --> I\n    H --> J\n```\n\n### Caching Strategy\n\n```mermaid\ngraph LR\n    subgraph \"Cache Layers\"\n        A[Browser Cache]\n        B[CDN Cache]\n        C[Server Cache]\n        D[React Query Cache]\n    end\n\n    subgraph \"Cache Invalidation\"\n        E[Time-based TTL]\n        F[Event-based]\n        G[Manual]\n    end\n\n    A --> E\n    B --> E\n    C --> E\n    C --> F\n    D --> F\n    D --> G\n```\n\n---\n\n## 📚 Related Documents\n\n- [Technical Architecture Details](./TECHNICAL-ARCHITECTURE.md)\n- [Data Flow Diagrams](./DATA-FLOW-DIAGRAMS.md)\n- [Integration Architecture](./INTEGRATION-ARCHITECTURE.md)\n- [API Documentation](../06-api-reference/API-DOCUMENTATION.md)\n- [Development Guide](../07-development/DEVELOPMENT-GUIDE.md)\n\n---\n\n## 📧 Architecture Review\n\nFor architecture-related questions or proposals:\n- **Email:** architecture-team@carmen-erp.com\n- **Review Schedule:** Bi-weekly\n- **RFC Process:** Submit via project management system\n\n---\n\n## 📜 Version History\n\n| Version | Date | Changes | Architect |\n|---------|------|---------|-----------|\n| 1.0 | 2025-10-09 | Initial architecture documentation | System Architecture Team |\n\n---\n\n**Last Updated:** October 9, 2025\n**Next Review:** November 1, 2025\n**Architecture Version:** 1.0\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

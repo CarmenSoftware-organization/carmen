@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Template API Specification - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Purchase Request Templates</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PRT</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Purchase Request Template API Specification\n\n## Table of Contents\n1. [Authentication & Authorization](#authentication--authorization)\n2. [Core Endpoints](#core-endpoints)\n3. [Data Models](#data-models)\n4. [Error Handling](#error-handling)\n5. [Rate Limiting](#rate-limiting)\n6. [Webhooks](#webhooks)\n\n## Authentication & Authorization\n\n### Authentication\n- **Type**: Bearer Token (JWT)\n- **Header**: `Authorization: Bearer <token>`\n- **Token Expiry**: 24 hours\n- **Refresh**: Automatic refresh before expiry\n\n### Authorization Levels\n- **View Templates**: `templates:read`\n- **Create Templates**: `templates:create`\n- **Edit Templates**: `templates:update`\n- **Delete Templates**: `templates:delete`\n- **Admin Operations**: `templates:admin`\n\n### Role-Based Access\n```typescript\ninterface UserPermissions {\n  purchasing_staff: ['templates:read', 'templates:create', 'templates:update']\n  department_manager: ['templates:read', 'templates:create', 'templates:update', 'templates:delete']\n  financial_manager: ['templates:read', 'templates:admin']\n  admin: ['templates:read', 'templates:create', 'templates:update', 'templates:delete', 'templates:admin']\n}\n```\n\n## Core Endpoints\n\n### Templates\n\n#### GET /api/purchase-request-templates\nGet list of purchase request templates with filtering and pagination.\n\n**Query Parameters:**\n```typescript\ninterface GetTemplatesQuery {\n  page?: number          // Page number (default: 1)\n  limit?: number         // Items per page (default: 20, max: 100)\n  sort?: string         // Sort field (name, created_at, updated_at)\n  order?: 'asc' | 'desc' // Sort order (default: desc)\n  search?: string       // Search term for name/description\n  type?: TemplateType   // Filter by template type\n  department?: string   // Filter by department\n  status?: TemplateStatus // Filter by status\n  created_after?: string // ISO date string\n  created_before?: string // ISO date string\n}\n```\n\n**Response:**\n```typescript\ninterface GetTemplatesResponse {\n  data: PurchaseRequestTemplate[]\n  pagination: {\n    page: number\n    limit: number\n    total: number\n    pages: number\n  }\n  filters: {\n    types: TemplateType[]\n    departments: string[]\n    statuses: TemplateStatus[]\n  }\n}\n```\n\n**Example:**\n```bash\nGET /api/purchase-request-templates?page=1&limit=10&type=general&department=kitchen\n```\n\n#### GET /api/purchase-request-templates/:id\nGet specific purchase request template by ID.\n\n**Path Parameters:**\n- `id` (string): Template UUID\n\n**Response:**\n```typescript\ninterface GetTemplateResponse {\n  data: PurchaseRequestTemplate\n  items: TemplateItem[]\n  metadata: {\n    created_by: User\n    updated_by: User\n    usage_count: number\n    last_used: string | null\n  }\n}\n```\n\n#### POST /api/purchase-request-templates\nCreate new purchase request template.\n\n**Request Body:**\n```typescript\ninterface CreateTemplateRequest {\n  name: string\n  description?: string\n  type: TemplateType\n  department: string\n  requestor_id: string\n  reference_number?: string\n  items: CreateTemplateItemRequest[]\n  budget_codes?: string[]\n  account_codes?: string[]\n  approval_workflow?: string\n  is_default?: boolean\n}\n\ninterface CreateTemplateItemRequest {\n  item_code: string\n  description: string\n  uom: string\n  quantity: number\n  unit_price: number\n  currency: CurrencyCode\n  budget_code: string\n  account_code: string\n  tax_code?: string\n  department?: string\n}\n```\n\n**Response:**\n```typescript\ninterface CreateTemplateResponse {\n  data: PurchaseRequestTemplate\n  message: string\n}\n```\n\n#### PUT /api/purchase-request-templates/:id\nUpdate existing purchase request template.\n\n**Path Parameters:**\n- `id` (string): Template UUID\n\n**Request Body:**\n```typescript\ninterface UpdateTemplateRequest {\n  name?: string\n  description?: string\n  type?: TemplateType\n  department?: string\n  requestor_id?: string\n  items?: UpdateTemplateItemRequest[]\n  is_active?: boolean\n  is_default?: boolean\n}\n\ninterface UpdateTemplateItemRequest {\n  id?: string           // Include for updates, omit for new items\n  item_code?: string\n  description?: string\n  uom?: string\n  quantity?: number\n  unit_price?: number\n  currency?: CurrencyCode\n  budget_code?: string\n  account_code?: string\n  _action?: 'create' | 'update' | 'delete'\n}\n```\n\n#### DELETE /api/purchase-request-templates/:id\nDelete purchase request template.\n\n**Path Parameters:**\n- `id` (string): Template UUID\n\n**Query Parameters:**\n- `force` (boolean): Force delete even if template is in use\n\n**Response:**\n```typescript\ninterface DeleteTemplateResponse {\n  message: string\n  affected_records?: {\n    purchase_requests: number\n    related_templates: number\n  }\n}\n```\n\n#### POST /api/purchase-request-templates/:id/clone\nClone existing template with modifications.\n\n**Path Parameters:**\n- `id` (string): Source template UUID\n\n**Request Body:**\n```typescript\ninterface CloneTemplateRequest {\n  name: string\n  description?: string\n  department?: string\n  modifications?: {\n    items?: {\n      include_all?: boolean\n      exclude_items?: string[]\n      quantity_multiplier?: number\n    }\n    pricing?: {\n      adjust_prices?: boolean\n      price_multiplier?: number\n      new_currency?: CurrencyCode\n    }\n  }\n}\n```\n\n#### PUT /api/purchase-request-templates/:id/set-default\nSet template as department default.\n\n**Path Parameters:**\n- `id` (string): Template UUID\n\n**Request Body:**\n```typescript\ninterface SetDefaultRequest {\n  department: string\n  replace_existing?: boolean\n}\n```\n\n### Template Items\n\n#### GET /api/purchase-request-templates/:id/items\nGet items for specific template.\n\n**Path Parameters:**\n- `id` (string): Template UUID\n\n**Response:**\n```typescript\ninterface GetTemplateItemsResponse {\n  data: TemplateItem[]\n  summary: {\n    total_items: number\n    total_amount: number\n    currencies: CurrencyCode[]\n    departments: string[]\n  }\n}\n```\n\n#### POST /api/purchase-request-templates/:id/items\nAdd item to template.\n\n**Path Parameters:**\n- `id` (string): Template UUID\n\n**Request Body:**\n```typescript\ninterface AddItemRequest {\n  item_code: string\n  description: string\n  uom: string\n  quantity: number\n  unit_price: number\n  currency: CurrencyCode\n  budget_code: string\n  account_code: string\n  tax_code?: string\n  department?: string\n}\n```\n\n#### PUT /api/purchase-request-templates/:id/items/:item_id\nUpdate template item.\n\n**Path Parameters:**\n- `id` (string): Template UUID\n- `item_id` (string): Item UUID\n\n#### DELETE /api/purchase-request-templates/:id/items/:item_id\nRemove item from template.\n\n### Bulk Operations\n\n#### POST /api/purchase-request-templates/bulk\nPerform bulk operations on templates.\n\n**Request Body:**\n```typescript\ninterface BulkOperationRequest {\n  operation: 'delete' | 'clone' | 'set_status' | 'export'\n  template_ids: string[]\n  parameters?: {\n    status?: TemplateStatus\n    clone_prefix?: string\n    export_format?: 'csv' | 'xlsx' | 'json'\n  }\n}\n```\n\n### Analytics & Reporting\n\n#### GET /api/purchase-request-templates/analytics/usage\nGet template usage analytics.\n\n**Query Parameters:**\n```typescript\ninterface UsageAnalyticsQuery {\n  period?: 'day' | 'week' | 'month' | 'quarter' | 'year'\n  start_date?: string\n  end_date?: string\n  department?: string\n  template_ids?: string[]\n}\n```\n\n**Response:**\n```typescript\ninterface UsageAnalyticsResponse {\n  data: {\n    template_id: string\n    template_name: string\n    usage_count: number\n    total_amount: number\n    avg_amount: number\n    departments: string[]\n    last_used: string\n  }[]\n  summary: {\n    total_templates: number\n    active_templates: number\n    total_usage: number\n    total_value: number\n  }\n}\n```\n\n#### GET /api/purchase-request-templates/analytics/trends\nGet template usage trends over time.\n\n## Data Models\n\n### PurchaseRequestTemplate\n```typescript\ninterface PurchaseRequestTemplate {\n  id: string\n  name: string\n  description: string | null\n  reference_number: string\n  type: TemplateType\n  department: string\n  requestor_id: string\n  status: TemplateStatus\n  is_active: boolean\n  is_default: boolean\n  total_amount: number\n  currency: CurrencyCode\n  item_count: number\n  budget_codes: string[]\n  account_codes: string[]\n  approval_workflow: string | null\n  created_at: string\n  updated_at: string\n  created_by: string\n  updated_by: string\n  version: number\n}\n\ntype TemplateType = 'general' | 'asset' | 'service' | 'recurring'\ntype TemplateStatus = 'draft' | 'active' | 'inactive' | 'archived'\n```\n\n### TemplateItem\n```typescript\ninterface TemplateItem {\n  id: string\n  template_id: string\n  item_code: string\n  description: string\n  uom: string\n  quantity: number\n  unit_price: number\n  total_amount: number\n  currency: CurrencyCode\n  exchange_rate: number\n  budget_code: string\n  account_code: string\n  department: string\n  tax_code: string | null\n  tax_rate: number\n  tax_amount: number\n  sort_order: number\n  created_at: string\n  updated_at: string\n}\n```\n\n### User\n```typescript\ninterface User {\n  id: string\n  name: string\n  email: string\n  department: string\n  role: UserRole\n  permissions: string[]\n}\n\ntype UserRole = 'purchasing_staff' | 'department_manager' | 'financial_manager' | 'admin'\n```\n\n### Department\n```typescript\ninterface Department {\n  id: string\n  name: string\n  code: string\n  budget_codes: string[]\n  default_template_id: string | null\n  parent_department_id: string | null\n}\n```\n\n## Error Handling\n\n### Error Response Format\n```typescript\ninterface ErrorResponse {\n  error: {\n    code: string\n    message: string\n    details?: any\n    timestamp: string\n    request_id: string\n  }\n}\n```\n\n### Common Error Codes\n\n| Code | Status | Description |\n|------|--------|-------------|\n| `TEMPLATE_NOT_FOUND` | 404 | Template does not exist |\n| `TEMPLATE_NAME_EXISTS` | 409 | Template name already exists |\n| `INVALID_TEMPLATE_TYPE` | 400 | Invalid template type specified |\n| `INSUFFICIENT_PERMISSIONS` | 403 | User lacks required permissions |\n| `TEMPLATE_IN_USE` | 409 | Cannot delete template in use |\n| `INVALID_ITEM_DATA` | 400 | Template item validation failed |\n| `BUDGET_CODE_INVALID` | 400 | Invalid budget code specified |\n| `CURRENCY_MISMATCH` | 400 | Currency inconsistency in items |\n| `TEMPLATE_LIMIT_EXCEEDED` | 429 | Too many templates for department |\n| `BULK_OPERATION_FAILED` | 422 | Bulk operation partially failed |\n\n### Validation Errors\n```typescript\ninterface ValidationError {\n  field: string\n  code: string\n  message: string\n  value?: any\n}\n\ninterface ValidationErrorResponse extends ErrorResponse {\n  error: {\n    code: 'VALIDATION_FAILED'\n    message: string\n    validation_errors: ValidationError[]\n  }\n}\n```\n\n## Rate Limiting\n\n### Limits\n- **Read Operations**: 1000 requests/hour per user\n- **Write Operations**: 200 requests/hour per user\n- **Bulk Operations**: 50 requests/hour per user\n- **Analytics**: 100 requests/hour per user\n\n### Headers\n```\nX-RateLimit-Limit: 1000\nX-RateLimit-Remaining: 999\nX-RateLimit-Reset: 1640995200\nX-RateLimit-Window: 3600\n```\n\n### Rate Limit Exceeded\n```typescript\ninterface RateLimitResponse {\n  error: {\n    code: 'RATE_LIMIT_EXCEEDED'\n    message: 'Rate limit exceeded'\n    retry_after: number\n  }\n}\n```\n\n## Webhooks\n\n### Available Events\n- `template.created`\n- `template.updated`\n- `template.deleted`\n- `template.cloned`\n- `template.set_default`\n- `template.item.added`\n- `template.item.updated`\n- `template.item.removed`\n\n### Webhook Payload\n```typescript\ninterface WebhookPayload {\n  event: string\n  timestamp: string\n  data: {\n    template: PurchaseRequestTemplate\n    changes?: any\n    user: User\n  }\n  organization_id: string\n}\n```\n\n### Webhook Configuration\n```typescript\ninterface WebhookConfig {\n  url: string\n  events: string[]\n  secret: string\n  active: boolean\n  retry_policy: {\n    max_retries: number\n    backoff_multiplier: number\n  }\n}\n```\n\n---\n\n*Generated on: 2025-09-23*\n*API Specification Version: 1.0*\n*Carmen ERP - Hospitality Supply Chain Management*";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

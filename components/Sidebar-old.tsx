@@ -196,8 +196,8 @@ const menuItems: MenuItem[] = [
       { name: "User Management", path: "/system-administration/user-management" },
       { name: "Location Management", path: "/system-administration/location-management" },
       { name: "Workflow Management", path: "/system-administration/workflow/workflow-configuration" },
-      { name: "General Settings", path: "/system-administration/general-settings" },
-      { name: "Notification Preferences", path: "/system-administration/notification-preferences" },
+      { name: "General Settings", path: "/system-administration/settings" },
+      { name: "Notification Preferences", path: "/system-administration/settings/notifications" },
       { name: "License Management", path: "/system-administration/license-management" },
       { 
         name: "Permission Management", 
@@ -224,8 +224,7 @@ const menuItems: MenuItem[] = [
           }
         ]
       },
-      { name: "Data Backup and Recovery", path: "/system-administration/data-backup-and-recovery" },
-      { 
+      {
         name: "System Integrations", 
         path: "/system-administration/system-integrations",
         subItems: [
@@ -253,16 +252,6 @@ const menuItems: MenuItem[] = [
       { name: "FAQs", path: "/help-support/faqs" },
       { name: "Support Ticket System", path: "/help-support/support-ticket-system" },
       { name: "System Updates and Release Notes", path: "/help-support/system-updates-and-release-notes" },
-    ],
-  },
-  {
-    title: "Products",
-    path: "/products",
-    icon: "ShoppingBag",
-    subItems: [
-      { name: "Products", path: "/products" },
-      { name: "Categories", path: "/products/categories" },
-      { name: "Reports", path: "/products/reports" },
     ],
   },
   {

@@ -44,7 +44,6 @@ export function FilterPanel({
   const [categoryTo, setCategoryTo] = useState(params.categoryRange.to)
   const [productFrom, setProductFrom] = useState(params.productRange.from)
   const [productTo, setProductTo] = useState(params.productRange.to)
-  const [valuationMethod, setValuationMethod] = useState(params.valuationMethod)
 
   // Apply filters
   const applyFilters = () => {
@@ -62,7 +61,6 @@ export function FilterPanel({
         from: productFrom,
         to: productTo,
       },
-      valuationMethod: valuationMethod as 'FIFO' | 'WEIGHTED_AVERAGE',
     })
   }
 
@@ -75,7 +73,6 @@ export function FilterPanel({
     setCategoryTo("")
     setProductFrom("")
     setProductTo("")
-    setValuationMethod('FIFO')
     
     onFilterChange({
       asOfDate: new Date().toISOString().substring(0, 10),
@@ -91,7 +88,6 @@ export function FilterPanel({
         from: "",
         to: "",
       },
-      valuationMethod: 'FIFO',
     })
   }
 
@@ -127,27 +123,6 @@ export function FilterPanel({
           </Popover>
         </div>
 
-        {/* Valuation Method */}
-        <div className="space-y-2">
-          <Label htmlFor="valuation-method" className="text-sm font-medium">
-            Valuation Method
-          </Label>
-          <Select
-            value={valuationMethod}
-            onValueChange={(value) => setValuationMethod(value as 'FIFO' | 'WEIGHTED_AVERAGE')}
-          >
-            <SelectTrigger id="valuation-method" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="FIFO">FIFO</SelectItem>
-              <SelectItem value="WEIGHTED_AVERAGE">Weighted Average</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {/* Empty space for alignment */}
-        <div></div>
 
         {/* Location Filter */}
         <div className="space-y-2">

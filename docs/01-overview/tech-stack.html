@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP - Technology Stack - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Overview</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Overview</a> / Tech Stack</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Carmen ERP - Technology Stack\n\n> **Document Type:** Technical Reference\n> **Audience:** Developers, DevOps, Technical Teams\n> **Last Updated:** October 20, 2025\n> **Version:** 1.0\n\n---\n\n## Overview\n\nCarmen ERP is built using modern web technologies with a focus on performance, scalability, and developer experience. The stack combines proven frameworks with cutting-edge tools to deliver a robust hospitality management system.\n\n---\n\n## Frontend Stack\n\n### Core Framework\n- **[Next.js 14](https://nextjs.org/)** `^14.2.15`\n  - App Router for improved routing and layouts\n  - React Server Components for optimal performance\n  - Server Actions for type-safe mutations\n  - Built-in optimization (images, fonts, scripts)\n  - Streaming SSR with Suspense boundaries\n\n### UI Framework & Language\n- **[React 18](https://react.dev/)** `^18.x`\n  - Concurrent rendering\n  - Automatic batching\n  - Transitions API\n- **[TypeScript 5](https://www.typescriptlang.org/)** `^5.8.2`\n  - Strict mode enabled\n  - Path aliases configured (`@/` prefix)\n  - Type-safe API and database access\n\n### Styling & UI Components\n- **[Tailwind CSS](https://tailwindcss.com/)** `^3.4.1`\n  - Utility-first CSS framework\n  - Custom design system configuration\n  - JIT compilation for optimal bundle size\n\n- **[Shadcn/ui](https://ui.shadcn.com/)** `^2.1.6`\n  - Accessible component library built on Radix UI\n  - Customizable components\n  - Copy-paste component architecture\n\n- **[Radix UI](https://www.radix-ui.com/)** (multiple packages)\n  - Unstyled, accessible UI primitives\n  - WAI-ARIA compliant components\n  - Keyboard navigation support\n  - Focus management\n\n### State Management\n- **[Zustand](https://zustand-demo.pmnd.rs/)** `^5.0.1`\n  - Global state management\n  - Minimal boilerplate\n  - TypeScript support\n  - React hooks integration\n\n- **[TanStack Query (React Query)](https://tanstack.com/query)** `^5.59.15`\n  - Server state management\n  - Caching and synchronization\n  - Automatic refetching\n  - Optimistic updates\n  - Infinite queries\n\n### Form Management\n- **[React Hook Form](https://react-hook-form.com/)** `^7.50.0`\n  - Performant form validation\n  - Minimal re-renders\n  - TypeScript support\n  - Integration with Zod\n\n- **[Zod](https://zod.dev/)** `^3.25.76`\n  - TypeScript-first schema validation\n  - Composable validators\n  - Type inference\n  - Error formatting\n\n### Data Visualization\n- **[Recharts](https://recharts.org/)** `^2.15.4`\n  - Composable charting library\n  - Built on React and D3\n  - Responsive charts\n  - Customizable themes\n\n### Icons & Assets\n- **[Lucide React](https://lucide.dev/)** `^0.439.0`\n  - Modern icon library\n  - Tree-shakeable\n  - Consistent design\n- **[Heroicons](https://heroicons.com/)** `^2.2.0`\n  - Tailwind CSS icon set\n\n### Utilities\n- **[Date-fns](https://date-fns.org/)** `^3.6.0`\n  - Modern date utility library\n  - Modular and tree-shakeable\n  - TypeScript support\n- **[class-variance-authority](https://cva.style/docs)** `^0.7.1`\n  - CSS-in-TS variant management\n- **[clsx](https://github.com/lukeed/clsx)** `^2.1.1` + **[tailwind-merge](https://github.com/dcastil/tailwind-merge)** `^2.5.2`\n  - Conditional className utilities\n\n---\n\n## Backend Stack\n\n### Runtime & Framework\n- **[Node.js](https://nodejs.org/)** `v20.14.0`\n  - LTS version for stability\n  - ES modules support\n\n- **[Next.js API Routes & Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations)** `^14.2.15`\n  - Server-side API endpoints\n  - Type-safe server actions\n  - Middleware support\n  - Edge runtime compatibility\n\n### Database & ORM\n- **[PostgreSQL](https://www.postgresql.org/)** `16.x`\n  - Primary relational database\n  - ACID compliance\n  - Advanced features (JSON, full-text search)\n\n- **[Prisma](https://www.prisma.io/)** `^5.22.0`\n  - Modern TypeScript ORM\n  - Type-safe database access\n  - Schema migrations\n  - Prisma Studio for data visualization\n  - Connection pooling\n  - Query optimization\n\n- **[Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client)** `^5.22.0`\n  - Auto-generated type-safe database client\n  - Relations and nested queries\n  - Transactions support\n\n### Authentication\n- **[NextAuth.js](https://next-auth.js.org/)** `^4.24.11`\n  - Authentication for Next.js\n  - Multiple providers support\n  - JWT and database sessions\n  - Role-based access control integration\n\n### File Processing\n- **[jsPDF](https://github.com/parallax/jsPDF)** `^3.0.1`\n  - PDF generation\n- **[jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable)** `^5.0.2`\n  - Table plugin for jsPDF\n- **[XLSX](https://sheetjs.com/)** `^0.18.5`\n  - Excel file processing\n  - Import/export spreadsheets\n\n---\n\n## Development Tools\n\n### Build & Tooling\n- **[Webpack](https://webpack.js.org/)** (via Next.js)\n  - Module bundling\n  - Code splitting\n  - Tree shaking\n  - Asset optimization\n\n- **[PostCSS](https://postcss.org/)** `^8.x`\n  - CSS transformation\n  - Autoprefixer\n  - Tailwind CSS processing\n\n### Testing\n- **[Vitest](https://vitest.dev/)** `^3.2.4`\n  - Unit testing framework\n  - Vite-powered test runner\n  - Jest-compatible API\n  - TypeScript support\n  - Watch mode\n\n- **[@vitest/ui](https://vitest.dev/guide/ui.html)** `^3.2.4`\n  - Visual test runner interface\n\n- **[Playwright](https://playwright.dev/)** `^1.54.2`\n  - End-to-end testing\n  - Cross-browser testing\n  - API testing\n  - Visual regression testing\n\n### Code Quality\n- **[ESLint](https://eslint.org/)** `^8.57.0`\n  - Code linting\n  - Style enforcement\n  - Custom rules\n\n- **[@typescript-eslint](https://typescript-eslint.io/)** `^7.2.0`\n  - TypeScript-specific linting\n\n- **[Depcheck](https://github.com/depcheck/depcheck)** `^1.4.7`\n  - Dependency analysis\n  - Unused dependency detection\n\n- **[ts-prune](https://github.com/nadeesha/ts-prune)** `^0.10.3`\n  - Dead code detection\n  - Unused export identification\n\n### Development Utilities\n- **[ts-node](https://typestrong.org/ts-node/)** `^10.9.1`\n  - TypeScript execution\n  - Script running\n\n- **[Nodemon](https://nodemon.io/)**\n  - Auto-restart on file changes\n  - Development workflow automation\n\n---\n\n## DevOps & Infrastructure\n\n### Database Tools\n- **[Prisma CLI](https://www.prisma.io/docs/concepts/components/prisma-cli)** `^5.22.0`\n  - Schema management\n  - Migration generation\n  - Database introspection\n\n- **[Prisma Studio](https://www.prisma.io/studio)**\n  - Visual database browser\n  - Data editing interface\n\n### Environment Management\n- **[dotenv](https://github.com/motdotla/dotenv)** `^16.4.5`\n  - Environment variable management\n  - Configuration separation\n\n### Version Control\n- **[Git](https://git-scm.com/)**\n  - Source control\n  - Branch management\n  - Collaborative development\n\n---\n\n## Architecture Patterns\n\n### Design Patterns\n- **Server Components + Client Components**\n  - Hybrid rendering for optimal performance\n  - Server-side data fetching with type safety\n\n- **Repository Pattern**\n  - Data access layer abstraction\n  - Business logic separation\n\n- **Service Layer**\n  - Business logic encapsulation\n  - Reusable business operations\n\n### Code Organization\n- **Feature-based Structure**\n  - Modules organized by business domain\n  - Clear separation of concerns\n\n- **Barrel Exports**\n  - Centralized exports from modules\n  - Simplified import paths\n\n### State Management Strategy\n- **Server State:** TanStack Query for API data\n- **Global UI State:** Zustand for app-wide state\n- **Local Component State:** useState/useReducer for component-specific state\n- **Form State:** React Hook Form for form management\n\n---\n\n## Performance Optimizations\n\n### Frontend\n- **Code Splitting:** Automatic route-based splitting\n- **Image Optimization:** Next.js Image component with WebP support\n- **Font Optimization:** Next.js Font with variable fonts\n- **Bundle Analysis:** @next/bundle-analyzer for size optimization\n- **Tree Shaking:** Automatic dead code elimination\n\n### Backend\n- **Database Connection Pooling:** Prisma connection pooling\n- **Query Optimization:** Prisma optimized queries\n- **Caching:** React Query caching strategies\n- **Streaming:** Server-side streaming with Suspense\n\n---\n\n## Security Features\n\n### Application Security\n- **Authentication:** NextAuth.js with secure sessions\n- **Authorization:** Role-based access control (RBAC)\n- **Attribute-based Access Control (ABAC):** Policy-based permissions\n- **Input Validation:** Zod schema validation\n- **SQL Injection Protection:** Prisma parameterized queries\n- **XSS Protection:** React automatic escaping\n\n### Data Security\n- **Password Hashing:** bcrypt or equivalent\n- **HTTPS:** Enforced secure connections\n- **Environment Variables:** Sensitive data protection\n- **CORS:** Cross-origin resource sharing controls\n\n---\n\n## Deployment Stack\n\n### Hosting Options\n- **Vercel** (Recommended)\n  - Native Next.js support\n  - Automatic deployments\n  - Edge functions\n  - Preview deployments\n\n- **Docker**\n  - Containerization support\n  - Self-hosted deployments\n  - Environment isolation\n\n### Database Hosting\n- **Supabase** (Recommended)\n  - Managed PostgreSQL\n  - Built-in backups\n  - Connection pooling\n  - Auto-scaling\n\n- **Neon** / **Railway** / **PlanetScale**\n  - Alternative managed database options\n\n---\n\n## Browser Support\n\n### Target Browsers\n- **Modern Browsers:** Last 2 versions\n  - Chrome/Edge (Chromium)\n  - Firefox\n  - Safari\n\n### Minimum Versions\n- Chrome 90+\n- Firefox 88+\n- Safari 14+\n- Edge 90+\n\n---\n\n## Version Matrix\n\n| Component | Current Version | Update Frequency |\n|-----------|----------------|------------------|\n| Next.js | 14.2.15 | Major: Yearly, Minor: Quarterly |\n| React | 18.x | Major: Yearly, Minor: As needed |\n| TypeScript | 5.8.2 | Minor: Monthly, Major: Yearly |\n| Prisma | 5.22.0 | Minor: Monthly |\n| Node.js | 20.14.0 LTS | LTS updates every 6 months |\n| PostgreSQL | 16.x | Major: Yearly |\n\n---\n\n## Development Requirements\n\n### Minimum System Requirements\n- **Node.js:** v20.14.0 or higher\n- **npm:** v10.7.0 or higher\n- **Memory:** 8GB RAM minimum\n- **Storage:** 2GB available disk space\n\n### Recommended Setup\n- **OS:** macOS, Linux, or Windows with WSL2\n- **Editor:** VS Code with extensions:\n  - ESLint\n  - Prettier\n  - Tailwind CSS IntelliSense\n  - Prisma\n  - TypeScript and JavaScript Language Features\n\n---\n\n## Related Documentation\n\n- [System Architecture](../02-architecture/system-architecture.md) - Architecture overview\n- [Development Guide](../07-development/) - Development setup and guidelines\n- [Data Model](../03-data-model/) - Database schema and structure\n- [API Reference](../06-api-reference/) - API documentation\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

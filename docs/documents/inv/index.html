@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Module - Documentation Index - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Inventory Management</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">INV</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Inventory Management Module - Documentation Index\n\nWelcome to the Inventory Management module documentation. This index provides quick access to all documentation resources.\n\n## 📚 Quick Links\n\n### Main Documentation\n- **[README.md](./README.md)** - Module overview and quick start\n  - Module overview and key features\n  - Technical architecture and component structure\n  - Data flow patterns and workflows\n  - Navigation hierarchy\n  - Screenshot reference\n\n- **[inventory-management-specification.md](./inventory-management-specification.md)** - Comprehensive technical specification\n  - Detailed page and component documentation\n  - UI patterns and interactions\n  - Data structures and TypeScript interfaces\n  - Business logic and validation rules\n  - Performance optimizations\n\n- **[inventory-management-sitemap.md](./inventory-management-sitemap.md)** - Navigation and workflow diagrams\n  - Complete Mermaid sitemap with visual flows\n  - User interaction patterns\n  - State diagrams and workflow transitions\n  - Navigation hierarchy and routing\n\n### Supporting Documentation\n- **[pages-and-components-spec.md](./pages-and-components-spec.md)** - Page-level specifications\n  - Individual page breakdowns\n  - Component usage patterns\n  - Integration points\n\n- **[glossary-and-gaps.md](./glossary-and-gaps.md)** - Terminology and feature gaps\n  - Business terminology definitions\n  - Known limitations and gaps\n  - Future enhancement opportunities\n\n- **[screenshot-capture-guide.md](./screenshot-capture-guide.md)** - Screenshot documentation\n  - Capture instructions and standards\n  - Screenshot inventory and reference\n  - Visual testing guidelines\n\n- **[analysis-summary.md](./analysis-summary.md)** - Analysis summary\n  - Code analysis findings\n  - Metrics and statistics\n  - Quality assessments\n\n## 📁 Documentation Structure\n\n```\ndocs/documents/inv/\n├── INDEX.md                                # This file\n├── README.md                               # Main documentation\n├── inventory-management-specification.md   # Technical spec (~25,000 words)\n├── inventory-management-sitemap.md         # Sitemaps with Mermaid diagrams\n├── inventory-sitemap.md                    # Alternative sitemap view\n├── pages-and-components-spec.md            # Page specifications\n├── glossary-and-gaps.md                    # Terminology and gaps\n├── screenshot-capture-guide.md             # Screenshot guide\n├── analysis-summary.md                     # Analysis summary\n└── screenshots/                            # Screenshot collection\n    ├── inventory-management-dashboard.png\n    ├── inventory-adjustments-list.png\n    ├── inventory-balance-report.png\n    ├── physical-count-setup.png\n    └── spot-check-dashboard.png\n```\n\n## 🎯 Quick Navigation\n\n### By Feature\n\n#### Dashboard & Overview\n1. [Inventory Management Dashboard](./inventory-management-specification.md#dashboard-components)\n2. [Draggable Widget System](./inventory-management-specification.md#draggable-widgets)\n3. [Widget Types & Interactions](./inventory-management-specification.md#widget-types)\n4. [Navigation Quick Links](./inventory-management-specification.md#navigation-quick-links)\n\n#### Stock Overview & Reporting\n1. [Stock Overview Module](./inventory-management-specification.md#stock-overview-module)\n2. [Inventory Balance Reports](./inventory-management-specification.md#inventory-balance-reports)\n3. [Advanced Filter Panel](./inventory-management-specification.md#advanced-filter-panel)\n4. [Export & Print Functions](./inventory-management-specification.md#export--print-functions)\n5. [Stock Cards](./inventory-management-specification.md#stock-cards-module)\n6. [Slow Moving Items](./inventory-management-specification.md#slow-moving-items)\n7. [Inventory Aging](./inventory-management-specification.md#inventory-aging)\n\n#### Inventory Adjustments\n1. [Adjustments Overview](./inventory-management-specification.md#inventory-adjustments)\n2. [Adjustments List](./inventory-management-specification.md#adjustments-list)\n3. [Search and Filter Interface](./inventory-management-specification.md#search-and-filter-interface)\n4. [Adjustment Workflow](./inventory-management-specification.md#adjustment-workflow)\n5. [Adjustment Detail Pages](./inventory-management-specification.md#adjustment-detail-pages)\n\n#### Spot Check Module\n1. [Spot Check Dashboard](./inventory-management-specification.md#spot-check-dashboard)\n2. [Spot Check Actions](./inventory-management-specification.md#spot-check-actions)\n3. [New Spot Check Workflow](./inventory-management-specification.md#new-spot-check-workflow)\n4. [Spot Check Workflow States](./inventory-management-specification.md#spot-check-workflow)\n\n#### Physical Count Module\n1. [Physical Count Setup Wizard](./inventory-management-specification.md#physical-count-setup-wizard)\n2. [Step 1: Basic Information](./inventory-management-specification.md#step-1-basic-information-setup)\n3. [Step 2: Location Selection](./inventory-management-specification.md#step-2-location-selection)\n4. [Step 3: Item Review](./inventory-management-specification.md#step-3-item-review)\n5. [Step 4: Final Review](./inventory-management-specification.md#step-4-final-review)\n6. [Physical Count Dashboard](./inventory-management-specification.md#physical-count-dashboard)\n7. [Physical Count Workflow](./inventory-management-specification.md#physical-count-workflow)\n\n#### Additional Modules\n1. [Period End Module](./inventory-management-specification.md#period-end-module)\n2. [Fractional Inventory](./inventory-management-specification.md#fractional-inventory)\n3. [Stock In Module](./inventory-management-specification.md#stock-in-module)\n\n### By Topic\n\n#### Technical Implementation\n1. [Component Architecture](./inventory-management-specification.md#component-architecture)\n2. [Data Management Patterns](./inventory-management-specification.md#data-management-patterns)\n3. [Performance Optimizations](./inventory-management-specification.md#performance-optimizations)\n4. [Data Structures](./inventory-management-specification.md#data-structures)\n\n#### UI Components & Patterns\n1. [Shared Component Library](./inventory-management-specification.md#shared-component-library)\n2. [Form Patterns](./inventory-management-specification.md#form-patterns)\n3. [Status Badge System](./inventory-management-specification.md#ui-components--patterns)\n\n#### Workflows\n1. [Adjustment Workflow](./inventory-management-specification.md#adjustment-workflow)\n2. [Spot Check Workflow](./inventory-management-specification.md#spot-check-workflow)\n3. [Physical Count Workflow](./inventory-management-specification.md#physical-count-workflow)\n\n### By User Role\n\n#### For Developers\n- [Technical Architecture](./README.md#technical-architecture)\n- [Component Structure](./inventory-management-specification.md#component-architecture)\n- [Data Structures](./inventory-management-specification.md#data-structures)\n- [TypeScript Interfaces](./inventory-management-specification.md#core-inventory-types)\n- [Performance Patterns](./inventory-management-specification.md#performance-optimizations)\n\n#### For Product Managers\n- [Feature Overview](./README.md#key-features-documented)\n- [Workflows](./inventory-management-specification.md#actions--workflows)\n- [Business Logic](./inventory-management-specification.md#module-overview)\n- [Future Enhancements](./glossary-and-gaps.md)\n\n#### For QA Engineers\n- [Testing Scenarios](./inventory-management-specification.md#data-table-components)\n- [Screenshot Reference](./screenshot-capture-guide.md)\n- [Workflow Validations](./inventory-management-specification.md#wizard-validation-logic)\n\n#### For UI/UX Designers\n- [Design Patterns](./inventory-management-specification.md#ui-components--patterns)\n- [Component Library](./inventory-management-specification.md#shared-component-library)\n- [Screenshots](./README.md#screenshots)\n- [User Flows](./inventory-management-sitemap.md)\n\n## 📊 Module Statistics\n\n### Documentation Coverage\n- **Total Documentation Files**: 8 markdown files\n- **Total Word Count**: ~35,000+ words\n- **Screenshots**: 5 high-resolution captures\n- **Mermaid Diagrams**: 15+ visual flows\n- **Pages Documented**: 20+ pages\n- **Components Documented**: 30+ components\n\n### Module Scope\n- **Main Features**: 8 major feature areas\n- **Sub-modules**: 8 specialized modules\n- **Workflows**: 3 comprehensive workflows\n- **UI Patterns**: 15+ reusable patterns\n\n### Technical Metrics\n- **Component Files**: 50+ components\n- **Total Lines**: 10,000+ lines of code\n- **TypeScript Coverage**: 100%\n- **Mock Data Integration**: Complete\n\n### Documentation Status\n- ✅ Main README: Complete\n- ✅ Technical Specification: Complete (~25,000 words)\n- ✅ Sitemap with Diagrams: Complete\n- ✅ Screenshot Documentation: Complete (5 screenshots)\n- ✅ Component Specifications: Complete\n- ✅ Analysis Summary: Complete\n- ✅ Glossary & Gaps: Complete\n\n## 🚀 Key Features\n\n### Production Ready ✅\n1. **Inventory Dashboard**\n   - Draggable widget system with React Beautiful DnD\n   - 6 interactive widgets with real-time data\n   - Persistent layout configuration\n   - Quick navigation links\n\n2. **Stock Overview & Balance Reporting**\n   - Advanced filtering with collapsible panel\n   - Multiple view modes (Product, Category, Lot)\n   - Dual valuation methods (FIFO, Weighted Average)\n   - Tabbed interface with movement history\n   - Export and print functionality\n\n3. **Inventory Adjustments**\n   - Complete adjustment lifecycle management\n   - Advanced search and filtering\n   - Status-based workflows (Draft → Posted → Voided)\n   - Bulk operations support\n   - Comprehensive audit trails\n\n4. **Spot Check Management**\n   - Card-based dashboard layout\n   - Progress tracking and monitoring\n   - Department and location filtering\n   - Quick creation workflows\n   - Real-time status updates\n\n5. **Physical Count Module**\n   - Multi-step setup wizard (4 steps)\n   - Location and item selection\n   - Counter assignment\n   - Progress monitoring\n   - Variance detection and reporting\n\n### In Development 🚧\n1. **Period End Processing**\n   - Period closing procedures\n   - Reconciliation workflows\n   - Journal entry generation\n\n2. **Fractional Inventory**\n   - Fractional unit handling\n   - Unit conversion management\n   - Recipe-based calculations\n\n3. **Stock In Workflows**\n   - Goods receipt processing\n   - Quality validation\n   - Inventory posting procedures\n\n## 📝 Page Index\n\n### Main Pages\n- **Dashboard** - `/inventory-management` - Main dashboard with draggable widgets\n- **Stock Overview** - `/inventory-management/stock-overview` - Overview dashboard (Coming Soon)\n- **Inventory Balance** - `/inventory-management/stock-overview/inventory-balance` - Balance reporting\n- **Adjustments List** - `/inventory-management/inventory-adjustments` - Adjustments management\n- **Spot Check Dashboard** - `/inventory-management/spot-check` - Spot check management\n- **Physical Count Setup** - `/inventory-management/physical-count` - Count setup wizard\n\n### Stock Overview Sub-pages\n- **Stock Cards** - `/inventory-management/stock-overview/stock-cards` - Product card views\n- **Slow Moving** - `/inventory-management/stock-overview/slow-moving` - Slow moving analysis\n- **Inventory Aging** - `/inventory-management/stock-overview/inventory-aging` - Age-based analysis\n\n### Additional Modules\n- **Period End** - `/inventory-management/period-end` - Period closing\n- **Fractional Inventory** - `/inventory-management/fractional-inventory` - Fractional units\n- **Stock In** - `/inventory-management/stock-in` - Goods receipt\n\n## 🔧 Component Index\n\n### Dashboard Components\n- [InventoryDashboard](./inventory-management-specification.md#main-dashboard) - Main dashboard container\n- [DraggableWidget](./inventory-management-specification.md#draggable-widgets) - Widget wrapper\n- [InventoryLevelsChart](./inventory-management-specification.md#widget-types) - Levels visualization\n- [InventoryValueTrend](./inventory-management-specification.md#widget-types) - Value trend chart\n- [InventoryTurnover](./inventory-management-specification.md#widget-types) - Turnover pie chart\n\n### Stock Overview Components\n- [ReportHeader](./inventory-management-specification.md#report-header-components) - Summary metrics\n- [FilterPanel](./inventory-management-specification.md#advanced-filter-panel) - Advanced filtering\n- [BalanceReportTable](./inventory-management-specification.md#tabbed-report-views) - Balance data table\n- [MovementHistoryTab](./inventory-management-specification.md#tabbed-report-views) - Movement history\n\n### Adjustment Components\n- [InventoryAdjustmentList](./inventory-management-specification.md#adjustments-list) - Main list component\n- [FilterSortOptions](./inventory-management-specification.md#search-and-filter-interface) - Filter controls\n- [StatusBadge](./inventory-management-specification.md#status-badge-system) - Status indicators\n- [ActionsDropdown](./inventory-management-specification.md#row-actions-menu) - Row actions\n\n### Physical Count Components\n- [SetupForm](./inventory-management-specification.md#step-1-basic-information-setup) - Setup wizard step 1\n- [LocationSelection](./inventory-management-specification.md#step-2-location-selection) - Location picker\n- [ItemReview](./inventory-management-specification.md#step-3-item-review) - Item review interface\n- [FinalReview](./inventory-management-specification.md#step-4-final-review) - Final confirmation\n\n### Spot Check Components\n- [SpotCheckCard](./inventory-management-specification.md#spot-check-dashboard) - Check card display\n- [SpotCheckFilters](./inventory-management-specification.md#dashboard-components) - Filter interface\n- [QuickCreateForm](./inventory-management-specification.md#new-spot-check-workflow) - Quick creation\n\n## 🔗 Related Modules\n\n### Integration Points\n- [Procurement Module](../pr/) - Purchase orders and goods receipt\n- [Product Management](../pm/) - Product catalog and specifications\n- [Finance Module](../finance/) - Inventory valuation and accounting\n- [Store Operations](../store-ops/) - Store requisitions and transfers\n- [Reporting](../reporting/) - Inventory analytics and reports\n\n### Technical Resources\n- [Next.js 14 Documentation](https://nextjs.org/docs)\n- [TypeScript Handbook](https://www.typescriptlang.org/docs/)\n- [React Beautiful DnD](https://github.com/atlassian/react-beautiful-dnd)\n- [Recharts](https://recharts.org/en-US/)\n- [Tailwind CSS](https://tailwindcss.com/docs)\n- [Shadcn/ui](https://ui.shadcn.com/)\n\n## 📞 Support\n\n### Documentation Issues\n- Report missing information or outdated content\n- Suggest improvements or clarifications\n- Request additional examples or screenshots\n\n### Module Issues\n- Technical bugs and errors\n- Feature requests and enhancements\n- Performance concerns\n- Integration issues\n\n## 🔄 Changelog\n\n### Version 1.1.0 (2025-10-18)\n- ✅ Created comprehensive INDEX.md for better navigation\n- ✅ Fixed all broken documentation links\n- ✅ Added Mermaid diagram support across all documentation\n- ✅ Optimized image sizes for better page load performance\n- ✅ Enhanced cross-module linking\n\n### Version 1.0.0 (2024-09-25)\n- ✅ Initial comprehensive documentation\n- ✅ Technical specification (~25,000 words)\n- ✅ Sitemap with Mermaid diagrams\n- ✅ Screenshot capture (5 screenshots)\n- ✅ Component and page specifications\n- ✅ Analysis summary and glossary\n\n## 📅 Next Steps\n\n### Documentation Enhancements\n1. Create video walkthroughs for major workflows\n2. Add interactive Mermaid diagrams with click navigation\n3. Expand component documentation with code examples\n4. Create API documentation with request/response examples\n\n### Screenshot Expansion\n1. Capture all planned screenshots per capture guide\n2. Add annotation layers for key features\n3. Create before/after comparison screenshots\n4. Document edge cases and error states\n\n### Integration Documentation\n1. Document integration points with other modules\n2. Create end-to-end workflow documentation\n3. Add data flow diagrams across modules\n4. Document API contracts and dependencies\n\n---\n\n**Last Updated**: 2025-10-18\n**Documentation Version**: 1.1.0\n**Maintained By**: Development Team\n**Module Status**: Production Ready\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

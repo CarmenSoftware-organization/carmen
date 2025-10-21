@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Management Module Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Vendor Management</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Vendor Management Module Documentation\n\n## Overview\n\nThe Vendor Management module is a comprehensive system for managing vendor relationships, profiles, certifications, price lists, and procurement workflows within the Carmen ERP system. It serves as the central hub for all vendor-related operations, from onboarding to ongoing relationship management.\n\n### Module Screenshots\n\n![Vendor Management Landing Page](screenshots/vm-landing.png)\n*Vendor Management Landing Page - Main dashboard with navigation to all submodules*\n\n## Module Information\n\n- **Main Path**: `/vendor-management`\n- **Icon**: Users\n- **Primary Purpose**: Manage vendor profiles, relationships, pricing, and procurement workflows\n- **Status**: Production-ready core features, with price management prototypes in development\n\n## Quick Navigation\n\n- [Submodules](#submodules)\n- [Key Features](#key-features)\n- [Page Structure](#page-structure)\n- [Data Models](#data-models)\n- [Workflows](#workflows)\n- [Components](#components)\n- [API & Server Actions](#api--server-actions)\n- [Business Rules](#business-rules)\n\n## Submodules\n\nThe Vendor Management module consists of 6 main submodules:\n\n### 1. Vendor Directory (Manage Vendors)\n**Path**: `/vendor-management/manage-vendors`\n\n**Purpose**: Core vendor profile management\n\n![Vendor List Page](screenshots/vm-vendor-list.png)\n*Vendor List Page - Table view with filtering and search capabilities*\n\n![Vendor List with Search](screenshots/vm-vendor-list-search.png)\n*Vendor List with Active Search - Real-time filtering results*\n\n**Features**:\n- List view with table/card toggle\n- Advanced filtering and search\n- Vendor CRUD operations\n- Vendor detail pages with tabs\n- Vendor deletion with dependency checking\n\n![New Vendor Form](screenshots/vm-new-vendor-form.png)\n*New Vendor Creation Form - Multi-section form with validation*\n\n### 2. Vendors (Alternative Path)\n**Path**: `/vendor-management/vendors`\n\n**Purpose**: Alternative vendor management interface\n\n**Features**:\n- Create new vendors\n- Edit existing vendors\n- Vendor pricelist settings\n- Alternative routing for vendor operations\n\n### 3. Pricelist Templates\n**Path**: `/vendor-management/templates`\n\n**Status**: 🚧 Prototype/Demo Only\n\n**Purpose**: Pricelist template management and configuration\n\n![Templates List](screenshots/vm-templates-list.png)\n*Pricelist Templates Management - Template configuration interface*\n\n**Features**:\n- Template creation and customization\n- Product selection component\n- Custom fields configuration\n- MOQ pricing setup\n- Excel template generation\n\n### 4. Requests for Pricing (Campaigns)\n**Path**: `/vendor-management/campaigns`\n\n**Status**: 🚧 Prototype/Demo Only\n\n**Purpose**: Manage pricing campaign workflows\n\n![Campaigns List](screenshots/vm-campaigns-list.png)\n*RFP Campaigns Management - Campaign tracking and vendor invitations*\n\n**Features**:\n- Campaign creation and management\n- Vendor invitation management\n- Campaign analytics\n- Response tracking\n\n### 5. Price Lists\n**Path**: `/vendor-management/pricelists`\n\n**Status**: 🚧 Prototype/Demo Only\n\n**Purpose**: Vendor price list management\n\n![Pricelists Management](screenshots/vm-pricelists-list.png)\n*Pricelists Management - Price list viewing and editing interface*\n\n**Features**:\n- Price list viewing and editing\n- Multi-MOQ pricing support\n- Price validation\n- Staff pricelist forms\n\n### 6. Vendor Entry Portal\n**Path**: `/vendor-management/vendor-portal/sample`\n\n**Status**: 🚧 Prototype/Demo Only\n\n![Vendor Portal](screenshots/vm-vendor-portal.png)\n*Vendor Self-Service Portal - External vendor price entry interface*\n\n**Purpose**: Vendor self-service price entry\n\n**Features**:\n- Token-based vendor access\n- Self-service price submission\n- Real-time validation\n- Auto-save functionality\n\n## Key Features\n\n### Vendor Profile Management\n- **Complete Vendor Profiles**: Company info, addresses, contacts, certifications\n- **Multi-Address Support**: Headquarters, warehouse, billing addresses\n- **Contact Management**: Multiple contacts with role specifications\n- **Certification Tracking**: Expiry monitoring and renewal alerts\n- **Tax Configuration**: Tax ID, profiles, and rates\n- **Performance Metrics**: Quality ratings, on-time delivery tracking\n\n### Search and Filtering\n- **Global Search**: Search across vendor names, types, addresses, contacts\n- **Advanced Filters**: Multi-criteria filtering with saved filter support\n- **Filter Storage**: Save and reuse complex filter configurations\n- **Status Filtering**: Quick filter by active/inactive status\n\n### View Options\n- **Table View**: Comprehensive data display with sortable columns\n- **Card View**: Visual grid layout for easier browsing\n- **Detail View**: Tabbed interface for comprehensive vendor information\n\n### Data Management\n- **CRUD Operations**: Full create, read, update, delete capabilities\n- **Bulk Operations**: Export, duplicate, batch actions\n- **Dependency Checking**: Validation before deletion\n- **Audit Trail**: Track all changes with timestamps and user info\n\n### Price Management (Prototype)\n- **Template System**: Reusable pricelist templates\n- **Campaign Management**: Request for pricing workflows\n- **Vendor Portal**: Self-service price entry\n- **Excel Integration**: Import/export capabilities\n\n## Page Structure\n\n### Main Landing Page\n**File**: `app/(main)/vendor-management/page.tsx`\n\n**Components**:\n- Quick statistics dashboard\n- Module navigation cards\n- Development status indicators\n- Direct links to submodules\n\n**Key Metrics Displayed**:\n- Total Vendors\n- Active Contracts\n- Price Updates This Month\n- Pending Approvals\n\n### Manage Vendors List Page\n**File**: `app/(main)/vendor-management/manage-vendors/page.tsx`\n\n**Layout**:\n```\n┌─────────────────────────────────────────────────────┐\n│ Header: Vendor Management                          │\n│ - Title and description                             │\n│ - Export and Add Vendor buttons                     │\n├─────────────────────────────────────────────────────┤\n│ Search and Filters Bar                              │\n│ - Search input (global search)                      │\n│ - Status dropdown filter                            │\n│ - Saved Filters button                              │\n│ - Add Filters button                                │\n│ - View toggle (Table/Card)                          │\n├─────────────────────────────────────────────────────┤\n│ Data Display Area                                   │\n│ - Table view OR Card view                           │\n│ - Action menu per vendor                            │\n└─────────────────────────────────────────────────────┘\n```\n\n**Features**:\n- Dual view modes (table/card)\n- In-line actions menu\n- Real-time filtering\n- Advanced filter dialog\n\n### Vendor Detail Page\n**File**: `app/(main)/vendor-management/manage-vendors/[id]/page.tsx`\n\n**Tabs**:\n1. **Overview Tab**\n   - Basic Information card\n   - Tax Configuration card\n   - Primary Address card\n   - Primary Contact card\n\n2. **Price Lists Tab**\n   - Vendor pricelists section\n   - Price history\n   - Active campaigns\n\n3. **Contacts & Addresses Tab**\n   - All addresses with management\n   - All contacts with roles\n   - Add/edit functionality\n\n4. **Certifications Tab**\n   - Certification list\n   - Expiry status\n   - Document management\n\n**Action Buttons**:\n- Edit Vendor (toggles edit mode)\n- Print (print-friendly view)\n- Delete Vendor (with dependency check)\n- Save Changes (in edit mode)\n- Cancel (in edit mode)\n\n### Vendor Form Pages\n\n#### New Vendor\n**File**: `app/(main)/vendor-management/manage-vendors/new/page.tsx`\n\n**Form Sections**:\n- Basic Information\n- Address Details\n- Contact Information\n- Tax Configuration\n- Certifications\n\n#### Edit Vendor\n**File**: `app/(main)/vendor-management/vendors/[id]/edit/page.tsx`\n\n**Features**:\n- Pre-populated form fields\n- Validation on submit\n- Change tracking\n- Cancel confirmation\n\n## Data Models\n\n### Core Vendor Types\n\n#### Vendor (Main Profile)\n```typescript\ninterface Vendor {\n  id: string\n  name: string\n  contactEmail: string\n  contactPhone?: string\n  address: Address\n  status: 'active' | 'inactive'\n  preferredCurrency: string\n  paymentTerms?: string\n  performanceMetrics: VendorMetrics\n  createdAt: Date\n  updatedAt: Date\n  createdBy: string\n  companyRegistration?: string\n  taxId?: string\n  taxProfile?: string\n  taxRate?: number\n  website?: string\n  businessType?: string\n  certifications?: string[]\n  languages?: string[]\n  notes?: string\n}\n```\n\n#### Vendor Metrics\n```typescript\ninterface VendorMetrics {\n  responseRate: number\n  averageResponseTime: number\n  qualityScore: number\n  onTimeDeliveryRate: number\n  totalCampaigns: number\n  completedSubmissions: number\n  averageCompletionTime: number\n  lastSubmissionDate?: Date\n}\n```\n\n#### Address\n```typescript\ninterface Address {\n  street: string\n  city: string\n  state: string\n  postalCode: string\n  country: string\n}\n```\n\n### Price Management Types\n\n#### Pricelist Template\n```typescript\ninterface PricelistTemplate {\n  id: string\n  name: string\n  description?: string\n  productSelection: ProductSelection\n  customFields: CustomField[]\n  instructions: string\n  validityPeriod: number // days\n  status: 'draft' | 'active' | 'inactive'\n  createdAt: Date\n  updatedAt: Date\n  createdBy: string\n  allowMultiMOQ: boolean\n  requireLeadTime: boolean\n  defaultCurrency: string\n  supportedCurrencies: string[]\n  maxItemsPerSubmission?: number\n  notificationSettings: {\n    sendReminders: boolean\n    reminderDays: number[]\n    escalationDays: number\n  }\n}\n```\n\n#### Request for Pricing (Campaign)\n```typescript\ninterface RequestForPricing {\n  id: string\n  name: string\n  description?: string\n  templateId: string\n  vendorIds: string[]\n  schedule: RequestForPricingSchedule\n  status: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled'\n  invitations: VendorInvitation[]\n  analytics: RequestForPricingAnalytics\n  createdAt: Date\n  updatedAt: Date\n  createdBy: string\n  deadlineBuffer: number\n  maxSubmissionAttempts: number\n  requireManagerApproval: boolean\n  priority: 'low' | 'medium' | 'high' | 'urgent'\n  tags: string[]\n}\n```\n\n#### Vendor Pricelist\n```typescript\ninterface VendorPricelist {\n  id: string\n  pricelistNumber: string\n  vendorId: string\n  campaignId: string\n  templateId: string\n  invitationId: string\n  currency: string\n  status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'expired'\n  items: PricelistItem[]\n  validFrom: Date\n  validTo: Date\n  submittedAt?: Date\n  approvedAt?: Date\n  rejectedAt?: Date\n  rejectionReason?: string\n  approvedBy?: string\n  createdAt: Date\n  updatedAt: Date\n  completionPercentage: number\n  qualityScore: number\n  totalItems: number\n  completedItems: number\n  lastAutoSave: Date\n  submissionNotes?: string\n  internalNotes?: string\n  version: number\n  parentPricelistId?: string\n}\n```\n\nSee [Data Models Documentation](./data-models.md) for complete type definitions.\n\n## Workflows\n\n### 1. Vendor Creation Workflow\n```mermaid\ngraph TD\n    A[Start: New Vendor] --> B[Fill Basic Info]\n    B --> C[Add Address]\n    C --> D[Add Contact]\n    D --> E[Configure Tax]\n    E --> F[Add Certifications]\n    F --> G[Validate Form]\n    G --> H{Valid?}\n    H -->|No| I[Show Errors]\n    I --> B\n    H -->|Yes| J[Submit to Server]\n    J --> K{Success?}\n    K -->|No| L[Show Error Toast]\n    L --> B\n    K -->|Yes| M[Show Success Toast]\n    M --> N[Redirect to Vendor List]\n```\n\n### 2. Vendor Deletion Workflow\n```mermaid\ngraph TD\n    A[Delete Button Click] --> B[Open Deletion Dialog]\n    B --> C[Check Dependencies]\n    C --> D{Has Dependencies?}\n    D -->|Yes| E[Show Warning with Details]\n    E --> F{Force Delete?}\n    F -->|No| G[Cancel]\n    F -->|Yes| H[Confirm Force Delete]\n    D -->|No| I[Show Standard Confirmation]\n    I --> J{Confirm?}\n    J -->|No| G\n    J -->|Yes| K[Call Delete API]\n    H --> K\n    K --> L{Success?}\n    L -->|No| M[Show Error]\n    L -->|Yes| N[Show Success]\n    N --> O[Redirect to List]\n```\n\n### 3. Price List Campaign Workflow (Prototype)\n```mermaid\ngraph TD\n    A[Create Template] --> B[Select Products]\n    B --> C[Configure Custom Fields]\n    C --> D[Set MOQ Rules]\n    D --> E[Create Campaign]\n    E --> F[Select Vendors]\n    F --> G[Set Schedule]\n    G --> H[Send Invitations]\n    H --> I[Vendors Access Portal]\n    I --> J[Submit Prices]\n    J --> K[Validate Submissions]\n    K --> L[Review & Approve]\n    L --> M[Publish Pricelists]\n```\n\nSee [Workflows Documentation](./workflows.md) for detailed workflow diagrams.\n\n## Components\n\n### Core Components\n\n#### VendorCard\n**File**: `components/VendorCard.tsx`\n- Card view display for vendors\n- Quick actions menu\n- Status indicators\n\n#### VendorForm\n**File**: `components/VendorForm.tsx`\n- Comprehensive vendor form\n- Multi-section layout\n- Validation handling\n\n#### VendorSearchBar\n**File**: `components/VendorSearchBar.tsx`\n- Global search functionality\n- Real-time filtering\n- Search suggestions\n\n#### VendorFilters\n**File**: `components/VendorFilters.tsx`\n- Filter panel\n- Multi-criteria selection\n- Save/load filters\n\n#### VendorDeletionDialog\n**File**: `components/VendorDeletionDialog.tsx`\n- Deletion confirmation\n- Dependency checking\n- Force delete option\n\n### Detail Page Components\n\n#### BasicInfoTab\n**File**: `manage-vendors/[id]/components/basic-info-tab.tsx`\n- Display/edit basic vendor info\n- Tax configuration\n- Business details\n\n#### AddressesTab\n**File**: `manage-vendors/[id]/components/addresses-tab.tsx`\n- List all addresses\n- Add/edit/delete addresses\n- Primary address designation\n\n#### ContactsTab\n**File**: `manage-vendors/[id]/components/contacts-tab.tsx`\n- Contact list management\n- Role assignment\n- Primary contact designation\n\n#### VendorPricelistsSection\n**File**: `manage-vendors/[id]/sections/vendor-pricelists-section.tsx`\n- Display vendor pricelists\n- Filter and search\n- Price history\n\n### Advanced Filter Component\n\n#### AdvancedFilter\n**File**: `manage-vendors/components/advanced-filter.tsx`\n\n**Features**:\n- Multi-field filtering\n- Operator selection (equals, contains, starts with, etc.)\n- Filter combination logic\n- Save filter configurations\n- Load saved filters\n\n**Filter Fields**:\n- Company Name\n- Business Type\n- Status\n- Address\n- Contact Name\n- Contact Email\n- Contact Phone\n\nSee [Components Documentation](./components/) for detailed component specifications.\n\n## API & Server Actions\n\n### Server Actions\n**File**: `app/(main)/vendor-management/manage-vendors/actions.ts`\n\n#### createVendor\n```typescript\nasync function createVendor(\n  vendorData: Omit<Vendor, 'id' | 'createdAt' | 'updatedAt' | 'performanceMetrics'>\n): Promise<{ success: boolean; data?: Vendor; error?: string }>\n```\n\n#### updateVendor\n```typescript\nasync function updateVendor(\n  vendor: Vendor\n): Promise<{ success: boolean; data?: Vendor; error?: string }>\n```\n\n#### deleteVendor\n```typescript\nasync function deleteVendor(\n  vendorId: string\n): Promise<{ success: boolean; data?: any; error?: string }>\n```\n\n#### getVendor\n```typescript\nasync function getVendor(\n  vendorId: string\n): Promise<{ success: boolean; data?: Vendor; error?: string }>\n```\n\n#### getVendors\n```typescript\nasync function getVendors(\n  filters?: any\n): Promise<{ success: boolean; data?: Vendor[]; error?: string }>\n```\n\n### API Routes\n\n#### /api/vendors\n- GET: List all vendors with optional filters\n- POST: Create new vendor\n\n#### /api/vendors/[id]\n- GET: Get specific vendor\n- PUT: Update vendor\n- DELETE: Delete vendor\n\n#### /api/vendors/[id]/metrics\n- GET: Get vendor performance metrics\n\n#### /api/vendors/stats\n- GET: Get vendor statistics\n\n### Vendor Service\n**File**: `lib/services/vendor-service.ts`\n\n**Methods**:\n- `createVendor()`: Create new vendor with validation\n- `updateVendor()`: Update vendor with dependency checks\n- `deleteVendor()`: Delete vendor with dependency validation\n- `getVendor()`: Retrieve single vendor\n- `searchVendors()`: Search with filters\n\n### Vendor Validation Service\n**File**: `lib/services/vendor-validation.ts`\n\n**Validation Rules**:\n- Required fields validation\n- Email format validation\n- Phone format validation\n- Tax ID format validation\n- Business registration validation\n- Duplicate vendor check\n\nSee [API Documentation](./api/) for complete API specifications.\n\n## Business Rules\n\n### Vendor Status Rules\n1. **Active Status**\n   - Can create purchase orders\n   - Can receive invitations\n   - Appears in vendor selection\n\n2. **Inactive Status**\n   - Cannot create new POs\n   - Historical data preserved\n   - Can be reactivated\n\n### Tax Configuration Rules\n1. **Tax Profiles**\n   - None VAT: 0% tax rate\n   - VAT (Thailand): 7% tax rate\n   - GST (Singapore/Australia): 10% tax rate\n   - Sales Tax (USA): 8.5% tax rate\n   - Custom: User-defined rate\n\n2. **Tax Rate Validation**\n   - Must be between 0-100%\n   - Can have decimal places (e.g., 8.25%)\n   - Auto-populated based on tax profile\n\n### Deletion Rules\n1. **Dependency Checking**\n   - Check for active purchase orders\n   - Check for pending purchase requests\n   - Check for active contracts\n   - Check for price lists\n\n2. **Soft Delete**\n   - Mark as deleted, preserve data\n   - Prevent new transactions\n   - Maintain audit trail\n\n### Performance Metrics Rules\n1. **Quality Score Calculation**\n   - Based on delivery performance\n   - Product quality ratings\n   - Invoice accuracy\n   - Communication responsiveness\n\n2. **Rating System**\n   - 0-5 star rating\n   - Calculated from metrics\n   - Updated periodically\n\nSee [Business Rules Documentation](./business-logic/) for complete rule specifications.\n\n## Integration Points\n\n### Procurement Module\n- Vendor selection in Purchase Requests\n- Vendor selection in Purchase Orders\n- Price validation against vendor pricelists\n- Delivery terms from vendor profile\n\n### Finance Module\n- Tax calculation using vendor tax profile\n- Payment terms from vendor settings\n- Currency preferences\n- Invoice validation\n\n### Inventory Module\n- GRN vendor association\n- Stock-in vendor tracking\n- Quality inspection by vendor\n\n### Reporting Module\n- Vendor performance reports\n- Spend analysis by vendor\n- Delivery performance tracking\n- Price trend analysis\n\n## Security & Permissions\n\n### Role-Based Access\n\n#### View Permissions\n- All users: View vendor list\n- Purchasing Staff: View detailed vendor info\n- Finance: View financial details\n\n#### Edit Permissions\n- Purchasing Staff: Create/edit vendors\n- Department Manager: Approve vendors\n- Financial Manager: Edit financial terms\n\n#### Delete Permissions\n- Department Manager: Delete vendors (with checks)\n- Admin: Force delete vendors\n\n### Data Privacy\n- Sensitive fields masked for unauthorized users\n- Audit trail for all changes\n- Encryption for sensitive data\n\n## Testing\n\n### Unit Tests\n- Component rendering tests\n- Form validation tests\n- Service layer tests\n- API endpoint tests\n\n### Integration Tests\n- End-to-end vendor creation flow\n- Vendor deletion with dependencies\n- Filter and search functionality\n- Pricelist management workflow\n\n### Test Data\n**File**: `lib/mock-data/vendors.ts`\n- Sample vendor profiles\n- Test certifications\n- Mock pricelists\n- Test campaigns\n\n## Development Roadmap\n\n### ✅ Completed (Production Ready)\n- Vendor profile management\n- CRUD operations\n- Advanced filtering\n- Dependency checking\n- Tax configuration\n- Certification tracking\n\n### 🚧 In Progress (Prototype/Demo)\n- Pricelist templates\n- Request for pricing campaigns\n- Vendor portal\n- Price validation\n- Excel integration\n\n### 📅 Planned (Future Features)\n- Advanced analytics dashboard\n- AI-powered vendor recommendations\n- Automated price comparison\n- Contract management automation\n- Vendor performance prediction\n- Blockchain-based verification\n\n## Troubleshooting\n\n### Common Issues\n\n#### Vendor Not Appearing in List\n**Cause**: Status filter or search query\n**Solution**: Clear all filters and check status\n\n#### Cannot Delete Vendor\n**Cause**: Active dependencies\n**Solution**: Review dependency list, consider archiving instead\n\n#### Tax Rate Not Updating\n**Cause**: Tax profile mismatch\n**Solution**: Select correct tax profile or use custom rate\n\n#### Price List Not Loading\n**Cause**: Prototype feature using mock data\n**Solution**: Check if using production or demo mode\n\n## Documentation Structure\n\nThis module documentation follows a modular structure for easy navigation and maintenance.\n\n### Main Documentation\n- **[VENDOR-MANAGEMENT-MODULE.md](VENDOR-MANAGEMENT-MODULE.md)** - Module overview and entry point\n\n### Submodule Documentation\n1. **[MANAGE-VENDORS.md](MANAGE-VENDORS.md)** - Vendor CRUD operations, detail pages, and forms\n2. **[TEMPLATES.md](TEMPLATES.md)** - Pricelist template management\n3. **[CAMPAIGNS.md](CAMPAIGNS.md)** - RFP/RFQ campaign workflows\n4. **[PRICELISTS.md](PRICELISTS.md)** - Pricelist viewing and editing\n5. **[VENDOR-PORTAL.md](VENDOR-PORTAL.md)** - External vendor self-service portal\n\n### Supporting Documentation\n- **[SHARED-COMPONENTS.md](SHARED-COMPONENTS.md)** - Reusable UI components, modals, dropdowns, and actions\n- **[PAGES-AND-COMPONENTS-SPEC.md](PAGES-AND-COMPONENTS-SPEC.md)** - Legacy comprehensive specification (reference)\n\n### Templates & Tools\n- **[module-spec-template.md](../module-spec-template.md)** - Reusable template for documenting other modules\n\n## Related Documentation\n\n- [Module Analysis Template](../module-analysis-template.md)\n- [Sitemap & Navigation](./sitemap.md)\n- [Page Documentation](./pages/)\n- [Component Documentation](./components/)\n- [Business Logic](./business-logic/)\n- [API Documentation](./api/)\n\n## Support & Contact\n\nFor questions or issues with the Vendor Management module:\n- Technical Lead: [Contact Info]\n- Product Owner: [Contact Info]\n- Documentation: This file and linked resources\n\n---\n\n**Last Updated**: 2025-10-02\n**Module Version**: 1.0.0 (Core), 0.5.0 (Price Management Prototype)\n**Documentation Status**: Complete\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

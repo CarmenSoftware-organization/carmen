@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Module - API and Stored Procedures Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">API Reference</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">API Reference</a> / Workflow Api Sp</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Workflow Module - API and Stored Procedures Documentation\n\n## 1. REST API Endpoints\n\n### 1.1 Workflow Configuration\n\n#### Get Workflows\n```typescript\nGET /api/workflows\nResponse: Workflow[]\n```\n\n#### Get Workflow by ID\n```typescript\nGET /api/workflows/:id\nResponse: Workflow\n```\n\n#### Create Workflow\n```typescript\nPOST /api/workflows\nBody: {\n  name: string\n  type: string\n  description: string\n  documentReferencePattern: string\n  status: string\n  stages: Stage[]\n  routingRules: RoutingRule[]\n  notifications: WorkflowNotification[]\n  notificationTemplates: Template[]\n  products: Product[]\n}\nResponse: Workflow\n```\n\n#### Update Workflow\n```typescript\nPUT /api/workflows/:id\nBody: Partial<Workflow>\nResponse: Workflow\n```\n\n#### Delete Workflow\n```typescript\nDELETE /api/workflows/:id\nResponse: { success: boolean }\n```\n\n### 1.2 Stage Management\n\n#### Get Stages\n```typescript\nGET /api/workflows/:workflowId/stages\nResponse: Stage[]\n```\n\n#### Get Stage by ID\n```typescript\nGET /api/workflows/:workflowId/stages/:id\nResponse: Stage\n```\n\n#### Create Stage\n```typescript\nPOST /api/workflows/:workflowId/stages\nBody: {\n  name: string\n  description: string\n  sla: string\n  slaUnit: string\n  availableActions: string[]\n  hideFields: {\n    pricePerUnit: boolean\n    totalPrice: boolean\n  }\n  assignedUsers: {\n    id: number\n    name: string\n    department: string\n    location: string\n  }[]\n}\nResponse: Stage\n```\n\n#### Update Stage\n```typescript\nPUT /api/workflows/:workflowId/stages/:id\nBody: Partial<Stage>\nResponse: Stage\n```\n\n#### Delete Stage\n```typescript\nDELETE /api/workflows/:workflowId/stages/:id\nResponse: { success: boolean }\n```\n\n### 1.3 Routing Rules\n\n#### Get Rules\n```typescript\nGET /api/workflows/:workflowId/rules\nResponse: RoutingRule[]\n```\n\n#### Get Rule by ID\n```typescript\nGET /api/workflows/:workflowId/rules/:id\nResponse: RoutingRule\n```\n\n#### Create Rule\n```typescript\nPOST /api/workflows/:workflowId/rules\nBody: {\n  name: string\n  description: string\n  triggerStage: string\n  condition: RoutingCondition\n  action: RoutingAction\n}\nResponse: RoutingRule\n```\n\n#### Update Rule\n```typescript\nPUT /api/workflows/:workflowId/rules/:id\nBody: Partial<RoutingRule>\nResponse: RoutingRule\n```\n\n#### Delete Rule\n```typescript\nDELETE /api/workflows/:workflowId/rules/:id\nResponse: { success: boolean }\n```\n\n### 1.4 Workflow Execution\n\n#### Start Workflow\n```typescript\nPOST /api/workflows/:workflowId/execute\nBody: {\n  documentId: string\n  initiator: string\n  initialData: Record<string, any>\n}\nResponse: {\n  instanceId: string\n  currentStage: Stage\n  status: string\n}\n```\n\n#### Process Stage Action\n```typescript\nPOST /api/workflows/:workflowId/instances/:instanceId/action\nBody: {\n  action: string\n  userId: string\n  comments?: string\n  data?: Record<string, any>\n}\nResponse: {\n  nextStage: Stage\n  status: string\n}\n```\n\n#### Get Instance Status\n```typescript\nGET /api/workflows/:workflowId/instances/:instanceId\nResponse: {\n  instanceId: string\n  workflow: Workflow\n  currentStage: Stage\n  status: string\n  history: {\n    stage: Stage\n    action: string\n    actionBy: string\n    actionDate: string\n    comments?: string\n  }[]\n}\n```\n\n## 2. Stored Procedures\n\n### 2.1 Workflow Configuration\n\n#### sp_CreateWorkflow\n```sql\nPROCEDURE sp_CreateWorkflow\n  @Name nvarchar(100),\n  @Type nvarchar(50),\n  @Description nvarchar(500),\n  @DocumentPattern nvarchar(50),\n  @Status nvarchar(20)\nRETURNS UNIQUEIDENTIFIER\n```\n\n#### sp_UpdateWorkflow\n```sql\nPROCEDURE sp_UpdateWorkflow\n  @WorkflowId uniqueidentifier,\n  @Name nvarchar(100),\n  @Description nvarchar(500),\n  @Status nvarchar(20)\nRETURNS bit\n```\n\n#### sp_DeleteWorkflow\n```sql\nPROCEDURE sp_DeleteWorkflow\n  @WorkflowId uniqueidentifier\nRETURNS bit\n```\n\n### 2.2 Stage Management\n\n#### sp_CreateStage\n```sql\nPROCEDURE sp_CreateStage\n  @WorkflowId uniqueidentifier,\n  @Name nvarchar(100),\n  @Description nvarchar(500),\n  @SLA nvarchar(20),\n  @SLAUnit nvarchar(10),\n  @AvailableActions nvarchar(max),\n  @HideFields nvarchar(max)\nRETURNS int\n```\n\n#### sp_UpdateStage\n```sql\nPROCEDURE sp_UpdateStage\n  @StageId int,\n  @Name nvarchar(100),\n  @Description nvarchar(500),\n  @SLA nvarchar(20),\n  @SLAUnit nvarchar(10),\n  @AvailableActions nvarchar(max),\n  @HideFields nvarchar(max)\nRETURNS bit\n```\n\n#### sp_AssignUsersToStage\n```sql\nPROCEDURE sp_AssignUsersToStage\n  @StageId int,\n  @Users nvarchar(max)\nRETURNS bit\n```\n\n### 2.3 Routing Rules\n\n#### sp_CreateRoutingRule\n```sql\nPROCEDURE sp_CreateRoutingRule\n  @WorkflowId uniqueidentifier,\n  @Name nvarchar(100),\n  @Description nvarchar(500),\n  @TriggerStage nvarchar(100),\n  @Condition nvarchar(max),\n  @Action nvarchar(max)\nRETURNS int\n```\n\n#### sp_UpdateRoutingRule\n```sql\nPROCEDURE sp_UpdateRoutingRule\n  @RuleId int,\n  @Name nvarchar(100),\n  @Description nvarchar(500),\n  @Condition nvarchar(max),\n  @Action nvarchar(max)\nRETURNS bit\n```\n\n### 2.4 Workflow Execution\n\n#### sp_InitiateWorkflow\n```sql\nPROCEDURE sp_InitiateWorkflow\n  @WorkflowId uniqueidentifier,\n  @DocumentId nvarchar(50),\n  @Initiator nvarchar(50),\n  @InitialData nvarchar(max)\nRETURNS uniqueidentifier\n```\n\n#### sp_ProcessStageAction\n```sql\nPROCEDURE sp_ProcessStageAction\n  @InstanceId uniqueidentifier,\n  @Action nvarchar(50),\n  @UserId nvarchar(50),\n  @Comments nvarchar(500),\n  @ActionData nvarchar(max)\nRETURNS bit\n```\n\n#### sp_GetWorkflowStatus\n```sql\nPROCEDURE sp_GetWorkflowStatus\n  @InstanceId uniqueidentifier\nRETURNS TABLE (\n  InstanceId uniqueidentifier,\n  WorkflowId uniqueidentifier,\n  CurrentStage int,\n  Status nvarchar(50),\n  LastUpdated datetime\n)\n```\n\n### 2.5 Notification Management\n\n#### sp_CreateNotification\n```sql\nPROCEDURE sp_CreateNotification\n  @WorkflowId uniqueidentifier,\n  @Event nvarchar(100),\n  @EventTrigger nvarchar(50),\n  @Description nvarchar(500),\n  @Recipients nvarchar(max),\n  @Channels nvarchar(max)\nRETURNS int\n```\n\n#### sp_SendNotification\n```sql\nPROCEDURE sp_SendNotification\n  @NotificationId int,\n  @InstanceId uniqueidentifier,\n  @Recipients nvarchar(max),\n  @TemplateData nvarchar(max)\nRETURNS bit\n```\n\n## 3. Database Functions\n\n### 3.1 Workflow Validation\n\n#### fn_ValidateWorkflowStages\n```sql\nFUNCTION fn_ValidateWorkflowStages\n  @WorkflowId uniqueidentifier\nRETURNS bit\n```\n\n#### fn_ValidateRoutingRules\n```sql\nFUNCTION fn_ValidateRoutingRules\n  @WorkflowId uniqueidentifier\nRETURNS bit\n```\n\n### 3.2 SLA Calculations\n\n#### fn_CalculateSLADeadline\n```sql\nFUNCTION fn_CalculateSLADeadline\n  @StartTime datetime,\n  @SLA nvarchar(20),\n  @SLAUnit nvarchar(10)\nRETURNS datetime\n```\n\n#### fn_CheckSLABreached\n```sql\nFUNCTION fn_CheckSLABreached\n  @InstanceId uniqueidentifier\nRETURNS bit\n```\n\n## 4. Error Codes and Handling\n\n### 4.1 API Error Codes\n- WF001: Invalid workflow configuration\n- WF002: Stage not found\n- WF003: Invalid routing rule\n- WF004: Unauthorized action\n- WF005: Invalid workflow state transition\n- WF006: SLA breach detected\n- WF007: Notification delivery failure\n\n### 4.2 Stored Procedure Error Handling\n```sql\nBEGIN TRY\n  -- Procedure logic\nEND TRY\nBEGIN CATCH\n  INSERT INTO WorkflowErrors (\n    ErrorNumber,\n    ErrorSeverity,\n    ErrorState,\n    ErrorProcedure,\n    ErrorLine,\n    ErrorMessage,\n    ErrorTimestamp\n  )\n  SELECT\n    ERROR_NUMBER(),\n    ERROR_SEVERITY(),\n    ERROR_STATE(),\n    ERROR_PROCEDURE(),\n    ERROR_LINE(),\n    ERROR_MESSAGE(),\n    GETDATE()\n  \n  -- Return error to caller\n  RETURN 0\nEND CATCH\n```\n\n## 5. Example Request/Response Payloads\n\n### 5.1 Workflow Configuration Examples\n\n#### Create Workflow\n```typescript\n// Request\nPOST /api/workflows\n{\n  \"name\": \"Purchase Request Workflow\",\n  \"type\": \"PURCHASE_REQUEST\",\n  \"description\": \"Standard purchase request approval workflow\",\n  \"documentReferencePattern\": \"PR-{YYYY}-{MM}-{0000}\",\n  \"status\": \"Draft\",\n  \"stages\": [\n    {\n      \"name\": \"Department Approval\",\n      \"description\": \"Initial approval by department head\",\n      \"sla\": \"24\",\n      \"slaUnit\": \"hours\",\n      \"availableActions\": [\"Approve\", \"Reject\", \"Send Back\"],\n      \"hideFields\": {\n        \"pricePerUnit\": false,\n        \"totalPrice\": false\n      },\n      \"assignedUsers\": [\n        {\n          \"id\": 101,\n          \"name\": \"John Smith\",\n          \"department\": \"IT\",\n          \"location\": \"Bangkok\"\n        }\n      ]\n    },\n    {\n      \"name\": \"Finance Review\",\n      \"description\": \"Financial review and budget verification\",\n      \"sla\": \"48\",\n      \"slaUnit\": \"hours\",\n      \"availableActions\": [\"Approve\", \"Reject\", \"Send Back\"],\n      \"hideFields\": {\n        \"pricePerUnit\": false,\n        \"totalPrice\": false\n      },\n      \"assignedUsers\": [\n        {\n          \"id\": 102,\n          \"name\": \"Jane Doe\",\n          \"department\": \"Finance\",\n          \"location\": \"Bangkok\"\n        }\n      ]\n    }\n  ],\n  \"routingRules\": [\n    {\n      \"name\": \"High Value Purchase\",\n      \"description\": \"Route high value purchases to finance\",\n      \"triggerStage\": \"Department Approval\",\n      \"condition\": {\n        \"field\": \"totalAmount\",\n        \"operator\": \"gt\",\n        \"value\": \"50000\"\n      },\n      \"action\": {\n        \"type\": \"NEXT_STAGE\",\n        \"parameters\": {\n          \"targetStage\": \"Finance Review\"\n        }\n      }\n    }\n  ],\n  \"notifications\": [\n    {\n      \"id\": 1,\n      \"event\": \"Request Submitted\",\n      \"eventTrigger\": \"onSubmit\",\n      \"description\": \"Notify when request is submitted\",\n      \"recipients\": [\"Requester\", \"Department Head\"],\n      \"channels\": [\"Email\", \"System\"]\n    }\n  ],\n  \"products\": [\n    {\n      \"id\": 1,\n      \"name\": \"Office Supplies\",\n      \"code\": \"OS-001\",\n      \"category\": \"Supplies\",\n      \"subCategory\": \"Office\"\n    }\n  ]\n}\n\n// Response\n{\n  \"id\": \"WF-2024-001\",\n  \"name\": \"Purchase Request Workflow\",\n  \"type\": \"PURCHASE_REQUEST\",\n  // ... rest of the workflow data ...\n  \"status\": \"Draft\"\n}\n```\n\n### 5.2 Workflow Execution Examples\n\n#### Start Workflow\n```typescript\n// Request\nPOST /api/workflows/WF-2024-001/execute\n{\n  \"documentId\": \"PR-2024-03-0001\",\n  \"initiator\": \"user123\",\n  \"initialData\": {\n    \"requestType\": \"Purchase\",\n    \"department\": \"IT\",\n    \"totalAmount\": 75000,\n    \"currency\": \"THB\",\n    \"items\": [\n      {\n        \"productId\": 1,\n        \"quantity\": 10,\n        \"unitPrice\": 7500\n      }\n    ]\n  }\n}\n\n// Response\n{\n  \"instanceId\": \"WFI-2024-001\",\n  \"currentStage\": {\n    \"id\": 1,\n    \"name\": \"Department Approval\",\n    \"description\": \"Initial approval by department head\",\n    // ... rest of stage data ...\n  },\n  \"status\": \"Pending_Approval\"\n}\n```\n\n#### Process Stage Action\n```typescript\n// Request\nPOST /api/workflows/WF-2024-001/instances/WFI-2024-001/action\n{\n  \"action\": \"Approve\",\n  \"userId\": \"dept_head_123\",\n  \"comments\": \"Approved based on budget allocation\",\n  \"data\": {\n    \"approvalDate\": \"2024-03-20T10:30:00Z\",\n    \"budgetCode\": \"IT-2024-Q1\"\n  }\n}\n\n// Response\n{\n  \"nextStage\": {\n    \"id\": 2,\n    \"name\": \"Finance Review\",\n    // ... rest of stage data ...\n  },\n  \"status\": \"In_Progress\"\n}\n```\n\n#### Get Instance Status\n```typescript\n// Request\nGET /api/workflows/WF-2024-001/instances/WFI-2024-001\n\n// Response\n{\n  \"instanceId\": \"WFI-2024-001\",\n  \"workflow\": {\n    \"id\": \"WF-2024-001\",\n    \"name\": \"Purchase Request Workflow\",\n    // ... rest of workflow data ...\n  },\n  \"currentStage\": {\n    \"id\": 2,\n    \"name\": \"Finance Review\",\n    // ... rest of stage data ...\n  },\n  \"status\": \"In_Progress\",\n  \"history\": [\n    {\n      \"stage\": {\n        \"id\": 1,\n        \"name\": \"Department Approval\"\n      },\n      \"action\": \"Approve\",\n      \"actionBy\": \"dept_head_123\",\n      \"actionDate\": \"2024-03-20T10:30:00Z\",\n      \"comments\": \"Approved based on budget allocation\"\n    }\n  ]\n}\n```\n\n### 5.3 Error Response Examples\n\n#### Validation Error\n```typescript\n// Response (400 Bad Request)\n{\n  \"error\": {\n    \"code\": \"WF001\",\n    \"message\": \"Invalid workflow configuration\",\n    \"details\": [\n      {\n        \"field\": \"stages\",\n        \"error\": \"Workflow must have at least one stage\"\n      }\n    ]\n  }\n}\n```\n\n#### Authorization Error\n```typescript\n// Response (403 Forbidden)\n{\n  \"error\": {\n    \"code\": \"WF004\",\n    \"message\": \"Unauthorized action\",\n    \"details\": {\n      \"requiredRole\": \"WORKFLOW_ADMIN\",\n      \"action\": \"DELETE_WORKFLOW\"\n    }\n  }\n}\n```\n\n#### SLA Breach Error\n```typescript\n// Response (400 Bad Request)\n{\n  \"error\": {\n    \"code\": \"WF006\",\n    \"message\": \"SLA breach detected\",\n    \"details\": {\n      \"stage\": \"Department Approval\",\n      \"sla\": \"24 hours\",\n      \"elapsed\": \"26 hours\"\n    }\n  }\n} ";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

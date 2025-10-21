@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Module - Detailed Specification - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Purchase Requests</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Purchase Request Module - Detailed Specification\n\n## Module Overview\n\n**Module Name**: Purchase Request Management System\n**Module Code**: `PR_MGT`\n**Version**: 1.0.0\n**Last Updated**: 2024-12-23\n**Status**: Active Development\n\n### Purpose\nThe Purchase Request Module is a comprehensive procurement initiation system that allows users to create, submit, approve, and track purchase requests throughout the organization's approval workflow.\n\n### Scope\nThis module handles the complete lifecycle of purchase requests from initial creation through final approval and conversion to purchase orders, including vendor management, budget validation, and workflow automation.\n\n## System Screenshots\n\n### Purchase Request List View\n![Purchase Request List View](./purchase-requests-list-view.png)\n\n*The main Purchase Request list interface showing filtering, sorting, and status management capabilities with comprehensive data display including requestor, department, amounts, and workflow status.*\n\n### Purchase Request Detail View - Items Tab\n![Purchase Request Detail View](./purchase-request-detail-working.png)\n\n*Detailed view of a purchase request showing the Items tab with comprehensive item management, including location status, product details, pricing, and approval workflow progress indicators.*\n\n### Purchase Request Detail View - Budget Tab\n![Purchase Request Budget Tab](./purchase-request-budgets-tab.png)\n\n*Budget allocation management interface showing budget categories, total budget amounts, soft and hard commitments, available budget, and current PR amounts with status indicators for budget compliance.*\n\n### System Dashboard Context\n![Dashboard Overview](./dashboard-overview.png)\n\n*Carmen ERP dashboard showing the procurement context with key metrics including total orders, active suppliers, inventory value, and monthly spend analytics.*\n\n## Functional Requirements\n\n### 1. Purchase Request Creation\n\n#### 1.1 Template-Based Creation\n```mermaid\nflowchart TD\n    A[User Clicks Create PR] --> B[Template Selection Modal]\n    B --> C{Template Type}\n    C -->|Office| D[Office Supplies Template]\n    C -->|IT| E[IT Equipment Template]\n    C -->|Kitchen| F[Kitchen/F&B Template]\n    C -->|Maintenance| G[Maintenance Template]\n    C -->|Custom| H[Blank Template]\n\n    D --> I[Pre-filled Categories]\n    E --> I\n    F --> I\n    G --> I\n    H --> I\n\n    I --> J[PR Form]\n```\n\n**Requirements**:\n- **PR-REQ-001**: System shall provide predefined templates for common purchase categories\n- **PR-REQ-002**: Templates shall pre-populate relevant item categories and default values\n- **PR-REQ-003**: Users shall be able to modify template items before submission\n- **PR-REQ-004**: System shall support custom/blank template creation\n\n#### 1.2 Form Data Collection\n```typescript\ninterface PurchaseRequestForm {\n  // Basic Information\n  requestorId: string;\n  departmentId: string;\n  locationId: string;\n  priority: 'low' | 'medium' | 'high' | 'urgent';\n  requiredDate: Date;\n  justification: string;\n\n  // Items\n  items: PurchaseRequestItem[];\n\n  // Budget\n  budgetCode?: string;\n  costCenter?: string;\n\n  // Approval\n  approvalRoute?: 'standard' | 'expedited' | 'executive';\n}\n```\n\n**Requirements**:\n- **PR-REQ-005**: System shall capture all mandatory fields before submission\n- **PR-REQ-006**: System shall validate required date is future date\n- **PR-REQ-007**: System shall enforce character limits on text fields\n- **PR-REQ-008**: System shall auto-populate requestor information from user session\n\n### 2. Item Management\n\n#### 2.1 Item Addition and Configuration\n```mermaid\ngraph TD\n    A[Add Item Button] --> B[Item Form Modal]\n    B --> C[Item Details Input]\n    C --> D[Quantity & Units]\n    D --> E[Price Information]\n    E --> F[Vendor Selection]\n    F --> G[Save Item]\n\n    G --> H{Validation}\n    H -->|Valid| I[Add to PR]\n    H -->|Invalid| J[Show Errors]\n    J --> C\n```\n\n**Requirements**:\n- **PR-REQ-009**: System shall support unlimited items per purchase request\n- **PR-REQ-010**: Each item shall have name, description, quantity, unit, and estimated price\n- **PR-REQ-011**: System shall validate numeric fields for quantity and price\n- **PR-REQ-012**: System shall support multiple units of measure per item type\n\n#### 2.2 Vendor Management Integration\n```typescript\ninterface ItemVendorSelection {\n  preferredVendor?: Vendor;\n  alternativeVendors: Vendor[];\n  priceQuotes: PriceQuote[];\n  selectedQuote?: PriceQuote;\n  justification?: string;\n}\n```\n\n**Requirements**:\n- **PR-REQ-013**: System shall integrate with vendor database for selection\n- **PR-REQ-014**: System shall display vendor ratings and performance history\n- **PR-REQ-015**: System shall support multiple price quotes per item\n- **PR-REQ-016**: System shall track vendor selection justification\n\n### 3. Workflow Management\n\n#### 3.1 Approval Routing Engine\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n\n    Draft --> Submitted : Submit for Approval\n\n    Submitted --> DeptApproval : Value < $5000\n    Submitted --> FinanceApproval : Value $5000-$10000\n    Submitted --> GMApproval : Value > $10000\n\n    DeptApproval --> FinanceApproval : Approved & Value > $1000\n    DeptApproval --> Purchasing : Approved & Value ≤ $1000\n    DeptApproval --> Rejected : Rejected\n    DeptApproval --> Draft : Returned\n\n    FinanceApproval --> GMApproval : Approved & Value > $10000\n    FinanceApproval --> Purchasing : Approved\n    FinanceApproval --> Rejected : Rejected\n    FinanceApproval --> DeptApproval : Returned\n\n    GMApproval --> Purchasing : Approved\n    GMApproval --> Rejected : Rejected\n    GMApproval --> FinanceApproval : Returned\n\n    Purchasing --> Completed : Processed\n    Purchasing --> OnHold : Vendor Issues\n\n    OnHold --> Purchasing : Issues Resolved\n\n    Rejected --> [*]\n    Completed --> [*]\n```\n\n**Requirements**:\n- **PR-REQ-017**: System shall route approval based on total request value\n- **PR-REQ-018**: System shall support department-specific approval workflows\n- **PR-REQ-019**: System shall track approval timestamps and comments\n- **PR-REQ-020**: System shall send notifications at each workflow stage\n\n#### 3.2 Role-Based Permissions\n```typescript\ninterface WorkflowPermissions {\n  canCreate: boolean;\n  canEdit: boolean;\n  canDelete: boolean;\n  canApprove: boolean;\n  canReject: boolean;\n  canReturn: boolean;\n  canViewFinancials: boolean;\n  canOverridePrices: boolean;\n}\n\ntype UserRole = 'requester' | 'dept_manager' | 'finance_manager' | 'purchasing_staff' | 'gm';\n```\n\n**Requirements**:\n- **PR-REQ-021**: System shall enforce role-based access control\n- **PR-REQ-022**: System shall hide/show UI elements based on permissions\n- **PR-REQ-023**: System shall validate permissions on all API operations\n- **PR-REQ-024**: System shall maintain audit trail of permission-based actions\n\n### 4. Budget Integration\n\n#### 4.1 Budget Validation\n```mermaid\nflowchart TD\n    A[PR Submission] --> B[Extract Budget Codes]\n    B --> C[Validate Budget Existence]\n    C --> D{Budget Valid?}\n    D -->|No| E[Budget Error]\n    D -->|Yes| F[Check Available Balance]\n    F --> G{Sufficient Funds?}\n    G -->|No| H[Over Budget Warning]\n    G -->|Yes| I[Reserve Funds]\n\n    H --> J[Require Additional Approval]\n    I --> K[Proceed with Approval]\n    E --> L[Return to User]\n    J --> M[Route to Finance]\n```\n\n**Requirements**:\n- **PR-REQ-025**: System shall validate budget codes against financial system\n- **PR-REQ-026**: System shall check available budget balance before approval\n- **PR-REQ-027**: System shall reserve funds upon approval\n- **PR-REQ-028**: System shall handle over-budget scenarios with escalation\n\n### 5. Reporting and Analytics\n\n#### 5.1 Dashboard Metrics\n```typescript\ninterface PRDashboardMetrics {\n  totalRequests: number;\n  pendingApprovals: number;\n  approvedThisMonth: number;\n  rejectedThisMonth: number;\n  averageApprovalTime: number;\n  topCategories: CategorySpending[];\n  budgetUtilization: BudgetMetrics[];\n}\n```\n\n**Requirements**:\n- **PR-REQ-029**: System shall provide real-time dashboard metrics\n- **PR-REQ-030**: System shall track approval cycle times\n- **PR-REQ-031**: System shall generate spending analytics by category\n- **PR-REQ-032**: System shall provide budget utilization reporting\n\n## Technical Requirements\n\n### 1. Performance Requirements\n\n| Metric | Requirement | Current Performance |\n|--------|-------------|-------------------|\n| Page Load Time | < 2 seconds | 1.8 seconds |\n| API Response Time | < 500ms | 320ms average |\n| Database Query Time | < 100ms | 85ms average |\n| File Upload Time | < 30 seconds for 10MB | 25 seconds |\n| Concurrent Users | 100+ simultaneous | 150+ tested |\n\n**Requirements**:\n- **PR-TECH-001**: System shall load pages within 2 seconds on standard network\n- **PR-TECH-002**: API responses shall return within 500ms for standard operations\n- **PR-TECH-003**: System shall support 100+ concurrent users\n- **PR-TECH-004**: File uploads shall complete within 30 seconds for files up to 10MB\n\n### 2. Data Requirements\n\n#### 2.1 Data Model\n```mermaid\nerDiagram\n    PURCHASE_REQUEST {\n        string id PK\n        string ref_number UK\n        datetime created_date\n        datetime required_date\n        string status\n        string current_stage\n        decimal total_amount\n        string requestor_id FK\n        string department_id FK\n        text justification\n    }\n\n    PR_ITEM {\n        string id PK\n        string pr_id FK\n        string name\n        text description\n        decimal quantity\n        string unit\n        decimal unit_price\n        decimal total_price\n        string vendor_id FK\n    }\n\n    PR_APPROVAL {\n        string id PK\n        string pr_id FK\n        string approver_id FK\n        string action\n        datetime timestamp\n        text comments\n    }\n\n    BUDGET_ALLOCATION {\n        string id PK\n        string pr_id FK\n        string budget_code\n        decimal amount\n        string cost_center\n    }\n\n    PURCHASE_REQUEST ||--o{ PR_ITEM : contains\n    PURCHASE_REQUEST ||--o{ PR_APPROVAL : has\n    PURCHASE_REQUEST ||--o{ BUDGET_ALLOCATION : allocates\n```\n\n**Requirements**:\n- **PR-DATA-001**: System shall maintain referential integrity across all tables\n- **PR-DATA-002**: System shall implement soft deletes for audit purposes\n- **PR-DATA-003**: System shall encrypt sensitive financial data at rest\n- **PR-DATA-004**: System shall implement row-level security for data access\n\n#### 2.2 Data Validation Rules\n```typescript\nconst ValidationRules = {\n  purchaseRequest: {\n    refNumber: { required: true, pattern: /^PR-\\d{6}$/, unique: true },\n    requiredDate: { required: true, minDate: 'today+1' },\n    justification: { required: true, maxLength: 1000 },\n    totalAmount: { required: true, min: 0.01, max: 1000000 }\n  },\n  prItem: {\n    name: { required: true, maxLength: 200 },\n    quantity: { required: true, min: 0.01, max: 99999 },\n    unitPrice: { required: true, min: 0.01, max: 100000 }\n  }\n};\n```\n\n**Requirements**:\n- **PR-DATA-005**: System shall validate all input data according to business rules\n- **PR-DATA-006**: System shall prevent SQL injection and XSS attacks\n- **PR-DATA-007**: System shall implement field-level validation with user feedback\n- **PR-DATA-008**: System shall maintain data consistency across all operations\n\n### 3. Integration Requirements\n\n#### 3.1 External System Integration\n```mermaid\ngraph LR\n    A[PR Module] --> B[ERP System]\n    A --> C[Budget System]\n    A --> D[Vendor Database]\n    A --> E[Email Service]\n    A --> F[Document Storage]\n\n    B --> G[Purchase Orders]\n    C --> H[Budget Validation]\n    D --> I[Vendor Information]\n    E --> J[Notifications]\n    F --> K[File Attachments]\n```\n\n**Requirements**:\n- **PR-INT-001**: System shall integrate with central ERP for purchase order creation\n- **PR-INT-002**: System shall validate budgets against financial system\n- **PR-INT-003**: System shall sync vendor data from central vendor database\n- **PR-INT-004**: System shall send email notifications via SMTP service\n- **PR-INT-005**: System shall store attachments in secure document management system\n\n### 4. Security Requirements\n\n#### 4.1 Authentication and Authorization\n```typescript\ninterface SecurityControls {\n  authentication: {\n    method: 'SSO' | 'LDAP' | 'LOCAL';\n    sessionTimeout: number; // minutes\n    passwordPolicy: PasswordPolicy;\n  };\n  authorization: {\n    rbac: boolean;\n    fieldLevelSecurity: boolean;\n    dataEncryption: boolean;\n  };\n  audit: {\n    logAllActions: boolean;\n    retentionPeriod: number; // days\n    tamperProtection: boolean;\n  };\n}\n```\n\n**Requirements**:\n- **PR-SEC-001**: System shall authenticate users via SSO integration\n- **PR-SEC-002**: System shall implement role-based access control\n- **PR-SEC-003**: System shall encrypt sensitive data in transit and at rest\n- **PR-SEC-004**: System shall maintain comprehensive audit logs\n- **PR-SEC-005**: System shall implement session timeout after 30 minutes of inactivity\n\n## User Interface Requirements\n\n### 1. Responsive Design\n```mermaid\ngraph TD\n    A[Device Detection] --> B{Screen Size}\n    B -->|Mobile < 768px| C[Mobile Layout]\n    B -->|Tablet 768-1024px| D[Tablet Layout]\n    B -->|Desktop > 1024px| E[Desktop Layout]\n\n    C --> F[Single Column]\n    C --> G[Collapsible Menu]\n    C --> H[Touch Optimized]\n\n    D --> I[Two Column]\n    D --> J[Sidebar Menu]\n\n    E --> K[Multi Column]\n    E --> L[Full Navigation]\n```\n\n**Requirements**:\n- **PR-UI-001**: System shall provide responsive design for mobile, tablet, and desktop\n- **PR-UI-002**: System shall maintain functionality across all screen sizes\n- **PR-UI-003**: System shall provide touch-friendly interface on mobile devices\n- **PR-UI-004**: System shall optimize performance for slower mobile networks\n\n### 2. Accessibility Requirements\n```typescript\ninterface AccessibilityFeatures {\n  keyboardNavigation: boolean;\n  screenReaderSupport: boolean;\n  colorContrastRatio: number; // WCAG AA: 4.5:1\n  focusIndicators: boolean;\n  alternativeText: boolean;\n  semanticMarkup: boolean;\n}\n```\n\n**Requirements**:\n- **PR-UI-005**: System shall meet WCAG 2.1 AA accessibility standards\n- **PR-UI-006**: System shall provide keyboard navigation for all functionality\n- **PR-UI-007**: System shall include appropriate ARIA labels and roles\n- **PR-UI-008**: System shall maintain color contrast ratio of 4.5:1 minimum\n\n### 3. User Experience Requirements\n```mermaid\njourney\n    title Purchase Request User Experience Journey\n    section Discovery\n        Navigate to PR Module    : 5: User\n        View Dashboard          : 4: User\n        Find Create Button      : 5: User\n    section Creation\n        Select Template         : 4: User\n        Fill Form              : 3: User\n        Add Items              : 3: User\n        Review Summary         : 4: User\n        Submit Request         : 5: User\n    section Tracking\n        Receive Confirmation   : 5: User\n        Check Status           : 4: User\n        Respond to Returns     : 3: User\n        Final Approval         : 5: User\n```\n\n**Requirements**:\n- **PR-UI-009**: System shall provide intuitive navigation with clear visual hierarchy\n- **PR-UI-010**: System shall minimize clicks required for common tasks\n- **PR-UI-011**: System shall provide clear status indicators and progress feedback\n- **PR-UI-012**: System shall implement consistent design patterns throughout\n\n## API Specifications\n\n### 1. RESTful API Endpoints\n\n#### 1.1 Purchase Requests\n```typescript\n// GET /api/purchase-requests\ninterface GetPurchaseRequestsResponse {\n  data: PurchaseRequest[];\n  pagination: {\n    page: number;\n    limit: number;\n    total: number;\n    totalPages: number;\n  };\n  filters: FilterOptions;\n}\n\n// POST /api/purchase-requests\ninterface CreatePurchaseRequestRequest {\n  requestorId: string;\n  departmentId: string;\n  locationId: string;\n  priority: Priority;\n  requiredDate: string;\n  justification: string;\n  items: CreatePRItemRequest[];\n  budgetAllocations: BudgetAllocation[];\n}\n\n// PUT /api/purchase-requests/{id}\ninterface UpdatePurchaseRequestRequest {\n  priority?: Priority;\n  requiredDate?: string;\n  justification?: string;\n  items?: UpdatePRItemRequest[];\n}\n\n// POST /api/purchase-requests/{id}/workflow\ninterface WorkflowActionRequest {\n  action: 'approve' | 'reject' | 'return';\n  comments?: string;\n  returnToStage?: string;\n}\n```\n\n#### 1.2 Response Format\n```typescript\ninterface ApiResponse<T> {\n  success: boolean;\n  data?: T;\n  error?: {\n    code: string;\n    message: string;\n    details?: any;\n  };\n  metadata?: {\n    timestamp: string;\n    requestId: string;\n    version: string;\n  };\n}\n```\n\n**Requirements**:\n- **PR-API-001**: All API endpoints shall follow RESTful conventions\n- **PR-API-002**: API responses shall include consistent error handling\n- **PR-API-003**: API shall implement pagination for list endpoints\n- **PR-API-004**: API shall support filtering, sorting, and searching\n- **PR-API-005**: API shall implement rate limiting and authentication\n\n### 2. Real-time Updates\n```typescript\ninterface WebSocketEvents {\n  'pr:status-changed': {\n    prId: string;\n    oldStatus: string;\n    newStatus: string;\n    timestamp: string;\n  };\n  'pr:comment-added': {\n    prId: string;\n    comment: Comment;\n    author: User;\n  };\n  'pr:approval-received': {\n    prId: string;\n    approver: User;\n    action: 'approved' | 'rejected' | 'returned';\n  };\n}\n```\n\n**Requirements**:\n- **PR-API-006**: System shall provide real-time status updates via WebSockets\n- **PR-API-007**: System shall notify relevant users of workflow changes\n- **PR-API-008**: System shall maintain connection state and handle reconnection\n\n## Testing Requirements\n\n### 1. Unit Testing\n```typescript\ndescribe('Purchase Request Creation', () => {\n  it('should validate required fields', () => {\n    const invalidPR = createPRWithoutRequiredFields();\n    const result = validatePurchaseRequest(invalidPR);\n    expect(result.isValid).toBe(false);\n    expect(result.errors).toContain('Required date is mandatory');\n  });\n\n  it('should calculate total amount correctly', () => {\n    const pr = createPRWithItems([\n      { quantity: 2, unitPrice: 10.50 },\n      { quantity: 1, unitPrice: 25.00 }\n    ]);\n    expect(pr.totalAmount).toBe(46.00);\n  });\n});\n```\n\n**Requirements**:\n- **PR-TEST-001**: System shall achieve 90%+ code coverage for unit tests\n- **PR-TEST-002**: All business logic functions shall have comprehensive unit tests\n- **PR-TEST-003**: Tests shall cover both positive and negative scenarios\n- **PR-TEST-004**: Tests shall validate data transformations and calculations\n\n### 2. Integration Testing\n```typescript\ndescribe('Workflow Integration', () => {\n  it('should route approval correctly based on amount', async () => {\n    const highValuePR = await createPR({ totalAmount: 15000 });\n    await submitPR(highValuePR.id);\n\n    const updatedPR = await getPR(highValuePR.id);\n    expect(updatedPR.currentStage).toBe('GM_APPROVAL');\n  });\n});\n```\n\n**Requirements**:\n- **PR-TEST-005**: System shall test integration with external systems\n- **PR-TEST-006**: Tests shall validate workflow routing logic\n- **PR-TEST-007**: Tests shall verify permission enforcement\n- **PR-TEST-008**: Tests shall validate API contract compliance\n\n### 3. End-to-End Testing\n```typescript\ndescribe('Complete PR Lifecycle', () => {\n  it('should complete full approval workflow', async () => {\n    await page.goto('/procurement/purchase-requests');\n    await page.click('[data-testid=\"create-pr-button\"]');\n    await page.selectOption('[data-testid=\"template-select\"]', 'office');\n    // ... complete E2E test scenario\n  });\n});\n```\n\n**Requirements**:\n- **PR-TEST-009**: System shall have E2E tests for critical user journeys\n- **PR-TEST-010**: Tests shall validate UI functionality across browsers\n- **PR-TEST-011**: Tests shall verify responsive design behavior\n- **PR-TEST-012**: Tests shall include accessibility validation\n\n## Deployment Requirements\n\n### 1. Environment Configuration\n```yaml\nenvironments:\n  development:\n    database_url: \"postgresql://localhost/carmen_dev\"\n    redis_url: \"redis://localhost:6379\"\n    log_level: \"debug\"\n    enable_debug_tools: true\n\n  staging:\n    database_url: \"${DATABASE_URL}\"\n    redis_url: \"${REDIS_URL}\"\n    log_level: \"info\"\n    enable_debug_tools: false\n\n  production:\n    database_url: \"${DATABASE_URL}\"\n    redis_url: \"${REDIS_URL}\"\n    log_level: \"warn\"\n    enable_monitoring: true\n    ssl_required: true\n```\n\n**Requirements**:\n- **PR-DEPLOY-001**: System shall support multiple deployment environments\n- **PR-DEPLOY-002**: Configuration shall be externalized via environment variables\n- **PR-DEPLOY-003**: System shall implement blue-green deployment strategy\n- **PR-DEPLOY-004**: System shall include health checks and monitoring\n\n### 2. Monitoring and Observability\n```typescript\ninterface MonitoringMetrics {\n  performance: {\n    responseTime: number;\n    throughput: number;\n    errorRate: number;\n  };\n  business: {\n    totalPRsCreated: number;\n    averageApprovalTime: number;\n    rejectionRate: number;\n  };\n  system: {\n    memoryUsage: number;\n    cpuUsage: number;\n    diskSpace: number;\n  };\n}\n```\n\n**Requirements**:\n- **PR-DEPLOY-005**: System shall implement comprehensive application monitoring\n- **PR-DEPLOY-006**: System shall track business and technical metrics\n- **PR-DEPLOY-007**: System shall provide alerting for critical issues\n- **PR-DEPLOY-008**: System shall maintain audit logs for compliance\n\n## Maintenance and Support\n\n### 1. Documentation Requirements\n**Requirements**:\n- **PR-MAINT-001**: System shall maintain up-to-date API documentation\n- **PR-MAINT-002**: System shall provide user manuals for each role\n- **PR-MAINT-003**: System shall document deployment and configuration procedures\n- **PR-MAINT-004**: System shall maintain troubleshooting guides\n\n### 2. Support Procedures\n**Requirements**:\n- **PR-MAINT-005**: System shall provide tiered support structure\n- **PR-MAINT-006**: System shall maintain knowledge base for common issues\n- **PR-MAINT-007**: System shall implement issue tracking and resolution\n- **PR-MAINT-008**: System shall provide user training materials\n\n---\n\nThis specification serves as the definitive technical and functional reference for the Purchase Request Module, covering all aspects from business requirements through technical implementation and ongoing maintenance.";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

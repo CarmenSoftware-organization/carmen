@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP - Refactored Documentation Structure Plan - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← All Modules</a>
+            <h1>DOCUMENTATION-STRUCTURE-PLAN.MD</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="index.html">Module Overview</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="index.html">Documentation</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Carmen ERP - Refactored Documentation Structure Plan\n\n> **Version:** 2.0\n> **Date:** 2025-01-17\n> **Purpose:** Organized, hierarchical documentation with HTML navigation\n\n---\n\n## 📋 Table of Contents\n\n- [Documentation Philosophy](#documentation-philosophy)\n- [Directory Structure](#directory-structure)\n- [Module Documentation Template](#module-documentation-template)\n- [HTML Navigation System](#html-navigation-system)\n- [Sub-Options Organization](#sub-options-organization)\n- [Implementation Plan](#implementation-plan)\n\n---\n\n## Documentation Philosophy\n\n### Goals\n1. **Hierarchical Organization** - Clear parent-child relationships\n2. **HTML Navigation** - Interactive browsing with visual index\n3. **Sub-Option Documentation** - Detailed docs for each feature\n4. **Consistency** - Standardized templates across all modules\n5. **Discoverability** - Easy to find and navigate\n\n### Principles\n- **DRY** - Reference shared components, don't duplicate\n- **Progressive Disclosure** - Overview → Details → Technical\n- **Visual Navigation** - HTML indexes with screenshots\n- **Cross-Linking** - Related docs interconnected\n\n---\n\n## Directory Structure\n\n### Standard Module Structure\n\n```\ndocs/documents/{module-abbrev}/\n├── index.html                          # Interactive visual index\n├── README.md                           # Module overview\n├── {module}-specification.md           # Complete specification\n├── {module}-sitemap.md                # Navigation map\n│\n├── features/                           # Feature-level docs\n│   ├── index.html                     # Features visual index\n│   ├── {feature-1}/\n│   │   ├── README.md                  # Feature overview\n│   │   ├── specification.md           # Detailed spec\n│   │   ├── user-guide.md             # User documentation\n│   │   └── screenshots/              # Feature screenshots\n│   ├── {feature-2}/\n│   └── ...\n│\n├── components/                         # Component documentation\n│   ├── index.html                     # Components index\n│   ├── {component-1}.md\n│   └── ...\n│\n├── api/                               # API documentation\n│   ├── index.html                     # API index\n│   ├── endpoints.md\n│   ├── {endpoint-group}.md\n│   └── examples/\n│\n├── guides/                            # User guides\n│   ├── index.html\n│   ├── getting-started.md\n│   ├── administrator-guide.md\n│   ├── user-guide.md\n│   └── troubleshooting.md\n│\n├── technical/                         # Technical documentation\n│   ├── architecture.md\n│   ├── data-models.md\n│   ├── workflows.md\n│   └── integrations.md\n│\n└── screenshots/                       # Module screenshots\n    ├── dashboard.png\n    ├── {feature-name}-{view}.png\n    └── ...\n```\n\n---\n\n## Module Documentation Template\n\n### Level 1: Module Overview (README.md)\n\n```markdown\n# {Module Name}\n\n> Status, stats, quick links\n\n## Overview\n- Purpose\n- Key capabilities\n- User roles\n\n## Features Summary\n- Feature list with status\n- Quick access links\n\n## Getting Started\n- Quick start guide\n- Common tasks\n\n## Sub-Modules / Features\n- Feature 1 with link\n- Feature 2 with link\n\n## Documentation Index\n- Links to all docs\n\n## Related Modules\n- Cross-references\n```\n\n### Level 2: Feature Documentation (features/{feature}/README.md)\n\n```markdown\n# {Feature Name}\n\n> Feature status, scope, dependencies\n\n## Overview\n- What it does\n- Why it exists\n- Who uses it\n\n## Functionality\n- Core capabilities\n- User workflows\n- Business rules\n\n## User Interface\n- Screens and views\n- Navigation\n- Actions available\n\n## Technical Details\n- Components used\n- Data models\n- API endpoints\n\n## User Guide\n- How to use\n- Common tasks\n- Tips and tricks\n\n## Screenshots\n- Annotated screenshots\n```\n\n### Level 3: Component Documentation (components/{component}.md)\n\n```markdown\n# {Component Name}\n\n> Type, location, dependencies\n\n## Purpose\n## Props / Interface\n## Usage Examples\n## Related Components\n```\n\n---\n\n## HTML Navigation System\n\n### Root Index (docs/documents/index.html)\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Carmen ERP Documentation</title>\n    <style>\n        /* Modern, responsive design */\n        /* Card-based layout */\n        /* Color-coded by status */\n    </style>\n</head>\n<body>\n    <header>\n        <h1>Carmen ERP System Documentation</h1>\n        <nav>All Modules | By Feature | By Status | Search</nav>\n    </header>\n\n    <main>\n        <!-- Module Cards Grid -->\n        <div class=\"module-grid\">\n            <!-- System Administration Card -->\n            <div class=\"module-card status-complete\">\n                <img src=\"sa/screenshots/dashboard.png\" />\n                <h2>System Administration</h2>\n                <p>47 pages | 10 sub-modules</p>\n                <div class=\"features\">\n                    <span>Permission Management</span>\n                    <span>POS Integration</span>\n                    <span>+8 more</span>\n                </div>\n                <a href=\"sa/index.html\">Explore →</a>\n            </div>\n\n            <!-- More module cards... -->\n        </div>\n    </main>\n</body>\n</html>\n```\n\n### Module Index (docs/documents/{module}/index.html)\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>{Module Name} Documentation</title>\n</head>\n<body>\n    <header>\n        <nav>\n            <a href=\"../index.html\">← All Modules</a>\n            <h1>{Module Name}</h1>\n        </nav>\n    </header>\n\n    <aside>\n        <!-- Sidebar navigation -->\n        <nav class=\"sidebar\">\n            <h3>Features</h3>\n            <ul>\n                <li><a href=\"features/feature-1/index.html\">Feature 1</a></li>\n                <li><a href=\"features/feature-2/index.html\">Feature 2</a></li>\n            </ul>\n\n            <h3>Documentation</h3>\n            <ul>\n                <li><a href=\"README.md\">Overview</a></li>\n                <li><a href=\"{module}-specification.md\">Specification</a></li>\n                <li><a href=\"guides/index.html\">User Guides</a></li>\n            </ul>\n        </nav>\n    </aside>\n\n    <main>\n        <!-- Feature cards with screenshots -->\n        <!-- Quick stats -->\n        <!-- Recent updates -->\n    </main>\n</body>\n</html>\n```\n\n### Feature Index (docs/documents/{module}/features/index.html)\n\n```html\n<!-- Similar structure, listing all features -->\n<!-- Each feature has card with:\n     - Screenshot\n     - Status badge\n     - Page count\n     - Quick description\n     - Link to feature docs\n-->\n```\n\n---\n\n## Sub-Options Organization\n\n### System Administration Example\n\n```\nsa/\n├── index.html                              # Main module index\n├── README.md                               # Module overview\n├── system-administration-specification.md  # Complete spec\n├── system-administration-sitemap.md       # Navigation map\n│\n├── features/\n│   ├── index.html                         # Features gallery\n│   │\n│   ├── permission-management/\n│   │   ├── index.html                    # PM visual index\n│   │   ├── README.md                     # PM overview\n│   │   ├── specification.md              # PM spec\n│   │   ├── user-guide.md                # How to use PM\n│   │   │\n│   │   ├── sub-features/\n│   │   │   ├── roles/\n│   │   │   │   ├── README.md            # Roles management\n│   │   │   │   ├── crud-operations.md   # CRUD details\n│   │   │   │   └── screenshots/\n│   │   │   │\n│   │   │   ├── policies/\n│   │   │   │   ├── README.md            # Policies overview\n│   │   │   │   ├── policy-builder.md    # Builder docs\n│   │   │   │   ├── abac-concepts.md     # ABAC explanation\n│   │   │   │   └── screenshots/\n│   │   │   │\n│   │   │   └── subscriptions/\n│   │   │       ├── README.md\n│   │   │       └── screenshots/\n│   │   │\n│   │   └── screenshots/                  # PM screenshots\n│   │\n│   ├── pos-integration/\n│   │   ├── index.html\n│   │   ├── README.md\n│   │   ├── specification.md\n│   │   │\n│   │   ├── sub-features/\n│   │   │   ├── settings/\n│   │   │   │   ├── configuration.md\n│   │   │   │   ├── system-settings.md\n│   │   │   │   └── screenshots/\n│   │   │   │\n│   │   │   ├── mapping/\n│   │   │   │   ├── locations-mapping.md\n│   │   │   │   ├── units-mapping.md\n│   │   │   │   ├── recipes-mapping.md\n│   │   │   │   └── screenshots/\n│   │   │   │\n│   │   │   ├── reports/\n│   │   │   │   ├── consumption-report.md\n│   │   │   │   ├── gross-profit-report.md\n│   │   │   │   └── screenshots/\n│   │   │   │\n│   │   │   └── transactions/\n│   │   │       ├── sync-process.md\n│   │   │       └── screenshots/\n│   │   │\n│   │   └── screenshots/\n│   │\n│   ├── location-management/\n│   ├── workflow/\n│   ├── certifications/\n│   ├── business-rules/\n│   └── ...\n│\n├── components/\n│   ├── index.html\n│   ├── PolicyEditor.md\n│   ├── WorkflowBuilder.md\n│   └── ...\n│\n├── api/\n│   ├── index.html\n│   ├── permission-api.md\n│   ├── workflow-api.md\n│   └── ...\n│\n├── guides/\n│   ├── index.html\n│   ├── getting-started.md\n│   ├── administrator-guide.md\n│   ├── permission-setup-guide.md\n│   └── pos-integration-guide.md\n│\n├── technical/\n│   ├── architecture.md\n│   ├── data-models.md\n│   └── security.md\n│\n└── screenshots/\n    ├── dashboard.png\n    ├── permission-management-overview.png\n    └── ...\n```\n\n---\n\n## Implementation Plan\n\n### Phase 1: Core Structure (Week 1)\n\n**Deliverables:**\n1. Root documentation index.html\n2. Module template files\n3. Feature template files\n4. CSS/JS for navigation\n\n**Tasks:**\n- Create HTML templates\n- Design responsive layout\n- Implement navigation logic\n- Add search functionality\n\n### Phase 2: System Administration (Weeks 1-2)\n\n**Structure:**\n```\nsa/\n├── index.html ✅\n├── README.md ✅\n├── sitemap.md ✅\n├── features/\n│   ├── index.html\n│   ├── permission-management/\n│   │   ├── README.md\n│   │   ├── specification.md\n│   │   ├── sub-features/\n│   │   │   ├── roles/README.md\n│   │   │   ├── policies/README.md\n│   │   │   └── subscriptions/README.md\n│   │   └── screenshots/\n│   ├── pos-integration/\n│   │   ├── README.md\n│   │   ├── sub-features/\n│   │   │   ├── settings/\n│   │   │   ├── mapping/\n│   │   │   ├── reports/\n│   │   │   └── transactions/\n│   │   └── screenshots/\n│   └── [other features]/\n├── guides/\n├── technical/\n└── screenshots/\n```\n\n**Tasks:**\n- Create all feature directories\n- Write feature READMEs\n- Document sub-features\n- Capture screenshots\n- Build HTML indexes\n\n### Phase 3: Other Modules (Weeks 3-6)\n\nApply same structure to:\n- Operational Planning\n- Security\n- Finance\n- Reporting\n- Production\n- Style Guide\n- Help & Support\n- User Profile\n\n---\n\n## Template Files\n\n### 1. Root Index Template\n\n**File:** `docs/documents/index-template.html`\n\nFeatures:\n- Module cards with screenshots\n- Status indicators\n- Search bar\n- Filter by status/category\n- Quick stats\n\n### 2. Module Index Template\n\n**File:** `docs/documents/{module}/index-template.html`\n\nFeatures:\n- Feature gallery\n- Sidebar navigation\n- Breadcrumbs\n- Module stats\n- Recent updates\n\n### 3. Feature Documentation Template\n\n**File:** `docs/documents/templates/feature-README-template.md`\n\nSections:\n- Overview\n- Functionality\n- User Interface\n- Technical Details\n- User Guide\n- Screenshots\n\n---\n\n## Navigation Flow\n\n```\nRoot Index (index.html)\n    ↓\nModule Index (sa/index.html)\n    ↓\nFeature Index (sa/features/index.html)\n    ↓\nFeature Page (sa/features/permission-management/index.html)\n    ↓\nSub-Feature (sa/features/permission-management/sub-features/roles/README.md)\n```\n\n---\n\n## Status Indicators\n\n### Color Coding\n\n- 🟢 **Complete** - Green - 100% documented\n- 🟡 **Partial** - Yellow - 50-99% documented\n- 🔴 **Missing** - Red - 0-49% documented\n- 🔵 **In Progress** - Blue - Currently being documented\n\n### Progress Tracking\n\nEach module/feature shows:\n- Pages documented / Total pages\n- Screenshot count\n- Last updated date\n- Contributors\n\n---\n\n## Benefits of This Structure\n\n1. **Better Organization** - Clear hierarchy, easy to navigate\n2. **Visual Discovery** - HTML indexes with screenshots\n3. **Detailed Sub-Options** - Every feature fully documented\n4. **Reusable Templates** - Consistent structure across modules\n5. **Scalable** - Easy to add new modules/features\n6. **User-Friendly** - Multiple entry points (visual, text, search)\n7. **Developer-Friendly** - Clear technical docs separate from user guides\n\n---\n\n## Next Steps\n\n1. ✅ Create template files\n2. ✅ Build root index.html\n3. ✅ Implement SA module with new structure\n4. ✅ Capture screenshots\n5. ✅ Replicate for other modules\n6. ✅ Add search functionality\n7. ✅ Create PDF exports\n\n---\n\n## Example: Permission Management Feature\n\n```\nsa/features/permission-management/\n├── index.html                         # PM visual overview\n├── README.md                          # PM overview (text)\n├── specification.md                   # Complete PM specification\n├── user-guide.md                      # How to use PM\n├── architecture.md                    # Technical architecture\n│\n├── sub-features/\n│   ├── roles/\n│   │   ├── README.md                 # Roles overview\n│   │   ├── creating-roles.md         # How to create\n│   │   ├── editing-roles.md          # How to edit\n│   │   ├── assigning-roles.md        # How to assign\n│   │   ├── role-hierarchy.md         # Role relationships\n│   │   └── screenshots/\n│   │       ├── roles-list.png\n│   │       ├── role-create-form.png\n│   │       └── role-detail.png\n│   │\n│   ├── policies/\n│   │   ├── README.md                 # Policies overview\n│   │   ├── abac-introduction.md      # ABAC concepts\n│   │   ├── policy-builder.md         # Using the builder\n│   │   ├── policy-syntax.md          # Policy language\n│   │   ├── examples/\n│   │   │   ├── basic-policies.md\n│   │   │   ├── advanced-policies.md\n│   │   │   └── common-scenarios.md\n│   │   └── screenshots/\n│   │       ├── policies-list.png\n│   │       ├── policy-builder.png\n│   │       ├── policy-editor.png\n│   │       └── policy-testing.png\n│   │\n│   └── subscriptions/\n│       ├── README.md\n│       ├── subscription-tiers.md\n│       ├── feature-flags.md\n│       └── screenshots/\n│\n├── api/\n│   ├── roles-api.md\n│   ├── policies-api.md\n│   └── subscriptions-api.md\n│\n└── screenshots/\n    ├── permission-management-dashboard.png\n    └── ...\n```\n\n---\n\n**Version:** 2.0\n**Last Updated:** 2025-01-17\n**Status:** Ready for Implementation\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

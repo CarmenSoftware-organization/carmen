@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operational Planning Module - Complete Sitemap - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Operational Planning</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">OP</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Operational Planning Module - Complete Sitemap\n\n> **Module:** Operational Planning\n> **Total Pages:** 25\n> **Last Updated:** 2025-01-17\n\n---\n\n## Navigation Hierarchy\n\n```\nOperational Planning\n├── Dashboard (Landing Page)\n│   └── /operational-planning\n│\n├── Recipe Management\n│   ├── /operational-planning/recipe-management\n│   │\n│   ├── Recipes\n│   │   ├── /operational-planning/recipe-management/recipes\n│   │   ├── /operational-planning/recipe-management/recipes/new\n│   │   ├── /operational-planning/recipe-management/recipes/create\n│   │   ├── /operational-planning/recipe-management/recipes/[id]\n│   │   └── /operational-planning/recipe-management/recipes/[id]/edit\n│   │\n│   ├── Categories\n│   │   └── /operational-planning/recipe-management/categories\n│   │\n│   └── Cuisine Types\n│       └── /operational-planning/recipe-management/cuisine-types\n│\n└── Menu Engineering\n    └── /operational-planning/menu-engineering\n```\n\n---\n\n## Page Count by Sub-Module\n\n| Sub-Module | Page Count | Status |\n|------------|------------|--------|\n| Dashboard | 1 | ✅ Complete |\n| Recipe Management | 20 | ✅ Complete |\n| Menu Engineering | 4 | ✅ Complete |\n| **TOTAL** | **25** | **✅ Complete** |\n\n---\n\n## Detailed Page Descriptions\n\n### Dashboard (1 page)\n\n**Route:** `/operational-planning`\n\n**Features:**\n- Customizable drag-and-drop dashboard\n- Demand forecast vs actual (Line chart)\n- Menu performance metrics (Bar chart)\n- Inventory planning status (Pie chart)\n- Recipe updates widget\n- Upcoming events widget\n- Menu engineering insights\n\n---\n\n### Recipe Management (20 pages)\n\n#### Recipes (5 pages)\n1. **Recipe List** `/recipe-management/recipes` - Browse all recipes\n2. **New Recipe (Legacy)** `/recipe-management/recipes/new` - Create recipe form (old)\n3. **Create Recipe** `/recipe-management/recipes/create` - Create recipe form (new)\n4. **Recipe Detail** `/recipe-management/recipes/[id]` - View recipe details\n5. **Edit Recipe** `/recipe-management/recipes/[id]/edit` - Modify recipe\n\n**Features:**\n- Search and filter recipes\n- Recipe cards with images\n- Cost and margin calculations\n- Ingredient management\n- Preparation instructions\n- Nutrition information\n- Allergen tracking\n- Recipe variations\n- Print functionality\n\n#### Recipe Categories (1 page)\n1. **Categories List** `/recipe-management/categories` - Manage recipe categories\n\n**Features:**\n- Create, edit, delete categories\n- Category hierarchy (parent-child)\n- Color coding\n- Category icons\n- Recipe count per category\n\n#### Cuisine Types (1 page)\n1. **Cuisine Types** `/recipe-management/cuisine-types` - Manage cuisine classifications\n\n**Features:**\n- Add, edit cuisine types\n- Cultural classification\n- Region mapping\n- Recipe association\n\n---\n\n### Menu Engineering (4 pages)\n\n**Route:** `/operational-planning/menu-engineering`\n\n**Main Tabs:**\n1. **Performance Matrix** - Scatter plot analysis\n2. **Portfolio Analysis** - Composition breakdown\n3. **Recipe Details** - Individual recipe metrics\n4. **Cost Alerts** - Alert management\n5. **Data Import** - Sales data import\n\n**Features:**\n- **Performance Matrix**:\n  - Stars (High popularity, High profitability)\n  - Plow Horses (High popularity, Low profitability)\n  - Puzzles (Low popularity, High profitability)\n  - Dogs (Low popularity, Low profitability)\n  - Interactive scatter chart\n  - Quadrant analysis\n\n- **Filters**:\n  - Date range selection\n  - Category filter\n  - Location filter\n  - Quick actions\n\n- **Key Metrics**:\n  - Total menu items\n  - Total revenue with trends\n  - Average contribution margin\n  - Active cost alerts\n  - Portfolio health score\n\n- **Portfolio Analysis**:\n  - Pie chart composition\n  - Top performers ranking\n  - Classification distribution\n  - Recommendations\n\n- **Cost Alerts**:\n  - Alert creation and management\n  - Cost variance tracking\n  - Ingredient price changes\n  - Threshold monitoring\n\n- **Sales Data Import**:\n  - POS integration\n  - Manual upload\n  - Data validation\n  - Import history\n\n---\n\n## User Flows\n\n### Common User Journeys\n\n#### 1. Create New Recipe\n```\n/operational-planning\n  → Recipe Management\n    → /recipe-management/recipes\n      → [Create Recipe]\n        → Fill recipe details\n          → Add ingredients\n            → Set pricing\n              → Save\n```\n\n#### 2. Analyze Menu Performance\n```\n/operational-planning\n  → Menu Engineering\n    → /menu-engineering\n      → Performance Matrix tab\n        → Filter by date/category\n          → Click on recipe point\n            → View detailed metrics\n              → Review recommendations\n```\n\n#### 3. Import Sales Data\n```\n/operational-planning\n  → Menu Engineering\n    → /menu-engineering\n      → Data Import tab\n        → Upload POS data\n          → Map fields\n            → Validate\n              → Process\n                → View updated metrics\n```\n\n---\n\n## Access Control\n\n### Role-Based Access\n\n| Feature | Chef | Kitchen Manager | GM | Staff |\n|---------|------|----------------|----|----|-----|\n| Recipe Management | Full | Full | Edit | View |\n| Menu Engineering | View | Full | Full | None |\n| Cost Analysis | None | Full | Full | None |\n| Demand Forecast | None | View | Full | None |\n| Recipe Cost | View | Edit | Edit | None |\n\n---\n\n## Technical Notes\n\n### Dynamic Routes\n\n- `[id]` - Recipe identifier\n- `[subItem]` - Dynamic sub-navigation\n\n### Components\n\n**Recipe Management**:\n- RecipeList - Main list view\n- RecipeCardCompact - Condensed recipe cards\n- RecipeCard - Full recipe cards\n- RecipeForm - Create/edit form\n- RecipeImage - Image handling\n- CategoryList - Category management\n- CuisineList - Cuisine type management\n\n**Menu Engineering**:\n- SalesDataImport - Sales data upload\n- CostAlertManagement - Alert configuration\n- RecipePerformanceMetrics - Detailed metrics\n\n### Data Visualization\n\n**Charts Used:**\n- Scatter Chart - Performance matrix\n- Pie Chart - Portfolio composition, inventory status\n- Bar Chart - Menu performance comparison\n- Line Chart - Demand forecast vs actual\n\n### External Dependencies\n\n```typescript\n// Charting\nimport { Recharts } from 'recharts';\n\n// Drag & Drop\nimport { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';\n\n// Date Handling\nimport { format } from 'date-fns';\n```\n\n---\n\n## Menu Engineering Methodology\n\n### Classification Algorithm\n\n**Popularity Score:**\n```typescript\npopularityScore = (itemSales / totalSales) * 100\n// Threshold: 50% (above = high, below = low)\n```\n\n**Profitability Score:**\n```typescript\nprofitabilityScore = (itemMargin / averageMargin) * 100\n// Threshold: 50% (above = high, below = low)\n```\n\n**Classification Matrix:**\n```\n                  High Popularity | Low Popularity\nHigh Profitability    STAR       |    PUZZLE\nLow Profitability   PLOW HORSE   |     DOG\n```\n\n### Recommendations by Classification\n\n**Stars (25%):** Promote, maintain quality, monitor carefully\n**Plow Horses (25%):** Increase price, reduce costs, reposition\n**Puzzles (25%):** Increase marketing, reduce price, enhance appeal\n**Dogs (25%):** Remove, reformulate, or replace\n\n---\n\n## Related Documentation\n\n- [Recipe Management Feature Specification](./features/recipe-management/README.md)\n- [Menu Engineering Feature Specification](./features/menu-engineering/README.md)\n- [Inventory Management Module](../inventory/README.md)\n- [Product Management Module](../product/README.md)\n\n---\n\n**Last Updated:** 2025-01-17\n**Module Version:** 1.0.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Management - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Operational Planning / Features</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Recipe Management\n\n> **Feature:** Operational Planning > Recipe Management\n> **Pages:** 20\n> **Status:** ✅ Production Ready\n\n---\n\n## Overview\n\nRecipe Management provides comprehensive tools for creating, managing, and analyzing recipes in Carmen ERP. The feature includes advanced capabilities for ingredient tracking, cost calculation, fractional sales support (pizza slices, cake portions), multi-variant yield management, and recipe performance analytics.\n\n### Key Features\n\n1. **Recipe CRUD** - Complete recipe lifecycle management\n2. **Advanced Filtering** - Quick filters and complex query builder\n3. **Dual View Modes** - Grid (cards) and list (table) views\n4. **Ingredient Management** - Products and sub-recipes with wastage tracking\n5. **Yield Variants** - Multiple selling options per recipe (whole, half, slices)\n6. **Fractional Sales** - Support for pizza slices, cake portions, bottled beverages\n7. **Cost Analysis** - Real-time cost calculations with margin tracking\n8. **Bulk Operations** - Multi-select actions for efficiency\n9. **Category System** - Hierarchical organization with visual coding\n10. **Cuisine Classification** - Cultural and regional categorization\n\n---\n\n## Page Structure\n\n### 1. Recipe List\n**Route:** `/operational-planning/recipe-management/recipes`\n\n#### Features:\n- **View Modes**:\n  - Grid view (responsive cards)\n  - List view (data table)\n- **Search**: Full-text search across recipe names\n- **Quick Filters**:\n  - No Media\n  - Has Media\n  - Active (published)\n  - Draft\n- **Advanced Filters**:\n  - Field-based query builder\n  - Multiple conditions with operators\n  - Supports: Name, Category, Cuisine, Status, Cost Range, Margin, Prep Time, Difficulty\n- **Bulk Operations**:\n  - Activate/Deactivate\n  - Export Selected\n  - Delete Selected\n- **Actions**:\n  - Import recipes\n  - Export recipes\n  - Create new recipe\n\n#### Components:\n- `RecipeList` - Main list container\n- `RecipeCardCompact` - Grid view cards\n- Advanced filter builder\n- Bulk action toolbar\n\n### 2. Recipe Detail\n**Route:** `/operational-planning/recipe-management/recipes/[id]`\n\n#### Features:\n- Complete recipe information\n- Ingredient list with costs\n- Preparation steps with images\n- Yield variants display\n- Cost breakdown\n- Allergen information\n- Nutrition facts\n- Print functionality\n\n#### Sections:\n- Header with image and basic info\n- Ingredients tab\n- Preparation steps tab\n- Cost analysis tab\n- Variants tab (if fractional sales enabled)\n- Notes and special instructions\n\n### 3. Create Recipe (New)\n**Route:** `/operational-planning/recipe-management/recipes/create`\n\n#### Form Sections:\n**Basic Information**\n- Recipe name (required)\n- Description\n- Category selection\n- Cuisine type\n- Status (draft/published)\n- Image upload\n- Tags\n\n**Yield Management**\n- Base yield quantity\n- Yield unit\n- Enable fractional sales checkbox\n- Fractional sales type (pizza-slice, cake-slice, etc.)\n- Yield variants configuration\n\n**Ingredients**\n- Add product ingredients\n- Add sub-recipe ingredients\n- Quantity and unit\n- Wastage percentage\n- Inventory tracking\n- Cost calculation\n\n**Preparation Steps**\n- Step-by-step instructions\n- Duration per step\n- Temperature requirements\n- Equipment needed\n- Step images\n\n**Pricing & Cost**\n- Cost per portion (auto-calculated)\n- Selling price\n- Target food cost percentage\n- Labor cost percentage\n- Overhead percentage\n- Recommended price calculation\n\n**Additional Details**\n- Preparation notes\n- Special instructions\n- Additional information\n- Allergens (multi-select)\n- Carbon footprint data\n\n**Metadata**\n- Preparation time\n- Cooking time\n- Total time\n- Difficulty level\n- Deduct from stock toggle\n\n### 4. Edit Recipe\n**Route:** `/operational-planning/recipe-management/recipes/[id]/edit`\n\nSame form as Create Recipe, pre-populated with existing data.\n\n### 5. Recipe Categories\n**Route:** `/operational-planning/recipe-management/categories`\n\n#### Features:\n- Category list view\n- Create new category\n- Edit existing category\n- Delete category\n- Parent-child hierarchy\n- Color coding\n- Icon selection\n- Recipe count per category\n\n### 6. Cuisine Types\n**Route:** `/operational-planning/recipe-management/cuisine-types`\n\n#### Features:\n- Cuisine type list\n- Add, edit, delete cuisine types\n- Cultural classification\n- Region mapping\n- Recipe association count\n\n---\n\n## Data Model\n\n```typescript\ninterface Recipe {\n  // Identity\n  id: string;\n  name: string;\n  description: string;\n  category: string;\n  cuisine: string;\n  status: 'draft' | 'published';\n  image: string;\n\n  // Yield Management\n  yield: number;\n  yieldUnit: string;\n\n  // Advanced Fractional Sales Support\n  yieldVariants: RecipeYieldVariant[];\n  defaultVariantId: string;\n  allowsFractionalSales: boolean;\n  fractionalSalesType?: 'pizza-slice' | 'cake-slice' | 'bottle-glass' | 'portion-control' | 'custom';\n\n  // Timing\n  prepTime: number; // minutes\n  cookTime: number;\n  totalTime: number;\n  difficulty: 'easy' | 'medium' | 'hard';\n\n  // Pricing & Cost\n  costPerPortion: number;\n  sellingPrice: number;\n  grossMargin: number; // percentage\n  netPrice: number;\n  grossPrice: number;\n  totalCost: number;\n  targetFoodCost: number; // target percentage\n  laborCostPercentage: number;\n  overheadPercentage: number;\n  recommendedPrice: number;\n  foodCostPercentage: number;\n  grossProfit: number;\n\n  // Environmental\n  carbonFootprint: number;\n  carbonFootprintSource?: string;\n\n  // Operations\n  hasMedia: boolean;\n  deductFromStock: boolean;\n  unitOfSale: string;\n\n  // Components\n  ingredients: Ingredient[];\n  steps: PreparationStep[];\n\n  // Documentation\n  prepNotes: string;\n  specialInstructions: string;\n  additionalInfo: string;\n  allergens: string[];\n  tags: string[];\n\n  // Audit\n  createdAt: string;\n  updatedAt: string;\n  createdBy: string;\n  updatedBy: string;\n}\n\ninterface RecipeYieldVariant {\n  id: string;\n  name: string;\n  unit: string; // 'slice', 'half', 'whole', 'glass', 'bottle'\n  quantity: number;\n  conversionRate: number; // Portion of base recipe (1.0 = whole, 0.125 = 1/8)\n  sellingPrice: number;\n  costPerUnit: number;\n  isDefault: boolean;\n  shelfLife?: number; // Hours after preparation/opening\n  wastageRate?: number; // Expected waste percentage\n  minOrderQuantity?: number;\n  maxOrderQuantity?: number;\n}\n\ninterface Ingredient {\n  id: string;\n  name: string;\n  type: 'product' | 'recipe'; // Sub-recipes supported\n  quantity: number;\n  unit: string;\n  wastage: number; // Percentage\n  inventoryQty: number;\n  inventoryUnit: string;\n  costPerUnit: number;\n  totalCost: number; // Auto-calculated\n  notes?: string;\n}\n\ninterface PreparationStep {\n  id: string;\n  order: number;\n  description: string;\n  duration?: number; // minutes\n  temperature?: number; // celsius/fahrenheit\n  equipments: string[];\n  image: string;\n}\n```\n\n---\n\n## Advanced Features\n\n### Fractional Sales Management\n\nCarmen ERP supports selling recipes in multiple variants, enabling operations like:\n\n#### Pizza Slice Sales\n```typescript\n{\n  allowsFractionalSales: true,\n  fractionalSalesType: 'pizza-slice',\n  yieldVariants: [\n    {\n      name: 'Pizza Slice',\n      conversionRate: 0.125, // 1 slice = 1/8 pizza\n      sellingPrice: 4.99,\n      shelfLife: 4, // hours under heat lamp\n      wastageRate: 5\n    },\n    {\n      name: 'Half Pizza',\n      conversionRate: 0.5,\n      sellingPrice: 18.99\n    },\n    {\n      name: 'Whole Pizza',\n      conversionRate: 1.0,\n      sellingPrice: 34.99,\n      isDefault: true\n    }\n  ]\n}\n```\n\n#### Cake Portion Sales\n```typescript\n{\n  allowsFractionalSales: true,\n  fractionalSalesType: 'cake-slice',\n  yieldVariants: [\n    {\n      name: 'Cake Slice',\n      conversionRate: 0.0625, // 1/16 of cake\n      sellingPrice: 6.99,\n      shelfLife: 72, // 3 days refrigerated\n      minOrderQuantity: 1,\n      maxOrderQuantity: 16\n    },\n    {\n      name: 'Quarter Cake',\n      conversionRate: 0.25,\n      sellingPrice: 24.99\n    },\n    {\n      name: 'Whole Cake',\n      conversionRate: 1.0,\n      sellingPrice: 89.99\n    }\n  ]\n}\n```\n\n### Benefits:\n- Flexible selling options\n- Accurate cost tracking per variant\n- Wastage management per variant\n- Shelf life tracking\n- Quantity limits for portion control\n\n---\n\n### Cost Calculation Engine\n\n**Auto-Calculation Formula:**\n```typescript\n// Ingredient Cost\ningredientCost = (quantity * costPerUnit * (1 + wastage/100))\n\n// Total Recipe Cost\ntotalCost = sum(all ingredientCosts)\n\n// Cost Per Portion\ncostPerPortion = totalCost / yield\n\n// For Yield Variants\nvariantCost = totalCost * conversionRate\n\n// Gross Margin\ngrossMargin = ((sellingPrice - costPerPortion) / sellingPrice) * 100\n\n// Food Cost Percentage\nfoodCostPercentage = (costPerPortion / sellingPrice) * 100\n\n// Recommended Price\nrecommendedPrice = costPerPortion / (targetFoodCost / 100)\n\n// Gross Profit\ngrossProfit = sellingPrice - costPerPortion\n```\n\n### Wastage Tracking\n- Ingredient-level wastage percentages\n- Variant-specific wastage rates\n- Automatic cost adjustments\n- Wastage reporting\n\n---\n\n### Advanced Filtering System\n\n**Filter Operators:**\n- `contains` - Partial text match\n- `equals` - Exact match\n- `notEquals` - Exclusion\n- `greaterThan` - Numeric comparison\n- `lessThan` - Numeric comparison\n- `isEmpty` - NULL check\n- `isNotEmpty` - NOT NULL check\n\n**Filterable Fields:**\n- Name, Category, Cuisine\n- Status, Cost Range, Margin\n- Preparation Time, Difficulty\n\n**Filter Combinations:**\n- Multiple conditions with AND logic\n- Quick filters combinable with advanced\n- Real-time filter result count\n\n---\n\n## API Endpoints\n\n```http\nGET /api/recipes\nPOST /api/recipes\nGET /api/recipes/:id\nPUT /api/recipes/:id\nDELETE /api/recipes/:id\n\nGET /api/recipes/search\nGET /api/recipes/filter\n\nGET /api/recipes/:id/cost-breakdown\nGET /api/recipes/:id/variants\n\nPOST /api/recipes/bulk/activate\nPOST /api/recipes/bulk/deactivate\nPOST /api/recipes/bulk/delete\nPOST /api/recipes/bulk/export\n\nGET /api/recipe-categories\nPOST /api/recipe-categories\nPUT /api/recipe-categories/:id\nDELETE /api/recipe-categories/:id\n\nGET /api/cuisine-types\nPOST /api/cuisine-types\nPUT /api/cuisine-types/:id\nDELETE /api/cuisine-types/:id\n\nPOST /api/recipes/import\nGET /api/recipes/export\n```\n\n---\n\n## Business Rules\n\n### Recipe Validation\n1. **Name Required**: Recipe name must be unique within organization\n2. **Yield Required**: Base yield quantity and unit mandatory\n3. **At Least One Ingredient**: Recipe must have minimum one ingredient\n4. **Cost Calculation**: Automatic when ingredients change\n5. **Variant Rates**: Conversion rates must sum to ≤ base yield\n\n### Fractional Sales Rules\n1. **Default Variant**: One variant must be marked as default\n2. **Conversion Rates**: Must be between 0 and 1.0\n3. **Shelf Life Tracking**: Required for fractional sales types\n4. **Quantity Limits**: Min/max quantities for portion control\n5. **Wastage Rates**: Different rates per variant size\n\n### Cost Management\n1. **Target Food Cost**: Recommended 25-35% for most items\n2. **Wastage Inclusion**: Wastage % added to ingredient costs\n3. **Sub-Recipe Costs**: Nested recipe costs aggregated\n4. **Price Recommendations**: Based on target food cost percentage\n5. **Margin Alerts**: Warning when margins below target\n\n### Inventory Integration\n1. **Stock Deduction**: Flag determines if recipe affects inventory\n2. **Ingredient Tracking**: Real-time availability checking\n3. **Inventory Units**: Conversion between recipe and inventory units\n4. **Wastage Accounting**: Included in stock calculations\n5. **Sub-Recipe Cascading**: Ingredients from sub-recipes tracked\n\n---\n\n## Integration Points\n\n### Inventory Management\n- Real-time ingredient availability\n- Stock deduction on recipe use\n- Wastage tracking and reporting\n- Inventory unit conversions\n\n### POS Integration\n- Recipe variants mapped to POS items\n- Fractional sales synchronization\n- Cost tracking per sale\n- Popular item identification\n\n### Menu Engineering\n- Performance metrics per recipe\n- Sales data analysis\n- Profitability tracking\n- Menu optimization recommendations\n\n### Product Management\n- Product catalog integration\n- Supplier cost updates\n- Product substitutions\n- Allergen management\n\n### Finance\n- Cost accounting\n- Margin analysis\n- Profitability reporting\n- Price optimization\n\n---\n\n## User Guide\n\n### Creating a Recipe\n\n1. Navigate to Recipe Management → Recipes\n2. Click \"New Recipe\"\n3. Fill basic information (name, description, category, cuisine)\n4. Add ingredients:\n   - Select from products or sub-recipes\n   - Enter quantity and unit\n   - Set wastage percentage\n   - View auto-calculated cost\n5. Configure yield:\n   - Set base yield (e.g., 4 portions, 1 pizza)\n   - Enable fractional sales if needed\n   - Add yield variants (slices, halves, etc.)\n6. Add preparation steps with images\n7. Set pricing and targets\n8. Add allergens and tags\n9. Save as draft or publish\n\n### Using Advanced Filters\n\n1. Click \"Advanced Filters\" button\n2. Click \"Add Filter Condition\"\n3. Select field, operator, and value\n4. Add multiple conditions as needed\n5. Click \"Apply Filters\"\n6. Clear with \"Reset\" or \"Clear All\"\n\n### Bulk Operations\n\n1. Switch to list view (optional)\n2. Select recipes using checkboxes\n3. Use bulk action toolbar:\n   - Activate multiple recipes\n   - Deactivate for temporary removal\n   - Export selected to Excel/CSV\n   - Delete multiple recipes\n4. Confirm action\n\n---\n\n## Troubleshooting\n\n### Issue: Cost Not Calculating\n**Cause**: Missing ingredient cost data\n**Solution**: Ensure all ingredients have `costPerUnit` values\n\n### Issue: Fractional Sales Not Available\n**Cause**: `allowsFractionalSales` flag not enabled\n**Solution**: Edit recipe and enable fractional sales checkbox\n\n### Issue: Filters Not Working\n**Cause**: Invalid filter operator for field type\n**Solution**: Use numeric operators only for numeric fields\n\n### Issue: Bulk Actions Disabled\n**Cause**: No recipes selected\n**Solution**: Use checkboxes to select at least one recipe\n\n---\n\n## Performance Optimization\n\n**Best Practices:**\n- Use quick filters before advanced filters\n- Filter results cached for 5 minutes\n- Bulk operations paginated (max 100 at a time)\n- Image thumbnails lazy-loaded\n- Recipe calculations memoized\n\n**Query Optimization:**\n- Ingredient costs pre-calculated and cached\n- Search uses indexed fields\n- List view pagination (50 items per page)\n- Grid view pagination (60 items per page)\n\n---\n\n## Future Enhancements\n\n**Planned Features:**\n- Recipe version history\n- Recipe collaboration and comments\n- AI-powered recipe suggestions\n- Nutrition calculator integration\n- Recipe scaling calculator\n- Seasonal recipe tracking\n- Recipe analytics dashboard\n- Allergen cross-contamination warnings\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

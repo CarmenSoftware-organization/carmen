@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP - System Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        nav {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .search-bar {
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .module-card {
+            background: var(--bg-white);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .module-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .module-card.status-complete {
+            border-color: var(--success);
+        }
+
+        .module-card.status-partial {
+            border-color: var(--warning);
+        }
+
+        .module-card.status-missing {
+            border-color: var(--danger);
+        }
+
+        .module-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .module-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .module-meta {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.complete {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.partial {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.missing {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.planned {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .feature-tag.gap {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px dashed #f59e0b;
+        }
+
+        .feature-tag.gap::before {
+            content: '🔧 ';
+        }
+
+        .module-content {
+            padding: 1.5rem;
+        }
+
+        .module-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .features-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .feature-tag {
+            background: var(--bg-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .module-footer {
+            padding: 1rem 1.5rem;
+            background: var(--bg-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: var(--border);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s;
+        }
+
+        footer {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Carmen ERP System Documentation</h1>
+            <p class="subtitle">Complete documentation for all Carmen ERP modules and features</p>
+            <nav>
+                <a href="#overview">Overview</a>
+                <a href="#modules">All Modules</a>
+                <a href="FEATURE-VERIFICATION-MATRIX.html">Feature Matrix</a>
+                <a href="MODULE-GAP-SUMMARY.html">Gap Summary</a>
+                <a href="architecture/">Architecture</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search documentation..." onkeyup="filterModules()">
+        </div>
+
+        <section id="overview">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value">11</div>
+                    <div class="stat-label">Total Modules</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">183</div>
+                    <div class="stat-label">Implemented Pages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">46/48</div>
+                    <div class="stat-label">Features Implemented</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">95.8%</div>
+                    <div class="stat-label">Implementation Accuracy</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="modules">
+            <h2 style="margin: 2rem 0 1rem;">All Modules</h2>
+
+            <div class="module-grid">
+                <!-- System Administration -->
+                <div class="module-card status-complete" data-name="system administration">
+                    <div class="module-header">
+                        <h2>📋 System Administration</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Fully Implemented</span>
+                            <span>47 pages</span>
+                            <span>10 features</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Comprehensive tools for managing users, permissions, workflows, integrations, and system-wide configurations.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Permission Management</span>
+                            <span class="feature-tag">User Management</span>
+                            <span class="feature-tag">Location Management</span>
+                            <span class="feature-tag">Workflow</span>
+                            <span class="feature-tag">+6 more</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% implemented (10/10 features)</span>
+                        <a href="sa/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Operational Planning -->
+                <div class="module-card status-partial" data-name="operational planning">
+                    <div class="module-header">
+                        <h2>📊 Operational Planning</h2>
+                        <div class="module-meta">
+                            <span class="status-badge partial">Partial Implementation</span>
+                            <span>15 pages</span>
+                            <span>2 implemented, 2 planned</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Recipe management and menu engineering with demand forecasting and inventory planning coming soon.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag gap" title="Planned - Not yet implemented">Demand Forecasting</span>
+                            <span class="feature-tag">Menu Engineering</span>
+                            <span class="feature-tag">Recipe Management</span>
+                            <span class="feature-tag gap" title="Planned - Not yet implemented">Inventory Planning</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">50% implemented (2/4 features)</span>
+                        <a href="op/FEATURE-GAPS.html" class="btn">View Gaps →</a>
+                    </div>
+                </div>
+
+                <!-- Security (ABAC) -->
+                <div class="module-card status-missing" data-name="security abac">
+                    <div class="module-header">
+                        <h2>🔒 Security / ABAC</h2>
+                        <div class="module-meta">
+                            <span class="status-badge missing">Not Documented</span>
+                            <span>1 page</span>
+                            <span>Advanced feature</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Attribute-Based Access Control system for advanced permission management and security policies.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">ABAC Policies</span>
+                            <span class="feature-tag">Policy Builder</span>
+                            <span class="feature-tag">Access Control</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">0% documented</span>
+                        <a href="security/README.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Finance -->
+                <div class="module-card status-complete" data-name="finance">
+                    <div class="module-header">
+                        <h2>💰 Finance</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Fully Implemented</span>
+                            <span>7 pages</span>
+                            <span>4 features</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Financial management including account code mapping, currency management, and exchange rates.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Account Code Mapping</span>
+                            <span class="feature-tag">Currency Management</span>
+                            <span class="feature-tag">Exchange Rates</span>
+                            <span class="feature-tag">Department List</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% implemented (4/4 features)</span>
+                        <a href="finance/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Procurement (Documented) -->
+                <div class="module-card status-complete" data-name="procurement">
+                    <div class="module-header">
+                        <h2>🛒 Procurement</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Documented</span>
+                            <span>30+ pages</span>
+                            <span>5 sub-modules</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Purchase requests, purchase orders, goods received notes, credit notes, and vendor comparison.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Purchase Requests</span>
+                            <span class="feature-tag">Purchase Orders</span>
+                            <span class="feature-tag">GRN</span>
+                            <span class="feature-tag">Credit Notes</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% documented</span>
+                        <a href="pr/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Inventory Management (Documented) -->
+                <div class="module-card status-complete" data-name="inventory management">
+                    <div class="module-header">
+                        <h2>📦 Inventory Management</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Documented</span>
+                            <span>20+ pages</span>
+                            <span>6 sub-modules</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Complete inventory management including stock overview, physical counts, spot checks, and adjustments.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Stock Overview</span>
+                            <span class="feature-tag">Physical Count</span>
+                            <span class="feature-tag">Spot Check</span>
+                            <span class="feature-tag">Adjustments</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% documented</span>
+                        <a href="inv/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Vendor Management (Documented) -->
+                <div class="module-card status-complete" data-name="vendor management">
+                    <div class="module-header">
+                        <h2>👥 Vendor Management</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Documented</span>
+                            <span>15+ pages</span>
+                            <span>6 sub-modules</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Comprehensive vendor management including pricelists, campaigns, templates, and vendor portal.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Vendor CRUD</span>
+                            <span class="feature-tag">Pricelists</span>
+                            <span class="feature-tag">Campaigns</span>
+                            <span class="feature-tag">Portal</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% documented</span>
+                        <a href="vm/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Product Management (Documented) -->
+                <div class="module-card status-complete" data-name="product management">
+                    <div class="module-header">
+                        <h2>📋 Product Management</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Documented</span>
+                            <span>8+ pages</span>
+                            <span>3 sub-modules</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Product catalog management including products, categories, and units of measurement.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Products</span>
+                            <span class="feature-tag">Categories</span>
+                            <span class="feature-tag">Units</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% documented</span>
+                        <a href="pm/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Store Operations (Documented) -->
+                <div class="module-card status-complete" data-name="store operations">
+                    <div class="module-header">
+                        <h2>🏪 Store Operations</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Documented</span>
+                            <span>12+ pages</span>
+                            <span>3 sub-modules</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Store requisitions, stock replenishment, and wastage reporting for store operations.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Store Requisitions</span>
+                            <span class="feature-tag">Stock Replenishment</span>
+                            <span class="feature-tag">Wastage Reporting</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% documented</span>
+                        <a href="store-ops/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Reporting & Analytics -->
+                <div class="module-card status-missing" data-name="reporting analytics">
+                    <div class="module-header">
+                        <h2>📈 Reporting & Analytics</h2>
+                        <div class="module-meta">
+                            <span class="status-badge missing">Not Documented</span>
+                            <span>12 pages</span>
+                            <span>2 sub-modules</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Business intelligence and analytics including consumption analytics and operational reports.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Consumption Analytics</span>
+                            <span class="feature-tag">Reports Dashboard</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 10%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">10% documented</span>
+                        <a href="reporting/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Dashboard (Documented) -->
+                <div class="module-card status-complete" data-name="dashboard">
+                    <div class="module-header">
+                        <h2>📊 Dashboard</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Documented</span>
+                            <span>3 pages</span>
+                            <span>Main module</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Main system dashboard with KPIs, metrics, and quick access to common functions.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">KPI Dashboard</span>
+                            <span class="feature-tag">Quick Actions</span>
+                            <span class="feature-tag">Widgets</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% documented</span>
+                        <a href="dashboard/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+
+                <!-- Production -->
+                <div class="module-card status-complete" data-name="production">
+                    <div class="module-header">
+                        <h2>🏭 Production</h2>
+                        <div class="module-meta">
+                            <span class="status-badge complete">Implemented</span>
+                            <span>2 pages</span>
+                            <span>1 feature</span>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <p class="module-description">
+                            Production management and batch processing.
+                        </p>
+                        <div class="features-list">
+                            <span class="feature-tag">Production Main</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="module-footer">
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% implemented (1/1 feature)</span>
+                        <a href="production/index.html" class="btn">Explore →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Carmen ERP. All rights reserved.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.875rem;">
+                Documentation v1.0 | Last updated: January 17, 2025
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function filterModules() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.module-card');
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                const content = card.textContent.toLowerCase();
+
+                if (name.includes(filter) || content.includes(filter)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

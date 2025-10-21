@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot Check Module - Complete Site Map - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Spot Check</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">SC</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Spot Check Module - Complete Site Map\n\n## Module Navigation Structure\n\n```mermaid\ngraph TD\n    %% Main Module Entry\n    A[Spot Check Module<br/>/inventory-management/spot-check] --> B[Main Spot Check Page<br/>/spot-check]\n    A --> C[Dashboard<br/>/spot-check/dashboard]\n    A --> D[New Spot Check<br/>/spot-check/new]\n    A --> E[Active Counts<br/>/spot-check/active]\n    A --> F[Completed Counts<br/>/spot-check/completed]\n\n    %% Main Page Components\n    B --> G[Count Detail Modal<br/>CountDetailForm]\n    B --> H[List View<br/>CountListItem]\n    B --> I[Grid View<br/>CountDetailCard]\n    B --> J[Filter Controls<br/>Search + Dropdowns]\n    B --> K[Location Filter Panel<br/>Conditional Display]\n\n    %% Dashboard Components\n    C --> L[Statistics Cards<br/>Active Counters, Items, Reviews]\n    C --> M[Active Counts Panel<br/>Real-time Monitoring]\n    C --> N[Pending Reviews Panel<br/>Approval Queue]\n    C --> O[Latest Activities Panel<br/>Activity Feed]\n\n    %% New Spot Check Components\n    D --> P[Creation Form<br/>NewSpotCheckForm]\n    D --> Q[Item Preview Panel<br/>Selected Items Display]\n    D --> R[Form Validation<br/>Zod Schema]\n\n    %% Active Counts Components\n    E --> S[Active Count Detail<br/>/spot-check/active/[id]]\n    E --> T[Status Filters<br/>Filter Controls]\n    E --> U[Count Session Cards<br/>Progress Display]\n\n    %% Active Count Detail Components\n    S --> V[Count Interface<br/>CountDetailForm]\n    S --> W[Session Controls<br/>Pause/Complete]\n    S --> X[Progress Tracking<br/>Real-time Updates]\n\n    %% Completed Counts Components\n    F --> Y[Completed Count Detail<br/>/spot-check/completed/[id]]\n    F --> Z[Search & Filters<br/>Search Bar + Date Filter]\n    F --> AA[Export Options<br/>Download Buttons]\n\n    %% Data Flow Connections\n    P -.->|Creates| S\n    S -.->|Completes| Y\n    V -.->|Submits| F\n\n    %% Modal/Overlay Connections\n    G -.->|Modal over| B\n    V -.->|Full screen| S\n```\n\n## Data Flow Diagram\n\n```mermaid\ngraph LR\n    subgraph \"Spot Check Creation\"\n        A1[Setup Parameters] --> A2[Filter Items]\n        A2 --> A3[Random/High Value Selection]\n        A3 --> A4[Create Count Session]\n    end\n\n    subgraph \"Count Execution\"\n        B1[Load Count Session] --> B2[Display Items]\n        B2 --> B3[Record Counts]\n        B3 --> B4[Calculate Variances]\n        B4 --> B5[Submit Results]\n    end\n\n    subgraph \"Data Storage\"\n        C1[Count Templates]\n        C2[Active Sessions]\n        C3[Count Results]\n        C4[Variance Reports]\n    end\n\n    A4 --> B1\n    B5 --> C3\n    C3 --> C4\n```\n\n## User Flow Paths\n\n```mermaid\njourney\n    title Spot Check User Journey\n    section Setup\n      Navigate to Spot Check: 5: User\n      Click New Spot Check: 5: User\n      Select Counter: 4: User\n      Choose Department: 4: User\n      Pick Store Location: 4: User\n      Set Count Date: 3: User\n      Choose Selection Method: 4: User\n      Set Item Count: 3: User\n      Review Selected Items: 5: User\n      Create Spot Check: 5: User\n    section Execution\n      Start Active Count: 5: Counter\n      View Item List: 4: Counter\n      Count First Item: 3: Counter\n      Record Quantity: 4: Counter\n      Note Item Status: 4: Counter\n      Continue to Next Item: 4: Counter\n      Complete All Items: 5: Counter\n      Review Count Summary: 5: Counter\n      Submit Final Results: 5: Counter\n    section Review\n      View Completed Counts: 4: Manager\n      Analyze Variances: 5: Manager\n      Generate Reports: 4: Manager\n```\n\n## Component Hierarchy\n\n```mermaid\ngraph TD\n    A[SpotCheck Root] --> B[Dashboard Page]\n    A --> C[New Spot Check Page]\n    A --> D[Active Count Page]\n    A --> E[Completed Count Page]\n\n    B --> B1[Count List Item]\n    B --> B2[Count Detail Card]\n    B --> B3[Filter Controls]\n    B --> B4[View Toggle]\n\n    C --> C1[New Spot Check Form]\n    C1 --> C2[Counter Selection]\n    C1 --> C3[Department Selection]\n    C1 --> C4[Store Selection]\n    C1 --> C5[Date Picker]\n    C1 --> C6[Selection Method]\n    C1 --> C7[Item Count Input]\n    C1 --> C8[Item Preview Panel]\n\n    D --> D1[Count Detail Form]\n    D1 --> D2[Count Items Component]\n    D1 --> D3[Count Progress]\n    D1 --> D4[Count Summary]\n\n    E --> E1[Completed Count List]\n    E1 --> E2[Count Result Display]\n    E1 --> E3[Variance Analysis]\n```\n\n## Workflow States\n\n```mermaid\nstateDiagram-v2\n    [*] --> Setup\n    Setup --> ItemSelection: Configure Parameters\n    ItemSelection --> SessionCreated: Create Count\n    SessionCreated --> InProgress: Start Count\n    InProgress --> Paused: Pause Count\n    Paused --> InProgress: Resume Count\n    InProgress --> Completed: Complete All Items\n    Completed --> Submitted: Submit Results\n    Submitted --> [*]\n\n    Setup --> [*]: Cancel\n    InProgress --> [*]: Cancel Count\n```\n\n## Page Structure Summary\n\n| Page | Route | Components | Key Features |\n|------|-------|------------|--------------|\n| Dashboard | `/spot-check` | CountListItem, CountDetailCard, Filters | List/Grid view, Status filtering |\n| New Count | `/spot-check/new` | NewSpotCheckForm, ItemPreview | Form validation, Real-time preview |\n| Active Count | `/spot-check/active/[id]` | CountDetailForm, CountItems | Item counting, Progress tracking |\n| Completed | `/spot-check/completed` | CompletedCountList | Results viewing, Variance analysis |\n\n*Generated: September 25, 2025*\n*Source: Complete codebase analysis of Spot Check module*";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

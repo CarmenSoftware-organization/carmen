@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operational Planning Module - Feature Gaps - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Operational Planning / FEATURE GAPS.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Operational Planning Module - Feature Gaps\n\n> **Generated:** 2025-01-18\n> **Module:** Operational Planning\n> **Gap Count:** 2\n> **Implementation Status:** 50% (2 of 4 features implemented)\n\n---\n\n## Summary\n\nThe Operational Planning module has **2 identified gaps** where features are documented but not yet implemented. This represents a 50% gap rate for this module.\n\n### Gap Overview\n\n| Feature | Status | Priority | Impact | Classification |\n|---------|--------|----------|--------|----------------|\n| Recipe Management | ✅ Implemented | High | N/A | Production Ready |\n| Menu Engineering | ✅ Implemented | Medium | N/A | Production Ready |\n| Demand Forecasting | ❌ Gap | Medium | Medium | **Documented but NOT implemented** |\n| Inventory Planning | ❌ Gap | Medium | Medium | **Documented but NOT implemented** |\n\n---\n\n## Identified Gaps\n\n### 1. Demand Forecasting\n\n**Route:** `/operational-planning/demand-forecasting`\n\n**Status:** ❌ NOT IMPLEMENTED\n\n**Documentation Reference:** `docs/documents/index.html` (Main documentation index)\n\n**Impact:** Medium\n- Planning feature that would enhance operational efficiency\n- Not critical to core business operations\n- Nice-to-have for advanced planning scenarios\n\n**Priority:** Low\n\n**Analysis:**\n- Feature is mentioned in main documentation index\n- No corresponding `page.tsx` file exists in codebase\n- No components or implementation found\n- Likely a planned future feature mistakenly documented as available\n\n**Recommendation:**\n- Update documentation to mark as \"Planned\" or \"Coming Soon\"\n- Remove from available features list until implementation begins\n- Add to product roadmap with priority classification\n\n---\n\n### 2. Inventory Planning\n\n**Route:** `/operational-planning/inventory-planning`\n\n**Status:** ❌ NOT IMPLEMENTED\n\n**Documentation Reference:** `docs/documents/index.html` (Main documentation index)\n\n**Impact:** Medium\n- Planning feature that would complement demand forecasting\n- Not critical to core business operations\n- Would integrate with existing inventory management if implemented\n\n**Priority:** Low\n\n**Analysis:**\n- Feature is mentioned in main documentation index\n- No corresponding `page.tsx` file exists in codebase\n- No components or implementation found\n- Likely a planned future feature mistakenly documented as available\n\n**Recommendation:**\n- Update documentation to mark as \"Planned\" or \"Coming Soon\"\n- Remove from available features list until implementation begins\n- Consider implementing alongside Demand Forecasting as they are related features\n\n---\n\n## Implemented Features\n\n### Recipe Management ✅\n\n**Route:** `/operational-planning/recipe-management`\n\n**Implementation Details:**\n- Main page: `app/(main)/operational-planning/recipe-management/page.tsx`\n- Sub-features implemented:\n  - Recipes List/CRUD (`/recipe-management/recipes`)\n  - Cuisine Types (`/recipe-management/cuisine-types`)\n  - Recipe Categories (`/recipe-management/categories`)\n- Full implementation with create, edit, detail views\n- Complete component structure in place\n\n**Status:** Production Ready\n\n---\n\n### Menu Engineering ✅\n\n**Route:** `/operational-planning/menu-engineering`\n\n**Implementation Details:**\n- Page exists: `app/(main)/operational-planning/menu-engineering/page.tsx`\n- Documented in main index.html\n- Implemented and functional\n\n**Status:** Production Ready\n\n---\n\n## Documentation Updates Required\n\n### 1. Main Index (`docs/documents/index.html`)\n\n**Current State:**\n- Lists all 4 features as available\n- No indication that 2 are unimplemented\n\n**Required Changes:**\n```html\n<!-- Mark gaps with visual indicators -->\n<div class=\"feature-card gap\">\n  <span class=\"status-badge planned\">Planned</span>\n  <h3>Demand Forecasting</h3>\n  <p>Coming soon - Advanced demand prediction and planning</p>\n</div>\n\n<div class=\"feature-card gap\">\n  <span class=\"status-badge planned\">Planned</span>\n  <h3>Inventory Planning</h3>\n  <p>Coming soon - Strategic inventory optimization</p>\n</div>\n```\n\n**Add CSS for gap indicators:**\n```css\n.feature-card.gap {\n  opacity: 0.6;\n  border: 2px dashed #ccc;\n}\n\n.status-badge.planned {\n  background: #ffc107;\n  color: #000;\n  padding: 4px 8px;\n  border-radius: 4px;\n  font-size: 12px;\n  font-weight: bold;\n}\n```\n\n### 2. Module Index Page\n\n**Action:** Create `docs/documents/op/index.html`\n\n**Should Include:**\n- Sidebar navigation with implemented features only\n- Clear separation of \"Available Features\" vs \"Planned Features\"\n- Gap indicators for unimplemented features\n- Links to Recipe Management and Menu Engineering only in main nav\n- Separate \"Roadmap\" section for planned features\n\n---\n\n## Gap Classification\n\n### Fictional vs. Planned\n\n**Demand Forecasting:**\n- Classification: **Planned Feature**\n- Reason: Appears in main documentation as part of module scope\n- Recommendation: Keep in documentation with \"Planned\" status\n\n**Inventory Planning:**\n- Classification: **Planned Feature**\n- Reason: Appears in main documentation as part of module scope\n- Recommendation: Keep in documentation with \"Planned\" status\n\n### Why Not Fictional?\n\nThese features are NOT considered \"fictional\" because:\n1. They align with the module's operational planning purpose\n2. They complement existing Recipe Management functionality\n3. They represent logical future enhancements\n4. No detailed implementation documentation exists (only high-level mention)\n\nIf these were \"fictional,\" we would completely remove them. Instead, we reclassify them as \"Planned.\"\n\n---\n\n## Impact Analysis\n\n### Business Impact\n\n**Low to Medium:**\n- Core operational planning needs met by Recipe Management\n- Menu Engineering provides adequate planning capabilities\n- Gap features would enhance but not fundamentally change operations\n\n### User Impact\n\n**Low:**\n- Users can currently perform essential operational planning\n- No critical workflows are blocked\n- Advanced users might want forecasting features in the future\n\n### Technical Impact\n\n**Low:**\n- No dependencies on gap features in existing code\n- Other modules function independently\n- Implementation can be deferred without risk\n\n---\n\n## Recommendations\n\n### Immediate Actions (High Priority)\n\n1. **Update Main Documentation**\n   - Mark Demand Forecasting as \"Planned\"\n   - Mark Inventory Planning as \"Planned\"\n   - Add visual indicators (badges, different styling)\n   - Update module statistics to show 2/4 implemented\n\n2. **Create Module Index**\n   - Build `docs/documents/op/index.html`\n   - Include only implemented features in main navigation\n   - Add \"Coming Soon\" section for planned features\n\n3. **Update Navigation**\n   - Remove direct links to unimplemented features\n   - Add tooltips explaining \"Planned\" status\n   - Ensure no broken links exist\n\n### Future Actions (Low Priority)\n\n1. **Product Roadmap**\n   - Add Demand Forecasting to roadmap\n   - Add Inventory Planning to roadmap\n   - Prioritize based on user feedback and business needs\n\n2. **Implementation Planning**\n   - Define requirements for each gap feature\n   - Design data models and API endpoints\n   - Create implementation timeline\n\n---\n\n## Verification Checklist\n\n- [ ] Main index.html updated with gap indicators\n- [ ] Module index.html created with correct navigation\n- [ ] All .md links converted to .html\n- [ ] Gap features marked as \"Planned\" not \"Available\"\n- [ ] No broken links to unimplemented features\n- [ ] Visual indicators (badges, styling) applied\n- [ ] Module statistics updated (2/4 instead of 4/4)\n- [ ] Roadmap section added for planned features\n\n---\n\n## Related Documentation\n\n- [Feature Verification Matrix](../FEATURE-VERIFICATION-MATRIX.md) - Complete cross-reference\n- [Recipe Management Specification](./recipe-management/README.md) - Implemented feature\n- [Main Index](../index.html) - Needs updates for gaps\n\n---\n\n**Last Updated:** 2025-01-18\n**Status:** Gap documentation complete, awaiting implementation of updates\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

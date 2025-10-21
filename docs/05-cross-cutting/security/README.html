@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security (ABAC) Module - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Cross-Cutting Concerns</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Cross-Cutting Concerns</a> / README</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Security (ABAC) Module\n\n**Module**: Security & Access Control (9th of 10 modules)\n**System**: Attribute-Based Access Control (ABAC)\n**Status**: Backend 95% Complete, Frontend 40% Complete\n**Last Updated**: January 2025\n\n## Table of Contents\n\n1. [Module Overview](#module-overview)\n2. [Key Features](#key-features)\n3. [System Architecture](#system-architecture)\n4. [ABAC Components](#abac-components)\n5. [Policy Framework](#policy-framework)\n6. [Implementation Guide](#implementation-guide)\n7. [API Reference](#api-reference)\n8. [User Guide](#user-guide)\n9. [Performance & Metrics](#performance--metrics)\n10. [Troubleshooting](#troubleshooting)\n\n## Module Overview\n\nThe Security (ABAC) module provides enterprise-grade access control for the Carmen Hospitality ERP system using Attribute-Based Access Control (ABAC). This sophisticated permission system enables fine-grained, context-aware access decisions based on multiple attributes of users, resources, actions, and environment.\n\n### Why ABAC?\n\nTraditional Role-Based Access Control (RBAC) systems are insufficient for the complex, multi-dimensional access requirements of hospitality operations. ABAC provides:\n\n**Fine-grained Control**: Access decisions based on multiple contextual attributes\n**Dynamic Authorization**: Real-time policy evaluation with environmental factors\n**Scalability**: Policy-based system scales with organizational complexity\n**Flexibility**: Supports complex business rules and approval hierarchies\n**Context-aware**: Decisions consider time, location, device, and threat level\n**Compliance**: Comprehensive audit trails and regulatory compliance support\n\n### Key Benefits\n\n- **Security First**: Defense-in-depth with deny-overrides default policy\n- **Real-time Evaluation**: <30ms average policy evaluation time\n- **High Performance**: 78.3% cache hit rate, 92.5 requests/min throughput\n- **Comprehensive Auditing**: SOX, GDPR, HIPAA compliance support\n- **User-Friendly**: Progressive disclosure UI with role-based templates\n- **Flexible Policies**: Expression-based rules without code changes\n\n## Key Features\n\n### 1. Attribute-Based Permission Evaluation\n\n**4 Attribute Categories** supporting multi-dimensional access control:\n\n```\n┌─────────────┐     ┌──────────┐     ┌────────────┐     ┌─────────────┐\n│   Subject   │────▶│  Action  │────▶│  Resource  │────▶│ Environment │\n│ (User/Role) │     │ (CRUD+)  │     │  (Entity)  │     │  (Context)  │\n└─────────────┘     └──────────┘     └────────────┘     └─────────────┘\n        │                  │                 │                    │\n        └──────────────────┴─────────────────┴────────────────────┘\n                                    │\n                            ┌───────▼────────┐\n                            │ Policy Engine  │\n                            └───────┬────────┘\n                                    │\n                            ┌───────▼────────┐\n                            │ Access Decision│\n                            │  (Permit/Deny) │\n                            └────────────────┘\n```\n\n#### Subject Attributes (26 fields)\n- **Identity**: userId, username, email\n- **Organizational**: role(s), department(s), location(s)\n- **Employment**: employeeType, seniority, clearanceLevel\n- **Permissions**: assignedWorkflowStages, delegatedAuthorities, specialPermissions\n- **Status**: accountStatus, onDuty, shiftTiming\n- **Financial**: approvalLimit, budgetAccess\n\n#### Resource Attributes (21 fields)\n- **Identity**: resourceId, resourceType, resourceName\n- **Ownership**: owner, ownerDepartment, ownerLocation, dataClassification\n- **Business Context**: documentStatus, workflowStage, approvalLevel\n- **Financial**: totalValue, budgetCategory, costCenter\n- **Temporal**: createdAt, updatedAt, expiresAt, effectiveDate\n- **Compliance**: requiresAudit, regulatoryFlags, retentionPeriod\n- **Relationships**: parentResource, relatedResources, dependencies\n\n#### Environment Attributes (20 fields)\n- **Temporal**: currentTime, dayOfWeek, isBusinessHours, isHoliday\n- **Location**: requestIP, requestLocation, isInternalNetwork, facility\n- **Device & Session**: deviceType, deviceId, sessionId, authenticationMethod, sessionAge\n- **System State**: systemLoad, maintenanceMode, emergencyMode\n- **Risk & Compliance**: threatLevel, complianceMode, auditMode\n\n#### Action Attributes (16+ standard actions)\n- **Read Operations**: view, list, search, export\n- **Write Operations**: create, update, delete, archive\n- **Workflow Operations**: submit, approve, reject, cancel, recall\n- **Special Operations**: assign, delegate, override, audit\n\n### 2. Policy Management System\n\n**Priority-Based Evaluation**: Policies evaluated in descending priority order (0-1000)\n\n**4 Combining Algorithms**:\n- **DENY_OVERRIDES** (default): Any deny decision overrides permits (security-first)\n- **PERMIT_OVERRIDES**: Any permit decision overrides denies\n- **FIRST_APPLICABLE**: First matching policy determines outcome\n- **ONLY_ONE_APPLICABLE**: Error if multiple policies match (strict validation)\n\n**12 Comparison Operators**:\n- Equality: `==`, `!=`\n- Numeric: `>`, `<`, `>=`, `<=`\n- Collection: `in`, `not_in`, `contains`\n- Pattern: `matches`\n- Existence: `exists`, `not_exists`\n\n**Expression Language**:\n```typescript\n{\n  type: 'composite',\n  logicalOperator: 'AND',\n  expressions: [\n    {\n      type: 'simple',\n      attribute: 'subject.department.id',\n      operator: '==',\n      value: 'resource.ownerDepartment'\n    },\n    {\n      type: 'simple',\n      attribute: 'resource.totalValue.amount',\n      operator: '<=',\n      value: 10000\n    }\n  ]\n}\n```\n\n### 3. Resource Classification\n\n**25 Resource Types** across all ERP modules:\n\n**Procurement**: purchase_request, purchase_order, goods_receipt_note, credit_note\n\n**Inventory**: inventory_item, stock_count, stock_adjustment, stock_transfer\n\n**Vendor**: vendor, vendor_price_list, vendor_contract\n\n**Product**: product, product_category, product_specification\n\n**Recipe**: recipe, recipe_variant, menu_item\n\n**Financial**: invoice, payment, budget, journal_entry\n\n**Operations**: store_requisition, wastage_report, production_order\n\n**System**: user, role, workflow, report, configuration\n\n### 4. Role Management & Hierarchy\n\n**Role Hierarchy System**:\n- **Level 5**: system_administrator (*:* permissions)\n- **Level 4**: department_manager (department:*, user:manage)\n- **Level 3**: supervisor (workflow:approve, report:view)\n- **Level 1**: staff (profile:update, dashboard:view)\n\n**Multi-Role Support**: Users can be assigned multiple roles with context-specific permissions\n\n**Context Switching**: Dynamic role/department/location switching with session validation\n\n**Permission Inheritance**: Child roles inherit parent permissions with override capability\n\n### 5. Comprehensive Audit Logging\n\n**Audit Capabilities**:\n- **Access Decision Logs**: Every permission check with full context\n- **Policy Evaluation Traces**: Step-by-step policy evaluation details\n- **User Activity Tracking**: Complete user access patterns and behavior\n- **Security Events**: Failed attempts, privilege escalation, anomalies\n- **Compliance Reports**: SOX, GDPR, HIPAA-compliant audit trails\n\n**Retention**: 7 years (2,555 days) configurable for compliance requirements\n\n**Performance**: <100ms audit log write time with asynchronous processing\n\n### 6. Performance Optimization\n\n**Multi-Layer Caching**:\n- **Policy Cache**: 85.2% hit rate, 300s TTL\n- **Attribute Cache**: 78.3% hit rate, 180s TTL\n- **User Permission Cache**: 92.1% hit rate, 120s TTL\n\n**Performance Metrics**:\n- **Average Evaluation Time**: 28.5ms\n- **P95 Response Time**: 85ms\n- **P99 Response Time**: 150ms\n- **Throughput**: 92.5 requests/minute\n- **Cache Hit Rate**: 78.3% overall\n- **Error Rate**: 0.08%\n\n## System Architecture\n\n### High-Level Architecture\n\n```typescript\ninterface ABACSystem {\n  // Core Components\n  policyEngine: PolicyEngine;\n  attributeResolver: AttributeResolver;\n  policyRepository: PolicyRepository;\n  auditLogger: AuditLogger;\n\n  // Evaluation Context\n  contextBuilder: ContextBuilder;\n  cacheManager: CacheManager;\n\n  // Integration Points\n  userProvider: UserProvider;\n  resourceProvider: ResourceProvider;\n  environmentProvider: EnvironmentProvider;\n}\n```\n\n### Policy Decision Point (PDP)\n\n```typescript\nclass PolicyDecisionPoint {\n  async evaluate(request: AccessRequest): Promise<AccessDecision> {\n    // 1. Build evaluation context\n    const context = await this.buildContext(request);\n\n    // 2. Retrieve applicable policies\n    const policies = await this.findApplicablePolicies(context);\n\n    // 3. Evaluate policies (priority-based)\n    const results = await this.evaluatePolicies(policies, context);\n\n    // 4. Combine results (deny-overrides default)\n    const decision = this.combineResults(results);\n\n    // 5. Audit the decision\n    await this.auditDecision(request, decision);\n\n    return decision;\n  }\n}\n```\n\n### Database Schema\n\n**15 PostgreSQL Tables** on port 5435:\n\n**Core Tables**:\n- `abac_policies`: Policy definitions\n- `abac_policy_rules`: Individual policy rules\n- `abac_expressions`: Rule conditions\n- `abac_roles`: Enhanced role management\n- `abac_user_roles`: User-role assignments\n\n**Attribute Tables**:\n- `abac_subject_attributes`: User attributes\n- `abac_resource_attributes`: Resource metadata\n- `abac_environment_attributes`: Context attributes\n\n**Evaluation Tables**:\n- `abac_access_requests`: Access decision records\n- `abac_policy_evaluation_logs`: Evaluation traces\n- `abac_permission_cache`: Performance cache\n\n**Management Tables**:\n- `abac_subscription_configs`: Package management\n- `abac_audit_logs`: Comprehensive audit trail\n- `abac_policy_test_scenarios`: Testing framework\n\n## ABAC Components\n\n### Subject Attributes Interface\n\n```typescript\ninterface SubjectAttributes {\n  // Identity\n  userId: string;\n  username: string;\n  email: string;\n\n  // Organizational\n  role: Role;\n  roles: Role[];\n  department: Department;\n  departments: Department[];\n  location: Location;\n  locations: Location[];\n\n  // Employment\n  employeeType: 'full-time' | 'part-time' | 'contractor' | 'temporary';\n  seniority: number;                // Years of service\n  clearanceLevel: 'public' | 'internal' | 'confidential' | 'restricted';\n\n  // Permissions & Capabilities\n  assignedWorkflowStages: string[];\n  delegatedAuthorities: string[];\n  specialPermissions: string[];\n\n  // Status\n  accountStatus: 'active' | 'suspended' | 'locked' | 'inactive';\n  onDuty: boolean;\n  shiftTiming?: { start: Date; end: Date };\n\n  // Financial\n  approvalLimit?: Money;\n  budgetAccess?: BudgetScope[];\n}\n```\n\n### Resource Attributes Interface\n\n```typescript\ninterface ResourceAttributes {\n  // Identity\n  resourceId: string;\n  resourceType: ResourceType;\n  resourceName: string;\n\n  // Ownership & Classification\n  owner?: string;\n  ownerDepartment?: string;\n  ownerLocation?: string;\n  dataClassification: 'public' | 'internal' | 'confidential' | 'restricted';\n\n  // Business Context\n  documentStatus?: DocumentStatus;\n  workflowStage?: string;\n  approvalLevel?: number;\n\n  // Financial\n  totalValue?: Money;\n  budgetCategory?: string;\n  costCenter?: string;\n\n  // Temporal\n  createdAt: Date;\n  updatedAt: Date;\n  expiresAt?: Date;\n  effectiveDate?: Date;\n\n  // Compliance & Audit\n  requiresAudit: boolean;\n  regulatoryFlags?: string[];\n  retentionPeriod?: number;\n\n  // Relationships\n  parentResource?: string;\n  relatedResources?: string[];\n  dependencies?: string[];\n}\n```\n\n### Policy Structure\n\n```typescript\ninterface Policy {\n  id: string;\n  name: string;\n  description: string;\n  priority: number;              // 0-1000\n  enabled: boolean;\n\n  // Target - When this policy applies\n  target: {\n    subjects?: AttributeCondition[];\n    resources?: AttributeCondition[];\n    actions?: string[];\n    environment?: AttributeCondition[];\n  };\n\n  // Rules - Conditions that must be met\n  rules: Rule[];\n\n  // Effect - What happens when conditions are met\n  effect: 'permit' | 'deny';\n\n  // Obligations - Additional requirements\n  obligations?: Obligation[];\n\n  // Advice - Optional recommendations\n  advice?: Advice[];\n}\n```\n\n## Policy Framework\n\n### Example Policy: Department Manager PR Approval\n\n```typescript\nconst departmentManagerPRApproval: Policy = {\n  id: 'pol-001',\n  name: 'Department Manager PR Approval',\n  description: 'Department managers can approve PRs from their department up to $10,000',\n  priority: 100,\n  enabled: true,\n\n  target: {\n    subjects: [\n      { attribute: 'role.id', operator: '==', value: 'department-manager' }\n    ],\n    resources: [\n      { attribute: 'resourceType', operator: '==', value: 'purchase_request' }\n    ],\n    actions: ['approve_department']\n  },\n\n  rules: [\n    {\n      id: 'rule-001',\n      description: 'Same department and within approval limit',\n      condition: {\n        type: 'composite',\n        logicalOperator: 'AND',\n        expressions: [\n          {\n            type: 'simple',\n            attribute: 'subject.department.id',\n            operator: '==',\n            value: 'resource.ownerDepartment'\n          },\n          {\n            type: 'simple',\n            attribute: 'resource.totalValue.amount',\n            operator: '<=',\n            value: 10000\n          },\n          {\n            type: 'simple',\n            attribute: 'resource.documentStatus',\n            operator: '==',\n            value: 'pending_approval'\n          }\n        ]\n      }\n    }\n  ],\n\n  effect: 'permit',\n\n  obligations: [\n    {\n      id: 'obl-001',\n      type: 'audit',\n      attributes: {\n        action: 'pr_approval',\n        level: 'department'\n      }\n    }\n  ]\n};\n```\n\n### Example Policy: Financial Data Access\n\n```typescript\nconst financialDataAccess: Policy = {\n  id: 'pol-003',\n  name: 'Financial Data Access',\n  description: 'Financial data visible only to authorized roles from secure locations',\n  priority: 110,\n  enabled: true,\n\n  target: {\n    resources: [\n      { attribute: 'dataClassification', operator: 'in', value: ['confidential', 'restricted'] },\n      { attribute: 'resourceType', operator: 'in', value: ['invoice', 'payment', 'budget'] }\n    ],\n    actions: ['view', 'export']\n  },\n\n  rules: [\n    {\n      id: 'rule-003',\n      description: 'Finance role or manager with secure access',\n      condition: {\n        type: 'composite',\n        logicalOperator: 'AND',\n        expressions: [\n          {\n            type: 'composite',\n            logicalOperator: 'OR',\n            expressions: [\n              {\n                type: 'simple',\n                attribute: 'subject.role.id',\n                operator: 'in',\n                value: ['financial-manager', 'admin']\n              },\n              {\n                type: 'composite',\n                logicalOperator: 'AND',\n                expressions: [\n                  {\n                    type: 'simple',\n                    attribute: 'subject.role.permissions',\n                    operator: 'contains',\n                    value: 'view_financial_reports'\n                  },\n                  {\n                    type: 'simple',\n                    attribute: 'subject.clearanceLevel',\n                    operator: 'in',\n                    value: ['confidential', 'restricted']\n                  }\n                ]\n              }\n            ]\n          },\n          {\n            type: 'composite',\n            logicalOperator: 'OR',\n            expressions: [\n              {\n                type: 'simple',\n                attribute: 'environment.isInternalNetwork',\n                operator: '==',\n                value: true\n              },\n              {\n                type: 'simple',\n                attribute: 'environment.authenticationMethod',\n                operator: 'in',\n                value: ['mfa', 'biometric']\n              }\n            ]\n          }\n        ]\n      }\n    }\n  ],\n\n  effect: 'permit',\n\n  obligations: [\n    {\n      id: 'obl-003',\n      type: 'audit',\n      attributes: {\n        action: 'financial_data_access',\n        sensitivity: 'high',\n        includeData: true\n      }\n    }\n  ]\n};\n```\n\n## Implementation Guide\n\n### React Hook Implementation\n\n```typescript\n// hooks/useABACPermission.ts\nimport { useUser } from '@/lib/context/user-context';\nimport { useState, useEffect } from 'react';\n\ninterface UseABACPermissionOptions {\n  resourceId?: string;\n  resourceType?: ResourceType;\n  action: string;\n  attributes?: Record<string, any>;\n}\n\nexport function useABACPermission({\n  resourceId,\n  resourceType,\n  action,\n  attributes\n}: UseABACPermissionOptions) {\n  const { user } = useUser();\n  const [permission, setPermission] = useState<PermissionResult | null>(null);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    if (!user) {\n      setPermission({ allowed: false, reason: 'Not authenticated' });\n      setLoading(false);\n      return;\n    }\n\n    const checkPermission = async () => {\n      try {\n        const result = await permissionService.checkPermission(\n          user.id,\n          resourceId || 'global',\n          action,\n          {\n            resourceType,\n            additionalAttributes: attributes\n          }\n        );\n        setPermission(result);\n      } catch (error) {\n        console.error('Permission check failed:', error);\n        setPermission({ allowed: false, reason: 'Permission check failed' });\n      } finally {\n        setLoading(false);\n      }\n    };\n\n    checkPermission();\n  }, [user, resourceId, resourceType, action, attributes]);\n\n  return {\n    allowed: permission?.allowed || false,\n    loading,\n    reason: permission?.reason,\n    obligations: permission?.obligations,\n    advice: permission?.advice\n  };\n}\n```\n\n### Component Usage Example\n\n```typescript\nfunction PurchaseRequestDetail({ prId }: { prId: string }) {\n  const { allowed: canApprove, loading } = useABACPermission({\n    resourceId: prId,\n    resourceType: ResourceType.PURCHASE_REQUEST,\n    action: 'approve_department'\n  });\n\n  if (loading) return <Skeleton />;\n\n  return (\n    <div>\n      {canApprove && (\n        <Button onClick={handleApprove}>\n          Approve Request\n        </Button>\n      )}\n    </div>\n  );\n}\n```\n\n## API Reference\n\n### Base URL\n\n```\n/api/v1/permissions\n```\n\n### Authentication\n\nAll APIs require JWT bearer token authentication:\n```http\nAuthorization: Bearer <jwt_token>\n```\n\n### 1. Check Single Permission\n\n**Endpoint**: `POST /check`\n\n**Request**:\n```json\n{\n  \"userId\": \"user123\",\n  \"resourceType\": \"purchase_order\",\n  \"resourceId\": \"po_456\",\n  \"action\": \"approve\",\n  \"context\": {\n    \"department\": \"procurement\",\n    \"location\": \"hotel_main\"\n  }\n}\n```\n\n**Response**:\n```json\n{\n  \"allowed\": true,\n  \"reason\": \"User has approval authority for purchase orders up to $10,000\",\n  \"executionTime\": 45,\n  \"matchedPolicies\": [\"policy_001\"],\n  \"auditLogId\": \"audit_xyz789\"\n}\n```\n\n### 2. Bulk Permission Check\n\n**Endpoint**: `POST /check/bulk`\n\nChecks multiple permissions for a user in a single request.\n\n### 3. Get User Effective Permissions\n\n**Endpoint**: `GET /users/{userId}/permissions`\n\nRetrieves all effective permissions for a user based on current policies.\n\n### 4. Policy Management\n\n**Create Policy**: `POST /policies`\n**Get Policy**: `GET /policies/{policyId}`\n**List Policies**: `GET /policies`\n**Update Policy**: `PUT /policies/{policyId}`\n**Delete Policy**: `DELETE /policies/{policyId}`\n**Test Policy**: `POST /policies/{policyId}/test`\n\n### 5. Audit & Analytics\n\n**Get Audit Logs**: `GET /audit/permissions`\n**User Access Analytics**: `GET /analytics/users/{userId}/access`\n**Policy Usage Statistics**: `GET /analytics/policies/usage`\n**Compliance Reports**: `POST /analytics/compliance/reports`\n**Performance Metrics**: `GET /analytics/performance`\n\n**Complete API Specification**: See `/docs/api/abac-permission-system-apis.md` for all 60+ endpoints with full request/response examples.\n\n## User Guide\n\n### For System Administrators\n\n#### Setting Up Policies\n\n1. **Access Policy Management**: Navigate to System Administration > Permission Management > Policies\n2. **Create New Policy**: Click \"New Policy\" and define:\n   - **Name & Description**: Clear, descriptive policy name\n   - **Priority**: 0-1000 (higher = evaluated first)\n   - **Effect**: Permit or Deny\n   - **Target**: Define which subjects, resources, actions, and environment conditions apply\n   - **Rules**: Add conditions that must be met\n   - **Obligations**: Define audit requirements or additional actions\n\n3. **Test Policy**: Use test scenarios to validate policy before activation\n4. **Activate Policy**: Enable policy to make it effective immediately\n\n#### Managing Roles\n\n1. **View Role Hierarchy**: System Administration > Permission Management > Roles\n2. **Assign Roles to Users**: Select user → Assign role with context (department, location)\n3. **Configure Role Permissions**: Define direct and inherited permissions\n4. **Context Switching**: Enable users to switch between roles dynamically\n\n#### Monitoring & Auditing\n\n1. **Access Audit Logs**: Reporting > Security > Audit Logs\n2. **View User Activity**: Analytics > Users > [Select User] > Access Patterns\n3. **Generate Compliance Reports**: Analytics > Compliance > Generate Report\n4. **Monitor Performance**: System Administration > Security > Performance Metrics\n\n### For Department Managers\n\n#### Viewing Your Permissions\n\n1. Navigate to: Profile > Permissions\n2. View effective permissions for current role and context\n3. See approval limits, accessible resources, and constraints\n\n#### Approving Requests\n\n1. System automatically evaluates your approval permissions\n2. Approve button appears only if you have permission\n3. Approval limits enforced based on attributes (amount, department, etc.)\n\n#### Switching Context\n\n1. Click department/location dropdown in header\n2. Select different context from available options\n3. Permissions update automatically based on new context\n\n### For End Users\n\n#### Understanding Access Restrictions\n\n- Access restrictions are based on multiple factors: role, department, time, location\n- If action is not available, hover for reason tooltip\n- Contact your manager or admin if you need additional permissions\n\n#### Requesting Access\n\n1. Navigate to Profile > Request Access\n2. Specify resource type and required action\n3. Provide business justification\n4. Request routed to appropriate approver based on policy\n\n## Performance & Metrics\n\n### Current Performance\n\n**Evaluation Metrics** (January 2025):\n- **Average Evaluation Time**: 28.5ms\n- **P95 Response Time**: 85ms\n- **P99 Response Time**: 150ms\n- **Throughput**: 92.5 requests/minute\n- **Error Rate**: 0.08%\n- **Timeout Rate**: 0.02%\n\n**Cache Performance**:\n- **Policy Cache**: 85.2% hit rate\n- **Attribute Cache**: 78.3% hit rate\n- **User Permission Cache**: 92.1% hit rate\n- **Overall Hit Rate**: 78.3%\n\n**System Health**:\n- **Total Policies**: 45 active\n- **Total Users**: 267\n- **Total Roles**: 15\n- **Evaluations Today**: 5,420\n- **Permits Today**: 4,785 (88.3%)\n- **Denies Today**: 635 (11.7%)\n\n### Performance Optimization\n\n**Caching Strategies**:\n- Policy cache with 300s TTL\n- Attribute resolution caching (180s TTL)\n- User permission caching (120s TTL)\n- Automatic cache invalidation on policy changes\n\n**Database Optimization**:\n- Comprehensive indexing for fast attribute lookup\n- Query optimization for policy evaluation\n- Connection pooling (min: 5, max: 20)\n\n**Rate Limiting**:\n- Standard APIs: 1000 requests/hour per user\n- Bulk APIs: 100 requests/hour per user\n- Admin APIs: 500 requests/hour per admin\n- Analytics APIs: 200 requests/hour per user\n\n## Troubleshooting\n\n### Common Issues\n\n#### Issue 1: Permission Denied Unexpectedly\n\n**Symptoms**: User cannot perform action they should have permission for\n\n**Diagnosis**:\n1. Check policy evaluation logs: `GET /audit/permissions?userId={userId}`\n2. Verify attribute resolution: `GET /attributes/subjects/{userId}`\n3. Review policy priorities: Higher priority deny policies override lower permits\n\n**Solutions**:\n- Verify user's role assignments and context\n- Check if deny policy is overriding permit policy\n- Ensure policy target conditions match user attributes\n- Verify time-based or location-based restrictions aren't blocking access\n\n#### Issue 2: Slow Permission Checks\n\n**Symptoms**: Permission evaluation taking >100ms consistently\n\n**Diagnosis**:\n1. Check performance metrics: `GET /analytics/performance`\n2. Review cache hit rates: `GET /admin/cache`\n3. Analyze policy complexity: Count rules and expressions per policy\n\n**Solutions**:\n- Increase cache TTL if acceptable for security\n- Optimize policy conditions (reduce nested expressions)\n- Enable policy caching if disabled\n- Review and consolidate similar policies\n\n#### Issue 3: Cache Inconsistency\n\n**Symptoms**: Permission changes not reflecting immediately\n\n**Diagnosis**:\n1. Check cache status: `GET /admin/cache`\n2. Review cache invalidation logs\n3. Verify TTL settings\n\n**Solutions**:\n- Manually clear cache: `DELETE /admin/cache`\n- Reduce cache TTL for critical resources\n- Implement webhook-based cache invalidation\n- Review cache invalidation strategy\n\n#### Issue 4: Policy Conflicts\n\n**Symptoms**: Unexpected access denials or permits\n\n**Diagnosis**:\n1. Review policy evaluation order: Check priorities\n2. Analyze combining algorithm: Verify deny-overrides is appropriate\n3. Test policy scenarios: `POST /policies/{policyId}/test`\n\n**Solutions**:\n- Adjust policy priorities to resolve conflicts\n- Change combining algorithm if needed\n- Use policy validation: `POST /policies/validate`\n- Consolidate overlapping policies\n\n### Support Resources\n\n**Documentation**:\n- Full Architecture Design: `/docs/architecture/abac-design.md` (1,240 lines)\n- API Specification: `/docs/api/abac-permission-system-apis.md` (2,216 lines, 60+ endpoints)\n- ADR Document: `/docs/architecture/adr-003-abac-permission-system.md`\n- Database Setup: `/prisma/README-ABAC.md`\n- TypeScript Types: `/types/abac.ts` (246 lines)\n\n**System Administration**:\n- Policy Management UI: `/system-administration/permission-management/policies`\n- Role Management UI: `/system-administration/permission-management/roles`\n- Audit Logs: `/reporting/security/audit-logs`\n\n**Performance Monitoring**:\n- Health Check: `GET /api/v1/permissions/admin/health`\n- System Stats: `GET /api/v1/permissions/admin/stats`\n- Performance Metrics: `GET /api/v1/permissions/analytics/performance`\n\n---\n\n**Implementation Status**: Backend 95% Complete, Frontend 40% Complete\n**Database**: PostgreSQL on port 5435 (15 tables)\n**Performance**: <30ms average evaluation, 78.3% cache hit rate\n**Security**: SOX, GDPR, HIPAA compliant audit trails\n**Next Steps**: Complete policy management UI, implement testing framework, mobile interfaces\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

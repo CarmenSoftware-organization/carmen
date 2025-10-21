@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management Module - Comprehensive Specification - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Product Management / Product Management Specification.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Product Management Module - Comprehensive Specification\n\n## Overview\n\nThe Product Management module serves as the central hub for managing products, categories, units, and supplier relationships within the Carmen ERP system. Built with Next.js 14, TypeScript, and modern React patterns, it provides comprehensive product lifecycle management with advanced filtering, hierarchical categorization, and flexible unit management.\n\n## Module Structure\n\n### File Organization\n```\napp/(main)/product-management/\n├── page.tsx                           # Main dashboard (16 lines, placeholder)\n├── products/\n│   ├── page.tsx                       # Products wrapper\n│   └── components/\n│       ├── product-list.tsx           # Core product listing (960 lines)\n│       └── advanced-filter.tsx        # Advanced filter system (539 lines)\n├── categories/\n│   ├── page.tsx                       # Categories wrapper\n│   └── components/\n│       └── category-list.tsx          # Hierarchical tree management (802 lines)\n├── units/\n│   ├── page.tsx                       # Units wrapper\n│   └── components/\n│       └── unit-list-improved.tsx     # Unit management interface\n└── suppliers/                         # Future implementation\n```\n\n## 1. Product Dashboard (Main Page)\n\n**File**: `app/(main)/product-management/page.tsx`\n**Status**: Placeholder Implementation\n**Lines of Code**: 16\n\n### Current Implementation\n- Basic page structure with \"Product Dashboard\" heading\n- Placeholder for future dashboard widgets\n- Imports prepared for React Beautiful DnD and Recharts\n\n### Planned Features\n- **6 Dashboard Widgets**:\n  1. Product Overview Chart\n  2. Category Distribution\n  3. Inventory Levels Summary\n  4. Price Analysis\n  5. Recent Products Activity\n  6. Product Status Alerts\n- **Draggable Widget System**: React Beautiful DnD integration\n- **Real-time Analytics**: Chart-based visualizations\n- **Quick Navigation**: Direct links to main product functions\n\n## 2. Products Module\n\n### 2.1 Product List Component\n\n**File**: `app/(main)/product-management/products/components/product-list.tsx`\n**Status**: Fully Implemented\n**Lines of Code**: 960\n**Screenshot**: ![Product List](./product-list.png)\n\n#### Data Structure\n```typescript\ninterface Product {\n  id: string;\n  productCode: string;\n  name: string;\n  description: string;\n  categoryName?: string;\n  subCategoryName?: string;\n  isActive: boolean;\n  basePrice: number;\n  costPrice?: number;\n  margin?: number;\n  supplierName?: string;\n  unitName?: string;\n  taxRate?: number;\n  allergens?: string[];\n  isVegetarian?: boolean;\n  isVegan?: boolean;\n  isGlutenFree?: boolean;\n  shelfLife?: number;\n  storageConditions?: string;\n  minOrderQty?: number;\n  maxOrderQty?: number;\n  leadTimeDays?: number;\n  supplierProductCode?: string;\n  barcode?: string;\n  images?: string[];\n  nutritionalInfo?: {\n    calories?: number;\n    protein?: number;\n    carbs?: number;\n    fat?: number;\n    fiber?: number;\n    sugar?: number;\n    sodium?: number;\n  };\n  createdAt: string;\n  updatedAt: string;\n  createdBy: string;\n  updatedBy: string;\n}\n```\n\n#### Mock Data\n- **8 Sample Products** with comprehensive attributes\n- **Categories**: Beverages, Dairy, Meat & Poultry, Produce, Bakery\n- **Price Range**: £2.50 - £89.99\n- **Multiple Suppliers**: Various food suppliers\n- **Nutritional Information**: Complete nutritional profiles\n- **Allergen Data**: Comprehensive allergen tracking\n\n#### View Modes\n\n##### Table View\n- **Sortable Columns**: All major product attributes\n- **Column Configuration**: Show/hide columns dynamically\n- **Row Actions**: Edit, duplicate, delete, view details\n- **Status Indicators**: Visual badges for active/inactive status\n- **Bulk Selection**: Multi-row selection with actions\n\n**Table Columns**:\n1. Product Code (sortable)\n2. Name (sortable, searchable)\n3. Category (filterable)\n4. Supplier (filterable)\n5. Base Price (sortable, formatted currency)\n6. Cost Price (sortable, formatted currency)\n7. Margin (calculated percentage)\n8. Status (filterable badge)\n9. Actions (dropdown menu)\n\n##### Card View\n- **Grid Layout**: Responsive card grid\n- **Product Images**: Visual product representation\n- **Key Information**: Price, category, status prominently displayed\n- **Quick Actions**: Edit, view, duplicate buttons\n- **Hover Effects**: Interactive card animations\n- **Mobile Optimized**: Touch-friendly interface\n\n**Card Elements**:\n- Product image placeholder\n- Product name and code\n- Category and supplier tags\n- Price display with margin calculation\n- Status badge\n- Action buttons (Edit, View, Duplicate)\n- Allergen indicators\n- Nutritional highlights\n\n#### Search and Filtering\n\n##### Basic Search\n- **Global Search**: Searches across product name, code, and description\n- **Real-time Results**: Instant filtering as user types\n- **Search Highlighting**: Matched terms highlighted in results\n- **Case Insensitive**: Flexible search matching\n\n##### Basic Filters\n```typescript\ninterface FilterState {\n  search: string;\n  category: string;\n  supplier: string;\n  status: 'all' | 'active' | 'inactive';\n  priceRange: {\n    min: number;\n    max: number;\n  };\n}\n```\n\n**Filter Types**:\n1. **Category Filter**: Dropdown with all available categories\n2. **Supplier Filter**: Multi-select supplier dropdown\n3. **Status Filter**: Active/Inactive/All toggle\n4. **Price Range**: Min/max price sliders\n5. **Allergen Filter**: Multi-select allergen checkboxes\n6. **Dietary Filter**: Vegetarian/Vegan/Gluten-Free checkboxes\n\n#### Bulk Operations\n- **Select All/None**: Bulk selection controls\n- **Selected Count**: Display number of selected items\n- **Bulk Actions Menu**:\n  - Bulk Activate/Deactivate\n  - Bulk Category Assignment\n  - Bulk Supplier Update\n  - Bulk Price Update\n  - Bulk Export\n  - Bulk Delete (with confirmation)\n\n#### Performance Features\n- **useMemo Optimization**: Filtered and sorted data memoization\n- **Virtual Scrolling**: For large product catalogs\n- **Lazy Loading**: Progressive data loading\n- **Debounced Search**: Optimized search performance\n\n### 2.2 Advanced Filter System\n\n**File**: `app/(main)/product-management/products/components/advanced-filter.tsx`\n**Status**: Fully Implemented\n**Lines of Code**: 539\n**Screenshots**:\n- ![Advanced Filter - JSON View](./advanced-filter-fixed.png)\n- ![Advanced Filter - Build View](./advanced-filter-build.png)\n\n#### Filter Builder Interface\n\n##### Filter Conditions\n```typescript\ninterface FilterType<T> {\n  field: keyof T;\n  operator: FilterOperator;\n  value: string | string[];\n  logicalOperator?: 'AND' | 'OR';\n}\n\ntype FilterOperator =\n  | 'equals' | 'not_equals'\n  | 'contains' | 'not_contains'\n  | 'starts_with' | 'ends_with'\n  | 'greater_than' | 'less_than'\n  | 'greater_equal' | 'less_equal'\n  | 'between' | 'in' | 'not_in'\n  | 'is_empty' | 'is_not_empty';\n```\n\n##### Field Types\n- **Text Fields**: name, description, productCode, supplierProductCode\n- **Numeric Fields**: basePrice, costPrice, margin, shelfLife, minOrderQty\n- **Boolean Fields**: isActive, isVegetarian, isVegan, isGlutenFree\n- **Date Fields**: createdAt, updatedAt\n- **Array Fields**: allergens, images\n- **Nested Fields**: nutritionalInfo properties\n\n##### Operator Mapping\n```typescript\nconst operatorsByFieldType = {\n  string: ['equals', 'not_equals', 'contains', 'not_contains', 'starts_with', 'ends_with', 'is_empty', 'is_not_empty'],\n  number: ['equals', 'not_equals', 'greater_than', 'less_than', 'greater_equal', 'less_equal', 'between'],\n  boolean: ['equals', 'not_equals'],\n  date: ['equals', 'not_equals', 'greater_than', 'less_than', 'between'],\n  array: ['contains', 'not_contains', 'in', 'not_in', 'is_empty', 'is_not_empty']\n};\n```\n\n#### Filter Management Features\n\n##### Saved Filters\n- **Filter Persistence**: LocalStorage-based filter saving\n- **Named Filters**: Custom names for saved filter sets\n- **Quick Load**: One-click filter application\n- **Filter Sharing**: Export/import filter configurations\n- **Default Filters**: System-provided common filter sets\n\n##### JSON View\n- **Raw JSON Display**: Complete filter configuration visibility\n- **Editable JSON**: Direct JSON editing capability\n- **Syntax Highlighting**: Formatted JSON display\n- **Validation**: JSON structure validation\n- **Import/Export**: JSON-based filter sharing\n\n#### Advanced Filter UI Components\n\n##### Filter Condition Builder\n1. **Field Selector**: Dropdown with all available product fields\n2. **Operator Selector**: Context-aware operator dropdown\n3. **Value Input**: Dynamic input based on field type\n   - Text input for strings\n   - Number input for numeric fields\n   - Date picker for date fields\n   - Multi-select for array fields\n   - Checkbox for boolean fields\n4. **Logical Operator**: AND/OR selection for multiple conditions\n5. **Add/Remove Buttons**: Dynamic condition management\n\n##### Filter Actions\n- **Add Condition**: Create new filter condition\n- **Remove Condition**: Delete existing condition\n- **Clear All**: Reset all filters\n- **Apply Filters**: Execute filter logic\n- **Save Filter**: Store current configuration\n- **Load Filter**: Apply saved configuration\n\n## 3. Category Management Module\n\n### 3.1 Category Tree Component\n\n**File**: `app/(main)/product-management/categories/components/category-list.tsx`\n**Status**: Fully Implemented\n**Lines of Code**: 802\n**Screenshot**: ![Category Tree](./category-tree.png)\n\n#### Hierarchical Structure\n\n##### Three-Level Hierarchy\n```typescript\ninterface CategoryItem {\n  id: string;\n  name: string;\n  type: 'CATEGORY' | 'SUBCATEGORY' | 'ITEM_GROUP';\n  itemCount: number;\n  children?: CategoryItem[];\n  parentId?: string;\n  sortOrder: number;\n  isExpanded?: boolean;\n  isSelected?: boolean;\n  isHighlighted?: boolean;\n}\n```\n\n##### Category Levels\n1. **Main Categories**: Top-level product categories\n   - Examples: Beverages, Dairy, Meat & Poultry, Produce, Bakery\n   - Visual: Folder icon, bold text\n   - Actions: Add subcategory, edit, delete, move\n\n2. **Subcategories**: Second-level categorization\n   - Examples: Hot Beverages, Cold Beverages, Soft Drinks\n   - Visual: Subfolder icon, medium weight text\n   - Actions: Add item group, edit, delete, move\n\n3. **Item Groups**: Third-level specific groupings\n   - Examples: Coffee, Tea, Juices, Energy Drinks\n   - Visual: File icon, normal weight text\n   - Actions: Edit, delete, move\n\n#### Drag and Drop Functionality\n\n##### React DnD Implementation\n```typescript\n// Drag Source\ninterface DragItem {\n  type: string;\n  id: string;\n  categoryType: CategoryType;\n  parentId?: string;\n  index: number;\n}\n\n// Drop Target\ninterface DropResult {\n  targetId: string;\n  targetType: CategoryType;\n  position: 'before' | 'after' | 'inside';\n}\n```\n\n##### Drag and Drop Rules\n1. **Category → Category**: Reorder at same level or move to different parent\n2. **Subcategory → Category**: Move subcategory to different parent category\n3. **Item Group → Subcategory**: Move item group to different parent subcategory\n4. **Cross-level Restrictions**: Prevent invalid hierarchy violations\n5. **Visual Feedback**: Drop zones highlight during drag operations\n\n##### Mobile Touch Support\n- **Touch Events**: Touch start, move, end handling\n- **Haptic Feedback**: Vibration on successful operations\n- **Long Press**: Initiate drag operation\n- **Visual Indicators**: Touch-friendly drag handles\n- **Gesture Recognition**: Swipe gestures for actions\n\n#### Search and Filtering\n\n##### Real-time Search\n```typescript\ninterface SearchState {\n  query: string;\n  matchedItems: string[];\n  expandedItems: string[];\n  highlightedItems: string[];\n}\n```\n\n##### Search Features\n- **Instant Results**: Real-time search as user types\n- **Hierarchy Preservation**: Maintain parent-child relationships in results\n- **Auto-expand**: Automatically expand parent categories containing matches\n- **Highlight Matching**: Visual highlighting of matched text\n- **Clear Search**: Quick reset to full tree view\n\n##### Search Behavior\n1. **Text Matching**: Search category names and descriptions\n2. **Case Insensitive**: Flexible matching\n3. **Partial Matches**: Substring matching\n4. **Path Expansion**: Show complete hierarchy path for matches\n5. **Result Navigation**: Navigate through search results\n\n#### Category Actions\n\n##### Context Menu Actions\n```typescript\ninterface CategoryAction {\n  id: string;\n  label: string;\n  icon: string;\n  action: () => void;\n  visible: (item: CategoryItem) => boolean;\n  disabled: (item: CategoryItem) => boolean;\n}\n```\n\n##### Available Actions by Type\n\n**Category Actions**:\n- **Add Subcategory**: Create new subcategory under current category\n- **Edit Category**: Modify category name and properties\n- **Delete Category**: Remove category and all children (with confirmation)\n- **Move Category**: Drag-and-drop or menu-based moving\n- **View Products**: Show all products in this category tree\n\n**Subcategory Actions**:\n- **Add Item Group**: Create new item group under current subcategory\n- **Edit Subcategory**: Modify subcategory properties\n- **Delete Subcategory**: Remove subcategory and all children\n- **Move Subcategory**: Relocate to different parent category\n- **View Products**: Show products in this subcategory\n\n**Item Group Actions**:\n- **Edit Item Group**: Modify item group properties\n- **Delete Item Group**: Remove item group\n- **Move Item Group**: Relocate to different parent subcategory\n- **View Products**: Show products in this item group\n\n#### Mobile Optimizations\n\n##### Responsive Design\n- **Collapsible Sidebar**: Mobile-friendly navigation\n- **Touch Targets**: Minimum 44px touch areas\n- **Swipe Gestures**: Swipe to reveal actions\n- **Pinch to Zoom**: Scale tree for better visibility\n- **Orientation Support**: Landscape and portrait modes\n\n##### Touch Interactions\n```typescript\ninterface TouchHandler {\n  onTouchStart: (e: TouchEvent) => void;\n  onTouchMove: (e: TouchEvent) => void;\n  onTouchEnd: (e: TouchEvent) => void;\n  onLongPress: (item: CategoryItem) => void;\n  onDoubleTap: (item: CategoryItem) => void;\n}\n```\n\n##### Mobile Features\n- **Haptic Feedback**: Vibration for drag operations and confirmations\n- **Long Press Menu**: Context actions via long press\n- **Swipe Actions**: Swipe left/right for quick actions\n- **Pull to Refresh**: Refresh category tree data\n- **Smooth Animations**: Touch-optimized transitions\n\n## 4. Unit Management Module\n\n### 4.1 Unit List Component\n\n**File**: `app/(main)/product-management/units/components/unit-list-improved.tsx`\n**Status**: Implemented\n**Screenshot**: ![Unit Management](./unit-list.png)\n\n#### Unit Data Structure\n```typescript\ninterface Unit {\n  id: string;\n  name: string;\n  symbol: string;\n  type: 'inventory' | 'order' | 'recipe';\n  isActive: boolean;\n  baseUnit?: string;\n  conversionFactor?: number;\n  description?: string;\n  usageCount: number;\n  createdAt: string;\n  updatedAt: string;\n}\n```\n\n#### View Modes\n\n##### Table View\n**Columns**:\n1. Unit Name (sortable)\n2. Symbol (display)\n3. Type (filterable badge)\n4. Status (active/inactive badge)\n5. Usage Count (sortable)\n6. Actions (dropdown menu)\n\n##### Card View\n**Card Elements**:\n- Unit name and symbol\n- Type badge\n- Status indicator\n- Usage statistics\n- Quick action buttons\n- Description tooltip\n\n#### Filtering System\n\n##### Type Filters\n- **Inventory Units**: Units used for stock management\n- **Order Units**: Units used for purchasing\n- **Recipe Units**: Units used in recipe formulations\n\n##### Status Filters\n- **Active Units**: Currently available for use\n- **Inactive Units**: Disabled units\n- **All Units**: Complete unit listing\n\n#### Unit Actions\n- **Edit Unit**: Modify unit properties\n- **Delete Unit**: Remove unit (if not in use)\n- **Activate/Deactivate**: Toggle unit status\n- **View Usage**: Show products/recipes using this unit\n\n## 5. Shared Components and Systems\n\n### 5.1 Status Badge System\n\n#### Status Types\n```typescript\ntype StatusType = 'active' | 'inactive' | 'draft' | 'archived';\ntype CategoryType = 'CATEGORY' | 'SUBCATEGORY' | 'ITEM_GROUP';\ntype UnitType = 'inventory' | 'order' | 'recipe';\n```\n\n#### Badge Styling\n- **Active**: Green background, white text\n- **Inactive**: Red background, white text\n- **Draft**: Yellow background, dark text\n- **Archived**: Gray background, white text\n\n### 5.2 Search Components\n\n#### Global Search\n```typescript\ninterface SearchProps {\n  placeholder: string;\n  onSearch: (query: string) => void;\n  value: string;\n  debounceMs?: number;\n}\n```\n\n#### Features\n- **Debounced Input**: Optimized search performance\n- **Clear Button**: Quick reset functionality\n- **Search History**: Recent search suggestions\n- **Autocomplete**: Intelligent search suggestions\n\n### 5.3 View Toggle Components\n\n#### Toggle Implementation\n```typescript\ninterface ViewToggleProps {\n  currentView: 'table' | 'card';\n  onViewChange: (view: 'table' | 'card') => void;\n  disabled?: boolean;\n}\n```\n\n#### Features\n- **Animated Transitions**: Smooth view switching\n- **Keyboard Support**: Tab navigation\n- **Preference Persistence**: Remember user choice\n- **Mobile Optimization**: Touch-friendly toggles\n\n### 5.4 Action Menu Components\n\n#### Dropdown Menu Structure\n```typescript\ninterface ActionItem {\n  id: string;\n  label: string;\n  icon?: string;\n  action: () => void;\n  disabled?: boolean;\n  destructive?: boolean;\n  separator?: boolean;\n}\n```\n\n#### Menu Features\n- **Keyboard Navigation**: Arrow keys and Enter\n- **Click Outside**: Auto-close on outside click\n- **Escape Key**: Close menu\n- **Disabled States**: Visual and functional disable\n- **Destructive Actions**: Red styling for delete operations\n\n## 6. Technical Implementation\n\n### 6.1 State Management\n\n#### Local State with React Hooks\n```typescript\n// Product List State\nconst [products, setProducts] = useState<Product[]>([]);\nconst [filteredProducts, setFilteredProducts] = useState<Product[]>([]);\nconst [selectedProducts, setSelectedProducts] = useState<string[]>([]);\nconst [viewMode, setViewMode] = useState<'table' | 'card'>('table');\nconst [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'name', direction: 'asc' });\nconst [filterState, setFilterState] = useState<FilterState>(initialFilterState);\n```\n\n#### Performance Optimizations\n```typescript\n// Memoized filtered products\nconst filteredProducts = useMemo(() => {\n  return products\n    .filter(product => matchesFilters(product, filterState))\n    .sort((a, b) => sortProducts(a, b, sortConfig));\n}, [products, filterState, sortConfig]);\n\n// Debounced search\nconst debouncedSearch = useCallback(\n  debounce((query: string) => {\n    setFilterState(prev => ({ ...prev, search: query }));\n  }, 300),\n  []\n);\n```\n\n### 6.2 Mock Data System\n\n#### Data Structure\n```typescript\n// Mock Products\nexport const mockProducts: Product[] = [\n  {\n    id: \"1\",\n    productCode: \"BEV001\",\n    name: \"Premium Coffee Beans\",\n    description: \"High-quality arabica coffee beans from Colombia\",\n    categoryName: \"Beverages\",\n    subCategoryName: \"Hot Beverages\",\n    isActive: true,\n    basePrice: 24.99,\n    costPrice: 18.50,\n    margin: 26,\n    supplierName: \"Colombian Coffee Co.\",\n    unitName: \"kg\",\n    // ... additional properties\n  },\n  // ... 7 more products\n];\n```\n\n#### Category Tree Mock Data\n```typescript\nexport const mockCategoryTree: CategoryItem[] = [\n  {\n    id: \"cat-1\",\n    name: \"Beverages\",\n    type: \"CATEGORY\",\n    itemCount: 25,\n    sortOrder: 1,\n    children: [\n      {\n        id: \"subcat-1\",\n        name: \"Hot Beverages\",\n        type: \"SUBCATEGORY\",\n        itemCount: 12,\n        parentId: \"cat-1\",\n        children: [\n          {\n            id: \"item-1\",\n            name: \"Coffee\",\n            type: \"ITEM_GROUP\",\n            itemCount: 8,\n            parentId: \"subcat-1\"\n          }\n        ]\n      }\n    ]\n  }\n];\n```\n\n### 6.3 Form Validation\n\n#### Zod Schema Validation\n```typescript\nimport { z } from 'zod';\n\nconst ProductSchema = z.object({\n  productCode: z.string().min(3, 'Product code must be at least 3 characters'),\n  name: z.string().min(2, 'Product name is required'),\n  description: z.string().optional(),\n  categoryId: z.string().min(1, 'Category is required'),\n  basePrice: z.number().min(0, 'Price must be non-negative'),\n  costPrice: z.number().min(0, 'Cost must be non-negative').optional(),\n  isActive: z.boolean(),\n  allergens: z.array(z.string()).optional(),\n  nutritionalInfo: z.object({\n    calories: z.number().min(0).optional(),\n    protein: z.number().min(0).optional(),\n    carbs: z.number().min(0).optional(),\n    fat: z.number().min(0).optional(),\n  }).optional(),\n});\n```\n\n### 6.4 Error Handling\n\n#### Error Boundary Implementation\n```typescript\ninterface ErrorState {\n  hasError: boolean;\n  error: Error | null;\n  errorInfo: ErrorInfo | null;\n}\n\nclass ProductManagementErrorBoundary extends Component<Props, ErrorState> {\n  constructor(props: Props) {\n    super(props);\n    this.state = { hasError: false, error: null, errorInfo: null };\n  }\n\n  static getDerivedStateFromError(error: Error): ErrorState {\n    return { hasError: true, error, errorInfo: null };\n  }\n\n  componentDidCatch(error: Error, errorInfo: ErrorInfo) {\n    this.setState({ error, errorInfo });\n    console.error('Product Management Error:', error, errorInfo);\n  }\n}\n```\n\n## 7. User Experience Features\n\n### 7.1 Accessibility\n\n#### WCAG 2.1 AA Compliance\n- **Keyboard Navigation**: Full keyboard accessibility\n- **Screen Reader Support**: ARIA labels and descriptions\n- **Color Contrast**: Minimum 4.5:1 contrast ratio\n- **Focus Management**: Visible focus indicators\n- **Alternative Text**: Images and icons have alt text\n\n#### ARIA Implementation\n```typescript\n// Example ARIA attributes\n<div\n  role=\"tree\"\n  aria-label=\"Product categories\"\n  aria-expanded={isExpanded}\n  aria-selected={isSelected}\n  tabIndex={isSelected ? 0 : -1}\n>\n```\n\n### 7.2 Responsive Design\n\n#### Breakpoints\n```css\n/* Tailwind CSS breakpoints */\nsm: 640px   /* Mobile landscape */\nmd: 768px   /* Tablet */\nlg: 1024px  /* Desktop */\nxl: 1280px  /* Large desktop */\n2xl: 1536px /* Extra large */\n```\n\n#### Mobile Adaptations\n- **Collapsible Filters**: Mobile-friendly filter panels\n- **Touch Gestures**: Swipe, long press, pinch to zoom\n- **Responsive Tables**: Horizontal scrolling for complex tables\n- **Card View Priority**: Card view as default on mobile\n- **Bottom Navigation**: Sticky action buttons\n\n### 7.3 Performance Optimization\n\n#### Code Splitting\n```typescript\n// Lazy loading for large components\nconst AdvancedFilter = lazy(() => import('./components/advanced-filter'));\nconst CategoryTree = lazy(() => import('./components/category-list'));\n```\n\n#### Virtual Scrolling\n```typescript\n// React Window for large datasets\nimport { FixedSizeList as List } from 'react-window';\n\nconst ProductVirtualList = ({ products }: { products: Product[] }) => (\n  <List\n    height={600}\n    itemCount={products.length}\n    itemSize={80}\n    itemData={products}\n  >\n    {ProductRow}\n  </List>\n);\n```\n\n## 8. Integration Points\n\n### 8.1 Inventory Management Integration\n- **Stock Levels**: Real-time inventory data display\n- **Reorder Points**: Automatic reorder notifications\n- **Unit Conversions**: Seamless unit conversion between modules\n\n### 8.2 Procurement Integration\n- **Supplier Products**: Direct link to procurement module\n- **Purchase Orders**: Generate orders for selected products\n- **Cost Updates**: Automatic cost price updates from procurement\n\n### 8.3 Store Operations Integration\n- **Requisition Items**: Available products for store requisitions\n- **Usage Tracking**: Monitor product consumption patterns\n- **Wastage Analysis**: Product-specific waste reporting\n\n## 9. Future Enhancements\n\n### 9.1 Planned Features\n- **Product Images**: Image upload and gallery management\n- **Batch Operations**: Enhanced bulk operation capabilities\n- **Product Templates**: Reusable product templates\n- **Approval Workflows**: Multi-stage product approval process\n- **Version Control**: Track product changes over time\n- **Import/Export**: CSV/Excel data exchange\n- **API Integration**: Real-time data synchronization\n- **Advanced Analytics**: Product performance analytics\n\n### 9.2 Technical Improvements\n- **Real-time Updates**: WebSocket integration for live updates\n- **Offline Support**: Progressive Web App capabilities\n- **Advanced Search**: Elasticsearch integration\n- **Machine Learning**: Intelligent product recommendations\n- **Blockchain**: Supply chain traceability\n\n## 10. Testing Strategy\n\n### 10.1 Unit Testing\n- **Component Testing**: React Testing Library\n- **Hook Testing**: Custom hook validation\n- **Utility Testing**: Pure function validation\n- **Mock Data Testing**: Data structure validation\n\n### 10.2 Integration Testing\n- **User Workflows**: Complete user journey testing\n- **Cross-module Integration**: Module interaction testing\n- **API Integration**: Mock API response testing\n- **State Management**: Complex state interaction testing\n\n### 10.3 E2E Testing\n- **Critical Paths**: Full user workflow validation\n- **Browser Compatibility**: Cross-browser testing\n- **Mobile Testing**: Touch interaction validation\n- **Performance Testing**: Load time and responsiveness\n\n## Conclusion\n\nThe Product Management module represents a comprehensive solution for managing product catalogs, hierarchical categorization, and flexible unit systems. With 960+ lines of core functionality, advanced filtering capabilities, drag-and-drop tree management, and mobile-optimized interfaces, it provides a robust foundation for hospitality ERP product management needs.\n\nThe module's architecture supports future enhancements while maintaining performance and usability standards, making it a scalable solution for growing businesses.";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

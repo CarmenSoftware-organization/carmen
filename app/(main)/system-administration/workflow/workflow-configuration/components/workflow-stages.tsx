@@ -347,29 +347,42 @@ export function WorkflowStages({
                           <CardContent className="space-y-4">
                             <div>
                               <Label>Recipients</Label>
-                              <div className="grid gap-2 mt-2">
-                                <div className="flex items-center space-x-2">
-                                  <Switch id="submit-requestor" disabled={!isStageEditing} />
-                                  <Label htmlFor="submit-requestor" className="cursor-pointer">Requestor</Label>
+                              <div className="grid gap-3 mt-2">
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center space-x-2 min-w-[200px]">
+                                    <Switch id="submit-requestor" disabled={!isStageEditing} />
+                                    <Label htmlFor="submit-requestor" className="cursor-pointer">Requestor</Label>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Select disabled={!isStageEditing}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select template" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="1">Request Submitted</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
                                 {selectedStage.availableActions.includes("Approve") && (
-                                  <div className="flex items-center space-x-2">
-                                    <Switch id="submit-next-approver" disabled={!isStageEditing} />
-                                    <Label htmlFor="submit-next-approver" className="cursor-pointer">Next Stage Approver</Label>
+                                  <div className="flex items-center gap-4">
+                                    <div className="flex items-center space-x-2 min-w-[200px]">
+                                      <Switch id="submit-next-approver" disabled={!isStageEditing} />
+                                      <Label htmlFor="submit-next-approver" className="cursor-pointer">Next Stage Approver</Label>
+                                    </div>
+                                    <div className="flex-1">
+                                      <Select disabled={!isStageEditing}>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select template" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="1">Request Submitted</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
                                   </div>
                                 )}
                               </div>
-                            </div>
-                            <div>
-                              <Label>Template</Label>
-                              <Select disabled={!isStageEditing}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select template" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="1">Request Submitted</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
                           </CardContent>
                         </Card>
@@ -383,33 +396,58 @@ export function WorkflowStages({
                           <CardContent className="space-y-4">
                             <div>
                               <Label>Recipients</Label>
-                              <div className="grid gap-2 mt-2">
-                                <div className="flex items-center space-x-2">
-                                  <Switch id="approve-requestor" disabled={!isStageEditing} />
-                                  <Label htmlFor="approve-requestor" className="cursor-pointer">Requestor</Label>
+                              <div className="grid gap-3 mt-2">
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center space-x-2 min-w-[200px]">
+                                    <Switch id="approve-requestor" disabled={!isStageEditing} />
+                                    <Label htmlFor="approve-requestor" className="cursor-pointer">Requestor</Label>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Select disabled={!isStageEditing}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select template" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="2">Request Approved</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                  <Switch id="approve-current-approver" disabled={!isStageEditing} />
-                                  <Label htmlFor="approve-current-approver" className="cursor-pointer">Current Approver</Label>
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center space-x-2 min-w-[200px]">
+                                    <Switch id="approve-current-approver" disabled={!isStageEditing} />
+                                    <Label htmlFor="approve-current-approver" className="cursor-pointer">Current Approver</Label>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Select disabled={!isStageEditing}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select template" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="2">Request Approved</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
                                 {selectedStage.availableActions.includes("Approve") && (
-                                  <div className="flex items-center space-x-2">
-                                    <Switch id="approve-next-approver" disabled={!isStageEditing} />
-                                    <Label htmlFor="approve-next-approver" className="cursor-pointer">Next Stage Approver</Label>
+                                  <div className="flex items-center gap-4">
+                                    <div className="flex items-center space-x-2 min-w-[200px]">
+                                      <Switch id="approve-next-approver" disabled={!isStageEditing} />
+                                      <Label htmlFor="approve-next-approver" className="cursor-pointer">Next Stage Approver</Label>
+                                    </div>
+                                    <div className="flex-1">
+                                      <Select disabled={!isStageEditing}>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select template" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="2">Request Approved</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
                                   </div>
                                 )}
                               </div>
-                            </div>
-                            <div>
-                              <Label>Template</Label>
-                              <Select disabled={!isStageEditing}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select template" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="2">Request Approved</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
                           </CardContent>
                         </Card>
@@ -423,27 +461,40 @@ export function WorkflowStages({
                           <CardContent className="space-y-4">
                             <div>
                               <Label>Recipients</Label>
-                              <div className="grid gap-2 mt-2">
-                                <div className="flex items-center space-x-2">
-                                  <Switch id="reject-requestor" disabled={!isStageEditing} />
-                                  <Label htmlFor="reject-requestor" className="cursor-pointer">Requestor</Label>
+                              <div className="grid gap-3 mt-2">
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center space-x-2 min-w-[200px]">
+                                    <Switch id="reject-requestor" disabled={!isStageEditing} />
+                                    <Label htmlFor="reject-requestor" className="cursor-pointer">Requestor</Label>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Select disabled={!isStageEditing}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select template" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="3">Request Rejected</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                  <Switch id="reject-previous-approvers" disabled={!isStageEditing} />
-                                  <Label htmlFor="reject-previous-approvers" className="cursor-pointer">Previous Stage Approvers</Label>
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center space-x-2 min-w-[200px]">
+                                    <Switch id="reject-previous-approvers" disabled={!isStageEditing} />
+                                    <Label htmlFor="reject-previous-approvers" className="cursor-pointer">Previous Stage Approvers</Label>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Select disabled={!isStageEditing}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select template" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="3">Request Rejected</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div>
-                              <Label>Template</Label>
-                              <Select disabled={!isStageEditing}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select template" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="3">Request Rejected</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
                           </CardContent>
                         </Card>
@@ -457,27 +508,40 @@ export function WorkflowStages({
                           <CardContent className="space-y-4">
                             <div>
                               <Label>Recipients</Label>
-                              <div className="grid gap-2 mt-2">
-                                <div className="flex items-center space-x-2">
-                                  <Switch id="sendback-requestor" disabled={!isStageEditing} />
-                                  <Label htmlFor="sendback-requestor" className="cursor-pointer">Requestor</Label>
+                              <div className="grid gap-3 mt-2">
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center space-x-2 min-w-[200px]">
+                                    <Switch id="sendback-requestor" disabled={!isStageEditing} />
+                                    <Label htmlFor="sendback-requestor" className="cursor-pointer">Requestor</Label>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Select disabled={!isStageEditing}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select template" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="4">Request Sent Back</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                  <Switch id="sendback-previous-approver" disabled={!isStageEditing} />
-                                  <Label htmlFor="sendback-previous-approver" className="cursor-pointer">Previous Stage Approver</Label>
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center space-x-2 min-w-[200px]">
+                                    <Switch id="sendback-previous-approver" disabled={!isStageEditing} />
+                                    <Label htmlFor="sendback-previous-approver" className="cursor-pointer">Previous Stage Approver</Label>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Select disabled={!isStageEditing}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select template" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="4">Request Sent Back</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div>
-                              <Label>Template</Label>
-                              <Select disabled={!isStageEditing}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select template" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="4">Request Sent Back</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
                           </CardContent>
                         </Card>
@@ -490,27 +554,40 @@ export function WorkflowStages({
                         <CardContent className="space-y-4">
                           <div>
                             <Label>Recipients</Label>
-                            <div className="grid gap-2 mt-2">
-                              <div className="flex items-center space-x-2">
-                                <Switch id="sla-requestor" disabled={!isStageEditing} />
-                                <Label htmlFor="sla-requestor" className="cursor-pointer">Requestor</Label>
+                            <div className="grid gap-3 mt-2">
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center space-x-2 min-w-[200px]">
+                                  <Switch id="sla-requestor" disabled={!isStageEditing} />
+                                  <Label htmlFor="sla-requestor" className="cursor-pointer">Requestor</Label>
+                                </div>
+                                <div className="flex-1">
+                                  <Select disabled={!isStageEditing}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select template" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="5">SLA Warning</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <Switch id="sla-current-approver" disabled={!isStageEditing} />
-                                <Label htmlFor="sla-current-approver" className="cursor-pointer">Current Approver</Label>
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center space-x-2 min-w-[200px]">
+                                  <Switch id="sla-current-approver" disabled={!isStageEditing} />
+                                  <Label htmlFor="sla-current-approver" className="cursor-pointer">Current Approver</Label>
+                                </div>
+                                <div className="flex-1">
+                                  <Select disabled={!isStageEditing}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select template" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="5">SLA Warning</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div>
-                            <Label>Template</Label>
-                            <Select disabled={!isStageEditing}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select template" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="5">SLA Warning</SelectItem>
-                              </SelectContent>
-                            </Select>
                           </div>
                         </CardContent>
                       </Card>

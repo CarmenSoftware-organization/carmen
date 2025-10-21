@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
+import { useUser } from '@/lib/context/simple-user-context'
 import { ReportHeader } from './components/ReportHeader'
 import { FilterPanel } from './components/FilterPanel'
 import { BalanceTable } from './components/BalanceTable'
@@ -22,6 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { MovementHistory } from './components/MovementHistory'
 
 export default function InventoryBalancePage() {
+  const { user } = useUser()
   const [isLoading, setIsLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [activeFilters, setActiveFilters] = useState<string[]>([])
@@ -40,28 +42,53 @@ export default function InventoryBalancePage() {
     categoryRange: { from: '', to: '' },
     productRange: { from: '', to: '' },
     viewType: 'PRODUCT',
-    valuationMethod: 'FIFO',
     showLots: false,
   })
 
-  // Load mock data with a simulated delay
+  // Load mock data with a simulated delay and apply user permissions
   useEffect(() => {
     setIsLoading(true)
     const timer = setTimeout(() => {
-      setReport(mockBalanceReport)
+      let filteredReport = { ...mockBalanceReport }
+
+      // Filter locations based on user permissions
+      if (user?.role !== 'System Administrator' && user?.availableLocations) {
+        const userLocationIds = user.availableLocations.map(l => l.id)
+        filteredReport.locations = mockBalanceReport.locations.filter(loc =>
+          userLocationIds.includes(loc.id)
+        )
+
+        // Recalculate totals based on filtered locations
+        const newTotals = filteredReport.locations.reduce((acc, location) => {
+          const locationTotal = location.categories.reduce((locAcc, category) => {
+            const categoryTotal = category.products.reduce((catAcc, product) => {
+              catAcc.quantity += product.totals.quantity
+              catAcc.value += product.totals.value
+              return catAcc
+            }, { quantity: 0, value: 0 })
+            locAcc.quantity += categoryTotal.quantity
+            locAcc.value += categoryTotal.value
+            return locAcc
+          }, { quantity: 0, value: 0 })
+          acc.quantity += locationTotal.quantity
+          acc.value += locationTotal.value
+          return acc
+        }, { quantity: 0, value: 0 })
+
+        filteredReport.totals = newTotals
+      }
+
+      setReport(filteredReport)
       setIsLoading(false)
     }, 1000)
-    
+
     return () => clearTimeout(timer)
-  }, [])
+  }, [user])
 
   const handleViewChange = (viewType: 'CATEGORY' | 'PRODUCT' | 'LOT') => {
     setParams(prev => ({ ...prev, viewType }))
   }
 
-  const handleValuationMethodChange = (valuationMethod: 'FIFO' | 'WEIGHTED_AVERAGE') => {
-    setParams(prev => ({ ...prev, valuationMethod }))
-  }
 
   const handleShowLotsChange = (showLots: boolean) => {
     setParams(prev => ({ ...prev, showLots }))
@@ -147,10 +174,9 @@ export default function InventoryBalancePage() {
         </div>
         
         <div className="flex flex-wrap items-center gap-2 self-end md:self-auto">
-          <ReportHeader 
+          <ReportHeader
             params={params}
             onViewChange={handleViewChange}
-            onValuationMethodChange={handleValuationMethodChange}
             onShowLotsChange={handleShowLotsChange}
           />
         </div>
@@ -198,11 +224,11 @@ export default function InventoryBalancePage() {
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-muted-foreground">Valuation Method</p>
-                    <p className="text-2xl font-bold">{params.valuationMethod === 'FIFO' ? 'FIFO' : 'Weighted Avg'}</p>
+                    <p className="text-sm text-muted-foreground">Locations</p>
+                    <p className="text-2xl font-bold">{report.locations.length}</p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                    <span className="text-purple-600 text-xl font-semibold">V</span>
+                    <span className="text-purple-600 text-xl font-semibold">L</span>
                   </div>
                 </div>
               </CardContent>

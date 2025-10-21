@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting & Analytics Module - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Reporting & Analytics</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">REPORTING</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Reporting & Analytics Module\n\n> **Module:** Reporting & Analytics\n> **Pages:** 15-20\n> **Status:** ✅ Production Ready\n> **Route:** `/reporting-analytics`\n\n---\n\n## Overview\n\nThe Reporting & Analytics module provides comprehensive business intelligence, real-time analytics, and consumption tracking for Carmen ERP. This module offers advanced analytics capabilities with a focus on consumption analytics, fractional sales tracking, variance analysis, and operational efficiency metrics.\n\n### Key Capabilities\n\n1. **Real-Time Consumption Analytics** - Live tracking of ingredient consumption, sales, and waste\n2. **Fractional Sales Analytics** - Specialized analytics for pizza slices, cake portions, bottle-by-glass\n3. **Variance Analysis** - Theoretical vs actual consumption tracking with root cause analysis\n4. **Efficiency Metrics** - Yield efficiency, profit margins, and optimization opportunities\n5. **Live Dashboard** - Auto-refreshing KPI dashboard with alerts and recommendations\n6. **Multi-Location Analytics** - Cross-location comparison and efficiency tracking\n\n---\n\n## 📸 System Screenshots\n\n### Consumption Analytics Dashboard\n![Consumption Analytics Dashboard](./screenshots/consumption-analytics.png)\n*The Consumption Analytics dashboard provides real-time business intelligence with comprehensive monitoring across 5 functional tabs. Active Alerts section displays 2 critical alerts: \"High Variance Detected\" for Premium Coffee Beans (Variance: 18.5%, Expected: 8%) and WARNING alert for \"Stock Level Low\" on Extra Virgin Olive Oil (Current: 15 kg, Reorder: 20 kg). Six KPI widgets track: Food Cost % (32.5% current vs 30% target, red indicator), Waste % (2.8% vs 3% target, green), Fractional Rate (68.5% conversion rate), Avg Transaction ($45.20 value), Profit Margin (38.2% with Grade: Good), and Yield Efficiency (94.5% with Performance: Excellent). Two analytical charts visualize: Consumption Trends (7-day line chart showing theoretical consumption 850-1150kg, actual consumption 900-1200kg, waste 50-100kg from Mon-Sun) and Sales Distribution (area chart comparing Fractional Sales 450-750 units vs Whole Sales 300-500 units). Navigation tabs (Overview, Fractional Sales, Variance, Ingredients, Efficiency) and filter controls (Location: All Locations, Time Range: This Week) enable comprehensive consumption analysis and optimization.*\n\n---\n\n## Module Structure\n\n```\nReporting & Analytics (15-20 pages)\n├── Main Dashboard: 1 page\n└── Consumption Analytics: 14-19 pages\n    ├── Overview Dashboard: 2 pages\n    ├── Fractional Sales Analytics: 3 pages\n    ├── Variance Analysis: 3 pages\n    ├── Ingredient Tracking: 2 pages\n    ├── Efficiency Analysis: 2 pages\n    ├── Executive Summary: 2 pages\n    └── Automated Reporting: 2-5 pages\n```\n\n---\n\n## Key Features\n\n### 1. Enhanced Consumption Dashboard\n\n**Purpose**: Real-time consumption tracking with fractional sales analytics and live KPI monitoring.\n\n**Features**:\n- Auto-refreshing real-time metrics (30-second intervals)\n- 6 key performance indicators with visual progress bars\n- Active alerts system with severity levels (critical, warning, info)\n- Multi-tab interface (Overview, Fractional Sales, Variance, Ingredients, Efficiency)\n- Location and time range filtering\n- Export capabilities for all reports\n\n**KPIs Tracked**:\n1. **Food Cost Percentage** - Target: 30%, visual threshold monitoring\n2. **Waste Percentage** - Target: 3%, waste reduction tracking\n3. **Fractional Sales Rate** - Conversion rate for partial items\n4. **Average Transaction Value** - Revenue per transaction with trend indicators\n5. **Profit Margin** - Overall profitability with performance grading\n6. **Yield Efficiency** - Recipe yield vs expected with performance rating\n\n### 2. Fractional Sales Analytics\n\n**Purpose**: Specialized tracking and analytics for fractional sales (pizza slices, cake portions, bottle-by-glass).\n\n**Types Supported**:\n- **Pizza Slices**: 1/8 slices with conversion tracking\n- **Cake Slices**: 1/12 portions with efficiency metrics\n- **Bottle-by-Glass**: 1/5 servings with waste tracking\n- **Portion Control**: Custom portion sizes with yield monitoring\n\n**Analytics**:\n- Transaction volume by fractional type\n- Revenue contribution per type\n- Efficiency percentage (target: 90%+)\n- Waste rate tracking (target: <5%)\n- Conversion rate trends\n- Real-time fractional sales distribution\n\n### 3. Consumption Trend Analysis\n\n**Purpose**: Track theoretical vs actual consumption over time with waste identification.\n\n**Features**:\n- **Consumption Charts**: Theoretical vs actual consumption comparison\n- **Waste Tracking**: Daily waste amounts with trend analysis\n- **Sales Distribution**: Fractional vs whole item sales breakdown\n- **7-Day Rolling Trends**: Daily consumption patterns\n- **Variance Alerts**: Automatic alerts when variance exceeds thresholds\n\n**Chart Types**:\n- Composed charts with theoretical/actual lines and waste bars\n- Area charts for fractional vs whole sales stacking\n- Line charts for efficiency trend visualization\n\n### 4. Variance Analysis\n\n**Purpose**: Identify and analyze discrepancies between theoretical and actual consumption.\n\n**Analysis Components**:\n- **Top Variance Ingredients**: Ranked list with percentage variance\n- **Trend Indicators**: Up, down, or stable variance trends\n- **Cost Impact**: Dollar amount of variances\n- **Threshold Monitoring**: Acceptable (8%) vs critical (15%) variance levels\n- **Root Cause Identification**: Wastage, over-portioning, spillage, theft\n\n**Variance Drivers**:\n- **Wastage**: Spoilage, preparation waste, disposal\n- **Over-portioning**: Inconsistent portion sizes, untrained staff\n- **Ingredient Cost Changes**: Price fluctuations, supplier changes\n- **Recipe Deviation**: Non-standard preparation methods\n- **Spillage**: Accidental loss during preparation/service\n- **Theft**: Inventory shrinkage, unauthorized consumption\n\n### 5. Live Ingredient Tracking\n\n**Purpose**: Real-time inventory status with consumption-based projections.\n\n**Features**:\n- **Current Levels**: Real-time inventory quantities\n- **Status Indicators**: Adequate, Low (yellow), Critical (red), Out of Stock\n- **Projected Depletion**: Estimated date when stock runs out\n- **Reorder Point Monitoring**: Visual progress toward reorder threshold\n- **Consumption-Based Forecasting**: Depletion projections based on consumption rates\n\n**Alert Thresholds**:\n- **Adequate**: Above 2x reorder point (green)\n- **Low**: Below 2x reorder point, above reorder point (yellow)\n- **Critical**: Below reorder point (red)\n- **Out of Stock**: Zero inventory (urgent)\n\n### 6. Efficiency Optimization\n\n**Purpose**: Identify and quantify opportunities for operational improvements.\n\n**Optimization Categories**:\n1. **Reduce Waste**: Improve storage, handling, portion control\n2. **Optimize Portion Sizes**: Standardize fractional portions for better yield\n3. **Recipe Standardization**: Update recipes based on actual consumption\n4. **Improve Yield**: Production process improvements\n\n**Impact Assessment**:\n- **Potential Savings**: Daily/monthly dollar impact\n- **Implementation Complexity**: Low, Medium, High\n- **Time to Value**: Estimated implementation timeline\n- **Priority Ranking**: High Impact, Medium Impact, Long Term\n\n---\n\n## Data Models\n\n### Real-Time Consumption Metrics\n\n```typescript\ninterface RealTimeConsumptionMetrics {\n  timestamp: Date;\n  location: string;\n\n  // Current period metrics\n  currentPeriodSales: number;\n  currentPeriodCosts: number;\n  currentPeriodProfit: number;\n\n  // Today's metrics\n  todayTransactionCount: number;\n  todayFractionalSales: number;\n  todayWholeSales: number;\n  todayWastage: number;\n\n  // Live inventory impact\n  liveIngredientLevels: {\n    ingredientId: string;\n    ingredientName: string;\n    currentLevel: number;\n    projectedDepletion: Date | null;\n    reorderPoint: number;\n    status: 'adequate' | 'low' | 'critical' | 'out_of_stock';\n  }[];\n\n  // Performance indicators\n  kpis: {\n    foodCostPercentage: number;\n    wastePercentage: number;\n    fractionalSalesConversionRate: number;\n    averageTransactionValue: number;\n    profitMargin: number;\n    yieldEfficiency: number;\n  };\n\n  // Alerts and recommendations\n  alerts: {\n    type: 'waste_warning' | 'stock_low' | 'variance_high' | 'efficiency_low';\n    severity: 'info' | 'warning' | 'critical';\n    message: string;\n    ingredientId?: string;\n    recipeId?: string;\n    threshold?: number;\n    currentValue?: number;\n    recommendedAction?: string;\n  }[];\n}\n```\n\n### Fractional Sales Transaction\n\n```typescript\ninterface FractionalSalesTransaction {\n  id: string;\n  transactionId: string; // POS transaction reference\n  posItemCode: string;\n  itemName: string;\n  variantId: string;\n  variantName: string;\n  baseRecipeId: string;\n  baseRecipeName: string;\n  fractionalSalesType: 'pizza-slice' | 'cake-slice' | 'bottle-glass' | 'portion-control' | 'custom';\n  quantitySold: number;\n  conversionRate: number; // How much of base recipe this represents\n  salePrice: number;\n  costPrice: number;\n  grossProfit: number;\n  location: string;\n  cashier: string;\n  timestamp: Date;\n  shiftId?: string;\n  orderNumber?: string;\n}\n```\n\n### Ingredient Consumption Record\n\n```typescript\ninterface IngredientConsumptionRecord {\n  id: string;\n  ingredientId: string;\n  ingredientName: string;\n  ingredientType: 'product' | 'recipe';\n\n  // Theoretical consumption (based on recipes)\n  theoreticalQuantity: number;\n  theoreticalCost: number;\n\n  // Actual consumption (including wastage, spillage, etc.)\n  actualQuantity: number;\n  actualCost: number;\n\n  // Variance tracking\n  quantityVariance: number; // actual - theoretical\n  costVariance: number; // actual - theoretical\n  variancePercentage: number; // (variance / theoretical) * 100\n\n  // Breakdown by source\n  recipeConsumption: number; // Consumed through recipes\n  directConsumption: number; // Direct usage (prep, seasoning, etc.)\n  wastage: number; // Identified waste\n  spillage: number; // Accidental loss\n  adjustment: number; // Manual adjustments\n\n  unit: string;\n  location: string;\n  period: string;\n  calculatedAt: Date;\n\n  // Fractional sales specific\n  fractionalContribution: number; // Portion consumed via fractional sales\n  wholeItemContribution: number; // Portion consumed via whole item sales\n}\n```\n\n### Recipe Consumption Summary\n\n```typescript\ninterface RecipeConsumptionSummary {\n  id: string;\n  recipeId: string;\n  recipeName: string;\n\n  // Production metrics\n  totalProduced: number; // Base recipe units produced\n  totalSold: number; // Total units sold (all variants)\n  remainingInventory: number; // Unsold prepared items\n\n  // Variant breakdown\n  variantSales: {\n    variantId: string;\n    variantName: string;\n    quantitySold: number;\n    revenueGenerated: number;\n    conversionRate: number;\n    contributionToBase: number;\n  }[];\n\n  // Cost analysis\n  totalIngredientCost: number;\n  totalLaborCost: number;\n  totalOverheadCost: number;\n  totalCost: number;\n  totalRevenue: number;\n  grossProfit: number;\n  profitMargin: number;\n\n  // Consumption efficiency\n  theoreticalIngredientCost: number;\n  actualIngredientCost: number;\n  ingredientVariance: number;\n  wastageRate: number;\n\n  // Fractional sales metrics\n  fractionalSalesRevenue: number;\n  wholeSalesRevenue: number;\n  fractionalSalesPercentage: number;\n\n  // Efficiency metrics\n  yieldEfficiency: number;\n  conversionEfficiency: number;\n  wasteReductionOpportunity: number;\n}\n```\n\n### Consumption Variance Analysis\n\n```typescript\ninterface ConsumptionVarianceAnalysis {\n  period: string;\n  location: string;\n  analysisType: 'daily' | 'weekly' | 'monthly' | 'custom';\n\n  // Overall variance\n  totalTheoreticalCost: number;\n  totalActualCost: number;\n  totalVariance: number;\n  totalVariancePercentage: number;\n\n  // Variance by category\n  categoryVariances: {\n    categoryName: string;\n    theoreticalCost: number;\n    actualCost: number;\n    variance: number;\n    variancePercentage: number;\n    contributionToTotal: number;\n    trend: 'improving' | 'worsening' | 'stable';\n  }[];\n\n  // Variance by recipe\n  recipeVariances: {\n    recipeId: string;\n    recipeName: string;\n    fractionalSalesType?: string;\n    theoreticalCost: number;\n    actualCost: number;\n    variance: number;\n    variancePercentage: number;\n    productionCount: number;\n    averageVariancePerUnit: number;\n  }[];\n\n  // Root cause analysis\n  varianceDrivers: {\n    driver: 'wastage' | 'over_portioning' | 'ingredient_cost_change' | 'recipe_deviation' | 'spillage' | 'theft';\n    impact: number;\n    impactPercentage: number;\n    affectedItems: string[];\n    recommendedActions: string[];\n  }[];\n\n  // Statistical analysis\n  statistics: {\n    meanVariance: number;\n    medianVariance: number;\n    standardDeviation: number;\n    confidenceInterval: {\n      lower: number;\n      upper: number;\n      confidence: number;\n    };\n    outliers: {\n      ingredientId: string;\n      ingredientName: string;\n      variance: number;\n      standardDeviations: number;\n    }[];\n  };\n\n  calculatedAt: Date;\n}\n```\n\n### Fractional Sales Efficiency Report\n\n```typescript\ninterface FractionalSalesEfficiencyReport {\n  period: string;\n  location: string;\n\n  // Overall efficiency metrics\n  totalFractionalTransactions: number;\n  totalFractionalRevenue: number;\n  averageFractionalTransactionValue: number;\n  fractionalSalesGrowthRate: number;\n\n  // Conversion efficiency by type\n  typeEfficiency: {\n    fractionalSalesType: 'pizza-slice' | 'cake-slice' | 'bottle-glass' | 'portion-control' | 'custom';\n    totalTransactions: number;\n    totalRevenue: number;\n    averageConversionRate: number;\n    wasteRate: number;\n    profitMargin: number;\n    efficiency: number; // Revenue per base recipe unit\n\n    itemPerformance: {\n      recipeId: string;\n      recipeName: string;\n      variantsSold: {\n        variantId: string;\n        variantName: string;\n        quantitySold: number;\n        revenue: number;\n        costEfficiency: number;\n      }[];\n      totalBaseRecipesConsumed: number;\n      revenuePerBaseRecipe: number;\n      wastePerBaseRecipe: number;\n    }[];\n  }[];\n\n  // Optimization opportunities\n  optimizationOpportunities: {\n    opportunity: 'reduce_waste' | 'improve_portioning' | 'adjust_pricing' | 'optimize_variants' | 'improve_yield';\n    potentialImpact: number;\n    affectedItems: string[];\n    currentMetric: number;\n    targetMetric: number;\n    implementationComplexity: 'low' | 'medium' | 'high';\n    estimatedTimeToValue: string;\n  }[];\n\n  // Trend analysis\n  trends: {\n    period: string;\n    fractionalSalesVolume: number;\n    fractionalSalesRevenue: number;\n    averageTransactionValue: number;\n    conversionEfficiency: number;\n    wasteRate: number;\n  }[];\n\n  calculatedAt: Date;\n}\n```\n\n---\n\n## Integration Points\n\n### POS Integration\n- Real-time transaction import from POS systems\n- Fractional sales transaction mapping\n- Revenue and cost data synchronization\n- Shift and cashier tracking\n\n### Operational Planning\n- Recipe data for theoretical consumption calculations\n- Yield variant conversion rates\n- Ingredient specifications and costs\n- Production schedules and forecasts\n\n### Inventory Management\n- Real-time inventory levels\n- Consumption-based depletion projections\n- Reorder point monitoring\n- Stock adjustment tracking\n\n### Finance\n- Cost allocation and GL posting\n- Variance impact on financial reporting\n- Budget vs actual tracking\n- Profitability analysis\n\n### Vendor Management\n- Ingredient cost tracking\n- Supplier price variance analysis\n- Cost change impact assessment\n\n---\n\n## Business Rules\n\n### Consumption Calculation Rules\n\n1. **Theoretical Consumption**:\n   - Calculated from recipe specifications and sales volumes\n   - Includes standard wastage factors from recipe definitions\n   - Based on yield variants for fractional sales\n\n2. **Actual Consumption**:\n   - Physical inventory deductions\n   - Includes all wastage, spillage, and adjustments\n   - Tracked per consumption period\n\n3. **Variance Thresholds**:\n   - Acceptable: ≤ 8% variance\n   - Warning: 8-15% variance\n   - Critical: > 15% variance\n\n### Fractional Sales Rules\n\n1. **Conversion Rates**:\n   - Pizza slice: 1/8 of base recipe (0.125)\n   - Cake slice: 1/12 of base recipe (0.083)\n   - Bottle glass: 1/5 of base recipe (0.200)\n   - Custom portions: User-defined rates\n\n2. **Efficiency Targets**:\n   - Minimum efficiency: 85%\n   - Target efficiency: 90%+\n   - Maximum waste: 5%\n\n3. **Inventory Deduction**:\n   - Fractional sales deduct from prepared item inventory\n   - Prepared items have shelf life tracking\n   - Automatic waste generation when shelf life expires\n\n### Alert Generation Rules\n\n1. **Stock Low Alert**:\n   - Triggered when current level < 2x reorder point\n   - Severity: Warning\n\n2. **Stock Critical Alert**:\n   - Triggered when current level < reorder point\n   - Severity: Critical\n   - Recommended action: Order immediately\n\n3. **Variance High Alert**:\n   - Triggered when variance > acceptable threshold (8%)\n   - Severity: Warning for 8-15%, Critical for >15%\n   - Recommended action: Review procedures\n\n4. **Waste Warning Alert**:\n   - Triggered when waste % > target (3%)\n   - Severity: Info for 3-5%, Warning for >5%\n   - Recommended action: Investigate causes\n\n### Period Management Rules\n\n1. **Consumption Periods**:\n   - Daily, weekly, monthly, or custom periods\n   - One active period per location\n   - Period must be closed before new period starts\n\n2. **Period Closing**:\n   - Requires physical inventory verification\n   - Calculates final variances\n   - Archives data for historical analysis\n   - Locks consumption records to prevent changes\n\n---\n\n## API Endpoints\n\n```http\n# Consumption Analytics\nGET /api/reporting/consumption/real-time\nGET /api/reporting/consumption/metrics?location={location}&period={period}\nGET /api/reporting/consumption/trends?location={location}&timeRange={range}\n\n# Fractional Sales Analytics\nGET /api/reporting/fractional-sales/efficiency\nGET /api/reporting/fractional-sales/by-type?type={type}\nGET /api/reporting/fractional-sales/transactions?period={period}\n\n# Variance Analysis\nGET /api/reporting/variance/analysis?period={period}&location={location}\nGET /api/reporting/variance/ingredients?top={count}\nGET /api/reporting/variance/drivers\n\n# Ingredient Tracking\nGET /api/reporting/ingredients/live-levels?location={location}\nGET /api/reporting/ingredients/consumption?ingredientId={id}&period={period}\nGET /api/reporting/ingredients/projections\n\n# Efficiency Analysis\nGET /api/reporting/efficiency/optimization-opportunities\nGET /api/reporting/efficiency/yield-trends?period={period}\nGET /api/reporting/efficiency/recipe-performance\n\n# Export\nPOST /api/reporting/export/consumption-report\nPOST /api/reporting/export/variance-analysis\nPOST /api/reporting/export/efficiency-report\nGET /api/reporting/export/download/{exportId}\n\n# Real-Time Updates\nWebSocket /api/reporting/realtime/subscribe?location={location}\n```\n\n---\n\n## User Guide\n\n### Viewing Real-Time Consumption Analytics\n\n1. Navigate to Reporting & Analytics > Consumption Analytics\n2. Select location from dropdown (defaults to current location)\n3. Select time range (Today, This Week, This Month)\n4. Enable auto-refresh for real-time updates (30-second intervals)\n5. Review KPIs at top of dashboard\n6. Check active alerts for critical issues\n7. Use tabs to explore different analytics views\n\n### Analyzing Fractional Sales Performance\n\n1. Go to Consumption Analytics dashboard\n2. Click \"Fractional Sales\" tab\n3. Review efficiency chart showing revenue and transactions by type\n4. Check today's fractional sales breakdown in sidebar\n5. Compare efficiency percentages against target (90%+)\n6. Identify waste rates for improvement opportunities\n7. Export report for detailed analysis\n\n### Investigating Variance Issues\n\n1. Navigate to \"Variance Analysis\" tab\n2. Review top variance ingredients list\n3. Check variance percentage against thresholds:\n   - Green: ≤ 8% (acceptable)\n   - Yellow: 8-15% (warning)\n   - Red: > 15% (critical)\n4. Click on ingredient for detailed variance history\n5. Review trend indicators (up, down, stable)\n6. Identify root causes from variance drivers section\n7. Implement recommended actions\n\n### Monitoring Live Ingredient Levels\n\n1. Click \"Ingredients\" tab\n2. Review real-time inventory status for each ingredient\n3. Check status indicators:\n   - Green: Adequate stock\n   - Yellow: Low (below 2x reorder point)\n   - Red: Critical (below reorder point)\n4. Review projected depletion dates\n5. Take action on critical items\n6. Export ingredient status report\n\n### Identifying Optimization Opportunities\n\n1. Navigate to \"Efficiency\" tab\n2. Review yield efficiency trends chart\n3. Check optimization opportunities panel\n4. Review potential savings for each opportunity\n5. Assess implementation complexity\n6. Prioritize based on impact and complexity\n7. Click \"View Details\" for implementation guidance\n\n### Exporting Reports\n\n1. Click \"Export\" button in dashboard header\n2. Select report type:\n   - Consumption Analytics\n   - Variance Analysis\n   - Efficiency Report\n   - Fractional Sales Report\n3. Choose date range for export\n4. Select export format (PDF, Excel, CSV)\n5. Click \"Generate Report\"\n6. Download when generation completes\n\n---\n\n## Troubleshooting\n\n### Issue: Real-Time Data Not Updating\n**Cause**: Auto-refresh disabled or WebSocket connection lost\n**Solution**:\n1. Check auto-refresh toggle (should show green \"ON\" status)\n2. Refresh browser page to reconnect WebSocket\n3. Verify network connectivity\n4. Check POS system integration status\n\n### Issue: Variance Percentages Seem Incorrect\n**Cause**: Mismatched consumption period or incomplete data\n**Solution**:\n1. Verify correct consumption period is selected\n2. Ensure period has been properly closed\n3. Check that all POS transactions have been imported\n4. Verify inventory counts are up to date\n5. Review recipe specifications for accuracy\n\n### Issue: Fractional Sales Not Appearing\n**Cause**: POS mapping not configured or recipes not set up for fractional sales\n**Solution**:\n1. Verify POS recipe mapping in System Administration\n2. Check that recipes have yield variants configured\n3. Ensure fractional sales type is set (pizza-slice, cake-slice, etc.)\n4. Verify conversion rates are properly defined\n5. Check POS transaction import logs\n\n### Issue: Alerts Not Generating\n**Cause**: Threshold configuration or data quality issues\n**Solution**:\n1. Verify alert thresholds in system settings\n2. Check that real-time data collection is active\n3. Review ingredient reorder points\n4. Ensure variance calculation is running\n5. Check alert notification settings\n\n### Issue: Export Fails or Incomplete\n**Cause**: Large data set or timeout\n**Solution**:\n1. Reduce date range for export\n2. Use filters to limit data scope\n3. Try different export format (CSV vs Excel)\n4. Schedule export for off-peak hours\n5. Contact system administrator for large exports\n\n---\n\n## Best Practices\n\n### Real-Time Monitoring\n\n1. **Enable Auto-Refresh**: Keep auto-refresh on during service hours for live monitoring\n2. **Review Alerts Promptly**: Address critical alerts within 30 minutes\n3. **Monitor KPIs**: Check KPI dashboard at start and end of each shift\n4. **Location-Specific**: Monitor each location separately for accurate insights\n\n### Variance Management\n\n1. **Daily Review**: Check variance analysis daily during active periods\n2. **Threshold Alignment**: Keep acceptable variance threshold at 8% or lower\n3. **Root Cause Analysis**: Investigate all variances > 10% immediately\n4. **Trend Tracking**: Monitor variance trends to identify systemic issues\n5. **Documentation**: Document all variance causes and corrective actions\n\n### Fractional Sales Optimization\n\n1. **Efficiency Targets**: Maintain 90%+ efficiency for all fractional types\n2. **Waste Reduction**: Keep waste rate below 5% for fractional items\n3. **Portion Control**: Standardize fractional portions with training and tools\n4. **Shelf Life Management**: Monitor prepared item shelf life to minimize waste\n5. **Revenue Maximization**: Analyze fractional vs whole sales mix for profitability\n\n### Reporting Cadence\n\n1. **Daily**: Real-time dashboard review, variance check, alert response\n2. **Weekly**: Trend analysis, efficiency review, optimization opportunities\n3. **Monthly**: Comprehensive variance analysis, period closing, executive reporting\n4. **Quarterly**: Strategic review, threshold adjustment, process improvements\n\n### Data Quality\n\n1. **Timely POS Import**: Ensure POS transactions import within 15 minutes\n2. **Accurate Inventory**: Conduct regular physical counts for validation\n3. **Recipe Maintenance**: Keep recipe specifications up to date\n4. **Period Management**: Close periods promptly to lock data\n5. **Audit Trail**: Maintain documentation for all adjustments\n\n---\n\n## Performance Metrics\n\n### Dashboard Performance\n- **Load Time**: < 2 seconds for initial dashboard load\n- **Auto-Refresh**: < 500ms for real-time metric updates\n- **Chart Rendering**: < 1 second for all chart visualizations\n- **Data Export**: < 5 seconds for standard date ranges\n\n### Data Freshness\n- **Real-Time Metrics**: < 30 seconds lag from POS transaction\n- **Inventory Levels**: < 1 minute lag from inventory system\n- **Variance Calculations**: Updated every 5 minutes during active periods\n- **Alert Generation**: < 1 minute from threshold breach\n\n### Calculation Accuracy\n- **Theoretical Consumption**: 99.9% accuracy vs recipe specifications\n- **Variance Calculations**: ± 0.1% accuracy\n- **Fractional Conversion**: 100% accuracy per defined conversion rates\n- **Cost Calculations**: ± $0.01 accuracy\n\n---\n\n## Future Enhancements\n\n**Planned Features**:\n- Predictive analytics for consumption forecasting\n- Machine learning for variance pattern detection\n- Automated optimization recommendations\n- Mobile app for real-time monitoring\n- Advanced statistical process control charts\n- Multi-location comparison dashboards\n- Custom report builder\n- Scheduled automated reports\n- API integrations for third-party BI tools\n- Advanced data visualization options\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

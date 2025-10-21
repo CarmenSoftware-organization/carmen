@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Requisitions Submodule - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Store Operations</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">STORE-OPS</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Store Requisitions Submodule\n\n**Submodule**: Store Requisitions\n**Route**: `/store-operations/store-requisitions`\n**Status**: ✅ Production\n**Last Updated**: 2025-10-02\n\n## Table of Contents\n\n1. [Pages](#pages)\n2. [Modals and Dialogues](#modals-and-dialogues)\n3. [Dropdown Fields](#dropdown-fields)\n4. [Actions and Buttons](#actions-and-buttons)\n5. [Form Components](#form-components)\n6. [Data Display Components](#data-display-components)\n\n---\n\n## Pages\n\n### 1. Store Requisition List Page\n\n**Path**: `/store-operations/store-requisitions`\n**Component**: `StoreRequisitionListComponent`\n**Screenshot**: ![Store Requisitions List - Table View](store-requisitions-list-table.png)\n\n#### Page Structure\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│ Store Requisition List                                      │\n│ Manage and track store requisitions across all locations    │\n│                                          [Export] [+ New]    │\n├─────────────────────────────────────────────────────────────┤\n│ [Search...]  [Status Filter]  [Saved Filters] [Add Filters] │\n│                                           [Table] [Card]     │\n├─────────────────────────────────────────────────────────────┤\n│                                                               │\n│  SR #    Date    Request To   Location   Store   Status...  │\n│  ───────────────────────────────────────────────────────...  │\n│  Data rows with workflow stages and amounts...               │\n│                                                               │\n├─────────────────────────────────────────────────────────────┤\n│  Page 1 of N                                 [< > Goto >>]  │\n└─────────────────────────────────────────────────────────────┘\n```\n\n#### Features\n\n**Search and Filtering**:\n- Global search across requisition number, description, location\n- Status filter dropdown (All, Draft, In Process, Complete, Reject, Void)\n- Advanced filter builder with multiple conditions\n- Saved filter presets\n\n**View Modes**:\n- Table view with sortable columns\n- Card view with compact information cards\n- View toggle button\n\n**Table Columns**:\n1. SR # (Requisition Number) - Clickable link to detail page\n2. Date - Formatted as DD/MM/YYYY\n3. Request To - Location code\n4. To Location - Destination location name\n5. Store Name - Originating store\n6. Description - Request description\n7. Amount - Total amount with currency\n8. Currency - Currency code\n9. Status - Status badge\n10. Workflow Stage - Current approval stage with tooltip\n11. Actions - Dropdown menu\n\n**Pagination**:\n- First/Previous/Next/Last page buttons\n- Go to page input field\n- Items per page: 10\n- Current page indicator\n\n#### Action Flows\n\n**Search Requisitions**:\n```mermaid\nflowchart LR\n    Type[\"Type Search Term\"] --> Filter[\"Filter Results\"]\n    Filter --> Display[\"Display Matched Requisitions\"]\n```\n\n**Apply Status Filter**:\n```mermaid\nflowchart LR\n    Select[\"Select Status\"] --> Filter[\"Filter List\"]\n    Filter --> Update[\"Update Display\"]\n```\n\n**Open Filter Builder**:\n```mermaid\nflowchart LR\n    Click[\"Click Add Filters\"] --> Open[\"Open Filter Dialog\"]\n    Open --> Build[\"Build Filter Conditions\"]\n    Build --> Apply[\"Click Apply\"]\n    Apply --> Filter[\"Filter Requisitions\"]\n    Filter --> Close[\"Close Dialog\"]\n```\n\n**Switch View Mode**:\n```mermaid\nflowchart LR\n    Click[\"Click View Toggle\"] --> Switch[\"Switch to Table/Card\"]\n    Switch --> Render[\"Re-render Display\"]\n```\n\n**Navigate to Detail**:\n```mermaid\nflowchart LR\n    Click[\"Click SR Number\"] --> Navigate[\"Navigate to Detail Page\"]\n```\n\n**Export Requisitions**:\n```mermaid\nflowchart LR\n    Click[\"Click Export\"] --> Generate[\"Generate Export File\"]\n    Generate --> Download[\"Download File\"]\n```\n\n**Create New Requisition**:\n```mermaid\nflowchart LR\n    Click[\"Click New Request\"] --> Navigate[\"Navigate to Creation Form\"]\n```\n\n**Page Navigation**:\n```mermaid\nflowchart LR\n    Click[\"Click Page Control\"] --> Load[\"Load Page Data\"]\n    Load --> Display[\"Display Page\"]\n```\n\n---\n\n### 2. Store Requisition Detail Page\n\n**Path**: `/store-operations/store-requisitions/[id]`\n**Component**: `StoreRequisitionDetailComponent`\n**Screenshot**: ![Store Requisition Detail](store-requisition-detail-items.png)\n\n#### Page Structure\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│ [< Back]  Store Requisition: SR-2024-001          [Actions▼]│\n├─────────────────────────────────────────────────────────────┤\n│ ┌─── Header Information ───────────────────────────────┐    │\n│ │ Date: 2024-01-15        Expected: 2024-01-20        │    │\n│ │ Request To: M01         Description: Monthly...     │    │\n│ │ Department: F&B Ops     Status: In Process          │    │\n│ └─────────────────────────────────────────────────────┘    │\n├─────────────────────────────────────────────────────────────┤\n│ [Items] [Stock Movements] [Journal Entries] [Approval]      │\n├─────────────────────────────────────────────────────────────┤\n│                                                               │\n│  Tab Content Area                                            │\n│  (Dynamic based on selected tab)                             │\n│                                                               │\n└─────────────────────────────────────────────────────────────┘\n```\n\n#### Header Information\n\n**Display Fields**:\n- Reference Number (SR-YYYY-NNN)\n- Request Date\n- Expected Delivery Date\n- Movement Type\n- Request To (Location code and name)\n- Department\n- Job Code\n- Description\n- Status Badge\n- Workflow Stage (if applicable)\n\n**Header Actions Dropdown**:\n- Edit Requisition\n- Print\n- Void\n- Copy\n- Delete\n- Export\n\n#### Tab 1: Items Tab\n\n**Screenshot**: ![Items Tab](store-requisition-detail-items.png)\n\n**Features**:\n- Expandable item rows\n- Item-level approval status\n- Quantity tracking (Required vs Approved vs Issued)\n- Cost per unit and total calculations\n- Tax and discount information\n- Inventory information popup\n\n**Table Columns**:\n1. Expand/Collapse icon\n2. Description\n3. Unit\n4. Qty Required\n5. Qty Approved\n6. Qty Issued\n7. Cost/Unit\n8. Subtotal\n9. Tax %\n10. Discount %\n11. Total\n12. Approval Status Badge\n13. Actions\n\n**Expanded Row Shows**:\n- Item Information (Location, Category, Sub-category, Item Group, Barcode)\n- Inventory Information (On Hand, On Order, Last Price, Last Vendor)\n- Request Date\n\n**Action Flows**:\n\n**View Item Details**:\n```mermaid\nflowchart LR\n    Click[\"Click Expand Icon\"] --> Show[\"Show Item Details\"]\n    Show --> Display[\"Display Item Info & Inventory\"]\n```\n\n**View Item Info Popup**:\n```mermaid\nflowchart LR\n    Hover[\"Hover on Item Name\"] --> Show[\"Show Info Popup\"]\n    Show --> Display[\"Display Location, Category, etc\"]\n```\n\n**View Inventory Info**:\n```mermaid\nflowchart LR\n    Hover[\"Hover on Inventory Icon\"] --> Show[\"Show Inventory Popup\"]\n    Show --> Display[\"Display On Hand, On Order, etc\"]\n```\n\n**Approve Item**:\n```mermaid\nflowchart LR\n    Click[\"Click Approve\"] --> Validate[\"Validate Permissions\"]\n    Validate --> Update[\"Update Item Status\"]\n    Update --> Refresh[\"Refresh Display\"]\n```\n\n**Reject Item**:\n```mermaid\nflowchart LR\n    Click[\"Click Reject\"] --> Prompt[\"Prompt for Reason\"]\n    Prompt --> Update[\"Update Item Status\"]\n    Update --> Refresh[\"Refresh Display\"]\n```\n\n**Calculate Totals**:\n```mermaid\nflowchart LR\n    Change[\"Quantity/Price Change\"] --> Calc[\"Calculate Subtotal\"]\n    Calc --> Tax[\"Apply Tax\"]\n    Tax --> Discount[\"Apply Discount\"]\n    Discount --> Total[\"Calculate Total\"]\n```\n\n#### Tab 2: Stock Movements Tab\n\n**Screenshot**: ![Stock Movements Tab](store-requisition-detail-stock-movements.png)\n\n**Features**:\n- Stock movement history for requisition\n- Source and destination tracking\n- Quantity movements\n- Transaction dates\n- Movement status\n\n**Table Columns**:\n1. Date\n2. Movement Type\n3. From Location\n4. To Location\n5. Item Description\n6. Quantity\n7. Unit\n8. Status\n9. Created By\n\n**Action Flows**:\n\n**View Movement Details**:\n```mermaid\nflowchart LR\n    Click[\"Click Movement Row\"] --> Show[\"Show Movement Details\"]\n```\n\n**Filter Movements**:\n```mermaid\nflowchart LR\n    Select[\"Select Item Filter\"] --> Filter[\"Filter Movements\"]\n    Filter --> Display[\"Display Filtered Results\"]\n```\n\n#### Tab 3: Journal Entries Tab\n\n**Screenshot**: ![Journal Entries Tab](store-requisition-detail-journal.png)\n\n**Features**:\n- Auto-generated journal entries\n- Debit and credit accounts\n- Account codes and descriptions\n- Amount tracking\n- Entry date and reference\n\n**Table Columns**:\n1. Entry Date\n2. Account Code\n3. Account Description\n4. Debit Amount\n5. Credit Amount\n6. Reference\n7. Created By\n\n**Action Flows**:\n\n**View Journal Entry**:\n```mermaid\nflowchart LR\n    Click[\"Click Entry Row\"] --> Show[\"Show Entry Details\"]\n```\n\n**Export Journal Entries**:\n```mermaid\nflowchart LR\n    Click[\"Click Export\"] --> Generate[\"Generate Export\"]\n    Generate --> Download[\"Download File\"]\n```\n\n#### Tab 4: Approval Workflow\n\n**Screenshot**: ![Approval Workflow](store-requisition-detail-approval-workflow.png)\n\n**Features**:\n- Visual workflow progress indicator\n- Approval stage cards\n- Approver information\n- Approval comments\n- Timestamp tracking\n- Stage-based actions\n\n**Approval Stages**:\n1. **Submission** - System auto-approval\n2. **HOD Approval** - Head of Department review\n3. **Store Manager Approval** - Final approval for issue\n4. **Complete** - All approvals done\n\n**Stage Card Shows**:\n- Stage level name\n- Approver name and role\n- Approval status (Pending/Approved/Rejected/Current)\n- Comments\n- Approval timestamp\n- Action buttons (if current stage)\n\n**Status Indicators**:\n- ✓ Approved (Green)\n- → Current (Blue)\n- ○ Pending (Gray)\n- ✗ Rejected (Red)\n\n**Action Flows**:\n\n**Approve Stage**:\n```mermaid\nflowchart LR\n    Click[\"Click Approve\"] --> Comment[\"Add Comment (Optional)\"]\n    Comment --> Validate[\"Validate Permissions\"]\n    Validate --> Update[\"Update Approval Status\"]\n    Update --> Notify[\"Send Notifications\"]\n    Notify --> Next[\"Move to Next Stage\"]\n    Next --> Refresh[\"Refresh Workflow Display\"]\n```\n\n**Reject Stage**:\n```mermaid\nflowchart LR\n    Click[\"Click Reject\"] --> Comment[\"Add Rejection Comment\"]\n    Comment --> Validate[\"Validate Permissions\"]\n    Validate --> Update[\"Update Approval Status\"]\n    Update --> Notify[\"Send Notifications\"]\n    Notify --> Lock[\"Lock Requisition\"]\n    Lock --> Refresh[\"Refresh Workflow Display\"]\n```\n\n**Request Changes**:\n```mermaid\nflowchart LR\n    Click[\"Click Request Changes\"] --> Comment[\"Add Change Request\"]\n    Comment --> Send[\"Send to Requester\"]\n    Send --> Status[\"Update to Review Status\"]\n```\n\n**View Approval Log**:\n```mermaid\nflowchart LR\n    Click[\"Click View Log\"] --> Open[\"Open Approval Log Dialog\"]\n    Open --> Display[\"Display Full Approval History\"]\n```\n\n---\n\n## Modals and Dialogues\n\n### 1. Filter Builder Dialog\n\n**Trigger**: Click \"Add Filters\" button\n**Screenshot**: ![Filter Builder](store-requisitions-filters.png)\n\n**Components**:\n- Filter condition rows\n- Field selector dropdown\n- Operator selector dropdown\n- Value input field\n- Add/Remove filter buttons\n- Apply button\n\n**Fields Available**:\n- Date\n- Requisition (Ref No)\n- Request To\n- To Location\n- Store Name\n- Description\n- Status\n- Workflow Stage\n- Process Status\n\n**Operators**:\n- Equals\n- Contains\n- Greater than\n- Less than\n\n**Action Flows**:\n\n**Build Filter**:\n```mermaid\nflowchart LR\n    Click[\"Click Add Filter\"] --> Select[\"Select Field\"]\n    Select --> Operator[\"Select Operator\"]\n    Operator --> Value[\"Enter Value\"]\n    Value --> Apply[\"Click Apply\"]\n    Apply --> Filter[\"Apply Filters\"]\n    Filter --> Close[\"Close Dialog\"]\n```\n\n**Remove Filter**:\n```mermaid\nflowchart LR\n    Click[\"Click Remove (X)\"] --> Delete[\"Delete Filter Condition\"]\n    Delete --> Update[\"Update Filter Display\"]\n```\n\n### 2. Approval Log Dialog\n\n**Trigger**: Click \"View Log\" in approval workflow\n**Component**: `ApprovalLogDialog`\n\n**Features**:\n- Complete approval history\n- Approver details\n- Action timestamps\n- Comments\n- Status changes\n\n**Display Fields**:\n- Stage Level\n- Approver Name\n- Approver Role\n- Action (Approved/Rejected/Requested Changes)\n- Comments\n- Timestamp\n\n**Action Flows**:\n\n**View Approval Log**:\n```mermaid\nflowchart LR\n    Open[\"Open Dialog\"] --> Load[\"Load Approval History\"]\n    Load --> Display[\"Display Chronological Log\"]\n```\n\n**Close Dialog**:\n```mermaid\nflowchart LR\n    Click[\"Click Close/Outside\"] --> Close[\"Close Dialog\"]\n```\n\n### 3. Item Details Popover\n\n**Trigger**: Hover on item name or info icon\n\n**Shows**:\n- Item Name\n- Category and Sub-category\n- Item Group\n- Location and Location Code\n- Barcode\n- Location Type\n\n### 4. Inventory Info Popover\n\n**Trigger**: Hover on inventory icon in expanded item row\n\n**Shows**:\n- On Hand Quantity\n- On Order Quantity\n- Last Purchase Price\n- Last Vendor\n\n---\n\n## Dropdown Fields\n\n### 1. Status Filter Dropdown\n\n**Field**: Status Filter\n**Type**: Single Select\n**Component**: `Select`\n\n**Options**:\n- All Status (default)\n- Draft\n- In Process\n- Complete\n- Reject\n- Void\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Open[\"Open Dropdown\"] --> Select[\"Select Status\"]\n    Select --> Apply[\"Apply Filter\"]\n    Apply --> Update[\"Update List\"]\n```\n\n### 2. Filter Field Dropdown\n\n**Field**: Filter Builder - Field Selection\n**Type**: Single Select\n\n**Options**:\n- Date\n- Requisition (Ref No)\n- Request To\n- To Location\n- Store Name\n- Description\n- Status\n- Workflow Stage\n- Process Status\n\n### 3. Filter Operator Dropdown\n\n**Field**: Filter Builder - Operator Selection\n**Type**: Single Select\n\n**Options**:\n- Equals\n- Contains\n- Greater than\n- Less than\n\n### 4. Actions Dropdown (List Page)\n\n**Trigger**: Click actions menu (⋮)\n**Type**: Multi-option menu\n\n**Options**:\n- View - Navigate to detail page\n- Edit - Open edit form\n- Export - Download requisition\n- Delete - Delete requisition (with confirmation)\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Menu Icon\"] --> Open[\"Open Dropdown\"]\n    Open --> Select[\"Select Action\"]\n    Select --> Execute[\"Execute Action\"]\n```\n\n### 5. Header Actions Dropdown (Detail Page)\n\n**Trigger**: Click \"Actions\" button in header\n**Type**: Multi-option menu\n\n**Options**:\n- Edit Requisition\n- Print\n- Void\n- Copy\n- Delete\n- Export\n\n---\n\n## Actions and Buttons\n\n### List Page Actions\n\n**Primary Actions**:\n1. **Export** - Export filtered requisitions to file\n2. **New Request** - Create new store requisition\n\n**Search Actions**:\n1. **Search Input** - Global search across requisitions\n2. **Status Filter** - Filter by requisition status\n3. **Saved Filters** - Load saved filter presets\n4. **Add Filters** - Open advanced filter builder\n\n**View Controls**:\n1. **Table View Toggle** - Switch to table layout\n2. **Card View Toggle** - Switch to card layout\n\n**Pagination Controls**:\n1. **First Page** - Jump to first page\n2. **Previous Page** - Go to previous page\n3. **Next Page** - Go to next page\n4. **Last Page** - Jump to last page\n5. **Go to Page** - Navigate to specific page number\n\n**Row Actions**:\n1. **View** - Open detail page\n2. **Edit** - Edit requisition\n3. **Export** - Download single requisition\n4. **Delete** - Delete requisition\n\n### Detail Page Actions\n\n**Header Actions**:\n1. **Back** - Return to list page\n2. **Actions Dropdown** - Access secondary actions\n\n**Items Tab Actions**:\n1. **Expand/Collapse** - Toggle item details\n2. **View Item Info** - Show item information popup\n3. **View Inventory** - Show inventory information popup\n4. **Approve Item** - Mark item as approved\n5. **Reject Item** - Mark item as rejected\n\n**Approval Workflow Actions**:\n1. **Approve** - Approve current stage\n2. **Reject** - Reject requisition\n3. **Request Changes** - Send back for modifications\n4. **View Log** - Open approval history dialog\n\n**Tab Actions**:\n1. **Switch Tab** - Navigate between tabs\n2. **Export Tab Data** - Download tab-specific data\n\n---\n\n## Form Components\n\n### Filter Builder Form\n\n**Components**:\n- Select (Field)\n- Select (Operator)\n- Input (Value)\n- Button (Add Filter)\n- Button (Remove Filter)\n- Button (Apply Filters)\n\n**Validation**:\n- Field is required\n- Operator is required\n- Value is required\n\n### Approval Comment Form\n\n**Fields**:\n- Comment Textarea (optional for approval, required for rejection)\n- Action Selection (Approve/Reject/Request Changes)\n\n**Validation**:\n- Comment required if rejecting\n- User must have appropriate role permissions\n\n---\n\n## Data Display Components\n\n### Status Badge\n\n**Component**: `StatusBadge`\n**Props**: `status: string`\n\n**Status Variants**:\n- **Draft** - Gray badge\n- **In Process** - Blue badge\n- **Complete** - Green badge\n- **Reject** - Red badge\n- **Void** - Gray strikethrough badge\n\n### Workflow Stage Badge\n\n**Component**: Custom badge with tooltip\n**Features**:\n- Colored dot indicator\n- Stage name text\n- Hover tooltip with description\n\n**Stage Styles**:\n- **Submission** - Blue\n- **HOD Approval** - Purple\n- **Store Manager Approval** - Amber\n- **Complete** - Green\n- **Rejected** - Red\n\n### Pagination Component\n\n**Component**: `Pagination`\n**Features**:\n- Page indicator\n- Navigation buttons\n- Go to page input\n- Responsive design (hides first/last on mobile)\n\n### Card View Component\n\n**Component**: Requisition card\n**Shows**:\n- Reference number\n- Status badge\n- Workflow stage\n- Description\n- Request To and Location\n- Store name\n- Date and amount\n- Action menu\n\n---\n\n**Last Updated**: 2025-10-02\n**Module**: Store Operations > Store Requisitions\n**Status**: ✅ Production\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

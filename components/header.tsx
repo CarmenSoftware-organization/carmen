@@ -178,9 +178,12 @@ export default function Header({}: HeaderProps = {}) {
                   <User className="mr-2 h-4 w-4" />
                   <span>Edit Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-foreground dark:text-gray-100">
+                <DropdownMenuItem
+                  onSelect={() => router.push('/user-preferences')}
+                  className="text-foreground dark:text-gray-100"
+                >
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <span>Preferences</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 

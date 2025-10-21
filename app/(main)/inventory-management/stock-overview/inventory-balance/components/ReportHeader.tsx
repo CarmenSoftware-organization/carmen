@@ -24,14 +24,12 @@ import Link from "next/link"
 interface ReportHeaderProps {
   params: BalanceReportParams
   onViewChange: (view: 'CATEGORY' | 'PRODUCT' | 'LOT') => void
-  onValuationMethodChange: (method: 'FIFO' | 'WEIGHTED_AVERAGE') => void
   onShowLotsChange: (showLots: boolean) => void
 }
 
 export function ReportHeader({
   params,
   onViewChange,
-  onValuationMethodChange,
   onShowLotsChange,
 }: ReportHeaderProps) {
   // Handle show lots toggle
@@ -42,8 +40,8 @@ export function ReportHeader({
   return (
     <>
       <div className="flex flex-wrap gap-2">
-        <Select 
-          value={params.viewType} 
+        <Select
+          value={params.viewType}
           onValueChange={(value) => onViewChange(value as 'CATEGORY' | 'PRODUCT' | 'LOT')}
         >
           <SelectTrigger className="w-[180px]">
@@ -53,19 +51,6 @@ export function ReportHeader({
             <SelectItem value="CATEGORY">By Category</SelectItem>
             <SelectItem value="PRODUCT">By Product</SelectItem>
             <SelectItem value="LOT">By Lot</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Select 
-          value={params.valuationMethod} 
-          onValueChange={(value) => onValuationMethodChange(value as 'FIFO' | 'WEIGHTED_AVERAGE')}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Valuation Method" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="FIFO">FIFO</SelectItem>
-            <SelectItem value="WEIGHTED_AVERAGE">Weighted Average</SelectItem>
           </SelectContent>
         </Select>
       </div>

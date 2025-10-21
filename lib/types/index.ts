@@ -35,6 +35,13 @@ export * from './menu-engineering'
 // Finance types
 export * from './finance'
 
+// Settings and preferences types
+export * from './settings'
+
+// POS Integration types
+export * from './pos-integration'
+export { ErrorCategory } from './pos-integration'
+
 // Existing specialized types (keep as is)
 export * from './fractional-inventory'
 export * from './enhanced-pr-types'

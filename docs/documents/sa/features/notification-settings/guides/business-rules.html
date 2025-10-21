@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Settings - Business Rules - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../../index.html" class="back-link">← All Modules</a>
+            <h1>System Administration</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../../index.html">Documentation</a> / <a href="../../../../index.html">SA</a> / Features / Notification Settings</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Notification Settings - Business Rules\n\n**Module**: System Administration\n**Feature**: Notification Settings\n**Document Type**: Business Rules\n**Version**: 1.0\n**Last Updated**: October 21, 2025\n\n---\n\n## Table of Contents\n\n1. [Global Rules](#global-rules)\n2. [Notification Delivery Rules](#notification-delivery-rules)\n3. [Channel-Specific Rules](#channel-specific-rules)\n4. [Routing Rules](#routing-rules)\n5. [Template Rules](#template-rules)\n6. [Rate Limiting Rules](#rate-limiting-rules)\n7. [Escalation Rules](#escalation-rules)\n8. [User Preference Rules](#user-preference-rules)\n\n---\n\n## Global Rules\n\n### GR-001: User Preference Override\n**Priority**: High\n**Category**: Configuration\n\n**Rule**: Individual user notification preferences MUST override global default settings.\n\n**Business Logic**:\n- Global defaults apply only to new users or users who haven't customized their preferences\n- When a user modifies their personal notification settings, those settings take precedence over global defaults\n- System administrators cannot force global settings on users who have customized their preferences\n\n**Example**:\n```\nGlobal Default: Purchase Request Approved → Email + In-App\nUser Preference: Purchase Request Approved → In-App only\n\nResult: User receives In-App notification only\n```\n\n**Validation**:\n- Check user-specific settings before applying global defaults\n- Log when user preferences override global settings\n\n**Exceptions**:\n- Critical security notifications (security-alert) bypass user preferences\n- System maintenance notifications cannot be disabled by users\n\n---\n\n### GR-002: Permission-Based Access\n**Priority**: High\n**Category**: Security\n\n**Rule**: Only users with appropriate permissions can modify notification settings.\n\n**Business Logic**:\n- `system_administration.settings.notifications.view`: View notification settings\n- `system_administration.settings.notifications.manage`: Modify notification settings\n- `system_administration.settings.notifications.test`: Send test notifications\n\n**Validation**:\n- Permission check required before any save operation\n- Audit log created for all configuration changes\n- Failed permission checks logged for security monitoring\n\n---\n\n### GR-003: Mandatory Notification Types\n**Priority**: High\n**Category**: Compliance\n\n**Rule**: Certain notification types CANNOT be completely disabled for compliance and security reasons.\n\n**Mandatory Notifications**:\n- `security-alert`: Security-related notifications\n- `workflow-assignment`: Task assignments\n- `system-maintenance`: Critical system updates\n\n**Business Logic**:\n- UI disables the \"Disable\" toggle for mandatory notifications\n- At least one channel must be enabled for mandatory notifications\n- Attempt to disable mandatory notifications returns validation error\n\n---\n\n## Notification Delivery Rules\n\n### ND-001: Delivery Attempt Sequence\n**Priority**: High\n**Category**: Delivery\n\n**Rule**: Notifications MUST be delivered in the order they are created, per user, per channel.\n\n**Business Logic**:\n1. Notifications queued in FIFO (First-In-First-Out) order\n2. Each channel maintains separate delivery queue\n3. Failed deliveries do not block subsequent notifications\n4. Retry attempts maintain original queue position\n\n**Example**:\n```\nQueue: N1 (Email), N2 (Email), N3 (Email)\nN1 fails → N2 and N3 proceed\nN1 retries after delay without blocking queue\n```\n\n---\n\n### ND-002: Multi-Channel Delivery\n**Priority**: Medium\n**Category**: Delivery\n\n**Rule**: When multiple channels are enabled for an event, ALL enabled channels MUST receive the notification independently.\n\n**Business Logic**:\n- Each channel delivery is independent\n- Failure in one channel does not affect other channels\n- Success/failure tracked separately per channel\n- Delivery timestamps recorded per channel\n\n**Example**:\n```\nEvent: Purchase Request Approved\nChannels: Email (success) + In-App (success) + SMS (failed)\n\nResult: User sees notification in email and in-app, SMS retry scheduled\n```\n\n---\n\n### ND-003: Delivery Confirmation\n**Priority**: Medium\n**Category**: Delivery\n\n**Rule**: Delivery status MUST be tracked and recorded for all notification attempts.\n\n**Delivery States**:\n- `pending`: Queued for delivery\n- `sent`: Successfully sent to channel provider\n- `delivered`: Confirmed delivery (when available)\n- `failed`: Delivery failed\n- `bounced`: Recipient rejected (email)\n\n**Business Logic**:\n- Webhook callbacks update delivery status\n- Timeout period: 5 minutes for email, 1 minute for SMS/Push\n- Failed status triggers retry logic\n- All status changes logged with timestamp\n\n---\n\n## Channel-Specific Rules\n\n### CS-001: Email Delivery Rules\n**Priority**: High\n**Category**: Email Channel\n\n**Business Rules**:\n\n1. **Valid Email Address Required**\n   - Recipient must have valid email in profile\n   - Email format validated before sending\n   - Bounced emails marked in user profile\n\n2. **Subject Line Limits**\n   - Maximum 150 characters\n   - Special characters encoded properly\n   - No empty subject lines allowed\n\n3. **Body Size Limits**\n   - HTML body: Maximum 200KB\n   - Plain text fallback required\n   - Attachments not supported in system notifications\n\n4. **Unsubscribe Requirements**\n   - All emails must include unsubscribe link (except security alerts)\n   - One-click unsubscribe compliant\n   - Unsubscribe preferences saved to user profile\n\n**Example**:\n```\nValid Email:\n- Subject: \"Purchase Request #PR-12345 Approved\" (38 chars ✓)\n- HTML + Plain text versions included ✓\n- Unsubscribe link present ✓\n\nInvalid Email:\n- Subject: \"\" (empty ✗)\n- HTML only, no plain text ✗\n```\n\n---\n\n### CS-002: SMS Delivery Rules\n**Priority**: High\n**Category**: SMS Channel\n\n**Business Rules**:\n\n1. **Phone Number Requirements**\n   - Valid phone number in international format required\n   - Country code mandatory\n   - Mobile numbers only (landlines not supported)\n\n2. **Message Length Limits**\n   - Maximum 160 characters per SMS\n   - Long messages split into segments\n   - URL shortening applied automatically\n\n3. **Cost Awareness**\n   - SMS delivery incurs cost per message\n   - Daily quota enforced\n   - Warning when approaching quota limit\n\n4. **Opt-In Requirements**\n   - User must explicitly enable SMS notifications\n   - Initial verification SMS sent\n   - Double opt-in for compliance\n\n**Example**:\n```\nValid SMS:\n- Phone: +12025551234 (international format ✓)\n- Message: \"PR #12345 approved\" (20 chars ✓)\n- User opted in ✓\n\nInvalid SMS:\n- Phone: 5551234 (missing country code ✗)\n- Message: 200 character message (exceeds limit ✗)\n- User hasn't opted in ✗\n```\n\n---\n\n### CS-003: In-App Notification Rules\n**Priority**: Medium\n**Category**: In-App Channel\n\n**Business Rules**:\n\n1. **Real-Time Delivery**\n   - Delivered immediately when user online\n   - Queued when user offline\n   - Delivered on next login\n\n2. **Notification Persistence**\n   - Unread notifications persist until dismissed\n   - Maximum 100 notifications displayed\n   - Older notifications archived automatically\n\n3. **Badge Counter**\n   - Unread count displayed in navigation\n   - Updates in real-time\n   - Maximum display: 99+ for large counts\n\n4. **Mark as Read**\n   - Click notification marks as read\n   - Bulk \"mark all read\" available\n   - Read status synchronized across devices\n\n---\n\n### CS-004: Push Notification Rules\n**Priority**: Medium\n**Category**: Push Channel\n\n**Business Rules**:\n\n1. **Device Registration**\n   - User must grant push notification permission\n   - Device token registered and validated\n   - Multiple devices supported per user\n\n2. **Message Format**\n   - Title: Maximum 65 characters\n   - Body: Maximum 240 characters\n   - Deep linking supported\n\n3. **Priority Levels**\n   - High: Security alerts, urgent workflow items\n   - Normal: Standard notifications\n   - Low: Digest notifications\n\n4. **Do Not Disturb**\n   - Respects device \"do not disturb\" settings\n   - Critical notifications bypass DND\n   - Quiet hours configurable per user\n\n---\n\n## Routing Rules\n\n### RR-001: Rule Evaluation Order\n**Priority**: High\n**Category**: Routing\n\n**Rule**: Routing rules MUST be evaluated in priority order (High → Medium → Low) until a match is found.\n\n**Business Logic**:\n1. Sort rules by priority (High, Medium, Low)\n2. Within same priority, sort by creation date (oldest first)\n3. Evaluate conditions from top to bottom\n4. Stop at first matching rule\n5. If no rules match, use default routing\n\n**Example**:\n```\nRules:\n1. [High] Amount > $10,000 → CFO approval\n2. [Medium] Department = Kitchen → Head Chef approval\n3. [Low] All others → Department Manager approval\n\nPurchase Request for $15,000 from Kitchen:\n→ Matches Rule 1 (High priority) → Routes to CFO\n(Rule 2 not evaluated even though it matches)\n```\n\n---\n\n### RR-002: Condition Matching\n**Priority**: High\n**Category**: Routing\n\n**Rule**: ALL conditions in a routing rule MUST be satisfied for the rule to match (AND logic).\n\n**Supported Conditions**:\n- Event Type: Specific notification event\n- Role: User's primary role\n- Department: User's department\n- Amount Threshold: Numeric comparison\n- Custom Fields: Additional metadata\n\n**Business Logic**:\n```typescript\nfunction matchesRule(notification: Notification, rule: RoutingRule): boolean {\n  const conditions = rule.conditions;\n\n  if (conditions.eventType && conditions.eventType !== notification.eventType) {\n    return false;\n  }\n\n  if (conditions.role && !user.roles.includes(conditions.role)) {\n    return false;\n  }\n\n  if (conditions.department && user.department !== conditions.department) {\n    return false;\n  }\n\n  if (conditions.amountThreshold && notification.amount < conditions.amountThreshold) {\n    return false;\n  }\n\n  return true; // All conditions satisfied\n}\n```\n\n---\n\n### RR-003: Recipient Resolution\n**Priority**: High\n**Category**: Routing\n\n**Rule**: Routing rules can target roles, specific users, or departments. Recipients MUST be resolved at delivery time.\n\n**Recipient Types**:\n\n1. **Role-Based**\n   - Send to all users with specified role\n   - Active users only\n   - Department context applied if specified\n\n2. **User-Based**\n   - Send to specific user IDs\n   - User must be active\n   - Fallback to manager if user inactive\n\n3. **Department-Based**\n   - Send to all users in department\n   - Optional role filter within department\n   - Hierarchical department support\n\n**Resolution Logic**:\n```typescript\nfunction resolveRecipients(rule: RoutingRule): User[] {\n  switch (rule.recipients.type) {\n    case 'role':\n      return getUsersByRole(rule.recipients.values);\n\n    case 'user':\n      return getUsersByIds(rule.recipients.values)\n        .filter(u => u.isActive);\n\n    case 'department':\n      return getUsersByDepartment(rule.recipients.values);\n  }\n}\n```\n\n---\n\n## Template Rules\n\n### TR-001: Variable Substitution\n**Priority**: High\n**Category**: Templates\n\n**Rule**: All template variables MUST be replaced with actual values before sending notifications.\n\n**Variable Syntax**: `{{variableName}}`\n\n**Standard Variables**:\n- `{{userName}}`: Recipient's full name\n- `{{documentNumber}}`: Document reference number\n- `{{amount}}`: Formatted amount with currency\n- `{{requesterName}}`: Name of person who initiated action\n- `{{actionDate}}`: Date of action\n- `{{actionUrl}}`: Deep link to document\n\n**Business Logic**:\n1. Parse template for variable placeholders\n2. Validate all required variables have values\n3. Apply formatting rules (currency, dates)\n4. Replace placeholders with actual values\n5. Handle missing variables with fallback text\n\n**Example**:\n```\nTemplate:\n\"Hello {{userName}}, {{requesterName}} submitted {{documentNumber}} for {{amount}}.\"\n\nData:\n{ userName: \"John\", requesterName: \"Sarah\", documentNumber: \"PR-12345\", amount: \"$1,500\" }\n\nOutput:\n\"Hello John, Sarah submitted PR-12345 for $1,500.\"\n```\n\n**Fallback Handling**:\n```\nMissing variable: {{userName}}\nFallback: \"Hello, Sarah submitted PR-12345 for $1,500.\"\n```\n\n---\n\n### TR-002: HTML Sanitization\n**Priority**: High\n**Category**: Security\n\n**Rule**: All user-provided content in templates MUST be sanitized to prevent XSS attacks.\n\n**Sanitization Rules**:\n1. Remove all `<script>` tags\n2. Remove dangerous attributes (`onclick`, `onerror`, etc.)\n3. Allow safe HTML tags (`<p>`, `<strong>`, `<em>`, `<a>`, etc.)\n4. Validate URLs in `href` and `src` attributes\n5. Encode special characters\n\n**Allowed Tags**:\n- Text formatting: `<p>`, `<h1-h6>`, `<strong>`, `<em>`, `<u>`\n- Links: `<a href=\"...\">`\n- Lists: `<ul>`, `<ol>`, `<li>`\n- Tables: `<table>`, `<tr>`, `<td>`, `<th>`\n- Other: `<br>`, `<hr>`, `<div>`, `<span>`\n\n---\n\n## Rate Limiting Rules\n\n### RL-001: Per-User Rate Limits\n**Priority**: High\n**Category**: Rate Limiting\n\n**Rule**: Individual users MUST NOT receive more notifications than the configured per-user hourly limit.\n\n**Default Limits**:\n- Per user per hour: 50 notifications\n- Configurable range: 1-1000\n\n**Business Logic**:\n1. Track notification count per user per hour (rolling window)\n2. Increment counter on each notification attempt\n3. If limit reached, queue notification for next hour\n4. Reset counter after rolling hour passes\n5. Critical notifications exempt from limit\n\n**Example**:\n```\nLimit: 50 per hour\nCurrent count: 49\nNew notification arrives → Delivered (count: 50)\nNext notification arrives → Queued for next hour\n\nCritical security alert arrives → Delivered immediately (exempt)\n```\n\n**Priority Handling**:\n- Critical notifications: Bypass limit\n- High priority: Delivered if < 90% of limit\n- Normal priority: Delivered if < 100% of limit\n- Low priority: Queued if at limit\n\n---\n\n### RL-002: Organization Rate Limits\n**Priority**: High\n**Category**: Rate Limiting\n\n**Rule**: The total number of notifications sent organization-wide MUST NOT exceed the configured hourly limit.\n\n**Default Limits**:\n- Organization per hour: 10,000 notifications\n- Configurable range: 100-100,000\n\n**Business Logic**:\n1. Track total notification count across all users (rolling window)\n2. Apply organization limit before per-user limit\n3. Priority queuing when approaching limit\n4. Administrative notifications prioritized\n\n**Quota Allocation**:\n- Critical notifications: 10% of quota reserved\n- Administrative: 20% of quota reserved\n- User notifications: 70% of quota\n\n**Warning Thresholds**:\n- 75% quota used: Warning to administrators\n- 90% quota used: Alert to administrators\n- 100% quota used: Queue normal priority notifications\n\n---\n\n### RL-003: Channel-Specific Quotas\n**Priority**: Medium\n**Category**: Rate Limiting\n\n**Rule**: Each notification channel MUST respect its configured daily quota.\n\n**Default Quotas**:\n- Email: 100,000 per day\n- SMS: 10,000 per day\n- Push: 1,000,000 per day\n- Webhook: Unlimited\n\n**Business Logic**:\n1. Track usage per channel per day\n2. Reset quota at midnight UTC\n3. Reject delivery when quota exhausted\n4. Fall back to alternative channels if configured\n\n**Fallback Logic**:\n```\nPrimary: SMS (quota exhausted)\nFallback: Email (available) → Deliver via email\nIf Email also exhausted → In-App (available) → Deliver via in-app\n```\n\n---\n\n## Escalation Rules\n\n### ER-001: Time-Based Escalation\n**Priority**: High\n**Category**: Escalation\n\n**Rule**: If a notification requiring action is not acknowledged within the configured time, it MUST be escalated to the next level.\n\n**Escalation Triggers**:\n- Workflow approval not actioned\n- Critical alert not acknowledged\n- Time-sensitive notification ignored\n\n**Business Logic**:\n1. Start escalation timer when notification delivered\n2. Monitor for acknowledgment/action\n3. If no response within delay period, escalate\n4. Send notification to escalation recipients\n5. Log escalation event\n6. Repeat escalation up to 3 levels\n\n**Example**:\n```\nPurchase Request approval sent to Manager\nDelay: 4 hours\nNo response after 4 hours → Escalate to Department Head\nStill no response after 4 more hours → Escalate to CFO\n```\n\n**Escalation Levels**:\n- Level 1: Direct manager (immediate)\n- Level 2: Department head (4 hours)\n- Level 3: Executive (8 hours from level 2)\n\n---\n\n### ER-002: Priority-Based Escalation\n**Priority**: Medium\n**Category**: Escalation\n\n**Rule**: Higher priority notifications have shorter escalation timeframes.\n\n**Escalation Delays by Priority**:\n- Critical: 1 hour\n- High: 4 hours\n- Medium: 8 hours\n- Low: 24 hours\n\n**Business Logic**:\n- Critical items escalate quickly\n- Low priority items allow more time for response\n- Manual escalation always allowed\n- Weekend/holiday delays configurable\n\n---\n\n## User Preference Rules\n\n### UP-001: Opt-Out Restrictions\n**Priority**: High\n**Category**: User Preferences\n\n**Rule**: Users MAY opt out of non-critical notifications but MUST receive critical notifications.\n\n**Opt-Out Allowed**:\n- Procurement notifications\n- Inventory notifications\n- Vendor notifications\n- Finance notifications (non-urgent)\n\n**Opt-Out NOT Allowed**:\n- Security alerts\n- System maintenance\n- Workflow assignments\n- Compliance notifications\n\n**Business Logic**:\n```typescript\nfunction canOptOut(eventType: NotificationEventType): boolean {\n  const mandatoryTypes = [\n    'security-alert',\n    'system-maintenance',\n    'workflow-assignment',\n  ];\n\n  return !mandatoryTypes.includes(eventType);\n}\n```\n\n---\n\n### UP-002: Frequency Preferences\n**Priority**: Medium\n**Category**: User Preferences\n\n**Rule**: Users can choose notification frequency for supported event types.\n\n**Frequency Options**:\n- **Instant**: Deliver immediately\n- **Hourly Digest**: Batch notifications hourly\n- **Daily Digest**: Batch notifications daily (8 AM local time)\n- **Weekly Digest**: Batch notifications weekly (Monday 8 AM)\n\n**Digest Rules**:\n1. Collect notifications within time window\n2. Combine into single digest message\n3. Deliver at scheduled time\n4. Include up to 50 notifications per digest\n5. Link to view all notifications\n\n**Example Digest**:\n```\nDaily Digest - October 21, 2025\n\nYou have 12 new notifications:\n- 5 Purchase Requests pending approval\n- 3 Low stock alerts\n- 2 Vendor price updates\n- 2 Comments on your documents\n\nView all notifications →\n```\n\n**Instant Delivery Override**:\n- Critical notifications always instant\n- User-mentioned notifications always instant\n- Workflow assignments always instant\n\n---\n\n## Validation Rules\n\n### VR-001: Configuration Validation\n**Priority**: High\n**Category**: Validation\n\n**Rule**: All notification settings MUST be validated before saving.\n\n**Validation Checks**:\n\n1. **Rate Limiting**\n   - Per-user limit: 1-1,000\n   - Organization limit ≥ per-user limit\n   - Values must be positive integers\n\n2. **Retry Policy**\n   - Max retries: 0-10\n   - Initial delay: 10-3,600 seconds\n   - Backoff multiplier: 1.0-10.0\n\n3. **Batching**\n   - Window: 1-60 minutes\n   - Max batch size: 1-100\n\n4. **Channel Configuration**\n   - Email: Valid SMTP settings if custom provider\n   - SMS: Valid API key and provider\n   - Push: Valid FCM/APNS credentials\n   - Webhook: Valid HTTPS URLs only\n\n**Validation Error Handling**:\n```typescript\ninterface ValidationError {\n  field: string;\n  message: string;\n  severity: 'error' | 'warning';\n}\n\nfunction validate(settings: DeliverySettings): ValidationError[] {\n  const errors: ValidationError[] = [];\n\n  if (settings.rateLimiting.perUserPerHour < 1) {\n    errors.push({\n      field: 'rateLimiting.perUserPerHour',\n      message: 'Must be at least 1',\n      severity: 'error'\n    });\n  }\n\n  return errors;\n}\n```\n\n---\n\n## Compliance Rules\n\n### CR-001: Data Retention\n**Priority**: High\n**Category**: Compliance\n\n**Rule**: Notification history MUST be retained for compliance and audit purposes.\n\n**Retention Periods**:\n- Active notifications: Indefinite\n- Delivered notifications: 12 months\n- Failed notifications: 6 months\n- Test notifications: 30 days\n\n**Archival Rules**:\n- Auto-archive after retention period\n- Archived data accessible for audit\n- Permanent deletion after 7 years\n- Export capability for compliance requests\n\n---\n\n### CR-002: Audit Logging\n**Priority**: High\n**Category**: Compliance\n\n**Rule**: All notification configuration changes MUST be logged for audit purposes.\n\n**Logged Events**:\n- Settings modifications (who, what, when)\n- Template changes\n- Routing rule updates\n- Channel configuration changes\n- Test notification sends\n\n**Audit Log Fields**:\n- Timestamp\n- User ID and name\n- Action type\n- Before/after values\n- IP address\n- Session ID\n\n---\n\n## Exception Handling\n\n### EH-001: Delivery Failure Handling\n**Priority**: High\n**Category**: Error Handling\n\n**Rule**: Failed notification deliveries MUST be handled gracefully with appropriate retry logic.\n\n**Failure Categories**:\n\n1. **Temporary Failures** (Retry automatically)\n   - Network timeouts\n   - Rate limit exceeded\n   - Service temporarily unavailable\n\n2. **Permanent Failures** (Do not retry)\n   - Invalid recipient address\n   - Blocked recipient\n   - Invalid credentials\n\n3. **Partial Failures** (Retry failed channels only)\n   - Email delivered, SMS failed\n   - Multiple recipients, some failed\n\n**Retry Logic**:\n```\nAttempt 1: Immediate\nAttempt 2: After initial delay (60s)\nAttempt 3: After delay * backoff (120s)\nAttempt 4: After delay * backoff^2 (240s)\nMax attempts: 3\n\nAfter max attempts: Mark as permanently failed, notify administrators\n```\n\n---\n\n## Summary\n\nThese business rules ensure:\n- Reliable and consistent notification delivery\n- User privacy and preference respect\n- System performance and scalability\n- Security and compliance\n- Graceful error handling\n- Comprehensive audit capabilities\n\nAll rules are enforced at both the application and database levels to ensure data integrity and business logic compliance.\n\n---\n\n*Last Updated: October 21, 2025*\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

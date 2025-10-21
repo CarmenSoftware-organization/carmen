@@ -13,7 +13,7 @@ export const mockRoles: Role[] = [
     id: 'role-001',
     name: 'System Administrator',
     description: 'Full system access with complete administrative privileges',
-    permissions: ['*'], // All permissions
+    permissions: ['*'], // All permissions including settings:*:*
     hierarchy: 1,
     isSystem: true
   },
@@ -23,7 +23,10 @@ export const mockRoles: Role[] = [
     description: 'Overall property operations management with full business access',
     permissions: [
       'purchase_request:*', 'purchase_order:*', 'budget:*', 'financial_report:*',
-      'user:create', 'user:update', 'user:assign_role', 'workflow:configure'
+      'user:create', 'user:update', 'user:assign_role', 'workflow:configure',
+      'settings:company:view', 'settings:user-preferences:*',
+      'notifications:global-defaults:view', 'notifications:global-defaults:edit',
+      'notifications:history:view'
     ],
     hierarchy: 2,
     isSystem: false,
@@ -36,7 +39,8 @@ export const mockRoles: Role[] = [
     permissions: [
       'purchase_request:approve_finance', 'purchase_order:approve_finance',
       'invoice:*', 'payment:*', 'budget:*', 'financial_report:*',
-      'journal_entry:*', 'exchange_rate:manage'
+      'journal_entry:*', 'exchange_rate:manage',
+      'settings:company:view', 'settings:audit:view', 'settings:user-preferences:*'
     ],
     hierarchy: 3,
     isSystem: false,
@@ -50,7 +54,8 @@ export const mockRoles: Role[] = [
     description: 'Procurement operations management and vendor relationships',
     permissions: [
       'purchase_request:*', 'purchase_order:*', 'vendor:*', 'vendor_quotation:*',
-      'goods_receipt_note:approve', 'credit_note:*', 'procurement_report:*'
+      'goods_receipt_note:approve', 'credit_note:*', 'procurement_report:*',
+      'settings:user-preferences:*'
     ],
     hierarchy: 4,
     isSystem: false,
@@ -63,7 +68,9 @@ export const mockRoles: Role[] = [
     permissions: [
       'purchase_request:create', 'purchase_request:approve_department',
       'department_budget:view', 'department_report:*',
-      'inventory_item:view_stock', 'recipe:view'
+      'inventory_item:view_stock', 'recipe:view',
+      'settings:company:view', 'settings:user-preferences:*',
+      'notifications:history:view'
     ],
     hierarchy: 4,
     isSystem: false
@@ -75,7 +82,8 @@ export const mockRoles: Role[] = [
     permissions: [
       'inventory_item:*', 'stock_adjustment:*', 'stock_count:*',
       'goods_receipt_note:*', 'stock_transfer:*', 'physical_count:*',
-      'wastage_report:create', 'inventory_report:*'
+      'wastage_report:create', 'inventory_report:*',
+      'settings:user-preferences:*'
     ],
     hierarchy: 4,
     isSystem: false
@@ -87,7 +95,8 @@ export const mockRoles: Role[] = [
     permissions: [
       'recipe:*', 'menu_item:*', 'recipe_category:*', 'cuisine_type:*',
       'production_order:*', 'batch_production:*', 'quality_control:*',
-      'recipe_report:*'
+      'recipe_report:*',
+      'settings:user-preferences:*'
     ],
     hierarchy: 4,
     isSystem: false
@@ -100,7 +109,8 @@ export const mockRoles: Role[] = [
     description: 'Financial operations and accounting management',
     permissions: [
       'invoice:*', 'payment:create', 'payment:approve',
-      'journal_entry:*', 'account_code:*', 'financial_report:view'
+      'journal_entry:*', 'account_code:*', 'financial_report:view',
+      'settings:company:view', 'settings:audit:view', 'settings:user-preferences:*'
     ],
     hierarchy: 5,
     isSystem: false
@@ -111,7 +121,8 @@ export const mockRoles: Role[] = [
     description: 'Purchase order processing and vendor coordination',
     permissions: [
       'purchase_order:create', 'purchase_order:update', 'purchase_order:send',
-      'vendor:view', 'vendor_quotation:create', 'goods_receipt_note:create'
+      'vendor:view', 'vendor_quotation:create', 'goods_receipt_note:create',
+      'settings:user-preferences:*'
     ],
     hierarchy: 6,
     isSystem: false
@@ -122,7 +133,8 @@ export const mockRoles: Role[] = [
     description: 'Inventory control and stock management oversight',
     permissions: [
       'inventory_item:view_stock', 'stock_adjustment:create', 'stock_count:execute',
-      'physical_count:*', 'spot_check:*', 'inventory_report:view'
+      'physical_count:*', 'spot_check:*', 'inventory_report:view',
+      'settings:user-preferences:*'
     ],
     hierarchy: 6,
     isSystem: false
@@ -136,7 +148,8 @@ export const mockRoles: Role[] = [
     permissions: [
       'recipe:view', 'recipe:print', 'menu_item:view',
       'production_order:view', 'batch_production:update_status',
-      'wastage_report:create'
+      'wastage_report:create',
+      'settings:user-preferences:*'
     ],
     hierarchy: 7,
     isSystem: false
@@ -148,7 +161,8 @@ export const mockRoles: Role[] = [
     permissions: [
       'inventory_item:view_stock', 'goods_receipt_note:create',
       'stock_transfer:execute', 'physical_count:participate',
-      'stock_adjustment:suggest'
+      'stock_adjustment:suggest',
+      'settings:user-preferences:*'
     ],
     hierarchy: 7,
     isSystem: false
@@ -159,7 +173,8 @@ export const mockRoles: Role[] = [
     description: 'Store operations and customer service',
     permissions: [
       'store_requisition:create', 'inventory_item:view_availability',
-      'wastage_report:create', 'product:view'
+      'wastage_report:create', 'product:view',
+      'settings:user-preferences:*'
     ],
     hierarchy: 7,
     isSystem: false
@@ -172,7 +187,8 @@ export const mockRoles: Role[] = [
     description: 'Quality assurance and compliance monitoring',
     permissions: [
       'quality_control:*', 'vendor:rate_quality', 'batch_production:quality_check',
-      'audit_log:view', 'compliance_report:*'
+      'audit_log:view', 'compliance_report:*',
+      'settings:user-preferences:*'
     ],
     hierarchy: 5,
     isSystem: false
@@ -183,7 +199,8 @@ export const mockRoles: Role[] = [
     description: 'Internal audit and compliance verification',
     permissions: [
       'audit_log:view', 'financial_report:audit', 'compliance_report:*',
-      'user:view_activity', 'workflow:audit'
+      'user:view_activity', 'workflow:audit',
+      'settings:audit:view', 'settings:user-preferences:*'
     ],
     hierarchy: 3,
     isSystem: false
@@ -194,7 +211,8 @@ export const mockRoles: Role[] = [
     description: 'Data analysis and business intelligence',
     permissions: [
       'report:*', 'analytics:*', 'dashboard:advanced',
-      'data_export:*', 'business_intelligence:*'
+      'data_export:*', 'business_intelligence:*',
+      'settings:user-preferences:*'
     ],
     hierarchy: 5,
     isSystem: false
@@ -207,7 +225,12 @@ export const mockRoles: Role[] = [
     description: 'Technical support and system maintenance',
     permissions: [
       'user:view', 'user:reset_password', 'system:backup',
-      'configuration:view', 'audit_log:technical'
+      'configuration:view', 'audit_log:technical',
+      'settings:application:view', 'settings:security:view', 'settings:user-preferences:*',
+      'notifications:templates:view', 'notifications:templates:edit',
+      'notifications:routing-rules:view', 'notifications:routing-rules:edit',
+      'notifications:delivery-settings:view', 'notifications:delivery-settings:edit',
+      'notifications:history:view', 'notifications:test:send'
     ],
     hierarchy: 4,
     isSystem: false
@@ -218,7 +241,8 @@ export const mockRoles: Role[] = [
     description: 'Accounting operations and financial record keeping',
     permissions: [
       'invoice:view', 'payment:view', 'journal_entry:create',
-      'account_code:view', 'financial_report:generate'
+      'account_code:view', 'financial_report:generate',
+      'settings:user-preferences:*'
     ],
     hierarchy: 6,
     isSystem: false
@@ -230,7 +254,8 @@ export const mockRoles: Role[] = [
     name: 'Intern',
     description: 'Limited access for training and learning purposes',
     permissions: [
-      'dashboard:view', 'report:view', 'product:view', 'recipe:view'
+      'dashboard:view', 'report:view', 'product:view', 'recipe:view',
+      'settings:user-preferences:*'
     ],
     hierarchy: 8,
     isSystem: false
@@ -241,7 +266,8 @@ export const mockRoles: Role[] = [
     description: 'Limited access for external service providers',
     permissions: [
       'inventory_item:view_public', 'vendor:view_own_profile',
-      'purchase_order:view_assigned'
+      'purchase_order:view_assigned',
+      'settings:user-preferences:*'
     ],
     hierarchy: 8,
     isSystem: false
@@ -257,57 +283,81 @@ export const mockDepartments: Department[] = [
     id: 'dept-001',
     name: 'Administration',
     code: 'ADMIN',
-    manager: 'user-002', // General Manager
-    costCenter: 'CC-001'
+    description: 'Oversees general administrative functions, policy implementation, and inter-departmental coordination',
+    status: 'active',
+    manager: 'user-manager-001', // General Manager
+    costCenter: 'CC-001',
+    assignedUsers: ['user-manager-001', 'user-staff-001', 'user-staff-002']
   },
   {
     id: 'dept-002',
     name: 'Procurement',
     code: 'PROC',
-    manager: 'user-004', // Procurement Manager
-    costCenter: 'CC-002'
+    description: 'Manages vendor relationships, purchase requests, orders, and inventory procurement processes',
+    status: 'active',
+    manager: 'user-purchasing-001', // Procurement Manager
+    costCenter: 'CC-002',
+    assignedUsers: ['user-purchasing-001', 'user-purchasing-002', 'user-staff-003']
   },
   {
     id: 'dept-003',
     name: 'Kitchen Operations',
     code: 'KITCHEN',
-    manager: 'user-007', // Executive Chef
-    costCenter: 'CC-003'
+    description: 'Manages all kitchen activities, recipe development, food preparation, and culinary standards',
+    status: 'active',
+    manager: 'user-chef-001', // Executive Chef
+    costCenter: 'CC-003',
+    assignedUsers: ['user-chef-001', 'user-staff-004', 'user-staff-005', 'user-counter-001']
   },
   {
     id: 'dept-004',
     name: 'Warehouse',
     code: 'WAREHOUSE',
-    manager: 'user-006', // Warehouse Manager
-    costCenter: 'CC-004'
+    description: 'Manages inventory storage, stock movements, and warehouse operations',
+    status: 'active',
+    manager: 'user-manager-002', // Warehouse Manager
+    costCenter: 'CC-004',
+    assignedUsers: ['user-manager-002', 'user-staff-006', 'user-staff-007']
   },
   {
     id: 'dept-005',
     name: 'Finance',
     code: 'FIN',
-    manager: 'user-003', // Finance Director
-    costCenter: 'CC-005'
+    description: 'Handles financial planning, accounting, budgeting, and financial reporting',
+    status: 'active',
+    manager: 'user-finance-001', // Finance Director
+    costCenter: 'CC-005',
+    assignedUsers: ['user-finance-001', 'user-finance-002', 'user-staff-008']
   },
   {
     id: 'dept-006',
     name: 'Food & Beverage',
     code: 'F&B',
-    manager: 'user-005', // Department Manager
-    costCenter: 'CC-006'
+    description: 'Manages restaurant operations, customer service, and food and beverage service delivery',
+    status: 'active',
+    manager: 'user-manager-003', // Department Manager
+    costCenter: 'CC-006',
+    assignedUsers: ['user-manager-003', 'user-staff-009', 'user-counter-002']
   },
   {
     id: 'dept-007',
     name: 'Housekeeping',
     code: 'HK',
-    manager: 'user-005', // Department Manager
-    costCenter: 'CC-007'
+    description: 'Maintains cleanliness and hygiene standards across all facilities',
+    status: 'inactive',
+    manager: 'user-manager-004', // Department Manager
+    costCenter: 'CC-007',
+    assignedUsers: ['user-manager-004', 'user-staff-010']
   },
   {
     id: 'dept-008',
     name: 'Maintenance',
     code: 'MAINT',
-    manager: 'user-005', // Department Manager
-    costCenter: 'CC-008'
+    description: 'Handles facility maintenance, repairs, and equipment upkeep',
+    status: 'active',
+    manager: 'user-manager-005', // Department Manager
+    costCenter: 'CC-008',
+    assignedUsers: ['user-manager-005', 'user-staff-011', 'user-staff-012']
   }
 ];
 

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Verification Matrix - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← All Modules</a>
+            <h1>FEATURE-VERIFICATION-MATRIX.MD</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="index.html">Module Overview</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="index.html">Documentation</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Feature Verification Matrix\n\n> **Generated:** 2025-10-21\n> **Purpose:** Cross-reference documented features with actual implementation\n> **Legend:**\n> - ✅ Implemented - Full page.tsx exists\n> - ⚠️ Partial - Page exists but may be incomplete\n> - ❌ Gap - Documented but NOT implemented\n> - 🔧 Planned - Documented as future feature\n\n---\n\n## Summary Statistics\n\n| Module | Total Documented | Implemented | Gaps | Partial | Gap % |\n|--------|-----------------|-------------|------|---------|-------|\n| System Administration | 12 | 12 | 0 | 0 | 0% |\n| Procurement | 7 | 7 | 0 | 0 | 0% |\n| Inventory Management | 8 | 8 | 0 | 0 | 0% |\n| Vendor Management | 5 | 5 | 0 | 0 | 0% |\n| Product Management | 3 | 3 | 0 | 0 | 0% |\n| Store Operations | 3 | 3 | 0 | 0 | 0% |\n| Finance | 4 | 4 | 0 | 0 | 0% |\n| Operational Planning | 4 | 3 | 1 | 0 | 25% |\n| Reporting & Analytics | 2 | 1 | 1 | 0 | 50% |\n| Production | 1 | 1 | 0 | 0 | 0% |\n| Dashboard | 1 | 1 | 0 | 0 | 0% |\n| **TOTAL** | **50** | **48** | **2** | **0** | **4.0%** |\n\n---\n\n## System Administration Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Permission Management | sa/features/permission-management/README.md | /system-administration/permission-management | ✅ | Full RBAC+ABAC implementation |\n| - Policies | sa/features/permission-management/sub-features/policies/README.md | /permission-management/policies | ✅ | List, Builder, Simple, Demo all exist |\n| - Roles | sa/features/permission-management/sub-features/roles/README.md | /permission-management/roles | ✅ | Full CRUD with user assignment |\n| - Subscriptions | sa/features/permission-management/sub-features/subscriptions/README.md | /permission-management/subscription(s) | ✅ | Both routes exist |\n| User Management | sa/features/user-management/README.md | /system-administration/user-management | ✅ | List and detail pages |\n| Location Management | sa/features/location-management/README.md | /system-administration/location-management | ✅ | Full CRUD (new, edit, view) |\n| Workflow Management | sa/features/workflow/README.md | /system-administration/workflow | ✅ | Workflow configuration + role assignment |\n| POS Integration | sa/features/pos-integration/README.md | /system-administration/system-integrations/pos | ✅ | Settings, Mapping, Reports, Transactions |\n| Business Rules | sa/features/business-rules/README.md | /system-administration/business-rules | ✅ | Main page + compliance monitoring |\n| Certifications | sa/features/certifications/README.md | /system-administration/certifications | ✅ | Full CRUD implementation |\n| Monitoring | sa/features/monitoring/README.md | /system-administration/monitoring | ✅ | Dashboard page exists |\n| Account Code Mapping | sa/features/account-code-mapping/README.md | /system-administration/account-code-mapping | ✅ | Page exists |\n| User Dashboard | sa/features/user-dashboard/README.md | /system-administration/user-dashboard | ✅ | Dashboard page exists |\n| General Settings | sa/features/general-settings/README.md | /system-administration/settings | ✅ | Settings Hub + Company/Security/Application pages with 11 tabs |\n| Notification Settings | sa/features/notification-settings/README.md | /system-administration/settings/notifications | ✅ | Comprehensive notification management with 6 tabs |\n\n---\n\n## Procurement Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Purchase Requests | pr/purchase-request-module-spec.md | /procurement/purchase-requests | ✅ | List, detail, new-pr, enhanced-demo |\n| Purchase Orders | po/README.md | /procurement/purchase-orders | ✅ | Full CRUD + create bulk/from-pr |\n| Goods Received Note | grn/README.md | /procurement/goods-received-note | ✅ | Full workflow (vendor/PO/item/location selection) |\n| Credit Notes | cn/README.md | /procurement/credit-note | ✅ | List, new, detail |\n| Purchase Request Templates | prt/README.md | /procurement/purchase-request-templates | ✅ | List and detail |\n| Vendor Comparison | - | /procurement/vendor-comparison | ✅ | Comparison page exists |\n| My Approvals | - | /procurement/my-approvals | ✅ | Approvals workflow page |\n\n---\n\n## Inventory Management Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Stock Overview | inv/inventory-management-specification.md | /inventory-management/stock-overview | ✅ | Main page exists |\n| - Inventory Balance | - | /stock-overview/inventory-balance | ✅ | Balance report page |\n| - Stock Cards | - | /stock-overview/stock-card(s) | ✅ | Both singular and plural routes |\n| - Inventory Aging | - | /stock-overview/inventory-aging | ✅ | Aging analysis page |\n| - Slow Moving | - | /stock-overview/slow-moving | ✅ | Slow moving report |\n| Physical Count | pc/README.md | /inventory-management/physical-count | ✅ | List, dashboard, management, active detail |\n| Spot Check | sc/README.md | /inventory-management/spot-check | ✅ | Main, dashboard, new, active, completed (with details) |\n| Stock In | - | /inventory-management/stock-in | ✅ | Stock in page exists |\n| Inventory Adjustments | - | /inventory-management/inventory-adjustments | ✅ | List and detail pages |\n| Period End | - | /inventory-management/period-end | ✅ | List and detail pages |\n| Fractional Inventory | - | /inventory-management/fractional-inventory | ✅ | Page exists |\n| Physical Count Management | - | /inventory-management/physical-count-management | ✅ | Management page exists |\n\n---\n\n## Vendor Management Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Manage Vendors | vm/MANAGE-VENDORS.md | /vendor-management/manage-vendors | ✅ | Full CRUD |\n| Vendors (Main) | vm/README.md | /vendor-management/vendors | ✅ | List, new, edit, detail, pricelist-settings |\n| Pricelists | vm/PRICELISTS.md | /vendor-management/pricelists | ✅ | Full CRUD + add functionality |\n| Campaigns | vm/CAMPAIGNS.md | /vendor-management/campaigns | ✅ | List, new, detail |\n| Templates | vm/TEMPLATES.md | /vendor-management/templates | ✅ | Full CRUD |\n| Vendor Portal | vm/VENDOR-PORTAL.md | /vendor-management/vendor-portal/sample | ✅ | Sample portal page |\n\n---\n\n## Product Management Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Products | pm/product-management-specification.md | /product-management/products | ✅ | List and detail pages |\n| Categories | pm/product-management-specification.md | /product-management/categories | ✅ | Categories page exists |\n| Units | pm/product-management-specification.md | /product-management/units | ✅ | Units page exists |\n\n---\n\n## Store Operations Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Store Requisitions | store-ops/STORE-REQUISITIONS.md | /store-operations/store-requisitions | ✅ | List and detail pages |\n| Stock Replenishment | store-ops/STOCK-REPLENISHMENT.md | /store-operations/stock-replenishment | ✅ | Replenishment page exists |\n| Wastage Reporting | store-ops/WASTAGE-REPORTING.md | /store-operations/wastage-reporting | ✅ | Wastage page exists |\n\n---\n\n## Finance Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Account Code Mapping | finance/features/account-code-mapping/README.md | /finance/account-code-mapping | ✅ | Mapping page (also in SA) |\n| Currency Management | finance/features/currency-and-rates/README.md | /finance/currency-management | ✅ | Currency page exists |\n| Exchange Rates | finance/features/currency-and-rates/README.md | /finance/exchange-rates | ✅ | Exchange rates page |\n| Department List | finance/features/departments/README.md | /finance/department-list | ✅ | Department page exists |\n\n---\n\n## Operational Planning Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Recipe Management | - | /operational-planning/recipe-management | ✅ | Full implementation |\n| - Recipes | - | /recipe-management/recipes | ✅ | Full CRUD (list, new, create, edit, detail) |\n| - Cuisine Types | - | /recipe-management/cuisine-types | ✅ | Cuisine types page |\n| - Categories | - | /recipe-management/categories | ✅ | Categories page exists |\n| Menu Engineering | index.html | /operational-planning/menu-engineering | ✅ | Page exists |\n| Demand Forecasting | index.html | /operational-planning/demand-forecasting | ❌ **GAP** | Not implemented |\n| Inventory Planning | index.html | /operational-planning/inventory-planning | ❌ **GAP** | Not implemented |\n\n---\n\n## Reporting & Analytics Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Consumption Analytics | - | /reporting-analytics/consumption-analytics | ✅ | Page exists |\n| Reports Dashboard | index.html | /reporting-analytics/reports-dashboard | ❌ **GAP** | Main page exists but no dashboard sub-route |\n\n---\n\n## Production Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Production | index.html | /production | ✅ | Main page exists |\n\n---\n\n## Dashboard Module\n\n| Feature | Doc Location | Route | Status | Notes |\n|---------|-------------|-------|--------|-------|\n| Main Dashboard | dashboard/README.md | /dashboard | ✅ | Dashboard page exists |\n\n---\n\n## Additional Pages (Not in Main Index)\n\n| Feature | Route | Notes |\n|---------|-------|-------|\n| Edit Profile | /edit-profile | User profile editing |\n| Help & Support | /help-support | Support pages |\n| Style Guide | /style-guide | UI style guide |\n| Security/ABAC | /security/abac | ABAC demo page |\n| Template (Dev) | /TEMPLATE | Development template |\n\n---\n\n## Identified Gaps\n\n### Operational Planning Gaps\n1. **Demand Forecasting** (`/operational-planning/demand-forecasting`)\n   - **Status:** ❌ Not Implemented\n   - **Documented:** Yes (in main index.html)\n   - **Impact:** Medium - planning feature\n   - **Priority:** Low\n   - **Notes:** Documented as available but no implementation found\n\n2. **Inventory Planning** (`/operational-planning/inventory-planning`)\n   - **Status:** ❌ Not Implemented\n   - **Documented:** Yes (in main index.html)\n   - **Impact:** Medium - planning feature\n   - **Priority:** Low\n   - **Notes:** Documented as available but no implementation found\n\n### Reporting & Analytics Gaps\n1. **Reports Dashboard** (`/reporting-analytics/reports-dashboard`)\n   - **Status:** ⚠️ Partial\n   - **Documented:** Yes (in main index.html)\n   - **Impact:** Low - main reporting page exists\n   - **Priority:** Low\n   - **Notes:** Main /reporting-analytics page exists, specific dashboard sub-route may not be needed\n\n---\n\n## Recommendations\n\n### Update Documentation\n1. **Mark gaps clearly** in all HTML index pages\n2. **Add roadmap section** for planned features\n3. **Update statistics** in main index.html to reflect actual implementation\n4. **Add feature status badges** to all feature cards\n\n### Fix Inconsistencies\n1. **Operational Planning** - Mark demand forecasting and inventory planning as \"Planned\" not \"Available\"\n2. **Reporting** - Clarify if dashboard sub-route is needed or if main page is sufficient\n3. **Update coverage percentages** to reflect actual implementation vs. documentation\n\n### Navigation Updates\n1. **Disable gap features** in navigation (gray out, no links)\n2. **Add tooltips** explaining feature status\n3. **Create unified index pages** for all modules\n4. **Convert all .md links to .html**\n\n---\n\n**Last Updated:** 2025-01-18\n**Total Pages Verified:** 183\n**Documentation Accuracy:** 95.8% (46/48 features implemented)\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

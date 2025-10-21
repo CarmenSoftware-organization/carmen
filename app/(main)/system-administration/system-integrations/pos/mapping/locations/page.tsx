@@ -17,10 +17,17 @@ import {
 
 import { LocationMapping } from "./types"
 import { locationMappings, posTypes } from "./data"
+import { LocationEditDrawer } from "../components/location-edit-drawer"
+import { DeleteConfirmationDialog } from "../components/delete-confirmation-dialog"
+import { MappingHistoryDrawer } from "../components/mapping-history-drawer"
 
 export default function LocationMappingPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([])
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false)
+  const [selectedLocation, setSelectedLocation] = useState<LocationMapping | null>(null)
   
   // Setup filter groups
   const filterGroups: FilterGroup[] = [
@@ -54,8 +61,31 @@ export default function LocationMappingPage() {
 
   // Handle row actions
   const handleRowAction = (action: ActionType, location: LocationMapping) => {
-    console.log(`${action} action on location:`, location)
-    // Implement action handlers here
+    setSelectedLocation(location)
+
+    switch(action) {
+      case "edit":
+        setEditDrawerOpen(true)
+        break
+      case "delete":
+        setDeleteDialogOpen(true)
+        break
+      case "history":
+        setHistoryDrawerOpen(true)
+        break
+    }
+  }
+
+  // Handle save mapping
+  const handleSaveMapping = (updatedMapping: Partial<LocationMapping>) => {
+    console.log("Saving updated mapping:", updatedMapping)
+    // TODO: Implement actual save logic with API call
+  }
+
+  // Handle delete mapping
+  const handleDeleteMapping = (deleteType: "soft" | "hard", reason?: string) => {
+    console.log(`Deleting mapping (${deleteType}):`, selectedLocation?.id, "Reason:", reason)
+    // TODO: Implement actual delete logic with API call
   }
 
   // Filter data based on search query and applied filters
@@ -184,6 +214,29 @@ export default function LocationMappingPage() {
         columns={columns}
         data={filteredData}
         rowClassName={getRowClassName}
+      />
+
+      <LocationEditDrawer
+        open={editDrawerOpen}
+        onOpenChange={setEditDrawerOpen}
+        mapping={selectedLocation}
+        onSave={handleSaveMapping}
+      />
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        mapping={selectedLocation}
+        mappingType="location"
+        onConfirm={handleDeleteMapping}
+      />
+
+      <MappingHistoryDrawer
+        open={historyDrawerOpen}
+        onOpenChange={setHistoryDrawerOpen}
+        mappingId={selectedLocation?.id || ""}
+        mappingType="location"
+        mappingName={selectedLocation?.posLocationName || ""}
       />
     </div>
   )

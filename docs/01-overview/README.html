@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen F&B Management System Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Overview</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Overview</a></div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Carmen F&B Management System Documentation\n\nThis directory contains comprehensive documentation for the Carmen F&B Management System, including business requirements, technical specifications, and design documents.\n\n## Documentation Structure\n\n### Top-Level Directories\n\n- [API Specifications](./api-specifications) - API endpoints, data structures, and technical specifications\n- [Business Analysis](./business-analysis) - Business requirements and analysis documents\n- [System Overview](./system-overview) - System-wide documentation, architecture, and workflow diagrams\n- [Testing](./testing) - Testing procedures, test plans, and test forms\n\n### Module Documentation\n\n- [Purchase Orders (PO)](./po) - Documentation for the Purchase Order module\n- [Purchase Requests (PR)](./pr) - Documentation for the Purchase Request module\n- [Goods Received Notes (GRN)](./grn) - Documentation for the Goods Received Note module\n- [Credit Notes (CN)](./cn) - Documentation for the Credit Note module\n- [Store Requisitions (SR)](./sr) - Documentation for the Store Requisition module\n- [Inventory Management](./inventory-management) - Documentation for the Inventory Management module\n- [Inventory Adjustment](./inventory-adjustment) - Documentation for the Inventory Adjustment module\n- [Product Management](./product-management) - Documentation for the Product Management module\n- [User Management](./user-management) - Documentation for the User Management module\n- [Recipe Module](./recipe-module) - Documentation for the Recipe Management module\n- [Platform Notification Service](./platform-notification-service) - Documentation for the Notification Service\n\n## Documentation Types\n\nEach module typically contains the following types of documentation:\n\n1. **Business Analysis (BA)** - Business requirements and analysis\n2. **Product Requirements Document (PRD)** - Detailed product requirements\n3. **Functional Specification Document (FSD)** - Technical specifications for implementation\n4. **API Specification** - API endpoints and data structures\n5. **User Flows** - Diagrams illustrating user interactions\n6. **State Diagrams** - Diagrams showing state transitions\n7. **Data Flow Diagrams** - Diagrams showing data movement through the system\n\n## Documentation Standards\n\nWhen creating or updating documentation:\n\n1. Place system-wide documents in their corresponding top-level directories\n   - API specifications in `/docs/api-specifications`\n   - Business analysis documents in `/docs/business-analysis`\n   - System overview documents in `/docs/system-overview`\n   - Testing-related documents in `/docs/testing`\n2. Place module-specific documents in their respective module directories (e.g., `/docs/po`)\n3. Use Markdown format for all documentation\n4. Include diagrams using Mermaid syntax where appropriate\n5. Keep documentation up-to-date with implementation changes\n6. Cross-reference related documents when applicable\n\n## Recent Updates\n\n- **April 18, 2025**: Reorganized documentation structure with clear separation of concerns\n- **March 14, 2024**: Added purchase-request-ba.md to the list of consolidated documents in PR module\n- **March 14, 2024**: Renamed module-map.md to PR-Module-Structure.md in PR module documentation\n- **March 14, 2024**: Completed documentation refinement (Phase 3) for the PR module\n- **March 14, 2024**: Enhanced Integration Points documentation across modules\n- **March 14, 2024**: Added detailed User Role specifications for PR module\n- **March 12, 2024**: Completed documentation consolidation (Phase 2) for the PR module\n- **March 12, 2024**: Created comprehensive Procurement Process Flow document\n- **March 12, 2024**: Updated cross-references between procurement-related modules";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

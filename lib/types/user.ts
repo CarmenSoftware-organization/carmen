@@ -14,8 +14,12 @@ export interface Department {
   id: string;
   name: string;
   code: string;
+  description?: string;
+  status: 'active' | 'inactive';
   manager?: string;
   costCenter?: string;
+  parentDepartment?: string;
+  assignedUsers?: string[]; // Array of user IDs assigned to this department
 }
 
 export interface Role {
@@ -81,6 +85,9 @@ export interface User extends UserProfile {
   // Workflow stages this user can approve
   assignedWorkflowStages?: string[];
   context: UserContext;
+  // User preferences
+  preferences?: import('./settings').UserPreferences;
+  lastPreferencesUpdate?: Date;
 }
 
 export interface UserContextType {

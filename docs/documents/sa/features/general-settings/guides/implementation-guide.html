@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Settings - Technical Implementation Guide - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../../index.html" class="back-link">← All Modules</a>
+            <h1>System Administration</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../../index.html">Documentation</a> / <a href="../../../../index.html">SA</a> / Features / General Settings</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# General Settings - Technical Implementation Guide\n\n**Document Version**: 1.0\n**Last Updated**: October 21, 2025\n**Target Audience**: Frontend Developers, Backend Developers, Full-Stack Engineers\n\n---\n\n## Overview\n\nThis guide provides comprehensive technical implementation details for the General Settings feature, covering the Settings Hub, Company Settings, Security Settings, and Application Settings. Each section includes component architecture, state management patterns, API specifications, and code examples.\n\n---\n\n## Table of Contents\n\n1. [Architecture Overview](#architecture-overview)\n2. [Component Structure](#component-structure)\n3. [State Management](#state-management)\n4. [Type Definitions](#type-definitions)\n5. [API Integration](#api-integration)\n6. [Form Handling](#form-handling)\n7. [Validation Rules](#validation-rules)\n8. [Testing Strategy](#testing-strategy)\n9. [Performance Optimization](#performance-optimization)\n10. [Security Considerations](#security-considerations)\n\n---\n\n## Architecture Overview\n\n### Technology Stack\n- **Framework**: Next.js 14 with App Router\n- **Language**: TypeScript 5.x with strict mode\n- **UI Components**: Shadcn/ui (Radix UI primitives)\n- **Styling**: Tailwind CSS\n- **Form Management**: React Hook Form\n- **Validation**: Zod schemas\n- **State Management**: React useState with controlled components\n\n### File Structure\n```\napp/(main)/system-administration/settings/\n├── page.tsx                    # Settings Hub\n├── company/\n│   └── page.tsx               # Company Settings (3 tabs)\n├── security/\n│   └── page.tsx               # Security Settings (4 tabs)\n├── application/\n│   └── page.tsx               # Application Settings (4 tabs)\n└── notifications/\n    └── page.tsx               # Notification Settings (6 tabs)\n\nlib/\n├── types/\n│   └── settings.ts            # All settings type definitions\n└── mock-data/\n    └── settings.ts            # Mock data for development\n```\n\n---\n\n## Component Structure\n\n### 1. Settings Hub Component\n\n**File**: `app/(main)/system-administration/settings/page.tsx`\n\n**Purpose**: Central dashboard providing navigation to all settings categories\n\n**Key Features**:\n- Grid layout with navigation cards\n- Icon-based visual hierarchy\n- Status badges for planned features\n- Responsive design with mobile optimization\n\n**Component Pattern**:\n```typescript\nexport default function SettingsPage() {\n  const router = useRouter();\n\n  const settingsCategories = [\n    {\n      title: \"Company Settings\",\n      description: \"Organization information and branding\",\n      icon: Building2,\n      href: \"/system-administration/settings/company\",\n      available: true\n    },\n    {\n      title: \"Security Settings\",\n      description: \"Security policies and authentication\",\n      icon: Shield,\n      href: \"/system-administration/settings/security\",\n      available: true\n    },\n    // ... more categories\n  ];\n\n  return (\n    <div className=\"px-9 pt-9 pb-6\">\n      <div className=\"mb-6\">\n        <h1 className=\"text-3xl font-bold\">General Settings</h1>\n        <p className=\"text-muted-foreground mt-2\">\n          Configure system-wide settings and preferences\n        </p>\n      </div>\n\n      <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">\n        {settingsCategories.map((category) => (\n          <Card key={category.title} className=\"hover:shadow-md transition-shadow\">\n            <CardHeader className=\"pb-3\">\n              <div className=\"flex items-center justify-between\">\n                <CardTitle className=\"text-xl\">{category.title}</CardTitle>\n                <category.icon className=\"h-5 w-5 text-muted-foreground\" />\n              </div>\n              <CardDescription>{category.description}</CardDescription>\n            </CardHeader>\n            <CardContent>\n              {category.available ? (\n                <Button asChild className=\"w-full\" variant=\"default\">\n                  <Link href={category.href}>Configure {category.title}</Link>\n                </Button>\n              ) : (\n                <Badge variant=\"secondary\">Coming Soon</Badge>\n              )}\n            </CardContent>\n          </Card>\n        ))}\n      </div>\n    </div>\n  );\n}\n```\n\n### 2. Company Settings Component\n\n**File**: `app/(main)/system-administration/settings/company/page.tsx` (539 lines)\n\n**Purpose**: Manage company information, branding, and operational settings\n\n**Tab Structure**:\n1. General Information (Company identity, contact, address)\n2. Branding (Logos, colors, visual identity)\n3. Operational Settings (Currency, timezone, fiscal year)\n\n**State Management Pattern**:\n```typescript\nconst [settings, setSettings] = useState<CompanySettings>(mockCompanySettings);\nconst [activeTab, setActiveTab] = useState(\"general\");\nconst [hasChanges, setHasChanges] = useState(false);\n\n// Nested state update pattern\nconst handleGeneralChange = (field: keyof CompanySettings[\"general\"], value: string) => {\n  setSettings({\n    ...settings,\n    general: {\n      ...settings.general,\n      [field]: value\n    }\n  });\n  setHasChanges(true);\n};\n\nconst handleContactChange = (field: keyof CompanySettings[\"contact\"], value: string) => {\n  setSettings({\n    ...settings,\n    contact: {\n      ...settings.contact,\n      [field]: value\n    }\n  });\n  setHasChanges(true);\n};\n\n// Similar patterns for address, branding, operational\n```\n\n**Save Handler**:\n```typescript\nconst handleSave = () => {\n  // TODO: Implement API call to save settings\n  toast({\n    title: \"Settings Saved\",\n    description: \"Company settings have been updated successfully.\",\n  });\n  setHasChanges(false);\n};\n\nconst handleReset = () => {\n  setSettings(mockCompanySettings);\n  setHasChanges(false);\n  toast({\n    title: \"Settings Reset\",\n    description: \"Company settings have been reset to default values.\",\n  });\n};\n```\n\n**Tab Navigation Implementation**:\n```typescript\n<Tabs value={activeTab} onValueChange={setActiveTab} className=\"space-y-6\">\n  <TabsList>\n    <TabsTrigger value=\"general\">\n      <Building2 className=\"h-4 w-4 mr-2\" />\n      General Information\n    </TabsTrigger>\n    <TabsTrigger value=\"branding\">\n      <Palette className=\"h-4 w-4 mr-2\" />\n      Branding\n    </TabsTrigger>\n    <TabsTrigger value=\"operational\">\n      <Settings className=\"h-4 w-4 mr-2\" />\n      Operational Settings\n    </TabsTrigger>\n  </TabsList>\n\n  <TabsContent value=\"general\" className=\"space-y-6\">\n    {/* General Information Form */}\n  </TabsContent>\n\n  <TabsContent value=\"branding\" className=\"space-y-6\">\n    {/* Branding Form */}\n  </TabsContent>\n\n  <TabsContent value=\"operational\" className=\"space-y-6\">\n    {/* Operational Settings Form */}\n  </TabsContent>\n</Tabs>\n```\n\n### 3. Security Settings Component\n\n**File**: `app/(main)/system-administration/settings/security/page.tsx` (713 lines)\n\n**Purpose**: Manage security policies, authentication, access control, and audit logging\n\n**Tab Structure**:\n1. Password Policy (Complexity requirements, expiry, history)\n2. Authentication (2FA, session management, login security)\n3. Access Control (IP whitelisting, security questions)\n4. Audit & Logging (Audit trails, data encryption)\n\n**Password Strength Calculation**:\n```typescript\nconst getPasswordStrength = () => {\n  const { minLength, requireUppercase, requireLowercase, requireNumbers, requireSpecialChars } = settings.passwordPolicy;\n  let strength = 0;\n\n  if (minLength >= 12) strength += 2;\n  else if (minLength >= 8) strength += 1;\n\n  if (requireUppercase) strength += 1;\n  if (requireLowercase) strength += 1;\n  if (requireNumbers) strength += 1;\n  if (requireSpecialChars) strength += 1;\n\n  if (strength <= 2) return { label: \"Weak\", color: \"destructive\" };\n  if (strength <= 4) return { label: \"Medium\", color: \"warning\" };\n  return { label: \"Strong\", color: \"success\" };\n};\n\nconst passwordStrength = getPasswordStrength();\n```\n\n**Slider Component for Password Length**:\n```typescript\n<div className=\"space-y-2\">\n  <div className=\"flex items-center justify-between\">\n    <Label htmlFor=\"min-length\">\n      Minimum Password Length: {settings.passwordPolicy.minLength}\n    </Label>\n  </div>\n  <Slider\n    id=\"min-length\"\n    value={[settings.passwordPolicy.minLength]}\n    onValueChange={([value]) => handlePasswordPolicyChange(\"minLength\", value)}\n    min={6}\n    max={32}\n    step={1}\n  />\n  <p className=\"text-sm text-muted-foreground\">\n    Recommended: At least 12 characters\n  </p>\n</div>\n```\n\n**Checkbox Array Handling**:\n```typescript\n// 2FA Methods\n<div className=\"space-y-2\">\n  <Label>Allowed Methods</Label>\n  <div className=\"space-y-2\">\n    {([\"authenticator\", \"sms\", \"email\"] as const).map((method) => (\n      <div key={method} className=\"flex items-center space-x-2\">\n        <input\n          type=\"checkbox\"\n          id={`method-${method}`}\n          checked={settings.twoFactor.methods.includes(method)}\n          onChange={(e) => {\n            const methods = e.target.checked\n              ? [...settings.twoFactor.methods, method]\n              : settings.twoFactor.methods.filter((m) => m !== method);\n            handleTwoFactorChange(\"methods\", methods);\n          }}\n          className=\"rounded\"\n        />\n        <Label htmlFor={`method-${method}`} className=\"capitalize font-normal\">\n          {method === \"authenticator\" ? \"Authenticator App\" : method.toUpperCase()}\n        </Label>\n      </div>\n    ))}\n  </div>\n</div>\n```\n\n**Security Warning Component**:\n```typescript\n<div className=\"mt-6 p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg\">\n  <div className=\"flex gap-3\">\n    <AlertTriangle className=\"h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5\" />\n    <div>\n      <h4 className=\"font-semibold text-yellow-900 dark:text-yellow-100\">Security Warning</h4>\n      <p className=\"text-sm text-yellow-800 dark:text-yellow-200 mt-1\">\n        Changes to security settings may affect all users. Ensure you understand the implications\n        before saving. Consider testing changes in a non-production environment first.\n      </p>\n    </div>\n  </div>\n</div>\n```\n\n### 4. Application Settings Component\n\n**File**: `app/(main)/system-administration/settings/application/page.tsx` (633 lines)\n\n**Purpose**: Manage email configuration, backups, integrations, and performance\n\n**Tab Structure**:\n1. Email Configuration (SMTP, email templates, testing)\n2. Backup & Recovery (Automated backups, storage, recovery)\n3. Integrations (POS, ERP, accounting systems)\n4. Features & Performance (Feature toggles, caching, API limits)\n\n**Provider Selection Pattern**:\n```typescript\n<div className=\"space-y-2\">\n  <Label htmlFor=\"email-provider\">Email Provider</Label>\n  <Select\n    value={settings.email.provider}\n    onValueChange={(value) => handleEmailChange(\"provider\", value)}\n  >\n    <SelectTrigger id=\"email-provider\">\n      <SelectValue />\n    </SelectTrigger>\n    <SelectContent>\n      <SelectItem value=\"smtp\">SMTP</SelectItem>\n      <SelectItem value=\"sendgrid\">SendGrid</SelectItem>\n      <SelectItem value=\"aws-ses\">AWS SES</SelectItem>\n      <SelectItem value=\"custom\">Custom</SelectItem>\n    </SelectContent>\n  </Select>\n</div>\n```\n\n**Conditional Form Fields**:\n```typescript\n// Show SMTP fields only when SMTP provider is selected\n{settings.email.provider === \"smtp\" && (\n  <>\n    <div className=\"grid grid-cols-2 gap-4\">\n      <div className=\"space-y-2\">\n        <Label htmlFor=\"smtp-host\">SMTP Host</Label>\n        <Input\n          id=\"smtp-host\"\n          value={settings.email.smtpHost}\n          onChange={(e) => handleEmailChange(\"smtpHost\", e.target.value)}\n          placeholder=\"smtp.example.com\"\n        />\n      </div>\n      <div className=\"space-y-2\">\n        <Label htmlFor=\"smtp-port\">SMTP Port</Label>\n        <Input\n          id=\"smtp-port\"\n          type=\"number\"\n          value={settings.email.smtpPort}\n          onChange={(e) => handleEmailChange(\"smtpPort\", parseInt(e.target.value))}\n          placeholder=\"587\"\n        />\n      </div>\n    </div>\n    {/* More SMTP fields */}\n  </>\n)}\n```\n\n**Integration Status Badge**:\n```typescript\n<div className=\"flex items-center justify-between\">\n  <div className=\"space-y-0.5\">\n    <Label htmlFor=\"pos-enabled\">Enable POS Integration</Label>\n    <p className=\"text-sm text-muted-foreground\">\n      Connect to Point of Sale systems\n    </p>\n  </div>\n  <div className=\"flex items-center gap-2\">\n    {settings.integrations.pos.enabled && (\n      <Badge variant=\"success\">Connected</Badge>\n    )}\n    <Switch\n      id=\"pos-enabled\"\n      checked={settings.integrations.pos.enabled}\n      onCheckedChange={(checked) => handlePOSChange(\"enabled\", checked)}\n    />\n  </div>\n</div>\n```\n\n---\n\n## State Management\n\n### State Structure\n\n**Company Settings State**:\n```typescript\nconst [settings, setSettings] = useState<CompanySettings>({\n  general: {\n    companyName: \"\",\n    legalName: \"\",\n    taxId: \"\",\n    registrationNumber: \"\",\n    incorporationDate: \"\",\n    website: \"\"\n  },\n  contact: {\n    primaryPhone: \"\",\n    secondaryPhone: \"\",\n    primaryEmail: \"\",\n    supportEmail: \"\"\n  },\n  address: {\n    street: \"\",\n    city: \"\",\n    state: \"\",\n    postalCode: \"\",\n    country: \"\"\n  },\n  branding: {\n    logoUrl: \"\",\n    darkModeLogoUrl: \"\",\n    faviconUrl: \"\",\n    primaryColor: \"#000000\",\n    secondaryColor: \"#000000\",\n    accentColor: \"#000000\"\n  },\n  operational: {\n    defaultCurrency: \"USD\",\n    timezone: \"America/New_York\",\n    language: \"en\",\n    fiscalYearStart: \"01-01\",\n    fiscalYearEnd: \"12-31\"\n  }\n});\n```\n\n**Security Settings State**:\n```typescript\nconst [settings, setSettings] = useState<SecuritySettings>({\n  passwordPolicy: {\n    minLength: 12,\n    requireUppercase: true,\n    requireLowercase: true,\n    requireNumbers: true,\n    requireSpecialChars: true,\n    expiryDays: 90,\n    historyCount: 5\n  },\n  twoFactor: {\n    enabled: true,\n    required: false,\n    methods: [\"authenticator\", \"sms\"],\n    gracePeriodDays: 7\n  },\n  sessionSettings: {\n    timeout: 30,\n    maxConcurrentSessions: 3,\n    rememberMe: true,\n    absoluteTimeout: false\n  },\n  loginAttempts: {\n    maxAttempts: 5,\n    lockoutDuration: 30,\n    notifyAdmin: true\n  },\n  ipAccessControl: {\n    enabled: false,\n    whitelist: []\n  },\n  securityQuestions: {\n    enabled: true,\n    minRequired: 3\n  },\n  auditLogging: {\n    enabled: true,\n    retentionDays: 365,\n    events: [\"login\", \"logout\", \"dataAccess\", \"dataModification\", \"settingsChange\"]\n  },\n  dataEncryption: {\n    atRest: true,\n    inTransit: true,\n    algorithm: \"AES-256\"\n  }\n});\n```\n\n**Application Settings State**:\n```typescript\nconst [settings, setSettings] = useState<ApplicationSettings>({\n  email: {\n    provider: \"smtp\",\n    smtpHost: \"\",\n    smtpPort: 587,\n    smtpUser: \"\",\n    smtpPassword: \"\",\n    encryption: \"tls\",\n    fromEmail: \"\",\n    fromName: \"\"\n  },\n  backup: {\n    enabled: true,\n    frequency: \"daily\",\n    retentionDays: 30,\n    storageLocation: \"cloud\",\n    cloudProvider: \"aws-s3\"\n  },\n  integrations: {\n    pos: {\n      enabled: false,\n      provider: \"\",\n      apiEndpoint: \"\",\n      apiKey: \"\"\n    },\n    erp: {\n      enabled: false,\n      system: \"\",\n      endpoint: \"\"\n    },\n    accounting: {\n      enabled: false,\n      system: \"\",\n      mode: \"realtime\"\n    }\n  },\n  features: {\n    advancedSearch: true,\n    realtimeNotifications: true,\n    mobileAccess: true,\n    offlineMode: false\n  },\n  performance: {\n    caching: {\n      enabled: true,\n      type: \"redis\",\n      duration: 3600\n    },\n    apiRateLimit: 1000\n  }\n});\n```\n\n### Update Patterns\n\n**Nested Object Update Pattern**:\n```typescript\n// Pattern for updating nested objects\nconst handleNestedChange = (\n  parent: keyof Settings,\n  field: keyof Settings[parent],\n  value: any\n) => {\n  setSettings(prev => ({\n    ...prev,\n    [parent]: {\n      ...prev[parent],\n      [field]: value\n    }\n  }));\n  setHasChanges(true);\n};\n\n// Usage\nhandleNestedChange(\"general\", \"companyName\", \"New Company Name\");\n```\n\n**Array Update Pattern**:\n```typescript\n// Adding to array\nconst addToArray = (item: string) => {\n  setSettings(prev => ({\n    ...prev,\n    someArray: [...prev.someArray, item]\n  }));\n};\n\n// Removing from array\nconst removeFromArray = (item: string) => {\n  setSettings(prev => ({\n    ...prev,\n    someArray: prev.someArray.filter(i => i !== item)\n  }));\n};\n```\n\n---\n\n## Type Definitions\n\n### Core Settings Types\n\n**File**: `lib/types/settings.ts`\n\n```typescript\n// Company Settings Types\nexport interface CompanySettings {\n  general: {\n    companyName: string;\n    legalName: string;\n    taxId: string;\n    registrationNumber: string;\n    incorporationDate: string;\n    website: string;\n  };\n  contact: {\n    primaryPhone: string;\n    secondaryPhone?: string;\n    primaryEmail: string;\n    supportEmail: string;\n  };\n  address: {\n    street: string;\n    city: string;\n    state: string;\n    postalCode: string;\n    country: string;\n  };\n  branding: {\n    logoUrl: string;\n    darkModeLogoUrl: string;\n    faviconUrl: string;\n    primaryColor: string;\n    secondaryColor: string;\n    accentColor: string;\n  };\n  operational: {\n    defaultCurrency: string;\n    timezone: string;\n    language: string;\n    fiscalYearStart: string;\n    fiscalYearEnd: string;\n  };\n}\n\n// Security Settings Types\nexport type TwoFactorMethod = \"authenticator\" | \"sms\" | \"email\";\nexport type AuditEvent = \"login\" | \"logout\" | \"dataAccess\" | \"dataModification\" | \"settingsChange\";\nexport type EncryptionAlgorithm = \"AES-256\" | \"AES-128\" | \"RSA-2048\";\n\nexport interface SecuritySettings {\n  passwordPolicy: {\n    minLength: number;\n    requireUppercase: boolean;\n    requireLowercase: boolean;\n    requireNumbers: boolean;\n    requireSpecialChars: boolean;\n    expiryDays: number;\n    historyCount: number;\n  };\n  twoFactor: {\n    enabled: boolean;\n    required: boolean;\n    methods: TwoFactorMethod[];\n    gracePeriodDays: number;\n  };\n  sessionSettings: {\n    timeout: number;\n    maxConcurrentSessions: number;\n    rememberMe: boolean;\n    absoluteTimeout: boolean;\n  };\n  loginAttempts: {\n    maxAttempts: number;\n    lockoutDuration: number;\n    notifyAdmin: boolean;\n  };\n  ipAccessControl: {\n    enabled: boolean;\n    whitelist: string[];\n  };\n  securityQuestions: {\n    enabled: boolean;\n    minRequired: number;\n  };\n  auditLogging: {\n    enabled: boolean;\n    retentionDays: number;\n    events: AuditEvent[];\n  };\n  dataEncryption: {\n    atRest: boolean;\n    inTransit: boolean;\n    algorithm: EncryptionAlgorithm;\n  };\n}\n\n// Application Settings Types\nexport type EmailProvider = \"smtp\" | \"sendgrid\" | \"aws-ses\" | \"custom\";\nexport type EncryptionType = \"tls\" | \"ssl\" | \"none\";\nexport type BackupFrequency = \"hourly\" | \"daily\" | \"weekly\" | \"monthly\";\nexport type StorageLocation = \"local\" | \"cloud\" | \"both\";\nexport type IntegrationMode = \"realtime\" | \"batch\";\nexport type CacheType = \"memory\" | \"redis\" | \"memcached\";\n\nexport interface ApplicationSettings {\n  email: {\n    provider: EmailProvider;\n    smtpHost: string;\n    smtpPort: number;\n    smtpUser: string;\n    smtpPassword: string;\n    encryption: EncryptionType;\n    fromEmail: string;\n    fromName: string;\n  };\n  backup: {\n    enabled: boolean;\n    frequency: BackupFrequency;\n    retentionDays: number;\n    storageLocation: StorageLocation;\n    cloudProvider?: string;\n  };\n  integrations: {\n    pos: {\n      enabled: boolean;\n      provider: string;\n      apiEndpoint: string;\n      apiKey: string;\n    };\n    erp: {\n      enabled: boolean;\n      system: string;\n      endpoint: string;\n    };\n    accounting: {\n      enabled: boolean;\n      system: string;\n      mode: IntegrationMode;\n    };\n  };\n  features: {\n    advancedSearch: boolean;\n    realtimeNotifications: boolean;\n    mobileAccess: boolean;\n    offlineMode: boolean;\n  };\n  performance: {\n    caching: {\n      enabled: boolean;\n      type: CacheType;\n      duration: number;\n    };\n    apiRateLimit: number;\n  };\n}\n```\n\n---\n\n## API Integration\n\n### API Endpoints\n\n**Base URL**: `/api/system-administration/settings`\n\n#### Company Settings\n```typescript\n// GET /api/system-administration/settings/company\n// Response: CompanySettings\ninterface GetCompanySettingsResponse {\n  success: boolean;\n  data: CompanySettings;\n}\n\n// PUT /api/system-administration/settings/company\n// Request: CompanySettings\n// Response: Success message\ninterface UpdateCompanySettingsRequest {\n  settings: CompanySettings;\n}\n\ninterface UpdateCompanySettingsResponse {\n  success: boolean;\n  message: string;\n  data: CompanySettings;\n}\n```\n\n#### Security Settings\n```typescript\n// GET /api/system-administration/settings/security\n// Response: SecuritySettings\ninterface GetSecuritySettingsResponse {\n  success: boolean;\n  data: SecuritySettings;\n}\n\n// PUT /api/system-administration/settings/security\n// Request: SecuritySettings\n// Response: Success message\ninterface UpdateSecuritySettingsRequest {\n  settings: SecuritySettings;\n}\n\ninterface UpdateSecuritySettingsResponse {\n  success: boolean;\n  message: string;\n  data: SecuritySettings;\n  affectedUsers?: number; // Number of users affected by the change\n}\n```\n\n#### Application Settings\n```typescript\n// GET /api/system-administration/settings/application\n// Response: ApplicationSettings\ninterface GetApplicationSettingsResponse {\n  success: boolean;\n  data: ApplicationSettings;\n}\n\n// PUT /api/system-administration/settings/application\n// Request: ApplicationSettings\n// Response: Success message\ninterface UpdateApplicationSettingsRequest {\n  settings: ApplicationSettings;\n}\n\ninterface UpdateApplicationSettingsResponse {\n  success: boolean;\n  message: string;\n  data: ApplicationSettings;\n}\n\n// POST /api/system-administration/settings/application/test-email\n// Request: Test email data\ninterface TestEmailRequest {\n  recipientEmail: string;\n}\n\ninterface TestEmailResponse {\n  success: boolean;\n  message: string;\n  deliveryTime?: number; // in milliseconds\n}\n\n// POST /api/system-administration/settings/application/test-integration\n// Request: Integration type and credentials\ninterface TestIntegrationRequest {\n  type: \"pos\" | \"erp\" | \"accounting\";\n  credentials: Record<string, string>;\n}\n\ninterface TestIntegrationResponse {\n  success: boolean;\n  message: string;\n  responseTime?: number; // in milliseconds\n  data?: any; // Sample data from integration\n}\n```\n\n### API Service Implementation\n\n```typescript\n// lib/api/settings.ts\nimport { CompanySettings, SecuritySettings, ApplicationSettings } from \"@/lib/types/settings\";\n\nexport class SettingsAPI {\n  private static baseUrl = \"/api/system-administration/settings\";\n\n  // Company Settings\n  static async getCompanySettings(): Promise<CompanySettings> {\n    const response = await fetch(`${this.baseUrl}/company`);\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n    return data.data;\n  }\n\n  static async updateCompanySettings(settings: CompanySettings): Promise<void> {\n    const response = await fetch(`${this.baseUrl}/company`, {\n      method: \"PUT\",\n      headers: { \"Content-Type\": \"application/json\" },\n      body: JSON.stringify({ settings })\n    });\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n  }\n\n  // Security Settings\n  static async getSecuritySettings(): Promise<SecuritySettings> {\n    const response = await fetch(`${this.baseUrl}/security`);\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n    return data.data;\n  }\n\n  static async updateSecuritySettings(settings: SecuritySettings): Promise<{ affectedUsers: number }> {\n    const response = await fetch(`${this.baseUrl}/security`, {\n      method: \"PUT\",\n      headers: { \"Content-Type\": \"application/json\" },\n      body: JSON.stringify({ settings })\n    });\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n    return { affectedUsers: data.affectedUsers };\n  }\n\n  // Application Settings\n  static async getApplicationSettings(): Promise<ApplicationSettings> {\n    const response = await fetch(`${this.baseUrl}/application`);\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n    return data.data;\n  }\n\n  static async updateApplicationSettings(settings: ApplicationSettings): Promise<void> {\n    const response = await fetch(`${this.baseUrl}/application`, {\n      method: \"PUT\",\n      headers: { \"Content-Type\": \"application/json\" },\n      body: JSON.stringify({ settings })\n    });\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n  }\n\n  static async testEmail(recipientEmail: string): Promise<{ deliveryTime: number }> {\n    const response = await fetch(`${this.baseUrl}/application/test-email`, {\n      method: \"POST\",\n      headers: { \"Content-Type\": \"application/json\" },\n      body: JSON.stringify({ recipientEmail })\n    });\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n    return { deliveryTime: data.deliveryTime };\n  }\n\n  static async testIntegration(type: string, credentials: Record<string, string>): Promise<any> {\n    const response = await fetch(`${this.baseUrl}/application/test-integration`, {\n      method: \"POST\",\n      headers: { \"Content-Type\": \"application/json\" },\n      body: JSON.stringify({ type, credentials })\n    });\n    const data = await response.json();\n    if (!response.ok) throw new Error(data.message);\n    return data;\n  }\n}\n```\n\n---\n\n## Form Handling\n\n### Validation Patterns\n\n**Email Validation**:\n```typescript\nconst validateEmail = (email: string): boolean => {\n  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n  return emailRegex.test(email);\n};\n```\n\n**URL Validation**:\n```typescript\nconst validateUrl = (url: string): boolean => {\n  try {\n    const urlObj = new URL(url);\n    return urlObj.protocol === \"https:\";\n  } catch {\n    return false;\n  }\n};\n```\n\n**Hex Color Validation**:\n```typescript\nconst validateHexColor = (color: string): boolean => {\n  const hexRegex = /^#[0-9A-Fa-f]{6}$/;\n  return hexRegex.test(color);\n};\n```\n\n**IP Address Validation**:\n```typescript\nconst validateIP = (ip: string): boolean => {\n  // IPv4 validation\n  const ipv4Regex = /^(\\d{1,3}\\.){3}\\d{1,3}$/;\n  // CIDR notation validation\n  const cidrRegex = /^(\\d{1,3}\\.){3}\\d{1,3}\\/\\d{1,2}$/;\n\n  return ipv4Regex.test(ip) || cidrRegex.test(ip);\n};\n```\n\n### Input Debouncing\n\n```typescript\nimport { useCallback } from \"react\";\nimport { debounce } from \"lodash\";\n\nconst CompanySettings = () => {\n  // Debounce input changes for performance\n  const debouncedUpdate = useCallback(\n    debounce((field: string, value: string) => {\n      handleGeneralChange(field, value);\n    }, 300),\n    []\n  );\n\n  return (\n    <Input\n      value={settings.general.companyName}\n      onChange={(e) => debouncedUpdate(\"companyName\", e.target.value)}\n    />\n  );\n};\n```\n\n---\n\n## Validation Rules\n\n### Server-Side Validation\n\n**Company Settings Validation**:\n```typescript\nimport { z } from \"zod\";\n\nexport const companySettingsSchema = z.object({\n  general: z.object({\n    companyName: z.string().min(3).max(200),\n    legalName: z.string().min(3).max(200),\n    taxId: z.string().regex(/^[0-9]{2}-[0-9]{7}$/),\n    registrationNumber: z.string().min(5).max(50),\n    incorporationDate: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),\n    website: z.string().url().startsWith(\"https://\")\n  }),\n  contact: z.object({\n    primaryPhone: z.string().regex(/^\\+?[1-9]\\d{1,14}$/),\n    secondaryPhone: z.string().optional(),\n    primaryEmail: z.string().email(),\n    supportEmail: z.string().email()\n  }),\n  address: z.object({\n    street: z.string().min(5).max(200),\n    city: z.string().min(2).max(100),\n    state: z.string().min(2).max(100),\n    postalCode: z.string().min(3).max(20),\n    country: z.string().length(2) // ISO country code\n  }),\n  branding: z.object({\n    logoUrl: z.string().url().startsWith(\"https://\"),\n    darkModeLogoUrl: z.string().url().startsWith(\"https://\"),\n    faviconUrl: z.string().url().startsWith(\"https://\"),\n    primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),\n    secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),\n    accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/)\n  }),\n  operational: z.object({\n    defaultCurrency: z.string().length(3), // ISO currency code\n    timezone: z.string(), // IANA timezone\n    language: z.string().length(2), // ISO language code\n    fiscalYearStart: z.string().regex(/^\\d{2}-\\d{2}$/),\n    fiscalYearEnd: z.string().regex(/^\\d{2}-\\d{2}$/)\n  })\n});\n```\n\n**Security Settings Validation**:\n```typescript\nexport const securitySettingsSchema = z.object({\n  passwordPolicy: z.object({\n    minLength: z.number().min(6).max(32),\n    requireUppercase: z.boolean(),\n    requireLowercase: z.boolean(),\n    requireNumbers: z.boolean(),\n    requireSpecialChars: z.boolean(),\n    expiryDays: z.number().min(0).max(365),\n    historyCount: z.number().min(0).max(24)\n  }),\n  twoFactor: z.object({\n    enabled: z.boolean(),\n    required: z.boolean(),\n    methods: z.array(z.enum([\"authenticator\", \"sms\", \"email\"])).min(1),\n    gracePeriodDays: z.number().min(0).max(90)\n  }),\n  sessionSettings: z.object({\n    timeout: z.number().min(5).max(1440),\n    maxConcurrentSessions: z.number().min(1).max(10),\n    rememberMe: z.boolean(),\n    absoluteTimeout: z.boolean()\n  }),\n  loginAttempts: z.object({\n    maxAttempts: z.number().min(3).max(20),\n    lockoutDuration: z.number().min(1).max(1440),\n    notifyAdmin: z.boolean()\n  }),\n  ipAccessControl: z.object({\n    enabled: z.boolean(),\n    whitelist: z.array(z.string())\n  }),\n  securityQuestions: z.object({\n    enabled: z.boolean(),\n    minRequired: z.number().min(1).max(10)\n  }),\n  auditLogging: z.object({\n    enabled: z.boolean(),\n    retentionDays: z.number().min(30).max(3650),\n    events: z.array(z.enum([\"login\", \"logout\", \"dataAccess\", \"dataModification\", \"settingsChange\"]))\n  }),\n  dataEncryption: z.object({\n    atRest: z.boolean(),\n    inTransit: z.boolean(),\n    algorithm: z.enum([\"AES-256\", \"AES-128\", \"RSA-2048\"])\n  })\n});\n```\n\n**Application Settings Validation**:\n```typescript\nexport const applicationSettingsSchema = z.object({\n  email: z.object({\n    provider: z.enum([\"smtp\", \"sendgrid\", \"aws-ses\", \"custom\"]),\n    smtpHost: z.string().min(3).max(255),\n    smtpPort: z.number().min(1).max(65535),\n    smtpUser: z.string().min(1).max(255),\n    smtpPassword: z.string().min(1).max(255),\n    encryption: z.enum([\"tls\", \"ssl\", \"none\"]),\n    fromEmail: z.string().email(),\n    fromName: z.string().min(1).max(100)\n  }),\n  backup: z.object({\n    enabled: z.boolean(),\n    frequency: z.enum([\"hourly\", \"daily\", \"weekly\", \"monthly\"]),\n    retentionDays: z.number().min(7).max(3650),\n    storageLocation: z.enum([\"local\", \"cloud\", \"both\"]),\n    cloudProvider: z.string().optional()\n  }),\n  integrations: z.object({\n    pos: z.object({\n      enabled: z.boolean(),\n      provider: z.string(),\n      apiEndpoint: z.string().url(),\n      apiKey: z.string()\n    }),\n    erp: z.object({\n      enabled: z.boolean(),\n      system: z.string(),\n      endpoint: z.string().url()\n    }),\n    accounting: z.object({\n      enabled: z.boolean(),\n      system: z.string(),\n      mode: z.enum([\"realtime\", \"batch\"])\n    })\n  }),\n  features: z.object({\n    advancedSearch: z.boolean(),\n    realtimeNotifications: z.boolean(),\n    mobileAccess: z.boolean(),\n    offlineMode: z.boolean()\n  }),\n  performance: z.object({\n    caching: z.object({\n      enabled: z.boolean(),\n      type: z.enum([\"memory\", \"redis\", \"memcached\"]),\n      duration: z.number().min(60).max(86400)\n    }),\n    apiRateLimit: z.number().min(10).max(10000)\n  })\n});\n```\n\n---\n\n## Testing Strategy\n\n### Unit Tests\n\n**Component Testing**:\n```typescript\nimport { describe, it, expect } from \"vitest\";\nimport { render, screen, fireEvent } from \"@testing-library/react\";\nimport CompanySettingsPage from \"../page\";\n\ndescribe(\"Company Settings\", () => {\n  it(\"renders all tabs\", () => {\n    render(<CompanySettingsPage />);\n    expect(screen.getByText(\"General Information\")).toBeInTheDocument();\n    expect(screen.getByText(\"Branding\")).toBeInTheDocument();\n    expect(screen.getByText(\"Operational Settings\")).toBeInTheDocument();\n  });\n\n  it(\"updates company name\", () => {\n    render(<CompanySettingsPage />);\n    const input = screen.getByLabelText(\"Company Name\");\n    fireEvent.change(input, { target: { value: \"New Company\" } });\n    expect(input).toHaveValue(\"New Company\");\n  });\n\n  it(\"enables save button on changes\", () => {\n    render(<CompanySettingsPage />);\n    const saveButton = screen.getByText(\"Save Changes\");\n    expect(saveButton).toBeDisabled();\n\n    const input = screen.getByLabelText(\"Company Name\");\n    fireEvent.change(input, { target: { value: \"New Company\" } });\n    expect(saveButton).not.toBeDisabled();\n  });\n});\n```\n\n**Password Strength Testing**:\n```typescript\ndescribe(\"Password Strength Calculator\", () => {\n  it(\"calculates weak password strength\", () => {\n    const settings = {\n      minLength: 6,\n      requireUppercase: false,\n      requireLowercase: false,\n      requireNumbers: false,\n      requireSpecialChars: false\n    };\n    const strength = getPasswordStrength(settings);\n    expect(strength.label).toBe(\"Weak\");\n  });\n\n  it(\"calculates strong password strength\", () => {\n    const settings = {\n      minLength: 12,\n      requireUppercase: true,\n      requireLowercase: true,\n      requireNumbers: true,\n      requireSpecialChars: true\n    };\n    const strength = getPasswordStrength(settings);\n    expect(strength.label).toBe(\"Strong\");\n  });\n});\n```\n\n### Integration Tests\n\n**API Integration Testing**:\n```typescript\ndescribe(\"Settings API\", () => {\n  it(\"saves company settings\", async () => {\n    const settings: CompanySettings = {\n      general: {\n        companyName: \"Test Company\",\n        // ... other fields\n      },\n      // ... other sections\n    };\n\n    await SettingsAPI.updateCompanySettings(settings);\n    const retrieved = await SettingsAPI.getCompanySettings();\n    expect(retrieved.general.companyName).toBe(\"Test Company\");\n  });\n\n  it(\"tests email configuration\", async () => {\n    const result = await SettingsAPI.testEmail(\"test@example.com\");\n    expect(result.deliveryTime).toBeLessThan(5000);\n  });\n});\n```\n\n### End-to-End Tests\n\n**Settings Workflow Testing**:\n```typescript\nimport { test, expect } from \"@playwright/test\";\n\ntest.describe(\"General Settings E2E\", () => {\n  test(\"complete company settings workflow\", async ({ page }) => {\n    await page.goto(\"/system-administration/settings/company\");\n\n    // Update company name\n    await page.fill(\"#company-name\", \"New Company Name\");\n\n    // Switch to branding tab\n    await page.click('button[value=\"branding\"]');\n\n    // Update primary color\n    await page.fill(\"#primary-color\", \"#FF0000\");\n\n    // Save changes\n    await page.click(\"button:has-text('Save Changes')\");\n\n    // Verify toast notification\n    await expect(page.getByText(\"Settings Saved\")).toBeVisible();\n  });\n\n  test(\"security settings with 2FA\", async ({ page }) => {\n    await page.goto(\"/system-administration/settings/security\");\n\n    // Enable 2FA\n    await page.click(\"#2fa-enabled\");\n\n    // Set required\n    await page.click(\"#2fa-required\");\n\n    // Select methods\n    await page.check(\"#method-authenticator\");\n    await page.check(\"#method-sms\");\n\n    // Save\n    await page.click(\"button:has-text('Save Changes')\");\n\n    // Verify warning\n    await expect(page.getByText(\"Security Warning\")).toBeVisible();\n  });\n});\n```\n\n---\n\n## Performance Optimization\n\n### Code Splitting\n\n```typescript\n// Lazy load tab content\nimport dynamic from \"next/dynamic\";\n\nconst GeneralInformationTab = dynamic(\n  () => import(\"./components/general-information-tab\"),\n  { loading: () => <p>Loading...</p> }\n);\n\nconst BrandingTab = dynamic(\n  () => import(\"./components/branding-tab\"),\n  { loading: () => <p>Loading...</p> }\n);\n```\n\n### Memoization\n\n```typescript\nimport { useMemo } from \"react\";\n\nconst CompanySettings = () => {\n  // Memoize password strength calculation\n  const passwordStrength = useMemo(() => {\n    return getPasswordStrength(settings.passwordPolicy);\n  }, [settings.passwordPolicy]);\n\n  // Memoize filtered options\n  const filteredProviders = useMemo(() => {\n    return emailProviders.filter(p => p.enabled);\n  }, [emailProviders]);\n};\n```\n\n### Debouncing\n\n```typescript\nimport { useCallback } from \"react\";\nimport { debounce } from \"lodash\";\n\nconst debouncedSave = useCallback(\n  debounce(async (settings: CompanySettings) => {\n    await SettingsAPI.updateCompanySettings(settings);\n  }, 1000),\n  []\n);\n```\n\n---\n\n## Security Considerations\n\n### Credential Management\n\n```typescript\n// Mask sensitive fields in UI\nconst maskCredential = (credential: string): string => {\n  if (credential.length <= 4) return \"****\";\n  return credential.substring(0, 2) + \"****\" + credential.substring(credential.length - 2);\n};\n\n// Example usage\n<Input\n  type=\"password\"\n  value={maskCredential(settings.email.smtpPassword)}\n  placeholder=\"Enter SMTP password\"\n/>\n```\n\n### Permission Checks\n\n```typescript\nimport { useUserContext } from \"@/lib/context/user-context\";\n\nconst SecuritySettingsPage = () => {\n  const { hasPermission } = useUserContext();\n\n  if (!hasPermission(\"system_administration.settings.security.manage\")) {\n    return <AccessDenied />;\n  }\n\n  // Rest of component\n};\n```\n\n### Audit Logging\n\n```typescript\n// Log all settings changes\nconst logSettingsChange = async (\n  userId: string,\n  settingsType: string,\n  changes: Record<string, any>\n) => {\n  await fetch(\"/api/audit/log\", {\n    method: \"POST\",\n    headers: { \"Content-Type\": \"application/json\" },\n    body: JSON.stringify({\n      userId,\n      action: \"settings_change\",\n      settingsType,\n      changes,\n      timestamp: new Date().toISOString(),\n      ipAddress: req.headers[\"x-forwarded-for\"] || req.connection.remoteAddress\n    })\n  });\n};\n```\n\n---\n\n## Best Practices\n\n### 1. State Management\n- Use controlled components for all form inputs\n- Track changes with `hasChanges` flag\n- Implement optimistic UI updates\n- Reset state on cancel or discard\n\n### 2. Error Handling\n- Display user-friendly error messages\n- Implement retry logic for failed saves\n- Validate inputs on both client and server\n- Show loading states during async operations\n\n### 3. Accessibility\n- Provide proper labels for all inputs\n- Use semantic HTML\n- Implement keyboard navigation\n- Add ARIA attributes where needed\n\n### 4. Performance\n- Debounce input changes\n- Lazy load tab content\n- Memoize expensive calculations\n- Use code splitting for large components\n\n### 5. Security\n- Validate all inputs on server\n- Sanitize user inputs\n- Mask sensitive credentials\n- Implement permission checks\n- Log all settings changes\n\n---\n\n## Related Documentation\n\n- [General Settings Overview](/docs/documents/sa/features/general-settings/README.md)\n- [General Settings Business Rules](/docs/documents/sa/features/general-settings/guides/business-rules.md)\n- [Notification Settings](/docs/documents/sa/features/notification-settings/)\n- [Type Definitions](/lib/types/settings.ts)\n- [Mock Data](/lib/mock-data/settings.ts)\n\n---\n\n*Last updated: October 21, 2025*\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+
+# Testing
+.playwright-mcp
+tests
+__tests__
+
+# Development
+.next/cache
+*.log
+npm-debug.log*
+
+# Docs (not needed for app)
+docs/documents
+docs/04-modules
+
+# Scripts
+optimize-images.mjs
+optimize-pngs.sh
+
+# Git
+.git
+
+# Temporary files
+*.tmp
+*.temp

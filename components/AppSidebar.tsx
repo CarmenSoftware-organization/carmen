@@ -141,7 +141,7 @@ const menuData: MenuItem[] = [
           }
         ]
       },
-      { title: "General Settings", url: "/system-administration/general-settings" },
+      { title: "General Settings", url: "/system-administration/settings" },
     ],
   },
 ]

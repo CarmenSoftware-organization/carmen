@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Components and UI Elements - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Vendor Management</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">VM</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Shared Components and UI Elements\n\n## Table of Contents\n\n1. [Overview](#overview)\n2. [Modals and Dialogs](#modals-and-dialogs)\n3. [Dropdown Fields Reference](#dropdown-fields-reference)\n4. [Actions and Buttons Reference](#actions-and-buttons-reference)\n5. [Form Components](#form-components)\n6. [Data Display Components](#data-display-components)\n\n---\n\n## Overview\n\nThis document describes all shared UI components, modals, dropdowns, actions, and display elements used across the Vendor Management module. These components are reusable across all submodules.\n\n---\n\n## Modals and Dialogs\n\n### 1. Advanced Filter Dialog\n\n**Trigger**: Click \"Advanced Filter\" button\n**Component**: `advanced-filter.tsx`\n\n**Filter Fields**:\n- Company Name (text contains)\n- Business Type (multi-select)\n- Status (dropdown)\n- Registration Date (date range)\n- Credit Limit (range)\n- Has Active Pricelists (yes/no)\n- Payment Terms (multi-select)\n\n**Actions**:\n- Apply Filters\n- Clear All\n- Save Filter Preset\n- Cancel\n\n#### Action Flows\n\n**Apply Filters**:\n```mermaid\nflowchart LR\n    Click[\"Click Apply Filters\"] --> Build[\"Build Filter Query\"]\n    Build --> Filter[\"Apply Filters to List\"]\n```\n\n**Clear All Filters**:\n```mermaid\nflowchart LR\n    Click[\"Click Clear All\"] --> Reset[\"Reset All Filter Fields\"]\n    Reset --> Refresh[\"Refresh List View\"]\n```\n\n**Save Filter Preset**:\n```mermaid\nflowchart LR\n    Click[\"Click Save Preset\"] --> Modal[\"Show Save Preset Dialog\"]\n    Modal --> Save[\"Save Filter Configuration\"]\n```\n\n---\n\n### 2. Vendor Deletion Dialog\n\n**Trigger**: Click delete on vendor\n**Component**: `VendorDeletionDialog.tsx`\n\n**Displays**:\n- Warning message\n- Dependency check results\n- Impact summary (POs, PRs affected)\n- Force delete option (if has dependencies)\n\n**Actions**:\n- Confirm Delete\n- Cancel\n- View Dependencies\n\n#### Action Flows\n\n**Confirm Delete**:\n```mermaid\nflowchart LR\n    Click[\"Click Confirm Delete\"] --> Check[\"Check for Dependencies\"]\n    Check --> Delete[\"Delete Vendor Record\"]\n```\n\n**View Dependencies**:\n```mermaid\nflowchart LR\n    Click[\"Click View Dependencies\"] --> Display[\"Display Dependency List\"]\n    Display --> Navigate[\"Navigate to Related Records\"]\n```\n\n---\n\n### 3. Add/Edit Contact Dialog\n\n**Trigger**: Add/Edit contact buttons\n\n**Fields**:\n- Contact Name\n- Role/Title\n- Email\n- Phone\n- Mobile\n- Is Primary Contact (toggle)\n\n**Actions**:\n- Save\n- Cancel\n\n#### Action Flows\n\n**Save Contact**:\n```mermaid\nflowchart LR\n    Click[\"Click Save\"] --> Validate[\"Validate Contact Fields\"]\n    Validate --> Save[\"Save Contact to Vendor\"]\n```\n\n**Set Primary Contact**:\n```mermaid\nflowchart LR\n    Toggle[\"Toggle Primary Contact\"] --> Update[\"Update Primary Contact Flag\"]\n    Update --> Unset[\"Unset Other Primary Contacts\"]\n```\n\n---\n\n### 4. Add/Edit Address Dialog\n\n**Trigger**: Add/Edit address buttons\n\n**Fields**:\n- Address Type\n- Street Address\n- City\n- State/Province\n- Postal Code\n- Country\n- Is Primary Address (toggle)\n\n**Actions**:\n- Save\n- Cancel\n\n#### Action Flows\n\n**Save Address**:\n```mermaid\nflowchart LR\n    Click[\"Click Save\"] --> Validate[\"Validate Address Fields\"]\n    Validate --> Save[\"Save Address to Vendor\"]\n```\n\n**Set Primary Address**:\n```mermaid\nflowchart LR\n    Toggle[\"Toggle Primary Address\"] --> Update[\"Update Primary Address Flag\"]\n    Update --> Unset[\"Unset Other Primary Addresses\"]\n```\n\n---\n\n### 5. Add/Edit Certification Dialog\n\n**Trigger**: Add/Edit certification buttons\n\n**Fields**:\n- Certification Name\n- Certification Number\n- Issuing Authority\n- Issue Date\n- Expiry Date\n- Document Upload\n- Notes\n\n**Actions**:\n- Save\n- Upload Document\n- Cancel\n\n#### Action Flows\n\n**Save Certification**:\n```mermaid\nflowchart LR\n    Click[\"Click Save\"] --> Validate[\"Validate Certification Fields\"]\n    Validate --> Save[\"Save Certification to Vendor\"]\n```\n\n**Upload Document**:\n```mermaid\nflowchart LR\n    Click[\"Click Upload\"] --> Open[\"Open File Upload Dialog\"]\n    Open --> Upload[\"Upload Certification Document\"]\n```\n\n---\n\n### 6. Product Selection Dialog\n\n**Trigger**: Add products in templates\n\n**Features**:\n- Search bar\n- Category tree navigation\n- Product list with checkboxes\n- Selected products preview\n- Bulk select/deselect\n\n**Actions**:\n- Add Selected\n- Clear Selection\n- Cancel\n\n#### Action Flows\n\n**Search Products**:\n```mermaid\nflowchart LR\n    Type[\"Type Search Query\"] --> Search[\"Search Product Catalog\"]\n    Search --> Display[\"Display Matching Products\"]\n```\n\n**Select Products**:\n```mermaid\nflowchart LR\n    Check[\"Check Product Checkbox\"] --> Add[\"Add to Selected Products\"]\n    Add --> Update[\"Update Selection Preview\"]\n```\n\n**Add Selected Products**:\n```mermaid\nflowchart LR\n    Click[\"Click Add Selected\"] --> Validate[\"Validate Selection\"]\n    Validate --> Add[\"Add Products to Template\"]\n```\n\n**Browse Categories**:\n```mermaid\nflowchart LR\n    Click[\"Click Category Node\"] --> Expand[\"Expand Category Tree\"]\n    Expand --> Display[\"Display Category Products\"]\n```\n\n---\n\n### 7. Email Preview Dialog\n\n**Trigger**: Preview campaign invitation\n\n**Displays**:\n- Email subject\n- Email body\n- Vendor portal link\n- Campaign details\n\n**Actions**:\n- Send Now\n- Edit Template\n- Cancel\n\n#### Action Flows\n\n**Send Now**:\n```mermaid\nflowchart LR\n    Click[\"Click Send Now\"] --> Confirm[\"Show Send Confirmation\"]\n    Confirm --> Send[\"Send Email to Vendors\"]\n```\n\n**Edit Template**:\n```mermaid\nflowchart LR\n    Click[\"Click Edit Template\"] --> Close[\"Close Preview\"]\n    Close --> Open[\"Open Email Template Editor\"]\n```\n\n---\n\n## Dropdown Fields Reference\n\n### Status Dropdown\n**Values**: Active, Inactive\n**Used in**: Vendor filters, vendor form\n\n### Business Type Dropdown\n**Values**:\n- Manufacturer\n- Distributor\n- Wholesaler\n- Retailer\n- Service Provider\n- Contractor\n- Supplier\n\n**Used in**: Vendor form, advanced filters\n\n### Payment Terms Dropdown\n**Values**:\n- Net 30 Days\n- Net 60 Days\n- Net 90 Days\n- Due on Receipt\n- Custom Terms\n\n**Used in**: Vendor form, pricelist settings\n\n### Address Type Dropdown\n**Values**:\n- Billing Address\n- Shipping Address\n- Office Address\n- Warehouse Address\n\n**Used in**: Address forms\n\n### Currency Dropdown\n**Values**: USD, EUR, GBP, JPY, CAD, AUD, etc.\n**Used in**: Vendor form, pricelist forms\n\n### Template Type Dropdown\n**Values**:\n- Standard Pricelist\n- RFQ Template\n- Contract Template\n- Catalog Template\n\n**Used in**: Template forms\n\n### Campaign Status Dropdown\n**Values**: Draft, Active, Completed, Cancelled\n**Used in**: Campaign filters\n\n### Pricelist Status Dropdown\n**Values**: Draft, Pending Review, Active, Expired, Rejected\n**Used in**: Pricelist filters\n\n---\n\n## Actions and Buttons Reference\n\n### Global Actions (appearing across multiple pages)\n- **Search** - Real-time search\n- **Filter** - Open filter dialog\n- **Export** - Export to Excel\n- **Add New** - Create new record\n- **Refresh** - Reload data\n- **Settings** - Module settings\n\n### List View Actions\n- **View Details** - Navigate to detail page\n- **Edit** - Edit mode or edit page\n- **Duplicate** - Clone record\n- **Delete** - Delete with confirmation\n- **Export Single** - Export single record\n\n### Detail View Actions\n- **Back** - Return to list\n- **Edit** - Enter edit mode\n- **Save** - Save changes\n- **Cancel** - Discard changes\n- **Delete** - Delete record\n- **Print** - Print view\n- **Download PDF** - Export to PDF\n\n### Form Actions\n- **Save** - Save record\n- **Save and Add Another** - Save and reset form\n- **Save Draft** - Save as draft\n- **Submit** - Submit for review/approval\n- **Cancel** - Discard and return\n- **Reset** - Clear form\n\n### Bulk Actions (multi-select)\n- **Delete Selected** - Bulk delete\n- **Export Selected** - Bulk export\n- **Update Status** - Bulk status change\n- **Apply Action** - Custom bulk operations\n\n---\n\n## Form Components\n\n### Text Input Fields\n- Standard text input\n- Email input (validated)\n- Phone input (formatted)\n- URL input (validated)\n- Number input (numeric keyboard)\n- Currency input (formatted with symbol)\n\n### Select/Dropdown Fields\n- Single select dropdown\n- Multi-select dropdown\n- Searchable dropdown\n- Country selector\n- Currency selector\n\n### Date/Time Fields\n- Date picker\n- Date range picker\n- Time picker\n- DateTime picker\n\n### Rich Input Fields\n- Textarea (multiline)\n- Rich text editor\n- File upload (with preview)\n- Image upload (with cropping)\n- Document upload (with validation)\n\n### Toggle/Checkbox Fields\n- Checkbox\n- Toggle switch\n- Radio button group\n- Checkbox group\n\n### Specialized Components\n- Product selector\n- Vendor selector\n- Category tree selector\n- MOQ tier builder\n- Custom field builder\n\n---\n\n## Data Display Components\n\n### Tables\n- Sortable columns\n- Pagination\n- Row selection\n- Inline actions\n- Expandable rows\n- Column visibility toggle\n\n### Cards\n- Vendor card\n- Template card\n- Campaign card\n- Pricelist card\n\n### Lists\n- Contact list\n- Address list\n- Certification list\n- Product list\n\n### Statistics/Metrics\n- KPI cards\n- Summary widgets\n- Progress indicators\n- Status badges\n\n### Timeline/History\n- Activity feed\n- Audit trail\n- Change log\n\n---\n\n**Last Updated**: 2025-10-02\n**Status**: Complete\n**Module**: Vendor Management\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

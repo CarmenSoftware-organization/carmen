@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management Module - Sitemap - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Product Management / Product Management Sitemap.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Product Management Module - Sitemap\n\n```mermaid\ngraph TD\n    PM[Product Management] --> PMD[Product Dashboard]\n    PM --> PROD[Products]\n    PM --> CAT[Categories]\n    PM --> UNITS[Units]\n    PM --> SUP[Suppliers]\n    PM --> PRICING[Pricing Management]\n    PM --> SPECS[Product Specifications]\n\n    %% Product Dashboard Components\n    PMD --> PMD_WIDGETS[Dashboard Widgets]\n    PMD_WIDGETS --> PMD_W1[Product Overview Chart]\n    PMD_WIDGETS --> PMD_W2[Category Distribution]\n    PMD_WIDGETS --> PMD_W3[Inventory Levels]\n    PMD_WIDGETS --> PMD_W4[Price Analysis]\n    PMD_WIDGETS --> PMD_W5[Recent Products]\n    PMD_WIDGETS --> PMD_W6[Product Alerts]\n\n    %% Products Module\n    PROD --> PROD_LIST[Product List]\n    PROD --> PROD_DETAIL[Product Detail]\n    PROD --> PROD_NEW[New Product]\n\n    %% Product List Components\n    PROD_LIST --> PROD_L_SEARCH[Search Products]\n    PROD_LIST --> PROD_L_FILTER[Advanced Filter System]\n    PROD_L_FILTER --> PROD_L_F_BASIC[Basic Filters]\n    PROD_L_F_BASIC --> PROD_L_F_STATUS[Status Filter]\n    PROD_L_F_BASIC --> PROD_L_F_CATEGORY[Category Filter]\n    PROD_L_F_BASIC --> PROD_L_F_SUPPLIER[Supplier Filter]\n    PROD_L_F_BASIC --> PROD_L_F_PRICE[Price Range Filter]\n    PROD_L_FILTER --> PROD_L_F_ADVANCED[Advanced Filter Builder]\n    PROD_L_F_ADVANCED --> PROD_L_F_A_CONDITIONS[Filter Conditions]\n    PROD_L_F_ADVANCED --> PROD_L_F_A_LOGIC[Logical Operators]\n    PROD_L_F_ADVANCED --> PROD_L_F_A_SAVED[Saved Filters]\n    PROD_L_F_ADVANCED --> PROD_L_F_A_JSON[JSON View]\n    PROD_LIST --> PROD_L_VIEW[View Toggle]\n    PROD_L_VIEW --> PROD_L_V_TABLE[Table View]\n    PROD_L_V_TABLE --> PROD_L_V_T_COLUMNS[Column Configuration]\n    PROD_L_V_TABLE --> PROD_L_V_T_SORT[Sorting Options]\n    PROD_L_V_TABLE --> PROD_L_V_T_ACTIONS[Row Actions]\n    PROD_L_VIEW --> PROD_L_V_CARD[Card View]\n    PROD_L_V_CARD --> PROD_L_V_C_GRID[Grid Layout]\n    PROD_L_V_CARD --> PROD_L_V_C_ACTIONS[Card Actions]\n    PROD_LIST --> PROD_L_BULK[Bulk Operations]\n    PROD_L_BULK --> PROD_L_B_SELECT[Select All/None]\n    PROD_L_BULK --> PROD_L_B_ACTIONS[Bulk Action Menu]\n    PROD_L_B_ACTIONS --> PROD_L_B_A_ACTIVATE[Bulk Activate]\n    PROD_L_B_ACTIONS --> PROD_L_B_A_DEACTIVATE[Bulk Deactivate]\n    PROD_L_B_ACTIONS --> PROD_L_B_A_CATEGORY[Bulk Category Update]\n    PROD_L_B_ACTIONS --> PROD_L_B_A_SUPPLIER[Bulk Supplier Update]\n    PROD_L_B_ACTIONS --> PROD_L_B_A_EXPORT[Bulk Export]\n\n    %% Product Detail Components\n    PROD_DETAIL --> PROD_D_HEADER[Product Header Info]\n    PROD_DETAIL --> PROD_D_TABS[Product Detail Tabs]\n    PROD_D_TABS --> PROD_D_T_BASIC[Basic Information]\n    PROD_D_T_BASIC --> PROD_D_T_B_GENERAL[General Details]\n    PROD_D_T_BASIC --> PROD_D_T_B_CATEGORY[Category Assignment]\n    PROD_D_T_BASIC --> PROD_D_T_B_SUPPLIER[Supplier Information]\n    PROD_D_T_BASIC --> PROD_D_T_B_STATUS[Status Management]\n    PROD_D_TABS --> PROD_D_T_PRICING[Pricing Information]\n    PROD_D_T_PRICING --> PROD_D_T_P_BASE[Base Price]\n    PROD_D_T_PRICING --> PROD_D_T_P_COST[Cost Information]\n    PROD_D_T_PRICING --> PROD_D_T_P_MARGIN[Margin Calculation]\n    PROD_D_T_PRICING --> PROD_D_T_P_HISTORY[Price History]\n    PROD_D_TABS --> PROD_D_T_INVENTORY[Inventory Details]\n    PROD_D_T_INVENTORY --> PROD_D_T_I_UNITS[Unit Configuration]\n    PROD_D_T_INVENTORY --> PROD_D_T_I_STOCK[Stock Information]\n    PROD_D_T_INVENTORY --> PROD_D_T_I_REORDER[Reorder Parameters]\n    PROD_D_TABS --> PROD_D_T_SPECS[Specifications]\n    PROD_D_T_SPECS --> PROD_D_T_S_ATTRIBUTES[Product Attributes]\n    PROD_D_T_SPECS --> PROD_D_T_S_VARIANTS[Product Variants]\n    PROD_D_T_SPECS --> PROD_D_T_S_ALLERGENS[Allergen Information]\n    PROD_D_TABS --> PROD_D_T_IMAGES[Product Images]\n    PROD_D_T_IMAGES --> PROD_D_T_I_GALLERY[Image Gallery]\n    PROD_D_T_IMAGES --> PROD_D_T_I_UPLOAD[Image Upload]\n    PROD_D_T_IMAGES --> PROD_D_T_I_MANAGEMENT[Image Management]\n    PROD_D_TABS --> PROD_D_T_HISTORY[Change History]\n    PROD_D_T_HISTORY --> PROD_D_T_H_CHANGES[Change Log]\n    PROD_D_T_HISTORY --> PROD_D_T_H_AUDIT[Audit Trail]\n\n    %% Categories Module\n    CAT --> CAT_TREE[Category Tree Management]\n    CAT --> CAT_LIST[Category List View]\n    CAT --> CAT_NEW[New Category]\n\n    %% Category Tree Components\n    CAT_TREE --> CAT_T_STRUCTURE[Hierarchical Structure]\n    CAT_T_STRUCTURE --> CAT_T_S_CATEGORY[Main Categories]\n    CAT_T_S_CATEGORY --> CAT_T_S_C_ACTIONS[Category Actions]\n    CAT_T_S_C_ACTIONS --> CAT_T_S_C_A_ADD[Add Subcategory]\n    CAT_T_S_C_ACTIONS --> CAT_T_S_C_A_EDIT[Edit Category]\n    CAT_T_S_C_ACTIONS --> CAT_T_S_C_A_DELETE[Delete Category]\n    CAT_T_S_C_ACTIONS --> CAT_T_S_C_A_MOVE[Move Category]\n    CAT_T_STRUCTURE --> CAT_T_S_SUBCATEGORY[Subcategories]\n    CAT_T_S_SUBCATEGORY --> CAT_T_S_S_ACTIONS[Subcategory Actions]\n    CAT_T_S_S_ACTIONS --> CAT_T_S_S_A_ADD[Add Item Group]\n    CAT_T_S_S_ACTIONS --> CAT_T_S_S_A_EDIT[Edit Subcategory]\n    CAT_T_S_S_ACTIONS --> CAT_T_S_S_A_DELETE[Delete Subcategory]\n    CAT_T_S_S_ACTIONS --> CAT_T_S_S_A_MOVE[Move Subcategory]\n    CAT_T_STRUCTURE --> CAT_T_S_ITEMGROUP[Item Groups]\n    CAT_T_S_ITEMGROUP --> CAT_T_S_I_ACTIONS[Item Group Actions]\n    CAT_T_S_I_ACTIONS --> CAT_T_S_I_A_EDIT[Edit Item Group]\n    CAT_T_S_I_ACTIONS --> CAT_T_S_I_A_DELETE[Delete Item Group]\n    CAT_T_S_I_ACTIONS --> CAT_T_S_I_A_MOVE[Move Item Group]\n    CAT_TREE --> CAT_T_DND[Drag and Drop]\n    CAT_T_DND --> CAT_T_D_REORDER[Reorder Categories]\n    CAT_T_DND --> CAT_T_D_RESTRUCTURE[Restructure Hierarchy]\n    CAT_T_DND --> CAT_T_D_VALIDATION[Move Validation]\n    CAT_TREE --> CAT_T_SEARCH[Tree Search]\n    CAT_T_SEARCH --> CAT_T_S_FILTER[Search Filter]\n    CAT_T_SEARCH --> CAT_T_S_HIGHLIGHT[Search Highlighting]\n    CAT_T_SEARCH --> CAT_T_S_EXPAND[Auto-expand Results]\n    CAT_TREE --> CAT_T_MOBILE[Mobile Optimizations]\n    CAT_T_MOBILE --> CAT_T_M_TOUCH[Touch Gestures]\n    CAT_T_MOBILE --> CAT_T_M_HAPTIC[Haptic Feedback]\n    CAT_T_MOBILE --> CAT_T_M_RESPONSIVE[Responsive Layout]\n\n    %% Units Module\n    UNITS --> UNITS_LIST[Units List]\n    UNITS --> UNITS_DETAIL[Unit Detail]\n    UNITS --> UNITS_NEW[New Unit]\n\n    %% Units List Components\n    UNITS_LIST --> UNITS_L_VIEW[View Toggle]\n    UNITS_L_VIEW --> UNITS_L_V_TABLE[Table View]\n    UNITS_L_VIEW --> UNITS_L_V_CARD[Card View]\n    UNITS_LIST --> UNITS_L_FILTER[Unit Filters]\n    UNITS_L_FILTER --> UNITS_L_F_TYPE[Type Filter]\n    UNITS_L_F_TYPE --> UNITS_L_F_T_INVENTORY[Inventory Units]\n    UNITS_L_F_TYPE --> UNITS_L_F_T_ORDER[Order Units]\n    UNITS_L_F_TYPE --> UNITS_L_F_T_RECIPE[Recipe Units]\n    UNITS_L_FILTER --> UNITS_L_F_STATUS[Status Filter]\n    UNITS_L_F_STATUS --> UNITS_L_F_S_ACTIVE[Active Units]\n    UNITS_L_F_STATUS --> UNITS_L_F_S_INACTIVE[Inactive Units]\n    UNITS_LIST --> UNITS_L_ACTIONS[Unit Actions]\n    UNITS_L_ACTIONS --> UNITS_L_A_EDIT[Edit Unit]\n    UNITS_L_ACTIONS --> UNITS_L_A_DELETE[Delete Unit]\n    UNITS_L_ACTIONS --> UNITS_L_A_ACTIVATE[Activate/Deactivate]\n\n    %% Unit Detail Components\n    UNITS_DETAIL --> UNITS_D_INFO[Unit Information]\n    UNITS_D_INFO --> UNITS_D_I_BASIC[Basic Details]\n    UNITS_D_I_BASIC --> UNITS_D_I_B_NAME[Unit Name]\n    UNITS_D_I_BASIC --> UNITS_D_I_B_SYMBOL[Unit Symbol]\n    UNITS_D_I_BASIC --> UNITS_D_I_B_TYPE[Unit Type]\n    UNITS_D_I_BASIC --> UNITS_D_I_B_STATUS[Unit Status]\n    UNITS_DETAIL --> UNITS_D_CONVERSIONS[Unit Conversions]\n    UNITS_D_CONVERSIONS --> UNITS_D_C_BASE[Base Conversions]\n    UNITS_D_CONVERSIONS --> UNITS_D_C_CUSTOM[Custom Conversions]\n    UNITS_D_CONVERSIONS --> UNITS_D_C_CALCULATOR[Conversion Calculator]\n    UNITS_DETAIL --> UNITS_D_USAGE[Usage Information]\n    UNITS_D_USAGE --> UNITS_D_U_PRODUCTS[Products Using Unit]\n    UNITS_D_USAGE --> UNITS_D_U_RECIPES[Recipes Using Unit]\n    UNITS_D_USAGE --> UNITS_D_U_ORDERS[Orders Using Unit]\n\n    %% Suppliers Module (Referenced)\n    SUP --> SUP_LIST[Supplier List]\n    SUP --> SUP_DETAIL[Supplier Detail]\n    SUP --> SUP_NEW[New Supplier]\n\n    %% Pricing Management Module (Future)\n    PRICING --> PRICING_RULES[Pricing Rules]\n    PRICING --> PRICING_TIERS[Pricing Tiers]\n    PRICING --> PRICING_ANALYSIS[Price Analysis]\n\n    %% Product Specifications Module (Future)\n    SPECS --> SPECS_TEMPLATES[Specification Templates]\n    SPECS --> SPECS_ATTRIBUTES[Attribute Management]\n    SPECS --> SPECS_VARIANTS[Variant Management]\n\n    %% Shared Components\n    PM --> SHARED[Shared Components]\n    SHARED --> STATUS_SYSTEM[Status Badge System]\n    SHARED --> SEARCH_COMPONENTS[Search Components]\n    SHARED --> FILTER_COMPONENTS[Filter Components]\n    SHARED --> VIEW_TOGGLES[View Toggle Components]\n    SHARED --> ACTION_MENUS[Action Menu Components]\n    SHARED --> BULK_OPERATIONS[Bulk Operation Components]\n    SHARED --> FORM_BUILDERS[Dynamic Form Builders]\n    SHARED --> DATA_TABLES[Data Table Components]\n    SHARED --> TREE_COMPONENTS[Tree Structure Components]\n\n    %% Status Badge Types\n    STATUS_SYSTEM --> SB_ACTIVE[Active Status]\n    STATUS_SYSTEM --> SB_INACTIVE[Inactive Status]\n    STATUS_SYSTEM --> SB_DRAFT[Draft Status]\n    STATUS_SYSTEM --> SB_ARCHIVED[Archived Status]\n    STATUS_SYSTEM --> SB_CATEGORY[Category Types]\n    STATUS_SYSTEM --> SB_UNIT[Unit Types]\n\n    %% Navigation Relationships\n    PROD_LIST -.->|View Details| PROD_DETAIL\n    PROD_LIST -.->|Create New| PROD_NEW\n    CAT_TREE -.->|Assign to Product| PROD_DETAIL\n    UNITS_LIST -.->|Configure Units| PROD_DETAIL\n    SUP_LIST -.->|Link to Product| PROD_DETAIL\n    PMD -.->|Quick Access| PROD_LIST\n    PMD -.->|Quick Access| CAT_TREE\n    PMD -.->|Quick Access| UNITS_LIST\n\n    %% Data Flow Relationships\n    PROD_DETAIL -.->|Update Category| CAT_TREE\n    PROD_DETAIL -.->|Update Units| UNITS_LIST\n    PROD_DETAIL -.->|Update Supplier| SUP_LIST\n    CAT_T_DND -.->|Restructure Impact| PROD_LIST\n    UNITS_D_CONVERSIONS -.->|Update Products| PROD_LIST\n\n    %% Style Classes\n    classDef dashboardNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px\n    classDef moduleNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px\n    classDef listNode fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px\n    classDef detailNode fill:#fff3e0,stroke:#e65100,stroke-width:2px\n    classDef filterNode fill:#fce4ec,stroke:#880e4f,stroke-width:2px\n    classDef actionNode fill:#f1f8e9,stroke:#33691e,stroke-width:2px\n    classDef sharedNode fill:#f9fbe7,stroke:#827717,stroke-width:2px\n    classDef treeNode fill:#e0f2f1,stroke:#004d40,stroke-width:2px\n\n    class PMD,PMD_WIDGETS,PMD_W1,PMD_W2,PMD_W3,PMD_W4,PMD_W5,PMD_W6 dashboardNode\n    class PROD,CAT,UNITS,SUP,PRICING,SPECS moduleNode\n    class PROD_LIST,CAT_LIST,UNITS_LIST,SUP_LIST listNode\n    class PROD_DETAIL,CAT_NEW,UNITS_DETAIL,SUP_DETAIL detailNode\n    class PROD_L_FILTER,PROD_L_F_ADVANCED,CAT_T_SEARCH,UNITS_L_FILTER filterNode\n    class PROD_L_BULK,PROD_L_ACTIONS,CAT_T_S_C_ACTIONS,UNITS_L_ACTIONS actionNode\n    class SHARED,STATUS_SYSTEM,SEARCH_COMPONENTS,FILTER_COMPONENTS sharedNode\n    class CAT_TREE,CAT_T_STRUCTURE,CAT_T_DND,CAT_T_MOBILE treeNode\n```\n\n## Module Navigation Flow\n\n```mermaid\nflowchart LR\n    A[Main Navigation] --> B[Product Management]\n    B --> C{Select Module}\n\n    C -->|Dashboard| D[Product Dashboard]\n    C -->|Products| E[Products Module]\n    C -->|Categories| F[Category Management]\n    C -->|Units| G[Unit Management]\n    C -->|Suppliers| H[Supplier Management]\n\n    E --> E1[Product List]\n    E1 --> E2[Product Detail]\n    E1 --> E3[New Product]\n\n    F --> F1[Category Tree]\n    F1 --> F2[Category Actions]\n    F1 --> F3[Drag & Drop Restructure]\n\n    G --> G1[Unit List]\n    G1 --> G2[Unit Detail]\n    G1 --> G3[Unit Conversions]\n\n    H --> H1[Supplier List]\n    H1 --> H2[Supplier Detail]\n\n    D -->|Quick Links| E1\n    D -->|Quick Links| F1\n    D -->|Quick Links| G1\n\n    style D fill:#e1f5fe\n    style E fill:#f3e5f5\n    style F fill:#e8f5e8\n    style G fill:#fff3e0\n    style H fill:#fce4ec\n```\n\n## Data Flow Patterns\n\n```mermaid\nsequenceDiagram\n    participant U as User\n    participant D as Dashboard\n    participant PL as Product List\n    participant PD as Product Detail\n    participant CT as Category Tree\n    participant API as Mock Data API\n\n    U->>D: Access Product Management\n    D->>API: Fetch dashboard metrics\n    API->>D: Return product analytics\n    D->>U: Display dashboard widgets\n\n    U->>D: Click \"View Products\"\n    D->>PL: Navigate to product list\n    PL->>API: Fetch products with filters\n    API->>PL: Return filtered products\n\n    U->>PL: Apply advanced filters\n    PL->>API: Apply filter conditions\n    API->>PL: Return filtered results\n    PL->>PL: Update view (table/card)\n\n    U->>PL: Click product row\n    PL->>PD: Navigate to product detail\n    PD->>API: Fetch product details\n    API->>PD: Return comprehensive product data\n\n    U->>PD: Update category assignment\n    PD->>CT: Open category selector\n    CT->>API: Fetch category tree\n    API->>CT: Return hierarchical categories\n    CT->>PD: Return selected category\n    PD->>API: Update product category\n    API->>PD: Confirm category update\n```\n\n## Filter System Workflow\n\n```mermaid\nstateDiagram-v2\n    [*] --> Basic_Filters\n    Basic_Filters --> Advanced_Builder : Switch to Advanced\n    Advanced_Builder --> Basic_Filters : Switch to Basic\n\n    Basic_Filters --> Filter_Applied : Apply Filters\n    Advanced_Builder --> Condition_Builder : Add Condition\n    Condition_Builder --> Logical_Operators : Add Logic\n    Logical_Operators --> Filter_Applied : Apply Complex Filter\n\n    Filter_Applied --> Results_Updated : Update Product List\n    Results_Updated --> [*] : Complete\n\n    Advanced_Builder --> Save_Filter : Save Current Filter\n    Save_Filter --> Saved_Filters : Store Filter\n    Saved_Filters --> Load_Filter : Load Saved Filter\n    Load_Filter --> Filter_Applied : Apply Saved Filter\n\n    Filter_Applied --> JSON_View : View as JSON\n    JSON_View --> Advanced_Builder : Edit JSON\n```\n\n## Category Tree Workflow\n\n```mermaid\nstateDiagram-v2\n    [*] --> Tree_Loaded\n    Tree_Loaded --> Category_Selected : Select Category\n    Tree_Loaded --> Search_Active : Start Search\n\n    Search_Active --> Results_Highlighted : Show Results\n    Results_Highlighted --> Tree_Expanded : Auto-expand\n    Tree_Expanded --> Category_Selected : Select Result\n\n    Category_Selected --> Action_Menu : Right Click\n    Action_Menu --> Add_Subcategory : Add Child\n    Action_Menu --> Edit_Category : Edit Current\n    Action_Menu --> Delete_Category : Delete Current\n    Action_Menu --> Move_Category : Drag & Drop\n\n    Add_Subcategory --> Category_Created : Create New\n    Edit_Category --> Category_Updated : Update Existing\n    Delete_Category --> Category_Removed : Remove from Tree\n    Move_Category --> Drag_Started : Begin Drag\n\n    Drag_Started --> Drop_Validation : Validate Drop Target\n    Drop_Validation --> Hierarchy_Updated : Valid Drop\n    Drop_Validation --> Drag_Cancelled : Invalid Drop\n\n    Category_Created --> Tree_Refreshed : Refresh Structure\n    Category_Updated --> Tree_Refreshed : Refresh Structure\n    Category_Removed --> Tree_Refreshed : Refresh Structure\n    Hierarchy_Updated --> Tree_Refreshed : Refresh Structure\n\n    Tree_Refreshed --> Tree_Loaded : Complete Update\n```";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

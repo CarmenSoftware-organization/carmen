@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request System Documentation - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Purchase Requests</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PR</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Purchase Request System Documentation\n\nThis directory contains comprehensive documentation for the Carmen ERP Purchase Request system, analyzing the complete system architecture, component relationships, user flows, and technical implementation.\n\n## 📚 Documentation Structure\n\n### 1. **[System Analysis](./purchase-request-system-analysis.md)**\nComplete technical analysis of the Purchase Request system including:\n- **System Overview**: High-level architecture and component relationships\n- **Component Architecture**: Detailed component hierarchy and file structure\n- **User Journey Flows**: Role-based user workflows and interactions\n- **Modal and Dialog System**: Popup components and overlay management\n- **Data Flow and State Management**: State handling and data persistence\n- **Workflow Engine**: Approval processes and business logic\n- **RBAC and Permissions**: Role-based access control implementation\n- **API Integration**: Service layer and data communication\n\n### 2. **[Component Map](./purchase-request-component-map.md)**\nDetailed technical mapping of all system components:\n- **File Structure Map**: Complete directory structure and file organization\n- **Component Hierarchy**: Parent-child relationships and dependencies\n- **Modal System Architecture**: Popup and overlay component system\n- **Form System Architecture**: Form handling and validation patterns\n- **State Management Flow**: Data flow and state update patterns\n- **Navigation Flow**: Routing and page transition logic\n- **API Integration Map**: Service layer architecture and endpoint mapping\n\n### 3. **[User Flows](./purchase-request-user-flows.md)**\nComprehensive user interaction documentation:\n- **User Role Definitions**: Role-based responsibilities and permissions\n- **Main User Journey**: End-to-end user experience mapping\n- **Create Purchase Request Flow**: Step-by-step creation process\n- **Detail View Flow**: PR viewing and editing interactions\n- **Approval Workflow**: Decision trees and approval processes\n- **Bulk Operations**: Multi-item operations and batch processing\n- **Modal Interactions**: Popup component user flows\n- **Error Handling**: Error recovery and validation flows\n- **Search and Filter**: Data discovery and filtering capabilities\n- **Mobile Responsive**: Mobile-first interaction patterns\n\n### 4. **[Module Specification](./purchase-request-module-spec.md)**\nDetailed module requirements and specifications:\n- **Functional Requirements**: Complete feature specifications with acceptance criteria\n- **Technical Requirements**: Performance, security, and integration requirements\n- **API Specifications**: RESTful endpoints and data contracts\n- **User Interface Requirements**: Responsive design and accessibility standards\n- **Testing Requirements**: Unit, integration, and E2E testing strategies\n- **Deployment Requirements**: Environment configuration and monitoring\n- **Maintenance and Support**: Documentation and support procedures\n\n### 5. **[Implementation Specification](./purchase-request-implementation-spec.md)**\nTechnical implementation guidance for developers:\n- **Architecture Implementation**: Technology stack and file structure\n- **Component Patterns**: React component implementation standards\n- **State Management**: React Query and Zustand integration patterns\n- **Service Layer**: API service and business logic implementation\n- **Validation Implementation**: Zod schema definitions and validation rules\n- **Testing Implementation**: Component, hook, and E2E testing patterns\n- **Performance Implementation**: Code splitting, memoization, and optimization\n\n## 📸 System Screenshots\n\n### **Procurement Dashboard**\n![Procurement Main Dashboard](./screenshots/procurement-main-dashboard.png)\n*The main procurement dashboard provides a comprehensive overview with 6 key metrics and 3 analytical charts. Features include Purchase Order Trend (line chart showing Jan-Jun data), Supplier Distribution (pie chart showing Food Suppliers 40.7%, Beverage Suppliers 25%, Equipment Suppliers 20%, Linen Suppliers 14.3%), and Top 5 Vendors by Spend (bar chart). The dashboard displays 5 pending approvals, 3 expiring contracts, and highlights an 8% cost savings achievement for the current quarter.*\n\n### **My Approvals Interface**\n![My Approvals Dashboard](./screenshots/my-approvals-dashboard.png)\n*The Department Approval interface shows 3 pending purchase requests (Bed Linens, Coffee Makers, Desk Chairs) awaiting action. The Recent Approvals log displays historical decisions including approved items (Towels, Desk Lamps with changes) and rejected items (Luxury Pens). A dedicated notifications section keeps approvers informed of new requests and workflow updates requiring attention.*\n\n### **Vendor Comparison Screen**\n![Vendor Comparison for Purchase Request](./screenshots/vendor-comparison-screen.png)\n*The vendor comparison interface for \"Organic Quinoa\" purchase request displays item details (Premium organic white quinoa grains, Approved status, 500 Kg requested, 450 Kg approved) alongside purchase history showing the last vendor (Seasonal Gourmet Supplies, purchased 15/02/2024 at 4,150.00 EUR). Three vendors are compared with detailed metrics: Premium Food Supplier Inc. (Rating 4.5, USD 3200.00, Min 1 pcs), Budget Supply Co. (Rating 4.1, USD 2850.00, Min 2 pcs), and Global Trade Partners (Rating 4.3, EUR 3050.00, Min 1 pcs). The interface operates in view-only mode for approval review workflows.*\n\n## 🎯 Key System Features\n\n### **Core Functionality**\n- ✅ Purchase Request Creation with Templates\n- ✅ Multi-stage Approval Workflows\n- ✅ Role-based Access Control (RBAC)\n- ✅ Vendor Comparison and Selection\n- ✅ Price History and Analytics\n- ✅ Bulk Operations Support\n- ✅ Mobile-responsive Design\n- ✅ Real-time Notifications\n- ✅ Advanced Search and Filtering\n- ✅ Document Attachment Management\n\n### **Technical Architecture**\n- 🏗️ **Next.js 14** with App Router\n- ⚛️ **React 18** with TypeScript\n- 🎨 **Tailwind CSS** + **shadcn/ui**\n- 📋 **React Hook Form** + **Zod Validation**\n- 🔄 **React Query** for State Management\n- 📊 **Mock Data** for Prototype Mode\n- 🔐 **Role-based Permissions**\n- 📱 **Responsive Design**\n\n## 🚀 Quick Navigation\n\n### **For Developers**\n- [Implementation Guide →](./purchase-request-implementation-spec.md#architecture-implementation)\n- [Component Patterns →](./purchase-request-implementation-spec.md#component-implementation-patterns)\n- [API Integration →](./purchase-request-component-map.md#api-integration-map)\n- [Testing Patterns →](./purchase-request-implementation-spec.md#testing-implementation)\n- [Performance Guide →](./purchase-request-implementation-spec.md#performance-implementation)\n\n### **For Designers**\n- [User Journey Map →](./purchase-request-user-flows.md#main-user-journey-map)\n- [UI Requirements →](./purchase-request-module-spec.md#user-interface-requirements)\n- [Modal System →](./purchase-request-system-analysis.md#modal-and-dialog-system)\n- [Mobile Flows →](./purchase-request-user-flows.md#mobile-responsive-flows)\n- [Accessibility →](./purchase-request-module-spec.md#accessibility-requirements)\n\n### **For Business Analysts**\n- [Functional Requirements →](./purchase-request-module-spec.md#functional-requirements)\n- [Workflow Engine →](./purchase-request-system-analysis.md#workflow-engine)\n- [Approval Process →](./purchase-request-user-flows.md#approval-workflow-decision-tree)\n- [User Roles →](./purchase-request-user-flows.md#user-role-definitions)\n- [Business Rules →](./purchase-request-system-analysis.md#workflow-rules-engine)\n\n### **For Project Managers**\n- [Module Overview →](./purchase-request-module-spec.md#module-overview)\n- [Technical Requirements →](./purchase-request-module-spec.md#technical-requirements)\n- [Testing Strategy →](./purchase-request-module-spec.md#testing-requirements)\n- [Deployment Plan →](./purchase-request-module-spec.md#deployment-requirements)\n- [Feature List →](./README.md#key-system-features)\n\n### **Visual References**\n- [System Screenshots →](./purchase-request-module-spec.md#system-screenshots)\n- [Implementation Examples →](./purchase-request-implementation-spec.md#visual-system-reference)\n- [Dashboard Context →](../assets/screenshots/dashboard-overview.png)\n- [List View Interface →](../assets/screenshots/purchase-requests-list-view.png)\n- [Detail View Interface →](../assets/screenshots/purchase-request-detail-working.png)\n- [Budget Management →](../assets/screenshots/purchase-request-budgets-tab.png)\n\n## 📖 How to Use This Documentation\n\n### **Reading Order for New Team Members**\n1. Start with [System Analysis](./purchase-request-system-analysis.md) for overall understanding\n2. Review [User Flows](./purchase-request-user-flows.md) to understand user experience\n3. Deep dive into [Component Map](./purchase-request-component-map.md) for technical implementation\n\n### **Reference Usage**\n- **Component Development**: Use Component Map for file locations and relationships\n- **User Experience Design**: Reference User Flows for interaction patterns\n- **System Integration**: Check API Integration maps and data flow diagrams\n- **Troubleshooting**: Use Error Handling flows and state management diagrams\n\n## 🔄 Mermaid Diagram Types Used\n\nThis documentation uses various Mermaid diagram types to visualize different aspects:\n\n- **📊 Flowcharts**: Process flows and decision trees\n- **🏗️ Graph Diagrams**: Component relationships and architecture\n- **📈 Journey Maps**: User experience flows\n- **🔄 Sequence Diagrams**: API interactions and component communication\n- **📋 State Diagrams**: Workflow states and transitions\n- **🎯 Pie Charts**: Data distribution and analytics\n\n## 🛠️ File Locations Reference\n\n### **Main Pages**\n```\napp/(main)/procurement/purchase-requests/\n├── page.tsx                     # Main list page\n├── [id]/page.tsx               # Detail view page\n├── new-pr/page.tsx             # Create new PR page\n└── enhanced-demo/page.tsx      # Enhanced demo features\n```\n\n### **Core Components**\n```\ncomponents/\n├── ModernPurchaseRequestList.tsx    # Main list component\n├── PRDetailPage.tsx                 # Detail view component\n├── PRForm.tsx                       # Creation/edit form\n├── VendorComparisonModal.tsx        # Vendor selection modal\n├── PriceHistoryModal.tsx            # Price analytics modal\n└── tabs/                            # Tab system components\n    ├── ItemsTab.tsx\n    ├── BudgetsTab.tsx\n    ├── WorkflowTab.tsx\n    ├── AttachmentsTab.tsx\n    └── ActivityTab.tsx\n```\n\n### **Services and Logic**\n```\nservices/\n├── rbac-service.ts                  # Role-based access control\n└── workflow-decision-engine.ts      # Workflow business logic\n```\n\n## 📞 Support and Maintenance\n\n### **Documentation Updates**\nThis documentation should be updated when:\n- New components are added to the system\n- User workflows change or new roles are introduced\n- API endpoints are modified or added\n- Business rules or approval processes change\n\n### **Diagram Maintenance**\n- Mermaid diagrams are version-controlled and should be updated alongside code changes\n- Use [Mermaid Live Editor](https://mermaid.live/) for testing diagram syntax\n- Follow existing diagram conventions for consistency\n\n---\n\n**Last Updated**: Generated automatically from system analysis\n**Version**: Carmen ERP v1.0\n**Maintained by**: Carmen Development Team";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

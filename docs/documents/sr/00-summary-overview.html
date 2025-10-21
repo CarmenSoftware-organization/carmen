@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP System - Feature Specifications Summary - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>SR</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">SR</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Carmen ERP System - Feature Specifications Summary\n\n## Overview\nThis document provides a comprehensive overview of the Carmen ERP system features based on systematic analysis of the source code. The documentation covers all major functional areas identified within the application architecture, providing detailed specifications for each feature group.\n\n## Documentation Structure\nThe feature specifications are organized into eight major modules, each representing a core functional area of the Carmen ERP system:\n\n### 01. Navigation and UI System\n**File**: `01-navigation-ui-system.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/01-navigation-ui-system.md`\n- Three-level hierarchical sidebar navigation\n- Dynamic menu rendering with user permission filtering\n- Responsive design with mobile sheet overlay\n- WorkflowProvider integration for global state management\n- 12 major navigation sections covering all system modules\n\n### 02. Dashboard and Analytics\n**File**: `02-dashboard-analytics.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/02-dashboard-analytics.md`\n- Real-time KPI metrics with trend indicators\n- Interactive charts (Area, Bar, Line) for trend analysis\n- Recent activities table with status and priority tracking\n- Responsive card-based layout design\n- Performance metrics integration across all modules\n\n### 03. Procurement Management System\n**File**: `03-procurement-management.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/03-procurement-management.md`\n- Complete procurement workflow: PR → PO → GRN → Credit Note\n- Sophisticated approval workflow engine with role-based routing\n- Vendor comparison capabilities and pricing intelligence\n- Multi-level item management with pricing transparency controls\n- Integration with inventory and accounting systems\n\n### 04. Vendor Management System\n**File**: `04-vendor-management.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/04-vendor-management.md`\n- Comprehensive vendor lifecycle management\n- Advanced pricing and pricelist management\n- RFP/RFQ campaign management system\n- Vendor portal integration for self-service\n- Performance metrics and rating system\n\n### 05. Inventory Management System\n**File**: `05-inventory-management.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/05-inventory-management.md`\n- Multi-faceted inventory control (Stock Overview, Physical Counts, Spot Checks)\n- Real-time inventory tracking with movement history\n- Sophisticated count management with variance analysis\n- Multi-location inventory support\n- Integration with procurement and production processes\n\n### 06. Product Management and Catalog System\n**File**: `06-product-management.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/06-product-management.md`\n- Comprehensive product catalog with multi-unit conversions\n- Environmental impact tracking and sustainability metrics\n- Location-based product assignments\n- Complex pricing and tax configuration\n- Category hierarchy and classification system\n\n### 07. User Authentication and Context Management\n**File**: `07-user-authentication-context.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/07-user-authentication-context.md`\n- Multi-role, multi-department, multi-location user framework\n- Dynamic context switching within sessions\n- Role-based access control with granular permissions\n- Price visibility controls based on user roles\n- Comprehensive audit trail for context changes\n\n### 08. System Administration\n**File**: `08-system-administration.md`\n**Path**: `/Users/peak/Documents/GitHub/carmen/docs/documents/sr/08-system-administration.md`\n- Advanced user and permission management\n- Visual workflow configuration engine\n- Location hierarchy management\n- POS system integration platform\n- Policy-based access control with business rule engine\n\n## System Architecture Highlights\n\n### Technology Stack\n- **Framework**: Next.js 14 with App Router\n- **Language**: TypeScript with strict mode\n- **Styling**: Tailwind CSS + Shadcn/ui components\n- **State Management**: Zustand for global state, React Query for server state\n- **Forms**: React Hook Form + Zod validation\n- **UI Components**: Radix UI primitives with custom styling\n- **Testing**: Vitest\n\n### Key Architectural Patterns\n- **Centralized Type System**: All TypeScript interfaces centralized in `lib/types/`\n- **Mock Data Architecture**: Comprehensive mock data system in `lib/mock-data/`\n- **Component Composition**: Functional components with consistent patterns\n- **Role-Based Security**: Multi-layered permission system throughout\n- **Integration Ready**: Designed for external system integration\n\n### Data Flow Architecture\n- **Server Actions**: Primary method for data mutations\n- **React Query**: Server state management with caching\n- **User Context System**: Dynamic role and permission management\n- **Workflow Engine**: Business rule-driven approval routing\n- **Real-time Updates**: Live data synchronization across modules\n\n## Business Process Coverage\n\n### Core Processes Documented\n1. **Procurement Workflow**: Complete P2P (Procure-to-Pay) process\n2. **Inventory Management**: Stock control and warehouse operations\n3. **Vendor Relationship Management**: Supplier lifecycle and performance\n4. **Product Catalog Management**: Master data and product information\n5. **User Access Control**: Authentication, authorization, and audit\n6. **System Configuration**: Administrative and integration management\n7. **Analytics and Reporting**: Performance monitoring and insights\n8. **Workflow Orchestration**: Business process automation\n\n### Integration Points\n- **Procurement ↔ Inventory**: Automatic stock updates from GRN\n- **Vendor ↔ Procurement**: Pricing and vendor comparison\n- **Product ↔ Inventory**: Location assignments and unit conversions\n- **User Context ↔ All Modules**: Permission-based access control\n- **Workflow ↔ Approval Processes**: Dynamic routing across modules\n- **Dashboard ↔ All Modules**: Real-time metrics aggregation\n\n## Quality Assurance\n\n### Documentation Standards\n- Consistent template format across all specifications\n- Process flow documentation with step-by-step procedures\n- Mermaid diagrams for visual workflow representation\n- Screen capture locations for testing and validation\n- Schema entity documentation for data model understanding\n- Ambiguities and assumptions clearly identified\n\n### Coverage Analysis\n- **Completeness**: All major features identified through systematic code analysis\n- **Accuracy**: Based on actual source code examination, not assumptions\n- **Consistency**: Uniform documentation structure and terminology\n- **Traceability**: Clear mapping between features and source code locations\n- **Maintainability**: Structured for easy updates as system evolves\n\n## Recommendations for Implementation Teams\n\n### Development Teams\n1. Use centralized type system for consistency\n2. Follow established component patterns\n3. Implement comprehensive error handling\n4. Maintain role-based access control throughout\n5. Design for integration from the start\n\n### Testing Teams\n1. Use screen capture locations for test case creation\n2. Focus on workflow integration testing\n3. Validate role-based access controls\n4. Test cross-module data flow\n5. Verify business rule enforcement\n\n### Business Analysis Teams\n1. Review ambiguities and assumptions for clarification\n2. Validate business process flows against requirements\n3. Confirm integration points meet business needs\n4. Assess scalability for organizational growth\n5. Evaluate compliance requirements coverage\n\n## Future Enhancements\n\n### Identified Areas for Expansion\n1. **Recipe Management**: Enhanced recipe and menu engineering capabilities\n2. **Production Planning**: Manufacturing and batch production workflows\n3. **Financial Integration**: Accounting and financial reporting modules\n4. **Mobile Applications**: Mobile-first interfaces for operations\n5. **Advanced Analytics**: AI-driven insights and predictive analytics\n6. **External Integrations**: Enhanced third-party system connectivity\n\n### Technical Debt Considerations\n1. Authentication system upgrade from mock to production-ready\n2. API layer standardization for external integrations\n3. Performance optimization for large-scale operations\n4. Enhanced error handling and recovery mechanisms\n5. Comprehensive logging and monitoring implementation\n\nThis documentation serves as a comprehensive guide for understanding the Carmen ERP system architecture, business processes, and implementation requirements. Each specification document provides detailed analysis suitable for development, testing, and business analysis activities.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

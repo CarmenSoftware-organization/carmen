@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot Check Module - Complete Site Map - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Inventory / Spot Check</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Spot Check Module - Complete Site Map\n\n## Module Navigation Structure\n\n```mermaid\ngraph TD\n    %% Main Module Entry\n    A[Spot Check Module<br/>/inventory-management/spot-check] --> B[Main Spot Check Page<br/>/spot-check]\n    A --> C[Dashboard<br/>/spot-check/dashboard]\n    A --> D[New Spot Check<br/>/spot-check/new]\n    A --> E[Active Counts<br/>/spot-check/active]\n    A --> F[Completed Counts<br/>/spot-check/completed]\n\n    %% Main Page Components\n    B --> G[Count Detail Modal<br/>CountDetailForm]\n    B --> H[List View<br/>CountListItem]\n    B --> I[Grid View<br/>CountDetailCard]\n    B --> J[Filter Controls<br/>Search + Dropdowns]\n    B --> K[Location Filter Panel<br/>Conditional Display]\n\n    %% Dashboard Components\n    C --> L[Statistics Cards<br/>Active Counters, Items, Reviews]\n    C --> M[Active Counts Panel<br/>Real-time Monitoring]\n    C --> N[Pending Reviews Panel<br/>Approval Queue]\n    C --> O[Latest Activities Panel<br/>Activity Feed]\n\n    %% New Spot Check Components\n    D --> P[Creation Form<br/>NewSpotCheckForm]\n    D --> Q[Item Preview Panel<br/>Selected Items Display]\n    D --> R[Form Validation<br/>Zod Schema]\n\n    %% Active Counts Components\n    E --> S[Active Count Detail<br/>/spot-check/active/[id]]\n    E --> T[Status Filters<br/>Filter Controls]\n    E --> U[Count Session Cards<br/>Progress Display]\n\n    %% Active Count Detail Components\n    S --> V[Count Interface<br/>CountDetailForm]\n    S --> W[Session Controls<br/>Pause/Complete]\n    S --> X[Progress Tracking<br/>Real-time Updates]\n\n    %% Completed Counts Components\n    F --> Y[Completed Count Detail<br/>/spot-check/completed/[id]]\n    F --> Z[Search & Filters<br/>Search Bar + Date Filter]\n    F --> AA[Export Options<br/>Download Buttons]\n\n    %% Data Flow Connections\n    P -.->|Creates| S\n    S -.->|Completes| Y\n    V -.->|Submits| F\n\n    %% Modal/Overlay Connections\n    G -.->|Modal over| B\n    V -.->|Full screen| S\n```\n\n## Data Flow Diagram\n\n```mermaid\ngraph LR\n    subgraph \"Spot Check Creation\"\n        A1[Setup Parameters] --> A2[Filter Items]\n        A2 --> A3[Random/High Value Selection]\n        A3 --> A4[Create Count Session]\n    end\n\n    subgraph \"Count Execution\"\n        B1[Load Count Session] --> B2[Display Items]\n        B2 --> B3[Record Counts]\n        B3 --> B4[Calculate Variances]\n        B4 --> B5[Submit Results]\n    end\n\n    subgraph \"Data Storage\"\n        C1[Count Templates]\n        C2[Active Sessions]\n        C3[Count Results]\n        C4[Variance Reports]\n    end\n\n    A4 --> B1\n    B5 --> C3\n    C3 --> C4\n```\n\n## User Flow Paths\n\n```mermaid\njourney\n    title Spot Check User Journey\n    section Setup\n      Navigate to Spot Check: 5: User\n      Click New Spot Check: 5: User\n      Select Counter: 4: User\n      Choose Department: 4: User\n      Pick Store Location: 4: User\n      Set Count Date: 3: User\n      Choose Selection Method: 4: User\n      Set Item Count: 3: User\n      Review Selected Items: 5: User\n      Create Spot Check: 5: User\n    section Execution\n      Start Active Count: 5: Counter\n      View Item List: 4: Counter\n      Count First Item: 3: Counter\n      Record Quantity: 4: Counter\n      Note Item Status: 4: Counter\n      Continue to Next Item: 4: Counter\n      Complete All Items: 5: Counter\n      Review Count Summary: 5: Counter\n      Submit Final Results: 5: Counter\n    section Review\n      View Completed Counts: 4: Manager\n      Analyze Variances: 5: Manager\n      Generate Reports: 4: Manager\n```\n\n## Component Hierarchy\n\n```mermaid\ngraph TD\n    A[SpotCheck Root] --> B[Dashboard Page]\n    A --> C[New Spot Check Page]\n    A --> D[Active Count Page]\n    A --> E[Completed Count Page]\n\n    B --> B1[Count List Item]\n    B --> B2[Count Detail Card]\n    B --> B3[Filter Controls]\n    B --> B4[View Toggle]\n\n    C --> C1[New Spot Check Form]\n    C1 --> C2[Counter Selection]\n    C1 --> C3[Department Selection]\n    C1 --> C4[Store Selection]\n    C1 --> C5[Date Picker]\n    C1 --> C6[Selection Method]\n    C1 --> C7[Item Count Input]\n    C1 --> C8[Item Preview Panel]\n\n    D --> D1[Count Detail Form]\n    D1 --> D2[Count Items Component]\n    D1 --> D3[Count Progress]\n    D1 --> D4[Count Summary]\n\n    E --> E1[Completed Count List]\n    E1 --> E2[Count Result Display]\n    E1 --> E3[Variance Analysis]\n```\n\n## Workflow States\n\n```mermaid\nstateDiagram-v2\n    [*] --> Setup\n    Setup --> ItemSelection: Configure Parameters\n    ItemSelection --> SessionCreated: Create Count\n    SessionCreated --> InProgress: Start Count\n    InProgress --> Paused: Pause Count\n    Paused --> InProgress: Resume Count\n    InProgress --> Completed: Complete All Items\n    Completed --> Submitted: Submit Results\n    Submitted --> [*]\n\n    Setup --> [*]: Cancel\n    InProgress --> [*]: Cancel Count\n```\n\n## Page Structure Summary\n\n| Page | Route | Components | Key Features |\n|------|-------|------------|--------------|\n| Dashboard | `/spot-check` | CountListItem, CountDetailCard, Filters | List/Grid view, Status filtering |\n| New Count | `/spot-check/new` | NewSpotCheckForm, ItemPreview | Form validation, Real-time preview |\n| Active Count | `/spot-check/active/[id]` | CountDetailForm, CountItems | Item counting, Progress tracking |\n| Completed | `/spot-check/completed` | CompletedCountList | Results viewing, Variance analysis |\n\n*Generated: September 25, 2025*\n*Source: Complete codebase analysis of Spot Check module*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

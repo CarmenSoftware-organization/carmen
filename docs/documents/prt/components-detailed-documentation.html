@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Template - Components Detailed Documentation - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Purchase Request Templates</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PRT</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Purchase Request Template - Components Detailed Documentation\n\n## Table of Contents\n1. [Component Overview](#component-overview)\n2. [Page Components](#page-components)\n3. [Form Components](#form-components)\n4. [Dialog Components](#dialog-components)\n5. [Table Components](#table-components)\n6. [Shared Template Components](#shared-template-components)\n7. [Component Interaction Patterns](#component-interaction-patterns)\n\n## Component Overview\n\nThe Purchase Request Template module follows a modular component architecture with clear separation between presentation, business logic, and data management. Components are organized into logical groups based on their functionality and reusability.\n\n### Component Categories\n- **Page Components**: Main route components that handle routing and top-level state\n- **Form Components**: Input handling and validation components\n- **Dialog Components**: Modal interfaces for focused interactions\n- **Table Components**: Data display and manipulation components\n- **Shared Components**: Reusable components across multiple contexts\n\n## Page Components\n\n### 1. PurchaseRequestTemplatesPage\n**File**: `app/(main)/procurement/purchase-request-templates/page.tsx`\n\n**Purpose**: Main landing page for template management with dual-view interface and bulk operations.\n\n**Key Features**:\n- View mode switching (table/card)\n- Search and filtering\n- Bulk operations\n- Template CRUD operations\n- Pagination\n\n**Props Interface**:\n```typescript\n// No external props - main page component\n```\n\n**State Management**:\n```typescript\nconst [viewMode, setViewMode] = useState<'table' | 'card'>('table')\nconst [selectedItems, setSelectedItems] = useState<string[]>([])\nconst [currentPage, setCurrentPage] = useState(1)\nconst [searchTerm, setSearchTerm] = useState(\"\")\nconst [selectedType, setSelectedType] = useState(\"All Types\")\nconst [selectedStatus, setSelectedStatus] = useState(\"All Statuses\")\nconst [activeFilters, setActiveFilters] = useState<FilterType<PurchaseRequest>[]>([])\nconst [templates, setTemplates] = useState<PurchaseRequest[]>(templateData)\nconst [deleteDialogOpen, setDeleteDialogOpen] = useState(false)\nconst [templateToDelete, setTemplateToDelete] = useState<string | null>(null)\n```\n\n**Core Functions**:\n```typescript\n// Navigation\nconst handleView = (id: string) => void\nconst handleEdit = (id: string) => void\nconst handleCreateNew = () => void\n\n// Item Selection\nconst handleSelectItem = (id: string) => void\nconst handleSelectAll = (checked: boolean) => void\n\n// CRUD Operations\nconst handleDelete = (id: string) => void\nconst confirmDelete = () => void\n\n// Filtering\nconst handleSearch = (term: string) => void\nconst handleTypeChange = (type: string) => void\nconst handleStatusChange = (status: string) => void\nconst handleApplyFilters = (filters: FilterType<PurchaseRequest>[]) => void\n```\n\n**Template Integration**:\n```typescript\n<PRListTemplate\n  title=\"Purchase Request Templates\"\n  data={templates}\n  selectedItems={selectedItems}\n  // ... other props\n  customActions={customActions}\n  viewToggle={viewToggle}\n  tableView={renderTableView()}\n  cardView={renderCardView()}\n/>\n```\n\n**Custom Actions**:\n- Delete Selected\n- Clone Selected\n- Set as Default\n\n### 2. PurchaseRequestTemplateDetailPage\n**File**: `app/(main)/procurement/purchase-request-templates/[id]/page.tsx`\n\n**Purpose**: Template detail view and editing interface with tab-based organization.\n\n**Props Interface**:\n```typescript\ninterface Props {\n  params: { id: string }\n}\n```\n\n**State Management**:\n```typescript\nconst [formData, setFormData] = useState<PurchaseRequest>(getTemplateById(params.id))\n```\n\n**Mode Handling**:\n```typescript\nconst mode = (searchParams?.get(\"mode\") as \"view\" | \"edit\" | \"add\") || \"view\"\n\nconst handleModeChange = (newMode: \"view\" | \"edit\") => {\n  router.push(`/procurement/purchase-request-templates/${params.id}?mode=${newMode}`)\n}\n```\n\n**Tab Configuration**:\n```typescript\nconst tabs = [\n  {\n    value: \"items\",\n    label: \"Items\",\n    content: <ItemsTab items={mockTemplateItems} mode={mode} />\n  },\n  {\n    value: \"budgets\",\n    label: \"Budgets\",\n    content: <BudgetsTabPlaceholder />\n  },\n  {\n    value: \"activity\",\n    label: \"Activity\",\n    content: <ActivityTabPlaceholder />\n  }\n]\n```\n\n**Action Buttons**:\n```typescript\nconst actions = (\n  <div className=\"flex items-center gap-2\">\n    <Button variant=\"outline\" size=\"sm\">\n      <FileCheck className=\"h-4 w-4 mr-2\" />\n      Set as Default\n    </Button>\n    <Button variant=\"outline\" size=\"sm\">\n      <Copy className=\"h-4 w-4 mr-2\" />\n      Clone Template\n    </Button>\n  </div>\n)\n```\n\n## Form Components\n\n### 3. ItemFormDialog\n**File**: `app/(main)/procurement/purchase-request-templates/components/item-form-dialog.tsx`\n\n**Purpose**: Comprehensive form dialog for adding and editing template items with real-time calculations.\n\n**Props Interface**:\n```typescript\ninterface ItemFormDialogProps {\n  open: boolean\n  onOpenChange: (open: boolean) => void\n  onSubmit: (data: Partial<TemplateItem>) => void\n  initialData?: TemplateItem\n  mode: \"add\" | \"edit\"\n}\n```\n\n**Form Schema**:\n```typescript\nconst formSchema = z.object({\n  itemCode: z.string().min(1, \"Item code is required\"),\n  description: z.string().min(1, \"Description is required\"),\n  uom: z.string().min(1, \"UOM is required\"),\n  quantity: z.number().min(0, \"Quantity must be positive\"),\n  unitPrice: z.number().min(0, \"Unit price must be positive\"),\n  budgetCode: z.string().min(1, \"Budget code is required\"),\n  accountCode: z.string().min(1, \"Account code is required\"),\n  department: z.string().min(1, \"Department is required\"),\n  taxCode: z.string().min(1, \"Tax code is required\"),\n  currency: z.nativeEnum(CurrencyCode),\n  currencyRate: z.number().min(0.01, \"Exchange rate must be positive\"),\n  taxIncluded: z.boolean().default(false),\n  discountRate: z.number().min(0, \"Discount rate must be non-negative\"),\n  taxRate: z.number().min(0, \"Tax rate must be non-negative\"),\n  adjustments: z.object({\n    discount: z.boolean().default(false),\n    tax: z.boolean().default(false),\n  })\n})\n```\n\n**Form Sections**:\n\n#### Basic Information Section\n```typescript\n// Item Code and Description\n<FormField name=\"itemCode\" />\n<FormField name=\"description\" />\n```\n\n#### Quantity and UOM Section\n```typescript\n// Unit of Measure and Quantity\n<FormField name=\"uom\" render={({ field }) => (\n  <Select onValueChange={field.onChange}>\n    <SelectItem value=\"KG\">KG</SelectItem>\n    <SelectItem value=\"EA\">EA</SelectItem>\n    <SelectItem value=\"BTL\">BTL</SelectItem>\n    <SelectItem value=\"CTN\">CTN</SelectItem>\n  </Select>\n)} />\n<FormField name=\"quantity\" type=\"number\" />\n```\n\n#### Pricing Section\n```typescript\n// Currency, Exchange Rate, Unit Price, Tax Settings\n<FormField name=\"currency\" />\n<FormField name=\"currencyRate\" />\n<FormField name=\"unitPrice\" />\n<FormField name=\"taxIncluded\" type=\"checkbox\" />\n```\n\n#### Adjustments Section\n```typescript\n// Discount and Tax Adjustments\n<FormField name=\"adjustments.discount\" type=\"checkbox\" />\n<FormField name=\"discountRate\" type=\"number\" />\n<FormField name=\"adjustments.tax\" type=\"checkbox\" />\n<FormField name=\"taxRate\" type=\"number\" />\n```\n\n#### Additional Information Section\n```typescript\n// Budget Code, Account Code, Department, Tax Code\n<FormField name=\"budgetCode\" />\n<FormField name=\"accountCode\" />\n<FormField name=\"department\" render={({ field }) => (\n  <Select onValueChange={field.onChange}>\n    <SelectItem value=\"Kitchen\">Kitchen</SelectItem>\n    <SelectItem value=\"Housekeeping\">Housekeeping</SelectItem>\n    <SelectItem value=\"Maintenance\">Maintenance</SelectItem>\n  </Select>\n)} />\n<FormField name=\"taxCode\" />\n```\n\n**Real-time Calculations**:\n```typescript\nconst [calculatedAmounts, setCalculatedAmounts] = useState({\n  baseAmount: 0,\n  discountAmount: 0,\n  netAmount: 0,\n  taxAmount: 0,\n  totalAmount: 0,\n})\n\nuseEffect(() => {\n  const quantity = form.watch('quantity') || 0\n  const unitPrice = form.watch('unitPrice') || 0\n  const discountRate = form.watch('discountRate') || 0\n  const taxRate = form.watch('taxRate') || 0\n\n  const baseAmount = quantity * unitPrice\n  const discountAmount = baseAmount * (discountRate / 100)\n  const netAmount = baseAmount - discountAmount\n  const taxAmount = netAmount * (taxRate / 100)\n  const totalAmount = netAmount + taxAmount\n\n  setCalculatedAmounts({\n    baseAmount,\n    discountAmount,\n    netAmount,\n    taxAmount,\n    totalAmount,\n  })\n}, [form.watch('quantity'), form.watch('unitPrice'), form.watch('discountRate'), form.watch('taxRate')])\n```\n\n**Calculated Amounts Display**:\n```typescript\n<div className=\"grid grid-cols-4 gap-4 bg-muted p-4 rounded-lg\">\n  <div>\n    <p className=\"text-sm font-medium\">Base Amount</p>\n    <p className=\"text-lg\">{calculatedAmounts.baseAmount.toFixed(2)}</p>\n  </div>\n  <div>\n    <p className=\"text-sm font-medium\">Discount</p>\n    <p className=\"text-lg\">{calculatedAmounts.discountAmount.toFixed(2)}</p>\n  </div>\n  <div>\n    <p className=\"text-sm font-medium\">Tax</p>\n    <p className=\"text-lg\">{calculatedAmounts.taxAmount.toFixed(2)}</p>\n  </div>\n  <div>\n    <p className=\"text-sm font-medium\">Total</p>\n    <p className=\"text-lg font-bold\">{calculatedAmounts.totalAmount.toFixed(2)}</p>\n  </div>\n</div>\n```\n\n## Dialog Components\n\n### 4. Delete Confirmation Dialog\n**Location**: Within parent components\n\n**Purpose**: Confirms deletion operations for templates and items.\n\n**Implementation Pattern**:\n```typescript\n<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>\n  <AlertDialogContent>\n    <AlertDialogHeader>\n      <AlertDialogTitle>Are you sure?</AlertDialogTitle>\n      <AlertDialogDescription>\n        This action cannot be undone. This will permanently delete the\n        template and remove it from our servers.\n      </AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n      <AlertDialogCancel>Cancel</AlertDialogCancel>\n      <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>\n    </AlertDialogFooter>\n  </AlertDialogContent>\n</AlertDialog>\n```\n\n**State Management**:\n```typescript\nconst [deleteDialogOpen, setDeleteDialogOpen] = useState(false)\nconst [templateToDelete, setTemplateToDelete] = useState<string | null>(null)\n\nconst handleDelete = (id: string) => {\n  setTemplateToDelete(id)\n  setDeleteDialogOpen(true)\n}\n\nconst confirmDelete = () => {\n  if (templateToDelete) {\n    // Perform deletion\n    setTemplates(templates.filter(template => template.id !== templateToDelete))\n    setTemplateToDelete(null)\n    setDeleteDialogOpen(false)\n  }\n}\n```\n\n## Table Components\n\n### 5. TemplateItemsTable\n**File**: `app/(main)/procurement/purchase-request-templates/components/template-items-table.tsx`\n\n**Purpose**: Displays template items in a comprehensive table format with actions.\n\n**Props Interface**:\n```typescript\ninterface TemplateItemsTableProps {\n  items: TemplateItem[]\n  mode: \"view\" | \"edit\" | \"add\"\n  onAddItem?: () => void\n  onEditItem?: (item: TemplateItem) => void\n  onDeleteItem?: (itemId: string) => void\n}\n```\n\n**Table Structure**:\n```typescript\n<Table>\n  <TableHeader>\n    <TableRow className=\"bg-muted/50\">\n      <TableHead>Item Code</TableHead>\n      <TableHead>Description</TableHead>\n      <TableHead>UOM</TableHead>\n      <TableHead className=\"text-right\">Quantity</TableHead>\n      <TableHead className=\"text-right\">Unit Price</TableHead>\n      <TableHead className=\"text-right\">Total Amount</TableHead>\n      <TableHead>Budget Code</TableHead>\n      <TableHead>Account Code</TableHead>\n      <TableHead>Department</TableHead>\n      {mode !== \"view\" && <TableHead className=\"w-[100px]\">Actions</TableHead>}\n    </TableRow>\n  </TableHeader>\n  <TableBody>\n    {items.map((item) => (\n      <TableRow key={item.id} className=\"hover:bg-muted/50\">\n        {/* Table cells */}\n      </TableRow>\n    ))}\n  </TableBody>\n</Table>\n```\n\n**Action Buttons** (Edit/Add modes only):\n```typescript\n{mode !== \"view\" && (\n  <TableCell>\n    <div className=\"flex justify-end space-x-1\">\n      <Button variant=\"ghost\" size=\"icon\" onClick={() => onEditItem?.(item)}>\n        <FileText className=\"h-4 w-4\" />\n      </Button>\n      <Button variant=\"ghost\" size=\"icon\" onClick={() => onEditItem?.(item)}>\n        <Edit className=\"h-4 w-4\" />\n      </Button>\n      <DropdownMenu>\n        <DropdownMenuTrigger asChild>\n          <Button variant=\"ghost\" size=\"icon\">\n            <MoreVertical className=\"h-4 w-4\" />\n          </Button>\n        </DropdownMenuTrigger>\n        <DropdownMenuContent align=\"end\">\n          <DropdownMenuItem onClick={() => onEditItem?.(item)}>\n            View Details\n          </DropdownMenuItem>\n          <DropdownMenuItem onClick={() => onEditItem?.(item)}>\n            Edit\n          </DropdownMenuItem>\n          <DropdownMenuItem\n            onClick={() => onDeleteItem?.(item.id)}\n            className=\"text-red-600\"\n          >\n            Delete\n          </DropdownMenuItem>\n        </DropdownMenuContent>\n      </DropdownMenu>\n    </div>\n  </TableCell>\n)}\n```\n\n**Add Item Button** (Edit/Add modes):\n```typescript\n{mode !== \"view\" && (\n  <div className=\"flex justify-end\">\n    <Button onClick={onAddItem} size=\"sm\" className=\"h-8\">\n      <PlusCircle className=\"h-4 w-4 mr-2\" />\n      Add Item\n    </Button>\n  </div>\n)}\n```\n\n### 6. ItemsTab\n**File**: `app/(main)/procurement/purchase-request-templates/components/ItemsTab.tsx`\n\n**Purpose**: Container component that manages the items table and form dialog interactions.\n\n**Props Interface**:\n```typescript\ninterface ItemsTabProps {\n  items: TemplateItem[]\n  mode: \"view\" | \"edit\" | \"add\"\n}\n```\n\n**State Management**:\n```typescript\nconst [items, setItems] = useState<TemplateItem[]>(initialItems)\nconst [formOpen, setFormOpen] = useState(false)\nconst [selectedItem, setSelectedItem] = useState<TemplateItem | null>(null)\nconst [deleteDialogOpen, setDeleteDialogOpen] = useState(false)\nconst [itemToDelete, setItemToDelete] = useState<string | null>(null)\n```\n\n**Event Handlers**:\n```typescript\nconst handleAddItem = () => {\n  setSelectedItem(null)\n  setFormOpen(true)\n}\n\nconst handleEditItem = (item: TemplateItem) => {\n  setSelectedItem(item)\n  setFormOpen(true)\n}\n\nconst handleDeleteItem = (itemId: string) => {\n  setItemToDelete(itemId)\n  setDeleteDialogOpen(true)\n}\n\nconst handleFormSubmit = (data: Partial<TemplateItem>) => {\n  if (selectedItem) {\n    // Edit existing item\n    setItems(items.map(item =>\n      item.id === selectedItem.id ? { ...item, ...data } : item\n    ))\n  } else {\n    // Add new item\n    setItems([...items, data as TemplateItem])\n  }\n}\n```\n\n**Component Layout**:\n```typescript\n<Card>\n  <CardContent className=\"p-6\">\n    <ScrollArea className=\"h-[calc(100vh-300px)]\">\n      <TemplateItemsTable\n        items={items}\n        mode={mode}\n        onAddItem={handleAddItem}\n        onEditItem={handleEditItem}\n        onDeleteItem={handleDeleteItem}\n      />\n    </ScrollArea>\n\n    <ItemFormDialog\n      open={formOpen}\n      onOpenChange={setFormOpen}\n      onSubmit={handleFormSubmit}\n      initialData={selectedItem || undefined}\n      mode={selectedItem ? \"edit\" : \"add\"}\n    />\n\n    <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>\n      {/* Delete confirmation dialog */}\n    </AlertDialog>\n  </CardContent>\n</Card>\n```\n\n## Shared Template Components\n\n### 7. PRListTemplate\n**File**: `components/templates/PRListTemplate.tsx`\n\n**Purpose**: Reusable list component shared across Purchase Request related modules.\n\n**Key Features**:\n- Dual view modes (table/card)\n- Advanced filtering\n- Pagination\n- Bulk operations\n- Customizable actions\n\n**Props Interface**:\n```typescript\ninterface PRListTemplateProps {\n  title: string\n  data: PurchaseRequest[]\n  selectedItems: string[]\n  currentPage: number\n  itemsPerPage: number\n  onPageChange: (page: number) => void\n  onSearch: (term: string) => void\n  onTypeChange: (type: string) => void\n  onStatusChange: (status: string) => void\n  onSelectItem: (id: string) => void\n  onSelectAll: (checked: boolean) => void\n  onView: (id: string) => void\n  onEdit: (id: string) => void\n  onDelete: (id: string) => void\n  onCreateNew: () => void\n  typeOptions: FilterOption[]\n  statusOptions: FilterOption[]\n  fieldConfigs: FieldConfig[]\n  advancedFilter?: React.ReactNode\n  customActions?: React.ReactNode\n  viewToggle?: React.ReactNode\n  viewMode: 'table' | 'card'\n  tableView?: React.ReactNode\n  cardView?: React.ReactNode\n}\n```\n\n### 8. PRDetailTemplate\n**File**: `components/templates/PRDetailTemplate.tsx`\n\n**Purpose**: Reusable detail component shared across Purchase Request related modules.\n\n**Key Features**:\n- Mode switching (view/edit)\n- Tab interface\n- Form handling\n- Custom actions\n\n**Props Interface**:\n```typescript\ninterface PRDetailTemplateProps {\n  mode: \"view\" | \"edit\" | \"add\"\n  title: React.ReactNode\n  formData: PurchaseRequest\n  onModeChange: (mode: \"view\" | \"edit\") => void\n  onSubmit: (e: React.FormEvent) => void\n  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void\n  onFormDataChange: (data: Partial<PurchaseRequest>) => void\n  tabs: Array<{\n    value: string\n    label: string\n    content: React.ReactNode\n  }>\n  actions?: React.ReactNode\n}\n```\n\n## Component Interaction Patterns\n\n### State Flow Patterns\n\n#### 1. Parent-Child Communication\n```typescript\n// Parent Component (ItemsTab)\nconst [items, setItems] = useState<TemplateItem[]>([])\n\n// Child Component (TemplateItemsTable)\n<TemplateItemsTable\n  items={items}\n  onEditItem={handleEditItem}\n  onDeleteItem={handleDeleteItem}\n/>\n\n// Event bubbling back to parent\nconst handleEditItem = (item: TemplateItem) => {\n  setSelectedItem(item)\n  setFormOpen(true)\n}\n```\n\n#### 2. Dialog State Management\n```typescript\n// Dialog open/close state\nconst [formOpen, setFormOpen] = useState(false)\nconst [selectedItem, setSelectedItem] = useState<TemplateItem | null>(null)\n\n// Dialog handlers\nconst handleAddItem = () => {\n  setSelectedItem(null)  // Clear selection for add mode\n  setFormOpen(true)\n}\n\nconst handleEditItem = (item: TemplateItem) => {\n  setSelectedItem(item)  // Set item for edit mode\n  setFormOpen(true)\n}\n\nconst handleFormSubmit = (data: Partial<TemplateItem>) => {\n  // Update items list\n  setFormOpen(false)     // Close dialog\n}\n```\n\n#### 3. Mode-Based Rendering\n```typescript\n// Conditional rendering based on mode\n{mode !== \"view\" && (\n  <Button onClick={onAddItem}>\n    <PlusCircle className=\"h-4 w-4 mr-2\" />\n    Add Item\n  </Button>\n)}\n\n// Actions column visibility\n{mode !== \"view\" && <TableHead>Actions</TableHead>}\n```\n\n### Data Flow Architecture\n\n#### Template List → Detail Flow\n```typescript\n// List page navigation\nconst handleView = (id: string) => {\n  router.push(`/procurement/purchase-request-templates/${id}?mode=view`)\n}\n\nconst handleEdit = (id: string) => {\n  router.push(`/procurement/purchase-request-templates/${id}?mode=edit`)\n}\n\n// Detail page mode detection\nconst mode = (searchParams?.get(\"mode\") as \"view\" | \"edit\" | \"add\") || \"view\"\n```\n\n#### Form Data Management\n```typescript\n// Form initialization\nconst form = useForm<z.infer<typeof formSchema>>({\n  resolver: zodResolver(formSchema),\n  defaultValues: initialData || defaultFormValues\n})\n\n// Real-time calculations\nuseEffect(() => {\n  // Watch form values and calculate totals\n  const quantity = form.watch('quantity')\n  const unitPrice = form.watch('unitPrice')\n  // ... calculation logic\n}, [form.watch('quantity'), form.watch('unitPrice')])\n\n// Form submission\nconst handleSubmit = (values: z.infer<typeof formSchema>) => {\n  onSubmit({\n    ...values,\n    totalAmount: calculatedAmounts.totalAmount\n  })\n}\n```\n\n### Error Handling Patterns\n\n#### Form Validation\n```typescript\n// Zod schema validation\nconst formSchema = z.object({\n  itemCode: z.string().min(1, \"Item code is required\"),\n  quantity: z.number().min(0, \"Quantity must be positive\"),\n  // ... other validations\n})\n\n// Display validation errors\n<FormMessage /> // Automatically displays field errors\n```\n\n#### Operation Error Handling\n```typescript\nconst handleOperation = async () => {\n  try {\n    // Perform operation\n    await operationFunction()\n\n    toast({\n      title: \"Success\",\n      description: \"Operation completed successfully\"\n    })\n  } catch (error) {\n    console.error(\"Operation failed:\", error)\n\n    toast({\n      title: \"Error\",\n      description: \"Operation failed. Please try again.\",\n      variant: \"destructive\"\n    })\n  }\n}\n```\n\n---\n\n*Documentation generated on: 2025-09-23*\n*Component Documentation Version: 1.0*\n*Carmen ERP - Purchase Request Template Module*";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary of Terms and Abbreviations - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Store Operations</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">STORE-OPS</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Glossary of Terms and Abbreviations\n\n**Module**: Store Operations\n**Last Updated**: 2025-10-02\n\n## Table of Contents\n\n- [General Terms](#general-terms)\n- [Store Requisitions](#store-requisitions)\n- [Stock Management](#stock-management)\n- [Wastage Management](#wastage-management)\n- [Workflow and Approvals](#workflow-and-approvals)\n- [Technical Terms](#technical-terms)\n- [Abbreviations](#abbreviations)\n\n---\n\n## General Terms\n\n### Store Operations\nThe overall module managing day-to-day store activities including requisitions, stock replenishment, and wastage tracking.\n\n### Location\nA physical storage area or operational unit where inventory is kept. Can be a warehouse, kitchen, store, or department.\n\n### Location Code\nA unique identifier for a storage location (e.g., CK-001, MW-001, RS-001).\n\n### Movement Type\nThe type of inventory transaction, typically \"Issue\" for store requisitions indicating materials being issued/transferred.\n\n### Unit of Measure (UOM)\nThe standard unit used to count or measure an item (e.g., Box, Bag, Kg, Liter, Piece, Pack).\n\n---\n\n## Store Requisitions\n\n### Store Requisition (SR)\nA formal request to transfer inventory items from one location (store/warehouse) to another operational unit or department.\n\n### SR Number\nUnique reference number for a store requisition following the format: SR-YYYY-NNN (e.g., SR-2024-001).\n\n### Requisition Status\nCurrent state of a requisition in its lifecycle:\n- **Draft**: Being prepared, not yet submitted\n- **In Process**: Submitted and moving through approval workflow\n- **Complete**: Fully approved and processed\n- **Reject**: Declined by an approver\n- **Void**: Cancelled/nullified\n\n### Request To\nThe source location or store from which items are being requested (supplier of the items).\n\n### To Location\nThe destination location or unit that will receive the items (recipient of the items).\n\n### Expected Delivery Date\nTarget date by which the requested items should be delivered to the requesting location.\n\n### Workflow Stage\nCurrent approval step in the requisition process (e.g., \"HOD Approval\", \"Store Manager Approval\").\n\n### Qty Required\nQuantity of an item requested in the requisition.\n\n### Qty Approved\nQuantity of an item approved by reviewers (may differ from Qty Required).\n\n### Qty Issued\nActual quantity of an item issued/delivered (tracked in stock movements).\n\n### Item-Level Approval\nThe ability to approve or reject individual line items within a requisition rather than the entire requisition.\n\n### Approval Status (Item)\nStatus of individual items in a requisition:\n- **Pending**: Awaiting approval decision\n- **Approved**: Item approved for issue\n- **Reject**: Item declined\n- **Review**: Requires additional review\n\n---\n\n## Stock Management\n\n### SKU (Stock Keeping Unit)\nA unique identifier for each distinct product/item in the inventory system.\n\n### On Hand\nCurrent quantity of an item physically available in a location's inventory.\n\n### On Order\nQuantity of an item currently on purchase orders but not yet received.\n\n### Min Level (Minimum Level)\nThe lowest acceptable quantity of an item before reordering action is required. Triggers low stock alerts.\n\n### Max Level (Maximum Level)\nThe maximum quantity of an item that should be stocked to avoid overstocking and storage issues.\n\n### Par Level\nThe optimal/target stock level for an item that balances availability with storage costs and waste risk.\n\n### Reorder Point\nThe stock level at which a new order should be triggered to replenish inventory before reaching minimum level.\n\n### Low Stock\nStatus indicator when current stock falls below the minimum level.\n\n### Critical Stock\nStatus when current stock falls below the reorder point, requiring immediate action.\n\n### Stock Value\nTotal monetary value of inventory calculated as quantity × unit cost for all items.\n\n### Stock Movement\nA record of inventory quantity changes between locations or due to transactions (issues, receipts, transfers, adjustments).\n\n### Stock Trend\nHistorical pattern of inventory levels over time, used for forecasting and planning.\n\n### Usage Pattern\nClassification of how frequently an item is consumed:\n- **High**: Frequently used items\n- **Medium**: Moderately used items\n- **Low**: Infrequently used items\n\n---\n\n## Wastage Management\n\n### Wastage\nInventory that has become unusable, unsellable, or has been lost and must be written off.\n\n### Wastage Reason\nClassification of why wastage occurred:\n- **Expiration**: Product past expiry/best-before date\n- **Damage**: Physical damage to product or packaging\n- **Quality Issues**: Failed quality inspection or contamination\n- **Other**: Miscellaneous reasons (spillage, customer returns, etc.)\n\n### Write-Off\nThe act of removing wasted inventory from stock records and recognizing the financial loss.\n\n### Total Loss\nThe calculated monetary value of wasted inventory (Quantity × Unit Cost).\n\n### Wastage Entry\nA record documenting a wastage event including item, quantity, reason, and reporter.\n\n### Pending Review (Wastage)\nWastage entries awaiting approval before being finalized.\n\n### Photo Evidence\nPhotographic documentation of damaged or wasted items for audit and approval purposes.\n\n---\n\n## Workflow and Approvals\n\n### Approval Workflow\nA defined sequence of approval stages that a requisition must pass through before completion.\n\n### Approval Stage\nA specific step in the approval workflow requiring action from a designated approver.\n\n### Approver\nAn individual with authority to approve or reject a requisition at a specific workflow stage.\n\n### Submission Stage\nThe initial workflow stage when a requisition is first submitted to the approval process.\n\n### HOD (Head of Department)\nA manager responsible for approving department-level requisitions. First level of approval.\n\n### Store Manager\nManager responsible for final approval before items are issued from stores. Second level of approval.\n\n### Approval Status (Workflow)\nState of a workflow stage:\n- **Pending**: Not yet reached or under review\n- **Approved**: Stage completed successfully\n- **Rejected**: Stage declined, workflow stopped\n- **Current**: Currently active stage awaiting action\n\n### Approval Comment\nNotes added by an approver explaining their decision or providing instructions.\n\n### Approval Log\nComplete history of all approval actions, decisions, and comments for a requisition.\n\n### Approval Timestamp\nDate and time when an approval decision was made.\n\n### Multi-Level Approval\nAn approval process requiring sequential approval from multiple authorities at different organizational levels.\n\n---\n\n## Technical Terms\n\n### Journal Entry\nAn accounting record documenting the financial impact of a transaction with debit and credit accounts.\n\n### Debit Account\nThe account that increases (receives value) in a journal entry.\n\n### Credit Account\nThe account that decreases (gives value) in a journal entry.\n\n### Account Code\nA unique identifier for a general ledger account used in financial transactions.\n\n### Reference Number\nA unique identifier linking a journal entry back to its source transaction (e.g., SR number).\n\n### Tax Rate\nPercentage of tax applied to an item's cost (e.g., 7% VAT).\n\n### Discount Rate\nPercentage discount applied to an item's cost.\n\n### Subtotal\nItem total before tax and discount calculations.\n\n### Total Amount\nFinal calculated amount including tax and discount (Subtotal + Tax - Discount).\n\n### Activity Log\nA chronological record of all actions and changes made to a record.\n\n### Audit Trail\nComplete history of changes, approvals, and transactions for compliance and tracking purposes.\n\n---\n\n## Abbreviations\n\n### General\n- **SR**: Store Requisition\n- **SKU**: Stock Keeping Unit\n- **UOM**: Unit of Measure\n- **QTY**: Quantity\n- **HOD**: Head of Department\n\n### Locations\n- **CK**: Central Kitchen\n- **RS**: Roastery Store\n- **MW**: Main Warehouse\n- **WH**: Warehouse\n\n### Status\n- **N/A**: Not Available/Applicable\n- **TBD**: To Be Determined\n\n### Financial\n- **VAT**: Value Added Tax\n- **GST**: Goods and Services Tax\n- **BHT**: Thai Baht (currency)\n- **USD**: US Dollar (currency)\n\n### Roles\n- **SM**: Store Manager\n- **DM**: Department Manager\n- **FM**: Financial Manager\n- **PS**: Purchasing Staff\n\n### Technical\n- **API**: Application Programming Interface\n- **UI**: User Interface\n- **UX**: User Experience\n- **CRUD**: Create, Read, Update, Delete\n- **CSV**: Comma-Separated Values\n- **PDF**: Portable Document Format\n- **XLS**: Excel Spreadsheet\n- **JSON**: JavaScript Object Notation\n\n### Workflow\n- **WIP**: Work In Progress\n- **ETA**: Estimated Time of Arrival\n- **ETD**: Estimated Time of Delivery\n\n### Inventory\n- **FIFO**: First In, First Out\n- **LIFO**: Last In, First Out\n- **EOQ**: Economic Order Quantity\n- **ROP**: Reorder Point\n- **ABC**: Activity Based Classification (inventory categorization)\n\n---\n\n## Usage Examples\n\n### Store Requisition Flow\n```\n1. User creates Draft SR\n2. Fills in Request To (M01) and To Location (Central Kitchen)\n3. Adds items with Qty Required\n4. Submits → moves to \"In Process\" status\n5. Workflow Stage changes to \"HOD Approval\"\n6. HOD reviews and approves/adjusts Qty Approved\n7. Workflow Stage advances to \"Store Manager Approval\"\n8. SM approves → Workflow Stage becomes \"Complete\"\n9. Qty Issued is recorded in Stock Movements\n10. Journal Entries are auto-generated\n```\n\n### Stock Replenishment Example\n```\nItem: Thai Milk Tea\nCurrent Stock: 25 boxes (On Hand)\nMin Level: 30 boxes\nPar Level: 80 boxes\nReorder Point: 40 boxes\nStatus: Low (below Min Level)\nAction: Create SR for 55 boxes to reach Par Level\n```\n\n### Wastage Recording Example\n```\nItem: Coffee Beans\nQty: 2 bags\nUnit Cost: $28.50\nTotal Loss: $57.00\nReason: Quality Issues\nStatus: Pending Review\nNext: HOD reviews photo evidence and approves write-off\nResult: Inventory adjusted, Journal Entry created\n```\n\n---\n\n**Last Updated**: 2025-10-02\n**Module**: Store Operations\n**Total Terms**: 100+\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

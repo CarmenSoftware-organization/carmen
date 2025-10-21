@@ -125,9 +125,9 @@ export default function SystemAdministrationPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Manage system-wide configurations and preferences.
             </p>
-            <Button asChild className="w-full" variant="outline">
-              <Link href="#" className="flex items-center justify-between">
-                Coming Soon
+            <Button asChild className="w-full" variant="default">
+              <Link href="/system-administration/settings" className="flex items-center justify-between">
+                Configure Settings
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>

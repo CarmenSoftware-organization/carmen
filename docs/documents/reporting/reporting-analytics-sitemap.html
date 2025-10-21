@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting & Analytics Module - Sitemap - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Reporting & Analytics</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">REPORTING</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Reporting & Analytics Module - Sitemap\n\n> **Module:** Reporting & Analytics\n> **Total Pages:** 15-20\n> **Route Base:** `/reporting-analytics`\n\n---\n\n## Navigation Hierarchy\n\n```\nReporting & Analytics (15-20 pages)\n├── Main Dashboard (1 page)\n│   └── /reporting-analytics\n└── Consumption Analytics (14-19 pages)\n    ├── Enhanced Dashboard (2 pages)\n    │   ├── /reporting-analytics/consumption-analytics\n    │   └── Real-Time KPI Monitoring\n    ├── Fractional Sales Analytics (3 pages)\n    │   ├── Efficiency by Type\n    │   ├── Transaction Volume\n    │   └── Today's Distribution\n    ├── Variance Analysis (3 pages)\n    │   ├── Top Variance Ingredients\n    │   ├── Trend Analysis\n    │   └── Root Cause Identification\n    ├── Live Ingredient Tracking (2 pages)\n    │   ├── Real-Time Inventory Levels\n    │   └── Depletion Projections\n    ├── Efficiency Analysis (2 pages)\n    │   ├── Yield Efficiency Trends\n    │   └── Optimization Opportunities\n    ├── Executive Summary Dashboard (2 pages - planned)\n    │   ├── High-Level KPIs\n    │   └── Executive Reporting\n    └── Automated Reporting (2-5 pages - planned)\n        ├── Report Scheduling\n        ├── Email Distribution\n        └── Custom Report Builder\n```\n\n---\n\n## Page Details\n\n### 1. Main Dashboard (1 page)\n\n**Route:** `/reporting-analytics`\n\n**Status:** Coming Soon\n\n**Purpose**: Central hub for all reporting and analytics features.\n\n**Planned Features**:\n- Quick access to consumption analytics\n- Summary KPI widgets\n- Recent reports list\n- Scheduled reports management\n- Custom report builder access\n\n---\n\n### 2. Consumption Analytics Dashboard (2 pages)\n\n**Route:** `/reporting-analytics/consumption-analytics`\n\n**Status:** ✅ Production Ready\n\n**Purpose**: Enhanced real-time consumption tracking with fractional sales analytics.\n\n#### Main Dashboard Features\n\n**Page Components**:\n1. **Header Controls**:\n   - Location selector (Main Kitchen, Pastry Section, Bar Station)\n   - Time range selector (Today, This Week, This Month)\n   - Auto-refresh toggle (30-second intervals)\n   - Export button\n\n2. **Active Alerts Panel**:\n   - Critical, Warning, and Info severity levels\n   - Alert message and affected items\n   - Recommended actions\n   - Visual severity indicators (red, yellow, blue)\n\n3. **KPI Cards (6 metrics)**:\n   - Food Cost Percentage (Target: 30%)\n   - Waste Percentage (Target: 3%)\n   - Fractional Sales Rate (Conversion tracking)\n   - Average Transaction Value (Trend indicators)\n   - Profit Margin (Performance grading)\n   - Yield Efficiency (Performance rating)\n\n4. **Tab Navigation**:\n   - Overview\n   - Fractional Sales\n   - Variance Analysis\n   - Ingredients\n   - Efficiency\n\n#### Real-Time Data\n\n**Auto-Refresh Features**:\n- 30-second refresh interval (configurable)\n- Live KPI updates\n- Real-time alert generation\n- Dynamic chart updates\n- Automatic data synchronization\n\n**Data Sources**:\n- POS transaction stream\n- Inventory management system\n- Recipe management system\n- Consumption period tracking\n\n---\n\n### 3. Overview Tab (Part of Consumption Analytics - 1 page)\n\n**Features**:\n\n#### Consumption Trends Chart\n- **Chart Type**: Composed chart (bars + lines)\n- **Data**: 7-day rolling consumption\n- **Metrics**:\n  - Theoretical consumption (blue line)\n  - Actual consumption (green line)\n  - Waste amount (red bars)\n- **X-Axis**: Day (1-7)\n- **Y-Axis**: Cost ($)\n- **Tooltip**: Currency-formatted values\n\n#### Sales Distribution Chart\n- **Chart Type**: Stacked area chart\n- **Data**: Fractional vs whole item sales\n- **Metrics**:\n  - Fractional sales (purple area)\n  - Whole sales (cyan area)\n- **X-Axis**: Day (1-7)\n- **Y-Axis**: Transaction count\n- **Tooltip**: Transaction counts\n\n---\n\n### 4. Fractional Sales Tab (3 pages worth of content)\n\n**Features**:\n\n#### Efficiency by Type Chart\n- **Chart Type**: Dual-axis bar + line chart\n- **Types Tracked**:\n  - Pizza Slice (1/8 conversion)\n  - Cake Slice (1/12 conversion)\n  - Portion Control (variable)\n  - Bottle Glass (1/5 conversion)\n- **Left Y-Axis**: Revenue ($) and transaction count\n- **Right Y-Axis**: Efficiency percentage\n- **Metrics**:\n  - Revenue per type (green bars)\n  - Transactions per type (blue bars)\n  - Efficiency percentage (orange line)\n\n#### Real-Time Distribution Panel\n- **Today's Fractional Sales**: Total transaction count\n- **Breakdown by Type**:\n  - Pizza Slices: Count + percentage\n  - Cake Slices: Count + percentage\n  - Portions: Count + percentage\n  - Others: Count + percentage\n- **Visual**: Progress bars for each type\n- **Updates**: Real-time with auto-refresh\n\n#### Performance Metrics\n- **Efficiency Target**: 90%+\n- **Waste Target**: < 5%\n- **Revenue Contribution**: Percentage of total revenue\n- **Transaction Volume**: Daily/weekly/monthly trends\n\n---\n\n### 5. Variance Analysis Tab (3 pages worth of content)\n\n**Features**:\n\n#### Top Variance Ingredients List\n- **Display**: Ranked list (top 5 default, expandable)\n- **Columns**:\n  - Ingredient name\n  - Theoretical cost\n  - Actual cost\n  - Variance percentage\n  - Trend indicator (up/down/stable)\n- **Visual Indicators**:\n  - Green: < 8% variance (acceptable)\n  - Yellow: 8-15% variance (warning)\n  - Red: > 15% variance (critical)\n\n**Example Variance Items**:\n1. **Fresh Vegetables**: 13.6% variance (high, up trend)\n   - Theoretical: $125.00\n   - Actual: $142.00\n   - Recommended action: Improve storage procedures\n\n2. **Chicken Breast**: 11.4% variance (high, up trend)\n   - Theoretical: $210.00\n   - Actual: $234.00\n   - Recommended action: Review portion control\n\n3. **Fresh Herbs**: 6.7% variance (acceptable, stable)\n   - Theoretical: $45.00\n   - Actual: $48.00\n   - No action required\n\n#### Variance Drivers Analysis\n- **Wastage**: Spoilage, prep waste, disposal\n- **Over-Portioning**: Inconsistent portions, training gaps\n- **Ingredient Cost Changes**: Price fluctuations\n- **Recipe Deviation**: Non-standard preparation\n- **Spillage**: Accidental loss\n- **Theft**: Shrinkage, unauthorized use\n\n#### Statistical Analysis\n- **Mean Variance**: Average across all ingredients\n- **Median Variance**: Middle value (less affected by outliers)\n- **Standard Deviation**: Variance consistency measure\n- **Confidence Intervals**: Statistical confidence levels\n- **Outlier Detection**: Items beyond 2-3 standard deviations\n\n---\n\n### 6. Ingredients Tab (2 pages worth of content)\n\n**Features**:\n\n#### Live Ingredient Levels Grid\n- **Display**: Card grid (3 columns on desktop)\n- **Per Card Information**:\n  - Ingredient name\n  - Status badge (Adequate, Low, Critical, Out of Stock)\n  - Current level (numeric)\n  - Progress bar (vs reorder point)\n  - Reorder point threshold\n  - Projected depletion date\n\n**Status Thresholds**:\n- **Adequate** (Green): > 2x reorder point\n- **Low** (Yellow): Between reorder point and 2x reorder point\n- **Critical** (Red): Below reorder point\n- **Out of Stock** (Urgent): Zero inventory\n\n#### Depletion Projections\n- **Algorithm**: Consumption rate × remaining quantity\n- **Factors**:\n  - Historical consumption patterns\n  - Current sales velocity\n  - Day of week adjustments\n  - Seasonal variations\n- **Accuracy**: ± 1 day for stable consumption patterns\n\n#### Real-Time Updates\n- **Frequency**: Every 60 seconds\n- **Trigger Events**:\n  - New POS transaction\n  - Inventory adjustment\n  - Stock receipt\n  - Waste/spoilage recording\n\n---\n\n### 7. Efficiency Tab (2 pages worth of content)\n\n**Features**:\n\n#### Yield Efficiency Trends Chart\n- **Chart Type**: Dual-line chart\n- **Time Range**: 7-day rolling window\n- **Lines**:\n  - Target efficiency (blue dashed line, 95%)\n  - Actual efficiency (green solid line)\n- **Y-Axis Range**: 80-100%\n- **Tooltip**: Percentage format\n\n#### Optimization Opportunities Panel\n- **Display**: Prioritized list of improvement opportunities\n- **Per Opportunity**:\n  - Title and description\n  - Impact badge (High, Medium, Long Term)\n  - Detailed explanation\n  - Potential savings ($/day)\n  - Implementation button (\"View Details\")\n\n**Example Opportunities**:\n\n1. **Reduce Vegetable Waste**\n   - **Impact**: High\n   - **Description**: Improve storage and handling procedures to reduce 13.6% variance\n   - **Potential Savings**: $125.50/day\n   - **Action**: Review storage temperatures, rotation procedures, prep schedules\n\n2. **Optimize Portion Sizes**\n   - **Impact**: Medium\n   - **Description**: Standardize fractional portion sizes for better yield control\n   - **Potential Savings**: $89.25/day\n   - **Action**: Implement portion control tools, staff training\n\n3. **Recipe Standardization**\n   - **Impact**: Long Term\n   - **Description**: Update recipe specifications based on actual consumption patterns\n   - **Potential Savings**: $67.80/day\n   - **Action**: Analyze 30+ days of consumption data, revise recipes\n\n#### Efficiency Metrics\n- **Current Yield Efficiency**: 92.8%\n- **Target**: 95%\n- **Gap to Target**: 2.2 percentage points\n- **Trend**: Improving / Stable / Declining\n- **Projected Impact**: Cost savings if target achieved\n\n---\n\n### 8. Executive Summary Dashboard (2 pages - Planned)\n\n**Status:** 🚧 Planned\n\n**Purpose**: High-level executive dashboard with strategic KPIs and trends.\n\n**Planned Features**:\n- **Key Financial Metrics**:\n  - Total revenue (period)\n  - Total costs (period)\n  - Gross profit and margin\n  - Variance impact on profitability\n\n- **Strategic KPIs**:\n  - Food cost percentage trends\n  - Waste reduction progress\n  - Efficiency improvement rate\n  - Revenue per location\n\n- **Executive Charts**:\n  - Monthly P&L trends\n  - Location comparison matrix\n  - Category performance heatmap\n  - Improvement opportunity ranking\n\n- **Automated Insights**:\n  - Top 3 improvement opportunities\n  - Critical variances requiring attention\n  - Cost savings achieved (vs baseline)\n  - Forecasted next period performance\n\n---\n\n### 9. Automated Reporting (2-5 pages - Planned)\n\n**Status:** 🚧 Planned\n\n**Purpose**: Scheduled report generation and distribution system.\n\n#### Report Scheduling (1 page)\n\n**Features**:\n- **Schedule Types**:\n  - Daily summary (end of day)\n  - Weekly performance (Monday mornings)\n  - Monthly comprehensive (month-end + 1 day)\n  - Custom schedules (cron-like syntax)\n\n- **Report Templates**:\n  - Consumption analytics summary\n  - Variance analysis report\n  - Fractional sales performance\n  - Efficiency opportunities\n  - Executive summary\n\n- **Delivery Options**:\n  - Email distribution (multiple recipients)\n  - Shared folder (PDF/Excel)\n  - API webhook (JSON)\n  - Dashboard archive\n\n#### Custom Report Builder (2-3 pages)\n\n**Features**:\n- **Data Source Selection**:\n  - Consumption metrics\n  - Variance analysis\n  - Fractional sales\n  - Ingredient tracking\n  - Efficiency metrics\n\n- **Filter Configuration**:\n  - Date range (custom)\n  - Location filter\n  - Category filter\n  - Ingredient filter\n  - Recipe filter\n\n- **Metric Selection**:\n  - Drag-and-drop metric builder\n  - Calculated fields\n  - Aggregations (sum, average, min, max)\n  - Comparisons (vs prior period, vs budget)\n\n- **Visualization Options**:\n  - Chart type selection\n  - Table formatting\n  - Conditional formatting\n  - Export formats (PDF, Excel, CSV)\n\n#### Report Archive (1 page)\n\n**Features**:\n- **Report History**:\n  - Generated reports list\n  - Download links\n  - Regenerate option\n  - Archive/delete\n\n- **Report Metadata**:\n  - Generation timestamp\n  - Parameters used\n  - Data period\n  - Generated by (user/automated)\n\n---\n\n## Technical Integration\n\n### Data Flow\n\n```\nPOS System → Real-Time Transaction Stream → Consumption Tracking Engine\n    ↓\nRecipe System → Theoretical Consumption Calculator\n    ↓\nInventory System → Actual Consumption Tracker\n    ↓\nVariance Analysis Engine → Alert Generator\n    ↓\nDashboard Visualization Layer → User Interface\n```\n\n### Performance Requirements\n\n- **Dashboard Load**: < 2 seconds initial load\n- **Auto-Refresh**: < 500ms incremental update\n- **Chart Rendering**: < 1 second per chart\n- **Data Export**: < 5 seconds standard ranges\n- **WebSocket Latency**: < 100ms for real-time updates\n\n### Technology Stack\n\n- **Frontend**: React, TypeScript, Recharts\n- **Real-Time**: WebSocket connections\n- **State Management**: React hooks, React Query\n- **Charts**: Recharts (Composed, Area, Line, Bar, Scatter charts)\n- **UI Components**: Shadcn/ui (Cards, Tabs, Progress, Badges, Buttons)\n\n---\n\n## Component Files\n\n### Primary Components\n\n1. **enhanced-consumption-dashboard.tsx** (733 lines)\n   - Main dashboard orchestrator\n   - Tab management\n   - Real-time data handling\n   - Chart rendering\n   - Alert display\n\n2. **executive-summary-dashboard.tsx** (planned)\n   - High-level KPI cards\n   - Strategic trend charts\n   - Executive reporting interface\n\n3. **automated-reporting-dashboard.tsx** (planned)\n   - Report scheduling interface\n   - Custom report builder\n   - Report archive management\n\n4. **compliance-reports.tsx** (planned)\n   - Regulatory compliance reporting\n   - Audit trail reports\n   - Variance compliance tracking\n\n5. **cross-location-efficiency.tsx** (planned)\n   - Multi-location comparison\n   - Efficiency benchmarking\n   - Best practice sharing\n\n6. **fractional-comparison-reports.tsx** (planned)\n   - Detailed fractional sales analysis\n   - Cross-type comparisons\n   - Efficiency deep-dive\n\n7. **operational-dashboard.tsx** (planned)\n   - Operational metrics\n   - Shift-level analytics\n   - Staff performance tracking\n\n8. **recipe-variant-performance.tsx** (planned)\n   - Recipe-level consumption tracking\n   - Variant performance comparison\n   - Recipe optimization suggestions\n\n9. **time-pattern-analysis.tsx** (planned)\n   - Time-of-day consumption patterns\n   - Day-of-week trends\n   - Seasonal variations\n   - Predictive analytics\n\n---\n\n## Future Enhancements\n\n### Planned Features (Next 6 Months)\n\n1. **Predictive Analytics**:\n   - Machine learning consumption forecasting\n   - Automated variance pattern detection\n   - Anomaly detection and alerting\n\n2. **Mobile App**:\n   - Real-time KPI monitoring on mobile\n   - Push notifications for critical alerts\n   - Quick variance entry and review\n\n3. **Advanced Visualizations**:\n   - Interactive drill-down charts\n   - Heatmaps for pattern identification\n   - Sankey diagrams for cost flow\n   - Statistical process control charts\n\n4. **Expanded Reporting**:\n   - Custom dashboard builder\n   - Scheduled PDF reports via email\n   - API for third-party BI tool integration\n   - Data warehouse export\n\n5. **Enhanced Analytics**:\n   - Multi-location comparison dashboards\n   - Benchmark against industry standards\n   - What-if scenario modeling\n   - ROI calculator for improvements\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

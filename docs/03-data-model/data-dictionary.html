@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP - Data Dictionary - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Data Model</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Data Model</a> / Data Dictionary</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Carmen ERP - Data Dictionary\n\n> **Document Type:** Data Model Reference\n> **Audience:** Developers, Database Administrators, Technical Teams\n> **Last Updated:** October 20, 2025\n> **Version:** 1.0\n\n---\n\n## Overview\n\nThis data dictionary provides comprehensive documentation of all database tables, columns, data types, and relationships in the Carmen ERP system. The database follows a normalized design with proper foreign key constraints and indexes for optimal performance.\n\n---\n\n## Core Entities\n\n### User Management\n\n#### Table: `User`\n**Purpose:** Stores user accounts and authentication information\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique user identifier |\n| name | String | NOT NULL | User's full name |\n| email | String | UNIQUE, NOT NULL | User's email address (login) |\n| password | String | NOT NULL | Hashed password |\n| role | Enum | NOT NULL | User role (staff, manager, admin, etc.) |\n| departmentId | String | FK → Department | Associated department |\n| locationId | String | FK → Location | Primary location |\n| isActive | Boolean | DEFAULT true | Account status |\n| createdAt | DateTime | DEFAULT now() | Account creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n**Indexes:**\n- PRIMARY KEY on `id`\n- UNIQUE INDEX on `email`\n- INDEX on `departmentId`\n- INDEX on `locationId`\n- INDEX on `role`\n\n---\n\n#### Table: `Department`\n**Purpose:** Organizational departments and cost centers\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique department identifier |\n| code | String | UNIQUE, NOT NULL | Department code (e.g., \"F&B\", \"KITCHEN\") |\n| name | String | NOT NULL | Department name |\n| description | String | NULLABLE | Department description |\n| costCenter | String | NULLABLE | Accounting cost center code |\n| managerId | String | FK → User | Department manager |\n| isActive | Boolean | DEFAULT true | Department status |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n---\n\n#### Table: `Location`\n**Purpose:** Physical locations (outlets, warehouses, kitchens)\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique location identifier |\n| code | String | UNIQUE, NOT NULL | Location code |\n| name | String | NOT NULL | Location name |\n| type | Enum | NOT NULL | Location type (outlet, warehouse, kitchen, office) |\n| address | String | NULLABLE | Physical address |\n| city | String | NULLABLE | City |\n| country | String | NULLABLE | Country |\n| isActive | Boolean | DEFAULT true | Location status |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n---\n\n### Procurement Module\n\n#### Table: `PurchaseRequest`\n**Purpose:** Purchase request documents initiated by departments\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique PR identifier |\n| prNumber | String | UNIQUE, NOT NULL | PR document number (auto-generated) |\n| requestorId | String | FK → User, NOT NULL | User who created the request |\n| departmentId | String | FK → Department, NOT NULL | Requesting department |\n| locationId | String | FK → Location, NOT NULL | Delivery location |\n| status | Enum | NOT NULL | PR status (draft, submitted, approved, rejected, converted) |\n| priority | Enum | NOT NULL | Priority level (low, normal, high, urgent) |\n| requestedDate | DateTime | NOT NULL | Date when items are needed |\n| description | String | NULLABLE | PR description/notes |\n| totalAmount | Decimal | NULLABLE | Total estimated amount |\n| approvedBy | String | FK → User, NULLABLE | Approving user |\n| approvedDate | DateTime | NULLABLE | Approval timestamp |\n| rejectionReason | String | NULLABLE | Rejection reason if rejected |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n**Related Tables:**\n- `PurchaseRequestItem` - Line items for the purchase request\n- `PurchaseRequestApproval` - Approval workflow history\n\n---\n\n#### Table: `PurchaseRequestItem`\n**Purpose:** Line items within purchase requests\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique item identifier |\n| purchaseRequestId | String | FK → PurchaseRequest, NOT NULL | Parent PR |\n| productId | String | FK → Product, NOT NULL | Requested product |\n| quantity | Decimal | NOT NULL | Requested quantity |\n| unitId | String | FK → Unit, NOT NULL | Unit of measure |\n| estimatedUnitPrice | Decimal | NULLABLE | Estimated unit price |\n| estimatedTotal | Decimal | NULLABLE | Estimated line total |\n| notes | String | NULLABLE | Item-specific notes |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n---\n\n#### Table: `PurchaseOrder`\n**Purpose:** Purchase orders sent to vendors\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique PO identifier |\n| poNumber | String | UNIQUE, NOT NULL | PO document number (auto-generated) |\n| vendorId | String | FK → Vendor, NOT NULL | Supplier |\n| locationId | String | FK → Location, NOT NULL | Delivery location |\n| status | Enum | NOT NULL | PO status (draft, sent, acknowledged, delivered, cancelled) |\n| orderDate | DateTime | NOT NULL | Order date |\n| expectedDate | DateTime | NULLABLE | Expected delivery date |\n| subtotal | Decimal | NOT NULL | Subtotal before tax |\n| taxAmount | Decimal | NOT NULL | Tax amount |\n| totalAmount | Decimal | NOT NULL | Total amount |\n| paymentTerms | String | NULLABLE | Payment terms |\n| deliveryTerms | String | NULLABLE | Delivery terms |\n| notes | String | NULLABLE | PO notes |\n| createdBy | String | FK → User, NOT NULL | Creating user |\n| approvedBy | String | FK → User, NULLABLE | Approving user |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n**Related Tables:**\n- `PurchaseOrderItem` - Line items for the purchase order\n- `GoodsReceivedNote` - Receipts against this PO\n\n---\n\n#### Table: `GoodsReceivedNote`\n**Purpose:** Receipt documents for delivered goods\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique GRN identifier |\n| grnNumber | String | UNIQUE, NOT NULL | GRN document number (auto-generated) |\n| purchaseOrderId | String | FK → PurchaseOrder, NULLABLE | Related PO (if any) |\n| vendorId | String | FK → Vendor, NOT NULL | Supplier |\n| locationId | String | FK → Location, NOT NULL | Receiving location |\n| status | Enum | NOT NULL | GRN status (draft, posted, cancelled) |\n| receiptDate | DateTime | NOT NULL | Receipt date |\n| invoiceNumber | String | NULLABLE | Vendor invoice number |\n| totalAmount | Decimal | NOT NULL | Total received amount |\n| notes | String | NULLABLE | Receipt notes |\n| receivedBy | String | FK → User, NOT NULL | Receiving user |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n---\n\n### Inventory Module\n\n#### Table: `Product`\n**Purpose:** Master product catalog\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique product identifier |\n| sku | String | UNIQUE, NOT NULL | Stock keeping unit |\n| name | String | NOT NULL | Product name |\n| description | String | NULLABLE | Product description |\n| categoryId | String | FK → Category, NULLABLE | Product category |\n| baseUnitId | String | FK → Unit, NOT NULL | Base unit of measure |\n| isActive | Boolean | DEFAULT true | Product status |\n| trackInventory | Boolean | DEFAULT true | Whether to track inventory |\n| minStockLevel | Decimal | NULLABLE | Minimum stock level alert |\n| maxStockLevel | Decimal | NULLABLE | Maximum stock level |\n| reorderPoint | Decimal | NULLABLE | Reorder point |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n---\n\n#### Table: `Stock`\n**Purpose:** Current inventory levels by location\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique stock record identifier |\n| productId | String | FK → Product, NOT NULL | Product |\n| locationId | String | FK → Location, NOT NULL | Storage location |\n| quantity | Decimal | NOT NULL | Current quantity |\n| unitId | String | FK → Unit, NOT NULL | Unit of measure |\n| lastCountDate | DateTime | NULLABLE | Last physical count date |\n| lastTransactionDate | DateTime | NULLABLE | Last movement date |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n**Unique Constraint:** `(productId, locationId, unitId)`\n\n---\n\n#### Table: `PhysicalCount`\n**Purpose:** Physical inventory count sessions\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique count identifier |\n| countNumber | String | UNIQUE, NOT NULL | Count document number |\n| locationId | String | FK → Location, NOT NULL | Location being counted |\n| countDate | DateTime | NOT NULL | Count date |\n| status | Enum | NOT NULL | Count status (active, completed, cancelled) |\n| countType | Enum | NOT NULL | Count type (full, partial, cycle) |\n| notes | String | NULLABLE | Count notes |\n| createdBy | String | FK → User, NOT NULL | Creating user |\n| completedBy | String | FK → User, NULLABLE | Completing user |\n| completedDate | DateTime | NULLABLE | Completion timestamp |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n**Related Tables:**\n- `PhysicalCountItem` - Products being counted\n\n---\n\n### Vendor Management\n\n#### Table: `Vendor`\n**Purpose:** Supplier master data\n\n| Column | Type | Constraints | Description |\n|--------|------|-------------|-------------|\n| id | String | PK, UUID | Unique vendor identifier |\n| vendorCode | String | UNIQUE, NOT NULL | Vendor code |\n| companyName | String | NOT NULL | Company name |\n| contactPerson | String | NULLABLE | Primary contact person |\n| email | String | NULLABLE | Contact email |\n| phone | String | NULLABLE | Contact phone |\n| address | String | NULLABLE | Vendor address |\n| city | String | NULLABLE | City |\n| country | String | NULLABLE | Country |\n| taxId | String | NULLABLE | Tax identification number |\n| paymentTerms | String | NULLABLE | Standard payment terms |\n| isActive | Boolean | DEFAULT true | Vendor status |\n| rating | Int | NULLABLE | Vendor rating (1-5) |\n| createdAt | DateTime | DEFAULT now() | Creation timestamp |\n| updatedAt | DateTime | Auto-updated | Last modification timestamp |\n\n---\n\n## Enumerations\n\n### User Roles\n- `staff` - Regular staff member\n- `department-manager` - Department manager with approval authority\n- `financial-manager` - Finance department manager\n- `purchasing-staff` - Procurement specialist\n- `counter` - Inventory counter\n- `chef` - Kitchen chef/manager\n\n### Document Statuses\n\n**Purchase Request:**\n- `draft` - Being edited\n- `submitted` - Awaiting approval\n- `approved` - Approved for PO creation\n- `rejected` - Rejected\n- `converted` - Converted to PO\n\n**Purchase Order:**\n- `draft` - Being edited\n- `sent` - Sent to vendor\n- `acknowledged` - Vendor confirmed\n- `partially_received` - Partially delivered\n- `received` - Fully delivered\n- `cancelled` - Cancelled\n\n**GRN:**\n- `draft` - Being edited\n- `posted` - Posted to inventory\n- `cancelled` - Cancelled\n\n---\n\n## Relationships\n\n### One-to-Many\n- `Department` → `User` (departmentId)\n- `Location` → `User` (locationId)\n- `User` → `PurchaseRequest` (requestorId)\n- `Vendor` → `PurchaseOrder` (vendorId)\n- `PurchaseOrder` → `GoodsReceivedNote` (purchaseOrderId)\n- `Product` → `Stock` (productId)\n- `Location` → `Stock` (locationId)\n\n### Many-to-Many (through junction tables)\n- `PurchaseRequest` ↔ `Product` (through `PurchaseRequestItem`)\n- `PurchaseOrder` ↔ `Product` (through `PurchaseOrderItem`)\n- `GoodsReceivedNote` ↔ `Product` (through `GoodsReceivedNoteItem`)\n\n---\n\n## Indexes and Performance\n\n### Primary Indexes\n- All tables have a UUID primary key with B-tree index\n- Unique constraints on document numbers (PRNumber, PONumber, GRNNumber, etc.)\n\n### Foreign Key Indexes\n- All foreign key relationships have indexes for join performance\n- Composite indexes on frequently queried combinations\n\n### Query Optimization\n- Document number searches: UNIQUE index\n- Date range queries: B-tree indexes on date columns\n- Status filters: Index on status enum columns\n- User/Department lookups: Index on user and department IDs\n\n---\n\n## Data Integrity\n\n### Constraints\n1. **Foreign Keys:** All relationships enforced with ON DELETE CASCADE or ON DELETE SET NULL as appropriate\n2. **Unique Constraints:** Document numbers, SKUs, vendor codes\n3. **Check Constraints:** Status values, quantity > 0, amounts >= 0\n\n### Triggers and Validations\n- Document number auto-generation\n- Stock level updates on inventory transactions\n- Audit trail for critical changes\n- Workflow state transitions\n\n---\n\n## Related Documentation\n\n- [Schema File](./schema.prisma) - Prisma schema definition\n- [System Architecture](../02-architecture/system-architecture.md) - Database architecture\n- [API Reference](../06-api-reference/) - Database access patterns\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

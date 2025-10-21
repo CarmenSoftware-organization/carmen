@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Module Name] - Pages and Components Specification - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← All Modules</a>
+            <h1>MODULE-SPEC-TEMPLATE.MD</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="index.html">Module Overview</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="index.html">Documentation</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# [Module Name] - Pages and Components Specification\n\n## Table of Contents\n\n1. [Pages Overview](#pages-overview)\n2. [Modals and Dialogs](#modals-and-dialogs)\n3. [Dropdown Fields Reference](#dropdown-fields-reference)\n4. [Actions and Buttons Reference](#actions-and-buttons-reference)\n5. [Form Components](#form-components)\n6. [Data Display Components](#data-display-components)\n7. [Glossary](#glossary)\n\n---\n\n## Pages Overview\n\n### Landing Page\n**Path**: `/[module-route]`\n**File**: `app/(main)/[module-route]/page.tsx`\n\n![Landing Page](screenshots/[module]-landing.png)\n*[Module] Landing Page - Main dashboard with module navigation*\n\n**Purpose**: Main entry point for [module name] module\n\n**Components**:\n- Module dashboard cards\n- Quick navigation tiles\n- Statistics overview\n- Recent activity feed\n\n**Actions**:\n- Navigate to [Primary Section]\n- Navigate to [Secondary Section]\n- Navigate to [Tertiary Section]\n\n#### Action Flows\n\n**Navigate to [Primary Section]**:\n```mermaid\nflowchart LR\n    Click[\"Click [Primary Section] Card\"] --> Navigate[\"Navigate to /[route]\"]\n    Navigate --> Display[\"Display [Page] Page\"]\n```\n\n**Navigate to [Secondary Section]**:\n```mermaid\nflowchart LR\n    Click[\"Click [Secondary Section] Card\"] --> Navigate[\"Navigate to /[route]\"]\n    Navigate --> Display[\"Display [Page] Page\"]\n```\n\n---\n\n### List Page\n**Path**: `/[module-route]/[list-route]`\n**File**: `app/(main)/[module-route]/[list-route]/page.tsx`\n\n![List Page](screenshots/[module]-list.png)\n*[Entity] List - List view with search and filtering*\n\n**Status**: 🚧 Prototype / ✅ Production\n\n**Components**:\n- Data table with sorting\n- Search bar\n- Filter panel\n- Pagination controls\n- Action buttons\n\n**Table Columns**:\n- [Column 1 Name]\n- [Column 2 Name]\n- [Column 3 Name]\n- [Column 4 Name]\n- Status\n- Actions\n\n**Filters**:\n- Status dropdown\n- [Filter Field 1] (dropdown/text/date range)\n- [Filter Field 2] (dropdown/text/date range)\n- Date range picker\n- Advanced filter\n\n**Sorting**:\n- Sort by [Field 1]\n- Sort by [Field 2]\n- Sort by Date\n- Sort by Status\n\n**Actions**:\n- Create New [Entity]\n- Edit [Entity]\n- View Details\n- Delete [Entity]\n- Export to Excel\n- Print List\n- Bulk Actions\n\n#### Action Flows\n\n**Create New [Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Create New\"] --> Navigate[\"Navigate to New [Entity] Form\"]\n    Navigate --> Display[\"Display Creation Form\"]\n```\n\n**Edit [Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Edit\"] --> Navigate[\"Navigate to Edit Page\"]\n    Navigate --> Display[\"Display Pre-populated Form\"]\n```\n\n**Delete [Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Delete\"] --> Modal[\"Show Delete Confirmation Modal\"]\n    Modal --> Delete[\"Delete [Entity] Record\"]\n```\n\n**Search**:\n```mermaid\nflowchart LR\n    Type[\"Type Search Query\"] --> Search[\"Search [Entity] Records\"]\n    Search --> Display[\"Display Filtered Results\"]\n```\n\n**Apply Filters**:\n```mermaid\nflowchart LR\n    Select[\"Select Filter Criteria\"] --> Apply[\"Apply Filters\"]\n    Apply --> Refresh[\"Refresh List View\"]\n```\n\n**Export to Excel**:\n```mermaid\nflowchart LR\n    Click[\"Click Export\"] --> Generate[\"Generate Excel File\"]\n    Generate --> Download[\"Download File\"]\n```\n\n---\n\n### Detail Page\n**Path**: `/[module-route]/[list-route]/:id`\n**File**: `app/(main)/[module-route]/[list-route]/[id]/page.tsx`\n\n![Detail Page](screenshots/[module]-detail.png)\n*[Entity] Detail View - Comprehensive information display*\n\n**Tabs**:\n- Overview\n- [Tab 2 Name]\n- [Tab 3 Name]\n- [Tab 4 Name]\n- Documents\n- Activity Log\n\n**Overview Tab**:\n\n**Basic Information**:\n- [Field 1]\n- [Field 2]\n- [Field 3]\n- Status\n- Created Date\n- Last Modified\n\n**[Section 1 Name]**:\n- [Field 1]\n- [Field 2]\n- [Field 3]\n\n**[Section 2 Name]**:\n- [Field 1]\n- [Field 2]\n- [Field 3]\n\n**Actions**:\n- Back to List\n- Edit [Entity]\n- Delete [Entity]\n- Print\n- Download PDF\n- [Custom Action 1]\n- [Custom Action 2]\n\n#### Action Flows\n\n**Switch Tabs**:\n```mermaid\nflowchart LR\n    Click[\"Click Tab\"] --> Load[\"Load Tab Content\"]\n    Load --> Display[\"Display Tab Data\"]\n```\n\n**Back to List**:\n```mermaid\nflowchart LR\n    Click[\"Click Back\"] --> Navigate[\"Navigate to List Page\"]\n    Navigate --> Display[\"Display List View\"]\n```\n\n**Edit [Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Edit\"] --> Navigate[\"Navigate to Edit Page\"]\n    Navigate --> Display[\"Display Edit Form\"]\n```\n\n**Delete [Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Delete\"] --> Modal[\"Show Delete Confirmation\"]\n    Modal --> Delete[\"Delete Record\"]\n    Delete --> Navigate[\"Navigate to List Page\"]\n```\n\n**Print**:\n```mermaid\nflowchart LR\n    Click[\"Click Print\"] --> Open[\"Open Print Dialog\"]\n    Open --> Print[\"Print Detail View\"]\n```\n\n**Download PDF**:\n```mermaid\nflowchart LR\n    Click[\"Click Download PDF\"] --> Generate[\"Generate PDF Document\"]\n    Generate --> Download[\"Download PDF File\"]\n```\n\n---\n\n### New/Create Form\n**Path**: `/[module-route]/[list-route]/new`\n**File**: `app/(main)/[module-route]/[list-route]/new/page.tsx`\n\n![New Form](screenshots/[module]-new-form.png)\n*New [Entity] Creation Form - Multi-section form with validation*\n\n**Component**: `[EntityName]Form`\n\n**Form Sections**:\n\n1. **Basic Information**\n   - [Field 1] (required)\n   - [Field 2] (dropdown)\n   - [Field 3]\n   - [Field 4] (required)\n   - [Field 5] (textarea)\n\n2. **[Section 2 Name]**\n   - [Field 1] (required)\n   - [Field 2] (required, validated)\n   - [Field 3] (required, validated)\n   - [Field 4]\n\n3. **[Section 3 Name]**\n   - [Field 1] (dropdown, required)\n   - [Field 2] (required)\n   - [Field 3] (required)\n   - [Field 4] (required)\n   - [Field 5] (dropdown, required)\n\n4. **[Section 4 Name]**\n   - [Field 1] (dropdown)\n   - [Field 2] (currency input)\n   - [Field 3] (dropdown)\n\n**Dropdown Options**:\n\n**[Dropdown 1 Name]**:\n- Option 1\n- Option 2\n- Option 3\n- Option 4\n\n**[Dropdown 2 Name]**:\n- Option 1\n- Option 2\n- Option 3\n\n**[Dropdown 3 Name]**:\n- Option 1\n- Option 2\n- Option 3\n\n**Validation Rules**:\n- [Field 1]: Required, min 2 characters\n- [Field 2]: Valid format validation\n- [Field 3]: Required\n- [Field 4]: Positive number\n- [Field 5]: Date range validation\n\n**Actions**:\n- Save [Entity]\n- Save and Add Another\n- Cancel\n- Reset Form\n\n**Modal Dialogs**:\n- Unsaved Changes Warning (on cancel)\n- Validation Error Summary\n\n#### Action Flows\n\n**Save [Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Save\"] --> Validate[\"Validate Form\"]\n    Validate --> Create[\"Create Record\"]\n    Create --> Navigate[\"Navigate to Detail Page\"]\n```\n\n**Save and Add Another**:\n```mermaid\nflowchart LR\n    Click[\"Click Save and Add Another\"] --> Validate[\"Validate Form\"]\n    Validate --> Create[\"Create Record\"]\n    Create --> Clear[\"Clear Form Fields\"]\n```\n\n**Cancel**:\n```mermaid\nflowchart LR\n    Click[\"Click Cancel\"] --> Check[\"Check for Unsaved Changes\"]\n    Check --> Modal[\"Show Unsaved Changes Warning\"]\n    Modal --> Navigate[\"Navigate Back to List\"]\n```\n\n**Reset Form**:\n```mermaid\nflowchart LR\n    Click[\"Click Reset Form\"] --> Clear[\"Clear All Form Fields\"]\n    Clear --> Reset[\"Reset to Default Values\"]\n```\n\n**Field Validation**:\n```mermaid\nflowchart LR\n    Blur[\"Field Blur Event\"] --> Validate[\"Validate Field Value\"]\n    Validate --> Show[\"Show Validation Error/Success\"]\n```\n\n**Dropdown Selection**:\n```mermaid\nflowchart LR\n    Click[\"Click Dropdown\"] --> Open[\"Open Dropdown Options\"]\n    Open --> Select[\"Select Option\"]\n```\n\n---\n\n### Edit Form\n**Path**: `/[module-route]/[list-route]/:id/edit`\n**File**: `app/(main)/[module-route]/[list-route]/[id]/edit/page.tsx`\n\nSame form structure as New Form but pre-populated with existing data.\n\n**Additional Actions**:\n- Save Changes\n- Cancel (revert to detail view)\n- Delete [Entity]\n\n#### Action Flows\n\n**Save Changes**:\n```mermaid\nflowchart LR\n    Click[\"Click Save Changes\"] --> Validate[\"Validate Form\"]\n    Validate --> Update[\"Update Record\"]\n    Update --> Navigate[\"Navigate to Detail Page\"]\n```\n\n**Cancel Edit**:\n```mermaid\nflowchart LR\n    Click[\"Click Cancel\"] --> Check[\"Check for Unsaved Changes\"]\n    Check --> Navigate[\"Navigate to Detail Page\"]\n```\n\n**Delete [Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Delete\"] --> Modal[\"Show Delete Confirmation Modal\"]\n    Modal --> Delete[\"Delete Record\"]\n    Delete --> Navigate[\"Navigate to List Page\"]\n```\n\n---\n\n## Modals and Dialogs\n\n### 1. Advanced Filter Dialog\n**Trigger**: Click \"Advanced Filter\" button\n**Component**: `advanced-filter.tsx`\n\n**Filter Fields**:\n- [Field 1] (text contains)\n- [Field 2] (multi-select)\n- [Field 3] (dropdown)\n- [Field 4] (date range)\n- [Field 5] (range)\n- [Field 6] (yes/no)\n\n**Actions**:\n- Apply Filters\n- Clear All\n- Save Filter Preset\n- Cancel\n\n#### Action Flows\n\n**Apply Filters**:\n```mermaid\nflowchart LR\n    Click[\"Click Apply Filters\"] --> Build[\"Build Filter Query\"]\n    Build --> Filter[\"Apply Filters to List\"]\n```\n\n**Clear All Filters**:\n```mermaid\nflowchart LR\n    Click[\"Click Clear All\"] --> Reset[\"Reset All Filter Fields\"]\n    Reset --> Refresh[\"Refresh List View\"]\n```\n\n**Save Filter Preset**:\n```mermaid\nflowchart LR\n    Click[\"Click Save Preset\"] --> Modal[\"Show Save Preset Dialog\"]\n    Modal --> Save[\"Save Filter Configuration\"]\n```\n\n---\n\n### 2. Delete Confirmation Dialog\n**Trigger**: Click delete on [entity]\n**Component**: `[Entity]DeletionDialog.tsx`\n\n**Displays**:\n- Warning message\n- Dependency check results\n- Impact summary (related records affected)\n- Force delete option (if has dependencies)\n\n**Actions**:\n- Confirm Delete\n- Cancel\n- View Dependencies\n\n#### Action Flows\n\n**Confirm Delete**:\n```mermaid\nflowchart LR\n    Click[\"Click Confirm Delete\"] --> Check[\"Check for Dependencies\"]\n    Check --> Delete[\"Delete Record\"]\n```\n\n**View Dependencies**:\n```mermaid\nflowchart LR\n    Click[\"Click View Dependencies\"] --> Display[\"Display Dependency List\"]\n    Display --> Navigate[\"Navigate to Related Records\"]\n```\n\n---\n\n### 3. Add/Edit [Sub-Entity] Dialog\n**Trigger**: Add/Edit [sub-entity] buttons\n\n**Fields**:\n- [Field 1]\n- [Field 2]\n- [Field 3]\n- [Field 4]\n- [Field 5]\n- Is Primary (toggle)\n\n**Actions**:\n- Save\n- Cancel\n\n#### Action Flows\n\n**Save [Sub-Entity]**:\n```mermaid\nflowchart LR\n    Click[\"Click Save\"] --> Validate[\"Validate Fields\"]\n    Validate --> Save[\"Save to Parent Entity\"]\n```\n\n**Set Primary**:\n```mermaid\nflowchart LR\n    Toggle[\"Toggle Primary Flag\"] --> Update[\"Update Primary Flag\"]\n    Update --> Unset[\"Unset Other Primary Records\"]\n```\n\n---\n\n### 4. Document Upload Dialog\n**Trigger**: Upload document buttons\n\n**Fields**:\n- Document Type (dropdown)\n- Document Name\n- File Upload\n- Description\n- Effective Date\n- Expiry Date\n\n**Actions**:\n- Upload\n- Cancel\n\n#### Action Flows\n\n**Upload Document**:\n```mermaid\nflowchart LR\n    Click[\"Click Upload\"] --> Validate[\"Validate File\"]\n    Validate --> Upload[\"Upload to Server\"]\n    Upload --> Attach[\"Attach to Record\"]\n```\n\n---\n\n### 5. Selection Dialog\n**Trigger**: Select [entity] in forms\n\n**Features**:\n- Search bar\n- Category/Filter navigation\n- List with checkboxes\n- Selected items preview\n- Bulk select/deselect\n\n**Actions**:\n- Add Selected\n- Clear Selection\n- Cancel\n\n#### Action Flows\n\n**Search Items**:\n```mermaid\nflowchart LR\n    Type[\"Type Search Query\"] --> Search[\"Search Catalog\"]\n    Search --> Display[\"Display Matching Items\"]\n```\n\n**Select Items**:\n```mermaid\nflowchart LR\n    Check[\"Check Item Checkbox\"] --> Add[\"Add to Selected Items\"]\n    Add --> Update[\"Update Selection Preview\"]\n```\n\n**Add Selected Items**:\n```mermaid\nflowchart LR\n    Click[\"Click Add Selected\"] --> Validate[\"Validate Selection\"]\n    Validate --> Add[\"Add Items to Form\"]\n```\n\n---\n\n## Dropdown Fields Reference\n\n### Status Dropdown\n**Values**: Active, Inactive, Draft, Pending, Completed\n**Used in**: [Entity] filters, forms\n\n### [Category] Dropdown\n**Values**:\n- Category 1\n- Category 2\n- Category 3\n- Category 4\n\n**Used in**: [Entity] forms, filters\n\n### [Type] Dropdown\n**Values**:\n- Type 1\n- Type 2\n- Type 3\n- Type 4\n\n**Used in**: [Entity] forms\n\n### Date Range Picker\n**Presets**:\n- Today\n- Last 7 Days\n- Last 30 Days\n- Last Quarter\n- Last Year\n- Custom Range\n\n**Used in**: Filters, reports\n\n---\n\n## Actions and Buttons Reference\n\n### Global Actions (appearing across multiple pages):\n- **Search** - Real-time search\n- **Filter** - Open filter dialog\n- **Export** - Export to Excel/PDF\n- **Add New** - Create new record\n- **Refresh** - Reload data\n- **Settings** - Module settings\n\n### List View Actions:\n- **View Details** - Navigate to detail page\n- **Edit** - Edit mode or edit page\n- **Duplicate** - Clone record\n- **Delete** - Delete with confirmation\n- **Export Single** - Export single record\n- **Bulk Select** - Select multiple records\n- **Bulk Actions** - Actions on selected records\n\n### Detail View Actions:\n- **Back** - Return to list\n- **Edit** - Enter edit mode\n- **Save** - Save changes\n- **Cancel** - Discard changes\n- **Delete** - Delete record\n- **Print** - Print view\n- **Download PDF** - Export to PDF\n- **Share** - Share record\n- **Clone** - Duplicate record\n\n### Form Actions:\n- **Save** - Save and return\n- **Save and New** - Save and create another\n- **Save as Draft** - Save without validation\n- **Submit** - Submit for review/approval\n- **Cancel** - Return without saving\n- **Reset** - Clear form fields\n\n---\n\n## Form Components\n\n### Input Fields\n- Text input\n- Number input\n- Email input\n- Phone input\n- URL input\n- Password input\n- Textarea\n- Rich text editor\n\n### Selection Components\n- Dropdown select\n- Multi-select\n- Autocomplete\n- Radio button group\n- Checkbox group\n- Toggle switch\n- Date picker\n- Date range picker\n- Time picker\n\n### File Components\n- File upload (single)\n- File upload (multiple)\n- Image upload with preview\n- Document manager\n\n### Specialized Components\n- Currency input\n- Percentage input\n- Color picker\n- Rating selector\n- Tag input\n- [Custom Component 1]\n- [Custom Component 2]\n\n---\n\n## Data Display Components\n\n### Tables\n- Sortable columns\n- Pagination\n- Row selection\n- Inline actions\n- Expandable rows\n- Column visibility toggle\n- Column reordering\n- Export functionality\n\n### Cards\n- [Entity] card\n- Summary card\n- Statistics card\n- Quick action card\n\n### Lists\n- Simple list\n- Detailed list\n- Grouped list\n- Hierarchical list\n\n### Statistics/Metrics\n- KPI cards\n- Summary widgets\n- Progress indicators\n- Status badges\n- Charts and graphs\n- Trend indicators\n\n### Timeline/History\n- Activity feed\n- Audit trail\n- Change log\n- Version history\n\n---\n\n## Glossary\n\n### A\n\n**Active Status**: [Definition of active status in this module context]\n\n**[Term A1]**: [Definition]\n\n**[Term A2]**: [Definition]\n\n### B\n\n**[Term B1]**: [Definition]\n\n**[Term B2]**: [Definition]\n\n### C\n\n**[Term C1]**: [Definition]\n\n**[Term C2]**: [Definition]\n\n### D\n\n**[Term D1]**: [Definition]\n\n**[Term D2]**: [Definition]\n\n### E\n\n**[Term E1]**: [Definition]\n\n**[Term E2]**: [Definition]\n\n### F\n\n**[Term F1]**: [Definition]\n\n**[Term F2]**: [Definition]\n\n### G\n\n**[Term G1]**: [Definition]\n\n**[Term G2]**: [Definition]\n\n### I\n\n**Import**: [Definition in module context]\n\n**[Term I1]**: [Definition]\n\n### L\n\n**[Term L1]**: [Definition]\n\n**[Term L2]**: [Definition]\n\n### M\n\n**[Term M1]**: [Definition]\n\n**[Term M2]**: [Definition]\n\n### P\n\n**[Term P1]**: [Definition]\n\n**[Term P2]**: [Definition]\n\n### R\n\n**[Term R1]**: [Definition]\n\n**[Term R2]**: [Definition]\n\n### S\n\n**Status**: [Definition of status in this module context]\n\n**[Term S1]**: [Definition]\n\n### T\n\n**[Term T1]**: [Definition]\n\n**[Term T2]**: [Definition]\n\n### U\n\n**[Term U1]**: [Definition]\n\n**[Term U2]**: [Definition]\n\n### V\n\n**Validation**: [Definition in module context]\n\n**[Term V1]**: [Definition]\n\n### W\n\n**Workflow**: [Definition in module context]\n\n**[Term W1]**: [Definition]\n\n---\n\n## Usage Instructions\n\nThis template provides a comprehensive structure for documenting any module's pages and components. When using this template:\n\n1. **Replace Placeholders**:\n   - `[Module Name]` - Replace with actual module name\n   - `[module-route]` - Replace with URL route\n   - `[Entity]` - Replace with primary entity name\n   - `[Field N]` - Replace with actual field names\n   - All bracketed placeholders should be replaced with actual content\n\n2. **Add Screenshots**:\n   - Capture screenshots for all pages\n   - Save to `screenshots/` directory\n   - Update image paths in markdown\n\n3. **Document Actions**:\n   - Add Mermaid flowcharts for each action (one level deep)\n   - Follow the pattern: `Action → Immediate Result`\n   - Keep flows simple and clear\n\n4. **Complete Sections**:\n   - Fill in all table columns\n   - Document all dropdown options\n   - List all validation rules\n   - Define all modal dialogs\n\n5. **Glossary**:\n   - Define all technical terms used in the module\n   - Include acronyms and abbreviations\n   - Add cross-references between related terms\n   - Organize alphabetically\n\n6. **Keep Updated**:\n   - Update status when pages change from prototype to production\n   - Add new pages as they are developed\n   - Keep action flows current with implementation\n\n---\n\n**Last Updated**: [Date]\n**Status**: [Template / In Progress / Complete]\n**Module**: [Module Name]\n**Version**: 1.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

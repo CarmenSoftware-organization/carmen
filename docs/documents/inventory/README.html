@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Module Documentation - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>INVENTORY</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">INVENTORY</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Inventory Management Module Documentation\n\nThis directory contains comprehensive documentation for the Inventory Management module of the Carmen ERP system.\n\n## Documentation Files\n\n### 📊 Sitemap and Architecture\n- **[inventory-sitemap.md](./inventory-sitemap.md)** - Complete Mermaid sitemap showing module structure, navigation flow, workflow state diagrams, and user interaction patterns\n\n### 📋 Detailed Specifications\n- **[inventory-management-spec.md](./inventory-management-spec.md)** - Comprehensive specification document covering all UI elements, workflows, actions, and technical implementation details following the standardized template format\n\n### 📸 Screenshots\nAll screenshots are captured at full page resolution and show the actual application state in the `screenshots/` folder:\n\n- **inventory-management-dashboard.png** - Main dashboard with draggable widgets using React Beautiful DnD\n- **inventory-adjustments-list.png** - Adjustments list with advanced search, filtering, and sorting capabilities\n- **inventory-balance-report.png** - Balance report with tabs, advanced filtering, and summary metrics\n- **physical-count-setup.png** - Physical count setup wizard Step 1 with form validation\n- **spot-check-dashboard.png** - Spot check dashboard with card-based layout and progress tracking\n\n## Module Overview\n\nThe Inventory Management module manages:\n- **Inventory Dashboard**: Draggable widget system with real-time analytics\n- **Stock Overview**: Comprehensive inventory balance reporting and analysis\n- **Inventory Adjustments**: Complete adjustment lifecycle with approval workflows\n- **Spot Checks**: Ad-hoc inventory verification with streamlined workflows\n- **Physical Counts**: Comprehensive cycle counting with multi-step setup wizard\n- **Period End**: Period closing and reconciliation procedures\n- **Fractional Inventory**: Fractional unit handling and conversions\n- **Stock In**: Goods receipt and inventory posting workflows\n\n## Key Features Documented\n\n### 🎛️ Inventory Management Dashboard\n- Draggable widget system using React Beautiful DnD\n- 6 interactive widgets with real-time data visualization\n- Customizable layout with persistent user preferences\n- Quick navigation to all major inventory functions\n\n### 📊 Stock Overview and Balance Reporting\n- Advanced filtering with collapsible filter panel\n- Multiple view modes (Product, Category, Lot)\n- Dual valuation methods (FIFO, Weighted Average)\n- Tabbed interface (Balance Report, Movement History)\n- Export and print functionality\n- Real-time calculation updates\n\n### 📝 Inventory Adjustments\n- Comprehensive adjustment tracking and approval workflows\n- Advanced search and filtering capabilities\n- Status-based workflow management (Draft → Posted → Voided)\n- Type categorization (IN/OUT adjustments)\n- Detailed audit trails and reason code tracking\n- Bulk operations and action menus\n\n### 🔍 Spot Check Management\n- Card-based dashboard layout with visual progress indicators\n- Status tracking (Planning → Scheduled → In Progress → Completed)\n- Department and location-based filtering\n- Real-time progress monitoring\n- Quick creation and scheduling workflows\n\n### 📊 Physical Count Management\n- Multi-step setup wizard with form validation\n- Location and item selection with hierarchical support\n- Counter assignment and scheduling\n- Progress tracking and variance detection\n- Comprehensive count lifecycle management\n\n### 📅 Period End and Specialized Modules\n- Period closing and reconciliation procedures\n- Fractional inventory unit conversions\n- Stock receipt and quality validation workflows\n- Integration with procurement and production modules\n\n## Technical Architecture\n\n### Component Structure\n```\ninventory-management/\n├── page.tsx                          # Main dashboard (6 draggable widgets)\n├── stock-overview/\n│   ├── inventory-balance/            # Balance reports with advanced filtering\n│   ├── stock-cards/                  # Individual product views\n│   ├── slow-moving/                  # Slow moving analysis\n│   └── inventory-aging/              # Age-based analysis\n├── inventory-adjustments/\n│   ├── components/\n│   │   ├── inventory-adjustment-list.tsx    # Main list (238 lines)\n│   │   └── filter-sort-options.tsx          # Advanced filtering\n│   └── [id]/                         # Adjustment detail pages\n├── spot-check/\n│   ├── page.tsx                      # Dashboard with card layout\n│   └── components/                   # Spot check workflow components\n├── physical-count/\n│   ├── components/\n│   │   ├── setup.tsx                 # Setup wizard Step 1 (128 lines)\n│   │   ├── location-selection.tsx    # Step 2: Location selection\n│   │   ├── item-review.tsx          # Step 3: Item review\n│   │   └── final-review.tsx         # Step 4: Final review\n│   └── dashboard/                    # Count management interface\n├── period-end/                       # Period closing workflows\n├── fractional-inventory/             # Fractional unit handling\n└── stock-in/                        # Goods receipt workflows\n```\n\n### Key Technologies\n- **Next.js 14** with App Router\n- **TypeScript** with strict mode\n- **React Beautiful DnD** for drag-and-drop dashboard\n- **Recharts** for data visualization and analytics\n- **Tailwind CSS** + **Shadcn/ui** for styling\n- **Mock Data System** for development and testing\n- **React Hook Form** + **Zod** validation for forms\n\n## Data Flow Patterns\n\n### Inventory Adjustment Lifecycle\nDraft → Submitted → Under Review → Approved → Posted\n\n### Spot Check Workflow\nPlanning → Scheduled → In Progress → Completed\n\n### Physical Count Workflow\nSetup → Location Selection → Item Review → Final Review → Scheduled → In Progress → Completed\n\n## Navigation Hierarchy\n\n```\nInventory Management\n├── Dashboard (Draggable Widget System)\n├── Stock Overview\n│   ├── Overview Dashboard (Coming Soon)\n│   ├── Inventory Balance (Multi-tab with advanced filtering)\n│   ├── Stock Cards (Card-based product views)\n│   ├── Slow Moving (Analysis and reporting)\n│   └── Inventory Aging (Age-based categorization)\n├── Inventory Adjustments\n│   ├── Adjustments List (Search, filter, sort)\n│   └── Adjustment Detail (Multi-tab interface)\n├── Spot Check\n│   ├── Spot Check Dashboard (Card layout)\n│   ├── New Spot Check (Quick creation)\n│   └── Active Checks (Progress monitoring)\n├── Physical Count\n│   ├── Setup Wizard (4-step process)\n│   ├── Count Dashboard (Management interface)\n│   └── Active Counts (Execution interface)\n├── Period End (Closing procedures)\n├── Fractional Inventory (Unit conversions)\n└── Stock In (Goods receipt workflows)\n```\n\n## File Sizes and Complexity\n\n| Component | File Size | Lines | Screenshot Size | Complexity |\n|-----------|-----------|-------|-----------------|------------|\n| Main Dashboard | Medium | ~300 | 243KB | High (DnD) |\n| Adjustments List | Medium | 238 | 354KB | High |\n| Balance Report | Large | ~320 | 285KB | Very High |\n| Physical Count Setup | Small | 128 | 242KB | Medium |\n| Spot Check Dashboard | Medium | ~200 | 265KB | Medium |\n\n## Usage Instructions\n\n1. **For Developers**: Start with the sitemap to understand the overall structure, then review the detailed specification for implementation details\n2. **For Product Managers**: Focus on the specification document for feature details, user workflows, and business logic\n3. **For UI/UX Designers**: Use the screenshots alongside the specification to understand current implementation and design patterns\n4. **For QA Teams**: The specification provides comprehensive test scenarios, expected behaviors, and workflow validations\n\n## Status Summary\n\n### Implementation Status\n- **✅ Fully Implemented**: 41% (24 features)\n- **⚠️ Partially Implemented**: 28% (16 features)\n- **❌ Not Implemented**: 31% (18 features)\n\n### Development Priorities\n1. **Priority 1** (46-63 days): Data persistence, posting mechanisms, finance integration\n2. **Priority 2** (28-43 days): PO integration, lot/batch entry, audit trail, error handling\n3. **Priority 3** (20-36 days): Slow moving report, inventory aging, stock card list, export functionality\n4. **Priority 4** (40-59 days): Barcode scanning, mobile app, automated testing, accessibility\n\n## Last Updated\n- **Documentation Generated**: October 2, 2025\n- **Source Code Analysis**: Complete recursive scan of inventory management module\n- **Screenshots**: 27 full-page captures of major interfaces\n- **Documentation Status**: ✅ Complete\n\n---\n\nThis documentation provides a complete analysis of the Inventory Management module based on recursive source code scanning and live application capture. All screenshots and specifications reflect the current state of the application as of the generation date.\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

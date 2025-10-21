@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goods Received Note Module - User Interaction Guide - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Goods Received Notes</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">GRN</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Goods Received Note Module - User Interaction Guide\n\n## Table of Contents\n1. [Navigation & Entry Points](#navigation--entry-points)\n2. [Primary User Workflows](#primary-user-workflows)\n3. [Dialog Interactions](#dialog-interactions)\n4. [Form Interactions](#form-interactions)\n5. [Data Management](#data-management)\n6. [Advanced Features](#advanced-features)\n\n## Navigation & Entry Points\n\n### Main Navigation\n- **Primary Access:** Procurement → Goods Received Note (sidebar menu)\n- **Breadcrumb:** Dashboard → Procurement → Goods Received Note\n- **URL Pattern:** `/procurement/goods-received-note`\n\n### Direct Links\n- **Specific GRN:** `/procurement/goods-received-note/[GRN-ID]`\n- **Create from PO:** `/procurement/goods-received-note/new/vendor-selection`\n- **Create Manual:** `/procurement/goods-received-note/new-[UUID]?mode=confirm`\n- **Edit Mode:** `/procurement/goods-received-note/[GRN-ID]?mode=edit`\n\n## Primary User Workflows\n\n### 1. Create GRN from Purchase Order\n\n**Step-by-Step Process:**\n\n1. **Navigate to GRN List**\n   - Click \"Procurement\" in sidebar\n   - Select \"Goods Received Note\"\n\n![GRN List Page](./screenshots/grn-list-page.png)\n\n2. **Initiate PO-based Creation**\n   - Click \"New GRN\" dropdown button\n   - Select \"Create from Purchase Order\"\n\n![New GRN Dropdown Menu](./screenshots/grn-new-dropdown-menu.png)\n\n3. **Select Vendor**\n   - Use search to find vendor by name or registration number\n   - Click \"Select\" button for desired vendor\n   - System stores vendor selection and navigates to PO selection\n\n![Vendor Selection Page](./screenshots/grn-vendor-selection-page.png)\n\n4. **Choose Purchase Orders**\n   - Review POs from selected vendor\n   - Select single or multiple POs for consolidation\n   - Preview total amounts and item counts\n   - Click \"Create GRN\" to proceed\n\n![PO Selection Page](./screenshots/grn-po-selection-page.png)\n\n5. **Select Items and Quantities**\n   - Choose specific items to receive from selected POs\n   - Enter receiving quantities for each item\n   - Select appropriate locations (e.g., Receiving Bay)\n   - Review real-time amount calculations\n   - Click \"Next: Confirm GRN\" to proceed\n\n![Item Location Selection Page](./screenshots/grn-item-location-selection-page.png)\n\n6. **Review Auto-populated Data**\n   - Verify vendor information is correct\n   - Check auto-populated items from selected POs\n   - Review calculated totals and currency information\n   - Modify quantities if partial receipt\n\n![GRN Detail Confirm Mode](./screenshots/grn-detail-confirm-mode.png)\n\n7. **Complete Header Information**\n   - Set GRN date (defaults to today)\n   - Enter invoice number and date\n   - Add tax invoice details if applicable\n   - Select receiver from dropdown\n   - Choose appropriate cash book\n   - Add description and remarks\n\n8. **Configure Special Flags**\n   - Check \"Consignment\" if applicable\n   - Check \"Cash\" for cash transactions\n\n9. **Confirm and Save**\n   - Review all details in confirm mode\n   - Use \"Edit Further\" if changes needed\n   - Click \"Confirm & Save\" to finalize GRN\n   - System generates real GRN number and saves\n\n**Screenshot References:**\n- GRN List with New GRN dropdown\n- Vendor selection interface\n- PO selection with totals preview\n- GRN detail in confirm mode\n\n### 2. Create GRN Manually\n\n**Step-by-Step Process:**\n\n1. **Access Manual Creation**\n   - From GRN List page\n   - Click \"New GRN\" → \"Create Manually\"\n\n2. **Auto-navigation to Confirm Mode**\n   - System creates temporary GRN with placeholder data\n   - Navigates directly to GRN detail in confirm mode\n   - All fields empty for manual entry\n\n3. **Enter Header Information**\n   - Set GRN date\n   - Select vendor from dropdown\n   - Enter invoice details manually\n   - Choose receiver and cash book\n   - Add description\n\n4. **Add Items Manually**\n   - Navigate to Items tab\n   - Click \"Add Item\" button\n   - Search and select products\n   - Enter quantities and pricing\n   - Configure discounts and taxes\n\n5. **Add Extra Costs (Optional)**\n   - Navigate to Extra Costs tab\n   - Add freight, insurance, handling charges\n   - Choose allocation method (even, weighted, manual)\n\n6. **Review Financial Summary**\n   - Check calculated totals\n   - Verify currency amounts\n   - Confirm tax calculations\n\n7. **Finalize GRN**\n   - Return to confirm mode view\n   - Review all entered data\n   - Click \"Confirm & Save\" to create GRN\n\n### 3. Edit Existing GRN\n\n**Edit Workflow:**\n\n1. **Access GRN for Editing**\n   - Open specific GRN from list\n   - Click \"Edit\" button in form footer\n   - System switches to edit mode\n\n2. **Modify GRN Data**\n   - Update header information as needed\n   - Modify item quantities and pricing\n   - Add or remove items\n   - Adjust extra costs\n\n3. **Review Changes**\n   - Monitor \"unsaved changes\" indicator\n   - Preview impact on financial totals\n   - Validate all modifications\n\n4. **Save or Cancel**\n   - Click \"Save\" to commit changes\n   - Or \"Cancel\" to discard modifications\n   - System returns to view mode after save\n\n### 4. Process Item Receipts\n\n**Item Management Workflow:**\n\n1. **Access Items Tab**\n   - Open GRN detail page\n   - Click on \"Items\" tab\n\n2. **Review Item Status**\n   - Check ordered vs received quantities\n   - Monitor remaining quantities\n   - Identify pending items\n\n3. **Update Received Quantities**\n   - Click edit icon for item\n   - Modify received quantity\n   - System auto-calculates remaining\n   - Update item status accordingly\n\n4. **Handle Partial Receipts**\n   - Use \"Split Line\" function for partial delivery\n   - Create separate line items for tracking\n   - Track multiple delivery dates\n\n5. **Bulk Operations**\n   - Select multiple items using checkboxes\n   - Choose bulk action from dropdown\n   - Apply changes to selected items\n\n6. **Finalize Items**\n   - Mark items as \"Fully Received\"\n   - Close line items when complete\n   - Update GRN status when all items complete\n\n7. **Review Stock Movements**\n   - Click on \"Stock Movements\" tab\n   - Monitor inventory impacts by location\n   - Review unit costs and total costs\n   - Verify stock level updates\n\n![Stock Movements Tab](./screenshots/grn-stock-movements-tab.png)\n\n## Dialog Interactions\n\n### 1. New GRN Creation Dialog\n\n**Interface Elements:**\n- **Process Type Selection**: Cards for PO-based vs Manual creation\n- **Visual Indicators**: Icons and descriptions for each option\n- **Action Buttons**: Clear selection and navigation\n\n**User Actions:**\n- **Select Process Type**: Click on preferred creation method\n- **Automatic Navigation**: System routes to appropriate next step\n- **No Confirmation**: Selection immediately proceeds to workflow\n\n### 2. Vendor Selection Dialog\n\n**Interface Elements:**\n- **Search Bar**: Filter vendors by name or registration\n- **Vendor Table**: Business registration number, company name, action button\n- **Loading States**: Progress indicators during data fetch\n\n**User Actions:**\n- **Search**: Type vendor name or registration number\n- **Filter**: Real-time filtering as user types\n- **Select**: Click \"Select\" button for desired vendor\n- **Validation**: Only active vendors selectable\n\n### 3. Item Add/Edit Dialogs\n\n**Add Item Dialog:**\n- **Product Search**: Searchable product catalog\n- **Quantity Fields**: Ordered and received quantities\n- **Pricing Configuration**: Unit price, discounts, taxes\n- **Validation**: Required fields and business rules\n\n**Edit Item Dialog:**\n- **Pre-populated Fields**: Current item values\n- **Change Tracking**: Visual indicators for modifications\n- **Impact Preview**: Updated totals before saving\n- **Validation**: Quantity and pricing constraints\n\n**User Actions:**\n- **Product Selection**: Search and choose from catalog\n- **Quantity Entry**: Enter ordered and received amounts\n- **Pricing Setup**: Configure unit price and adjustments\n- **Save/Cancel**: Commit changes or discard modifications\n\n### 4. Bulk Actions Confirmation\n\n**Dialog Triggers:**\n- **Item Selection**: Multiple items selected in Items tab\n- **Bulk Action**: Action chosen from bulk actions menu\n\n**Interface Elements:**\n- **Action Summary**: Description of operation to be performed\n- **Item Count**: Number of items affected\n- **Confirmation Buttons**: Proceed or Cancel options\n- **Warning Messages**: For destructive operations\n\n**User Actions:**\n- **Review Selection**: Verify items and action\n- **Confirm Operation**: Proceed with bulk action\n- **Cancel**: Abort operation and return to item list\n\n## Form Interactions\n\n### 1. Header Information Form\n\n**Field Types and Validation:**\n\n**Date Fields:**\n- **GRN Date**: HTML5 date picker, defaults to today\n- **Invoice Date**: Must be ≤ GRN date\n- **Tax Invoice Date**: Optional, validation if provided\n\n**Selection Fields:**\n- **Vendor**: Dropdown with search capability\n- **Receiver**: Staff member selection\n- **Currency**: Multi-currency support with exchange rates\n- **Cash Book**: Account selection for financial posting\n\n**Text Fields:**\n- **Invoice Numbers**: Alphanumeric input with validation\n- **Description**: Multi-line text area for details\n- **Remarks**: Additional comments and notes\n\n**Validation Rules:**\n- **Required Fields**: Date, vendor, receiver marked with indicators\n- **Date Logic**: Invoice date ≤ GRN date ≤ current date\n- **Currency Consistency**: Must match PO currency if from PO\n- **Character Limits**: Text fields have maximum length validation\n\n### 2. Items Tab Interactions\n\n**Item Selection:**\n- **Individual Selection**: Checkbox per item row\n- **Bulk Selection**: Master checkbox for all items\n- **Range Selection**: Shift+click for contiguous ranges\n- **Visual Feedback**: Selected items highlighted\n\n**Quantity Management:**\n- **Ordered Quantity**: Read-only (from PO or manual entry)\n- **Received Quantity**: Editable field with validation\n- **Remaining Quantity**: Auto-calculated (Ordered - Received)\n- **Unit Display**: Order unit and base unit with conversion\n\n**Pricing Configuration:**\n- **Unit Price**: Editable with currency formatting\n- **Discount Rate**: Percentage input with validation\n- **Tax Rate**: Configurable tax percentage\n- **Total Calculation**: Auto-calculated display\n\n**Item Actions:**\n- **Add New**: Button opens item creation dialog\n- **Edit**: Pencil icon for item modification\n- **Delete**: Trash icon with confirmation\n- **Split**: Divide quantities for partial receipts\n\n### 3. Extra Costs Tab Interactions\n\n**Cost Entry:**\n- **Description**: Text field for cost description\n- **Amount**: Currency input with validation\n- **Currency**: Dropdown selection\n- **Allocation Type**: Radio buttons for distribution method\n\n**Allocation Methods:**\n- **Even**: Equal distribution across all items\n- **Weighted**: Distribution based on item values\n- **Manual**: Custom allocation per item\n\n**Real-time Updates:**\n- **Total Impact**: Immediate calculation of cost effect\n- **Item Allocation**: Show distribution across items\n- **Financial Summary**: Auto-update of GRN totals\n\n## Data Management\n\n### 1. Search and Filtering\n\n**Quick Filters:**\n- **Status-based Filtering**: Draft, Received, Verified, Posted\n- **Date Range Selection**: From/To date pickers\n- **Vendor Filtering**: Multi-select vendor dropdown\n- **Amount Range**: Min/Max amount filters\n\n**Advanced Search:**\n- **GRN Reference**: Exact or partial match\n- **Invoice Number**: Cross-reference search\n- **Item Description**: Search within GRN items\n- **Multi-criteria**: Combine multiple search terms\n\n**Search Features:**\n- **Auto-complete**: Suggestions based on existing data\n- **Search History**: Recently used search terms\n- **Saved Searches**: Store frequently used filters\n- **Clear Filters**: Reset all search criteria\n\n### 2. Bulk Operations\n\n**Selection Methods:**\n- **Individual Selection**: Click checkboxes for specific GRNs\n- **Page Selection**: Select all GRNs on current page\n- **Filter-based Selection**: Select all matching filter criteria\n- **Manual Range**: Shift+click for range selection\n\n**Bulk Actions:**\n- **Status Updates**: Change status for multiple GRNs\n- **Export Operations**: Generate reports for selected GRNs\n- **Print Batches**: Print multiple GRN documents\n- **Delete Operations**: Remove multiple GRNs (with confirmation)\n\n**Progress Tracking:**\n- **Operation Progress**: Progress bars for bulk operations\n- **Success/Failure Count**: Results summary with details\n- **Error Reporting**: Detailed error information for failures\n- **Rollback**: Undo operations if supported\n\n### 3. Data Export and Import\n\n**Export Options:**\n- **PDF Reports**: Formatted GRN documents\n- **Excel Spreadsheets**: Detailed data for analysis\n- **CSV Files**: Data export for other systems\n- **Financial Reports**: Accounting-focused exports\n\n**Export Configuration:**\n- **Date Range**: Specify export period\n- **Field Selection**: Choose columns to include\n- **Format Options**: Layout and styling preferences\n- **Delivery Method**: Download or email delivery\n\n**Import Capabilities:**\n- **Bulk GRN Creation**: CSV import for multiple GRNs\n- **Item Data**: Import item information from spreadsheets\n- **Vendor Updates**: Bulk vendor information updates\n- **Validation**: Data validation before import\n\n## Advanced Features\n\n### 1. Multi-Currency Handling\n\n**Currency Operations:**\n- **Real-time Exchange Rates**: Automatic rate retrieval\n- **Historical Rates**: Date-specific exchange rates\n- **Manual Rate Override**: Custom exchange rate entry\n- **Currency Conversion**: Auto-conversion to base currency\n\n**Multi-Currency Display:**\n- **Primary Currency**: GRN transaction currency\n- **Base Currency**: Company reporting currency\n- **Dual Display**: Side-by-side currency amounts\n- **Conversion Calculations**: Transparent rate application\n\n### 2. Workflow Integration\n\n**Purchase Order Integration:**\n- **Seamless PO to GRN**: Direct creation from POs\n- **Three-way Matching**: PO-GRN-Invoice matching\n- **Status Synchronization**: Update PO status on GRN creation\n- **Quantity Tracking**: Monitor ordered vs received\n\n**Inventory Integration:**\n- **Stock Updates**: Automatic inventory adjustments\n- **Location Tracking**: Multi-location stock management\n- **Cost Updates**: Weighted average cost calculations\n- **Availability Check**: Stock level validation\n\n**Financial Integration:**\n- **Journal Entries**: Automatic accounting entries\n- **Cost Center Allocation**: Departmental cost assignment\n- **Budget Integration**: Budget vs actual tracking\n- **Payment Processing**: Integration with accounts payable\n\n### 3. Approval Workflows\n\n**Approval Routing:**\n- **Amount-based Approval**: Different limits for different roles\n- **Department Approval**: Route based on requesting department\n- **Vendor Approval**: Special handling for new vendors\n- **Exception Handling**: Escalation for unusual transactions\n\n**Notification System:**\n- **Email Notifications**: Automatic notifications to approvers\n- **In-app Notifications**: Dashboard notification center\n- **Mobile Notifications**: Push notifications for mobile users\n- **Reminder System**: Automated follow-up reminders\n\n### 4. Integration Features\n\n**Vendor Portal Integration:**\n- **Vendor Access**: Portal for vendors to view GRNs\n- **Status Updates**: Real-time status communication\n- **Document Sharing**: Secure document exchange\n- **Invoice Matching**: Automated invoice-GRN matching\n\n**Quality Management:**\n- **Quality Checks**: Integration with quality control\n- **Inspection Results**: Link QC results to GRNs\n- **Compliance Tracking**: Regulatory compliance monitoring\n- **Certificate Management**: Track vendor certifications\n\n**Reporting Integration:**\n- **Financial Reporting**: Integration with financial reports\n- **Operational Reports**: GRN performance metrics\n- **Compliance Reports**: Regulatory reporting support\n- **Analytics**: Business intelligence integration\n\n---\n\n*Generated on: Latest*\n*User Interaction Guide Version: 1.0*";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

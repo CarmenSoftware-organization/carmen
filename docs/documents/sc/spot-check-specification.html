@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot Check Module - Complete Specification - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Spot Check</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">SC</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Spot Check Module - Complete Specification\n\n**Carmen ERP System - Inventory Management**\n\n## Table of Contents\n\n1. [Overview](#overview)\n2. [Module Structure](#module-structure)\n3. [Pages and Components](#pages-and-components)\n4. [User Interface Elements](#user-interface-elements)\n5. [Data Flow](#data-flow)\n6. [Actions and Options](#actions-and-options)\n7. [Screenshots](#screenshots)\n8. [Site Map](#site-map)\n\n---\n\n## Overview\n\nThe Spot Check module is a core component of Carmen ERP's Inventory Management system designed to facilitate random inventory verification and accuracy checking. It allows authorized personnel to perform targeted inventory counts on specific items or locations to maintain inventory accuracy and identify discrepancies.\n\n### Key Features\n\n- **Random Item Selection**: Automatically select items for spot checking based on criteria\n- **High-Value Item Focus**: Target expensive items for more frequent verification\n- **Real-time Count Tracking**: Live progress monitoring during active counts\n- **Variance Analysis**: Automatic calculation and tracking of inventory discrepancies\n- **Dashboard Overview**: Comprehensive monitoring of all spot check activities\n- **Multi-user Support**: Role-based access for different user types\n\n### Business Objectives\n\n- Maintain inventory accuracy through regular spot checks\n- Identify potential inventory issues before full cycle counts\n- Reduce inventory shrinkage through targeted verification\n- Improve overall inventory control and visibility\n\n---\n\n## Module Structure\n\n### File Structure\n```\napp/(main)/inventory-management/spot-check/\n├── page.tsx                       # Main spot check listing\n├── layout.tsx                     # Module layout wrapper\n├── types.ts                       # TypeScript interfaces\n├── dashboard/\n│   └── page.tsx                   # Dashboard overview\n├── new/\n│   ├── page.tsx                   # New spot check creation\n│   └── layout.tsx                 # New spot check layout\n├── active/\n│   ├── page.tsx                   # Active spot checks listing\n│   └── [id]/\n│       └── page.tsx               # Individual active count\n├── completed/\n│   ├── page.tsx                   # Completed spot checks\n│   └── [id]/\n│       └── page.tsx               # Individual completed count details\n├── components/\n│   ├── new-spot-check-form.tsx    # Form for creating new spot checks\n│   ├── count-detail-form.tsx      # Form for entering count data\n│   ├── count-list-item.tsx        # List item component\n│   ├── count-detail-card.tsx      # Card view component\n│   ├── spot-check-nav.tsx         # Navigation component\n│   └── [other components]         # Additional UI components\n```\n\n### Core TypeScript Interfaces\n\n```typescript\ninterface SpotCheckDetails {\n  countId: string\n  counter: string\n  department: string\n  store: string\n  date: Date\n  selectedItems: Array<{\n    id: string\n    code: string\n    name: string\n    description: string\n    expectedQuantity: number\n    unit: string\n  }>\n}\n\ninterface CountDetailData {\n  items: {\n    id: string\n    name: string\n    code: string\n    currentStock: number\n    actualCount: number\n    unit: string\n    status: 'good' | 'damaged' | 'missing' | 'expired'\n    isSubmitted: boolean\n    variance: number\n  }[]\n  notes: string\n}\n```\n\n---\n\n## Pages and Components\n\n### 1. Main Spot Check Page (`/spot-check`)\n\n**File**: `page.tsx`\n**Route**: `/inventory-management/spot-check`\n\n#### Description\nThe main landing page displaying all spot check entries with filtering and search capabilities.\n\n#### Key Features\n- List and grid view toggle\n- Status filtering (All, Pending, In Progress, Completed)\n- Department and location filtering\n- Search functionality\n- Quick actions for each spot check entry\n\n#### UI Elements\n- **Header Section**:\n  - Page title: \"Spot Check\"\n  - Description: \"Random inventory spot checks for accuracy verification\"\n  - \"New Spot Check\" button with Plus icon\n\n- **Filter Controls Card**:\n  - Search input field\n  - Status dropdown (All Statuses, Pending, In Progress, Completed)\n  - Department dropdown (populated from mockData)\n  - Location filter toggle button (Building icon)\n  - View toggle buttons (List/Grid icons)\n\n- **Location Filter Panel** (conditional):\n  - Location dropdown selector\n  - Active filter tags with remove option\n\n- **Content Display**:\n  - List View: `CountListItem` components\n  - Grid View: `CountDetailCard` components\n\n#### Mock Data Structure\n```javascript\nconst spotCheckData = [\n  {\n    storeName: \"Main Kitchen Store\",\n    department: \"F&B\",\n    userName: \"John Doe\",\n    date: \"2024-04-20\",\n    status: \"pending\",\n    itemCount: 10,\n    lastCountDate: \"2024-03-20\",\n    variance: 5.2,\n    notes: \"Spot check of dry goods section\",\n    completedCount: 5\n  }\n]\n```\n\n---\n\n### 2. Dashboard Page (`/spot-check/dashboard`)\n\n**File**: `dashboard/page.tsx`\n**Route**: `/inventory-management/spot-check/dashboard`\n\n#### Description\nComprehensive dashboard providing real-time overview of all spot check activities and key metrics.\n\n#### Key Features\n- Statistics overview cards\n- Active counts monitoring\n- Pending reviews management\n- Recent activity feed\n- Quick access actions\n\n#### UI Elements\n- **Statistics Cards**:\n  - Active Counters: Shows number of users currently performing counts\n  - Items Counted Today: Total items counted across all active sessions\n  - Pending Reviews: Number of completed counts awaiting approval\n\n- **Active Counts Panel**:\n  - Real-time list of ongoing spot checks\n  - Progress indicators (percentage complete)\n  - Counter and location information\n  - Start time and duration tracking\n  - \"View All Active Counts\" action button\n\n- **Pending Reviews Panel**:\n  - Completed counts awaiting review/approval\n  - Variance count indicators\n  - Counter and completion date information\n  - Status badges (Pending Review, Pending Approval)\n  - \"Review All Pending\" action button\n\n- **Latest Activities Panel**:\n  - Timeline of recent spot check activities\n  - Activity type indicators (Count Completed, Count Started, Variance Approved)\n  - User attribution and timestamps\n  - Descriptive activity messages\n\n#### Mock Data Examples\n```javascript\nconst stats = [\n  { title: \"Active Counters\", value: \"4\", icon: Users },\n  { title: \"Items Counted Today\", value: \"245\", icon: Boxes },\n  { title: \"Pending Reviews\", value: \"8\", icon: ClipboardList }\n]\n```\n\n---\n\n### 3. New Spot Check Page (`/spot-check/new`)\n\n**File**: `new/page.tsx`\n**Route**: `/inventory-management/spot-check/new`\n\n#### Description\nForm interface for creating new spot check sessions with customizable selection criteria.\n\n#### Key Features\n- Counter assignment\n- Location and department selection\n- Item selection methodology (Random vs High-Value)\n- Real-time item preview\n- Form validation\n\n#### UI Elements\n- **Form Section** (Left Panel):\n  - Counter dropdown selector\n  - Department dropdown selector\n  - Store location dropdown selector\n  - Count date picker (calendar widget)\n  - Selection method radio buttons:\n    - Random Selection\n    - High Value Items (with minimum price field)\n  - Number of items input (1-100 range)\n\n- **Selected Items Preview** (Right Panel):\n  - Sticky sidebar showing selected items\n  - Real-time updates based on form criteria\n  - Item cards displaying:\n    - Item name and code\n    - Category and location\n    - Stock level and unit\n    - Item value\n    - Last count date\n\n#### Form Validation Schema\n```typescript\nconst formSchema = z.object({\n  counterId: z.string().nonempty(\"Please select a counter\"),\n  departmentId: z.string().nonempty(\"Please select a department\"),\n  storeId: z.string().nonempty(\"Please select a store\"),\n  countDate: z.date(),\n  selectionType: z.enum([\"random\", \"highValue\"]),\n  itemCount: z.number().min(1).max(100),\n  minimumPrice: z.number().optional(),\n})\n```\n\n---\n\n### 4. Active Spot Checks Page (`/spot-check/active`)\n\n**File**: `active/page.tsx`\n**Route**: `/inventory-management/spot-check/active`\n\n#### Description\nLists all currently active or pending spot check sessions that can be started or resumed.\n\n#### Key Features\n- Status filtering (All, Pending, In Progress, Paused)\n- Progress tracking with visual indicators\n- Quick start/resume actions\n- Comprehensive session details\n\n#### UI Elements\n- **Header Section**:\n  - Title: \"Pending Counts\"\n  - Description: \"Start or resume your inventory counts\"\n  - Status filter dropdown\n\n- **Count Session Cards**:\n  - Session ID with status badge\n  - Counter and department information\n  - Start time and duration display\n  - Location badges\n  - Progress bar with completion percentage\n  - Item count tracking (completed/total)\n  - Match/variance/pending counters\n  - Start/Resume action button\n\n#### Status Badge Variants\n- **Pending**: Blue background, \"Pending\" text\n- **In Progress**: Green background, \"In Progress\" text\n- **Paused**: Yellow background, \"Paused\" text\n\n---\n\n### 5. Individual Active Count Page (`/spot-check/active/[id]`)\n\n**File**: `active/[id]/page.tsx`\n**Route**: `/inventory-management/spot-check/active/{countId}`\n\n#### Description\nInteractive counting interface for performing actual spot checks on selected items.\n\n#### Key Features\n- Item-by-item counting interface\n- Real-time variance calculation\n- Item status tracking (good, damaged, missing, expired)\n- Progress persistence\n- Session controls (pause, complete)\n\n#### UI Elements\n- **Header Navigation Bar**:\n  - Back to Spot Checks button\n  - Session controls (Pause, Complete Count)\n  - Sticky positioning\n\n- **Session Info Card**:\n  - Counter name with User icon\n  - Count date with Calendar icon\n  - Session reference with FileText icon\n  - Grid layout for information display\n\n- **Count Detail Form**:\n  - Full-screen counting interface\n  - Integrated `CountDetailForm` component\n  - Item listing with current stock levels\n  - Actual count input fields\n  - Status dropdown selectors\n  - Notes section for additional information\n\n---\n\n### 6. Completed Spot Checks Page (`/spot-check/completed`)\n\n**File**: `completed/page.tsx`\n**Route**: `/inventory-management/spot-check/completed`\n\n#### Description\nHistorical view of all completed spot check sessions with search and filtering capabilities.\n\n#### Key Features\n- Search functionality across multiple fields\n- Date range filtering\n- Accuracy percentage display\n- Export capabilities\n- Detailed view access\n\n#### UI Elements\n- **Search and Filter Bar**:\n  - Search input with Search icon\n  - Date range filter dropdown (All Time, Today, This Week, This Month)\n\n- **Completed Count Cards**:\n  - Count ID with accuracy percentage badge\n  - Counter and department information\n  - Completion timestamp and duration\n  - Location badges\n  - Progress indicator (always 100%)\n  - Match/variance counters\n  - Notes preview (truncated)\n  - Action buttons (View Details, Export)\n\n#### Accuracy Badge Colors\n- **95%+**: Green background (high accuracy)\n- **85-94%**: Yellow background (medium accuracy)\n- **<85%**: Red background (low accuracy)\n\n---\n\n### 7. Individual Completed Count Page (`/spot-check/completed/[id]`)\n\n**File**: `completed/[id]/page.tsx`\n**Route**: `/inventory-management/spot-check/completed/{countId}`\n\n#### Description\nDetailed read-only view of a completed spot check session with full audit information.\n\n#### Key Features\n- Complete session history\n- Detailed variance analysis\n- Item-level results\n- Audit trail information\n- Export/print capabilities\n\n*Note: Implementation details to be added based on actual component development.*\n\n---\n\n## User Interface Elements\n\n### Buttons and Actions\n\n#### Primary Actions\n- **New Spot Check** (Plus icon): Creates new spot check session\n- **Start Count** (PlayCircle icon): Initiates pending count\n- **Resume Count** (PlayCircle icon): Continues paused count\n- **Complete Count** (CheckCircle icon): Finalizes active count\n- **Pause** (PauseCircle icon): Temporarily suspends count\n\n#### Secondary Actions\n- **View Details** (FileText icon): Shows detailed information\n- **Export** (Download icon): Downloads count data\n- **Back** (ChevronLeft icon): Navigation return\n- **Delete** (X icon): Removes count session\n\n### Input Controls\n\n#### Form Elements\n- **Text Inputs**: Standard text entry with validation\n- **Number Inputs**: Numeric fields with min/max constraints\n- **Dropdowns**: Single-select with search capabilities\n- **Radio Buttons**: Exclusive choice selection\n- **Checkboxes**: Multiple selection options\n- **Date Pickers**: Calendar-based date selection\n- **Textareas**: Multi-line text entry for notes\n\n#### Filter Controls\n- **Search Bars**: Real-time filtering with search icons\n- **Status Filters**: Dropdown selection for status types\n- **View Toggles**: List/Grid display mode switching\n- **Location Filters**: Collapsible panel with multi-select\n\n### Visual Indicators\n\n#### Status Badges\n- **Pending**: Blue with \"Pending\" text\n- **In Progress**: Green with \"In Progress\" text\n- **Completed**: Gray with \"Completed\" text\n- **Paused**: Yellow with \"Paused\" text\n\n#### Progress Indicators\n- **Progress Bars**: Visual completion tracking\n- **Percentage Displays**: Numeric progress indicators\n- **Item Counters**: \"X of Y items\" format\n\n#### Variance Indicators\n- **Positive Variance**: Green badge with \"+\" prefix\n- **Negative Variance**: Red badge with \"-\" prefix\n- **Zero Variance**: Gray outline badge\n\n---\n\n## Data Flow\n\n### Spot Check Creation Flow\n\n1. **User navigates** to `/spot-check/new`\n2. **Form renders** with empty state\n3. **User selects** counter, department, store, date\n4. **System filters** available items based on criteria\n5. **Preview updates** with selected items in real-time\n6. **User submits** form with validation\n7. **System creates** spot check session with unique ID\n8. **Navigation redirects** to active count page\n\n### Count Execution Flow\n\n1. **User accesses** active count via `/spot-check/active/[id]`\n2. **System loads** session data and selected items\n3. **Count form renders** with item listing\n4. **User enters** actual counts for each item\n5. **System calculates** variance in real-time\n6. **User selects** item status (good/damaged/missing/expired)\n7. **Progress tracking** updates completion percentage\n8. **User submits** individual items or entire session\n9. **System saves** count data and updates session status\n\n### Data Persistence\n\n#### Session Storage\n- Count sessions persist across browser refreshes\n- Form state maintained during navigation\n- Progress automatically saved on item submission\n\n#### Mock Data Integration\n- Uses centralized mock data from `@/lib/mockData`\n- Simulates real database operations\n- Maintains data consistency across components\n\n---\n\n## Actions and Options\n\n### User Actions by Page\n\n#### Main Spot Check Page (`/spot-check`)\n| Action | Description | Icon | Behavior |\n|--------|-------------|------|----------|\n| New Spot Check | Creates new count session | Plus | Navigate to `/spot-check/new` |\n| Filter by Status | Filters entries by status | None | Updates displayed items |\n| Filter by Department | Filters entries by department | None | Updates displayed items |\n| Filter by Location | Filters entries by location | Building | Shows/hides location panel |\n| Toggle View | Switches between list/grid | List/Grid | Changes display layout |\n| Search | Filters entries by text | None | Real-time filtering |\n| Start Count | Opens count detail form | None | Shows modal overlay |\n| Delete Count | Removes count entry | None | Confirms and deletes |\n\n#### Dashboard Page (`/spot-check/dashboard`)\n| Action | Description | Icon | Behavior |\n|--------|-------------|------|----------|\n| View All Active Counts | Navigate to active counts | ArrowRight | Route to `/spot-check/active` |\n| Review All Pending | Navigate to reviews | ArrowRight | Route to review interface |\n\n#### New Spot Check Page (`/spot-check/new`)\n| Action | Description | Icon | Behavior |\n|--------|-------------|------|----------|\n| Select Counter | Choose count performer | None | Dropdown selection |\n| Select Department | Choose department | None | Dropdown selection |\n| Select Store | Choose location | None | Dropdown selection |\n| Pick Date | Choose count date | Calendar | Date picker modal |\n| Choose Selection Type | Random vs High-Value | None | Radio button toggle |\n| Set Item Count | Number of items to count | None | Numeric input |\n| Set Minimum Price | High-value threshold | None | Currency input |\n| Create Spot Check | Submit form | None | Validation and creation |\n\n#### Active Counts Page (`/spot-check/active`)\n| Action | Description | Icon | Behavior |\n|--------|-------------|------|----------|\n| Filter by Status | Filter active counts | None | Dropdown filtering |\n| Start Count | Begin pending count | PlayCircle | Navigate to count interface |\n| Resume Count | Continue paused count | PlayCircle | Navigate to count interface |\n\n#### Individual Count Page (`/spot-check/active/[id]`)\n| Action | Description | Icon | Behavior |\n|--------|-------------|------|----------|\n| Back to Spot Checks | Return to main page | ChevronLeft | Navigate back |\n| Pause Count | Temporarily stop | PauseCircle | Save state and pause |\n| Complete Count | Finish counting | CheckCircle | Finalize and submit |\n| Enter Actual Count | Input count value | None | Update item data |\n| Set Item Status | Mark item condition | None | Dropdown selection |\n| Submit Item | Confirm item count | Check | Lock item entry |\n| Add Notes | Enter additional info | None | Textarea input |\n\n### Dropdown Options\n\n#### Status Filter Options\n- **All Statuses**: Shows all entries\n- **Pending**: Not yet started\n- **In Progress**: Currently being counted\n- **Completed**: Finished counting\n\n#### Department Filter Options\n*(Populated from mock data)*\n- **F&B**: Food & Beverage operations\n- **Housekeeping**: Room and facility maintenance\n- **Maintenance**: Equipment and infrastructure\n\n#### Location Filter Options\n*(Populated from mock data)*\n- **Main Kitchen Store**: Primary food storage\n- **Cold Room**: Refrigerated storage\n- **Dry Store**: Non-perishable storage\n- **Linen Room**: Housekeeping supplies\n\n#### Item Selection Methods\n- **Random Selection**: Computer-generated random item selection\n- **High Value Items**: Focus on expensive inventory items\n\n#### Item Status Options\n- **Good**: Item in acceptable condition\n- **Damaged**: Item has defects but may be usable\n- **Missing**: Item not found at expected location\n- **Expired**: Item past expiration date\n\n---\n\n## Screenshots\n\n*Note: Screenshots to be captured and placed in this section showing:*\n\n1. **Main Spot Check Page**: List and grid views with filters\n2. **Dashboard Overview**: Statistics and active monitoring\n3. **New Spot Check Form**: Creation interface with item preview\n4. **Active Count Interface**: Item-by-item counting screen\n5. **Completed Counts**: Historical view with search\n6. **Count Detail Modal**: Item entry form\n7. **Mobile Responsive Views**: All pages on mobile devices\n\n---\n\n## Site Map\n\n```mermaid\ngraph TD\n    A[Spot Check Module] --> B[Main Page ]\n    A --> C[Dashboard ]\n    A --> D[New Spot Check ]\n    A --> E[Active Counts ]\n    A --> F[Completed Counts ] \n\n    B --> G[Count Detail Modal]\n    B --> H[List View]\n    B --> I[Grid View]\n    B --> J[Filter Panel]\n\n    C --> K[Stats Overview]\n    C --> L[Active Counts Panel]\n    C --> M[Pending Reviews Panel]\n    C --> N[Activities Panel]\n\n    D --> O[Creation Form]\n    D --> P[Item Preview Panel]\n    D --> Q[Validation]\n\n    E --> R[Active Count Detail ]\n    E --> S[Status Filters]\n\n    F --> T[Completed Count Detail] \n    F --> U[Search & Filters]\n    F --> V[Export Options]\n\n    R --> W[Count Interface]\n    R --> X[Session Controls]\n    R --> Y[Progress Tracking]\n\n    W --> Z[Item Entry Form]\n    W --> AA[Status Selection]\n    W --> BB[Notes Section]\n```\n\n---\n\n## Technical Implementation Notes\n\n### State Management\n- Uses React hooks (`useState`) for local component state\n- Form state managed with React Hook Form and Zod validation\n- Session persistence through browser storage for active counts\n\n### Data Sources\n- Mock data imported from `@/lib/mockData`\n- TypeScript interfaces defined in `types.ts`\n- Real-time calculations for variances and progress\n\n### Navigation\n- Next.js App Router for routing\n- `useRouter` for programmatic navigation\n- Nested layouts for consistent page structure\n\n### Styling\n- Tailwind CSS for styling\n- Shadcn/ui components for consistent UI\n- Responsive design with mobile-first approach\n- Card-based layouts with consistent spacing\n\n### Key Dependencies\n- React 18+ with Next.js 14\n- React Hook Form for form handling\n- Zod for schema validation\n- Lucide React for icons\n- Date-fns for date formatting\n\n---\n\n## Future Enhancement Opportunities\n\n1. **Real-time Collaboration**: Multiple counters on same session\n2. **Barcode Integration**: Scanner support for item identification\n3. **Photo Documentation**: Attach images for damaged/missing items\n4. **Advanced Analytics**: Trend analysis and predictive insights\n5. **Mobile App**: Native mobile application for counting\n6. **Integration APIs**: Connection to external inventory systems\n7. **Automated Scheduling**: Recurring spot check automation\n8. **Approval Workflows**: Multi-level approval for variances\n\n---\n\n*This specification document serves as the complete reference for the Carmen ERP Spot Check module implementation and functionality.*";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

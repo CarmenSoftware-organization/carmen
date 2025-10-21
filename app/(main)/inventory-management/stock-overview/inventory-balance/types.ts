@@ -71,6 +71,5 @@ export interface BalanceReportParams {
     to: string
   }
   viewType: 'CATEGORY' | 'PRODUCT' | 'LOT'
-  valuationMethod: 'FIFO' | 'WEIGHTED_AVERAGE'
   showLots: boolean
 }

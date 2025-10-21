@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard API Specifications - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Dashboard / Api</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Dashboard API Specifications\n\n## Overview\n\nThis document defines the API endpoints, data models, and integration specifications for the Dashboard module. Currently using mock data; this specification serves as the blueprint for backend implementation.\n\n## Base Configuration\n\n### API Base URL\n```\nProduction: https://api.carmen-erp.com/v1\nDevelopment: http://localhost:3000/api\n```\n\n### Authentication\nAll endpoints require authentication via JWT token in Authorization header:\n```\nAuthorization: Bearer <jwt_token>\n```\n\n### Rate Limiting\n- **Default**: 100 requests per minute per user\n- **Premium**: 500 requests per minute per user\n\n## Endpoints\n\n### 1. Get Dashboard Metrics\n\n**Endpoint**: `GET /api/dashboard/metrics`\n\n**Description**: Retrieve aggregated metrics for dashboard cards\n\n**Authorization**: Required - All authenticated users\n\n**Query Parameters**:\n```typescript\n{\n  department?: string        // Filter by department ID (optional)\n  dateRange?: 'month' | 'quarter' | 'year'  // Default: 'month'\n  currency?: string          // Currency code (default: 'USD')\n}\n```\n\n**Request Example**:\n```bash\nGET /api/dashboard/metrics?department=kitchen&dateRange=month&currency=USD\nAuthorization: Bearer eyJhbGc...\n```\n\n**Response Schema**:\n```typescript\n{\n  success: boolean\n  data: {\n    totalOrders: {\n      value: number\n      change: number        // Percentage change\n      trend: 'up' | 'down'\n      period: string        // e.g., \"June 2024\"\n    }\n    activeSuppliers: {\n      value: number\n      change: number\n      trend: 'up' | 'down'\n      verified: number\n    }\n    inventoryValue: {\n      value: number\n      change: number\n      trend: 'up' | 'down'\n      currency: string\n    }\n    monthlySpend: {\n      value: number\n      change: number\n      trend: 'up' | 'down'\n      currency: string\n      budget: number        // Budget allocation\n      utilization: number   // Percentage used\n    }\n    criticalStockItems: {\n      count: number\n      items: Array<{\n        id: string\n        name: string\n        currentQuantity: number\n        minimumQuantity: number\n        severity: 'critical' | 'warning'\n      }>\n    }\n    pendingApprovals: {\n      count: number\n      overdue: number\n      urgent: number\n    }\n    completedDeliveries: {\n      count: number\n      period: 'week' | 'month'\n      onTime: number\n      delayed: number\n    }\n  }\n  meta: {\n    lastUpdated: string     // ISO 8601 timestamp\n    cacheExpiry: number     // Seconds until cache expires\n  }\n}\n```\n\n**Response Example**:\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"totalOrders\": {\n      \"value\": 1234,\n      \"change\": 12.5,\n      \"trend\": \"up\",\n      \"period\": \"June 2024\"\n    },\n    \"activeSuppliers\": {\n      \"value\": 89,\n      \"change\": 3.2,\n      \"trend\": \"up\",\n      \"verified\": 85\n    },\n    \"inventoryValue\": {\n      \"value\": 45231,\n      \"change\": -2.4,\n      \"trend\": \"down\",\n      \"currency\": \"USD\"\n    },\n    \"monthlySpend\": {\n      \"value\": 89432,\n      \"change\": 8.7,\n      \"trend\": \"up\",\n      \"currency\": \"USD\",\n      \"budget\": 100000,\n      \"utilization\": 89.4\n    },\n    \"criticalStockItems\": {\n      \"count\": 12,\n      \"items\": [\n        {\n          \"id\": \"INV-001\",\n          \"name\": \"Organic Milk\",\n          \"currentQuantity\": 5,\n          \"minimumQuantity\": 20,\n          \"severity\": \"critical\"\n        }\n      ]\n    },\n    \"pendingApprovals\": {\n      \"count\": 8,\n      \"overdue\": 2,\n      \"urgent\": 3\n    },\n    \"completedDeliveries\": {\n      \"count\": 156,\n      \"period\": \"week\",\n      \"onTime\": 142,\n      \"delayed\": 14\n    }\n  },\n  \"meta\": {\n    \"lastUpdated\": \"2024-06-15T10:30:00Z\",\n    \"cacheExpiry\": 300\n  }\n}\n```\n\n**Error Responses**:\n```typescript\n// 401 Unauthorized\n{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Authentication required\"\n  }\n}\n\n// 403 Forbidden\n{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Insufficient permissions to view department metrics\"\n  }\n}\n\n// 500 Internal Server Error\n{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"INTERNAL_ERROR\",\n    \"message\": \"Failed to calculate metrics\",\n    \"details\": \"Database connection timeout\"\n  }\n}\n```\n\n### 2. Get Chart Data\n\n**Endpoint**: `GET /api/dashboard/charts`\n\n**Description**: Retrieve time-series data for dashboard charts\n\n**Authorization**: Required - All authenticated users\n\n**Query Parameters**:\n```typescript\n{\n  chartType: 'orders' | 'spend' | 'suppliers'  // Required\n  period: 'month' | 'quarter' | 'year'          // Default: 'month'\n  months?: number                                // Number of months (default: 6)\n  department?: string                            // Filter by department\n}\n```\n\n**Request Example**:\n```bash\nGET /api/dashboard/charts?chartType=orders&period=month&months=6\nAuthorization: Bearer eyJhbGc...\n```\n\n**Response Schema**:\n```typescript\n{\n  success: boolean\n  data: {\n    chartType: string\n    period: string\n    dataPoints: Array<{\n      period: string          // e.g., \"Jan\", \"Feb\"\n      value: number           // Primary metric\n      secondaryValue?: number // For dual-metric charts\n      label: string\n    }>\n    aggregation: {\n      total: number\n      average: number\n      min: number\n      max: number\n      trend: 'increasing' | 'decreasing' | 'stable'\n    }\n  }\n  meta: {\n    startDate: string\n    endDate: string\n    lastUpdated: string\n  }\n}\n```\n\n**Response Example**:\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"chartType\": \"orders\",\n    \"period\": \"month\",\n    \"dataPoints\": [\n      { \"period\": \"Jan\", \"value\": 186, \"label\": \"January 2024\" },\n      { \"period\": \"Feb\", \"value\": 305, \"label\": \"February 2024\" },\n      { \"period\": \"Mar\", \"value\": 237, \"label\": \"March 2024\" },\n      { \"period\": \"Apr\", \"value\": 273, \"label\": \"April 2024\" },\n      { \"period\": \"May\", \"value\": 209, \"label\": \"May 2024\" },\n      { \"period\": \"Jun\", \"value\": 214, \"label\": \"June 2024\" }\n    ],\n    \"aggregation\": {\n      \"total\": 1424,\n      \"average\": 237,\n      \"min\": 186,\n      \"max\": 305,\n      \"trend\": \"stable\"\n    }\n  },\n  \"meta\": {\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-06-30\",\n    \"lastUpdated\": \"2024-06-15T10:30:00Z\"\n  }\n}\n```\n\n### 3. Get Recent Activities\n\n**Endpoint**: `GET /api/dashboard/activities`\n\n**Description**: Retrieve recent system activities for the activity feed\n\n**Authorization**: Required - All authenticated users\n\n**Query Parameters**:\n```typescript\n{\n  limit?: number           // Number of activities (default: 10, max: 50)\n  offset?: number          // Pagination offset (default: 0)\n  type?: string            // Filter by activity type\n  status?: string          // Filter by status\n  priority?: string        // Filter by priority\n  dateFrom?: string        // ISO 8601 date\n  dateTo?: string          // ISO 8601 date\n}\n```\n\n**Request Example**:\n```bash\nGET /api/dashboard/activities?limit=10&offset=0&priority=high\nAuthorization: Bearer eyJhbGc...\n```\n\n**Response Schema**:\n```typescript\n{\n  success: boolean\n  data: {\n    activities: Array<{\n      id: string\n      type: string              // 'Purchase Request' | 'Purchase Order' | etc.\n      documentNumber: string    // e.g., 'PR-2024-001'\n      status: string\n      target: string            // Associated entity\n      priority: 'critical' | 'high' | 'medium' | 'low'\n      reviewer: {\n        id: string\n        name: string\n        avatar?: string\n      }\n      metadata: {\n        amount?: number\n        currency?: string\n        items?: number\n        location?: string\n      }\n      createdAt: string         // ISO 8601\n      updatedAt: string\n      actions: Array<{\n        type: 'view' | 'edit' | 'delete'\n        url: string\n        enabled: boolean\n      }>\n    }>\n    pagination: {\n      total: number\n      limit: number\n      offset: number\n      hasMore: boolean\n    }\n  }\n  meta: {\n    lastUpdated: string\n  }\n}\n```\n\n**Response Example**:\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"activities\": [\n      {\n        \"id\": \"1\",\n        \"type\": \"Purchase Request\",\n        \"documentNumber\": \"PR-2024-001\",\n        \"status\": \"Approved\",\n        \"target\": \"Kitchen Supplies\",\n        \"priority\": \"high\",\n        \"reviewer\": {\n          \"id\": \"user-123\",\n          \"name\": \"Sarah Johnson\",\n          \"avatar\": \"https://...\"\n        },\n        \"metadata\": {\n          \"amount\": 1500,\n          \"currency\": \"USD\",\n          \"items\": 15\n        },\n        \"createdAt\": \"2024-01-20T08:00:00Z\",\n        \"updatedAt\": \"2024-01-20T10:30:00Z\",\n        \"actions\": [\n          { \"type\": \"view\", \"url\": \"/procurement/purchase-requests/PR-2024-001\", \"enabled\": true },\n          { \"type\": \"edit\", \"url\": \"/procurement/purchase-requests/PR-2024-001/edit\", \"enabled\": true },\n          { \"type\": \"delete\", \"url\": \"/api/purchase-requests/PR-2024-001\", \"enabled\": false }\n        ]\n      }\n    ],\n    \"pagination\": {\n      \"total\": 156,\n      \"limit\": 10,\n      \"offset\": 0,\n      \"hasMore\": true\n    }\n  },\n  \"meta\": {\n    \"lastUpdated\": \"2024-06-15T10:30:00Z\"\n  }\n}\n```\n\n### 4. Get User Permissions\n\n**Endpoint**: `GET /api/dashboard/permissions`\n\n**Description**: Retrieve user's dashboard permissions and visibility rules\n\n**Authorization**: Required\n\n**Response Schema**:\n```typescript\n{\n  success: boolean\n  data: {\n    userId: string\n    role: string\n    department: string\n    permissions: {\n      viewMetrics: boolean\n      viewCharts: boolean\n      viewActivities: boolean\n      editActivities: boolean\n      deleteActivities: boolean\n      exportData: boolean\n    }\n    dataScope: {\n      departments: string[]\n      locations: string[]\n      suppliers: string[]\n    }\n    restrictions: {\n      maxDataRange: number      // Days\n      allowedCharts: string[]\n      allowedMetrics: string[]\n    }\n  }\n}\n```\n\n### 5. Export Dashboard Data\n\n**Endpoint**: `POST /api/dashboard/export`\n\n**Description**: Export dashboard data to PDF or Excel\n\n**Authorization**: Required - Users with export permission\n\n**Request Body**:\n```typescript\n{\n  format: 'pdf' | 'excel'\n  include: {\n    metrics: boolean\n    charts: boolean\n    activities: boolean\n  }\n  dateRange: {\n    from: string    // ISO 8601\n    to: string\n  }\n  filters?: {\n    department?: string\n    priority?: string\n  }\n}\n```\n\n**Response**:\n```typescript\n{\n  success: boolean\n  data: {\n    downloadUrl: string\n    expiresAt: string\n    fileSize: number\n    filename: string\n  }\n}\n```\n\n## WebSocket Events\n\n### Real-time Updates\n\n**Connection URL**: `wss://api.carmen-erp.com/ws/dashboard`\n\n**Authentication**: Send JWT token in connection query string\n```\nwss://api.carmen-erp.com/ws/dashboard?token=<jwt_token>\n```\n\n### Event Types\n\n#### 1. Metrics Update\n```typescript\n{\n  event: 'metrics:update',\n  data: {\n    metric: 'totalOrders' | 'activeSuppliers' | 'inventoryValue' | 'monthlySpend',\n    value: number,\n    change: number,\n    timestamp: string\n  }\n}\n```\n\n#### 2. New Activity\n```typescript\n{\n  event: 'activity:new',\n  data: {\n    activity: ActivityObject,  // Same as GET /activities response\n    timestamp: string\n  }\n}\n```\n\n#### 3. Critical Alert\n```typescript\n{\n  event: 'alert:critical',\n  data: {\n    type: 'stock_critical' | 'approval_overdue' | 'budget_exceeded',\n    severity: 'critical' | 'high',\n    message: string,\n    actionUrl: string,\n    timestamp: string\n  }\n}\n```\n\n#### 4. Status Change\n```typescript\n{\n  event: 'status:change',\n  data: {\n    activityId: string,\n    previousStatus: string,\n    newStatus: string,\n    timestamp: string\n  }\n}\n```\n\n## Data Models\n\n### Metric Model\n```typescript\ninterface Metric {\n  value: number\n  change: number\n  trend: 'up' | 'down'\n  period?: string\n  currency?: string\n}\n```\n\n### Activity Model\n```typescript\ninterface Activity {\n  id: string\n  type: ActivityType\n  documentNumber: string\n  status: ActivityStatus\n  target: string\n  priority: Priority\n  reviewer: User\n  metadata: Record<string, any>\n  createdAt: Date\n  updatedAt: Date\n  actions: Action[]\n}\n\ntype ActivityType =\n  | 'Purchase Request'\n  | 'Purchase Order'\n  | 'Goods Receipt'\n  | 'Stock Adjustment'\n  | 'Vendor Invoice'\n  | 'Quality Check'\n\ntype ActivityStatus =\n  | 'Approved'\n  | 'Processing'\n  | 'Pending'\n  | 'Under Review'\n  | 'Complete'\n  | 'Failed'\n  | 'Rejected'\n\ntype Priority = 'critical' | 'high' | 'medium' | 'low'\n```\n\n### Chart Data Model\n```typescript\ninterface ChartDataPoint {\n  period: string\n  value: number\n  secondaryValue?: number\n  label: string\n}\n\ninterface ChartData {\n  chartType: string\n  period: string\n  dataPoints: ChartDataPoint[]\n  aggregation: {\n    total: number\n    average: number\n    min: number\n    max: number\n    trend: 'increasing' | 'decreasing' | 'stable'\n  }\n}\n```\n\n## Caching Strategy\n\n### Cache Configuration\n```typescript\ncacheConfig = {\n  metrics: {\n    ttl: 300,        // 5 minutes\n    key: 'dashboard:metrics:{userId}:{department}',\n    invalidateOn: ['order:created', 'order:approved', 'inventory:updated']\n  },\n  chartData: {\n    ttl: 900,        // 15 minutes\n    key: 'dashboard:charts:{chartType}:{period}:{department}',\n    invalidateOn: ['order:created', 'spend:updated']\n  },\n  activities: {\n    ttl: 60,         // 1 minute\n    key: 'dashboard:activities:{userId}:{offset}',\n    invalidateOn: ['activity:created', 'activity:updated']\n  }\n}\n```\n\n### Cache Invalidation\n```typescript\n// Invalidate on specific events\nevents.on('order:created', () => {\n  cache.invalidate('dashboard:metrics:*')\n  cache.invalidate('dashboard:charts:orders:*')\n  cache.invalidate('dashboard:activities:*')\n})\n\nevents.on('inventory:updated', () => {\n  cache.invalidate('dashboard:metrics:*:inventoryValue')\n})\n```\n\n## Error Handling\n\n### Error Codes\n```typescript\nenum DashboardErrorCode {\n  UNAUTHORIZED = 'UNAUTHORIZED',\n  FORBIDDEN = 'FORBIDDEN',\n  INVALID_PARAMETER = 'INVALID_PARAMETER',\n  METRIC_CALCULATION_FAILED = 'METRIC_CALCULATION_FAILED',\n  CHART_DATA_UNAVAILABLE = 'CHART_DATA_UNAVAILABLE',\n  ACTIVITY_FETCH_FAILED = 'ACTIVITY_FETCH_FAILED',\n  EXPORT_FAILED = 'EXPORT_FAILED',\n  INTERNAL_ERROR = 'INTERNAL_ERROR'\n}\n```\n\n### Error Response Format\n```typescript\n{\n  success: false,\n  error: {\n    code: DashboardErrorCode,\n    message: string,\n    details?: string,\n    timestamp: string,\n    requestId: string\n  }\n}\n```\n\n## Rate Limiting\n\n### Limits by Endpoint\n```typescript\nrateLimits = {\n  '/api/dashboard/metrics': {\n    perMinute: 60,\n    perHour: 1000\n  },\n  '/api/dashboard/charts': {\n    perMinute: 30,\n    perHour: 500\n  },\n  '/api/dashboard/activities': {\n    perMinute: 100,\n    perHour: 2000\n  },\n  '/api/dashboard/export': {\n    perMinute: 5,\n    perHour: 50\n  }\n}\n```\n\n### Rate Limit Headers\n```\nX-RateLimit-Limit: 60\nX-RateLimit-Remaining: 45\nX-RateLimit-Reset: 1634567890\n```\n\n## Security Considerations\n\n### Data Filtering\nAll API responses must filter data based on:\n1. User role and permissions\n2. Department access\n3. Location access\n4. Data sensitivity level\n\n### Audit Logging\nAll API calls logged with:\n```typescript\n{\n  userId: string,\n  endpoint: string,\n  method: string,\n  parameters: object,\n  responseCode: number,\n  timestamp: string,\n  ipAddress: string,\n  userAgent: string\n}\n```\n\n### Input Validation\n- Sanitize all query parameters\n- Validate date ranges\n- Limit pagination offsets\n- Validate enum values\n- Prevent SQL injection\n- Rate limit enforcement\n\n## Performance Optimization\n\n### Database Queries\n- Use materialized views for metrics\n- Index frequently queried columns\n- Implement query result caching\n- Use connection pooling\n- Optimize join operations\n\n### Response Optimization\n- Gzip compression enabled\n- Minimize payload size\n- Use ETags for conditional requests\n- Implement HTTP/2 server push\n- CDN for static chart images\n\n## Testing Endpoints\n\n### Mock Data Endpoints (Development Only)\n```\nGET /api/dashboard/mock/metrics\nGET /api/dashboard/mock/charts\nGET /api/dashboard/mock/activities\n```\n\n### Health Check\n```\nGET /api/dashboard/health\nResponse: { status: 'healthy', timestamp: string }\n```\n\n## Future API Enhancements\n\n1. **GraphQL Support**: Single endpoint with flexible queries\n2. **Batch Operations**: Multiple metric requests in single call\n3. **Streaming Data**: Server-Sent Events for real-time updates\n4. **Advanced Filtering**: Complex query language support\n5. **AI Insights**: ML-powered anomaly detection endpoint\n6. **Custom Metrics**: User-defined metric calculations\n7. **Scheduled Reports**: Automated report generation API\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

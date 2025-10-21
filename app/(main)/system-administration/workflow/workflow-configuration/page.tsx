@@ -8,7 +8,7 @@ import { WorkflowCardView } from "./components/workflow-card-view"
 import { createWorkflowColumns } from "./components/workflow-columns"
 import { WorkflowTemplates } from "./components/workflow-templates"
 import { sampleWorkflows } from "./data/mockData"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Suspense, useState } from "react"
 
 export default function WorkflowConfigurationPage() {
@@ -21,6 +21,7 @@ export default function WorkflowConfigurationPage() {
 
 function WorkflowConfigurationContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const defaultTab = searchParams.get('tab') || 'workflow'
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
@@ -41,19 +42,21 @@ function WorkflowConfigurationContent() {
 
   // Workflow action handlers
   const handleView = (workflow: any) => {
-    console.log('View workflow:', workflow)
+    router.push(`/system-administration/workflow/workflow-configuration/${workflow.id}`)
   }
 
   const handleEdit = (workflow: any) => {
-    console.log('Edit workflow:', workflow)
+    router.push(`/system-administration/workflow/workflow-configuration/${workflow.id}?mode=edit`)
   }
 
   const handleDelete = (workflow: any) => {
     console.log('Delete workflow:', workflow)
+    // TODO: Implement delete confirmation dialog
   }
 
   const handleDuplicate = (workflow: any) => {
     console.log('Duplicate workflow:', workflow)
+    // TODO: Implement duplicate functionality
   }
 
   const columns = createWorkflowColumns({

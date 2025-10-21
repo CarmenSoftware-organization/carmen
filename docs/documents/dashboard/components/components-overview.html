@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Components Overview - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../index.html" class="back-link">← All Modules</a>
+            <h1>Dashboard</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../index.html">Module Overview</a></li>
+                    <li><a href="../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../../index.html">DASHBOARD</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Dashboard Components Overview\n\n## Component Architecture\n\nThe Dashboard module consists of 4 main components that work together to provide a comprehensive system overview.\n\n## 1. Dashboard Header Component\n\n**File**: `/app/(main)/dashboard/components/dashboard-header.tsx`\n\n### Purpose\nProvides the top navigation bar with search, notifications, and settings access.\n\n### Structure\n```typescript\n<header>\n  <SidebarTrigger /> // Toggle sidebar\n  <h1>Hotel Supply Chain Dashboard</h1>\n  <Search Input /> // Desktop only\n  <Bell Button /> // Notifications\n  <Settings Button /> // Settings\n</header>\n```\n\n### Features\n- **Sidebar Toggle**: Opens/closes main navigation sidebar\n- **Page Title**: \"Hotel Supply Chain Dashboard\"\n- **Search Bar**: Global search (hidden on mobile, visible on md+ screens)\n- **Notifications**: Bell icon button for system notifications\n- **Settings**: Gear icon button for user/system settings\n\n### Props\nNone (stateless component)\n\n### Styling\n- Height: 64px (h-16), reduced to 48px when sidebar is collapsed\n- Responsive: Search hidden on mobile (<768px)\n- Icons: 16px (h-4 w-4) Lucide icons\n- Layout: Flexbox with space-between alignment\n\n### Accessibility\n- Screen reader labels on icon buttons\n- Keyboard navigable\n- Semantic header element\n\n### Dependencies\n- `@/components/ui/sidebar` - SidebarTrigger\n- `@/components/ui/button` - Button component\n- `@/components/ui/input` - Search input\n- `lucide-react` - Icons (Bell, Search, Settings)\n\n## 2. Dashboard Cards Component\n\n**File**: `/app/(main)/dashboard/components/dashboard-cards.tsx`\n\n### Purpose\nDisplays key performance indicators and status alerts in card format.\n\n### Structure\n```typescript\n<div>\n  {/* Main Metrics - 4 cards */}\n  <MetricCard>\n    - Total Orders\n    - Active Suppliers\n    - Inventory Value\n    - Monthly Spend\n  </MetricCard>\n\n  {/* Status Cards - 3 cards */}\n  <StatusCard>\n    - Critical Stock Items\n    - Orders Pending Approval\n    - Completed Deliveries\n  </StatusCard>\n</div>\n```\n\n### Main Metric Cards\n\n#### 1. Total Orders Card\n- **Value**: Number of purchase orders\n- **Change**: Percentage change from previous month\n- **Trend**: Up/Down indicator\n- **Icon**: ShoppingCart\n- **Description**: \"Purchase orders this month\"\n- **Current Mock Value**: 1,234 (+12.5%)\n\n#### 2. Active Suppliers Card\n- **Value**: Count of verified suppliers\n- **Change**: Growth percentage\n- **Trend**: Up/Down indicator\n- **Icon**: Users\n- **Description**: \"Verified suppliers\"\n- **Current Mock Value**: 89 (+3.2%)\n\n#### 3. Inventory Value Card\n- **Value**: Total stock value in dollars\n- **Change**: Value change percentage\n- **Trend**: Up/Down indicator\n- **Icon**: Package\n- **Description**: \"Current stock value\"\n- **Current Mock Value**: $45,231 (-2.4%)\n\n#### 4. Monthly Spend Card\n- **Value**: Total procurement spend\n- **Change**: Spend change percentage\n- **Trend**: Up/Down indicator\n- **Icon**: DollarSign\n- **Description**: \"Total procurement spend\"\n- **Current Mock Value**: $89,432 (+8.7%)\n\n### Status Alert Cards\n\n#### 1. Critical Stock Items\n- **Value**: Count of items below threshold\n- **Status**: Critical (red badge)\n- **Icon**: AlertTriangle\n- **Description**: \"Items below minimum threshold\"\n- **Current Mock Value**: 12 items\n\n#### 2. Orders Pending Approval\n- **Value**: Count of pending orders\n- **Status**: Warning (yellow badge)\n- **Icon**: Package\n- **Description**: \"Awaiting manager approval\"\n- **Current Mock Value**: 8 orders\n\n#### 3. Completed Deliveries\n- **Value**: Count of completed deliveries\n- **Status**: Success (green badge)\n- **Icon**: CheckCircle2\n- **Description**: \"This week\"\n- **Current Mock Value**: 156 deliveries\n\n### Color Scheme\n- **Green**: Positive trends, success states\n- **Red**: Negative trends, critical alerts\n- **Yellow**: Warning states\n- **Muted**: Secondary information\n\n### Responsive Grid\n- **Mobile** (< 768px): 1 column\n- **Tablet** (768px - 1024px): 2 columns\n- **Desktop** (> 1024px): 4 columns (main metrics), 3 columns (status)\n\n### Data Source\nCurrently uses static mock data. Future: API endpoint `/api/dashboard/metrics`\n\n## 3. Dashboard Chart Component\n\n**File**: `/app/(main)/dashboard/components/dashboard-chart.tsx`\n\n### Purpose\nVisualizes trends and analytics using interactive charts.\n\n### Chart Types\n\n#### 1. Order Trends (Area Chart)\n**Layout**: Top-left position\n\n**Configuration**:\n- Type: Area chart with gradient fill\n- Data Points: 6 months (Jan-Jun)\n- X-Axis: Month names (abbreviated)\n- Y-Axis: Hidden (shown in tooltip)\n- Color: Chart-1 color variable\n- Fill Opacity: 40%\n\n**Data Structure**:\n```typescript\n{\n  month: string\n  orders: number\n}\n```\n\n**Features**:\n- Natural curve type\n- Interactive tooltip on hover\n- Responsive sizing\n- Accessibility layer\n\n#### 2. Spend Analysis (Bar Chart)\n**Layout**: Top-right position\n\n**Configuration**:\n- Type: Bar chart with rounded corners\n- Data Points: 6 months (Jan-Jun)\n- X-Axis: Month names (abbreviated)\n- Y-Axis: Hidden (shown in tooltip)\n- Color: Chart-2 color variable\n- Border Radius: 8px\n\n**Data Structure**:\n```typescript\n{\n  month: string\n  spend: number // in thousands\n}\n```\n\n**Features**:\n- Rounded bar corners\n- Hide label tooltip\n- Responsive sizing\n- Accessibility layer\n\n#### 3. Supplier Network Growth (Line Chart)\n**Layout**: Full-width bottom position (spans 2 columns)\n\n**Configuration**:\n- Type: Dual-line chart\n- Data Points: 6 months (Jan-Jun)\n- Lines: Suppliers (Chart-3) and Orders (Chart-1)\n- X-Axis: Month names (abbreviated)\n- Y-Axis: Hidden (shown in tooltip)\n- Stroke Width: 2px\n- Line Type: Monotone\n\n**Data Structure**:\n```typescript\n{\n  month: string\n  suppliers: number\n  orders: number\n}\n```\n\n**Features**:\n- Correlation visualization\n- Dual-metric comparison\n- Interactive tooltips\n- Responsive sizing\n\n### Chart Configuration\n```typescript\nchartConfig = {\n  orders: {\n    label: \"Orders\"\n    color: \"hsl(var(--chart-1))\"\n  }\n  spend: {\n    label: \"Spend (k)\"\n    color: \"hsl(var(--chart-2))\"\n  }\n  suppliers: {\n    label: \"Suppliers\"\n    color: \"hsl(var(--chart-3))\"\n  }\n}\n```\n\n### Dependencies\n- `recharts` - Chart library\n- `@/components/ui/chart` - Chart container and tooltip components\n- `@/components/ui/card` - Card wrapper\n\n### Responsive Behavior\n- **Mobile**: Stacked layout, reduced height\n- **Tablet**: 2-column grid for first two charts\n- **Desktop**: 2-column grid, full-width third chart\n\n### Performance\n- Client component (uses state)\n- Lazy loaded with dynamic import\n- Memoized data transformations\n- Throttled tooltip updates\n\n## 4. Dashboard Data Table Component\n\n**File**: `/app/(main)/dashboard/components/dashboard-data-table.tsx`\n\n### Purpose\nDisplays recent system activities in a sortable, actionable table format.\n\n### Table Structure\n\n#### Columns\n1. **Type** - Activity type\n   - Purchase Request\n   - Purchase Order\n   - Goods Receipt\n   - Stock Adjustment\n   - Vendor Invoice\n   - Quality Check\n\n2. **Document** - Document reference\n   - Primary: Document number (e.g., PR-2024-001)\n   - Secondary: Internal ID\n\n3. **Target** - Associated entity\n   - Supplier name\n   - Department name\n   - Product category\n\n4. **Status** - Current status with badge\n   - Approved (green)\n   - Processing (yellow)\n   - Pending (yellow)\n   - Under Review (blue)\n   - Complete (green)\n   - Failed (red)\n\n5. **Priority** - Priority level with badge\n   - Critical (red)\n   - High (orange)\n   - Medium (yellow)\n   - Low (green)\n\n6. **Reviewer** - Assigned person\n\n7. **Date** - Activity date\n\n8. **Actions** - Dropdown menu\n   - View details\n   - Edit\n   - Delete (destructive)\n\n### Data Structure\n```typescript\ninterface Activity {\n  id: number\n  type: string\n  header: string // Document number\n  status: string\n  target: string\n  limit: string\n  reviewer: string\n  priority: 'critical' | 'high' | 'medium' | 'low'\n  date: string\n}\n```\n\n### Color Functions\n\n#### Status Colors\n```typescript\ngetStatusColor(status: string) {\n  'approved' | 'complete' → green\n  'processing' | 'pending' → yellow\n  'under review' → blue\n  'failed' → red\n  default → gray\n}\n```\n\n#### Priority Colors\n```typescript\ngetPriorityColor(priority: string) {\n  'critical' → red\n  'high' → orange\n  'medium' → yellow\n  'low' → green\n  default → gray\n}\n```\n\n### Actions Menu\n**Trigger**: Three-dot (MoreHorizontal) icon button\n\n**Menu Items**:\n1. **View details**\n   - Icon: Eye\n   - Action: Navigate to detail page\n   - Available: Always\n\n2. **Edit**\n   - Icon: Edit\n   - Action: Open edit modal/page\n   - Available: If user has permission\n\n3. **Delete**\n   - Icon: Trash2\n   - Action: Delete with confirmation\n   - Style: Red text (destructive)\n   - Available: If user has permission\n\n### Features\n- **Responsive**: Horizontal scroll on mobile\n- **Sortable**: Click column headers to sort (future)\n- **Filterable**: Filter by type, status, priority (future)\n- **Pagination**: Load more activities (future)\n- **Real-time Updates**: WebSocket for live data (future)\n\n### Accessibility\n- Semantic table structure\n- Row headers for screen readers\n- Keyboard navigable dropdowns\n- Focus indicators on rows\n- ARIA labels on icon buttons\n\n### Data Source\nCurrently uses static mock data (6 activities). Future: API endpoint `/api/dashboard/activities`\n\n## Component Interactions\n\n### Data Flow\n```\nPage Load\n  ↓\nDashboardHeader renders (static)\n  ↓\nDashboardCards fetches metrics\n  ↓\nDashboardChart fetches chart data\n  ↓\nDashboardDataTable fetches activities\n  ↓\nAll components render with data\n```\n\n### User Interactions\n1. **Search** (Header) → Navigate to search results\n2. **Notifications** (Header) → Open notifications panel\n3. **Settings** (Header) → Navigate to settings\n4. **Metric Card Click** → Navigate to detailed view (future)\n5. **Chart Click** → Drill-down to detailed analytics (future)\n6. **Table Row Click** → Navigate to activity details (future)\n7. **Action Menu** → View/Edit/Delete operations\n\n## Shared Utilities\n\n### Color Mapping\nAll components use consistent color scheme:\n- Success/Positive: Green (`green-100` to `green-800`)\n- Warning/Pending: Yellow (`yellow-100` to `yellow-800`)\n- Info/Review: Blue (`blue-100` to `blue-800`)\n- Error/Critical: Red (`red-100` to `red-800`)\n- Neutral: Gray (`gray-100` to `gray-800`)\n\n### Icon Library\nAll icons from `lucide-react`:\n- TrendingUp, TrendingDown - Trend indicators\n- Package, Users, ShoppingCart, DollarSign - Metric icons\n- AlertTriangle, CheckCircle2 - Status icons\n- Bell, Search, Settings - Action icons\n- Eye, Edit, Trash2, MoreHorizontal - Table actions\n\n## Testing Considerations\n\n### Unit Tests\n- Component rendering\n- Data transformation functions\n- Color mapping functions\n- Icon selection logic\n\n### Integration Tests\n- Component interaction\n- Data flow between components\n- Event handling\n- Navigation triggers\n\n### Visual Regression Tests\n- Chart rendering accuracy\n- Responsive layout behavior\n- Color consistency\n- Typography hierarchy\n\n## Performance Optimization\n\n### Current Optimizations\n1. **Static Components**: Header uses no state\n2. **Memoization**: Card and chart data memoized\n3. **Lazy Loading**: Charts lazy loaded\n4. **Code Splitting**: Each component separately bundled\n\n### Future Optimizations\n1. Virtual scrolling for long activity lists\n2. Chart data aggregation on server\n3. Incremental static regeneration\n4. Service worker caching\n5. WebSocket connection pooling\n\n## Dependencies Summary\n\n### UI Components\n- `@/components/ui/sidebar` - Sidebar components\n- `@/components/ui/button` - Button component\n- `@/components/ui/input` - Input component\n- `@/components/ui/card` - Card components\n- `@/components/ui/badge` - Badge component\n- `@/components/ui/table` - Table components\n- `@/components/ui/chart` - Chart container\n- `@/components/ui/dropdown-menu` - Dropdown menu\n\n### External Libraries\n- `lucide-react` - Icon library\n- `recharts` - Chart library\n- `react` - React framework\n- `next` - Next.js framework\n\n### Type Definitions\nAll components use TypeScript with strict type checking. Interfaces are defined inline currently. Future: Move to centralized type definitions.\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goods Received Note Module Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Goods Received Notes</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Goods Received Note Module Documentation\n\nWelcome to the comprehensive documentation for the Carmen ERP Goods Received Note (GRN) module. This documentation provides complete technical specifications, user guides, and implementation details.\n\n## 📚 Documentation Structure\n\n### 1. [Complete Technical Specification](./goods-received-note-complete-specification.md)\n**Comprehensive overview of the entire GRN module**\n- Module overview and key features\n- Complete site map with Mermaid diagrams\n- Page and component documentation\n- Data flow and user interactions\n- Technical architecture details\n- API endpoints and database schema\n\n### 2. [Detailed Component Documentation](./components-detailed-documentation.md)\n**In-depth analysis of all components and their interactions**\n- Page components (List, Detail, Create)\n- Form components and validation\n- Dialog components and workflows\n- Tab components and functionality\n- Utility and data components\n- Component interaction patterns\n\n### 3. [User Interaction Guide](./user-interaction-guide.md)\n**Complete guide for user workflows and interactions**\n- Navigation and entry points\n- Primary user workflows\n- Dialog and form interactions\n- Data management features\n- Advanced functionality\n\n### 4. [API Specification](./api-specification.md)\n**Technical API documentation for developers**\n- Authentication and authorization\n- Core endpoints and operations\n- Data models and schemas\n- Error handling and responses\n- Rate limiting and webhooks\n\n## 🖼️ Screenshots & Visual Documentation\n\nAll screenshots are stored in the [`screenshots/`](./screenshots/) directory:\n\n- **grn-list-page.png** - Main GRN listing interface\n- **grn-new-dropdown-menu.png** - New GRN creation dropdown menu\n- **grn-vendor-selection-page.png** - Vendor selection interface\n- **grn-po-selection-page.png** - Purchase Order selection interface\n- **grn-item-location-selection-page.png** - Item and location selection interface\n- **grn-detail-confirm-mode.png** - GRN detail page in confirm mode with Items tab\n- **grn-stock-movements-tab.png** - GRN detail page showing Stock Movements tab\n\n## 🗺️ Module Site Map\n\n```mermaid\ngraph TD\n    A[GRN Landing Page] --> B[GRN List View]\n    A --> C[GRN Card View]\n\n    B --> D[New GRN Dropdown Menu]\n    D --> E[Create from Purchase Order]\n    D --> F[Create Manually]\n\n    E --> G[Vendor Selection Page]\n    G --> H[PO Selection Page]\n    H --> I[Item Location Selection Page]\n    I --> J[GRN Detail Page - Confirm Mode]\n\n    F --> J\n\n    J --> K[Items Tab]\n    J --> L[Stock Movements Tab]\n    J --> M[Extra Costs Tab]\n    J --> N[Related POs Tab]\n    J --> O[Financials Tab]\n\n    K --> P[Item Management Functions]\n    P --> Q[Add Item Dialog]\n    P --> R[Edit Item Dialog]\n    P --> S[Delete Confirmation]\n\n    J --> T[Edit Mode]\n    J --> U[View Mode]\n    J --> V[Action Buttons]\n    V --> W[Print Options]\n    V --> X[Export Options]\n    V --> Y[Share Options]\n\n    J --> Z[Comments & Attachments Sidebar]\n    J --> AA[Activity Log Sidebar]\n```\n\n## 🚀 Key Features\n\n### Goods Received Note Management\n- Complete GRN lifecycle management (Draft → Received → Verified → Posted)\n- Multi-currency support with real-time exchange rates\n- Integration with Purchase Orders for seamless procurement flow\n- Comprehensive item management with inventory tracking\n- Three-way matching (PO-GRN-Invoice) capabilities\n\n### User Interface\n- Responsive design with table and card views\n- Advanced filtering and search capabilities\n- Multi-step creation workflow\n- Export and print functionality\n- Real-time status updates\n\n### Document Management\n- Attachment handling for GRN documents\n- Integration with purchase orders and invoices\n- Activity logging and complete audit trail\n- Email notifications and vendor communication\n- Comments and collaboration features\n\n### Technical Architecture\n- Next.js 14 with App Router\n- TypeScript with strict mode\n- Tailwind CSS + Shadcn/ui components\n- Zustand state management\n- React Hook Form + Zod validation\n\n## 📁 File Structure\n\n```\ndocs/documents/grn/\n├── README.md                                   # This file\n├── goods-received-note-complete-specification.md # Complete technical spec\n├── components-detailed-documentation.md       # Component documentation\n├── user-interaction-guide.md                  # User workflows\n├── api-specification.md                       # API documentation\n└── screenshots/                               # Visual documentation\n    ├── grn-list-page.png\n    ├── grn-new-dropdown-menu.png\n    ├── grn-vendor-selection-page.png\n    ├── grn-po-selection-page.png\n    ├── grn-item-location-selection-page.png\n    ├── grn-detail-confirm-mode.png\n    └── grn-stock-movements-tab.png\n```\n\n## 🔗 Source Code Structure\n\n```\napp/(main)/procurement/goods-received-note/\n├── page.tsx                                   # Main listing page\n├── [id]/page.tsx                             # Detail page route\n├── new/vendor-selection/page.tsx             # Vendor selection page\n├── new/po-selection/page.tsx                 # PO selection page\n├── new/item-location-selection/page.tsx      # Item location selection page\n└── components/                               # Component library\n    ├── GoodsReceiveNoteDetail.tsx           # Main detail component\n    ├── GoodsReceiveNoteList.tsx             # List component\n    ├── NewGRNProcessSelector.tsx            # Process selection dialog\n    ├── VendorSelectionPage.tsx              # Vendor selection\n    ├── POSelectionPage.tsx                  # PO selection\n    ├── ItemLocationSelectionPage.tsx        # Item location selection\n    ├── GoodsReceiveNoteItems.tsx            # Items management\n    ├── TransactionSummary.tsx               # Financial summary\n    └── tabs/                                # Tab components\n        ├── StockMovementsTab.tsx            # Stock movements\n        ├── ExtraCostsTab.tsx                # Extra costs\n        ├── RelatedPOsTab.tsx                # Related POs\n        └── FinancialsTab.tsx                # Financial details\n```\n\n## 🎯 Primary User Workflows\n\n### 1. Create GRN from Purchase Order\n1. Navigate to GRN List → Click \"New GRN\" → \"Create from Purchase Order\"\n2. Select vendor from searchable list\n3. Choose one or multiple purchase orders\n4. Select items and quantities to receive\n5. Review and confirm GRN details\n6. Save as draft or finalize\n\n### 2. Create GRN Manually\n1. Click \"New GRN\" → \"Create Manually\"\n2. Fill vendor and header information manually\n3. Add items with pricing and quantities\n4. Configure extra costs if needed\n5. Review financial summary\n6. Save as draft or finalize\n\n### 3. Process Goods Receipt\n1. Open GRN Detail → Items tab\n2. Review ordered vs received quantities\n3. Process stock movements (automatic)\n4. Handle partial deliveries\n5. Complete item receipts\n\n## 🛠️ Technical Implementation\n\n### Component Architecture\n- **GoodsReceiveNoteDetail**: Main detail interface with multi-mode support\n- **GoodsReceiveNoteItems**: Comprehensive item management\n- **TransactionSummary**: Real-time financial calculations\n- **Multi-step workflow**: Vendor → PO → Items → Confirmation\n\n### State Management\n- Zustand for global GRN state management\n- URL parameters for routing context\n- LocalStorage for temporary workflow data\n- Mock data integration with future API readiness\n\n### Data Flow\n```mermaid\nflowchart TD\n    A[Mock Data Store] --> B[GRN List Page]\n    B --> C[New GRN Process]\n    C --> D[Vendor Selection]\n    D --> E[PO Selection]\n    E --> F[Item Location Selection]\n    F --> G[GRN Detail Confirm Mode]\n\n    G --> H[Items Tab]\n    G --> I[Stock Movements Tab]\n    G --> J[Extra Costs Tab]\n    G --> K[Related POs Tab]\n    G --> L[Financials Tab]\n\n    H --> M[Item Management]\n    M --> N[Add/Edit/Delete Items]\n\n    G --> O[Comments & Attachments]\n    G --> P[Activity Log]\n```\n\n## 📊 Database Schema Overview\n\n### Main Tables\n- **goods_received_notes** - Core GRN information\n- **grn_items** - Line items and quantities\n- **grn_stock_movements** - Inventory movements\n- **grn_extra_costs** - Additional costs (freight, etc.)\n- **grn_activity_log** - Complete audit trail\n\n### Key Relationships\n- GRN → Items (One-to-Many)\n- GRN → Stock Movements (One-to-Many)\n- GRN → Extra Costs (One-to-Many)\n- GRN → Activity Log (One-to-Many)\n- Items → Purchase Orders (Many-to-One, optional)\n\n## 🔄 Status Workflow\n\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n    Draft --> Received\n    Received --> Verified\n    Verified --> Posted\n    Draft --> Voided\n    Received --> Cancelled\n    Verified --> Cancelled\n    Cancelled --> [*]\n    Voided --> [*]\n    Posted --> [*]\n```\n\n## 📧 Support & Contributions\n\nFor questions, issues, or contributions to this documentation:\n\n1. **Technical Issues**: Review the component documentation and API specification\n2. **User Workflow Questions**: Consult the user interaction guide\n3. **Feature Requests**: Reference the complete technical specification\n4. **Bug Reports**: Include relevant screenshots and component details\n\n---\n\n*Documentation generated on: 2025-09-23*\n*Module Version: 1.0*\n*Carmen ERP - Hospitality Supply Chain Management*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

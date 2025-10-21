@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lot Transfer Module - API and Stored Procedures Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">API Reference</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">API Reference</a> / Lot Transfer Api Sp</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Lot Transfer Module - API and Stored Procedures Documentation\n\n## 1. Overview\n\nThis document outlines the API endpoints and stored procedures for managing lot transfers between locations, including validation rules and workflow.\n\n### 1.1 Transfer Types\n\n- **Internal Transfer**: Between warehouses/locations within the same facility\n- **Inter-facility Transfer**: Between different facilities\n- **Quality Hold Transfer**: To/from quality control areas\n- **Return Transfer**: To return/rejected items area\n- **Quarantine Transfer**: To/from quarantine areas\n\n## 2. Stored Procedures\n\n### 2.1 Transfer Management\n\n#### sp_InitiateLotTransfer\n```sql\nPROCEDURE sp_InitiateLotTransfer\n  @TransferId uniqueidentifier,\n  @ItemId uniqueidentifier,\n  @LotNumber nvarchar(50),\n  @FromLocationId uniqueidentifier,\n  @ToLocationId uniqueidentifier,\n  @Quantity decimal(18,2),\n  @TransferType nvarchar(50),\n  @RequestedBy nvarchar(50),\n  @ExpectedDate datetime,\n  @QualityCheckRequired bit = 0,\n  @Notes nvarchar(500) = NULL\nRETURNS uniqueidentifier\n```\n\n#### sp_ValidateLotTransfer\n```sql\nPROCEDURE sp_ValidateLotTransfer\n  @TransferId uniqueidentifier\nRETURNS TABLE (\n  IsValid bit,\n  ValidationCode nvarchar(50),\n  ValidationMessage nvarchar(500),\n  Details nvarchar(max)\n)\n```\n\n#### sp_ProcessLotTransfer\n```sql\nPROCEDURE sp_ProcessLotTransfer\n  @TransferId uniqueidentifier,\n  @ProcessedBy nvarchar(50),\n  @ActualQuantity decimal(18,2),\n  @TransferDate datetime,\n  @QualityCheckResults nvarchar(max) = NULL\nRETURNS TABLE (\n  TransactionId uniqueidentifier,\n  Status nvarchar(50),\n  FromLocationBalance decimal(18,2),\n  ToLocationBalance decimal(18,2),\n  TransferDetails nvarchar(max)\n)\n```\n\n#### sp_CancelLotTransfer\n```sql\nPROCEDURE sp_CancelLotTransfer\n  @TransferId uniqueidentifier,\n  @CancelledBy nvarchar(50),\n  @Reason nvarchar(500)\nRETURNS bit\n```\n\n### 2.2 Quality Control\n\n#### sp_QualityCheckForTransfer\n```sql\nPROCEDURE sp_QualityCheckForTransfer\n  @TransferId uniqueidentifier,\n  @CheckedBy nvarchar(50),\n  @Parameters nvarchar(max), -- JSON with quality parameters\n  @Status nvarchar(50),\n  @Notes nvarchar(500) = NULL\nRETURNS TABLE (\n  CheckId uniqueidentifier,\n  Status nvarchar(50),\n  NextActions nvarchar(max)\n)\n```\n\n### 2.3 Transfer Tracking\n\n#### sp_GetTransferHistory\n```sql\nPROCEDURE sp_GetTransferHistory\n  @ItemId uniqueidentifier = NULL,\n  @LotNumber nvarchar(50) = NULL,\n  @LocationId uniqueidentifier = NULL,\n  @FromDate datetime = NULL,\n  @ToDate datetime = NULL\nRETURNS TABLE (\n  TransferId uniqueidentifier,\n  TransferType nvarchar(50),\n  Status nvarchar(50),\n  FromLocation nvarchar(100),\n  ToLocation nvarchar(100),\n  Quantity decimal(18,2),\n  TransferDate datetime,\n  CompletionDate datetime,\n  QualityStatus nvarchar(50),\n  TransferDetails nvarchar(max)\n)\n```\n\n## 3. API Endpoints\n\n### 3.1 Transfer Management\n\n#### Initiate Transfer\n```typescript\n// Request\nPOST /api/lot-transfers\n{\n  \"itemId\": \"ITEM-001\",\n  \"lotNumber\": \"LOT-2024-001\",\n  \"fromLocationId\": \"LOC-001\",\n  \"toLocationId\": \"LOC-002\",\n  \"quantity\": 50,\n  \"transferType\": \"Internal\",\n  \"expectedDate\": \"2024-03-28T10:00:00Z\",\n  \"qualityCheckRequired\": true,\n  \"notes\": \"Regular stock rotation\",\n  \"storageConditions\": {\n    \"temperature\": \"20-25°C\",\n    \"humidity\": \"45-55%\",\n    \"specialInstructions\": \"Handle with care\"\n  }\n}\n\n// Response\n{\n  \"transferId\": \"TRF-2024-001\",\n  \"status\": \"Pending\",\n  \"validations\": {\n    \"isValid\": true,\n    \"checks\": [\n      {\n        \"type\": \"QuantityAvailable\",\n        \"status\": \"Passed\",\n        \"details\": {\n          \"availableQuantity\": 98,\n          \"requestedQuantity\": 50\n        }\n      },\n      {\n        \"type\": \"LocationCompatibility\",\n        \"status\": \"Passed\",\n        \"details\": {\n          \"fromLocation\": {\n            \"type\": \"Main Warehouse\",\n            \"conditions\": { \"temperature\": \"20-25°C\" }\n          },\n          \"toLocation\": {\n            \"type\": \"Distribution Center\",\n            \"conditions\": { \"temperature\": \"20-25°C\" }\n          }\n        }\n      },\n      {\n        \"type\": \"LotValidity\",\n        \"status\": \"Passed\",\n        \"details\": {\n          \"expiryDate\": \"2025-01-15T00:00:00Z\",\n          \"remainingShelfLife\": \"290 days\"\n        }\n      }\n    ]\n  },\n  \"transferDetails\": {\n    \"item\": {\n      \"id\": \"ITEM-001\",\n      \"name\": \"Laptop Dell XPS 13\",\n      \"lotNumber\": \"LOT-2024-001\"\n    },\n    \"locations\": {\n      \"from\": {\n        \"id\": \"LOC-001\",\n        \"name\": \"Main Warehouse\",\n        \"type\": \"Storage\"\n      },\n      \"to\": {\n        \"id\": \"LOC-002\",\n        \"name\": \"Distribution Center\",\n        \"type\": \"Distribution\"\n      }\n    },\n    \"quantity\": 50,\n    \"scheduledDate\": \"2024-03-28T10:00:00Z\",\n    \"qualityCheck\": {\n      \"required\": true,\n      \"parameters\": [\n        \"visualInspection\",\n        \"packagingCheck\",\n        \"temperatureLog\"\n      ]\n    }\n  }\n}\n```\n\n#### Process Transfer\n```typescript\n// Request\nPOST /api/lot-transfers/TRF-2024-001/process\n{\n  \"actualQuantity\": 50,\n  \"transferDate\": \"2024-03-28T10:00:00Z\",\n  \"qualityCheck\": {\n    \"status\": \"Passed\",\n    \"checkedBy\": \"USER456\",\n    \"parameters\": {\n      \"visualInspection\": \"Pass\",\n      \"packagingCheck\": \"Pass\",\n      \"temperatureLog\": {\n        \"min\": 22,\n        \"max\": 24,\n        \"status\": \"Within Range\"\n      }\n    },\n    \"notes\": \"All items in good condition\"\n  },\n  \"transportDetails\": {\n    \"method\": \"Internal Transport\",\n    \"conditions\": {\n      \"temperature\": 23,\n      \"humidity\": 50\n    }\n  }\n}\n\n// Response\n{\n  \"transactionId\": \"TRF-TXN-001\",\n  \"status\": \"Completed\",\n  \"locations\": {\n    \"from\": {\n      \"locationId\": \"LOC-001\",\n      \"previousBalance\": 98,\n      \"newBalance\": 48\n    },\n    \"to\": {\n      \"locationId\": \"LOC-002\",\n      \"previousBalance\": 0,\n      \"newBalance\": 50\n    }\n  },\n  \"qualityCheck\": {\n    \"status\": \"Passed\",\n    \"checkId\": \"QC-001\",\n    \"timestamp\": \"2024-03-28T09:45:00Z\"\n  },\n  \"lotStatus\": {\n    \"lotNumber\": \"LOT-2024-001\",\n    \"qualityStatus\": \"Good\",\n    \"shelfLifeStatus\": \"Valid\"\n  }\n}\n```\n\n### 3.2 Transfer Tracking\n\n#### Get Transfer History\n```typescript\n// Request\nGET /api/lot-transfers/history?lotNumber=LOT-2024-001\n\n// Response\n{\n  \"lotNumber\": \"LOT-2024-001\",\n  \"itemDetails\": {\n    \"id\": \"ITEM-001\",\n    \"name\": \"Laptop Dell XPS 13\"\n  },\n  \"transfers\": [\n    {\n      \"transferId\": \"TRF-2024-001\",\n      \"type\": \"Internal\",\n      \"status\": \"Completed\",\n      \"fromLocation\": {\n        \"id\": \"LOC-001\",\n        \"name\": \"Main Warehouse\"\n      },\n      \"toLocation\": {\n        \"id\": \"LOC-002\",\n        \"name\": \"Distribution Center\"\n      },\n      \"quantity\": 50,\n      \"dates\": {\n        \"requested\": \"2024-03-27T15:00:00Z\",\n        \"scheduled\": \"2024-03-28T10:00:00Z\",\n        \"completed\": \"2024-03-28T10:15:00Z\"\n      },\n      \"qualityCheck\": {\n        \"status\": \"Passed\",\n        \"checkId\": \"QC-001\"\n      }\n    }\n  ],\n  \"locationHistory\": [\n    {\n      \"locationId\": \"LOC-001\",\n      \"period\": {\n        \"from\": \"2024-03-26T10:00:00Z\",\n        \"to\": \"2024-03-28T10:00:00Z\"\n      },\n      \"quantity\": 98\n    },\n    {\n      \"locationId\": \"LOC-002\",\n      \"period\": {\n        \"from\": \"2024-03-28T10:15:00Z\",\n        \"to\": null\n      },\n      \"quantity\": 50\n    }\n  ]\n}\n```\n\n## 4. Validation Rules\n\n### 4.1 Pre-Transfer Validations\n\n1. **Quantity Validation**\n   - Available quantity check\n   - Minimum transfer quantity check\n   - Maximum transfer quantity check\n\n2. **Location Validation**\n   - Location compatibility check\n   - Storage condition compatibility\n   - Location status check (active/inactive)\n   - Transfer path validation\n\n3. **Lot Validation**\n   - Lot existence check\n   - Expiry date validation\n   - Quality status check\n   - Hold status check\n   - Quarantine status check\n\n4. **Quality Check Requirements**\n   - Based on item category\n   - Based on transfer type\n   - Based on storage condition changes\n   - Based on transport duration\n\n### 4.2 Transfer Process Validations\n\n1. **Documentation Requirements**\n   - Quality check documentation\n   - Transport condition logs\n   - Handler certifications\n   - Special handling requirements\n\n2. **Condition Monitoring**\n   - Temperature monitoring\n   - Humidity monitoring\n   - Shock monitoring (if applicable)\n   - Time monitoring\n\n3. **Quantity Reconciliation**\n   - Quantity match check\n   - Damage assessment\n   - Loss assessment\n   - Variance reporting\n\n## 5. Error Handling\n\n```typescript\n// Location Incompatibility Error\n{\n  \"error\": \"LocationIncompatibilityError\",\n  \"message\": \"Destination location not compatible with item storage requirements\",\n  \"details\": {\n    \"itemRequirements\": {\n      \"temperature\": \"20-25°C\",\n      \"humidity\": \"45-55%\"\n    },\n    \"locationConditions\": {\n      \"temperature\": \"15-20°C\",\n      \"humidity\": \"60-70%\"\n    }\n  }\n}\n\n// Insufficient Quantity Error\n{\n  \"error\": \"InsufficientQuantityError\",\n  \"message\": \"Available quantity less than requested transfer quantity\",\n  \"details\": {\n    \"lotNumber\": \"LOT-2024-001\",\n    \"availableQuantity\": 48,\n    \"requestedQuantity\": 50,\n    \"locationId\": \"LOC-001\"\n  }\n}\n\n// Quality Hold Error\n{\n  \"error\": \"QualityHoldError\",\n  \"message\": \"Lot is currently under quality hold\",\n  \"details\": {\n    \"lotNumber\": \"LOT-2024-001\",\n    \"holdType\": \"Quality Investigation\",\n    \"holdReference\": \"QH-2024-001\",\n    \"holdDate\": \"2024-03-27T09:00:00Z\"\n  }\n}\n\n// Transfer Path Error\n{\n  \"error\": \"InvalidTransferPathError\",\n  \"message\": \"Direct transfer not allowed between these locations\",\n  \"details\": {\n    \"fromLocation\": \"Production\",\n    \"toLocation\": \"Distribution\",\n    \"requiredPath\": [\"Production\", \"QC\", \"Warehouse\", \"Distribution\"]\n  }\n}\n``` ";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

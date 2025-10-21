@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Note Module - Complete Technical Specification - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Credit Notes</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Credit Note Module - Complete Technical Specification\n\n## Table of Contents\n1. [Module Overview](#module-overview)\n2. [Complete Site Map](#complete-site-map)\n3. [Page Documentation](#page-documentation)\n4. [Component Architecture](#component-architecture)\n5. [Data Flow](#data-flow)\n6. [User Interactions](#user-interactions)\n7. [Technical Architecture](#technical-architecture)\n8. [API Integration](#api-integration)\n9. [Database Schema](#database-schema)\n10. [Status Workflow](#status-workflow)\n\n## Module Overview\n\nThe Credit Note (CN) module is a comprehensive component of the Carmen Hospitality ERP system that manages vendor credit notes for returned goods, pricing adjustments, and discounts. It provides complete lifecycle management from creation through posting, with robust inventory and financial integration.\n\n### Key Features\n\n#### Core Credit Note Management\n- **Multi-type Credit Notes**: Quantity return and amount discount credit notes\n- **GRN Integration**: Create credit notes from Goods Received Notes\n- **Vendor Management**: Complete vendor selection and credit note tracking\n- **Item-level Processing**: Detailed line-item management with lot tracking\n\n#### Advanced Functionality\n- **Lot Application**: Advanced lot number tracking and application\n- **Stock Movement Integration**: Automatic inventory adjustments upon credit note processing\n- **Financial Integration**: Journal entries and tax calculations\n- **Multi-currency Support**: Handle credit notes in different currencies with exchange rates\n\n#### User Experience\n- **Dual View Interface**: Table and card views for credit note listing\n- **Multi-step Workflow**: Vendor selection → GRN selection → Item selection → Credit note creation\n- **Comprehensive Detail Interface**: Tabbed interface with inventory, journal entries, and tax details\n- **Bulk Operations**: Multi-select credit notes for batch processing\n\n## Complete Site Map\n\n```mermaid\ngraph TD\n    A[Credit Note Landing Page] --> B[CN List View - Table]\n    A --> C[CN List View - Card]\n\n    B --> D[New Credit Note Creation]\n    C --> D\n\n    D --> E[Vendor Selection Page]\n    E --> F[GRN Selection for Vendor]\n    F --> G[Item & Lot Selection Page]\n    G --> H[Credit Note Detail Page]\n\n    H --> I[CN Header Information]\n    H --> J[Item Details Tab]\n    H --> K[Inventory Tab]\n    H --> L[Journal Entries Tab]\n    H --> M[Tax Entries Tab]\n    H --> N[Stock Movement Tab]\n\n    J --> O[Item Edit Dialog]\n    J --> P[Lot Application Dialog]\n    J --> Q[Add Item Dialog]\n\n    K --> R[Inventory Impact View]\n    L --> S[Journal Entry Management]\n    M --> T[Tax Calculation View]\n    N --> U[Stock Movement Summary]\n\n    H --> V[Action Buttons]\n    V --> W[Edit Mode]\n    V --> X[Delete Confirmation]\n    V --> Y[Print Options]\n    V --> Z[Send Options]\n    V --> AA[Commit/Post Action]\n\n    H --> BB[Comments & Attachments Sidebar]\n    H --> CC[Activity Log Sidebar]\n\n    B --> DD[Advanced Filter Dialog]\n    B --> EE[Bulk Actions Menu]\n    EE --> FF[Bulk Approve]\n    EE --> GG[Bulk Reject]\n    EE --> HH[Bulk Delete]\n\n    C --> DD\n    C --> EE\n```\n\n## Page Documentation\n\n### 1. Credit Note Landing Page (`/procurement/credit-note/page.tsx`)\n\n**Purpose**: Main entry point for Credit Note module with list management and creation options\n\n**Key Features**:\n- **View Toggle**: Switch between table and card layouts for optimal viewing\n- **New Credit Note Button**: Single-click creation with workflow initiation\n- **Advanced Filtering**: Status, vendor, date range, and amount filters\n- **Search Functionality**: Global search across credit note fields, vendor names, and descriptions\n\n![Credit Note List Page - Card View](./screenshots/cn-list-page.png)\n\n![Credit Note List Page - Table View](./screenshots/cn-list-page-table-view.png)\n- **Bulk Operations**: Multi-select actions for approve, reject, and delete operations\n- **Export Options**: PDF, Excel, CSV exports with customizable parameters\n\n**State Management**:\n```typescript\nconst [creditNotes, setCreditNotes] = useState<CreditNote[]>(mockCreditNotes)\nconst [filterStatus, setFilterStatus] = useState('All')\nconst [currentPage, setCurrentPage] = useState(1)\nconst [searchTerm, setSearchTerm] = useState('')\nconst [selectedNotes, setSelectedNotes] = useState<number[]>([])\nconst [viewMode, setViewMode] = useState<'table' | 'card'>('card')\nconst [sortConfig, setSortConfig] = useState<{key: keyof CreditNote | null, direction: 'asc' | 'desc'}>()\n```\n\n**Creation Workflow**:\n- Click \"New Credit Note\" button initiates vendor selection workflow\n- System navigates to `/procurement/credit-note/new` (vendor selection page)\n- Multi-step process guides user through credit note creation\n\n### 2. Vendor Selection Page (`/new/page.tsx` + `vendor-selection.tsx`)\n\n**Purpose**: Select vendor for credit note creation with GRN filtering\n\n**Key Features**:\n- **Vendor Search**: Filter by company name, business registration, or tax ID\n- **Vendor Listing**: Table view with comprehensive vendor information\n- **Selection Validation**: Only active vendors with valid GRNs selectable\n- **Credit Note Type Selection**: Choose between quantity return or amount discount\n\n**Workflow Integration**:\n```typescript\ntype CreditNoteType = 'item-based' | 'amount-only' | null\ntype SelectedItem = GoodsReceiveNoteItem & {\n  creditQuantity: number\n  creditPrice: number\n  lotNumber: string\n  creditLotNumber: string\n}\n```\n\n### 3. GRN Selection for Vendor\n\n**Purpose**: Select specific Goods Received Notes for credit note processing\n\n**Key Features**:\n- **Filtered GRN Display**: Shows only GRNs from selected vendor\n- **GRN Status Validation**: Only posted/received GRNs available for credit\n- **Multi-selection Support**: Choose multiple GRNs for consolidated credit note\n- **GRN Details Preview**: Show items, quantities, and amounts for each GRN\n\n### 4. Item & Lot Selection Page\n\n**Purpose**: Select specific items and lot numbers for credit note processing\n\n**Key Features**:\n- **Item Filtering**: Filter by product name, description, or lot number\n- **Lot Number Management**: Select specific lots for return or credit\n- **Quantity Input**: Enter credit quantities with validation against available quantities\n- **Price Adjustment**: Modify unit prices for amount-based credit notes\n- **Real-time Calculations**: Auto-calculate credit amounts and totals\n\n### 5. Credit Note Detail Page (`/[id]/page.tsx` + `credit-note-detail.tsx`)\n\n**Purpose**: Comprehensive credit note management interface supporting multiple operational modes\n\n#### Operational Modes\n- **View Mode**: Read-only display of existing credit note\n- **Edit Mode**: Modify credit note data before posting\n- **Draft Mode**: Create and manage draft credit notes\n\n**Key Features**:\n- **Header Information**: Credit note number, dates, vendor details, references\n\n![Credit Note Detail Page - Items Tab](./screenshots/cn-detail-page-items-tab.png)\n\n![Credit Note Detail Page - Stock Movement Tab](./screenshots/cn-detail-page-stock-movement-tab.png)\n- **Tabbed Interface**: Items, Inventory, Journal Entries, Tax Entries, Stock Movement\n- **Mode-Aware UI**: Dynamic form states based on current mode\n- **Financial Summary**: Real-time calculation with tax and currency conversion\n- **Action Buttons**: Context-specific action menus (Edit, Delete, Commit, Print, Send)\n\n**State Management**:\n```typescript\nconst [creditNoteData, setCreditNoteData] = useState<CreditNote>(initialData)\nconst [currentMode, setCurrentMode] = useState<'view' | 'edit' | 'draft'>('view')\nconst [selectedItems, setSelectedItems] = useState<string[]>([])\nconst [showSidePanel, setShowSidePanel] = useState(false)\n```\n\n## Component Architecture\n\n### Core Components\n\n#### 1. CreditNoteManagement (Main Container)\n**File**: `components/credit-note-management.tsx`\n\n**Purpose**: Primary component managing all credit note list operations and navigation\n\n**Key Responsibilities**:\n- List view management (table/card modes)\n- Search and filtering functionality\n- Pagination and sorting\n- Bulk operations coordination\n- Navigation to detail views\n\n#### 2. CreditNoteDetail (Detail Container)\n**File**: `components/credit-note-detail.tsx` + `credit-note.tsx`\n\n**Purpose**: Comprehensive credit note detail interface\n\n**Key Responsibilities**:\n- Mode management (view/edit/draft)\n- Tab coordination and data flow\n- Action handling (save, delete, commit, print, send)\n- Financial calculations and currency conversion\n\n#### 3. Tab Components\n\n**ItemDetailsTab** (`item-details-edit.tsx`)\n- Item line management and editing\n- Quantity and pricing modifications\n- Lot number applications\n- Bulk selection and actions\n\n**InventoryTab** (`inventory.tsx`)\n- Inventory impact visualization\n- Stock level updates\n- Location-based inventory tracking\n\n**JournalEntriesTab** (`journal-entries.tsx`)\n- Accounting journal entry management\n- Debit/credit account assignments\n- Financial posting coordination\n\n**TaxEntriesTab** (`tax-entries.tsx`)\n- Tax calculation and management\n- Tax rate applications\n- Tax reporting integration\n\n**StockMovementTab** (`StockMovementTab.tsx` + `stock-movement.tsx`)\n- Inventory movement tracking\n- Stock location management\n- Movement history and audit trail\n\n#### 4. Workflow Components\n\n**VendorSelection** (`vendor-selection.tsx`)\n- Vendor search and selection\n- GRN filtering by vendor\n- Credit note type selection\n\n**GRNSelection** (`grn-selection.tsx`)\n- GRN listing and selection\n- Item preview and validation\n- Multi-GRN consolidation\n\n**ItemAndLotSelection** (`item-and-lot-selection.tsx`)\n- Item selection from GRNs\n- Lot number management\n- Quantity and pricing input\n\n**LotSelection** (`lot-selection.tsx`)\n- Advanced lot number selection\n- Lot application management\n- FIFO/LIFO lot processing\n\n#### 5. Specialized Components\n\n**CnLotApplication** (`cn-lot-application.tsx`)\n- Advanced lot application interface\n- Lot tracking and traceability\n- Batch processing coordination\n\n**AdvancedFilter** (`advanced-filter.tsx`)\n- Complex filtering interface\n- Date range and amount filters\n- Multi-criteria search\n\n## Data Flow\n\n### Credit Note Creation Flow\n\n```mermaid\nflowchart TD\n    A[User Clicks New Credit Note] --> B[Vendor Selection Page]\n    B --> C[Select Vendor]\n    C --> D[Load GRNs for Vendor]\n    D --> E[GRN Selection Interface]\n    E --> F[Select GRNs]\n    F --> G[Load Items from Selected GRNs]\n    G --> H[Item & Lot Selection Page]\n    H --> I[Select Items and Lots]\n    I --> J[Set Credit Quantities/Prices]\n    J --> K[Generate Credit Note]\n    K --> L[Credit Note Detail Page]\n    L --> M[Review and Edit]\n    M --> N[Commit/Post Credit Note]\n    N --> O[Update Inventory]\n    O --> P[Generate Journal Entries]\n    P --> Q[Credit Note Complete]\n```\n\n### Data State Management\n\n```mermaid\nflowchart LR\n    A[Mock Data Store] --> B[Credit Note List]\n    B --> C[Vendor Selection]\n    C --> D[GRN Selection]\n    D --> E[Item Selection]\n    E --> F[Credit Note Detail]\n\n    F --> G[Items Tab]\n    F --> H[Inventory Tab]\n    F --> I[Journal Entries Tab]\n    F --> J[Tax Entries Tab]\n    F --> K[Stock Movement Tab]\n\n    G --> L[Item Management]\n    L --> M[Lot Applications]\n\n    F --> N[Financial Calculations]\n    N --> O[Currency Conversion]\n    N --> P[Tax Calculations]\n```\n\n## User Interactions\n\n### 1. Credit Note List Management\n\n**Search and Filter Operations**:\n- **Global Search**: Search across reference numbers, descriptions, vendor names\n- **Status Filtering**: Filter by Draft, Posted, Void status\n- **Advanced Filters**: Date range, vendor, amount range filters\n- **Sorting**: Multi-column sorting with direction indicators\n\n**View Mode Toggle**:\n- **Table View**: Detailed tabular display with sorting and selection\n- **Card View**: Visual card-based layout with key information highlights\n- **Responsive Design**: Adaptive layout based on screen size\n\n### 2. Credit Note Creation Workflow\n\n**Type Selection Dialog**:\nThe credit note creation process begins with a type selection dialog that allows users to choose between Item-based and Amount-only credit notes.\n\n![Credit Note Type Selection Dialog](./screenshots/cn-new-type-selection-dialog.png)\n\n**Bulk Operations**:\n- **Selection**: Individual and bulk selection with master checkbox\n- **Actions**: Approve, reject, delete operations on selected credit notes\n- **Confirmation**: User confirmation for destructive operations\n\n### 2. Creation Workflows\n\n**Vendor-Based Creation**:\n1. Click \"New Credit Note\" button\n2. Search and select vendor from comprehensive list\n3. Choose applicable GRNs from vendor\n4. Select specific items and lot numbers\n5. Set credit quantities and pricing adjustments\n6. Review auto-populated credit note data\n7. Commit and post credit note\n\n### 3. Detail Page Interactions\n\n**Tab Navigation**:\n- **Items Tab**: Comprehensive item management with editing capabilities\n- **Inventory Tab**: Inventory impact visualization and stock level tracking\n- **Journal Entries Tab**: Accounting entries with debit/credit management\n- **Tax Entries Tab**: Tax calculations and reporting integration\n- **Stock Movement Tab**: Inventory movement tracking and audit trail\n\n**Action Management**:\n- **Edit Mode**: Switch to editable mode for modifications\n- **Delete**: Soft delete with confirmation and audit trail\n- **Commit**: Post credit note to accounting system\n- **Print**: Generate formatted credit note documents\n- **Send**: Email credit note to vendor with attachments\n\n### 4. Advanced Features\n\n**Lot Management**:\n- **Lot Selection**: Choose specific lot numbers for return processing\n- **Lot Application**: Apply credit notes to specific lot batches\n- **FIFO/LIFO Processing**: Automated lot processing based on business rules\n\n**Financial Integration**:\n- **Multi-currency Support**: Handle different currencies with exchange rates\n- **Tax Calculations**: Automated tax calculations based on jurisdiction\n- **Journal Entries**: Automated accounting entries with customizable accounts\n\n## Technical Architecture\n\n### Framework and Libraries\n- **Next.js 14**: App Router with server-side rendering\n- **TypeScript**: Strict mode with comprehensive type safety\n- **Tailwind CSS + Shadcn/ui**: Consistent design system\n- **React Hook Form**: Form management with validation\n- **Zod**: Runtime type validation\n\n### State Management\n- **React useState**: Local component state management\n- **URL Parameters**: Navigation and mode state\n- **Props Drilling**: Component communication for complex workflows\n- **Local Storage**: Temporary workflow data persistence\n\n### Component Patterns\n- **Functional Components**: All components use function declarations\n- **TypeScript Interfaces**: Strict typing for all props and state\n- **Compound Components**: Complex components broken into manageable parts\n- **Custom Hooks**: Reusable logic extraction\n\n### Data Types\n\n#### Core Interfaces\n\n```typescript\ninterface CreditNote {\n  id: number\n  refNumber: string\n  description: string\n  vendorId: number\n  vendorName: string\n  createdDate: Date\n  docNumber: string\n  docDate: Date\n  netAmount: number\n  taxAmount: number\n  totalAmount: number\n  currency: string\n  status: string\n  notes: string\n  createdBy: string\n  updatedDate: Date\n  updatedBy: string\n  items: CreditNoteItem[]\n  attachments: CreditNoteAttachment[]\n}\n\ninterface CreditNoteItem {\n  id: number\n  description: string\n  quantity: number\n  unitPrice: number\n  discountPercentage: number\n  taxPercentage: number\n}\n\ninterface EditedItem {\n  id: string\n  productName: string\n  productDescription: string\n  location: string\n  lotNo: string\n  orderUnit: string\n  inventoryUnit: string\n  rcvQty: number\n  cnQty: number\n  unitPrice: number\n  cnAmt: number\n  costVariance: number\n  discountAmount: number\n  totalReceivedQty: number\n  grnNumber: string\n  grnDate: Date\n  taxRate: number\n  tax: number\n  total: number\n  appliedLots?: Array<{\n    lotNumber: string\n    receiveDate: Date\n    grnNumber: string\n    invoiceNumber: string\n  }>\n}\n```\n\n#### Type Definitions\n\n```typescript\ntype CreditNoteType = \"QUANTITY_RETURN\" | \"AMOUNT_DISCOUNT\"\ntype CreditNoteStatus = \"DRAFT\" | \"POSTED\" | \"VOID\"\ntype CreditNoteReason =\n  | \"PRICING_ERROR\"\n  | \"DAMAGED_GOODS\"\n  | \"RETURN\"\n  | \"DISCOUNT_AGREEMENT\"\n  | \"OTHER\"\n```\n\n## API Integration\n\n### RESTful Endpoints\n\n```typescript\n// Credit Note Management\nGET    /api/credit-notes              // List credit notes with filtering\nPOST   /api/credit-notes              // Create new credit note\nGET    /api/credit-notes/:id          // Get specific credit note\nPUT    /api/credit-notes/:id          // Update credit note\nDELETE /api/credit-notes/:id          // Delete credit note\n\n// Workflow Endpoints\nGET    /api/credit-notes/vendors      // Get vendors for selection\nGET    /api/credit-notes/grns/:vendorId // Get GRNs for vendor\nPOST   /api/credit-notes/generate     // Generate credit note from GRN items\n\n// Processing Endpoints\nPOST   /api/credit-notes/:id/commit   // Commit/post credit note\nPOST   /api/credit-notes/:id/void     // Void credit note\nGET    /api/credit-notes/:id/lots     // Get lot information\nPOST   /api/credit-notes/:id/lots/apply // Apply lots to credit note\n\n// Financial Integration\nGET    /api/credit-notes/:id/journal-entries // Get journal entries\nPOST   /api/credit-notes/:id/journal-entries // Create journal entries\nGET    /api/credit-notes/:id/tax-entries     // Get tax calculations\nPOST   /api/credit-notes/:id/stock-movements // Process stock movements\n```\n\n### Data Models\n\n#### Request/Response Patterns\n\n```typescript\n// Credit Note Creation Request\ninterface CreateCreditNoteRequest {\n  vendorId: number\n  grnIds: number[]\n  type: CreditNoteType\n  reason: CreditNoteReason\n  description: string\n  items: {\n    grnItemId: number\n    creditQuantity: number\n    creditPrice?: number\n    lotNumbers?: string[]\n  }[]\n}\n\n// Credit Note Response\ninterface CreditNoteResponse {\n  creditNote: CreditNote\n  items: EditedItem[]\n  journalEntries: JournalEntry[]\n  taxEntries: TaxEntry[]\n  stockMovements: StockMovement[]\n}\n```\n\n## Database Schema\n\n### Main Tables\n\n#### credit_notes\n```sql\nCREATE TABLE credit_notes (\n  id SERIAL PRIMARY KEY,\n  ref_number VARCHAR(50) UNIQUE NOT NULL,\n  description TEXT,\n  vendor_id INTEGER REFERENCES vendors(id),\n  type VARCHAR(20) NOT NULL, -- QUANTITY_RETURN, AMOUNT_DISCOUNT\n  status VARCHAR(20) DEFAULT 'DRAFT', -- DRAFT, POSTED, VOID\n  reason VARCHAR(50), -- PRICING_ERROR, DAMAGED_GOODS, etc.\n  doc_number VARCHAR(50),\n  doc_date DATE,\n  net_amount DECIMAL(15,2) DEFAULT 0,\n  tax_amount DECIMAL(15,2) DEFAULT 0,\n  total_amount DECIMAL(15,2) DEFAULT 0,\n  currency VARCHAR(3) DEFAULT 'USD',\n  exchange_rate DECIMAL(10,4) DEFAULT 1,\n  notes TEXT,\n  created_by INTEGER REFERENCES users(id),\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_by INTEGER REFERENCES users(id),\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  posted_at TIMESTAMP,\n  posted_by INTEGER REFERENCES users(id)\n);\n```\n\n#### credit_note_items\n```sql\nCREATE TABLE credit_note_items (\n  id SERIAL PRIMARY KEY,\n  credit_note_id INTEGER REFERENCES credit_notes(id),\n  grn_item_id INTEGER REFERENCES grn_items(id),\n  product_id INTEGER REFERENCES products(id),\n  description TEXT,\n  location_id INTEGER REFERENCES locations(id),\n  lot_number VARCHAR(50),\n  credit_quantity DECIMAL(15,4),\n  unit_price DECIMAL(15,4),\n  discount_percentage DECIMAL(5,2) DEFAULT 0,\n  discount_amount DECIMAL(15,2) DEFAULT 0,\n  tax_rate DECIMAL(5,2) DEFAULT 0,\n  tax_amount DECIMAL(15,2) DEFAULT 0,\n  total_amount DECIMAL(15,2),\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n#### credit_note_lot_applications\n```sql\nCREATE TABLE credit_note_lot_applications (\n  id SERIAL PRIMARY KEY,\n  credit_note_item_id INTEGER REFERENCES credit_note_items(id),\n  lot_number VARCHAR(50),\n  grn_number VARCHAR(50),\n  grn_date DATE,\n  invoice_number VARCHAR(50),\n  applied_quantity DECIMAL(15,4),\n  unit_cost DECIMAL(15,4),\n  total_cost DECIMAL(15,2),\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n#### credit_note_journal_entries\n```sql\nCREATE TABLE credit_note_journal_entries (\n  id SERIAL PRIMARY KEY,\n  credit_note_id INTEGER REFERENCES credit_notes(id),\n  account_id INTEGER REFERENCES chart_of_accounts(id),\n  description TEXT,\n  debit_amount DECIMAL(15,2) DEFAULT 0,\n  credit_amount DECIMAL(15,2) DEFAULT 0,\n  currency VARCHAR(3) DEFAULT 'USD',\n  exchange_rate DECIMAL(10,4) DEFAULT 1,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n#### credit_note_stock_movements\n```sql\nCREATE TABLE credit_note_stock_movements (\n  id SERIAL PRIMARY KEY,\n  credit_note_id INTEGER REFERENCES credit_notes(id),\n  credit_note_item_id INTEGER REFERENCES credit_note_items(id),\n  product_id INTEGER REFERENCES products(id),\n  location_id INTEGER REFERENCES locations(id),\n  lot_number VARCHAR(50),\n  movement_type VARCHAR(20), -- RETURN, ADJUSTMENT\n  quantity DECIMAL(15,4),\n  unit_cost DECIMAL(15,4),\n  total_cost DECIMAL(15,2),\n  movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  created_by INTEGER REFERENCES users(id)\n);\n```\n\n### Relationships\n- **Credit Note → Items**: One-to-Many (Credit note can have multiple items)\n- **Credit Note → Journal Entries**: One-to-Many (Multiple accounting entries)\n- **Credit Note → Stock Movements**: One-to-Many (Multiple inventory movements)\n- **Credit Note Item → Lot Applications**: One-to-Many (Item can apply to multiple lots)\n- **Credit Note → Vendor**: Many-to-One (Multiple credit notes per vendor)\n- **Credit Note Item → GRN Item**: Many-to-One (Can reference original GRN item)\n\n### Indexes and Constraints\n\n```sql\n-- Performance indexes\nCREATE INDEX idx_cn_vendor_date ON credit_notes(vendor_id, created_at DESC);\nCREATE INDEX idx_cn_status_created ON credit_notes(status, created_at DESC);\nCREATE INDEX idx_cn_ref ON credit_notes(ref_number);\nCREATE INDEX idx_cn_doc_number ON credit_notes(doc_number) WHERE doc_number IS NOT NULL;\n\n-- Foreign key indexes\nCREATE INDEX idx_cn_items_credit_note ON credit_note_items(credit_note_id);\nCREATE INDEX idx_cn_items_grn_item ON credit_note_items(grn_item_id);\nCREATE INDEX idx_cn_lot_apps_item ON credit_note_lot_applications(credit_note_item_id);\n\n-- Business constraints\nALTER TABLE credit_notes ADD CONSTRAINT chk_cn_total_positive CHECK (total_amount >= 0);\nALTER TABLE credit_note_items ADD CONSTRAINT chk_cn_item_qty_positive CHECK (credit_quantity > 0);\n```\n\n## Status Workflow\n\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n    Draft --> Posted\n    Draft --> Void\n    Posted --> [*]\n    Void --> [*]\n\n    note right of Draft : Can be edited\\nPending approval\n    note right of Posted : Finalized\\nInventory updated\\nJournal entries created\n    note right of Void : Cancelled\\nNo financial impact\n```\n\n### Status Descriptions\n\n- **Draft**: Credit note created but not yet committed. Can be edited and modified.\n- **Posted**: Credit note committed and posted to accounting system. Inventory and financial impacts are applied.\n- **Void**: Credit note cancelled. No financial or inventory impact.\n\n### Workflow Rules\n\n1. **Draft → Posted**: Requires validation of all items, calculations, and approvals\n2. **Draft → Void**: Can be voided at any time before posting\n3. **Posted → Void**: Not allowed - posted credit notes cannot be voided\n4. **Inventory Impact**: Only occurs when transitioning to Posted status\n5. **Journal Entries**: Generated automatically when credit note is posted\n\n---\n\n*Generated on: 2025-09-23*\n*Credit Note Module Version: 1.0*\n*Carmen ERP - Hospitality Supply Chain Management*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

@@ -101,7 +101,7 @@ function LocationList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 px-6 pt-6">
       {/* Header Row - Title and Action Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -109,7 +109,7 @@ function LocationList() {
           <p className="text-muted-foreground">Manage your business locations and their configurations</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/system-administration/location-management/new">
+          <Link href="/system-administration/location-management/new/edit">
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               Create Location
@@ -259,7 +259,7 @@ function LocationList() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Link href={`/system-administration/location-management/${location.id}/view`}>
+                      <Link href={`/system-administration/location-management/${location.id}`}>
                         <Button variant="ghost" size="sm">
                           <FileText className="h-4 w-4" />
                         </Button>
@@ -269,9 +269,9 @@ function LocationList() {
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleDelete(location.id)}
                         className="text-destructive hover:text-destructive"
                       >
@@ -326,7 +326,7 @@ function LocationList() {
                   <div>{location.deliveryPoint}</div>
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
-                  <Link href={`/system-administration/location-management/${location.id}/view`}>
+                  <Link href={`/system-administration/location-management/${location.id}`}>
                     <Button variant="ghost" size="sm">
                       <FileText className="h-4 w-4" />
                     </Button>
@@ -336,9 +336,9 @@ function LocationList() {
                       <Edit className="h-4 w-4" />
                     </Button>
                   </Link>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleDelete(location.id)}
                     className="text-destructive hover:text-destructive"
                   >

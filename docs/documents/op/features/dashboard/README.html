@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operational Planning Dashboard - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../index.html" class="back-link">← All Modules</a>
+            <h1>Operational Planning</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../index.html">Documentation</a> / <a href="../../../index.html">OP</a> / Features / Dashboard</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Operational Planning Dashboard\n\n> **Feature:** Operational Planning > Dashboard\n> **Pages:** 1\n> **Status:** ✅ Production Ready\n\n---\n\n## Overview\n\nThe Operational Planning Dashboard provides a customizable, drag-and-drop interface for monitoring key operational metrics including demand forecasting, menu performance, inventory planning, and recipe updates. Users can personalize their dashboard layout to focus on the most relevant metrics for their role.\n\n### Key Features\n\n1. **Drag-and-Drop Customization** - Rearrange dashboard widgets\n2. **Demand Forecasting** - Forecast vs actual sales comparison\n3. **Menu Performance** - Sales and profit tracking by recipe\n4. **Inventory Planning** - Stock status distribution (overstocked, optimal, understocked, stockout risk)\n5. **Real-Time Updates** - Live data refresh\n6. **Responsive Design** - Adapts to all screen sizes\n\n---\n\n## Page Structure\n\n### Main Dashboard\n**Route:** `/operational-planning`\n\n**Layout:** Responsive grid (1 column mobile, 2 columns tablet, 3 columns desktop)\n\n---\n\n## Dashboard Widgets\n\n### 1. Demand Forecast vs Actual\n**Type:** Line Chart\n**Data Source:** Sales history + forecasting algorithm\n\n**Metrics Displayed:**\n- Forecasted sales by day\n- Actual sales by day\n- Variance percentage\n- Trend indicators\n\n**Chart Configuration:**\n```typescript\ninterface DemandForecastData {\n  day: string; // Day of week or date\n  forecast: number; // Predicted sales\n  actual: number; // Real sales\n}\n\n// Example data\nconst data = [\n  { day: 'Mon', forecast: 1000, actual: 950 },\n  { day: 'Tue', forecast: 1200, actual: 1150 },\n  { day: 'Wed', forecast: 1100, actual: 1050 },\n  { day: 'Thu', forecast: 1300, actual: 1250 },\n  { day: 'Fri', forecast: 1500, actual: 1600 },\n  { day: 'Sat', forecast: 1800, actual: 1900 },\n  { day: 'Sun', forecast: 1600, actual: 1700 }\n];\n```\n\n**Insights:**\n- Green line: Actual sales\n- Blue line: Forecast\n- Accuracy percentage displayed\n- Over/under forecast indicators\n\n### 2. Menu Performance\n**Type:** Bar Chart (Dual Axis)\n**Data Source:** Menu engineering analysis\n\n**Metrics Displayed:**\n- Sales volume per dish (left axis)\n- Profit per dish (right axis)\n- Top 5 performers shown\n\n**Chart Configuration:**\n```typescript\ninterface MenuPerformanceData {\n  name: string; // Dish name\n  sales: number; // Units sold\n  profit: number; // Total profit in currency\n}\n\n// Example data\nconst data = [\n  { name: 'Dish A', sales: 120, profit: 600 },\n  { name: 'Dish B', sales: 80, profit: 480 },\n  { name: 'Dish C', sales: 100, profit: 550 },\n  { name: 'Dish D', sales: 60, profit: 420 },\n  { name: 'Dish E', sales: 90, profit: 540 }\n];\n```\n\n**Insights:**\n- Identify best sellers\n- Compare sales vs profitability\n- Spot underperformers\n- Quick link to Menu Engineering\n\n### 3. Inventory Planning Status\n**Type:** Pie Chart\n**Data Source:** Inventory management system\n\n**Categories:**\n- **Overstocked** (Red): Items above max stock level\n- **Optimal** (Green): Items within target range\n- **Understocked** (Yellow): Items below min stock level\n- **Stockout Risk** (Orange): Items approaching zero\n\n**Chart Configuration:**\n```typescript\ninterface InventoryPlanningData {\n  category: 'Overstocked' | 'Optimal' | 'Understocked' | 'Stockout Risk';\n  value: number; // Percentage\n}\n\n// Example data\nconst data = [\n  { category: 'Overstocked', value: 20 },\n  { category: 'Optimal', value: 60 },\n  { category: 'Understocked', value: 15 },\n  { category: 'Stockout Risk', value: 5 }\n];\n```\n\n**Insights:**\n- Overall inventory health\n- Action items by category\n- Click to view detailed inventory report\n- Alerts for critical items\n\n### 4. Recipe Updates Widget\n**Type:** Text Summary\n**Data Source:** Recipe management system\n\n**Information Displayed:**\n- Number of recipes updated in last 7 days\n- Recently modified recipes\n- Pending approvals\n- Draft recipes count\n\n**Example:**\n```\n3 recipes updated in the last week\n- Thai Green Curry (cost updated)\n- Caesar Salad (new variant added)\n- Margherita Pizza (ingredients modified)\n```\n\n### 5. Upcoming Events Widget\n**Type:** Text Summary\n**Data Source:** Calendar/Events system\n\n**Information Displayed:**\n- Scheduled major events\n- Expected attendance\n- Menu planning status\n- Special requirements\n\n**Example:**\n```\n2 major events scheduled next month\n- Wedding Reception (200 guests) - Jan 28\n- Corporate Banquet (150 guests) - Feb 5\n```\n\n### 6. Menu Engineering Widget\n**Type:** Text Summary\n**Data Source:** Menu engineering analysis\n\n**Information Displayed:**\n- Items needing attention\n- Classification changes\n- Optimization opportunities\n- Quick actions\n\n**Example:**\n```\n5 dishes identified for menu optimization\n- 2 Dogs: Consider removal\n- 2 Plow Horses: Increase price\n- 1 Puzzle: Enhance marketing\n```\n\n---\n\n## Drag-and-Drop Functionality\n\n### Implementation\n**Library:** `react-beautiful-dnd`\n\n### Features:\n- **Drag Handle**: Entire widget card is draggable\n- **Drop Zones**: Visual indicators during drag\n- **Smooth Animation**: Transitions between positions\n- **Persistence**: Layout saved to user preferences\n- **Reset Layout**: Option to restore default arrangement\n\n### User Actions:\n1. Click and hold on any widget\n2. Drag to desired position\n3. Drop in new location\n4. Layout auto-saves\n\n### Technical Details:\n```typescript\ninterface DashboardItem {\n  id: string; // Unique widget identifier\n  content: string; // Widget title\n  type: 'demandForecast' | 'menuPerformance' | 'inventoryPlanning' | 'text';\n  data?: any; // Widget-specific data\n}\n\n// Layout state persisted to localStorage\nconst saveLayout = (items: DashboardItem[]) => {\n  localStorage.setItem('dashboardLayout', JSON.stringify(items));\n};\n```\n\n---\n\n## Data Model\n\n```typescript\ninterface DashboardWidget {\n  id: string;\n  type: WidgetType;\n  title: string;\n  position: number; // Display order\n  size: 'small' | 'medium' | 'large';\n  refreshInterval: number; // Seconds\n  dataSource: string;\n  filters?: WidgetFilter[];\n  visible: boolean;\n}\n\ntype WidgetType =\n  | 'demandForecast'\n  | 'menuPerformance'\n  | 'inventoryPlanning'\n  | 'recipeUpdates'\n  | 'upcomingEvents'\n  | 'menuEngineering';\n\ninterface WidgetFilter {\n  field: string;\n  operator: string;\n  value: any;\n}\n\ninterface DashboardPreferences {\n  userId: string;\n  layout: DashboardWidget[];\n  defaultView: 'grid' | 'list';\n  refreshRate: number; // Seconds\n  theme: 'light' | 'dark';\n}\n```\n\n---\n\n## API Endpoints\n\n```http\n# Dashboard Data\nGET /api/operational-planning/dashboard\nGET /api/operational-planning/dashboard/widgets\n\n# Individual Widget Data\nGET /api/operational-planning/dashboard/demand-forecast\nGET /api/operational-planning/dashboard/menu-performance\nGET /api/operational-planning/dashboard/inventory-planning\nGET /api/operational-planning/dashboard/recipe-updates\nGET /api/operational-planning/dashboard/upcoming-events\n\n# User Preferences\nGET /api/operational-planning/dashboard/preferences\nPUT /api/operational-planning/dashboard/preferences\nPOST /api/operational-planning/dashboard/preferences/reset\n```\n\n---\n\n## Business Rules\n\n### Data Refresh\n1. **Demand Forecast**: Updated every 6 hours\n2. **Menu Performance**: Updated daily at midnight\n3. **Inventory Planning**: Real-time updates\n4. **Recipe Updates**: Updated on change\n5. **Upcoming Events**: Updated hourly\n\n### Widget Visibility\n1. **Role-Based**: Widgets visible based on user role\n2. **Permission-Gated**: Sensitive data requires permissions\n3. **Customizable**: Users can show/hide widgets\n4. **Default Layout**: Different defaults per role\n\n### Data Accuracy\n1. **Forecast Accuracy**: Displayed with confidence interval\n2. **Real-Time Lag**: Max 5 minutes for inventory data\n3. **Historical Range**: Last 30 days for trends\n4. **Cache Duration**: 5 minutes for dashboard data\n\n---\n\n## Integration Points\n\n### Recipe Management\n- Recipe update notifications\n- Draft recipe count\n- Cost change alerts\n- New recipe approvals\n\n### Menu Engineering\n- Performance classification\n- Optimization recommendations\n- Alert summaries\n- Quick action links\n\n### Inventory Management\n- Stock status aggregation\n- Reorder point alerts\n- Wastage tracking\n- Stockout predictions\n\n### Forecasting System\n- Sales predictions\n- Demand patterns\n- Seasonal adjustments\n- Accuracy tracking\n\n### Events Management\n- Scheduled events\n- Expected volumes\n- Special requirements\n- Menu planning status\n\n---\n\n## User Guide\n\n### Customizing Dashboard Layout\n\n1. **Rearrange Widgets**:\n   - Click and drag any widget\n   - Drop in desired position\n   - Layout saves automatically\n\n2. **Reset Layout**:\n   - Click settings icon\n   - Select \"Reset to Default\"\n   - Confirm action\n\n3. **Hide/Show Widgets**:\n   - Click settings icon\n   - Toggle widget visibility\n   - Save preferences\n\n### Reading Charts\n\n**Demand Forecast:**\n- Blue line = Predicted sales\n- Green line = Actual sales\n- Above forecast = Positive variance\n- Below forecast = Negative variance\n\n**Menu Performance:**\n- Blue bars = Sales volume\n- Green bars = Profit amount\n- Taller bars = Better performers\n\n**Inventory Planning:**\n- Green = Healthy stock levels (target 60-70%)\n- Yellow = Needs attention (keep <20%)\n- Orange = Critical (keep <10%)\n- Red = Action required (keep <20%)\n\n### Taking Action\n\nFrom dashboard widgets, users can:\n- Click charts to drill down\n- View detailed reports\n- Navigate to related modules\n- Create quick tasks\n- Export data\n\n---\n\n## Responsive Design\n\n### Breakpoints\n\n**Mobile (< 768px)**\n- 1 column layout\n- Stacked widgets\n- Condensed charts\n- Simplified interactions\n\n**Tablet (768px - 1024px)**\n- 2 column layout\n- Medium-sized widgets\n- Full chart features\n- Touch-optimized\n\n**Desktop (> 1024px)**\n- 3 column layout\n- Large widgets\n- Full functionality\n- Mouse interactions\n\n### Adaptive Content\n- Charts scale to container\n- Text wraps appropriately\n- Icons adjust to size\n- Touch targets >44px on mobile\n\n---\n\n## Performance Optimization\n\n### Best Practices\n\n1. **Lazy Loading**:\n   - Widgets load on scroll\n   - Charts render on viewport entry\n   - Images loaded progressively\n\n2. **Caching**:\n   - Dashboard data cached 5 minutes\n   - Widget preferences cached locally\n   - Chart data memoized\n\n3. **Efficient Rendering**:\n   - React.memo for widgets\n   - UseMemo for calculations\n   - Debounced drag events\n   - Virtualized lists for large data\n\n4. **Data Management**:\n   - Paginated API responses\n   - Aggregated data where possible\n   - Incremental updates\n   - Background refresh\n\n### Load Time Targets\n- Initial render: <2 seconds\n- Widget load: <500ms each\n- Chart rendering: <300ms\n- Drag response: <100ms\n\n---\n\n## Accessibility\n\n### WCAG 2.1 AA Compliance\n\n**Keyboard Navigation:**\n- Tab through widgets\n- Arrow keys for drag-and-drop\n- Enter/Space to activate\n- Escape to cancel\n\n**Screen Reader Support:**\n- ARIA labels on all widgets\n- Chart data tables provided\n- Status announcements\n- Landmark regions\n\n**Visual Accessibility:**\n- Color contrast ratio >4.5:1\n- Chart patterns (not just colors)\n- Resizable text\n- Focus indicators\n\n---\n\n## Troubleshooting\n\n### Issue: Widgets Not Loading\n**Cause**: API connection error or timeout\n**Solution**: Refresh page, check network connection, verify API status\n\n### Issue: Drag-and-Drop Not Working\n**Cause**: Browser compatibility or JavaScript disabled\n**Solution**: Use modern browser (Chrome, Firefox, Safari, Edge), enable JavaScript\n\n### Issue: Data Not Updating\n**Cause**: Cache issue or stale data\n**Solution**: Hard refresh (Ctrl+F5), clear browser cache, check refresh interval settings\n\n### Issue: Charts Not Displaying\n**Cause**: Missing data or rendering error\n**Solution**: Verify data availability, check date range, refresh widget\n\n---\n\n## Future Enhancements\n\n**Planned Features:**\n- Custom widget creation\n- More chart types (heatmaps, gauges)\n- Real-time collaboration\n- AI-powered insights\n- Voice commands\n- Mobile app version\n- Widget marketplace\n- Advanced filtering per widget\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

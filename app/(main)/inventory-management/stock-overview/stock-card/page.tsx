@@ -19,7 +19,13 @@ import {
   Truck 
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { formatCurrency, formatDate, formatNumber } from "../inventory-balance/utils"
+import { formatCurrency, formatNumber } from '@/lib/utils/formatters'
+
+// Helper function to format dates
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString()
+}
 import { 
   StockCardGeneralInfo,
   StockCardMovementHistory,

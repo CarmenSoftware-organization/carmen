@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Module - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Production</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PRODUCTION</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Production Module\n\n**Module**: Production (10th of 10 modules)\n**System**: Manufacturing & Kitchen Operations Management\n**Status**: Design Complete, TypeScript Interfaces Implemented\n**Last Updated**: January 2025\n\n## Table of Contents\n\n1. [Module Overview](#module-overview)\n2. [Key Features](#key-features)\n3. [Production Workflows](#production-workflows)\n4. [TypeScript Interfaces](#typescript-interfaces)\n5. [Integration Points](#integration-points)\n6. [User Guide](#user-guide)\n7. [Performance Metrics](#performance-metrics)\n8. [Best Practices](#best-practices)\n9. [Troubleshooting](#troubleshooting)\n\n## Module Overview\n\nThe Production Module serves as the manufacturing and kitchen operations command center for the Carmen Hospitality ERP system. It transforms recipes and operational plans into actionable production schedules, managing the complete production lifecycle from ingredient preparation to finished products.\n\n### Strategic Value\n\n**Business Impact**:\n- **Waste Reduction**: 15-25% decrease in food waste through predictive planning\n- **Efficiency Improvement**: 30% increase in production efficiency\n- **Cost Tracking**: Precise cost tracking for fractional product offerings\n- **Quality Improvement**: 60% reduction in quality-related customer complaints\n- **Profitability**: Direct impact through fractional sales optimization and waste reduction\n\n**Key Differentiators**:\n- Advanced fractional sales production (pizza slices, cake portions, bottle-by-glass)\n- Real-time production monitoring with mobile access\n- Comprehensive quality control with batch traceability\n- AI-driven production recommendations and waste optimization\n- Equipment utilization optimization with predictive maintenance\n\n### Business Objectives\n\n**1. Production Efficiency Optimization**\n- Streamline kitchen workflow through intelligent production scheduling\n- Reduce setup and changeover times between recipe productions\n- Maximize equipment utilization across multiple production lines\n- Enable real-time production adjustments based on demand fluctuations\n\n**2. Fractional Product Management**\n- Support pizza slice, cake portion, and fractional sales operations\n- Manage yield variants and portion control for consistent profitability\n- Track partial consumption and remaining inventory accurately\n- Enable dynamic pricing strategies for fractional offerings\n\n**3. Quality Assurance & Compliance**\n- Enforce standardized preparation procedures across all production\n- Monitor quality control checkpoints and batch tracking\n- Ensure food safety compliance through temperature and time tracking\n- Maintain audit trails for regulatory compliance and traceability\n\n**4. Cost Control & Waste Reduction**\n- Provide real-time visibility into production costs and margins\n- Identify and minimize waste through predictive production planning\n- Track ingredient consumption against planned recipes for variance analysis\n- Enable data-driven decisions for production optimization\n\n---\n\n## 📸 System Screenshots\n\n### Production Dashboard\n![Production Dashboard](./screenshots/production-dashboard.png)\n*The Production Dashboard provides real-time production monitoring with 6 customizable drag-and-drop widgets powered by react-beautiful-dnd. Key visualizations include: Production Volume (7-day line chart showing Mon-Sun production trends from 500-900 units), Quality Control Results (pie chart displaying 92% Passed, 6% Minor Issues, 2% Failed), and Top 5 Recipes Produced (bar chart ranking Recipe A-E by production count). Three text metric widgets display Batch Production (3 batches currently in production), Wastage Tracking (2.5% production wastage this week), and Equipment Utilization (85% average utilization rate). The dashboard uses Recharts for data visualization and features responsive grid layout (1 column mobile, 2 columns tablet, 3 columns desktop) for comprehensive production operations management.*\n\n---\n\n## Key Features\n\n### 1. Production Planning & Scheduling\n\n**Business Value**: Reduces labor costs by 20% and improves on-time delivery by 95% through optimized production sequencing and resource allocation.\n\n**Core Capabilities**:\n\n**Recipe-Based Production Orders**\n- Convert menu forecasts into detailed production schedules\n- Automatic ingredient allocation from inventory\n- Multi-recipe batch coordination\n- Dynamic quantity adjustment based on demand\n- Rush order priority management\n\n**Equipment Capacity Planning**\n- Optimize oven, fryer, and prep station utilization\n- Schedule conflicts detection and resolution\n- Equipment availability tracking\n- Maintenance window integration\n- Capacity utilization reporting\n\n**Labor Schedule Integration**\n- Align production schedules with staff availability and skills\n- Skill-based task assignment\n- Labor cost tracking per production batch\n- Productivity metrics per staff member\n- Training needs identification\n\n**Multi-Batch Coordination**\n- Manage simultaneous production of multiple recipes\n- Shared resource optimization\n- Parallel vs. sequential production decisions\n- Cross-batch timing coordination\n- Bottleneck identification and resolution\n\n### 2. Fractional Sales Production Management\n\n**Business Value**: Enables flexible revenue streams and reduces waste by 30% through intelligent portion management and yield optimization.\n\n**Core Capabilities**:\n\n**Yield Variant Management**\n- Support multiple selling formats (whole/half/slice/portion)\n- Automatic conversion rate calculations\n- Quality preservation during portioning\n- Shelf life tracking per variant\n- Pricing optimization per variant\n\n**Portion Control Systems**\n- Ensure consistent portioning for all fractional products\n- Weight and size standardization\n- Visual portion guides for staff\n- Portion yield tracking\n- Cost per portion accuracy\n\n**Fractional Inventory Tracking**\n- Real-time tracking of partial products (374-line type system)\n- 6 item states: RAW → PREPARED → PORTIONED → PARTIAL → COMBINED → WASTE\n- Remaining yield calculations\n- Expiration tracking for partial products\n- Quality grade monitoring (EXCELLENT, GOOD, FAIR, POOR, EXPIRED)\n\n**Dynamic Production Adjustment**\n- Modify production quantities based on fractional sales patterns\n- Demand-based conversion recommendations\n- Optimal conversion time suggestions\n- Inventory level balancing\n- AI-driven production forecasting\n\n**Cross-Contamination Prevention**\n- Allergen controls for partial product handling\n- Separate storage tracking\n- Equipment sanitation scheduling\n- Quality isolation procedures\n- Compliance documentation\n\n### 3. Real-Time Production Monitoring\n\n**Business Value**: Increases production visibility by 100% and reduces quality issues by 40% through continuous monitoring and immediate intervention capabilities.\n\n**Core Capabilities**:\n\n**Live Production Dashboard**\n- Real-time visibility into all active production orders\n- Production volume trends (7-day view)\n- Quality control results visualization\n- Top recipes produced ranking\n- Batch status overview\n\n**Progress Tracking**\n- Monitor completion status per batch\n- Timing vs. planned schedule\n- Quality checkpoint completion\n- Ingredient consumption tracking\n- Cost variance monitoring\n\n**Alert System**\n- Proactive notifications for delays\n- Quality issues immediate alerts\n- Resource constraint warnings\n- Equipment malfunction detection\n- Temperature deviation alerts\n\n**Mobile Access**\n- Enable floor staff to update production status from kitchen stations\n- Touch-optimized interface for gloves-on use\n- Quick status updates (started, completed, quality check)\n- Photo upload for quality documentation\n- Real-time sync with central system\n\n**Performance Metrics**\n- Production speed tracking\n- Quality scores per batch\n- Efficiency ratios\n- Labor productivity metrics\n- Equipment utilization rates\n\n### 4. Quality Control & Batch Management\n\n**Business Value**: Reduces quality-related customer complaints by 60% and ensures regulatory compliance through systematic quality management.\n\n**Core Capabilities**:\n\n**Batch Tracking**\n- Complete traceability from ingredients to finished products\n- Unique batch numbers with date/time stamps\n- Supplier lot number linkage\n- Storage location tracking\n- Expiration management\n\n**Quality Checkpoints**\n- Enforce quality gates at critical production stages\n- 6 check types: visual, taste, temperature, texture, aroma, portion_size\n- Expected vs. actual value comparison\n- Pass/fail decision documentation\n- Corrective action tracking\n\n**Temperature Monitoring**\n- Track cooking temperatures and holding times\n- Food safety compliance (HACCP)\n- Automatic alert on deviation\n- Temperature history logging\n- Cooling curve monitoring\n\n**Sensory Evaluation**\n- Document taste, appearance, and texture assessments\n- Standardized evaluation criteria\n- Chef approval workflows\n- Customer feedback integration\n- Continuous improvement tracking\n\n**Non-Conformance Management**\n- Handle quality deviations systematically\n- Root cause analysis workflows\n- Corrective and preventive actions (CAPA)\n- Supplier notification for ingredient issues\n- Quality trend analysis\n\n### 5. Waste Tracking & Analysis\n\n**Business Value**: Reduces food waste costs by 25% and improves sustainability metrics through precise waste identification and prevention strategies.\n\n**Core Capabilities**:\n\n**Production Waste Recording**\n- Track ingredient waste during preparation and cooking\n- Categorize waste by type (trim, spoilage, over-production, error)\n- Weight and cost tracking per waste event\n- Photo documentation capability\n- Staff accountability\n\n**Yield Variance Analysis**\n- Compare actual vs. expected yields\n- Identify patterns and trends\n- Recipe-specific variance tracking\n- Supplier quality correlation\n- Continuous improvement metrics\n\n**Waste Root Cause Analysis**\n- Identify patterns and causes of production waste\n- Equipment-related waste tracking\n- Staff training needs identification\n- Recipe improvement recommendations\n- Process optimization opportunities\n\n**Sustainability Reporting**\n- Environmental impact tracking\n- Carbon footprint calculations\n- Landfill diversion metrics\n- Composting and recycling tracking\n- Sustainability goal progress\n\n**Cost Impact Analysis**\n- Financial impact of waste on production margins\n- Cost per waste type\n- Waste reduction ROI calculations\n- Budget variance attribution\n- Cost savings from improvements\n\n### 6. Equipment Utilization & Maintenance\n\n**Business Value**: Increases equipment efficiency by 25% and reduces downtime by 50% through predictive maintenance and optimal utilization.\n\n**Core Capabilities**:\n\n**Equipment Schedule Management**\n- Plan and track equipment usage across production orders\n- Prevent scheduling conflicts\n- Optimize sequential batch production\n- Setup and changeover time minimization\n- Real-time availability status\n\n**Maintenance Scheduling**\n- Preventive maintenance integration with production planning\n- Maintenance history tracking\n- Parts inventory management\n- Service provider scheduling\n- Downtime cost tracking\n\n**Utilization Analytics**\n- Equipment efficiency reporting (target: 85% utilization)\n- Capacity vs. actual usage\n- Idle time analysis\n- Bottleneck identification\n- Investment ROI tracking\n\n**Downtime Tracking**\n- Monitor and minimize unplanned equipment downtime\n- Categorize downtime causes\n- Mean time between failures (MTBF)\n- Mean time to repair (MTTR)\n- Reliability improvement tracking\n\n**Energy Consumption**\n- Track energy usage per production batch\n- Cost per production unit\n- Optimization recommendations\n- Peak demand management\n- Sustainability metrics\n\n## Production Workflows\n\n### Batch Production Workflow\n\n```\n1. Production Order Creation\n   ├── Select recipe and yield variant\n   ├── Define quantity and production date\n   ├── Assign chef and crew\n   └── System checks ingredient availability\n\n2. Ingredient Allocation\n   ├── Reserve ingredients from inventory\n   ├── Generate pick list for staff\n   ├── Quality check on ingredients\n   └── Document supplier lot numbers\n\n3. Production Execution\n   ├── Start production (mobile/dashboard)\n   ├── Follow preparation steps\n   ├── Quality checkpoints at critical stages\n   └── Record actual times and temperatures\n\n4. Quality Control\n   ├── Visual inspection\n   ├── Taste test\n   ├── Temperature verification\n   ├── Portion size check\n   └── Chef approval\n\n5. Completion & Documentation\n   ├── Record actual yield vs. planned\n   ├── Document any waste\n   ├── Calculate actual costs\n   ├── Transfer to inventory\n   └── Generate batch report\n\n6. Analysis & Improvement\n   ├── Yield variance analysis\n   ├── Cost variance analysis\n   ├── Quality score tracking\n   └── Continuous improvement recommendations\n```\n\n### Fractional Conversion Workflow\n\n```\n1. Whole Product Production\n   ├── Produce recipe as complete unit (e.g., whole pizza, whole cake)\n   ├── Quality inspection and approval\n   ├── Record as RAW inventory\n   └── Assign batch number and expiration\n\n2. Preparation Stage (Optional)\n   ├── RAW → PREPARED state transition\n   ├── Additional processing (cooling, setting)\n   ├── Quality grade assignment\n   └── Update shelf life\n\n3. Portioning Decision\n   ├── Demand analysis\n   ├── Conversion recommendation from AI\n   ├── Staff approval\n   └── Schedule conversion time\n\n4. Conversion Execution\n   ├── PREPARED/RAW → PORTIONED state\n   ├── Physical portioning with portion control\n   ├── Weight verification per portion\n   ├── Record waste generated\n   └── Quality check on portions\n\n5. Fractional Inventory Update\n   ├── Update available portions\n   ├── Track partial quantity remaining\n   ├── Set individual portion expiration\n   ├── Apply quality grade\n   └## Fractional Conversion Workflow (continued)\n\n```\n5. Fractional Inventory Update (continued)\n   └── Enable individual portion sales\n\n6. Sales and Consumption\n   ├── POS system records fractional sale\n   ├── PORTIONED → CONSUMED state\n   ├── Deduct from available portions\n   ├── Update partial quantity\n   └── Track conversion efficiency\n\n7. Quality Monitoring\n   ├── Time since preparation tracking\n   ├── Quality grade degradation alerts\n   ├── Expiration warnings\n   └── Automatic quality downgrade (EXCELLENT → GOOD → FAIR → POOR → EXPIRED)\n\n8. Optimization Analysis\n   ├── Conversion efficiency calculation\n   ├── Waste percentage vs. target\n   ├── Demand pattern analysis\n   └── Recommendation generation for future conversions\n```\n\n### Quality Control Workflow\n\n```\n1. Quality Checkpoint Setup\n   ├── Define checkpoints in recipe\n   ├── Set expected values\n   ├── Assign check types\n   └── Configure alerts\n\n2. Pre-Production Quality Check\n   ├── Ingredient quality verification\n   ├── Equipment functionality check\n   ├── Staff certification verification\n   └── Environment conditions (temperature, humidity)\n\n3. In-Production Quality Checks\n   ├── Visual inspection at critical steps\n   ├── Temperature monitoring (continuous)\n   ├── Texture and consistency checks\n   ├── Timing verification\n   └── Process compliance\n\n4. Post-Production Quality Checks\n   ├── Final product visual inspection\n   ├── Taste test by chef\n   ├── Portion size verification\n   ├── Temperature check (hot holding or cooling)\n   └── Plating/presentation review\n\n5. Quality Decision\n   ├── Pass → Approve for service/sale\n   ├── Minor Issues → Document corrective action, conditional approval\n   ├── Fail → Rework or waste\n   └── Critical Failure → Root cause analysis required\n\n6. Documentation & Reporting\n   ├── Record all quality check results\n   ├── Photo documentation for failures\n   ├── Quality trends analysis\n   ├── Supplier feedback (ingredient issues)\n   └── Staff training needs identification\n\n7. Continuous Improvement\n   ├── Quality score tracking over time\n   ├── Failure pattern analysis\n   ├── Recipe improvement recommendations\n   ├── Process optimization\n   └── Best practice documentation\n```\n\n### Waste Management Workflow\n\n```\n1. Waste Event Recording\n   ├── Capture waste occurrence (real-time)\n   ├── Categorize waste type:\n   │   ├── Trim waste (normal processing)\n   │   ├── Spoilage (quality degradation)\n   │   ├── Over-production (excess production)\n   │   ├── Preparation error (staff mistake)\n   │   ├── Equipment failure (mechanical)\n   │   └── Other (miscellaneous)\n   ├── Weigh and record quantity\n   ├── Calculate cost impact\n   └── Photo documentation (optional)\n\n2. Root Cause Analysis\n   ├── Identify primary cause\n   ├── Link to specific recipe/batch\n   ├── Link to staff member (for training)\n   ├── Link to equipment (for maintenance)\n   └── Link to supplier (for quality issues)\n\n3. Immediate Actions\n   ├── Adjust current production batch\n   ├── Alert supervisor if threshold exceeded\n   ├── Initiate corrective action\n   └── Update inventory\n\n4. Analysis & Reporting\n   ├── Daily waste summary\n   ├── Waste by category analysis\n   ├── Cost impact calculation\n   ├── Trend analysis (7-day, 30-day, 90-day)\n   └── Benchmark against targets (target: <3% waste)\n\n5. Improvement Planning\n   ├── Identify high-waste recipes\n   ├── Staff training recommendations\n   ├── Equipment maintenance needs\n   ├── Supplier quality discussions\n   └── Process improvement projects\n\n6. Sustainability Tracking\n   ├── Composting vs. landfill tracking\n   ├── Environmental impact metrics\n   ├── Carbon footprint calculations\n   └── Sustainability goal progress reporting\n```\n\n## TypeScript Interfaces\n\n### RecipeProductionBatch\n\nComplete production batch tracking with timing, costs, quality, and yield analysis.\n\n```typescript\ninterface RecipeProductionBatch {\n  id: string;\n  batchNumber: string;\n  recipeId: string;\n  yieldVariantId?: string;\n\n  // Production details\n  plannedQuantity: number;\n  actualQuantity: number;\n  unit: string;\n\n  // Timing\n  plannedStartTime: Date;\n  actualStartTime?: Date;\n  plannedEndTime: Date;\n  actualEndTime?: Date;\n\n  // Staff\n  assignedChef: string;\n  assistants?: string[];\n  supervisor?: string;\n\n  // Quality control\n  qualityChecks: QualityCheck[];\n  qualityApproved: boolean;\n  qualityApprovedBy?: string;\n  qualityApprovedAt?: Date;\n\n  // Costs\n  actualIngredientCost: Money;\n  actualLaborCost: Money;\n  totalActualCost: Money;\n  costVariance: Money;\n\n  // Yield analysis\n  expectedYield: number;\n  actualYield: number;\n  yieldVariance: number; // percentage\n  wasteGenerated: number;\n  wasteReason?: string;\n\n  // Status\n  status: 'planned' | 'in_progress' | 'completed' | 'quality_check' | 'approved' | 'rejected';\n  notes?: string;\n\n  createdAt: Date;\n  updatedAt: Date;\n  createdBy: string;\n  updatedBy: string;\n}\n```\n\n### Fractional Production Types\n\n**374-line complete fractional inventory system** supporting pizza slices, cake portions, bottle-by-glass, and custom fractional sales.\n\n**FractionalItemState**\n```typescript\ntype FractionalItemState =\n  | \"RAW\"           // Original whole item\n  | \"PREPARED\"      // Item prepared/processed but not portioned\n  | \"PORTIONED\"     // Item divided into sellable portions\n  | \"PARTIAL\"       // Partially consumed item with remaining portions\n  | \"COMBINED\"      // Multiple portions combined back to bulk\n  | \"WASTE\";        // Waste generated during conversion\n```\n\n**ConversionType**\n```typescript\ntype ConversionType =\n  | \"SPLIT\"         // Whole item → multiple portions\n  | \"COMBINE\"       // Multiple portions → bulk item\n  | \"PREPARE\"       // Raw → prepared\n  | \"PORTION\"       // Prepared → portioned\n  | \"CONSUME\"       // Portioned → consumed\n  | \"WASTE\";        // Any state → waste\n```\n\n**FractionalStock**\n```typescript\ninterface FractionalStock {\n  id: string;\n  itemId: string;\n  locationId: string;\n  batchId?: string;\n\n  // Current state\n  currentState: FractionalItemState;\n  stateTransitionDate: string;\n  qualityGrade: \"EXCELLENT\" | \"GOOD\" | \"FAIR\" | \"POOR\" | \"EXPIRED\";\n\n  // Quantity tracking\n  wholeUnitsAvailable: number;      // Complete whole units\n  partialQuantityAvailable: number; // Remaining partial quantity\n  totalPortionsAvailable: number;   // Total sellable portions\n  reservedPortions: number;         // Reserved for orders\n\n  // Original quantities\n  originalWholeUnits: number;\n  originalTotalPortions: number;\n\n  // Conversion tracking\n  conversionsApplied: ConversionRecord[];\n  totalWasteGenerated: number;\n\n  // Quality tracking\n  preparedAt?: string;\n  portionedAt?: string;\n  expiresAt?: string;\n  lastQualityCheck?: string;\n  qualityNotes?: string;\n\n  // Location and batch info\n  storageLocation?: string;\n  batchNumber?: string;\n  supplierLotNumber?: string;\n\n  createdAt: string;\n  updatedAt: string;\n}\n```\n\n**ConversionRecord**\n```typescript\ninterface ConversionRecord {\n  id: string;\n  conversionType: ConversionType;\n  fromState: FractionalItemState;\n  toState: FractionalItemState;\n\n  // Quantities before conversion\n  beforeWholeUnits: number;\n  beforePartialQuantity: number;\n  beforeTotalPortions: number;\n\n  // Quantities after conversion\n  afterWholeUnits: number;\n  afterPartialQuantity: number;\n  afterTotalPortions: number;\n\n  // Conversion details\n  wasteGenerated: number;\n  conversionEfficiency: number;     // Actual vs expected conversion ratio\n  conversionCost: number;\n\n  // Metadata\n  performedBy: string;\n  performedAt: string;\n  reason?: string;\n  notes?: string;\n  qualityBefore?: string;\n  qualityAfter?: string;\n\n  // References\n  sourceStockIds: string[];         // Stock items used in conversion\n  targetStockIds: string[];         // Stock items created from conversion\n  relatedOrderId?: string;          // If conversion was for specific order\n}\n```\n\n**ConversionRecommendation** (AI-Driven)\n```typescript\ninterface ConversionRecommendation {\n  id: string;\n  itemId: string;\n  stockId: string;\n\n  recommendationType: \"IMMEDIATE\" | \"SCHEDULED\" | \"DEMAND_BASED\";\n  priority: \"LOW\" | \"MEDIUM\" | \"HIGH\" | \"URGENT\";\n\n  fromState: FractionalItemState;\n  toState: FractionalItemState;\n\n  // Quantities\n  recommendedWholeUnits: number;\n  recommendedPortions: number;\n\n  // Reasoning\n  reason: string;\n  expectedBenefits: string[];\n  potentialRisks: string[];\n\n  // Impact estimates\n  estimatedWaste: number;\n  estimatedCost: number;\n  estimatedRevenue?: number;\n  qualityImpact?: number;\n\n  // Timing\n  recommendedBy: string;\n  recommendedAt: string;\n  optimalExecutionTime?: string;\n  expirationTime?: string;        // When recommendation is no longer valid\n\n  // Status\n  status: \"PENDING\" | \"ACCEPTED\" | \"REJECTED\" | \"EXECUTED\";\n  acceptedBy?: string;\n  acceptedAt?: string;\n  executionNotes?: string;\n}\n```\n\n### QualityCheck\n\n```typescript\ninterface QualityCheck {\n  id: string;\n  checkType: 'visual' | 'taste' | 'temperature' | 'texture' | 'aroma' | 'portion_size';\n  description: string;\n  expectedValue?: string;\n  actualValue?: string;\n  passed: boolean;\n  checkedBy: string;\n  checkedAt: Date;\n  notes?: string;\n  correctiveAction?: string;\n}\n```\n\n### RecipeMetrics\n\n```typescript\ninterface RecipeMetrics {\n  recipeId: string;\n  period: {\n    startDate: Date;\n    endDate: Date;\n  };\n\n  // Production metrics\n  totalBatchesProduced: number;\n  totalQuantityProduced: number;\n  averageBatchSize: number;\n  productionEfficiency: number; // percentage\n\n  // Quality metrics\n  qualityPassRate: number; // percentage\n  averageYieldVariance: number; // percentage\n  wastePercentage: number;\n  reworkBatches: number;\n\n  // Cost metrics\n  averageCostPerPortion: Money;\n  costVariance: Money;\n  ingredientCostTrend: number; // percentage change\n\n  // Popularity metrics\n  orderFrequency: number;\n  customerRating?: number; // 0-5\n  returnRate: number; // percentage\n\n  // Profitability\n  averageSellingPrice: Money;\n  grossMargin: Money;\n  grossMarginPercentage: number;\n  totalRevenue: Money;\n  totalProfit: Money;\n\n  // Staff feedback\n  preparationDifficulty: number; // 0-5 rating\n  timeAccuracy: number; // actual vs planned time percentage\n  lastUpdated: Date;\n}\n```\n\n## Integration Points\n\n### Operational Planning Module Integration\n\n**Recipe Management**\n- Import standardized recipes with preparation instructions\n- Access recipe yield variants and portion specifications\n- Retrieve ingredient lists with quantities and substitutes\n- Get preparation steps with timing and quality checkpoints\n\n**Menu Planning**\n- Receive production requirements from menu forecasts\n- Access seasonal availability and menu item status\n- Get special event production requirements\n- Receive promotional item production schedules\n\n**Ingredient Specifications**\n- Access detailed ingredient information and costs\n- Get quality requirements and handling instructions\n- Retrieve allergen information for cross-contamination prevention\n- Access nutritional information for labeling\n\n**Data Flow**: Recipe data → Production orders → Ingredient allocation → Production execution\n\n### Inventory Management Module Integration\n\n**Ingredient Allocation**\n- Reserve ingredients for production orders automatically\n- Check ingredient availability before production scheduling\n- Handle ingredient substitutions when primary unavailable\n- Manage ingredient quality grades and lot numbers\n\n**Stock Deduction**\n- Automatic inventory updates upon production completion\n- Real-time stock level updates during production\n- Waste deduction from inventory\n- Spoilage and expiration handling\n\n**Fractional Inventory**\n- Update partial product inventory for slice/portion sales\n- Track conversion from whole to portioned items\n- Monitor remaining yields and expiration dates\n- Synchronize with POS for real-time fractional sales\n\n**Data Flow**: Production order → Ingredient reservation → Production completion → Inventory update → Fractional conversion → Sales deduction\n\n### Store Operations Module Integration\n\n**Demand Planning**\n- Receive sales forecasts for production planning\n- Get special event requirements and catering orders\n- Access historical sales patterns for demand prediction\n- Receive store requisitions for inter-location transfers\n\n**Product Transfer**\n- Manage finished goods transfer to service areas\n- Track product movement between kitchen and service stations\n- Handle inter-location production transfers\n- Document quality during transfers\n\n**Customer Feedback Integration**\n- Quality improvement based on customer feedback\n- Recipe adjustment recommendations from service staff\n- Complaint tracking linked to production batches\n- Customer preference analysis for production planning\n\n**Data Flow**: Sales forecast → Production planning → Finished goods → Store transfer → Customer service → Feedback loop\n\n### Vendor Management Module Integration\n\n**Supplier Quality Data**\n- Access supplier quality certifications and specifications\n- Get supplier performance ratings and reliability scores\n- Retrieve ingredient specifications from supplier catalogs\n- Access supplier compliance documents\n\n**Ingredient Traceability**\n- Link production batches to supplier lot numbers\n- Track ingredient journey from supplier to finished product\n- Document supplier information in batch records\n- Enable recall management with complete traceability\n\n**Quality Incident Reporting**\n- Coordinate with suppliers on quality issues\n- Document ingredient quality deviations\n- Initiate supplier corrective action requests\n- Track supplier quality improvement over time\n\n**Data Flow**: Supplier lot → Ingredient receipt → Production batch → Quality issue → Supplier feedback → Corrective action\n\n### POS System Integration\n\n**Real-time Sales Data**\n- Monitor actual vs. forecasted demand for production adjustment\n- Receive live menu item sales for dynamic production\n- Get special requests and customizations\n- Access peak time patterns for production scheduling\n\n**Fractional Sales Tracking**\n- Receive slice/portion sales data for inventory management\n- Track fractional conversion efficiency\n- Monitor partial product consumption rates\n- Analyze fractional vs. whole product sales ratios\n\n**Menu Item Availability**\n- Communicate production status to sales systems\n- Update menu availability based on production completion\n- Flag items out of stock or delayed production\n- Enable dynamic menu based on production capacity\n\n**Data Flow**: POS sales → Production adjustment → Production status → Menu availability → POS system\n\n### Financial System Integration\n\n**Cost Accounting**\n- Export production costs for financial reporting\n- Track actual vs. standard costs per batch\n- Calculate cost variances (material, labor, overhead)\n- Generate cost center reports by production line\n\n**Labor Cost Integration**\n- Track production labor costs per batch\n- Calculate labor efficiency metrics\n- Monitor overtime and premium time\n- Analyze labor productivity by staff member\n\n**Margin Analysis**\n- Provide data for product profitability analysis\n- Calculate gross margin per recipe and yield variant\n- Track margin trends over time\n- Identify high-margin and low-margin products\n\n**Data Flow**: Production batch → Cost data → Financial system → Profitability reports → Management decisions\n\n## User Guide\n\n### Kitchen Managers\n\n#### Production Planning and Oversight\n\n**Daily Production Planning**\n1. Review sales forecast for next 24-48 hours\n2. Create production orders for required recipes\n3. Check ingredient availability (automated)\n4. Assign chefs and crews to batches\n5. Review equipment schedule for conflicts\n6. Approve production schedule\n\n**Production Monitoring**\n1. Access live production dashboard\n2. Monitor batch progress and timing\n3. Review quality checkpoint completion\n4. Track cost variance alerts\n5. Respond to alerts and notifications\n6. Adjust production as needed\n\n**Performance Analysis**\n1. Review daily/weekly production metrics\n2. Analyze quality pass rates and trends\n3. Monitor waste percentages vs. targets\n4. Track labor productivity by staff\n5. Review equipment utilization rates\n6. Identify improvement opportunities\n\n**Staff Management**\n1. Assign production tasks based on skills\n2. Monitor staff productivity metrics\n3. Identify training needs\n4. Recognize high performers\n5. Address quality issues with staff\n6. Schedule cross-training activities\n\n### Production Supervisors\n\n#### Real-Time Monitoring and Crew Coordination\n\n**Shift Start Activities**\n1. Review production schedule for shift\n2. Conduct pre-shift briefing with crew\n3. Verify equipment functionality\n4. Check ingredient availability\n5. Assign tasks to crew members\n6. Start first production batch\n\n**During Production**\n1. Monitor batch progress on mobile device\n2. Update batch status as steps complete\n3. Document quality checks at checkpoints\n4. Record temperatures and timing\n5. Respond to alerts and issues\n6. Communicate with kitchen manager\n\n**Quality Control**\n1. Perform visual inspections at critical steps\n2. Conduct taste tests with chef\n3. Verify portion sizes and presentation\n4. Document any quality deviations\n5. Initiate corrective actions\n6. Approve batches for service\n\n**Waste Management**\n1. Document waste events immediately\n2. Categorize waste type and cause\n3. Weigh and record waste quantities\n4. Photo document significant waste\n5. Identify root causes\n6. Implement corrective actions\n\n### Line Cooks & Production Staff\n\n#### Production Execution and Quality Control\n\n**Following Production Instructions**\n1. Access assigned production order on mobile/tablet\n2. Review recipe and preparation steps\n3. Gather ingredients from allocated stock\n4. Verify ingredient quality before use\n5. Follow preparation steps in sequence\n6. Document completion of each step\n\n**Quality Checkpoints**\n1. Perform self-checks at designated points\n2. Verify measurements and weights\n3. Check temperatures during cooking\n4. Document timing for critical steps\n5. Alert supervisor if issues arise\n6. Take corrective action as needed\n\n**Status Updates**\n1. Update batch status on mobile device\n   - Started\n   - Step completed\n   - Quality check passed\n   - Completed\n   - Issue encountered\n2. Add photos for quality documentation\n3. Record actual timing vs. planned\n4. Note any ingredient substitutions\n5. Document waste events\n\n**Quality Standards**\n1. Understand expected outcomes for recipe\n2. Follow portion control standards\n3. Maintain consistent techniques\n4. Use designated equipment properly\n5. Report quality issues immediately\n6. Participate in continuous improvement\n\n## Performance Metrics\n\n### Operational Excellence KPIs\n\n**Production Efficiency Metrics**\n- **Production Cycle Time**: Target 20% reduction from baseline\n  - Measure: Average time from order creation to completion\n  - Current: Baseline being established\n  - Target: 80% of baseline\n\n- **Equipment Utilization Rate**: Target 85% average utilization\n  - Measure: Active production time / Available time\n  - Current: 70% (estimated from PRD)\n  - Target: 85%\n\n- **Labor Productivity**: Target 15% improvement in output per labor hour\n  - Measure: Units produced / Total labor hours\n  - Current: Baseline being established\n  - Target: 115% of baseline\n\n- **On-Time Production Completion**: Target 95% on-time delivery\n  - Measure: Batches completed within planned time / Total batches\n  - Current: Baseline being established\n  - Target: 95%\n\n**Quality & Consistency Metrics**\n- **Quality Failure Rate**: Target <2% of production batches\n  - Measure: Failed quality checks / Total quality checks\n  - Current: 2% (from dashboard mock data: 2% failed)\n  - Target: <2%\n\n- **Recipe Standardization Compliance**: Target 98% adherence\n  - Measure: Batches following standard recipe / Total batches\n  - Current: Baseline being established\n  - Target: 98%\n\n- **Customer Quality Complaints**: Target 50% reduction\n  - Measure: Quality-related complaints / Total customer interactions\n  - Current: Baseline being established\n  - Target: 50% reduction\n\n- **Batch Traceability Completion**: Target 100%\n  - Measure: Batches with complete traceability / Total batches\n  - Current: Baseline being established\n  - Target: 100%\n\n**Cost Management Metrics**\n- **Food Waste Reduction**: Target 25% decrease\n  - Measure: Waste weight / Total production weight\n  - Current: 2.5% (from dashboard mock data)\n  - Target: <2% (25% reduction from baseline)\n\n- **Ingredient Yield Variance**: Target within 5% of planned yields\n  - Measure: (Actual yield - Planned yield) / Planned yield\n  - Current: Baseline being established\n  - Target: ±5%\n\n- **Production Cost Accuracy**: Target 95% accuracy\n  - Measure: |Actual cost - Standard cost| / Standard cost\n  - Current: Baseline being established\n  - Target: <5% variance\n\n- **Fractional Sales Profitability**: Target 15% margin improvement\n  - Measure: Fractional sales margin vs. whole product margin\n  - Current: Baseline being established\n  - Target: +15%\n\n### Financial Performance KPIs\n\n**Revenue Impact Metrics**\n- **Fractional Sales Revenue Growth**: Target 30% increase\n  - Measure: Fractional sales revenue period over period\n  - Current: Baseline being established\n  - Target: +30%\n\n- **Production Cost Per Unit**: Target 10% reduction\n  - Measure: Total production cost / Units produced\n  - Current: Baseline being established\n  - Target: 90% of baseline\n\n- **Gross Margin Improvement**: Target 5% increase\n  - Measure: (Revenue - Production cost) / Revenue\n  - Current: Baseline being established\n  - Target: +5%\n\n- **Labor Cost Optimization**: Target 15% reduction\n  - Measure: Production labor cost / Total production cost\n  - Current: Baseline being established\n  - Target: 85% of baseline\n\n**Sustainability & Compliance Metrics**\n- **Environmental Waste Reduction**: Target 40% reduction in food waste to landfill\n  - Measure: Landfill waste weight / Total waste weight\n  - Current: Baseline being established\n  - Target: 60% of baseline\n\n- **Energy Consumption Per Unit**: Target 20% reduction\n  - Measure: Energy consumed / Units produced\n  - Current: Baseline being established\n  - Target: 80% of baseline\n\n- **Food Safety Compliance Score**: Target 100% compliance\n  - Measure: Passed health inspections / Total health inspections\n  - Current: Baseline being established\n  - Target: 100%\n\n- **Audit Readiness**: Target 100% documentation completeness\n  - Measure: Complete batch records / Total batches\n  - Current: Baseline being established\n  - Target: 100%\n\n### Dashboard Metrics (Current Implementation)\n\n**Production Volume** (7-day trend)\n- Monday: 500 units\n- Tuesday: 600 units\n- Wednesday: 550 units\n- Thursday: 700 units\n- Friday: 800 units\n- Saturday: 900 units\n- Sunday: 750 units\n- **Average**: 685 units/day\n\n**Quality Control Results**\n- Passed: 92%\n- Minor Issues: 6%\n- Failed: 2%\n\n**Top 5 Recipes Produced**\n1. Recipe A: 150 units\n2. Recipe B: 120 units\n3. Recipe C: 100 units\n4. Recipe D: 80 units\n5. Recipe E: 70 units\n\n**Current Metrics**\n- Batch Production: 3 batches currently in production\n- Wastage Tracking: 2.5% production wastage this week\n- Equipment Utilization: 85% average utilization rate\n\n## Best Practices\n\n### Production Scheduling Optimization\n\n**1. Demand-Based Scheduling**\n- Use historical sales data to predict demand patterns\n- Schedule high-demand items during peak production windows\n- Balance production across multiple days to avoid overload\n- Build safety stock for high-variability items\n- Adjust schedules dynamically based on real-time POS data\n\n**2. Batch Sizing Optimization**\n- Calculate optimal batch sizes based on equipment capacity\n- Consider shelf life when determining batch quantities\n- Balance setup time vs. holding cost\n- Use fractional production for items with uncertain demand\n- Coordinate batch timing to minimize wait time between steps\n\n**3. Equipment Sequencing**\n- Group similar recipes to minimize setup and changeover time\n- Schedule equipment-intensive items during off-peak hours\n- Implement parallel production where possible\n- Reserve critical equipment for high-priority items\n- Plan maintenance during low-demand periods\n\n**4. Staff Utilization**\n- Match staff skills to recipe complexity requirements\n- Cross-train staff to increase scheduling flexibility\n- Balance workload across team members\n- Schedule breaks to avoid fatigue-related quality issues\n- Use productive time for training during slow periods\n\n### Quality Control Implementation\n\n**1. Checkpoint Design**\n- Place checkpoints at critical control points (HACCP)\n- Use objective criteria (temperature, weight, time)\n- Include subjective assessments (taste, appearance)\n- Document expected values clearly in recipes\n- Provide visual guides and photos for consistency\n\n**2. Staff Training**\n- Train all staff on quality standards and expectations\n- Demonstrate proper techniques and common mistakes\n- Provide hands-on practice with feedback\n- Certify staff competency before production assignment\n- Conduct regular refresher training and assessments\n\n**3. Quality Documentation**\n- Record all quality check results digitally\n- Photo document quality issues for analysis\n- Track quality trends over time by recipe, staff, equipment\n- Share quality successes and failures with team\n- Use quality data to drive continuous improvement\n\n**4. Corrective Action**\n- Define clear escalation procedures for quality failures\n- Empower staff to stop production if quality at risk\n- Investigate root causes systematically\n- Implement corrective actions quickly\n- Verify effectiveness of corrective actions\n\n### Waste Reduction Strategies\n\n**1. Accurate Forecasting**\n- Use historical sales data and trends\n- Incorporate special events and promotions\n- Adjust for seasonal variations and weather\n- Collaborate with sales team on demand predictions\n- Review and refine forecasts continuously\n\n**2. Portion Control**\n- Use standardized measuring tools and scales\n- Provide portion guides (photos, templates)\n- Train staff on consistent portioning techniques\n- Audit portion sizes regularly\n- Track portion variance and provide feedback\n\n**3. Ingredient Optimization**\n- Use whole ingredients efficiently (nose-to-tail, root-to-stem)\n- Plan recipes to utilize trimmings and scraps\n- Implement FIFO (First In, First Out) inventory management\n- Monitor ingredient quality and supplier performance\n- Substitute ingredients proactively to avoid spoilage\n\n**4. Process Improvement**\n- Analyze waste patterns to identify root causes\n- Simplify recipes to reduce preparation complexity\n- Improve equipment reliability to reduce failure waste\n- Enhance staff training to reduce error waste\n- Implement continuous improvement culture\n\n### Equipment Utilization Improvement\n\n**1. Capacity Planning**\n- Calculate theoretical capacity for each piece of equipment\n- Monitor actual utilization vs. capacity\n- Identify bottleneck equipment\n- Schedule production to balance equipment usage\n- Invest in bottleneck-relief equipment strategically\n\n**2. Maintenance Optimization**\n- Implement preventive maintenance schedules\n- Track equipment reliability (MTBF, MTTR)\n- Schedule maintenance during low-demand periods\n- Keep spare parts inventory for critical equipment\n- Train staff on basic troubleshooting and maintenance\n\n**3. Multi-Tasking and Parallel Production**\n- Identify recipes that can share equipment sequentially\n- Plan parallel production for independent recipes\n- Optimize oven/equipment loading for multiple items\n- Coordinate timing to minimize idle time\n- Use prep time for one recipe during cooking time for another\n\n**4. Energy Efficiency**\n- Preheat equipment only when needed\n- Batch similar temperature requirements together\n- Turn off equipment during idle periods\n- Monitor energy consumption and set reduction targets\n- Invest in energy-efficient equipment when replacing\n\n## Troubleshooting\n\n### Common Production Issues\n\n#### Issue 1: Production Delays\n\n**Symptoms**: Batches not completing on time, cascading delays\n\n**Diagnosis**:\n1. Check ingredient availability - stockouts or quality holds?\n2. Review equipment schedule - conflicts or breakdowns?\n3. Assess staff availability - adequate staffing and skills?\n4. Examine recipe complexity - realistic time estimates?\n5. Analyze batch sequencing - inefficient scheduling?\n\n**Solutions**:\n- Implement better ingredient forecasting and safety stock\n- Add buffer time to schedules for unexpected delays\n- Cross-train staff to increase scheduling flexibility\n- Review and update recipe timing estimates\n- Use production scheduling optimization algorithms\n- Communicate delays to downstream operations immediately\n\n#### Issue 2: Quality Control Problems\n\n**Symptoms**: High failure rate, inconsistent product quality, customer complaints\n\n**Diagnosis**:\n1. Review quality check data - which checks are failing?\n2. Analyze by recipe - specific recipes with issues?\n3. Analyze by staff - training needs identified?\n4. Check ingredient quality - supplier issues?\n5. Examine equipment performance - maintenance needed?\n6. Review process adherence - staff following procedures?\n\n**Solutions**:\n- Enhance staff training on quality standards and techniques\n- Implement more frequent or detailed quality checkpoints\n- Work with suppliers to improve ingredient quality\n- Schedule equipment maintenance to restore performance\n- Simplify recipes to reduce complexity and failure points\n- Provide real-time feedback to staff on quality performance\n- Use visual guides and photos for quality standards\n\n#### Issue 3: Excessive Waste\n\n**Symptoms**: Waste percentage above 3% target, high cost variance\n\n**Diagnosis**:\n1. Categorize waste type - trim, spoilage, over-production, error?\n2. Analyze by recipe - high-waste recipes identified?\n3. Analyze by staff - technique or training issues?\n4. Check ingredient quality - spoilage or defects?\n5. Review forecasting accuracy - over-production issue?\n6. Examine equipment performance - failure causing waste?\n\n**Solutions**:\n- **Trim Waste**: Optimize recipes to use whole ingredients, improve knife skills training\n- **Spoilage**: Improve forecasting, implement FIFO, monitor expiration dates\n- **Over-production**: Refine demand forecasts, implement fractional production for uncertain items\n- **Error Waste**: Enhance training, simplify recipes, improve process documentation\n- **Equipment Failure**: Schedule maintenance, repair or replace failing equipment\n- Track waste trends over time and set reduction targets\n\n#### Issue 4: Equipment Utilization Challenges\n\n**Symptoms**: Low utilization rate (<85%), bottlenecks, idle equipment\n\n**Diagnosis**:\n1. Calculate utilization rate per equipment\n2. Identify bottleneck equipment (highest utilization, causing delays)\n3. Identify idle equipment (low utilization, underused)\n4. Analyze production schedule - inefficient sequencing?\n5. Review equipment capacity - insufficient capacity?\n\n**Solutions**:\n- **Bottleneck Equipment**:\n  - Schedule production to maximize bottleneck usage\n  - Consider acquiring additional bottleneck capacity\n  - Redesign recipes to reduce bottleneck dependency\n  - Implement parallel production where possible\n\n- **Idle Equipment**:\n  - Identify recipes that can utilize idle equipment\n  - Cross-train staff to operate underused equipment\n  - Consider leasing out or relocating idle equipment\n  - Retire equipment with consistently low utilization\n\n- **Scheduling**:\n  - Optimize batch sequencing to minimize setup/changeover\n  - Group similar recipes to share equipment efficiently\n  - Use scheduling algorithms to maximize utilization\n  - Balance production across time periods\n\n#### Issue 5: Fractional Conversion Problems\n\n**Symptoms**: Inconsistent portion sizes, high conversion waste, quality degradation after portioning\n\n**Diagnosis**:\n1. Review conversion records - waste percentage per conversion?\n2. Check quality grades - degradation after portioning?\n3. Analyze portion sizes - weight variance acceptable?\n4. Examine conversion timing - optimal timing used?\n5. Assess storage conditions - proper temperature and handling?\n\n**Solutions**:\n- Implement stricter portion control with weighing\n- Train staff on proper portioning techniques\n- Use portioning guides and templates\n- Optimize conversion timing based on demand patterns\n- Improve storage conditions to preserve quality\n- Monitor quality grades and adjust conversion timing\n- Track conversion efficiency and provide feedback\n- Use AI recommendations for optimal conversion timing\n\n---\n\n**Implementation Status**: Type system complete, dashboard prototype functional, comprehensive PRD available\n**Next Steps**: Full production order management, quality control workflows, fractional conversion implementation\n**Integration Priority**: Recipe Management (phase 1), Inventory Management (phase 1), POS integration (phase 2)\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

@@ -22,10 +22,19 @@ import {
 
 import { RecipeMapping } from "./types"
 import { recipeMappings, categories, locations } from "./data"
+import { RecipeEditDrawer } from "../components/recipe-edit-drawer"
+import { DeleteConfirmationDialog } from "../components/delete-confirmation-dialog"
+import { MappingHistoryDrawer } from "../components/mapping-history-drawer"
+import { TestMappingModal } from "../components/test-mapping-modal"
 
 export default function RecipeMappingPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([])
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false)
+  const [testModalOpen, setTestModalOpen] = useState(false)
+  const [selectedRecipe, setSelectedRecipe] = useState<RecipeMapping | null>(null)
   
   // Setup filter groups
   const filterGroups: FilterGroup[] = [
@@ -68,8 +77,34 @@ export default function RecipeMappingPage() {
 
   // Handle row actions
   const handleRowAction = (action: ActionType, recipe: RecipeMapping) => {
-    console.log(`${action} action on recipe:`, recipe)
-    // Implement action handlers here
+    setSelectedRecipe(recipe)
+
+    switch(action) {
+      case "edit":
+        setEditDrawerOpen(true)
+        break
+      case "delete":
+        setDeleteDialogOpen(true)
+        break
+      case "history":
+        setHistoryDrawerOpen(true)
+        break
+      case "test":
+        setTestModalOpen(true)
+        break
+    }
+  }
+
+  // Handle save mapping
+  const handleSaveMapping = (updatedMapping: Partial<RecipeMapping>) => {
+    console.log("Saving updated mapping:", updatedMapping)
+    // TODO: Implement actual save logic with API call
+  }
+
+  // Handle delete mapping
+  const handleDeleteMapping = (deleteType: "soft" | "hard", reason?: string) => {
+    console.log(`Deleting mapping (${deleteType}):`, selectedRecipe?.id, "Reason:", reason)
+    // TODO: Implement actual delete logic with API call
   }
 
   // Filter data based on search query and applied filters
@@ -220,6 +255,35 @@ export default function RecipeMappingPage() {
         columns={columns}
         data={filteredData}
         rowClassName={getRowClassName}
+      />
+
+      <RecipeEditDrawer
+        open={editDrawerOpen}
+        onOpenChange={setEditDrawerOpen}
+        mapping={selectedRecipe}
+        onSave={handleSaveMapping}
+      />
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        mapping={selectedRecipe}
+        mappingType="recipe"
+        onConfirm={handleDeleteMapping}
+      />
+
+      <MappingHistoryDrawer
+        open={historyDrawerOpen}
+        onOpenChange={setHistoryDrawerOpen}
+        mappingId={selectedRecipe?.id || ""}
+        mappingType="recipe"
+        mappingName={selectedRecipe?.posDescription || ""}
+      />
+
+      <TestMappingModal
+        open={testModalOpen}
+        onOpenChange={setTestModalOpen}
+        mapping={selectedRecipe}
       />
     </div>
   )

@@ -11,7 +11,6 @@ import { AlertCircle,ChevronLeft } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Workflow } from "../types/workflow"
-import { WorkflowProducts } from "./workflow-products"
 
 interface WorkflowDetailProps {
   workflowId: string
@@ -57,7 +56,6 @@ export function WorkflowDetail({ workflowId }: WorkflowDetailProps) {
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="stages">Stages</TabsTrigger>
           <TabsTrigger value="routing">Routing</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
         </TabsList>
         <TabsContent value="general">
           <WorkflowGeneral workflow={workflow} isEditing={isEditing} onSave={(updatedWorkflow) => handleSave({...workflow, ...updatedWorkflow})} />
@@ -66,18 +64,11 @@ export function WorkflowDetail({ workflowId }: WorkflowDetailProps) {
           <WorkflowStages stages={workflow.stages} isEditing={isEditing} onSave={(stages) => handleSave({...workflow, stages})} />
         </TabsContent>
         <TabsContent value="routing">
-          <WorkflowRouting 
-            rules={workflow.routingRules || []} 
-            stages={stageNames} 
+          <WorkflowRouting
+            rules={workflow.routingRules || []}
+            stages={stageNames}
             isEditing={isEditing}
-            onSave={(routingRules) => handleSave({...workflow, routingRules})} 
-          />
-        </TabsContent>
-        <TabsContent value="products">
-          <WorkflowProducts 
-            products={workflow.products || []} 
-            isEditing={isEditing}
-            onSave={(products) => handleSave({...workflow, products})} 
+            onSave={(routingRules) => handleSave({...workflow, routingRules})}
           />
         </TabsContent>
       </Tabs>

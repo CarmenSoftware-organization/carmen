@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Count Module - Complete Specification - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Physical Count</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PC</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Physical Count Module - Complete Specification\n\n## Overview\n\nThe Physical Count module is a comprehensive inventory management system designed for hospitality environments. It provides a structured workflow for conducting physical inventory counts with multi-step processes, location-based organization, and real-time progress tracking.\n\n## Module Architecture\n\n### Core Components\n- **Physical Count Creation Wizard** - Multi-step form for setting up new counts\n- **Physical Count Dashboard** - Overview and management interface\n- **Active Count Interface** - Real-time counting execution\n- **Physical Count Management** - Administrative management of counts\n\n## Physical Count Creation Workflow\n\n### Main Wizard Steps\nThe physical count creation follows a 4-step wizard pattern:\n\n1. **Setup** - Basic information and configuration\n2. **Location** - Select locations to include in count\n3. **Items** - Review and configure items to count\n4. **Review** - Final verification before starting count\n\n### Step 1: Setup (`/physical-count` - Setup Component)\n\n**Location**: `app/(main)/inventory-management/physical-count/components/setup.tsx`\n\n**Purpose**: Capture basic information for the physical count\n\n**Fields**:\n- **Counter Name** (auto-filled from user context)\n- **Department** (dropdown from mockDepartments)\n- **Date & Time** (DateTimePicker component)\n- **Notes** (optional text area)\n\n**Validation**: Requires department and dateTime to proceed\n\n**UI Elements**:\n- Card layout with title \"Physical Count Setup\"\n- Form fields with labels\n- Auto-population of counter name\n- Navigation buttons (Back/Next)\n\n### Step 2: Location Selection (`/physical-count` - Location Component)\n\n**Location**: `app/(main)/inventory-management/physical-count/components/location-selection.tsx`\n\n**Purpose**: Allow users to select which locations to include in the physical count\n\n**Features**:\n- Multi-select location checkboxes\n- Location details display\n- Validation to ensure at least one location is selected\n\n**UI Elements**:\n- Checkbox list of available locations\n- Location information cards\n- Select all/none functionality\n\n### Step 3: Item Review (`/physical-count` - Items Component)\n\n**Location**: `app/(main)/inventory-management/physical-count/components/item-review.tsx`\n\n**Purpose**: Review and configure items that will be included in the count\n\n**Features**:\n- Display items from selected locations\n- Option to exclude specific items\n- Item details and current stock levels\n\n### Step 4: Final Review (`/physical-count` - Review Component)\n\n**Location**: `app/(main)/inventory-management/physical-count/components/final-review.tsx`\n\n**Purpose**: Final verification before starting the physical count\n\n**Features**:\n- Summary of all selections\n- Confirmation before count creation\n- Redirects to active count page upon completion\n\n**Navigation**: Redirects to `/inventory-management/physical-count/active/${countId}`\n\n## Physical Count Dashboard\n\n**Location**: `app/(main)/inventory-management/physical-count/dashboard/page.tsx`\n\n**Purpose**: Provides overview and management of all physical count activities\n\n### Dashboard Components\n\n#### Statistics Cards\n- **Total Counts** - Overall count statistics\n- **In Progress** - Currently active counts\n- **Active Counters** - Number of people currently counting\n- **Pending Review** - Counts requiring attention\n\n#### Activity Chart\n- Bar chart showing count activity over time\n- Filterable by time period (Week/Month/Quarter/Year)\n- Uses Recharts library for visualization\n\n#### Recent Counts Panel\n- List of recent counting activities\n- Status indicators (In Progress/Completed)\n- Variance information\n- Counter assignments\n\n#### All Counts Table\n- Comprehensive table of all physical counts\n- Implemented via CountsTable component\n- Action buttons for scheduling and creating new counts\n\n### Navigation Options\n- **New Count** button → `/inventory-management/physical-count`\n- **Schedule Count** button (placeholder functionality)\n\n## Active Count Interface\n\n**Location**: `app/(main)/inventory-management/physical-count/active/[id]/page.tsx`\n\n**Purpose**: Real-time interface for conducting physical counts\n\n### Interface Components\n\n#### Count Header (Sticky)\n- Count session information\n- Start time and duration tracking\n- Control buttons:\n  - **Pause Count** - Temporarily pause the counting process\n  - **Complete Count** - Finish and submit the count\n\n#### Location Bar\n- Horizontal tabs for switching between count locations\n- Item count badges for each location\n- Visual indication of current active location\n\n#### Count Interface (Main)\n- **Left Panel (2/3 width)**: Current location items\n  - Item cards with system stock information\n  - Physical count input fields\n  - Status dropdown (Good/Damaged/Missing/Expired)\n  - Individual save buttons per item\n\n- **Right Panel (1/3 width)**: Progress tracking\n  - Progress bar visualization\n  - Completed vs remaining items counter\n  - Count statistics\n\n### Count Data Management\n- State management for count entries\n- Real-time progress calculation\n- Location-based item filtering\n\n## Physical Count Management\n\n**Location**: `app/(main)/inventory-management/physical-count-management/page.tsx`\n\n**Purpose**: Administrative interface for managing physical counts\n\n### Management Features\n\n#### View Options\n- **List View** - Detailed list with full information\n- **Grid View** - Card-based layout for quick overview\n\n#### Filtering System\n- **Status Filter**: All/Pending/In Progress/Completed\n- **Department Filter**: Dropdown from departments\n- **Location Filter**: Collapsible location selector with active filter display\n\n#### Search Functionality\n- Text search input (placeholder functionality)\n- Real-time filtering of displayed counts\n\n#### Count Operations\n- **New Count** creation via modal form\n- **Delete** functionality for count entries\n- **Start Count** action launching count detail form\n\n### Data Structure\n```typescript\ninterface CountData {\n  storeName: string\n  department: string\n  userName: string\n  date: string\n  status: \"pending\" | \"completed\" | \"in-progress\"\n  itemCount: number\n  lastCountDate: string\n  variance: number\n  notes: string\n  completedCount: number\n}\n```\n\n## Modal Components\n\n### New Count Form Modal\n**Component**: `NewCountForm`\n**Location**: `app/(main)/inventory-management/physical-count-management/components/new-count-form.tsx`\n\n**Purpose**: Create new physical count entries\n\n**Fields**:\n- Store Name\n- Department\n- Counter assignment\n- Scheduled date\n- Notes\n\n### Count Detail Form Modal\n**Component**: `CountDetailForm`\n**Location**: `app/(main)/inventory-management/physical-count-management/components/count-detail-form.tsx`\n\n**Purpose**: Manage detailed count execution and configuration\n\n## Supporting Components\n\n### Count List Item\n**Component**: `CountListItem`\n**Location**: `app/(main)/inventory-management/physical-count-management/components/count-list-item.tsx`\n\n**Purpose**: List view representation of count entries\n\n### Count Detail Card\n**Component**: `CountDetailCard`\n**Location**: `app/(main)/inventory-management/physical-count-management/components/count-detail-card.tsx`\n\n**Purpose**: Grid view card representation of count entries\n\n### Counts Table\n**Component**: `CountsTable`\n**Location**: `app/(main)/inventory-management/physical-count/dashboard/components/counts-table.tsx`\n\n**Purpose**: Tabular display of all counts in dashboard\n\n## API Integration\n\n### Endpoints\n- `GET /api/inventory/counts` - Retrieve physical counts with filtering\n- `POST /api/inventory/counts` - Create new physical count\n- `GET /api/inventory/counts/[id]` - Get specific count details\n- `POST /api/inventory/counts/[id]/start` - Start physical count execution\n- `POST /api/inventory/counts/advanced` - Advanced count operations\n\n### Services\n- `physicalCountService` - Database service for physical count operations\n- Located in `lib/services/db/physical-count-service`\n\n## Data Flow\n\n### Count Creation Flow\n1. User navigates to Physical Count creation wizard\n2. Completes 4-step setup process\n3. System validates and creates count session\n4. Redirects to active count interface\n5. User performs physical counting\n6. System tracks progress and saves count data\n7. Count completion triggers inventory adjustment workflows\n\n### Count Management Flow\n1. Administrative users access management interface\n2. Filter and search existing counts\n3. Create new counts via modal forms\n4. Monitor count progress and status\n5. Handle count completion and variance resolution\n\n## State Management\n\n### Local State (useState)\n- Form data for wizard steps\n- Current step tracking\n- Modal visibility states\n- Filter selections\n- View preferences (list/grid)\n\n### Data State\n- Mock data integration for counts, locations, departments\n- Real-time count updates\n- Progress calculations\n\n## Integration Points\n\n### User Context\n- Auto-population of counter names\n- Department access based on user roles\n- Permission-based feature access\n\n### Inventory System\n- Integration with inventory items and locations\n- Stock level verification\n- Variance calculation and reporting\n\n### Reporting System\n- Count completion data feeding into reports\n- Variance analysis and trending\n- Performance metrics and KPIs\n\n## Navigation Structure\n\n```\n/inventory-management/\n├── physical-count/                    # Count creation wizard\n│   ├── dashboard/                    # Dashboard overview\n│   └── active/[id]/                  # Active count interface\n└── physical-count-management/        # Administrative management\n    └── components/                   # Management components\n```\n\n## Technical Implementation\n\n### Framework Integration\n- **Next.js 14** App Router structure\n- **TypeScript** for type safety\n- **Shadcn/ui** component library\n- **Tailwind CSS** for styling\n- **Recharts** for data visualization\n\n### Component Patterns\n- Function-based React components\n- Props interface definitions\n- Controlled form components\n- Modal overlay patterns\n- Progressive wizard interfaces\n\n### Data Validation\n- Form validation at each wizard step\n- Required field enforcement\n- Data type validation\n- Business rule validation\n\nThis specification provides a complete overview of the Physical Count module's functionality, components, and integration points within the larger inventory management system.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

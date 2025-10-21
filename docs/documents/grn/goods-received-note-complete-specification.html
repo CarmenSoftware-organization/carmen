@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goods Received Note Module - Complete Technical Specification - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Goods Received Notes</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">GRN</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Goods Received Note Module - Complete Technical Specification\n\n## Table of Contents\n1. [Module Overview](#module-overview)\n2. [Complete Site Map](#complete-site-map)\n3. [Page Documentation](#page-documentation)\n4. [Component Architecture](#component-architecture)\n5. [Data Flow](#data-flow)\n6. [User Interactions](#user-interactions)\n7. [Technical Architecture](#technical-architecture)\n8. [API Integration](#api-integration)\n9. [Database Schema](#database-schema)\n10. [Status Workflow](#status-workflow)\n\n## Module Overview\n\nThe Goods Received Note (GRN) module is a critical component of the Carmen Hospitality ERP system that manages the receipt and processing of goods from vendors. It serves as the bridge between Purchase Orders and inventory management, enabling three-way matching (PO-GRN-Invoice) for complete procurement lifecycle tracking.\n\n### Key Features\n\n#### Core GRN Management\n- **Multi-path GRN Creation**: Create from Purchase Orders or manually\n- **Three-way Matching**: Automated matching with Purchase Orders and Invoices\n- **Real-time Financial Calculations**: Multi-currency support with exchange rate handling\n- **Comprehensive Item Processing**: Detailed line-item management with quantity tracking\n\n#### Advanced Functionality\n- **Consignment Management**: Special handling for consignment goods\n- **Cash Transactions**: Support for cash-based purchases\n- **Extra Costs Processing**: Handling of additional charges (freight, insurance, etc.)\n- **Stock Movement Integration**: Automatic inventory updates upon receipt\n- **Financial Summary**: Real-time calculation of totals with tax and currency conversion\n\n#### User Experience\n- **Multi-mode Interface**: View, Edit, Confirm, and Add modes\n- **Bulk Operations**: Select and process multiple items simultaneously\n- **Responsive Design**: Optimized for desktop, tablet, and mobile devices\n- **Activity Logging**: Complete audit trail of all changes and actions\n\n## Complete Site Map\n\n```mermaid\ngraph TD\n    A[GRN Landing Page] --> B[GRN List View]\n    A --> C[GRN Card View]\n\n    B --> D[New GRN Dropdown]\n    D --> E[Create from Purchase Order]\n    D --> F[Create Manually]\n\n    E --> G[Vendor Selection Page]\n    G --> H[PO Selection Page]\n    H --> I[GRN Detail Page - Confirm Mode]\n\n    F --> J[GRN Detail Page - Add Mode]\n\n    B --> K[GRN Detail Page - View Mode]\n    K --> L[Edit Mode Toggle]\n    L --> M[GRN Detail Page - Edit Mode]\n\n    I --> N[Items Tab]\n    I --> O[Extra Costs Tab]\n    I --> P[Stock Movement Tab]\n    I --> Q[Financial Summary Tab]\n\n    J --> N\n    J --> O\n    J --> P\n    J --> Q\n\n    K --> N\n    K --> O\n    K --> P\n    K --> Q\n\n    M --> N\n    M --> O\n    M --> P\n    M --> Q\n\n    N --> R[Item Detail Forms]\n    N --> S[Bulk Actions]\n    N --> T[Add Item Dialog]\n\n    O --> U[Extra Cost Management]\n    O --> V[Cost Allocation]\n\n    P --> W[Stock Movement Summary]\n    P --> X[Inventory Impact View]\n\n    Q --> Y[Financial Calculations]\n    Q --> Z[Currency Conversion]\n\n    K --> AA[Floating Actions Menu]\n    AA --> BB[Send GRN]\n    AA --> CC[Delete GRN]\n\n    I --> DD[Floating Confirm Menu]\n    DD --> EE[Edit Further]\n    DD --> FF[Confirm & Save]\n\n    B --> GG[Search & Filter]\n    B --> HH[Export Options]\n    B --> II[Bulk Actions]\n\n    style A fill:#e1f5fe\n    style B fill:#f3e5f5\n    style I fill:#fff3e0\n    style K fill:#e8f5e8\n    style M fill:#fff8e1\n```\n\n## Page Documentation\n\n### 1. GRN Landing Page (`/procurement/goods-received-note/page.tsx`)\n\n**Purpose**: Main entry point for GRN module with list management and creation options\n\n**Key Features**:\n- **View Toggle**: Switch between table and card layouts\n- **New GRN Dropdown**: Multiple creation paths\n- **Advanced Filtering**: Status, vendor, date range filters\n- **Search Functionality**: Global search across GRN fields\n- **Bulk Operations**: Multi-select actions\n- **Export Options**: PDF, Excel, CSV exports\n\n**Screenshot**:\n![GRN List Page](./screenshots/grn-list-page.png)\n*Main GRN listing interface showing table view with filtering and search capabilities*\n\n**State Management**:\n```typescript\nconst [processType, setProcessType] = useState<'po' | 'manual' | null>(null)\nconst [viewMode, setViewMode] = useState<'table' | 'card'>('table')\nconst [selectedGRNs, setSelectedGRNs] = useState<string[]>([])\nconst [showCreateDialog, setShowCreateDialog] = useState(false)\n```\n\n**New GRN Creation Flow**:\n1. **From Purchase Order**:\n   - Navigate to vendor selection\n   - Select appropriate POs\n   - Auto-populate GRN data\n2. **Manual Creation**:\n   - Create temporary GRN with placeholder data\n   - Navigate directly to confirm mode\n   - Manual data entry required\n\n**Screenshot**:\n![New GRN Dropdown Menu](./screenshots/grn-new-dropdown-menu.png)\n*New GRN creation dropdown showing process selection options*\n\n### 2. Vendor Selection Page (`/new/vendor-selection/page.tsx`)\n\n**Purpose**: Select vendor for PO-based GRN creation\n\n**Key Features**:\n- **Vendor Search**: Filter by company name or registration number\n- **Vendor Listing**: Table view with business registration details\n- **Selection Action**: Single-click vendor selection\n\n**Screenshot**:\n![Vendor Selection Page](./screenshots/grn-vendor-selection-page.png)\n*Vendor selection interface with search functionality and vendor listing*\n\n**Data Flow**:\n```typescript\nconst { setSelectedVendor, setStep } = useGRNCreationStore()\n\nconst handleSelectVendor = (vendor: Vendor) => {\n  setSelectedVendor(vendor)\n  setStep('po-selection')\n  router.push('/procurement/goods-received-note/new/po-selection')\n}\n```\n\n### 3. PO Selection Page (`/new/po-selection/page.tsx`)\n\n**Purpose**: Select Purchase Orders for GRN creation from chosen vendor\n\n**Key Features**:\n- **Filtered PO Display**: Shows only POs from selected vendor\n- **Multi-selection**: Choose multiple POs for single GRN\n- **PO Status Validation**: Only open/partially received POs available\n- **Auto-calculation**: Preview of GRN totals\n\n**Screenshot**:\n![PO Selection Page](./screenshots/grn-po-selection-page.png)\n*Purchase Order selection interface showing filtered POs from selected vendor*\n\n### 4. Item Location Selection Page (`/new/item-location-selection/page.tsx`)\n\n**Purpose**: Select specific items and quantities to receive from chosen Purchase Orders\n\n**Key Features**:\n- **Item Filtering**: Filter by location (e.g., Receiving Bay)\n- **Item Search**: Search by item name, description, or PO number\n- **Quantity Management**: Enter receiving quantities with unit conversions\n- **Multi-selection**: Select multiple items for processing\n- **Real-time Calculations**: Auto-calculate amounts based on quantities and pricing\n\n**Screenshot**:\n![Item Location Selection Page](./screenshots/grn-item-location-selection-page.png)\n*Item and location selection interface with quantity management and real-time calculations*\n\n### 5. GRN Detail Page (`/[id]/page.tsx` + `GoodsReceiveNoteDetail.tsx`)\n\n**Purpose**: Comprehensive GRN management interface supporting multiple operational modes\n\n#### Operational Modes\n- **View Mode**: Read-only display of existing GRN\n- **Edit Mode**: Modify existing GRN data\n- **Confirm Mode**: Review and confirm new GRN before saving\n- **Add Mode**: Create new manual GRN\n\n**Key Features**:\n- **Header Information**: Date, invoice details, vendor, receiver\n- **Tabbed Interface**: Items, Extra Costs, Stock Movement, Financial Summary\n- **Mode-Aware UI**: Dynamic form states based on current mode\n- **Financial Summary**: Real-time calculation with currency conversion\n- **Floating Actions**: Context-specific action menus\n\n**Screenshot**:\n![GRN Detail Confirm Mode](./screenshots/grn-detail-confirm-mode.png)\n*GRN detail page in confirm mode showing header information, Items tab, and transaction summary*\n\n**State Management**:\n```typescript\nconst [formData, setFormData] = useState<GoodsReceiveNote>(initialData)\nconst [currentMode, setCurrentMode] = useState<GRNDetailMode>(mode)\nconst [extraCosts, setExtraCosts] = useState<ExtraCost[]>([])\nconst [selectedItems, setSelectedItems] = useState<string[]>([])\nconst [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)\n```\n\n## Component Architecture\n\n### Core Components\n\n#### 1. GoodsReceiveNoteDetail (Main Container)\n**File**: `components/GoodsReceiveNoteDetail.tsx`\n\n**Purpose**: Primary component managing all GRN operations and state\n\n**Key Responsibilities**:\n- Mode management (view/edit/confirm/add)\n- Form data synchronization\n- Tab coordination\n- Action handling (save, cancel, confirm)\n- Financial calculations\n\n**Props Interface**:\n```typescript\ninterface GoodsReceiveNoteDetailProps {\n  id?: string\n  mode?: GRNDetailMode\n  onModeChange?: (mode: GRNDetailMode) => void\n  initialData: GoodsReceiveNote\n}\n```\n\n#### 2. Tab Components\n\n**GoodsReceiveNoteItems** (`tabs/GoodsReceiveNoteItems.tsx`)\n- Item line management\n- Quantity tracking (ordered vs received)\n- Unit price and calculations\n- Bulk selection and actions\n\n**ExtraCostsTab** (`tabs/ExtraCostsTab.tsx`)\n- Additional cost management\n- Cost allocation across items\n- Freight, insurance, handling charges\n\n**StockMovementsTab** (`tabs/StockMovementsTab.tsx`)\n- Inventory movement tracking\n- Stock location management\n- Unit cost calculations\n- Total cost summaries\n\n**Screenshot**:\n![Stock Movements Tab](./screenshots/grn-stock-movements-tab.png)\n*Stock Movements tab showing inventory transactions and cost breakdowns*\n\n**StockMovementTab** (`tabs/StockMovementTab.tsx`)\n- Inventory impact visualization\n- Stock level updates\n- Movement history\n\n**FinancialSummaryTab** (`tabs/FinancialSummaryTab.tsx`)\n- Financial totals calculation\n- Currency conversion display\n- Tax calculations\n- Journal entry preview\n\n#### 3. Form Components\n\n**Header Information Form**\n- GRN reference and dates\n- Vendor and receiver selection\n- Invoice details\n- Status and flags (consignment, cash)\n\n**Item Detail Forms** (`tabs/itemDetailForm.tsx`)\n- Individual item editing\n- Quantity and pricing\n- Product information\n- Unit conversions\n\n### Utility Components\n\n#### 1. Bulk Actions (`tabs/GoodsReceiveNoteItemsBulkActions.tsx`)\n**Purpose**: Multi-item operations\n\n**Actions**:\n- Delete selected items\n- Mark as received\n- Update pricing\n- Split quantities\n\n#### 2. Floating Action Menus\n**Purpose**: Context-aware action buttons\n\n**Confirm Mode Actions**:\n- Edit Further\n- Confirm & Save\n\n**View Mode Actions**:\n- Delete GRN\n- Send to vendor\n- Print/Export\n\n#### 3. SummaryTotal\n**Purpose**: Financial calculations display\n\n**Features**:\n- Real-time total updates\n- Multi-currency display\n- Tax breakdown\n- Exchange rate application\n\n## Data Flow\n\n### GRN Creation Flow (from PO)\n\n```mermaid\nsequenceDiagram\n    participant U as User\n    participant LP as Landing Page\n    participant VS as Vendor Selection\n    participant PS as PO Selection\n    participant GD as GRN Detail\n    participant S as Store\n\n    U->>LP: Click \"Create from PO\"\n    LP->>VS: Navigate to vendor selection\n    U->>VS: Select vendor\n    VS->>S: Store selected vendor\n    VS->>PS: Navigate to PO selection\n    U->>PS: Select PO(s)\n    PS->>S: Store selected POs\n    PS->>GD: Navigate to GRN detail (confirm mode)\n    GD->>S: Retrieve vendor & PO data\n    GD->>GD: Auto-populate GRN fields\n    U->>GD: Review and confirm\n    GD->>GD: Save GRN with real ID\n    GD->>LP: Navigate back to list\n```\n\n### GRN Manual Creation Flow\n\n```mermaid\nsequenceDiagram\n    participant U as User\n    participant LP as Landing Page\n    participant GD as GRN Detail\n    participant S as Store\n\n    U->>LP: Click \"Create Manually\"\n    LP->>S: Create temporary GRN data\n    LP->>GD: Navigate to GRN detail (confirm mode)\n    GD->>S: Retrieve temporary data\n    U->>GD: Enter GRN details manually\n    U->>GD: Confirm and save\n    GD->>GD: Generate real GRN ID\n    GD->>LP: Navigate back to list\n```\n\n### Item Management Flow\n\n```mermaid\nflowchart TD\n    A[Items Tab] --> B{Bulk Selection?}\n    B -->|Yes| C[Bulk Actions Menu]\n    B -->|No| D[Individual Item Actions]\n\n    C --> E[Delete Items]\n    C --> F[Mark as Received]\n    C --> G[Update Pricing]\n\n    D --> H[Edit Item Details]\n    D --> I[Split Quantities]\n    D --> J[Add New Item]\n\n    E --> K[Update Items Array]\n    F --> K\n    G --> K\n    H --> K\n    I --> K\n    J --> K\n\n    K --> L[Recalculate Totals]\n    L --> M[Update Financial Summary]\n    M --> N[Trigger Re-render]\n```\n\n## User Interactions\n\n### Navigation Patterns\n\n#### 1. Entry Points\n- **Sidebar Navigation**: Procurement → Goods Received Note\n- **Direct URL**: `/procurement/goods-received-note`\n- **Dashboard Links**: Quick access to pending GRNs\n\n#### 2. Creation Workflows\n\n**From Purchase Order**:\n1. Click \"New GRN\" → \"Create from Purchase Order\"\n2. Search and select vendor\n3. Choose applicable POs\n4. Review auto-populated data\n5. Confirm and save\n\n**Manual Creation**:\n1. Click \"New GRN\" → \"Create Manually\"\n2. Enter all GRN details manually\n3. Add items individually\n4. Confirm and save\n\n### Form Interactions\n\n#### 1. Header Form\n**Field Types**:\n- **Date Fields**: HTML5 date pickers with validation\n- **Dropdowns**: Vendor, receiver, currency, cash book selection\n- **Text Fields**: Invoice numbers, descriptions\n- **Checkboxes**: Consignment, cash transaction flags\n\n**Validation Rules**:\n- Required fields: Date, vendor, receiver\n- Date constraints: Invoice date ≤ current date\n- Currency validation: Must match PO currency (if applicable)\n\n#### 2. Items Tab Interactions\n\n**Item Selection**:\n- **Individual**: Checkbox per item\n- **Bulk**: Master checkbox for all items\n- **Range**: Shift+click for range selection\n\n**Item Actions**:\n- **Add**: Dialog with product search and details\n- **Edit**: Inline editing or popup form\n- **Delete**: Individual or bulk deletion\n- **Split**: Divide quantities for partial receipts\n\n### Mode Transitions\n\n```mermaid\nstateDiagram-v2\n    [*] --> View\n    View --> Edit: Click Edit\n    Edit --> View: Save/Cancel\n    [*] --> Confirm: New GRN Creation\n    Confirm --> Edit: Edit Further\n    Confirm --> View: Confirm & Save\n    [*] --> Add: Manual Creation\n    Add --> Confirm: Enter Confirm Mode\n```\n\n## Technical Architecture\n\n### Framework Components\n\n#### 1. Next.js 14 App Router\n- **File-based Routing**: Automatic route generation\n- **Server Components**: Default server rendering\n- **Client Components**: Interactive elements marked with 'use client'\n\n#### 2. State Management\n- **Zustand Store**: Global GRN creation state\n- **React useState**: Local component state\n- **URL Parameters**: Mode and navigation state\n\n**Store Structure**:\n```typescript\ninterface GRNCreationStore {\n  selectedVendor: Vendor | null\n  selectedPOs: PurchaseOrder[]\n  currentStep: 'vendor-selection' | 'po-selection' | 'grn-creation'\n  newlyCreatedGRNData: GoodsReceiveNote | null\n\n  setSelectedVendor: (vendor: Vendor) => void\n  setSelectedPOs: (pos: PurchaseOrder[]) => void\n  setStep: (step: string) => void\n  setNewlyCreatedGRNData: (data: GoodsReceiveNote) => void\n  clearCreationData: () => void\n}\n```\n\n#### 3. Component Architecture\n- **Functional Components**: All components use function declarations\n- **TypeScript Interfaces**: Strict typing for all props and state\n- **Shadcn/ui Components**: Consistent design system\n- **Modular Structure**: Tab components for feature separation\n\n### Data Types\n\n#### Core Interfaces\n\n```typescript\ninterface GoodsReceiveNote {\n  id: string\n  ref: string\n  selectedItems: string[]\n  date: Date\n  invoiceDate: Date\n  invoiceNumber: string\n  description: string\n  receiver: string\n  vendor: string\n  vendorId: string\n  location: string\n  currency: string\n  status: GoodsReceiveNoteStatus\n  cashBook: string\n  items: GoodsReceiveNoteItem[]\n  stockMovements: StockMovement[]\n  isConsignment: boolean\n  isCash: boolean\n  extraCosts: ExtraCost[]\n  comments: Comment[]\n  attachments: Attachment[]\n  activityLog: ActivityLogEntry[]\n  financialSummary: FinancialSummary | null\n  exchangeRate: number\n  baseCurrency: string\n  // Financial totals\n  baseSubTotalPrice: number\n  subTotalPrice: number\n  baseNetAmount: number\n  netAmount: number\n  baseDiscAmount: number\n  discountAmount: number\n  baseTaxAmount: number\n  taxAmount: number\n  baseTotalAmount: number\n  totalAmount: number\n}\n\ninterface GoodsReceiveNoteItem {\n  id: string\n  productName: string\n  description: string\n  orderedQuantity: number\n  receivedQuantity: number\n  remainingQuantity: number\n  orderUnit: string\n  baseUnit: string\n  conversionFactor: number\n  unitPrice: number\n  subTotalPrice: number\n  discountRate: number\n  discountAmount: number\n  netAmount: number\n  taxRate: number\n  taxAmount: number\n  totalAmount: number\n  status: ItemStatus\n  poReference?: string\n  poItemId?: string\n}\n\ninterface ExtraCost {\n  id: string\n  description: string\n  amount: number\n  currency: string\n  allocationType: 'even' | 'weighted' | 'manual'\n  allocation: ExtraCostAllocation[]\n}\n\ntype GoodsReceiveNoteStatus = 'Draft' | 'Received' | 'Verified' | 'Posted' | 'Cancelled'\ntype GRNDetailMode = 'view' | 'edit' | 'add' | 'confirm'\n```\n\n### Responsive Design\n\n#### Breakpoint Strategy\n- **Mobile**: 320px - 768px (Stack columns, simplified navigation)\n- **Tablet**: 768px - 1024px (Responsive grids, collapsible sidebars)\n- **Desktop**: 1024px+ (Full feature set, multi-column layouts)\n\n#### Component Adaptations\n- **Tables**: Horizontal scroll on mobile, card view option\n- **Forms**: Single column on mobile, multi-column on desktop\n- **Navigation**: Hamburger menu on mobile, full sidebar on desktop\n\n## API Integration\n\n### Endpoints\n\n#### GRN Management\n```\nGET    /api/grn                    # List GRNs with filtering\nPOST   /api/grn                    # Create new GRN\nGET    /api/grn/:id                # Get specific GRN\nPUT    /api/grn/:id                # Update GRN\nDELETE /api/grn/:id                # Delete GRN\nPATCH  /api/grn/:id/status         # Update GRN status\n```\n\n#### Item Management\n```\nPOST   /api/grn/:id/items          # Add item to GRN\nPUT    /api/grn/:id/items/:itemId  # Update GRN item\nDELETE /api/grn/:id/items/:itemId  # Remove item from GRN\nPOST   /api/grn/:id/items/bulk     # Bulk item operations\n```\n\n#### Related Resources\n```\nGET    /api/vendors                # List vendors for selection\nGET    /api/purchase-orders        # Get POs for vendor\nGET    /api/products               # Product search for manual items\nPOST   /api/grn/:id/stock-movements # Process stock movements\n```\n\n### Data Models\n\n#### Request/Response Patterns\n\n**Create GRN Request**:\n```json\n{\n  \"vendorId\": \"vendor-123\",\n  \"poIds\": [\"PO-2023-001\", \"PO-2023-002\"],\n  \"date\": \"2023-06-15\",\n  \"invoiceNumber\": \"INV-456\",\n  \"invoiceDate\": \"2023-06-14\",\n  \"description\": \"Monthly inventory delivery\",\n  \"receiver\": \"warehouse_manager\",\n  \"currency\": \"USD\",\n  \"exchangeRate\": 1.0,\n  \"isConsignment\": false,\n  \"isCash\": false,\n  \"items\": [...],\n  \"extraCosts\": [...]\n}\n```\n\n**GRN Response**:\n```json\n{\n  \"id\": \"GRN-2023-001\",\n  \"ref\": \"GRN-2023-001\",\n  \"status\": \"Received\",\n  \"vendor\": {\n    \"id\": \"vendor-123\",\n    \"name\": \"Global Foods Inc.\",\n    \"businessRegistrationNumber\": \"BRN001\"\n  },\n  \"financialSummary\": {\n    \"netAmount\": 1250.00,\n    \"taxAmount\": 87.50,\n    \"totalAmount\": 1337.50,\n    \"currency\": \"USD\"\n  },\n  \"items\": [...],\n  \"activityLog\": [...],\n  \"createdAt\": \"2023-06-15T10:30:00Z\",\n  \"updatedAt\": \"2023-06-15T15:45:00Z\"\n}\n```\n\n## Database Schema\n\n### Primary Tables\n\n#### goods_receive_notes\n```sql\nCREATE TABLE goods_receive_notes (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  ref VARCHAR(50) UNIQUE NOT NULL,\n  vendor_id UUID NOT NULL REFERENCES vendors(id),\n  receiver_id UUID NOT NULL REFERENCES users(id),\n  date DATE NOT NULL,\n  invoice_number VARCHAR(100),\n  invoice_date DATE,\n  tax_invoice_number VARCHAR(100),\n  tax_invoice_date DATE,\n  description TEXT,\n  currency VARCHAR(3) NOT NULL,\n  exchange_rate DECIMAL(10,4) DEFAULT 1.0000,\n  base_currency VARCHAR(3) NOT NULL,\n  status grn_status_enum NOT NULL DEFAULT 'Draft',\n  cash_book_id UUID REFERENCES cash_books(id),\n  is_consignment BOOLEAN DEFAULT FALSE,\n  is_cash BOOLEAN DEFAULT FALSE,\n\n  -- Financial totals\n  sub_total_price DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  discount_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  net_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  total_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n\n  -- Base currency equivalents\n  base_sub_total_price DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  base_discount_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  base_net_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  base_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n  base_total_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,\n\n  created_by UUID NOT NULL REFERENCES users(id),\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TYPE grn_status_enum AS ENUM (\n  'Draft', 'Received', 'Verified', 'Posted', 'Cancelled'\n);\n```\n\n#### grn_items\n```sql\nCREATE TABLE grn_items (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  grn_id UUID NOT NULL REFERENCES goods_receive_notes(id) ON DELETE CASCADE,\n  product_id UUID NOT NULL REFERENCES products(id),\n  po_item_id UUID REFERENCES purchase_order_items(id),\n\n  ordered_quantity DECIMAL(10,3) NOT NULL,\n  received_quantity DECIMAL(10,3) NOT NULL,\n  remaining_quantity DECIMAL(10,3) GENERATED ALWAYS AS (ordered_quantity - received_quantity) STORED,\n\n  order_unit VARCHAR(20) NOT NULL,\n  base_unit VARCHAR(20) NOT NULL,\n  conversion_factor DECIMAL(10,4) DEFAULT 1.0000,\n\n  unit_price DECIMAL(15,4) NOT NULL,\n  sub_total_price DECIMAL(15,2) NOT NULL,\n  discount_rate DECIMAL(5,2) DEFAULT 0.00,\n  discount_amount DECIMAL(15,2) DEFAULT 0.00,\n  net_amount DECIMAL(15,2) NOT NULL,\n  tax_rate DECIMAL(5,2) DEFAULT 0.00,\n  tax_amount DECIMAL(15,2) DEFAULT 0.00,\n  total_amount DECIMAL(15,2) NOT NULL,\n\n  status item_status_enum NOT NULL DEFAULT 'Open',\n\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TYPE item_status_enum AS ENUM (\n  'Open', 'PartiallyReceived', 'FullyReceived', 'Cancelled', 'Closed'\n);\n```\n\n#### grn_extra_costs\n```sql\nCREATE TABLE grn_extra_costs (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  grn_id UUID NOT NULL REFERENCES goods_receive_notes(id) ON DELETE CASCADE,\n  description VARCHAR(255) NOT NULL,\n  amount DECIMAL(15,2) NOT NULL,\n  currency VARCHAR(3) NOT NULL,\n  allocation_type extra_cost_allocation_enum NOT NULL DEFAULT 'even',\n\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TYPE extra_cost_allocation_enum AS ENUM (\n  'even', 'weighted', 'manual'\n);\n```\n\n#### grn_activity_log\n```sql\nCREATE TABLE grn_activity_log (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  grn_id UUID NOT NULL REFERENCES goods_receive_notes(id) ON DELETE CASCADE,\n  user_id UUID NOT NULL REFERENCES users(id),\n  action VARCHAR(100) NOT NULL,\n  activity_type activity_type_enum NOT NULL,\n  description TEXT NOT NULL,\n  metadata JSONB,\n\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TYPE activity_type_enum AS ENUM (\n  'Creation', 'StatusChange', 'ItemModification', 'DocumentGeneration',\n  'Communication', 'SystemEvent'\n);\n```\n\n### Key Relationships\n\n- **GRN → Items**: One-to-Many (Cascade delete)\n- **GRN → Extra Costs**: One-to-Many (Cascade delete)\n- **GRN → Activity Log**: One-to-Many (Cascade delete)\n- **GRN → Vendor**: Many-to-One\n- **GRN Items → PO Items**: Many-to-One (Optional for manual GRNs)\n- **GRN → Stock Movements**: One-to-Many (Generated on confirmation)\n\n### Indexes and Constraints\n\n```sql\n-- Performance indexes\nCREATE INDEX idx_grn_vendor_date ON goods_receive_notes(vendor_id, date DESC);\nCREATE INDEX idx_grn_status_created ON goods_receive_notes(status, created_at DESC);\nCREATE INDEX idx_grn_ref ON goods_receive_notes(ref);\nCREATE INDEX idx_grn_invoice ON goods_receive_notes(invoice_number) WHERE invoice_number IS NOT NULL;\n\n-- Foreign key indexes\nCREATE INDEX idx_grn_items_grn ON grn_items(grn_id);\nCREATE INDEX idx_grn_items_product ON grn_items(product_id);\nCREATE INDEX idx_grn_items_po_item ON grn_items(po_item_id) WHERE po_item_id IS NOT NULL;\n\n-- Constraints\nALTER TABLE goods_receive_notes ADD CONSTRAINT chk_positive_amounts\n  CHECK (sub_total_price >= 0 AND net_amount >= 0 AND total_amount >= 0);\n\nALTER TABLE grn_items ADD CONSTRAINT chk_quantities_positive\n  CHECK (ordered_quantity > 0 AND received_quantity >= 0);\n\nALTER TABLE grn_items ADD CONSTRAINT chk_received_not_exceed_ordered\n  CHECK (received_quantity <= ordered_quantity);\n```\n\n## Status Workflow\n\n### GRN Status Progression\n\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n    Draft --> Received: Confirm Receipt\n    Received --> Verified: Quality Check\n    Verified --> Posted: Financial Posting\n    Draft --> Cancelled: Cancel Draft\n    Received --> Cancelled: Cancel After Receipt\n    Cancelled --> [*]\n    Posted --> [*]\n\n    note right of Draft: Initial creation state\n    note right of Received: Goods physically received\n    note right of Verified: Quality and quantity verified\n    note right of Posted: Financially processed\n    note right of Cancelled: Cancelled at any stage\n```\n\n### Item Status Workflow\n\n```mermaid\nstateDiagram-v2\n    [*] --> Open\n    Open --> PartiallyReceived: Partial Receipt\n    Open --> FullyReceived: Complete Receipt\n    PartiallyReceived --> FullyReceived: Remaining Receipt\n    PartiallyReceived --> Cancelled: Cancel Remainder\n    Open --> Cancelled: Cancel Item\n    FullyReceived --> Closed: Final Processing\n    Cancelled --> [*]\n    Closed --> [*]\n```\n\n### Business Rules\n\n#### Status Transitions\n1. **Draft → Received**: Requires all mandatory fields and at least one item\n2. **Received → Verified**: Requires quality check completion\n3. **Verified → Posted**: Requires financial approval\n4. **Any → Cancelled**: Requires cancellation reason\n\n#### Validation Rules\n1. **Financial Consistency**: Item totals must equal GRN total\n2. **Quantity Constraints**: Received ≤ Ordered for all items\n3. **Currency Matching**: All items must use same currency as GRN\n4. **Date Validation**: Invoice date ≤ GRN date ≤ Current date\n\n#### Auto-calculations\n1. **Item Totals**: Net amount = (Quantity × Unit Price) - Discount + Tax\n2. **GRN Total**: Sum of all item totals + extra costs\n3. **Base Currency**: All amounts converted using exchange rate\n4. **Stock Impact**: Automatic inventory updates on status change\n\n---\n\n*Documentation Version: 1.0*\n*Generated on: $(date)*\n*Carmen ERP - Hospitality Supply Chain Management*";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

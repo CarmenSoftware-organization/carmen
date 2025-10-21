@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request System - Comprehensive Analysis - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Purchase Requests</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PR</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Purchase Request System - Comprehensive Analysis\n\nThis document provides a complete analysis of the Carmen ERP Purchase Request system, including system architecture, component hierarchy, user flows, and technical implementation details.\n\n## Table of Contents\n\n1. [System Overview](#system-overview)\n2. [Component Architecture](#component-architecture)\n3. [User Journey Flows](#user-journey-flows)\n4. [User Interface Screenshots](#user-interface-screenshots)\n5. [Modal and Dialog System](#modal-and-dialog-system)\n6. [Data Flow and State Management](#data-flow-and-state-management)\n7. [Workflow Engine](#workflow-engine)\n8. [RBAC and Permissions](#rbac-and-permissions)\n9. [API Integration](#api-integration)\n\n## System Overview\n\n```mermaid\ngraph TB\n    subgraph \"Purchase Request System\"\n        A[Purchase Request List] --> B[PR Detail View]\n        A --> C[Create New PR]\n        B --> D[Edit Mode]\n        B --> E[Workflow Actions]\n\n        subgraph \"Core Components\"\n            F[ModernPurchaseRequestList]\n            G[PRDetailPage]\n            H[PRForm]\n            I[Workflow Engine]\n        end\n\n        subgraph \"Supporting Systems\"\n            J[RBAC Service]\n            K[Notification System]\n            L[Modal System]\n            M[Data Management]\n        end\n    end\n```\n\n## Component Architecture\n\n```mermaid\ngraph TD\n    subgraph \"Main Pages\"\n        A[\"/procurement/purchase-requests<br/>page.tsx\"] --> B[ModernPurchaseRequestList]\n        C[\"/procurement/purchase-requests/[id]<br/>page.tsx\"] --> D[PRDetailPage]\n        E[\"/procurement/purchase-requests/new-pr<br/>page.tsx\"] --> F[PRForm]\n    end\n\n    subgraph \"List View Components\"\n        B --> G[PurchaseRequestsDataTable]\n        B --> H[PurchaseRequestsCardView]\n        B --> I[BulkOperations]\n        B --> J[FilterControls]\n    end\n\n    subgraph \"Detail View Components\"\n        D --> K[PRHeader]\n        D --> L[CompactWorkflowIndicator]\n        D --> M[TabSystem]\n        D --> N[SummaryTotal]\n        D --> O[FloatingActionMenu]\n\n        M --> P[ItemsTab]\n        M --> Q[BudgetsTab]\n        M --> R[WorkflowTab]\n        M --> S[PRCommentsAttachmentsTab]\n        M --> T[ActivityTab]\n    end\n\n    subgraph \"Modal Components\"\n        U[VendorComparisonModal]\n        V[PriceHistoryModal]\n        W[ReturnStepSelector]\n        X[ItemDetailsModal]\n        Y[BulkOperationDialog]\n    end\n\n    subgraph \"Form Components\"\n        F --> Z[ItemForm]\n        F --> AA[VendorSelection]\n        F --> BB[BudgetAllocation]\n        F --> CC[WorkflowSubmission]\n    end\n```\n\n## User Journey Flows\n\n### Main Purchase Request Flow\n\n```mermaid\nflowchart TD\n    A[User Logs In] --> B{User Role?}\n\n    B -->|Requestor| C[View My PRs]\n    B -->|Manager| D[View Department PRs]\n    B -->|Finance| E[View All PRs - Financial]\n    B -->|Purchasing| F[View All PRs - Procurement]\n\n    C --> G[Create New PR]\n    D --> H[Review PRs for Approval]\n    E --> I[Financial Review]\n    F --> J[Procurement Processing]\n\n    G --> K[Select Template]\n    K --> L[Fill PR Form]\n    L --> M[Add Items]\n    M --> N[Submit for Approval]\n\n    H --> O{Approve/Reject?}\n    O -->|Approve| P[Send to Next Stage]\n    O -->|Reject| Q[Return with Comments]\n    O -->|Send Back| R[Select Return Stage]\n\n    I --> S[Budget Validation]\n    S --> T{Within Budget?}\n    T -->|Yes| U[Approve]\n    T -->|No| V[Request Additional Approval]\n\n    J --> W[Vendor Assignment]\n    W --> X[Price Negotiation]\n    X --> Y[Create Purchase Order]\n```\n\n### Create Purchase Request Flow\n\n```mermaid\nflowchart TD\n    A[Click Create PR] --> B[Template Selection Dialog]\n\n    B --> C{Select Template}\n    C -->|Office Supplies| D[Office Template]\n    C -->|IT Equipment| E[IT Template]\n    C -->|Kitchen/F&B| F[Kitchen Template]\n    C -->|Maintenance| G[Maintenance Template]\n    C -->|Custom| H[Blank Form]\n\n    D --> I[Pre-filled Office Items]\n    E --> I\n    F --> I\n    G --> I\n    H --> I\n\n    I[PR Form] --> J[Basic Information]\n    J --> K[Add Items]\n    K --> L{More Items?}\n    L -->|Yes| M[Item Form Modal]\n    M --> N[Save Item]\n    N --> L\n    L -->|No| O[Review Summary]\n\n    O --> P{Valid?}\n    P -->|No| Q[Show Validation Errors]\n    Q --> J\n    P -->|Yes| R[Save as Draft or Submit]\n\n    R --> S{Save Option}\n    S -->|Draft| T[Save Draft]\n    S -->|Submit| U[Submit for Approval]\n\n    U --> V[Workflow Engine]\n    V --> W[Determine Next Stage]\n    W --> X[Send Notifications]\n    X --> Y[Redirect to PR Detail]\n```\n\n### Approval Workflow\n\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n\n    Draft --> Submitted : Submit for Approval\n\n    Submitted --> DeptApproval : Workflow Engine Route\n    Submitted --> FinApproval : High Value Items\n    Submitted --> Purchasing : Low Value / Auto-approve\n\n    DeptApproval --> FinApproval : Manager Approve\n    DeptApproval --> Rejected : Manager Reject\n    DeptApproval --> Draft : Send Back to Requester\n\n    FinApproval --> GMApproval : High Value (>$10k)\n    FinApproval --> Purchasing : Standard Approval\n    FinApproval --> Rejected : Finance Reject\n    FinApproval --> DeptApproval : Send Back to Manager\n\n    GMApproval --> Purchasing : GM Approve\n    GMApproval --> Rejected : GM Reject\n    GMApproval --> FinApproval : Send Back to Finance\n\n    Purchasing --> Completed : Process Complete\n    Purchasing --> OnHold : Vendor Issues\n    Purchasing --> FinApproval : Send Back for Budget Review\n\n    OnHold --> Purchasing : Issues Resolved\n\n    Rejected --> [*]\n    Completed --> [*]\n```\n\n## Modal and Dialog System\n\n```mermaid\ngraph TD\n    subgraph \"Modal System Architecture\"\n        A[Component Trigger] --> B{Modal Type}\n\n        B -->|Vendor Comparison| C[VendorComparisonModal]\n        B -->|Price History| D[PriceHistoryModal]\n        B -->|Return Workflow| E[ReturnStepSelector]\n        B -->|Item Details| F[ItemDetailsModal]\n        B -->|Bulk Operations| G[BulkOperationDialog]\n        B -->|Confirmations| H[ConfirmationDialog]\n\n        C --> I[Vendor Data Fetch]\n        I --> J[Price Comparison Table]\n        J --> K[Vendor Selection]\n        K --> L[Update PR Item]\n\n        D --> M[Historical Price Fetch]\n        M --> N[Price Trend Chart]\n        N --> O[Price Analytics]\n\n        E --> P[Workflow Stage Selection]\n        P --> Q[Return Comments]\n        Q --> R[Workflow Engine Update]\n\n        F --> S[Inventory Check]\n        S --> T[On-hand Quantities]\n        T --> U[Alternative Suggestions]\n\n        G --> V[Selected Items Validation]\n        V --> W[Bulk Action Confirmation]\n        W --> X[Batch Processing]\n    end\n```\n\n### Modal Interaction Flow\n\n```mermaid\nsequenceDiagram\n    participant User\n    participant Component\n    participant Modal\n    participant API\n    participant State\n\n    User->>Component: Click Action Button\n    Component->>Modal: Open Modal\n    Modal->>API: Fetch Required Data\n    API-->>Modal: Return Data\n    Modal->>User: Display Modal Content\n\n    User->>Modal: Interact (Select/Input)\n    Modal->>Modal: Validate Input\n\n    alt Valid Input\n        User->>Modal: Confirm Action\n        Modal->>API: Submit Changes\n        API-->>Modal: Confirm Success\n        Modal->>State: Update Component State\n        Modal->>Component: Close Modal\n        Component->>User: Show Success Notification\n    else Invalid Input\n        Modal->>User: Show Validation Errors\n    end\n```\n\n## Data Flow and State Management\n\n```mermaid\ngraph TB\n    subgraph \"Data Layer\"\n        A[Mock Data Store] --> B[API Service Layer]\n        C[TypeScript Types] --> B\n        D[Zod Validation] --> B\n    end\n\n    subgraph \"State Management\"\n        E[React Query Cache] --> F[Component State]\n        G[User Context] --> F\n        H[Workflow Context] --> F\n        I[Form State] --> F\n    end\n\n    subgraph \"Component Layer\"\n        F --> J[List Components]\n        F --> K[Detail Components]\n        F --> L[Form Components]\n        F --> M[Modal Components]\n    end\n\n    subgraph \"User Interface\"\n        J --> N[PR List View]\n        K --> O[PR Detail View]\n        L --> P[PR Create/Edit]\n        M --> Q[Dialogs & Modals]\n    end\n\n    B --> E\n    E --> R[Optimistic Updates]\n    R --> S[Background Sync]\n```\n\n### State Update Flow\n\n```mermaid\nflowchart LR\n    A[User Action] --> B[Component Handler]\n    B --> C{Action Type}\n\n    C -->|Create/Update| D[Form Validation]\n    C -->|Delete| E[Confirmation Dialog]\n    C -->|Workflow| F[RBAC Check]\n\n    D --> G[API Call]\n    E --> G\n    F --> G\n\n    G --> H[Optimistic Update]\n    H --> I[Background Sync]\n\n    I --> J{Success?}\n    J -->|Yes| K[Update Cache]\n    J -->|No| L[Rollback State]\n\n    K --> M[Refresh UI]\n    L --> N[Show Error]\n\n    M --> O[Success Notification]\n    N --> P[Error Notification]\n```\n\n## Workflow Engine\n\n```mermaid\ngraph TD\n    subgraph \"Workflow Decision Engine\"\n        A[PR Submission] --> B[Analyze Items]\n        B --> C[Calculate Total Value]\n        C --> D[Check Budget Requirements]\n        D --> E[Determine Approval Path]\n\n        E --> F{Value Threshold}\n        F -->|< $1000| G[Auto-Approve to Purchasing]\n        F -->|$1000-$5000| H[Department Manager]\n        F -->|$5000-$10000| I[Finance Manager]\n        F -->|> $10000| J[GM Approval]\n\n        G --> K[Purchasing Queue]\n        H --> L{Manager Decision}\n        I --> M{Finance Decision}\n        J --> N{GM Decision}\n\n        L -->|Approve| O[Next Stage Routing]\n        L -->|Reject| P[Rejected State]\n        L -->|Return| Q[Previous Stage]\n\n        M -->|Approve| O\n        M -->|Reject| P\n        M -->|Return| Q\n\n        N -->|Approve| O\n        N -->|Reject| P\n        N -->|Return| Q\n\n        O --> R[Notification System]\n        P --> S[Rejection Notifications]\n        Q --> T[Return Notifications]\n    end\n```\n\n### Workflow Rules Engine\n\n```mermaid\nflowchart TD\n    A[Workflow Action Request] --> B[Load PR Data]\n    B --> C[Get User Permissions]\n    C --> D[Apply Business Rules]\n\n    D --> E{Budget Check}\n    E -->|Over Budget| F[Require Additional Approval]\n    E -->|Within Budget| G[Standard Process]\n\n    F --> H[Escalate to Finance]\n    G --> I[Check Item Categories]\n\n    I --> J{Special Categories?}\n    J -->|IT Equipment| K[IT Manager Approval]\n    J -->|Controlled Items| L[Additional Compliance]\n    J -->|Standard Items| M[Normal Flow]\n\n    K --> N[Route to IT Department]\n    L --> O[Compliance Check]\n    M --> P[Standard Approval Path]\n\n    N --> Q[Update Workflow State]\n    O --> Q\n    P --> Q\n\n    Q --> R[Send Notifications]\n    R --> S[Log Activity]\n    S --> T[Update UI State]\n```\n\n## RBAC and Permissions\n\n```mermaid\ngraph TD\n    subgraph \"Role-Based Access Control\"\n        A[User Login] --> B[Load User Profile]\n        B --> C[Determine Roles]\n        C --> D[Load Permissions]\n\n        D --> E{User Role}\n        E -->|Requestor| F[Requestor Permissions]\n        E -->|Department Manager| G[Manager Permissions]\n        E -->|Finance Manager| H[Finance Permissions]\n        E -->|Purchasing Staff| I[Purchasing Permissions]\n        E -->|GM| J[Executive Permissions]\n\n        F --> K[Create, Edit Own PRs]\n        G --> L[Approve Department PRs]\n        H --> M[Financial Oversight]\n        I --> N[Procurement Actions]\n        J --> O[All System Access]\n\n        K --> P[Component Rendering]\n        L --> P\n        M --> P\n        N --> P\n        O --> P\n\n        P --> Q[Dynamic UI Elements]\n        Q --> R[Action Buttons]\n        Q --> S[Field Editing]\n        Q --> T[Data Visibility]\n    end\n```\n\n### Permission Matrix\n\n```mermaid\ngraph LR\n    subgraph \"Actions vs Roles\"\n        A[Create PR] --> B{Role Check}\n        B -->|All Roles| C[✓ Allowed]\n\n        D[Edit PR] --> E{Ownership + Status}\n        E -->|Owner + Draft| F[✓ Allowed]\n        E -->|Manager + Pending| F\n        E -->|Other| G[✗ Denied]\n\n        H[Approve PR] --> I{Role + Stage}\n        I -->|Manager + Dept Stage| J[✓ Allowed]\n        I -->|Finance + Finance Stage| J\n        I -->|Other| K[✗ Denied]\n\n        L[Delete PR] --> M{Owner + Status}\n        M -->|Owner + Draft| N[✓ Allowed]\n        M -->|Other| O[✗ Denied]\n    end\n```\n\n## API Integration\n\n```mermaid\ngraph TB\n    subgraph \"API Architecture\"\n        A[Frontend Components] --> B[React Query Hooks]\n        B --> C[API Service Layer]\n        C --> D[HTTP Client]\n        D --> E[Backend Services]\n\n        E --> F[Mock Data Store]\n        E --> G[Business Logic]\n        E --> H[Validation Layer]\n\n        subgraph \"API Endpoints\"\n            I[GET /api/purchase-requests]\n            J[GET /api/purchase-requests/*id*]\n            K[POST /api/purchase-requests]\n            L[PUT /api/purchase-requests/*id*]\n            M[DELETE /api/purchase-requests/*id*]\n            N[POST /api/purchase-requests/*id/workflow]\n        end\n\n        C --> I\n        C --> J\n        C --> K\n        C --> L\n        C --> M\n        C --> N\n    end\n```\n\n### API Flow Sequence\n\n```mermaid\nsequenceDiagram\n    participant UI as UI Component\n    participant RQ as React Query\n    participant API as API Service\n    participant BE as Backend\n    participant DS as Data Store\n\n    UI->>RQ: Request Data\n    RQ->>API: HTTP Request\n    API->>BE: Service Call\n    BE->>DS: Data Query\n    DS-->>BE: Return Data\n    BE-->>API: Processed Data\n    API-->>RQ: JSON Response\n    RQ-->>UI: Cached Data\n\n    Note over UI,RQ: Optimistic Updates\n    UI->>RQ: Update Request\n    RQ->>UI: Immediate UI Update\n    RQ->>API: Background Sync\n\n    alt Success\n        API-->>RQ: Confirm Success\n        RQ->>UI: Maintain Update\n    else Failure\n        API-->>RQ: Error Response\n        RQ->>UI: Rollback Update\n        RQ->>UI: Show Error\n    end\n```\n\n## Notification and Message System\n\n```mermaid\ngraph TD\n    subgraph \"Notification System\"\n        A[User Action] --> B[Action Handler]\n        B --> C{Action Result}\n\n        C -->|Success| D[Success Toast]\n        C -->|Error| E[Error Toast]\n        C -->|Warning| F[Warning Alert]\n        C -->|Info| G[Info Banner]\n\n        D --> H[Auto-dismiss Timer]\n        E --> I[Manual Dismiss]\n        F --> J[Action Required]\n        G --> K[Persistent Display]\n\n        subgraph \"Message Types\"\n            L[Form Validation]\n            M[Workflow Updates]\n            N[System Alerts]\n            O[Business Rules]\n        end\n\n        L --> P[Field-level Errors]\n        M --> Q[Status Changes]\n        N --> R[System Maintenance]\n        O --> S[Budget Warnings]\n\n        P --> T[Form Component]\n        Q --> U[Status Badge]\n        R --> V[Global Banner]\n        S --> W[Alert Component]\n    end\n```\n\n## User Interface Screenshots\n\nThis section provides visual documentation of the key user interface screens in the Carmen ERP Purchase Request system. Screenshots were captured from the running application to show the actual implementation of the designs and workflows described in this document.\n\n### Purchase Request List View\n*Screenshot captured: Purchase Request main list interface*\n\n![Purchase Request List View](./purchase-request-list-view.png)\n\nThe main Purchase Request list view shows:\n- **Navigation sidebar** with procurement module expanded\n- **Filter controls** including \"My Pending\", \"All Documents\", stage filters, and saved filters\n- **Action buttons** for Export, Print, and New PR creation\n- **Data table** with sortable columns: PR Number, Date, Type, Stage, Status, Requestor, Department, Amount, Currency\n- **Status indicators** with color coding (Completed in green, InProgress in blue, Submitted in blue, Rejected in red, Draft in yellow)\n- **Pagination controls** at the bottom\n- **View toggle** between list and card views\n- **Bulk selection** capability with checkboxes\n\n### Purchase Request Detail View\n*Screenshot captured: Purchase Request detail interface (PR-2024-002)*\n\n![Purchase Request Detail View](./purchase-request-detail-view.png)\n\nThe Purchase Request detail view displays:\n- **Header section** with PR number, status badge, and action buttons (Print, Export, Share)\n- **Basic information** including Date, PR Type, Requestor, and Department\n- **Description field** with full PR details\n- **Workflow progress indicator** showing current stage in the approval process\n- **Tabbed interface** with Items, Budgets, and Workflow tabs\n- **Items table** with expandable rows showing:\n  - Item numbers and location/status\n  - Product details with descriptions\n  - Requested vs Approved quantities\n  - Date required and delivery points\n  - Pricing information\n- **Auto-expand on hover** functionality for better UX\n- **Status badges** for individual items (Pending, Approved, etc.)\n- **Comments & Attachments** section with file upload and download capabilities\n- **Activity Log** showing complete history of all actions performed on the PR\n\n### Purchase Request Creation Form\n*Screenshot captured: Purchase Request creation/editing interface (PR-2023-001 Draft)*\n\n![Purchase Request Creation Form](./purchase-request-creation-form.png)\n\nThe Purchase Request creation form includes:\n- **Form header** with PR number and draft status\n- **Basic details** including Date, PR Type, Requestor, and Department\n- **Description field** for PR purpose\n- **Workflow progress** showing submission stage\n- **Items management** with detailed table including:\n  - Item numbering and location selection\n  - Product details with full descriptions\n  - Quantity requested vs approved tracking\n  - Date requirements and delivery points\n  - Pricing calculations\n- **Item status indicators** (Approved, Review, Pending, etc.)\n- **Auto-expand functionality** for better data visibility\n- **Comments & Attachments** section for collaboration\n- **Activity Log** for tracking all changes and actions\n- **Validation and submission** controls\n\n### Dynamic UI Elements and Interactions\n*Screenshots captured: Interactive menus, dropdowns, and popup elements*\n\n#### Action Menu (Three-dot Menu)\n![Action Menu Popup](./action-menu-popup.png)\n\nThe row-level action menu provides context-specific actions for each Purchase Request:\n- **Approve** option with green checkmark icon for pending requests\n- **Reject** option with red X icon for declining requests\n- **Delete** option with red trash icon for removing requests\n- **Visual separator** between approval/rejection actions and destructive delete action\n- **Contextual availability** - options appear based on current PR status and user permissions\n\n#### Filter Dropdown Menus\n\n##### Stage Filter Dropdown\n![Stage Filter Dropdown](./filter-dropdown-all-stage.png)\n\nThe Stage filter dropdown allows filtering by approval workflow stages:\n- **All Stage** (default selection showing all requests)\n- **Request Creation** for newly created PRs\n- **Department Approval** for requests pending department head approval\n- **Purchasing Review** for requests under purchasing team review\n- **Finance Review** for requests requiring financial approval\n- **Final Approval** for requests pending final sign-off\n- **Completed** for fully processed requests\n\n##### Requester Filter Dropdown\n![Requester Filter Dropdown](./filter-dropdown-all-requester.png)\n\nThe Requester filter dropdown enables filtering by the person who created the PR:\n- **All Requester** (default selection showing all requesters)\n- **Individual staff members** including:\n  - Somchai\n  - Somsri\n  - John\n  - Mary\n- **Dynamic population** based on users who have created Purchase Requests\n\n#### Bulk Operations Menu (In PR Detail Form)\n![Bulk Operations Menu](./bulk-operations-menu-pr-detail.png)\n\nThe bulk operations functionality is located within the Purchase Request detail form, specifically in the Items tab:\n\n**Selection Interface:**\n- **Item checkboxes** on each row for individual selection\n- **Select all checkbox** in the table header for bulk selection\n- **Selection counter** displays \"X items selected: Y Approved\" showing total and status breakdown\n- **Auto-expand on hover** toggle for better visibility during bulk operations\n\n**Bulk Action Buttons:**\n- **Approve Selected** (green checkmark icon) - Approve multiple items simultaneously\n- **Reject Selected** (red X icon) - Reject multiple items at once\n- **Return Selected** (orange return icon) - Return selected items for revision\n- **Split** (blue split icon) - Split selected items into separate requests\n- **Set Date Required** (purple calendar icon) - Update delivery dates for multiple items\n\n**Context-Aware Functionality:**\n- Button availability changes based on current item status and user permissions\n- Visual feedback shows the impact of bulk operations before execution\n- Actions apply only to currently selected items, maintaining granular control\n\n#### Auto-Expand Item Details on Hover\n![Item Detail Hover Expanded](./item-detail-hover-expanded.png)\n\nThe auto-expand functionality provides detailed information when hovering over item rows:\n\n**Inventory Information Panel:**\n- **On Hand**: Current stock quantity with piece/unit indicators\n- **On Order**: Pending incoming stock quantities\n- **Reorder**: Minimum threshold for reordering\n- **Restock**: Target quantity for restocking\n- **Stock Level**: Percentage indicator with visual status bar\n- **Needs Reorder** alert when stock falls below threshold\n\n**Business Dimensions Panel:**\n- **Job Number**: Project/job reference (e.g., FB-2024-Q1-001)\n- **Event**: Associated event name (e.g., CONF2024)\n- **Project**: Project code (e.g., PROJ001)\n- **Market Segment**: Business classification (e.g., ENTERPRISE)\n\n#### Role-Based UI Differences\n![Role-Based Purchasing Staff View](./role-based-purchasing-staff-view.png)\n\nThe system displays different information based on user roles:\n\n**Chef/Requestor Role (Original View):**\n- Comment section shows user initials \"CMR\" (Chef Maria Rodriguez)\n- Standard approval quantities without additional procurement details\n- Focus on operational requirements and item specifications\n\n**Purchasing Staff Role:**\n- Comment section shows \"DPS\" (Demo Purchasing Staff)\n- **Additional FOC (Free of Charge) information** displayed in Approved column:\n  - \"FOC: 0.000 piece\" for each item showing free quantities\n  - Critical for procurement cost calculations and vendor negotiations\n- **Submit & Approve button** appears at bottom for procurement workflow actions\n- User profile shows \"Demo Purchasing Staff\" with \"purchasing@example.com\"\n- Department context switches from \"Kitchen Operations\" to \"Administration\"\n\n**Dynamic Panel Visibility:**\n- **Inventory panels** may show/hide based on role permissions\n- **Business dimensions** visibility controlled by departmental access\n- **Pricing details** and FOC information restricted to procurement roles\n- **Auto-expand behavior** may differ based on user's data access level\n\n#### UI Interaction Patterns\n- **Hover states** provide visual feedback for interactive elements\n- **Dropdown menus** close when clicking outside or pressing Escape\n- **Status color coding** maintains consistency across all views:\n  - Green for Completed/Approved states\n  - Blue for InProgress/Submitted states\n  - Red for Rejected states\n  - Yellow for Draft states\n- **Progressive disclosure** with expandable rows and hover details\n- **Contextual actions** that adapt based on item status and user permissions\n- **Role-based information display** with procurement-specific details for purchasing staff\n\n## Workflow Action Buttons\n\nThe system implements workflow action buttons for approval processes through a dedicated approval interface rather than on individual purchase request detail pages.\n\n### Approval Workflow Interface\n\nThe workflow actions are primarily handled through the **My Approvals** page (`/procurement/my-approvals`) which provides:\n\n#### 1. Two-Tab Approval System\n\n**Pending Approval Tab:**\n- Items ready for immediate approval\n- Direct \"Approve\" buttons for straightforward requests\n- Standard approval workflow for routine procurement\n\n![My Approvals Workflow Buttons](./my-approvals-workflow-buttons.png)\n\n**Flagged for Review Tab:**\n- High-value or exceptional requests requiring detailed review\n- \"Review\" buttons for complex approval scenarios\n- Additional scrutiny for requests exceeding normal parameters\n\n![Flagged Review Workflow Buttons](./flagged-review-workflow-buttons.png)\n\n#### 2. Purchase Request Detail Page Behavior\n\nOn individual PR detail pages, the workflow action appears as:\n\n- **\"Review Required\" button** (typically disabled until specific conditions are met)\n- Located at the bottom-right of the page interface\n- Serves as an indicator rather than primary action interface\n\n![Workflow Review Required Button](./workflow-review-required-button.png)\n\n#### 3. Workflow Action Patterns\n\n**Approve Actions:**\n- Single-click approval for standard requests\n- Immediate state change with visual feedback\n- Auto-navigation or list update upon completion\n\n**Review Actions:**\n- Opens detailed review interface for complex items\n- Allows for additional scrutiny and documentation\n- May provide multiple action options (approve, reject, request changes)\n\n**Role-Based Access:**\n- Actions only visible to users with appropriate approval permissions\n- Department Manager role enables approval capabilities\n- Context-sensitive button activation based on workflow stage\n\n#### 4. Workflow States and Button Behavior\n\n- **Disabled State**: \"Review Required\" button appears disabled when user lacks permissions or item isn't ready for approval\n- **Active State**: Buttons become interactive when approval criteria are met\n- **Processing State**: Visual feedback during approval processing\n- **Completion State**: State updates and potential navigation after action completion\n\n### Implementation Notes\n\nThe workflow system prioritizes:\n- **Separation of concerns**: Dedicated approval interface separate from viewing interface\n- **Role-based access control**: Buttons only appear for authorized users\n- **Two-tier approval process**: Standard vs. flagged items require different approval paths\n- **Visual state management**: Clear indication of approval status and available actions\n\n## Technical Implementation Details\n\n### Component Communication\n\n```mermaid\ngraph LR\n    subgraph \"Component Communication Patterns\"\n        A[Parent Component] --> B[Props Down]\n        B --> C[Child Component]\n        C --> D[Events Up]\n        D --> A\n\n        E[Sibling A] --> F[Shared State]\n        F --> G[Sibling B]\n\n        H[Deep Child] --> I[Context Provider]\n        I --> J[Any Consumer]\n\n        K[Component] --> L[Custom Hook]\n        L --> M[API Service]\n        M --> N[React Query]\n        N --> K\n    end\n```\n\n### Performance Optimizations\n\n```mermaid\nflowchart TD\n    A[Performance Strategy] --> B[Code Splitting]\n    A --> C[Lazy Loading]\n    A --> D[Memoization]\n    A --> E[Virtual Scrolling]\n\n    B --> F[Dynamic Imports]\n    F --> G[Route-based Chunks]\n\n    C --> H[Modal Components]\n    C --> I[Tab Content]\n\n    D --> J[React.memo]\n    D --> K[useMemo]\n    D --> L[useCallback]\n\n    E --> M[Large Lists]\n    E --> N[Data Tables]\n\n    O[Caching Strategy] --> P[React Query]\n    P --> Q[Background Refetch]\n    P --> R[Stale While Revalidate]\n    P --> S[Optimistic Updates]\n```\n\n---\n\nThis comprehensive analysis provides a complete technical overview of the Carmen ERP Purchase Request system, covering all aspects from high-level architecture to detailed implementation patterns. The Mermaid diagrams illustrate the relationships between components, data flow, user interactions, and system behavior.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

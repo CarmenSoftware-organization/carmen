@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Management - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../index.html" class="back-link">← All Modules</a>
+            <h1>Operational Planning</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../index.html">Documentation</a> / <a href="../../../index.html">OP</a> / Features / Recipe Management</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Recipe Management\n\n> **Feature:** Operational Planning > Recipe Management\n> **Pages:** 20\n> **Status:** ✅ Production Ready\n\n---\n\n## Overview\n\nRecipe Management provides comprehensive tools for creating, managing, and analyzing recipes in Carmen ERP. The feature includes advanced capabilities for ingredient tracking, cost calculation, fractional sales support (pizza slices, cake portions), multi-variant yield management, and recipe performance analytics.\n\n### Key Features\n\n1. **Recipe CRUD** - Complete recipe lifecycle management\n2. **Advanced Filtering** - Quick filters and complex query builder\n3. **Dual View Modes** - Grid (cards) and list (table) views\n4. **Ingredient Management** - Products and sub-recipes with wastage tracking\n5. **Yield Variants** - Multiple selling options per recipe (whole, half, slices)\n6. **Fractional Sales** - Support for pizza slices, cake portions, bottled beverages\n7. **Cost Analysis** - Real-time cost calculations with margin tracking\n8. **Bulk Operations** - Multi-select actions for efficiency\n9. **Category System** - Hierarchical organization with visual coding\n10. **Cuisine Classification** - Cultural and regional categorization\n\n---\n\n## Page Structure\n\n### 1. Recipe List\n**Route:** `/operational-planning/recipe-management/recipes`\n\n#### Features:\n- **View Modes**:\n  - Grid view (responsive cards)\n  - List view (data table)\n- **Search**: Full-text search across recipe names\n- **Quick Filters**:\n  - No Media\n  - Has Media\n  - Active (published)\n  - Draft\n- **Advanced Filters**:\n  - Field-based query builder\n  - Multiple conditions with operators\n  - Supports: Name, Category, Cuisine, Status, Cost Range, Margin, Prep Time, Difficulty\n- **Bulk Operations**:\n  - Activate/Deactivate\n  - Export Selected\n  - Delete Selected\n- **Actions**:\n  - Import recipes\n  - Export recipes\n  - Create new recipe\n\n#### Components:\n- `RecipeList` - Main list container\n- `RecipeCardCompact` - Grid view cards\n- Advanced filter builder\n- Bulk action toolbar\n\n### 2. Recipe Detail\n**Route:** `/operational-planning/recipe-management/recipes/[id]`\n\n#### Features:\n- Complete recipe information\n- Ingredient list with costs\n- Preparation steps with images\n- Yield variants display\n- Cost breakdown\n- Allergen information\n- Nutrition facts\n- Print functionality\n\n#### Sections:\n- Header with image and basic info\n- Ingredients tab\n- Preparation steps tab\n- Cost analysis tab\n- Variants tab (if fractional sales enabled)\n- Notes and special instructions\n\n### 3. Create Recipe (New)\n**Route:** `/operational-planning/recipe-management/recipes/create`\n\n#### Form Sections:\n**Basic Information**\n- Recipe name (required)\n- Description\n- Category selection\n- Cuisine type\n- Status (draft/published)\n- Image upload\n- Tags\n\n**Yield Management**\n- Base yield quantity\n- Yield unit\n- Enable fractional sales checkbox\n- Fractional sales type (pizza-slice, cake-slice, etc.)\n- Yield variants configuration\n\n**Ingredients**\n- Add product ingredients\n- Add sub-recipe ingredients\n- Quantity and unit\n- Wastage percentage\n- Inventory tracking\n- Cost calculation\n\n**Preparation Steps**\n- Step-by-step instructions\n- Duration per step\n- Temperature requirements\n- Equipment needed\n- Step images\n\n**Pricing & Cost**\n- Cost per portion (auto-calculated)\n- Selling price\n- Target food cost percentage\n- Labor cost percentage\n- Overhead percentage\n- Recommended price calculation\n\n**Additional Details**\n- Preparation notes\n- Special instructions\n- Additional information\n- Allergens (multi-select)\n- Carbon footprint data\n\n**Metadata**\n- Preparation time\n- Cooking time\n- Total time\n- Difficulty level\n- Deduct from stock toggle\n\n### 4. Edit Recipe\n**Route:** `/operational-planning/recipe-management/recipes/[id]/edit`\n\nSame form as Create Recipe, pre-populated with existing data.\n\n### 5. Recipe Categories\n**Route:** `/operational-planning/recipe-management/categories`\n\n#### Features:\n- Category list view\n- Create new category\n- Edit existing category\n- Delete category\n- Parent-child hierarchy\n- Color coding\n- Icon selection\n- Recipe count per category\n\n### 6. Cuisine Types\n**Route:** `/operational-planning/recipe-management/cuisine-types`\n\n#### Features:\n- Cuisine type list\n- Add, edit, delete cuisine types\n- Cultural classification\n- Region mapping\n- Recipe association count\n\n---\n\n## Data Model\n\n```typescript\ninterface Recipe {\n  // Identity\n  id: string;\n  name: string;\n  description: string;\n  category: string;\n  cuisine: string;\n  status: 'draft' | 'published';\n  image: string;\n\n  // Yield Management\n  yield: number;\n  yieldUnit: string;\n\n  // Advanced Fractional Sales Support\n  yieldVariants: RecipeYieldVariant[];\n  defaultVariantId: string;\n  allowsFractionalSales: boolean;\n  fractionalSalesType?: 'pizza-slice' | 'cake-slice' | 'bottle-glass' | 'portion-control' | 'custom';\n\n  // Timing\n  prepTime: number; // minutes\n  cookTime: number;\n  totalTime: number;\n  difficulty: 'easy' | 'medium' | 'hard';\n\n  // Pricing & Cost\n  costPerPortion: number;\n  sellingPrice: number;\n  grossMargin: number; // percentage\n  netPrice: number;\n  grossPrice: number;\n  totalCost: number;\n  targetFoodCost: number; // target percentage\n  laborCostPercentage: number;\n  overheadPercentage: number;\n  recommendedPrice: number;\n  foodCostPercentage: number;\n  grossProfit: number;\n\n  // Environmental\n  carbonFootprint: number;\n  carbonFootprintSource?: string;\n\n  // Operations\n  hasMedia: boolean;\n  deductFromStock: boolean;\n  unitOfSale: string;\n\n  // Components\n  ingredients: Ingredient[];\n  steps: PreparationStep[];\n\n  // Documentation\n  prepNotes: string;\n  specialInstructions: string;\n  additionalInfo: string;\n  allergens: string[];\n  tags: string[];\n\n  // Audit\n  createdAt: string;\n  updatedAt: string;\n  createdBy: string;\n  updatedBy: string;\n}\n\ninterface RecipeYieldVariant {\n  id: string;\n  name: string;\n  unit: string; // 'slice', 'half', 'whole', 'glass', 'bottle'\n  quantity: number;\n  conversionRate: number; // Portion of base recipe (1.0 = whole, 0.125 = 1/8)\n  sellingPrice: number;\n  costPerUnit: number;\n  isDefault: boolean;\n  shelfLife?: number; // Hours after preparation/opening\n  wastageRate?: number; // Expected waste percentage\n  minOrderQuantity?: number;\n  maxOrderQuantity?: number;\n}\n\ninterface Ingredient {\n  id: string;\n  name: string;\n  type: 'product' | 'recipe'; // Sub-recipes supported\n  quantity: number;\n  unit: string;\n  wastage: number; // Percentage\n  inventoryQty: number;\n  inventoryUnit: string;\n  costPerUnit: number;\n  totalCost: number; // Auto-calculated\n  notes?: string;\n}\n\ninterface PreparationStep {\n  id: string;\n  order: number;\n  description: string;\n  duration?: number; // minutes\n  temperature?: number; // celsius/fahrenheit\n  equipments: string[];\n  image: string;\n}\n```\n\n---\n\n## Advanced Features\n\n### Fractional Sales Management\n\nCarmen ERP supports selling recipes in multiple variants, enabling operations like:\n\n#### Pizza Slice Sales\n```typescript\n{\n  allowsFractionalSales: true,\n  fractionalSalesType: 'pizza-slice',\n  yieldVariants: [\n    {\n      name: 'Pizza Slice',\n      conversionRate: 0.125, // 1 slice = 1/8 pizza\n      sellingPrice: 4.99,\n      shelfLife: 4, // hours under heat lamp\n      wastageRate: 5\n    },\n    {\n      name: 'Half Pizza',\n      conversionRate: 0.5,\n      sellingPrice: 18.99\n    },\n    {\n      name: 'Whole Pizza',\n      conversionRate: 1.0,\n      sellingPrice: 34.99,\n      isDefault: true\n    }\n  ]\n}\n```\n\n#### Cake Portion Sales\n```typescript\n{\n  allowsFractionalSales: true,\n  fractionalSalesType: 'cake-slice',\n  yieldVariants: [\n    {\n      name: 'Cake Slice',\n      conversionRate: 0.0625, // 1/16 of cake\n      sellingPrice: 6.99,\n      shelfLife: 72, // 3 days refrigerated\n      minOrderQuantity: 1,\n      maxOrderQuantity: 16\n    },\n    {\n      name: 'Quarter Cake',\n      conversionRate: 0.25,\n      sellingPrice: 24.99\n    },\n    {\n      name: 'Whole Cake',\n      conversionRate: 1.0,\n      sellingPrice: 89.99\n    }\n  ]\n}\n```\n\n### Benefits:\n- Flexible selling options\n- Accurate cost tracking per variant\n- Wastage management per variant\n- Shelf life tracking\n- Quantity limits for portion control\n\n---\n\n### Cost Calculation Engine\n\n**Auto-Calculation Formula:**\n```typescript\n// Ingredient Cost\ningredientCost = (quantity * costPerUnit * (1 + wastage/100))\n\n// Total Recipe Cost\ntotalCost = sum(all ingredientCosts)\n\n// Cost Per Portion\ncostPerPortion = totalCost / yield\n\n// For Yield Variants\nvariantCost = totalCost * conversionRate\n\n// Gross Margin\ngrossMargin = ((sellingPrice - costPerPortion) / sellingPrice) * 100\n\n// Food Cost Percentage\nfoodCostPercentage = (costPerPortion / sellingPrice) * 100\n\n// Recommended Price\nrecommendedPrice = costPerPortion / (targetFoodCost / 100)\n\n// Gross Profit\ngrossProfit = sellingPrice - costPerPortion\n```\n\n### Wastage Tracking\n- Ingredient-level wastage percentages\n- Variant-specific wastage rates\n- Automatic cost adjustments\n- Wastage reporting\n\n---\n\n### Advanced Filtering System\n\n**Filter Operators:**\n- `contains` - Partial text match\n- `equals` - Exact match\n- `notEquals` - Exclusion\n- `greaterThan` - Numeric comparison\n- `lessThan` - Numeric comparison\n- `isEmpty` - NULL check\n- `isNotEmpty` - NOT NULL check\n\n**Filterable Fields:**\n- Name, Category, Cuisine\n- Status, Cost Range, Margin\n- Preparation Time, Difficulty\n\n**Filter Combinations:**\n- Multiple conditions with AND logic\n- Quick filters combinable with advanced\n- Real-time filter result count\n\n---\n\n## API Endpoints\n\n```http\nGET /api/recipes\nPOST /api/recipes\nGET /api/recipes/:id\nPUT /api/recipes/:id\nDELETE /api/recipes/:id\n\nGET /api/recipes/search\nGET /api/recipes/filter\n\nGET /api/recipes/:id/cost-breakdown\nGET /api/recipes/:id/variants\n\nPOST /api/recipes/bulk/activate\nPOST /api/recipes/bulk/deactivate\nPOST /api/recipes/bulk/delete\nPOST /api/recipes/bulk/export\n\nGET /api/recipe-categories\nPOST /api/recipe-categories\nPUT /api/recipe-categories/:id\nDELETE /api/recipe-categories/:id\n\nGET /api/cuisine-types\nPOST /api/cuisine-types\nPUT /api/cuisine-types/:id\nDELETE /api/cuisine-types/:id\n\nPOST /api/recipes/import\nGET /api/recipes/export\n```\n\n---\n\n## Business Rules\n\n### Recipe Validation\n1. **Name Required**: Recipe name must be unique within organization\n2. **Yield Required**: Base yield quantity and unit mandatory\n3. **At Least One Ingredient**: Recipe must have minimum one ingredient\n4. **Cost Calculation**: Automatic when ingredients change\n5. **Variant Rates**: Conversion rates must sum to ≤ base yield\n\n### Fractional Sales Rules\n1. **Default Variant**: One variant must be marked as default\n2. **Conversion Rates**: Must be between 0 and 1.0\n3. **Shelf Life Tracking**: Required for fractional sales types\n4. **Quantity Limits**: Min/max quantities for portion control\n5. **Wastage Rates**: Different rates per variant size\n\n### Cost Management\n1. **Target Food Cost**: Recommended 25-35% for most items\n2. **Wastage Inclusion**: Wastage % added to ingredient costs\n3. **Sub-Recipe Costs**: Nested recipe costs aggregated\n4. **Price Recommendations**: Based on target food cost percentage\n5. **Margin Alerts**: Warning when margins below target\n\n### Inventory Integration\n1. **Stock Deduction**: Flag determines if recipe affects inventory\n2. **Ingredient Tracking**: Real-time availability checking\n3. **Inventory Units**: Conversion between recipe and inventory units\n4. **Wastage Accounting**: Included in stock calculations\n5. **Sub-Recipe Cascading**: Ingredients from sub-recipes tracked\n\n---\n\n## Integration Points\n\n### Inventory Management\n- Real-time ingredient availability\n- Stock deduction on recipe use\n- Wastage tracking and reporting\n- Inventory unit conversions\n\n### POS Integration\n- Recipe variants mapped to POS items\n- Fractional sales synchronization\n- Cost tracking per sale\n- Popular item identification\n\n### Menu Engineering\n- Performance metrics per recipe\n- Sales data analysis\n- Profitability tracking\n- Menu optimization recommendations\n\n### Product Management\n- Product catalog integration\n- Supplier cost updates\n- Product substitutions\n- Allergen management\n\n### Finance\n- Cost accounting\n- Margin analysis\n- Profitability reporting\n- Price optimization\n\n---\n\n## User Guide\n\n### Creating a Recipe\n\n1. Navigate to Recipe Management → Recipes\n2. Click \"New Recipe\"\n3. Fill basic information (name, description, category, cuisine)\n4. Add ingredients:\n   - Select from products or sub-recipes\n   - Enter quantity and unit\n   - Set wastage percentage\n   - View auto-calculated cost\n5. Configure yield:\n   - Set base yield (e.g., 4 portions, 1 pizza)\n   - Enable fractional sales if needed\n   - Add yield variants (slices, halves, etc.)\n6. Add preparation steps with images\n7. Set pricing and targets\n8. Add allergens and tags\n9. Save as draft or publish\n\n### Using Advanced Filters\n\n1. Click \"Advanced Filters\" button\n2. Click \"Add Filter Condition\"\n3. Select field, operator, and value\n4. Add multiple conditions as needed\n5. Click \"Apply Filters\"\n6. Clear with \"Reset\" or \"Clear All\"\n\n### Bulk Operations\n\n1. Switch to list view (optional)\n2. Select recipes using checkboxes\n3. Use bulk action toolbar:\n   - Activate multiple recipes\n   - Deactivate for temporary removal\n   - Export selected to Excel/CSV\n   - Delete multiple recipes\n4. Confirm action\n\n---\n\n## Troubleshooting\n\n### Issue: Cost Not Calculating\n**Cause**: Missing ingredient cost data\n**Solution**: Ensure all ingredients have `costPerUnit` values\n\n### Issue: Fractional Sales Not Available\n**Cause**: `allowsFractionalSales` flag not enabled\n**Solution**: Edit recipe and enable fractional sales checkbox\n\n### Issue: Filters Not Working\n**Cause**: Invalid filter operator for field type\n**Solution**: Use numeric operators only for numeric fields\n\n### Issue: Bulk Actions Disabled\n**Cause**: No recipes selected\n**Solution**: Use checkboxes to select at least one recipe\n\n---\n\n## Performance Optimization\n\n**Best Practices:**\n- Use quick filters before advanced filters\n- Filter results cached for 5 minutes\n- Bulk operations paginated (max 100 at a time)\n- Image thumbnails lazy-loaded\n- Recipe calculations memoized\n\n**Query Optimization:**\n- Ingredient costs pre-calculated and cached\n- Search uses indexed fields\n- List view pagination (50 items per page)\n- Grid view pagination (60 items per page)\n\n---\n\n## Future Enhancements\n\n**Planned Features:**\n- Recipe version history\n- Recipe collaboration and comments\n- AI-powered recipe suggestions\n- Nutrition calculator integration\n- Recipe scaling calculator\n- Seasonal recipe tracking\n- Recipe analytics dashboard\n- Allergen cross-contamination warnings\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

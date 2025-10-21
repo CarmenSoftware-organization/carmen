@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Module - Sitemap - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Production / Production Sitemap.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Production Module - Sitemap\n\n**Module**: Production\n**System**: Manufacturing & Kitchen Operations Management\n**Navigation Structure**: 10-15 pages\n\n## Navigation Hierarchy\n\n### 1. Production Module Overview (`/production`)\n\n**Page Type**: Landing Page & Dashboard\n**Status**: Basic Implementation Complete (Dashboard with drag-drop widgets)\n**Content**:\n- Module introduction and strategic value\n- Quick access to key production functions\n- Real-time production dashboard with:\n  - Production Volume chart (7-day trend)\n  - Quality Control Results (pie chart)\n  - Top 5 Recipes Produced (bar chart)\n  - Current batch production status\n  - Wastage tracking summary\n  - Equipment utilization overview\n\n**Key Sections**:\n- Production objectives and business impact\n- Current production status summary\n- Recent batches and quality scores\n- Equipment status overview\n- Quick links to planning, monitoring, quality control\n\n---\n\n### 2. Production Planning & Scheduling (`/production/planning`)\n\n**Page Type**: Planning Interface\n**Status**: Design Complete, Implementation Pending\n**Content**: Production order creation and scheduling with resource optimization\n\n**Sub-pages**:\n\n#### 2.1 Production Orders (`/production/planning/orders`)\n- **Content**: Production order management interface\n- **Features**:\n  - Create new production orders from recipes\n  - Define quantity, yield variant, and production date\n  - Assign chef and production crew\n  - Check ingredient availability automatically\n  - Schedule equipment usage\n  - View production order list with status\n  - Filter by date, recipe, status, assigned chef\n  - Bulk operations (schedule, reassign, cancel)\n\n#### 2.2 Equipment Schedule (`/production/planning/equipment`)\n- **Content**: Equipment capacity planning and scheduling\n- **Features**:\n  - Visual equipment schedule (Gantt chart)\n  - Equipment availability tracking\n  - Conflict detection and resolution\n  - Setup and changeover time optimization\n  - Maintenance window integration\n  - Utilization forecasting\n  - Equipment capacity analytics\n\n#### 2.3 Labor Schedule (`/production/planning/labor`)\n- **Content**: Staff scheduling and skill-based assignment\n- **Features**:\n  - Staff availability calendar\n  - Skill-based task assignment\n  - Crew composition optimizer\n  - Labor cost tracking per batch\n  - Productivity metrics per staff member\n  - Training needs identification\n  - Shift planning and handoff management\n\n#### 2.4 Batch Calendar (`/production/planning/calendar`)\n- **Content**: Calendar view of all scheduled production\n- **Features**:\n  - Day/Week/Month calendar views\n  - Color-coded by recipe category or status\n  - Drag-and-drop rescheduling\n  - Equipment conflicts highlighted\n  - Special events and catering production flagged\n  - Multi-location view for operations managers\n\n---\n\n### 3. Production Monitoring (`/production/monitoring`)\n\n**Page Type**: Real-Time Monitoring Interface\n**Status**: Partial Implementation (Dashboard widgets), Full System Pending\n**Content**: Live production tracking and progress monitoring\n\n**Sub-pages**:\n\n#### 3.1 Live Dashboard (`/production/monitoring/dashboard`)\n- **Content**: Real-time production status dashboard\n- **Features**:\n  - Current production dashboard (implemented with drag-drop widgets)\n  - Active batches map view by kitchen station\n  - Progress bars for each active batch\n  - Quality checkpoint completion indicators\n  - Cost variance alerts\n  - Equipment status indicators\n  - Auto-refresh every 30 seconds\n  - Mobile-optimized for floor staff\n\n#### 3.2 Batch Tracking (`/production/monitoring/batches`)\n- **Content**: Individual batch monitoring and history\n- **Features**:\n  - Batch list view with filters\n  - Batch detail view with:\n    - Production timeline (planned vs. actual)\n    - Quality checkpoint status\n    - Ingredient consumption tracking\n    - Staff assignments\n    - Cost breakdown\n    - Photos and documentation\n  - Batch history and traceability\n  - Search by batch number, recipe, date, staff\n\n#### 3.3 Progress Tracking (`/production/monitoring/progress`)\n- **Content**: Step-by-step production progress monitoring\n- **Features**:\n  - Production steps checklist\n  - Time tracking per step\n  - Temperature monitoring graphs\n  - Quality checkpoint reminders\n  - Photo capture for critical steps\n  - Issue flagging and escalation\n  - Real-time notifications for delays\n\n#### 3.4 Alert Management (`/production/monitoring/alerts`)\n- **Content**: Production alert center\n- **Features**:\n  - Active alerts dashboard\n  - Alert categorization (delay, quality, resource, equipment)\n  - Severity levels (info, warning, critical)\n  - Alert history and trends\n  - Custom alert rule configuration\n  - Notification settings (push, email, SMS)\n  - Alert resolution tracking\n\n---\n\n### 4. Fractional Production (`/production/fractional`)\n\n**Page Type**: Fractional Sales Management Interface\n**Status**: Comprehensive Type System Complete (374 lines), UI Pending\n**Content**: Fractional product management for pizza slices, cake portions, bottle-by-glass\n\n**Sub-pages**:\n\n#### 4.1 Yield Variants (`/production/fractional/variants`)\n- **Content**: Yield variant management for fractional selling\n- **Features**:\n  - Yield variant list by recipe\n  - Create/edit yield variants (whole, half, slice, portion)\n  - Define conversion rates (e.g., 1/8 for pizza slice, 1/12 for cake slice)\n  - Set pricing per variant\n  - Configure shelf life per variant\n  - Manage portion specifications (weight, size)\n  - Visual portion guides and photos\n\n#### 4.2 Portion Control (`/production/fractional/portions`)\n- **Content**: Portion control standards and monitoring\n- **Features**:\n  - Portion size standards by item\n  - Portioning guides and templates\n  - Portion weight variance tracking\n  - Quality check integration\n  - Staff training materials\n  - Portion compliance reporting\n  - Cost impact of portion variance\n\n#### 4.3 Conversion Management (`/production/fractional/conversions`)\n- **Content**: Fractional inventory conversion tracking\n- **Features**:\n  - Fractional stock dashboard\n  - Item state tracking (RAW → PREPARED → PORTIONED → PARTIAL → WASTE)\n  - Conversion record history\n  - Conversion type tracking (SPLIT, COMBINE, PREPARE, PORTION, CONSUME, WASTE)\n  - Quality grade monitoring (EXCELLENT → GOOD → FAIR → POOR → EXPIRED)\n  - Conversion efficiency metrics\n  - Waste tracking per conversion\n  - AI-driven conversion recommendations:\n    - Optimal conversion timing\n    - Recommended quantities\n    - Expected benefits and risks\n    - Impact estimates (waste, cost, revenue, quality)\n\n#### 4.4 Fractional Inventory (`/production/fractional/inventory`)\n- **Content**: Real-time fractional product inventory\n- **Features**:\n  - Whole units vs. partial quantities\n  - Total portions available\n  - Reserved portions for orders\n  - Quality grade per batch\n  - Expiration tracking\n  - Storage location tracking\n  - Demand-based recommendations\n  - Conversion opportunity alerts\n\n---\n\n### 5. Quality Control (`/production/quality`)\n\n**Page Type**: Quality Management Interface\n**Status**: Type System Complete, Implementation Pending\n**Content**: Quality control checkpoints, batch testing, and non-conformance management\n\n**Sub-pages**:\n\n#### 5.1 Quality Checkpoints (`/production/quality/checkpoints`)\n- **Content**: Quality checkpoint configuration and monitoring\n- **Features**:\n  - Checkpoint list by recipe\n  - Create/edit quality checkpoints\n  - 6 check types: visual, taste, temperature, texture, aroma, portion_size\n  - Define expected values and tolerance ranges\n  - Critical control point (HACCP) flagging\n  - Checkpoint pass/fail statistics\n  - Quality trends by checkpoint type\n\n#### 5.2 Batch Testing (`/production/quality/testing`)\n- **Content**: Batch quality testing and approval\n- **Features**:\n  - Batch quality testing dashboard\n  - Quality check form for each checkpoint\n  - Expected vs. actual value comparison\n  - Pass/fail decision with documentation\n  - Photo upload for quality issues\n  - Chef approval workflow\n  - Sensory evaluation forms\n  - Temperature and timing verification\n  - Corrective action tracking\n\n#### 5.3 Quality Metrics (`/production/quality/metrics`)\n- **Content**: Quality performance analytics\n- **Features**:\n  - Quality pass rate trends (target: >98%)\n  - Quality failure analysis by:\n    - Recipe\n    - Staff member\n    - Equipment\n    - Supplier (ingredient quality)\n    - Time of day/shift\n  - Rework batches tracking\n  - Customer complaint correlation\n  - Quality improvement tracking\n  - Benchmarking across locations\n\n#### 5.4 Non-Conformance Management (`/production/quality/non-conformance`)\n- **Content**: Quality deviation management\n- **Features**:\n  - Non-conformance report creation\n  - Root cause analysis workflow\n  - Corrective action planning\n  - Preventive action recommendations\n  - Supplier notification (if ingredient issue)\n  - Staff retraining tracking\n  - Non-conformance trend analysis\n  - CAPA (Corrective and Preventive Action) tracking\n\n---\n\n### 6. Waste Management (`/production/waste`)\n\n**Page Type**: Waste Tracking & Analysis Interface\n**Status**: Design Complete, Implementation Pending\n**Content**: Production waste tracking, yield variance analysis, sustainability reporting\n\n**Sub-pages**:\n\n#### 6.1 Waste Tracking (`/production/waste/tracking`)\n- **Content**: Real-time waste recording and categorization\n- **Features**:\n  - Waste event recording form\n  - 6 waste categories:\n    - Trim waste (normal processing)\n    - Spoilage (quality degradation)\n    - Over-production (excess production)\n    - Preparation error (staff mistake)\n    - Equipment failure (mechanical)\n    - Other (miscellaneous)\n  - Weight and cost tracking\n  - Photo documentation\n  - Root cause selection\n  - Staff accountability (training, not punishment)\n  - Immediate corrective actions\n  - Waste dashboard with current week summary (implemented: 2.5% waste)\n\n#### 6.2 Yield Variance Analysis (`/production/waste/variance`)\n- **Content**: Actual vs. expected yield analysis\n- **Features**:\n  - Yield variance dashboard\n  - Recipe-specific yield analysis\n  - Variance categorization (acceptable ±5%, warning 5-10%, critical >10%)\n  - Trend analysis over time\n  - Staff performance correlation\n  - Supplier quality correlation\n  - Equipment performance correlation\n  - Waste cost impact calculation\n  - Improvement opportunity identification\n\n#### 6.3 Sustainability Reports (`/production/waste/reports`)\n- **Content**: Environmental impact and sustainability tracking\n- **Features**:\n  - Waste reduction progress (target: 25% reduction)\n  - Landfill vs. composting vs. recycling breakdown\n  - Carbon footprint calculations\n  - Water usage tracking\n  - Energy consumption per production unit\n  - Sustainability goal tracking\n  - Regulatory compliance reports\n  - ESG (Environmental, Social, Governance) metrics\n\n---\n\n### 7. Equipment Management (`/production/equipment`)\n\n**Page Type**: Equipment Optimization Interface\n**Status**: Design Complete, Implementation Pending\n**Content**: Equipment utilization, maintenance scheduling, downtime tracking\n\n**Sub-pages**:\n\n#### 7.1 Utilization Monitoring (`/production/equipment/utilization`)\n- **Content**: Equipment utilization analytics and optimization\n- **Features**:\n  - Equipment utilization dashboard (current: 85% avg from dashboard)\n  - Utilization by equipment (target: 85% average)\n  - Bottleneck identification (highest utilization causing delays)\n  - Idle equipment tracking (low utilization, underused)\n  - Capacity vs. actual usage comparison\n  - Production schedule optimization recommendations\n  - Equipment investment ROI analysis\n  - Multi-location utilization comparison\n\n#### 7.2 Maintenance Schedule (`/production/equipment/maintenance`)\n- **Content**: Preventive maintenance scheduling and tracking\n- **Features**:\n  - Maintenance calendar with production schedule integration\n  - Preventive maintenance task list\n  - Maintenance history by equipment\n  - Parts inventory tracking\n  - Service provider management\n  - Maintenance cost tracking\n  - Equipment reliability metrics (MTBF, MTTR)\n  - Warranty and service contract management\n\n#### 7.3 Downtime Tracking (`/production/equipment/downtime`)\n- **Content**: Equipment downtime monitoring and analysis\n- **Features**:\n  - Downtime event recording\n  - Downtime categorization (planned maintenance, breakdown, setup, other)\n  - Downtime cost calculation (lost production value)\n  - Equipment reliability analysis\n  - Downtime trends over time\n  - Root cause analysis for breakdowns\n  - Improvement opportunity identification\n  - Predictive maintenance recommendations\n\n#### 7.4 Energy Management (`/production/equipment/energy`)\n- **Content**: Energy consumption tracking and optimization\n- **Features**:\n  - Energy usage dashboard by equipment\n  - Energy cost per production batch\n  - Energy efficiency trends\n  - Peak demand management\n  - Energy-saving recommendations\n  - Target: 20% reduction in energy per unit\n  - Sustainability impact tracking\n  - Utility cost allocation\n\n---\n\n### 8. Recipe Production Analysis (`/production/analysis`)\n\n**Page Type**: Performance Analytics Interface\n**Status**: Type System Complete (RecipeMetrics), Implementation Pending\n**Content**: Recipe-level production metrics and profitability analysis\n\n**Sub-pages**:\n\n#### 8.1 Recipe Performance (`/production/analysis/recipes`)\n- **Content**: Comprehensive recipe production analytics\n- **Features**:\n  - Recipe performance dashboard\n  - Metrics per recipe:\n    - Total batches produced\n    - Total quantity produced\n    - Average batch size\n    - Production efficiency %\n    - Quality pass rate %\n    - Average yield variance %\n    - Waste percentage\n    - Rework batches\n    - Average cost per portion\n    - Cost variance\n    - Ingredient cost trend\n  - Recipe comparison and ranking\n  - Top/bottom performers identification\n\n#### 8.2 Profitability Analysis (`/production/analysis/profitability`)\n- **Content**: Recipe profitability and margin analysis\n- **Features**:\n  - Profitability dashboard by recipe\n  - Metrics:\n    - Average selling price\n    - Gross margin\n    - Gross margin percentage\n    - Total revenue\n    - Total profit\n    - Order frequency\n    - Customer rating (0-5)\n    - Return rate %\n  - Margin improvement opportunities\n  - Pricing recommendations\n  - Menu optimization suggestions\n\n#### 8.3 Staff Performance (`/production/analysis/staff`)\n- **Content**: Production staff performance analytics\n- **Features**:\n  - Staff performance dashboard\n  - Metrics per staff member:\n    - Batches produced\n    - Quality pass rate\n    - Production speed\n    - Waste percentage\n    - Preparation difficulty rating (self-reported)\n    - Time accuracy (actual vs. planned %)\n  - Top performers recognition\n  - Training needs identification\n  - Skill development tracking\n  - Cross-training recommendations\n\n---\n\n## Page Count Summary\n\n**Total Pages**: 28 sub-pages across 8 main sections\n\n**Implementation Status**:\n- TypeScript Interfaces: 100% complete (RecipeProductionBatch, FractionalStock, ConversionRecord, QualityCheck, RecipeMetrics)\n- Dashboard Prototype: Complete (drag-drop widgets with production volume, quality, top recipes)\n- Full Production System: Design complete, implementation pending\n\n### Page Breakdown:\n\n1. **Production Overview**: 1 page (dashboard implemented)\n2. **Production Planning & Scheduling**: 4 pages (design complete)\n3. **Production Monitoring**: 4 pages (partial implementation)\n4. **Fractional Production**: 4 pages (type system complete, UI pending)\n5. **Quality Control**: 4 pages (type system complete, implementation pending)\n6. **Waste Management**: 3 pages (design complete)\n7. **Equipment Management**: 4 pages (design complete)\n8. **Recipe Production Analysis**: 3 pages (type system complete)\n\n---\n\n## Technical Integration\n\n### Data Flow\n\n```\n┌─────────────────────┐\n│   Menu Forecast     │ (Operational Planning Module)\n└──────────┬──────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  Production Order Creation  │\n│  - Recipe selection         │\n│  - Quantity calculation     │\n│  - Yield variant selection  │\n│  - Staff assignment         │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  Ingredient Allocation      │ (Inventory Management Module)\n│  - Availability check       │\n│  - Ingredient reservation   │\n│  - Lot number tracking      │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  Production Execution       │\n│  - Batch start             │\n│  - Step completion         │\n│  - Quality checkpoints     │\n│  - Timing and temp tracking│\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  Quality Control            │\n│  - Visual inspection       │\n│  - Taste test              │\n│  - Temperature check       │\n│  - Portion verification    │\n│  - Chef approval           │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  Fractional Conversion      │ (Optional)\n│  - Yield variant selection  │\n│  - Portioning execution     │\n│  - Quality grade assignment │\n│  - Conversion tracking      │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  Inventory Update           │ (Inventory Management Module)\n│  - Stock deduction          │\n│  - Finished goods addition  │\n│  - Fractional stock update  │\n│  - Waste recording          │\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  POS Integration            │ (Store Operations/POS)\n│  - Menu availability update │\n│  - Fractional sales tracking│\n└──────────┬──────────────────┘\n           │\n           ▼\n┌─────────────────────────────┐\n│  Financial Reporting        │ (Finance Module)\n│  - Cost accounting          │\n│  - Margin analysis          │\n│  - Profitability reporting  │\n└─────────────────────────────┘\n```\n\n### Component Integration\n\n**Frontend Components** (React + TypeScript):\n- `/app/(main)/production/`\n  - `page.tsx` - Production dashboard (149 lines, implemented)\n  - `planning/` - Production planning UI (pending)\n  - `monitoring/` - Real-time monitoring UI (partial)\n  - `fractional/` - Fractional production UI (pending)\n  - `quality/` - Quality control UI (pending)\n  - `waste/` - Waste tracking UI (pending)\n  - `equipment/` - Equipment management UI (pending)\n  - `analysis/` - Production analytics UI (pending)\n\n**Backend Services** (Next.js API Routes):\n- `/app/api/v1/production/` (to be implemented)\n  - Production order endpoints (CRUD, scheduling)\n  - Batch management endpoints (create, start, complete, quality)\n  - Fractional conversion endpoints (6 conversion types)\n  - Quality control endpoints (checkpoints, testing, approval)\n  - Waste tracking endpoints (recording, analysis, reporting)\n  - Equipment endpoints (scheduling, maintenance, utilization)\n  - Analytics endpoints (recipe metrics, profitability, staff performance)\n\n**Database** (PostgreSQL):\n- Production-related tables (to be created)\n- Fractional inventory tables (designed in type system)\n- Quality control tables (designed in type system)\n- Waste tracking tables (to be designed)\n- Equipment management tables (to be designed)\n\n**TypeScript Types** (`/lib/types/`):\n- `recipe.ts` - RecipeProductionBatch, QualityCheck, RecipeMetrics (implemented, 486 lines)\n- `fractional-inventory.ts` - FractionalStock, ConversionRecord, ConversionRecommendation (implemented, 374 lines)\n- Additional production types (to be created for equipment, waste)\n\n---\n\n## API Integration\n\n**Base URL**: `/api/v1/production`\n\n**Endpoint Categories** (to be implemented):\n\n1. **Production Orders** (7 endpoints)\n   - Create production order\n   - Get production order\n   - List production orders\n   - Update production order\n   - Delete production order\n   - Schedule production order\n   - Bulk production order operations\n\n2. **Batch Management** (8 endpoints)\n   - Start batch production\n   - Update batch status\n   - Complete batch production\n   - Record quality check\n   - Approve batch\n   - Reject batch with reason\n   - Get batch details\n   - Get batch history\n\n3. **Fractional Production** (6 endpoints)\n   - Get fractional inventory\n   - Execute conversion (6 types: SPLIT, COMBINE, PREPARE, PORTION, CONSUME, WASTE)\n   - Get conversion recommendations\n   - Accept conversion recommendation\n   - Get conversion history\n   - Get fractional metrics\n\n4. **Quality Control** (6 endpoints)\n   - Get quality checkpoints\n   - Record quality check\n   - Batch quality approval\n   - Non-conformance report\n   - Get quality metrics\n   - Get quality trends\n\n5. **Waste Management** (5 endpoints)\n   - Record waste event\n   - Get waste dashboard\n   - Get yield variance analysis\n   - Get sustainability reports\n   - Get waste trends\n\n6. **Equipment Management** (7 endpoints)\n   - Get equipment schedule\n   - Update equipment availability\n   - Record downtime event\n   - Get utilization metrics\n   - Get maintenance schedule\n   - Get energy consumption\n   - Get equipment analytics\n\n7. **Production Analytics** (6 endpoints)\n   - Get recipe performance metrics\n   - Get profitability analysis\n   - Get staff performance\n   - Get production trends\n   - Get cost variance analysis\n   - Get efficiency metrics\n\n**Total Estimated Endpoints**: 45+ endpoints\n\n---\n\n## Future Enhancements\n\n### Phase 1: Core Implementation (Months 1-3)\n- Production order creation and scheduling system\n- Real-time production dashboard with progress tracking\n- Basic quality control checkpoint management\n- Integration with recipe management and inventory systems\n- Mobile-friendly production status updates\n\n### Phase 2: Fractional Sales & Analytics (Months 4-6)\n- Fractional sales production management (pizza slices, cake portions)\n- Yield variant tracking and optimization\n- Advanced production analytics and reporting\n- Waste tracking and analysis capabilities\n- Equipment utilization monitoring\n\n### Phase 3: Quality & Advanced Features (Months 7-9)\n- Comprehensive batch tracking and traceability\n- Advanced quality control workflows\n- AI-driven conversion recommendations\n- Supplier quality integration\n- Automated quality alerts and escalations\n- Predictive maintenance for equipment\n\n### Phase 4: Integration & Optimization (Months 10-12)\n- POS integration for real-time demand-based production\n- Financial system integration for cost accounting\n- Multi-location production coordination\n- Advanced forecasting with machine learning\n- Mobile app for production staff\n- Voice-activated production updates\n- Wearable device integration for hands-free operation\n\n---\n\n**Documentation Status**: ✅ Complete\n**Total Documentation Lines**: 1,300+ lines (README + Sitemap)\n**TypeScript Interfaces**: 100% complete (2 major systems: RecipeProductionBatch, FractionalInventory)\n**Implementation Status**: Dashboard prototype complete, comprehensive design ready for full implementation\n**Integration Priority**: Recipe Management (phase 1), Inventory Management (phase 1), POS integration (phase 2)\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

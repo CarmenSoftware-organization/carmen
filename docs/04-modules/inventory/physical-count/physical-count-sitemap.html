@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Count Module - Site Map - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Inventory / Physical Count</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Physical Count Module - Site Map\n\n## Main Site Map Flow\n\n```mermaid\ngraph TD\n    A[Main Inventory Management] --> B[Physical Count Dashboard]\n    A --> C[Physical Count Management]\n    A --> D[Physical Count Creation Wizard]\n\n    B --> B1[Statistics Overview]\n    B --> B2[Activity Charts]\n    B --> B3[Recent Counts]\n    B --> B4[All Counts Table]\n    B --> D\n\n    C --> C1[List/Grid View Toggle]\n    C --> C2[Search & Filters]\n    C --> C3[Count Management Actions]\n    C --> C4[New Count Modal]\n    C --> C5[Count Detail Modal]\n\n    D --> D1[Step 1: Setup]\n    D --> D2[Step 2: Location Selection]\n    D --> D3[Step 3: Item Review]\n    D --> D4[Step 4: Final Review]\n\n    D1 --> D2\n    D2 --> D3\n    D3 --> D4\n    D4 --> E[Active Count Interface]\n\n    E --> E1[Count Header Controls]\n    E --> E2[Location Navigation Bar]\n    E --> E3[Item Counting Interface]\n    E --> E4[Progress Tracking Panel]\n\n    E1 --> F[Count Completion]\n    F --> G[Inventory Adjustments]\n    F --> H[Reports & Analytics]\n\n    C4 --> I[New Count Form]\n    I --> J[Count Created]\n    J --> C\n\n    C5 --> K[Count Detail Form]\n    K --> L[Count Updated]\n    L --> C\n```\n\n## Detailed Page Navigation Flow\n\n```mermaid\ngraph LR\n    subgraph \"Physical Count Creation Wizard\"\n        PCA[\"/physical-count\"]\n        PCA --> PC1[\"Step 1: Setup<br/>- Counter Name<br/>- Department<br/>- Date/Time<br/>- Notes\"]\n        PC1 --> PC2[\"Step 2: Location Selection<br/>- Multi-select locations<br/>- Location details<br/>- Validation\"]\n        PC2 --> PC3[\"Step 3: Item Review<br/>- Review items<br/>- Exclude options<br/>- Stock levels\"]\n        PC3 --> PC4[\"Step 4: Final Review<br/>- Summary<br/>- Confirmation<br/>- Submit\"]\n    end\n\n    subgraph \"Active Count Interface\"\n        PC4 --> ACI[\"/physical-count/active/[id]\"]\n        ACI --> ACH[\"Count Header<br/>- Session info<br/>- Duration<br/>- Controls\"]\n        ACI --> ACL[\"Location Bar<br/>- Location tabs<br/>- Item counts<br/>- Navigation\"]\n        ACI --> ACMI[\"Main Interface<br/>- Item list<br/>- Count inputs<br/>- Status selection\"]\n        ACI --> ACP[\"Progress Panel<br/>- Progress bar<br/>- Statistics<br/>- Completion\"]\n    end\n\n    subgraph \"Dashboard Interface\"\n        PCB[\"/physical-count/dashboard\"] --> DS[\"Statistics Cards<br/>- Total counts<br/>- In progress<br/>- Active counters<br/>- Pending review\"]\n        PCB --> DC[\"Activity Chart<br/>- Time-based view<br/>- Filtering<br/>- Visualization\"]\n        PCB --> DR[\"Recent Counts<br/>- Latest activities<br/>- Status indicators<br/>- Quick access\"]\n        PCB --> DT[\"All Counts Table<br/>- Comprehensive view<br/>- Management actions<br/>- Bulk operations\"]\n    end\n\n    subgraph \"Management Interface\"\n        PCM[\"/physical-count-management\"] --> MV[\"View Controls<br/>- List/Grid toggle<br/>- Filter options<br/>- Search functionality\"]\n        PCM --> ML[\"List View<br/>- Detailed rows<br/>- Action buttons<br/>- Status indicators\"]\n        PCM --> MG[\"Grid View<br/>- Card layout<br/>- Quick overview<br/>- Visual status\"]\n        PCM --> MM[\"Modals<br/>- New count form<br/>- Detail forms<br/>- Confirmations\"]\n    end\n```\n\n## Modal and Dialog Flow\n\n```mermaid\ngraph TD\n    subgraph \"Management Modals\"\n        NCM[New Count Modal] --> NCF[\"New Count Form<br/>- Store selection<br/>- Department<br/>- Counter assignment<br/>- Date scheduling<br/>- Notes\"]\n        NCF --> NCS[Count Created Successfully]\n        NCS --> CLOSE1[Close Modal]\n\n        CDM[Count Detail Modal] --> CDF[\"Count Detail Form<br/>- Count configuration<br/>- Item management<br/>- Status updates<br/>- Progress tracking\"]\n        CDF --> CDS[Count Updated Successfully]\n        CDS --> CLOSE2[Close Modal]\n    end\n\n    subgraph \"Confirmation Dialogs\"\n        DEL[Delete Count] --> DCONF[\"Delete Confirmation<br/>- Confirm action<br/>- Warning message<br/>- Cancel/Proceed\"]\n        DCONF --> DELCONF[Count Deleted]\n\n        COMP[Complete Count] --> CCONF[\"Completion Confirmation<br/>- Variance summary<br/>- Final review<br/>- Submit/Cancel\"]\n        CCONF --> INVENTORY[Update Inventory]\n    end\n\n    subgraph \"Action Flows\"\n        START[Start Count] --> ACTIVE[Redirect to Active Interface]\n        PAUSE[Pause Count] --> PAUSED[Count Paused State]\n        RESUME[Resume Count] --> ACTIVE\n        SCHEDULE[Schedule Count] --> SFORM[Scheduling Form]\n        SFORM --> SCHEDULED[Count Scheduled]\n    end\n```\n\n## Data Flow and State Management\n\n```mermaid\ngraph TB\n    subgraph \"Data Sources\"\n        API[Physical Count API]\n        MOCK[Mock Data]\n        USER[User Context]\n        INV[Inventory Data]\n    end\n\n    subgraph \"State Management\"\n        FORM[Form State]\n        COUNT[Count Data]\n        FILTER[Filter State]\n        PROGRESS[Progress State]\n    end\n\n    subgraph \"Components\"\n        WIZARD[Creation Wizard]\n        DASH[Dashboard]\n        MGMT[Management]\n        ACTIVE[Active Count]\n    end\n\n    API --> COUNT\n    MOCK --> COUNT\n    USER --> FORM\n    INV --> COUNT\n\n    COUNT --> WIZARD\n    COUNT --> DASH\n    COUNT --> MGMT\n    COUNT --> ACTIVE\n\n    FORM --> WIZARD\n    FILTER --> MGMT\n    FILTER --> DASH\n    PROGRESS --> ACTIVE\n\n    WIZARD --> |Submit| API\n    ACTIVE --> |Update| API\n    MGMT --> |CRUD| API\n```\n\n## URL Structure and Routes\n\n```mermaid\ngraph LR\n    subgraph \"Route Structure\"\n        ROOT[\"/inventory-management\"]\n\n        ROOT --> PC[\"/physical-count\"]\n        ROOT --> PCD[\"/physical-count/dashboard\"]\n        ROOT --> PCM[\"/physical-count-management\"]\n        ROOT --> PCA[\"/physical-count/active/[id]\"]\n\n        PC --> |Wizard Steps| PC1[\"Step 1-4<br/>Component-based navigation\"]\n        PCD --> |Dashboard Views| PCD1[\"Statistics<br/>Charts<br/>Tables\"]\n        PCM --> |Management Views| PCM1[\"List View<br/>Grid View<br/>Modals\"]\n        PCA --> |Active Count| PCA1[\"Location-based<br/>Real-time counting\"]\n    end\n\n    subgraph \"Navigation Patterns\"\n        NAV1[Linear Wizard Flow]\n        NAV2[Tab-based Dashboard]\n        NAV3[Filter-based Management]\n        NAV4[Location-based Active]\n\n        PC1 --> NAV1\n        PCD1 --> NAV2\n        PCM1 --> NAV3\n        PCA1 --> NAV4\n    end\n```\n\n## Component Hierarchy Map\n\n```mermaid\ngraph TD\n    subgraph \"Physical Count Module Components\"\n        PC[PhysicalCountPage] --> PS[PhysicalCountSetup]\n        PC --> LS[LocationSelection]\n        PC --> IR[ItemReview]\n        PC --> FR[FinalReview]\n\n        PCD[PhysicalCountDashboard] --> CT[CountsTable]\n        PCD --> CHART[Activity Chart]\n        PCD --> STATS[Statistics Cards]\n\n        PCM[PhysicalCountManagement] --> CLI[CountListItem]\n        PCM --> CDC[CountDetailCard]\n        PCM --> NCF[NewCountForm]\n        PCM --> CDF[CountDetailForm]\n\n        PCAI[PhysicalActiveCountInterface] --> CH[CountHeader]\n        PCAI --> LB[LocationBar]\n        PCAI --> CI[CountInterface]\n        PCAI --> PP[ProgressPanel]\n    end\n\n    subgraph \"Shared UI Components\"\n        BUTTON[Button]\n        CARD[Card]\n        INPUT[Input]\n        SELECT[Select]\n        MODAL[Modal]\n        BADGE[Badge]\n        TABLE[Table]\n    end\n\n    PS --> BUTTON\n    PS --> CARD\n    PS --> INPUT\n    PS --> SELECT\n\n    LS --> BUTTON\n    LS --> CARD\n\n    IR --> TABLE\n    IR --> BUTTON\n\n    FR --> CARD\n    FR --> BUTTON\n\n    CLI --> CARD\n    CLI --> BADGE\n    CLI --> BUTTON\n\n    CDC --> CARD\n    CDC --> BADGE\n    CDC --> BUTTON\n\n    NCF --> MODAL\n    NCF --> INPUT\n    NCF --> SELECT\n\n    CDF --> MODAL\n    CDF --> INPUT\n```";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Management Module - Overview - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Vendor Management</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">VM</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Vendor Management Module - Overview\n\n## Table of Contents\n\n1. [Module Overview](#module-overview)\n2. [Submodules](#submodules)\n3. [Module-Level Components](#module-level-components)\n4. [Navigation](#navigation)\n5. [Related Documentation](#related-documentation)\n\n---\n\n## Module Overview\n\n**Module Name**: Vendor Management\n**Route**: `/vendor-management`\n**Purpose**: Comprehensive vendor relationship management, pricing, and procurement workflows\n\n### Landing Page\n**Path**: `/vendor-management`\n**File**: `app/(main)/vendor-management/page.tsx`\n\n![Landing Page](screenshots/vm-landing.png)\n*Vendor Management Landing Page - Main dashboard with module navigation*\n\n**Purpose**: Main entry point for vendor management module\n\n**Components**:\n- Module dashboard cards\n- Quick navigation tiles\n- Statistics overview\n- Recent activity feed\n\n**Quick Access Cards**:\n- Manage Vendors\n- Templates\n- Campaigns\n- Pricelists\n- Vendor Portal Demo\n\n### Action Flows\n\n**Navigate to Manage Vendors**:\n```mermaid\nflowchart LR\n    Click[\"Click Manage Vendors Card\"] --> Navigate[\"Navigate to /manage-vendors\"]\n    Navigate --> Display[\"Display Vendor List Page\"]\n```\n\n**Navigate to Templates**:\n```mermaid\nflowchart LR\n    Click[\"Click Templates Card\"] --> Navigate[\"Navigate to /templates\"]\n    Navigate --> Display[\"Display Templates List\"]\n```\n\n**Navigate to Campaigns**:\n```mermaid\nflowchart LR\n    Click[\"Click Campaigns Card\"] --> Navigate[\"Navigate to /campaigns\"]\n    Navigate --> Display[\"Display Campaigns List\"]\n```\n\n**Navigate to Pricelists**:\n```mermaid\nflowchart LR\n    Click[\"Click Pricelists Card\"] --> Navigate[\"Navigate to /pricelists\"]\n    Navigate --> Display[\"Display Pricelists List\"]\n```\n\n**Try Vendor Portal Demo**:\n```mermaid\nflowchart LR\n    Click[\"Click Try Demo Button\"] --> Navigate[\"Navigate to /vendor-portal/sample\"]\n    Navigate --> Display[\"Display Vendor Portal Interface\"]\n```\n\n---\n\n## Submodules\n\n### 1. Manage Vendors\n**Route**: `/vendor-management/manage-vendors`\n**Status**: ✅ Production\n**Purpose**: Vendor profile management, contacts, addresses, certifications\n\n**Key Features**:\n- Vendor CRUD operations\n- Contact management\n- Address management\n- Certification tracking\n- Pricelist association\n\n**Documentation**: [MANAGE-VENDORS.md](MANAGE-VENDORS.md)\n\n---\n\n### 2. Templates\n**Route**: `/vendor-management/templates`\n**Status**: 🚧 Prototype\n**Purpose**: Pricelist template creation and management\n\n**Key Features**:\n- Template creation and editing\n- Product selection\n- Custom field configuration\n- MOQ pricing structure\n- Excel template generation\n\n**Documentation**: [TEMPLATES.md](TEMPLATES.md)\n\n---\n\n### 3. Campaigns\n**Route**: `/vendor-management/campaigns`\n**Status**: 🚧 Prototype\n**Purpose**: RFP/RFQ campaign management\n\n**Key Features**:\n- Campaign creation\n- Vendor invitation\n- Response tracking\n- Email management\n- Result export\n\n**Documentation**: [CAMPAIGNS.md](CAMPAIGNS.md)\n\n---\n\n### 4. Pricelists\n**Route**: `/vendor-management/pricelists`\n**Status**: 🚧 Prototype\n**Purpose**: Vendor pricelist management and approval\n\n**Key Features**:\n- Pricelist creation and editing\n- Approval workflow\n- Bulk price updates\n- Excel import/export\n- Price comparison\n\n**Documentation**: [PRICELISTS.md](PRICELISTS.md)\n\n---\n\n### 5. Vendor Portal\n**Route**: `/vendor-management/vendor-portal`\n**Status**: 🚧 Prototype/Demo\n**Purpose**: External vendor self-service portal\n\n**Key Features**:\n- Token-based access\n- Price submission\n- Auto-save functionality\n- Template download\n- Submission tracking\n\n**Documentation**: [VENDOR-PORTAL.md](VENDOR-PORTAL.md)\n\n---\n\n## Module-Level Components\n\n### Shared Components\nAll shared UI components, modals, and utilities are documented in:\n**Documentation**: [SHARED-COMPONENTS.md](SHARED-COMPONENTS.md)\n\n### Glossary\nComplete terminology and definitions for the module:\n**Documentation**: [GLOSSARY.md](GLOSSARY.md)\n\n---\n\n## Navigation\n\n### Module Structure\n```\nvendor-management/\n├── (landing page)\n├── manage-vendors/\n│   ├── (list page)\n│   ├── new/\n│   ├── [id]/\n│   │   ├── (detail page)\n│   │   └── edit/\n│   └── vendors/[id]/edit (alt path)\n├── templates/\n│   ├── (list page)\n│   ├── new/\n│   └── [id]/edit/\n├── campaigns/\n│   ├── (list page)\n│   ├── new/\n│   └── [id]/ (detail)\n├── pricelists/\n│   ├── (list page)\n│   └── [id]/\n│       ├── edit/\n│       └── edit-new/\n└── vendor-portal/\n    └── sample/\n```\n\n### Breadcrumb Pattern\n```\nVendor Management > [Submodule] > [Page] > [Detail]\n```\n\n**Examples**:\n- `Vendor Management > Manage Vendors`\n- `Vendor Management > Manage Vendors > Vendor Detail`\n- `Vendor Management > Templates > New Template`\n- `Vendor Management > Campaigns > Campaign Detail`\n\n---\n\n## Related Documentation\n\n### Module Documentation\n- [README.md](README.md) - Module overview and features\n- [sitemap.md](sitemap.md) - Complete navigation structure with Mermaid diagrams\n- [ANALYSIS-COMPLETE.md](ANALYSIS-COMPLETE.md) - Analysis summary\n- [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md) - Executive summary\n\n### Submodule Documentation\n- [MANAGE-VENDORS.md](MANAGE-VENDORS.md) - Vendor management submodule\n- [TEMPLATES.md](TEMPLATES.md) - Templates submodule\n- [CAMPAIGNS.md](CAMPAIGNS.md) - Campaigns submodule\n- [PRICELISTS.md](PRICELISTS.md) - Pricelists submodule\n- [VENDOR-PORTAL.md](VENDOR-PORTAL.md) - Vendor portal submodule\n\n### Shared Documentation\n- [SHARED-COMPONENTS.md](SHARED-COMPONENTS.md) - Shared components, modals, dropdowns\n- [GLOSSARY.md](GLOSSARY.md) - Complete terminology reference\n\n### Technical Documentation\n- Architecture patterns\n- Data models\n- API endpoints\n- State management\n- Form validation\n\n---\n\n## Module Statistics\n\n**Total Pages**: 23+\n**Total Screenshots**: 15\n**Total Action Flows**: 84+\n**Components**: 70+\n**Modals/Dialogs**: 7\n\n**File Structure**:\n- Source files analyzed: 70+\n- Pages documented: 23\n- Modals documented: 7\n- Dropdown fields: 10+\n- Validation rules: 20+\n\n---\n\n**Last Updated**: 2025-10-02\n**Status**: Complete - Refactored into modular structure\n**Version**: 2.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

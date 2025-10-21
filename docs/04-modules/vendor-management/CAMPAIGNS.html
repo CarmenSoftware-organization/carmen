@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaigns Submodule - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Vendor Management / CAMPAIGNS.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Campaigns Submodule\n\n## Table of Contents\n\n1. [Overview](#overview)\n2. [Campaigns List Page](#campaigns-list-page)\n3. [New/Detail Campaign Pages](#newdetail-campaign-pages)\n\n---\n\n## Overview\n\n**Submodule Name**: Campaigns\n**Route**: `/vendor-management/campaigns`\n**Status**: 🚧 Prototype\n**Purpose**: RFP/RFQ campaign management for collecting vendor pricing through coordinated invitations\n\n**Key Features**:\n- Campaign creation and editing\n- Multi-vendor invitation management\n- Email template customization\n- Response tracking\n- Campaign scheduling\n- Result export and comparison\n\n---\n\n## Campaigns List Page\n\n**Path**: `/vendor-management/campaigns`\n**File**: `app/(main)/vendor-management/campaigns/page.tsx`\n\n![Campaigns List](screenshots/vm-campaigns-list.png)\n*RFP Campaigns List - Campaign management and tracking*\n\n**Status**: 🚧 Prototype\n\n### Table Columns\n- Campaign Name\n- Template Used\n- Start Date\n- End Date\n- Vendors Invited\n- Responses Received\n- Status\n- Actions\n\n### Campaign Status Options\n- Draft\n- Active\n- Completed\n- Cancelled\n\n### Actions\n- Create Campaign\n- Edit Campaign\n- View Responses\n- Send Reminders\n- Close Campaign\n- Export Results\n\n### Action Flows\n\n**Create Campaign**:\n```mermaid\nflowchart LR\n    Click[\"Click Create Campaign\"] --> Navigate[\"Navigate to New Campaign Form\"]\n    Navigate --> Display[\"Display Campaign Form\"]\n```\n\n**Edit Campaign**:\n```mermaid\nflowchart LR\n    Click[\"Click Edit Campaign\"] --> Navigate[\"Navigate to Edit Campaign Page\"]\n    Navigate --> Display[\"Display Pre-populated Form\"]\n```\n\n**View Responses**:\n```mermaid\nflowchart LR\n    Click[\"Click View Responses\"] --> Navigate[\"Navigate to Campaign Detail Page\"]\n    Navigate --> Display[\"Display Vendor Responses\"]\n```\n\n**Send Reminders**:\n```mermaid\nflowchart LR\n    Click[\"Click Send Reminders\"] --> Modal[\"Show Reminder Confirmation\"]\n    Modal --> Send[\"Send Email Reminders to Vendors\"]\n```\n\n**Close Campaign**:\n```mermaid\nflowchart LR\n    Click[\"Click Close Campaign\"] --> Modal[\"Show Close Confirmation Modal\"]\n    Modal --> Update[\"Update Campaign Status to Completed\"]\n```\n\n**Export Results**:\n```mermaid\nflowchart LR\n    Click[\"Click Export Results\"] --> Generate[\"Generate Comparison Report\"]\n    Generate --> Download[\"Download Excel File\"]\n```\n\n---\n\n## New/Detail Campaign Pages\n\n**Path**: `/vendor-management/campaigns/new` or `/vendor-management/campaigns/:id`\n**Files**:\n- `app/(main)/vendor-management/campaigns/new/page.tsx`\n- `app/(main)/vendor-management/campaigns/[id]/page.tsx`\n\n![New Campaign](screenshots/vm-campaign-new.png)\n*New Campaign Creation - Vendor selection and invitation management*\n\n### Form Sections\n\n**1. Campaign Information**\n- Campaign Name\n- Description\n- Template Selection\n- Start Date\n- End Date\n\n**2. Vendor Selection**\n- Multi-select vendor list\n- Filter by category\n- Bulk select options\n\n**3. Invitation Settings**\n- Email template\n- Send immediately or schedule\n- Reminder schedule\n\n**4. Response Tracking** (Detail view only)\n- Vendors invited\n- Responses received\n- Pending responses\n- Response deadline\n\n### Actions\n- Save Campaign\n- Send Invitations\n- Schedule Campaign\n- Cancel Campaign\n- View Vendor Responses\n- Send Reminder\n\n### Modals\n- Vendor Selection Dialog\n- Email Preview\n- Schedule Confirmation\n- Response Detail View\n\n### Action Flows\n\n**Save Campaign**:\n```mermaid\nflowchart LR\n    Click[\"Click Save Campaign\"] --> Validate[\"Validate Form\"]\n    Validate --> Create[\"Create Campaign Record\"]\n    Create --> Navigate[\"Navigate to Campaigns List\"]\n```\n\n**Send Invitations**:\n```mermaid\nflowchart LR\n    Click[\"Click Send Invitations\"] --> Modal[\"Show Email Preview Modal\"]\n    Modal --> Send[\"Send Invitations to Selected Vendors\"]\n```\n\n**Schedule Campaign**:\n```mermaid\nflowchart LR\n    Click[\"Click Schedule Campaign\"] --> Modal[\"Show Schedule Confirmation Modal\"]\n    Modal --> Schedule[\"Schedule Campaign for Future Date\"]\n```\n\n**Select Vendors**:\n```mermaid\nflowchart LR\n    Click[\"Click Select Vendors\"] --> Open[\"Open Vendor Selection Dialog\"]\n    Open --> Add[\"Add Selected Vendors to Campaign\"]\n```\n\n**Preview Email**:\n```mermaid\nflowchart LR\n    Click[\"Click Preview Email\"] --> Open[\"Open Email Preview Modal\"]\n    Open --> Display[\"Display Email Template\"]\n```\n\n**View Vendor Responses**:\n```mermaid\nflowchart LR\n    Click[\"Click View Response\"] --> Open[\"Open Response Detail Modal\"]\n    Open --> Display[\"Display Vendor Submission\"]\n```\n\n**Send Reminder**:\n```mermaid\nflowchart LR\n    Click[\"Click Send Reminder\"] --> Modal[\"Show Reminder Confirmation\"]\n    Modal --> Send[\"Send Reminder Email to Vendors\"]\n```\n\n**Template Selection**:\n```mermaid\nflowchart LR\n    Click[\"Click Template Dropdown\"] --> Open[\"Open Template Options\"]\n    Open --> Select[\"Select Template\"]\n```\n\n---\n\n**Last Updated**: 2025-10-02\n**Status**: Complete\n**Module**: Vendor Management\n**Submodule**: Campaigns\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

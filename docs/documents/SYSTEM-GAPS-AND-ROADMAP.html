@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP - System Gaps and Implementation Roadmap - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← All Modules</a>
+            <h1>SYSTEM-GAPS-AND-ROADMAP.MD</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="index.html">Module Overview</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="index.html">Documentation</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Carmen ERP - System Gaps and Implementation Roadmap\n\n> **Document Type:** Gap Analysis & Project Roadmap\n> **Last Updated:** October 9, 2025\n> **Version:** 1.0\n> **Status:** Active Planning\n\n---\n\n## 📚 Related Documentation\n\n- **[System Documentation Index](./SYSTEM-DOCUMENTATION-INDEX.md)** - Main navigation hub\n- **[System Architecture](./architecture/SYSTEM-ARCHITECTURE.md)** - Technical architecture details\n- **[Business Value & ROI](./stakeholders/BUSINESS-VALUE.md)** - Business case and ROI analysis\n- **[Documentation Catalog](./DOCUMENTATION-CATALOG.md)** - Complete asset inventory\n- **[Documentation Summary](./DOCUMENTATION-SUMMARY-REPORT.md)** - Executive summary\n\n---\n\n## 📋 Executive Summary\n\nThis document outlines the identified gaps between the current implementation and the complete system requirements, along with a prioritized roadmap for closing these gaps.\n\n### Overall Implementation Status\n\n- **Total Features Planned:** 65\n- **Features Implemented:** 46\n- **Implementation Rate:** 71%\n- **Features in Gap:** 19\n- **Critical Gaps:** 5\n- **Priority Gaps:** 7\n- **Future Enhancement Gaps:** 7\n\n---\n\n## 🔴 Critical Gaps (High Priority)\n\nThese gaps represent core functionality that should be implemented immediately for system completeness.\n\n### 1. Reporting & Analytics - Core Reports Suite\n**Priority:** Critical 🔴\n**Module:** Reporting & Analytics\n**Impact:** High - Business intelligence and decision making\n**Dependencies:** All operational modules\n\n**Description:**\nThe reporting module is minimally implemented with only consumption analytics. Core business reports are missing.\n\n**Required Reports:**\n\n#### Operational Reports\n- Daily transaction summary\n- Order fulfillment rates\n- Inventory turnover\n- Stock availability\n\n#### Financial Reports\n- Spend analysis by category\n- Budget vs. actual\n- Cost variance analysis\n- AP/AR aging\n\n#### Inventory Reports\n- Stock valuation\n- Slow-moving items\n- Stockout analysis\n- Reorder recommendations\n\n#### Vendor Performance\n- On-time delivery rates\n- Quality metrics\n- Price competitiveness\n- Vendor scorecards\n\n**Technical Scope:**\n```\nFiles to Create:\n- app/(main)/reporting-analytics/operational-reports/page.tsx\n- app/(main)/reporting-analytics/financial-reports/page.tsx\n- app/(main)/reporting-analytics/inventory-reports/page.tsx\n- app/(main)/reporting-analytics/vendor-performance/page.tsx\n- app/(main)/reporting-analytics/cost-analysis/page.tsx\n- app/(main)/reporting-analytics/sales-analysis/page.tsx\n- components/reports/ReportBuilder.tsx\n- components/reports/ReportViewer.tsx\n- components/reports/ChartComponents.tsx\n```\n\n**Estimated Effort:** 15-20 days\n**Target:** Phase 1 - Q4 2025 / Q1 2026\n\n---\n\n### 2. Product Management - Reports\n**Priority:** Medium-High 🟡\n**Module:** Product Management\n**Impact:** Medium - Analytics for product performance\n**Dependencies:** Product data, inventory transactions\n\n**Description:**\nProduct performance reporting is missing.\n\n**Required Reports:**\n- Product usage analysis\n- Product profitability\n- Product lifecycle analysis\n- ABC classification\n\n**Technical Scope:**\n```\nFiles to Create:\n- app/(main)/product-management/reports/page.tsx\n- components/product/ProductReports.tsx\n```\n\n**Estimated Effort:** 3-4 days\n**Target:** Phase 2 - Q1 2026\n\n---\n\n### 3. Finance - Budget Planning and Control\n**Priority:** Medium-High 🟡\n**Module:** Finance\n**Impact:** Medium - Financial planning and control\n**Dependencies:** Department management, cost centers\n\n**Description:**\nBudget planning functionality is required for financial management.\n\n**Required Features:**\n- Budget creation by department/cost center\n- Budget allocation and distribution\n- Budget tracking and monitoring\n- Variance analysis\n- Budget revision workflows\n\n**Technical Scope:**\n```\nFiles to Create:\n- app/(main)/finance/budget-planning-and-control/page.tsx\n- app/(main)/finance/budget-planning-and-control/[id]/page.tsx\n- app/(main)/finance/budget-planning-and-control/new/page.tsx\n- components/finance/BudgetForm.tsx\n- components/finance/BudgetTracker.tsx\n```\n\n**Estimated Effort:** 8-10 days\n**Target:** Phase 2 - Q1 2026\n\n---\n\n### 4. Operational Planning - Demand Forecasting\n**Priority:** Medium 🟡\n**Module:** Operational Planning\n**Impact:** Medium - Inventory optimization\n**Dependencies:** Recipe data, historical sales, POS integration\n\n**Description:**\nDemand forecasting for intelligent inventory planning.\n\n**Required Features:**\n- Historical demand analysis\n- Trend identification\n- Seasonal adjustment\n- Forecast generation\n- Forecast accuracy tracking\n\n**Technical Scope:**\n```\nFiles to Create:\n- app/(main)/operational-planning/demand-forecasting/page.tsx\n- components/operational-planning/ForecastDashboard.tsx\n- lib/algorithms/demand-forecasting.ts\n```\n\n**Estimated Effort:** 10-12 days\n**Target:** Phase 2 - Q1 2026\n\n---\n\n### 5. Operational Planning - Inventory Planning\n**Priority:** Medium 🟡\n**Module:** Operational Planning\n**Impact:** Medium - Automated replenishment\n**Dependencies:** Demand forecasting, supplier lead times\n\n**Description:**\nIntelligent inventory planning based on demand forecasts.\n\n**Required Features:**\n- Reorder point calculation\n- Safety stock calculation\n- Order quantity optimization\n- Supplier selection\n- Automated PR generation\n\n**Technical Scope:**\n```\nFiles to Create:\n- app/(main)/operational-planning/inventory-planning/page.tsx\n- components/operational-planning/InventoryPlanner.tsx\n- lib/algorithms/inventory-optimization.ts\n```\n\n**Estimated Effort:** 10-12 days\n**Target:** Phase 2 - Q1 2026\n\n---\n\n## 🟡 Priority Gaps (Medium Priority)\n\nThese gaps represent important functionality that should be implemented in Phase 2.\n\n### 6-9. System Administration Gaps\n\n#### 6. General Settings\n**Impact:** Medium\n**Description:** System-wide configuration settings\n**Effort:** 3-4 days\n**Target:** Phase 2\n\n#### 7. Notification Preferences\n**Impact:** Medium\n**Description:** User notification configuration\n**Effort:** 4-5 days\n**Target:** Phase 2\n\n#### 8. License Management\n**Impact:** Medium\n**Description:** User license and subscription management\n**Effort:** 5-6 days\n**Target:** Phase 2\n\n#### 9. Data Backup and Recovery\n**Impact:** High (but operational, not feature)\n**Description:** Backup configuration and restore capabilities\n**Effort:** 7-10 days\n**Target:** Phase 2\n\n---\n\n## 🟢 Future Enhancement Gaps (Low Priority)\n\nThese gaps represent nice-to-have features for future phases.\n\n### 10-13. Production Module (Entire Module)\n\n**Priority:** Low - Future Phase 🟢\n**Module:** Production\n**Impact:** Low - Not core to initial rollout\n**Status:** Planned for Phase 3\n\nThe entire Production module is currently not implemented:\n\n#### Features to Implement:\n1. **Recipe Execution**\n   - Production order creation\n   - Ingredient allocation\n   - Production tracking\n   - Yield recording\n\n2. **Batch Production**\n   - Batch planning\n   - Multi-recipe batches\n   - Batch tracking\n   - Cost allocation\n\n3. **Wastage Tracking**\n   - Production wastage recording\n   - Wastage categorization\n   - Cost impact analysis\n\n4. **Quality Control**\n   - Quality checks\n   - QC documentation\n   - Non-conformance tracking\n   - Corrective actions\n\n**Total Estimated Effort:** 25-30 days\n**Target:** Phase 3 - Q2 2026\n\n---\n\n### 14-18. Help & Support Module (Entire Module)\n\n**Priority:** Low - Post-Launch 🟢\n**Module:** Help & Support\n**Impact:** Low - Can be handled externally initially\n**Status:** Planned for Phase 3\n\nFeatures to Implement:\n1. User Manuals\n2. Video Tutorials\n3. FAQs\n4. Support Ticket System\n5. System Updates and Release Notes\n\n**Total Estimated Effort:** 15-20 days\n**Target:** Phase 3 - Post-Launch\n\n---\n\n## 📊 Gap Analysis Summary\n\n### Gaps by Module\n\n```mermaid\npie title \"Gaps by Module\"\n    \"System Administration\" : 4\n    \"Reporting & Analytics\" : 1\n    \"Production\" : 4\n    \"Help & Support\" : 5\n    \"Operational Planning\" : 2\n    \"Finance\" : 1\n    \"Product Management\" : 1\n    \"Others\" : 1\n```\n\n### Gaps by Priority\n\n```mermaid\npie title \"Gaps by Priority\"\n    \"Critical (High)\" : 5\n    \"Priority (Medium)\" : 7\n    \"Future (Low)\" : 7\n```\n\n### Implementation Effort Estimate\n\n| Priority | Total Gaps | Est. Days | Est. Weeks |\n|----------|------------|-----------|------------|\n| Critical | 5 | 46-58 | 9-12 |\n| Priority | 7 | 19-25 | 4-5 |\n| Future | 7 | 40-50 | 8-10 |\n| **TOTAL** | **19** | **105-133** | **21-27** |\n\n---\n\n## 🗺️ Implementation Roadmap\n\n### Phase 1: Critical Gaps (Q4 2025)\n**Duration:** 9-12 weeks\n**Focus:** Core system completeness\n\n```mermaid\ngantt\n    title Phase 1 - Critical Gaps Implementation\n    dateFormat  YYYY-MM-DD\n    section Reporting\n    Operational Reports       :2025-10-15, 5d\n    Financial Reports         :2025-10-22, 5d\n    Inventory Reports         :2025-10-29, 5d\n    Vendor Performance        :2025-11-05, 5d\n    section Other\n    Product Reports           :2025-11-12, 4d\n    Budget Planning           :2025-11-18, 10d\n    Demand Forecasting        :2025-11-30, 12d\n    Inventory Planning        :2025-12-14, 12d\n```\n\n#### Deliverables:\n- ✅ Core Reporting Suite (Operational, Financial, Inventory, Vendor Performance)\n- ✅ Product Reports\n- ✅ Budget Planning\n- ✅ Demand Forecasting\n- ✅ Inventory Planning\n\n---\n\n### Phase 2: Priority Gaps (Q1 2026)\n**Duration:** 4-5 weeks\n**Focus:** System Administration enhancements\n\n#### Deliverables:\n- ✅ General Settings\n- ✅ Notification Preferences\n- ✅ License Management\n- ✅ Data Backup/Recovery\n\n---\n\n### Phase 3: Future Enhancements (Q2 2026)\n**Duration:** 8-10 weeks\n**Focus:** Complete feature set\n\n#### Deliverables:\n- ✅ Production Module (Complete)\n- ✅ Help & Support Module (Complete)\n- ✅ Advanced Analytics\n- ✅ Mobile Optimization\n\n---\n\n## 🎯 Gap Closure Strategy\n\n### Prioritization Criteria\n\nGaps are prioritized based on:\n1. **Business Impact** (40%)\n2. **User Demand** (25%)\n3. **Technical Dependencies** (20%)\n4. **Implementation Complexity** (15%)\n\n### Resource Allocation\n\n| Phase | Team Size | Duration | Focus Areas |\n|-------|-----------|----------|-------------|\n| Phase 1 | 3-4 developers | 14-17 weeks | System Admin, Reporting |\n| Phase 2 | 2-3 developers | 9-12 weeks | Planning, Configuration |\n| Phase 3 | 2-3 developers | 8-10 weeks | Production, Support |\n\n---\n\n## 📈 Success Metrics\n\n### Phase 1 Success Criteria\n- ✅ All critical gaps closed\n- ✅ Core reporting suite available (Operational, Financial, Inventory, Vendor)\n- ✅ Advanced planning features operational (Demand Forecasting, Inventory Planning)\n- ✅ Budget planning and control implemented\n- ✅ 92%+ system implementation rate\n\n### Phase 2 Success Criteria\n- ✅ All priority gaps closed\n- ✅ System administration enhancements complete\n- ✅ System configuration complete\n- ✅ 98%+ system implementation rate\n\n### Phase 3 Success Criteria\n- ✅ All planned features implemented\n- ✅ Production module operational\n- ✅ Help system available\n- ✅ 100% system implementation rate\n\n---\n\n## 🔄 Gap Tracking Process\n\n### Monthly Reviews\n- Gap status assessment\n- Priority re-evaluation\n- Resource allocation review\n- Timeline adjustments\n\n### Stakeholder Communication\n- Monthly progress reports\n- Quarterly roadmap updates\n- Ad-hoc critical gap notifications\n\n---\n\n## 📝 Additional Implemented Features\n\nThe following features were implemented but are not in the main menu structure:\n\n### Inventory Management Extras\n- **Fractional Inventory:** `/inventory-management/fractional-inventory`\n- **Physical Count:** `/inventory-management/physical-count`\n- **Stock-In:** `/inventory-management/stock-in`\n- **Stock Card (Single):** `/inventory-management/stock-overview/stock-card`\n\n### Procurement Extras\n- **Vendor Comparison:** `/procurement/vendor-comparison`\n\n### Reporting Extras\n- **Consumption Analytics:** `/reporting-analytics/consumption-analytics`\n\n### System Administration Extras\n- **Account Code Mapping:** `/system-administration/account-code-mapping`\n\n### Vendor Management Extras\n- **Vendors (Alternate):** `/vendor-management/vendors`\n\n**Recommendation:** These features should be integrated into the main navigation menu structure.\n\n---\n\n## 📧 Gap Reporting\n\nTo report new gaps or update existing gap status:\n1. Submit via project management system\n2. Include business justification\n3. Estimate business impact\n4. Suggest priority level\n\n**Contact:** project-management@carmen-erp.com\n\n---\n\n## 📚 Related Documents\n\n- [System Documentation Index](./SYSTEM-DOCUMENTATION-INDEX.md)\n- [System Architecture](./architecture/SYSTEM-ARCHITECTURE.md)\n- [Module Specifications](./modules/README.md)\n- [Business Requirements](./carmen-erp-system-requirements-documentation.md)\n\n---\n\n## 📜 Version History\n\n| Version | Date | Changes | Author |\n|---------|------|---------|--------|\n| 1.0 | 2025-10-09 | Initial gap analysis and roadmap | Documentation Team |\n\n---\n\n**Last Updated:** October 9, 2025\n**Next Review:** November 1, 2025\n**Review Frequency:** Monthly\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

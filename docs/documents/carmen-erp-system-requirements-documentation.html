@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP System - Complete System Requirements & Documentation - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← All Modules</a>
+            <h1>CARMEN-ERP-SYSTEM-REQUIREMENTS-DOCUMENTATION.MD</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="index.html">Module Overview</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="index.html">Documentation</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Carmen ERP System - Complete System Requirements & Documentation\n\n## System Overview\n\nCarmen is a comprehensive hospitality-focused Enterprise Resource Planning (ERP) system designed for hotels, restaurants, and hospitality operations. The system manages procurement, inventory, vendor relationships, operational planning, and financial operations through a unified web-based platform.\n\n**Vision**: A complete end-to-end hospitality management system that streamlines operations from procurement to service delivery, with intelligent automation, real-time analytics, and seamless integration across all hotel departments.\n\n---\n\n## 1. Authentication & User Management\n\n### Current Implementation\nThe system uses a mock authentication system for prototype development with no real authentication or session management.\n\n### Features Implemented\n- **Simple User Context**: Mock user authentication system (`lib/context/simple-user-context.tsx`)\n- **User Switching**: Ability to switch between different mock users for testing\n- **Role System**: Mock roles including staff, manager, financial-manager, purchasing-staff, chef\n- **Department/Location Context**: Users can switch between departments and locations\n\n### Technical Implementation\n```typescript\n// Simple mock authentication\nconst DEFAULT_MOCK_USER = mockUsers[0]\n- Mock user data from centralized mock data files\n- Client-side context provider for user state\n- No real authentication, sessions, or security\n```\n\n### Flow Diagram\n```mermaid\nsequenceDiagram\n    participant User\n    participant AuthSystem\n    participant UserContext\n    participant PermissionEngine\n    participant Application\n\n    User->>AuthSystem: Login credentials + MFA\n    AuthSystem->>AuthSystem: Validate credentials & MFA\n    AuthSystem->>PermissionEngine: Load user roles & permissions\n    PermissionEngine->>UserContext: Create secure user session\n    UserContext->>UserContext: Initialize department & location context\n    UserContext->>Application: Grant access to authorized features\n    Application-->>User: Display personalized interface\n\n    User->>UserContext: Switch department/role\n    UserContext->>PermissionEngine: Validate switch permissions\n    PermissionEngine->>UserContext: Update active context\n    UserContext->>Application: Refresh feature access\n    Application-->>User: Update interface permissions\n```\n\n### Limitations\n- No real authentication system\n- No password validation\n- No session management\n- All authentication is mocked for development\n\n---\n\n## 2. Dashboard & Analytics\n\n### Current Implementation\nThe dashboard displays static mock data with basic charts and tables showing hospitality metrics.\n\n### Features Implemented\n\n#### Dashboard Cards (`dashboard-cards.tsx`)\n- **Total Orders**: Hardcoded value of 1,234\n- **Active Suppliers**: Hardcoded value of 89\n- **Inventory Value**: Hardcoded value of $45,231\n- **Monthly Spend**: Hardcoded value of $89,432\n\n#### Dashboard Charts (`dashboard-chart.tsx`)\n- **Order Trends Chart**: Area chart showing mock monthly order data\n- **Spend Analysis Chart**: Bar chart displaying mock procurement spend\n- **Supplier Network Growth**: Line chart with mock supplier and order correlation\n\n#### Recent Activities Table (`dashboard-data-table.tsx`)\n- Displays 6 hardcoded activity records\n- Shows Purchase Requests, Purchase Orders, Goods Receipt, Stock Adjustment, Vendor Invoice, Quality Check\n- Each record has mock data for status, priority, reviewer, and date\n\n### Data Structure\n```typescript\nconst chartData = [\n  { month: \"Jan\", orders: 186, spend: 45000, suppliers: 12 },\n  { month: \"Feb\", orders: 305, spend: 52000, suppliers: 15 },\n  // ... more hardcoded monthly data\n]\n```\n\n### Flow Diagram\n```mermaid\nflowchart TD\n    A[User Accesses Dashboard] --> B[Load User Context & Preferences]\n    B --> C[Real-time Data Aggregation]\n    C --> D[Procurement Data Stream]\n    C --> E[Inventory Data Stream]\n    C --> F[Financial Data Stream]\n    C --> G[Operational Data Stream]\n\n    D --> H[KPI Calculation Engine]\n    E --> H\n    F --> H\n    G --> H\n\n    H --> I[Anomaly Detection]\n    H --> J[Trend Analysis]\n    H --> K[Predictive Modeling]\n\n    I --> L[Smart Alerts Generation]\n    J --> M[Interactive Charts & Visualizations]\n    K --> N[Forecasting & Recommendations]\n\n    L --> O[Personalized Dashboard Display]\n    M --> O\n    N --> O\n\n    O --> P[User Interaction & Drill-down]\n    P --> Q[Detailed Analysis & Actions]\n```\n\n### Limitations\n- All data is hardcoded/static\n- No real-time data fetching\n- No dynamic calculations or aggregations\n- Charts display mock trends only\n\n---\n\n## 3. Procurement Management\n\n### Current Implementation\nBasic procurement interface with mock purchase request data and list views.\n\n### Features Implemented\n\n#### Purchase Requests List (`ModernPurchaseRequestList.tsx`)\n- **List View**: Table and card view modes for purchase requests\n- **Mock Data**: Uses `mockPRListData.ts` with sample purchase request records\n- **View Modes**: Toggle between table and card display\n- **Selection**: Multi-select functionality for purchase requests\n- **Actions**: Placeholder buttons for create, download, print (non-functional)\n\n#### Purchase Request Data\n- Sample purchase requests with realistic hospitality data\n- Fields: ID, reference number, requestor, status, workflow stage, estimated total\n- Workflow statuses: pending, approved, completed\n- Request types: General Purchase, Emergency, Capital Expenditure\n\n### Data Structure\n```typescript\nexport const mockPRListData: PurchaseRequest[] = [\n  {\n    id: 'pr-2024-001',\n    refNumber: 'PR-2024-001',\n    description: 'Kitchen Equipment and Food Supplies for Grand Ballroom Event',\n    requestor: { name: 'Chef Maria Rodriguez', department: 'Food & Beverage' },\n    status: DocumentStatus.Completed,\n    estimatedTotal: 15750.00,\n    // ... more mock fields\n  }\n]\n```\n\n### Flow Diagram\n```mermaid\nstateDiagram-v2\n    [*] --> Draft_Request\n    Draft_Request --> Submitted : Submit with Approvers\n    Submitted --> Department_Review : Auto Route by Rules\n    Department_Review --> Manager_Approval : Department Head Approves\n    Department_Review --> Purchasing_Review : Direct to Procurement\n    Manager_Approval --> Purchasing_Review : Escalate by Value\n\n    Purchasing_Review --> Vendor_Selection : Approve for Sourcing\n    Vendor_Selection --> RFQ_Process : Multiple Vendors\n    Vendor_Selection --> Direct_Order : Preferred Vendor\n\n    RFQ_Process --> Quote_Evaluation : Receive Proposals\n    Quote_Evaluation --> Vendor_Selection : Select Best Quote\n\n    Direct_Order --> Purchase_Order : Generate PO\n    Purchase_Order --> Order_Tracking : Monitor Delivery\n    Order_Tracking --> Goods_Receipt : Delivery Received\n\n    Goods_Receipt --> Quality_Check : Inspection Process\n    Quality_Check --> Receipt_Complete : Accept Goods\n    Quality_Check --> Discrepancy_Handling : Quality Issues\n\n    Discrepancy_Handling --> Vendor_Resolution : Work with Vendor\n    Vendor_Resolution --> Receipt_Complete : Resolved\n    Vendor_Resolution --> Return_Process : Return Goods\n\n    Receipt_Complete --> Invoice_Matching : 3-Way Match\n    Invoice_Matching --> Payment_Processing : Approved for Payment\n    Payment_Processing --> [*] : Transaction Complete\n\n    Purchasing_Review --> Rejected : Reject Request\n    Department_Review --> Rejected : Decline\n    Rejected --> [*] : Process Ends\n```\n\n### Limitations\n- No create/edit functionality\n- No approval workflow implementation\n- No integration with vendor or inventory systems\n- All data is static mock data\n\n---\n\n## 4. Vendor Management\n\n### Current Implementation\nMulti-module vendor management system with working features and prototype demonstrations.\n\n### Features Implemented\n\n#### Vendor Management Dashboard (`page.tsx`)\n- **Quick Stats**: Total vendors (25), active contracts (18), price updates (45), pending approvals (3)\n- **Module Navigation**: Links to different vendor management sections\n- **Development Status**: Clear indication of what's implemented vs. prototype\n\n#### Module Structure\n1. **Manage Vendors**: ✅ Fully implemented (links to `/vendor-management/manage-vendors`)\n2. **Price Lists**: ✅ Implemented (links to `/vendor-management/pricelists`)\n3. **Pricelist Templates**: 🚧 UI Prototype only (marked as \"Demo Only\")\n4. **Pricing Campaigns**: 🚧 UI Prototype only (marked as \"Demo Only\")\n5. **Analytics & Reports**: ❌ Coming Soon (disabled button)\n\n### Implementation Status\n```typescript\n// Actual implementation markers in the code\n<Badge className=\"bg-orange-100 text-orange-700\">Prototype</Badge>\n<Badge variant=\"outline\" className=\"text-orange-600 border-orange-200\">Demo Only</Badge>\n<Button variant=\"outline\" size=\"sm\" disabled>Coming Soon</Button>\n```\n\n### Prototype Features\n- Pricelist template management UI (no backend functionality)\n- Pricing campaign management UI (no backend functionality)\n- Vendor portal demo interface\n\n### Flow Diagram\n```mermaid\ngraph TD\n    A[Vendor Application] --> B[Initial Screening]\n    B --> C[Document Collection]\n    C --> D[Verification Process]\n    D --> E[Credit & Reference Check]\n    E --> F{Qualification Met?}\n\n    F -->|Yes| G[Approved Vendor]\n    F -->|No| H[Rejected/Conditional]\n\n    G --> I[Contract Negotiation]\n    I --> J[Contract Execution]\n    J --> K[Active Vendor Status]\n\n    K --> L[Performance Monitoring]\n    L --> M[Quarterly Review]\n    M --> N[Scorecard Generation]\n\n    N --> O{Performance Acceptable?}\n    O -->|Yes| P[Maintain Status]\n    O -->|No| Q[Improvement Plan]\n\n    Q --> R[Performance Monitoring Period]\n    R --> S{Improved?}\n    S -->|Yes| P\n    S -->|No| T[Probation/Termination]\n\n    P --> L\n\n    U[Certification Monitoring] --> V[Expiry Alerts]\n    V --> W[Renewal Process]\n    W --> X[Compliance Verification]\n\n    Y[Risk Assessment] --> Z[Financial Monitoring]\n    Z --> AA[Risk Score Update]\n    AA --> BB{High Risk?}\n    BB -->|Yes| CC[Risk Mitigation]\n    BB -->|No| DD[Continue Monitoring]\n```\n\n### Limitations\n- Price management features are UI prototypes only\n- No real data integration for pricing\n- Analytics module not implemented\n- Templates and campaigns are demonstration interfaces only\n\n---\n\n## 5. System Navigation\n\n### Current Implementation\nMulti-level sidebar navigation system with responsive design and collapsible sections.\n\n### Features Implemented\n\n#### Sidebar Navigation (`sidebar.tsx`)\n- **Multi-level Menu**: Supports up to 3 levels of nesting\n- **Responsive Design**: Collapsible sidebar with mobile sheet overlay\n- **Dynamic Icons**: Uses Lucide React icons throughout\n- **Active State**: Highlights current page/section\n\n#### Available Modules\nBased on existing page files:\n- Dashboard\n- Procurement\n- Inventory Management\n- Vendor Management\n- Product Management\n- Operational Planning\n- Production\n- Store Operations\n- Finance\n- Reporting & Analytics\n- System Administration\n- Help & Support\n- Style Guide\n\n### Navigation Structure\n```typescript\ninterface MenuItem {\n  title: string;\n  path: string;\n  icon: string;\n  subItems: Array<SubMenuItem>;\n}\n```\n\n### Navigation Flow Diagram\n```mermaid\nflowchart TD\n    A[App Loads] --> B[SidebarProvider Initializes]\n    B --> C[Load Navigation Menu Structure]\n\n    C --> D[Main Menu Items]\n    D --> E[Dashboard - Working]\n    D --> F[Procurement - Partial]\n    D --> G[Inventory Management - Unknown]\n    D --> H[Vendor Management - Working]\n    D --> I[Product Management - Unknown]\n    D --> J[Other Modules - Various]\n\n    K[User Clicks Menu Item] --> L{Has Submenu?}\n    L -->|Yes| M[Expand Submenu]\n    L -->|No| N[Navigate to Page]\n\n    M --> O[Show Sub-items]\n    O --> P[User Clicks Sub-item]\n    P --> N\n\n    N --> Q{Page Exists?}\n    Q -->|Yes| R[Load Page Content]\n    Q -->|No| S[Empty/Placeholder Page]\n\n    T[Mobile View] --> U[Sidebar Collapses]\n    U --> V[Sheet Overlay Mode]\n    V --> W[Touch-friendly Navigation]\n\n    X[Desktop View] --> Y[Persistent Sidebar]\n    Y --> Z[Multi-level Expansion]\n```\n\n### Limitations\n- Many module pages are placeholder/empty implementations\n- Navigation structure exists but content varies by module\n- Some modules are fully implemented, others are basic stubs\n\n---\n\n## 6. User Interface System\n\n### Current Implementation\nConsistent UI component system based on Tailwind CSS and Shadcn/ui components.\n\n### Components Implemented\n- **Cards**: Used throughout for metric display and module navigation\n- **Tables**: Data tables with sorting, filtering, selection capabilities\n- **Charts**: Area, bar, and line charts using Recharts library\n- **Forms**: React Hook Form integration with Zod validation\n- **Navigation**: Sidebar, dropdown menus, breadcrumbs\n- **Badges**: Status indicators, labels, categories\n- **Buttons**: Various sizes, variants, and states\n\n### Design System\n- **Typography**: Consistent font sizing and hierarchy\n- **Colors**: Tailwind CSS color palette with semantic usage\n- **Spacing**: Consistent padding and margin patterns\n- **Icons**: Lucide React icon library throughout\n- **Responsive**: Mobile-first design approach\n\n### Limitations\n- No comprehensive design system documentation\n- Some components are basic implementations\n- Limited accessibility testing and compliance\n\n---\n\n## 7. Data Architecture\n\n### Current Implementation\nMock data system with TypeScript types and centralized data management.\n\n### Type System (`lib/types/`)\n- **Centralized Types**: All interfaces defined in `lib/types/` barrel exports\n- **Domain Types**: User, Vendor, PurchaseRequest, Inventory, Product, Recipe, Finance\n- **Common Types**: Money, DocumentStatus, WorkflowStatus, Currency\n- **Type Guards**: Runtime validation functions\n- **Converters**: Data transformation utilities\n\n### Mock Data System (`lib/mock-data/`)\n- **Centralized Mock Data**: All sample data in `lib/mock-data/`\n- **Factory Functions**: Functions to create mock entities with overrides\n- **Realistic Data**: Mock data reflects actual hospitality scenarios\n- **Data Consistency**: Cross-referenced mock data between modules\n\n### Data Structure Example\n```typescript\n// Type definition\nexport interface PurchaseRequest {\n  id: string;\n  refNumber: string;\n  requestor: User;\n  status: DocumentStatus;\n  estimatedTotal: number;\n  // ... additional fields\n}\n\n// Mock data usage\nimport { mockPRListData } from '@/lib/mock-data'\nconst displayData = useMemo(() => mockPRListData, [])\n```\n\n### Data Flow Diagram\n```mermaid\nflowchart TD\n    A[Application Starts] --> B[Import Type Definitions]\n    B --> C[lib/types/index.ts - Barrel Exports]\n\n    C --> D[Domain-Specific Types]\n    D --> E[User, Vendor, PurchaseRequest]\n    D --> F[Inventory, Product, Recipe]\n    D --> G[Finance, Common Types]\n\n    H[Component Needs Data] --> I[Import from lib/mock-data]\n    I --> J[Centralized Mock Data Files]\n\n    J --> K[mockUsers, mockVendors]\n    J --> L[mockPRListData, mockInventory]\n    J --> M[Factory Functions Available]\n\n    N[Runtime Usage] --> O[Component Uses Mock Data]\n    O --> P[Display in UI Components]\n\n    Q[Type Safety] --> R[TypeScript Validation]\n    R --> S[Compile-time Checking]\n\n    T[No Persistence] --> U[Client-side State Only]\n    U --> V[Page Refresh = Data Reset]\n\n    W[Type Guards Available] --> X[Runtime Type Validation]\n    X --> Y[isUser and isPurchaseRequest functions]\n\n    Z[Converters Available] --> AA[Data Transformation]\n    AA --> BB[formatMoney and convertTypes functions]\n```\n\n### Limitations\n- No real database integration\n- All data persistence is client-side only\n- No data validation at runtime\n- Mock data doesn't reflect real business complexity\n\n---\n\n## Technical Architecture\n\n### Frontend Technology Stack\n- **Framework**: Next.js 14 with App Router\n- **Language**: TypeScript with strict mode\n- **Styling**: Tailwind CSS + Shadcn/ui components\n- **State Management**: Zustand for global state, React Query for server state\n- **Form Handling**: React Hook Form with Zod validation\n- **Charts**: Recharts library for data visualization\n- **Icons**: Lucide React icon system\n\n### Project Structure\n```\napp/(main)/              # Main application routes\n  dashboard/            # ✅ Fully implemented with mock data\n  procurement/         # ✅ Basic list views implemented\n  vendor-management/   # ✅ Mixed: working features + prototypes\n  [other-modules]/     # ❓ Various implementation levels\ncomponents/ui/          # ✅ Shadcn/ui component library\nlib/\n  types/               # ✅ Centralized TypeScript definitions\n  mock-data/          # ✅ Centralized mock data system\n  context/            # ✅ User context and state management\n```\n\n### Development Environment\n- **Node.js**: v20.14.0\n- **Package Manager**: npm v10.7.0\n- **Build System**: Next.js built-in build system\n- **Development Server**: Next.js dev server on port 3003\n\n---\n\n## Implementation Status Summary\n\n### ✅ Fully Implemented\n- **Dashboard**: Working interface with mock data and charts\n- **Basic Navigation**: Multi-level sidebar with responsive design\n- **User Context**: Mock authentication and role switching\n- **UI Components**: Consistent component library\n- **Type System**: Comprehensive TypeScript definitions\n- **Mock Data**: Realistic sample data across domains\n\n### 🚧 Partially Implemented\n- **Procurement**: List views work, but no CRUD operations\n- **Vendor Management**: Core features work, price management is prototype only\n\n### ❌ Not Implemented\n- **Real Authentication**: All authentication is mocked\n- **Data Persistence**: No database or API integration\n- **Business Logic**: No real workflow or calculation engines\n- **Advanced Features**: Most modules are basic stubs or placeholders\n\n### 🎨 UI Prototypes Only\n- **Pricelist Templates**: Visual interface with no functionality\n- **Pricing Campaigns**: Demo screens with mock interactions\n- **Advanced Analytics**: UI mockups planned but not built\n\n---\n\nThis documentation reflects the actual state of the Carmen ERP prototype as implemented in the source code. The system provides a solid foundation for hospitality ERP functionality with working user interfaces, consistent design patterns, and extensible architecture, but currently operates entirely on mock data without real business logic implementation.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

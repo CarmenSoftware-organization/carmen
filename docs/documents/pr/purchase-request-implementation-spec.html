@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Module - Implementation Specification - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Purchase Requests</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PR</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Purchase Request Module - Implementation Specification\n\n## Implementation Overview\n\n**Document Type**: Technical Implementation Specification\n**Module**: Purchase Request Management System\n**Implementation Phase**: MVP Development\n**Target Completion**: Q1 2024\n\nThis document provides detailed implementation guidance for developers building the Purchase Request module, focusing on architectural patterns, design decisions, implementation strategies, and best practices. Rather than providing specific code examples, this specification emphasizes the reasoning behind technical decisions, implementation patterns, and strategic approaches that ensure scalable, maintainable, and performant software delivery.\n\n## Visual System Reference\n\n### Purchase Request List Implementation\n![Purchase Request List View](../../assets/screenshots/purchase-requests-list-view.png)\n\n*Reference implementation showing data table patterns, filtering controls, status indicators, and responsive design principles used throughout the system.*\n\n### Purchase Request Detail Implementation\n![Purchase Request Detail View](../../assets/screenshots/purchase-request-detail-working.png)\n\n*Implementation example demonstrating tab-based navigation, workflow status indicators, data formatting, and interactive table components with expandable rows.*\n\n### Budget Management Implementation\n![Purchase Request Budget Tab](../../assets/screenshots/purchase-request-budgets-tab.png)\n\n*Reference for budget allocation interfaces showing color-coded status indicators, data validation feedback, and financial data presentation patterns.*\n\n## Architecture Implementation\n\n### 1. Technology Stack Implementation\n\n#### 1.1 Frontend Architecture Strategy\n\n**Framework Selection Rationale**\n- Next.js 14 with App Router provides server-side rendering capabilities and optimal performance for large-scale applications\n- React 18 enables concurrent features and improved user experience through progressive hydration\n- TypeScript ensures type safety across the entire codebase and reduces runtime errors\n\n**Styling and Component Strategy**\n- Tailwind CSS provides utility-first approach for consistent design implementation\n- shadcn/ui components offer accessible, customizable building blocks that maintain design system consistency\n- Component composition pattern ensures reusability and maintainability\n\n**Form Management Philosophy**\n- React Hook Form minimizes re-renders and provides performant form handling\n- Zod validation ensures runtime type safety and provides clear validation error messages\n- Schema-driven approach enables sharing validation logic between frontend and backend\n\n**State Management Architecture**\n- React Query handles server state with intelligent caching and background synchronization\n- Zustand manages client-side UI state with minimal boilerplate\n- Context API provides user authentication and permission state across components\n\n#### 1.2 Backend Integration Strategy\n\n**API Communication Patterns**\n- RESTful endpoints with consistent HTTP status codes and error handling\n- Request/response interceptors for authentication token management and error processing\n- Optimistic updates for immediate UI feedback with automatic rollback on failures\n\n**Authentication and Authorization Approach**\n- JWT tokens for stateless authentication with automatic refresh mechanisms\n- Role-based access control implemented at both route and component levels\n- Permission checks integrated into UI components to hide/show functionality based on user roles\n\n**Data Validation Strategy**\n- Shared validation schemas between frontend and backend ensure consistency\n- Client-side validation provides immediate feedback while server-side validation ensures data integrity\n- Progressive validation approach validates fields as users interact with forms\n\n**Error Handling Philosophy**\n- Centralized error boundaries catch and handle unexpected errors gracefully\n- User-friendly error messages with actionable recovery suggestions\n- Automatic retry mechanisms for transient network errors\n\n**Real-time Communication**\n- WebSocket integration for instant notifications and status updates\n- Polling fallback for environments where WebSockets are not supported\n- Event-driven architecture for workflow state changes and approvals\n\n### 2. File Structure Implementation Strategy\n\n#### 2.1 Directory Organization Philosophy\n\n**Route-Based Organization**\n- Next.js App Router structure with nested routes for intuitive navigation\n- Dynamic routes ([id]) for parameterized pages like detail views\n- Co-located loading and error components for enhanced user experience\n- Separate creation routes for dedicated purchase request creation workflows\n\n**Component Categorization Strategy**\n- List components handle data display, filtering, and bulk operations\n- Detail components manage individual purchase request viewing and editing\n- Form components provide reusable input handling with validation\n- Modal components offer overlay functionality for supplementary actions\n- Tab components organize complex information into digestible sections\n\n**Business Logic Organization**\n- Custom hooks encapsulate component logic and provide reusable functionality\n- Service layer abstracts API communication and business operations\n- Type definitions ensure consistency across the entire module\n- Utility functions provide pure, testable business logic\n\n#### 2.2 Component Architecture Principles\n\n**Separation of Concerns**\n- Presentation components focus solely on UI rendering\n- Container components handle state management and business logic\n- Service components manage external API communication\n- Utility components provide reusable helper functionality\n\n**Dependency Management**\n- Clear import/export patterns with barrel exports for cleaner imports\n- Dependency injection pattern for testability and flexibility\n- Interface-driven development for loose coupling between components\n- Props-based composition for maximum reusability\n\n**Performance Considerations**\n- Lazy loading for heavy components and modals\n- Code splitting at the route level for optimal bundle sizes\n- Memoization strategies for expensive calculations and rendering\n- Virtual scrolling for large data sets\n\n### 3. Component Implementation Patterns\n\n#### 3.1 Page Component Architecture\n\n**Route Component Responsibilities**\n- Parameter extraction from URL segments and query strings for dynamic routing\n- Initial data fetching using custom hooks with proper loading and error states\n- Permission checking based on user role and purchase request ownership\n- Error boundary implementation for graceful error handling\n- Mode detection for view/edit state management\n\n**State Management Strategy**\n- URL-driven state for navigation and deep linking capabilities\n- React Query for server state management with automatic caching\n- Local state for UI interactions that don't require persistence\n- Permission state derived from user context and data ownership\n\n**Error Handling Approach**\n- Nested error boundaries to catch errors at different component levels\n- Fallback UI components for various error states (network, permission, not found)\n- User-friendly error messages with actionable recovery suggestions\n- Automatic retry mechanisms for transient failures\n\n**Loading State Management**\n- Skeleton components for content areas during data fetching\n- Progressive loading for different sections of complex pages\n- Optimistic updates for immediate user feedback during mutations\n- Suspense integration for code-split components\n\n#### 3.2 Form Component Design Philosophy\n\n**Form State Management Strategy**\n- React Hook Form integration for performant form handling with minimal re-renders\n- Zod schema validation for type-safe form validation with runtime checking\n- Default value initialization based on templates or existing data for editing scenarios\n- Real-time validation feedback with debounced field validation\n\n**Validation Implementation Approach**\n- Progressive validation that validates fields as users interact with them\n- Cross-field validation for complex business rules (budget allocation matching total amounts)\n- Async validation for external dependencies (vendor verification, budget code validation)\n- Client-side validation with server-side validation as backup for data integrity\n\n**User Experience Considerations**\n- Auto-save functionality for draft purchase requests to prevent data loss\n- Dynamic form sections that appear based on user selections or data requirements\n- Intelligent field pre-population based on user history and preferences\n- Clear visual feedback for validation errors with actionable correction guidance\n\n**Data Flow Management**\n- Controlled components for form inputs with proper state synchronization\n- Optimistic updates for immediate user feedback during form submission\n- Rollback mechanisms for failed submissions with preserved user input\n- Integration with global state for user preferences and default values\n\n**Accessibility Implementation**\n- Proper ARIA labels and descriptions for screen reader compatibility\n- Keyboard navigation support for all form elements\n- Focus management for modal forms and multi-step workflows\n- High contrast support and proper color coding for validation states\n\n#### 3.3 Custom Hook Architecture\n\n**Data Fetching Hook Design**\n- Query key standardization for consistent cache management across components\n- Intelligent stale time configuration based on data volatility and user interaction patterns\n- Conditional query execution based on required parameters and user permissions\n- Background refetching strategies for keeping data fresh without disrupting user experience\n\n**Mutation Hook Strategy**\n- Optimistic update patterns for immediate UI feedback during data modifications\n- Cache invalidation strategies that maintain data consistency across related queries\n- Error handling with automatic retry for transient failures and user notification for permanent errors\n- Success callback integration for navigation and user feedback management\n\n**State Synchronization Approach**\n- Manual cache updates for predictable data changes to avoid unnecessary network requests\n- Intelligent query invalidation that only refetches affected data\n- Relationship management between related data entities (purchase requests, vendors, items)\n- Cache warming strategies for anticipated user navigation patterns\n\n**Performance Optimization Techniques**\n- Debounced queries for search and filter operations to reduce API calls\n- Pagination support with infinite scroll capabilities for large data sets\n- Selective data fetching to minimize payload sizes and improve response times\n- Background synchronization for offline-first functionality\n\n**Business Logic Integration**\n- Permission checking integrated into data fetching hooks for security\n- Role-based data filtering at the hook level for appropriate data access\n- Workflow state management with automatic status polling for real-time updates\n- Integration with notification systems for workflow events and status changes\n\n### 4. State Management Implementation Strategy\n\n#### 4.1 React Query Configuration Approach\n\n**Cache Management Philosophy**\n- Intelligent stale time configuration based on data volatility and business requirements\n- Differentiated cache times for various data types (user data vs. transactional data)\n- Strategic cache invalidation that balances data freshness with performance\n- Background refetching to keep frequently accessed data current\n\n**Error Handling and Retry Logic**\n- Conditional retry strategies based on error types and HTTP status codes\n- Exponential backoff for transient network errors to avoid overwhelming servers\n- Immediate failure for client errors (4xx) that won't resolve with retries\n- User notification integration for permanent failures requiring manual intervention\n\n**Performance Optimization Strategies**\n- Query deduplication to prevent multiple identical requests\n- Selective query invalidation to minimize unnecessary network requests\n- Intelligent prefetching for anticipated user navigation patterns\n- Memory management for large data sets with appropriate garbage collection\n\n#### 4.2 UI State Management Architecture\n\n**Client State Separation Strategy**\n- Clear separation between server state (React Query) and client UI state (Zustand)\n- Persistent UI preferences stored in local storage for user experience continuity\n- Temporary UI state for modal management and user interactions\n- Global UI state for cross-component communication and shared user preferences\n\n**State Structure Design Philosophy**\n- Flat state structure for optimal performance and predictable updates\n- Normalized state for complex nested data relationships\n- Immutable update patterns to ensure proper re-rendering and state consistency\n- Action-based state modifications for clear state transition tracking\n\n**Modal and Overlay Management**\n- Centralized modal state management for consistent user experience\n- Context-aware modal data passing for dynamic content rendering\n- Stack-based modal management for nested overlay scenarios\n- Focus management and keyboard navigation for accessibility compliance\n\n**Filter and Search State Management**\n- URL synchronization for shareable filter states and deep linking\n- Debounced filter application to balance responsiveness with performance\n- Filter history for improved user experience and quick access to common filters\n- Real-time filter feedback with loading states during data fetching\n\n**Selection and Bulk Operation State**\n- Efficient selection state management for large data sets\n- Cross-page selection persistence during pagination\n- Bulk operation state with progress tracking and error handling\n- Undo functionality for accidental bulk operations\n\n### 5. Service Layer Implementation Architecture\n\n#### 5.1 API Service Design Patterns\n\n**Service Abstraction Philosophy**\n- Clean separation between API communication logic and business components\n- Consistent interface patterns across all service modules for predictable usage\n- Error handling abstraction that provides meaningful error messages to components\n- Request/response transformation to normalize data formats between frontend and backend\n\n**HTTP Client Configuration**\n- Centralized HTTP client with request/response interceptors for consistent handling\n- Authentication token management with automatic refresh mechanisms\n- Request timeout configuration appropriate for different operation types\n- Response data normalization to ensure consistent data structures\n\n**Parameter Handling Strategy**\n- URL parameter encoding for complex filter objects and search criteria\n- Query string optimization to minimize URL length while maintaining functionality\n- Type-safe parameter validation to prevent runtime errors\n- Default parameter handling for common use cases and user preferences\n\n**CRUD Operation Patterns**\n- Standardized method signatures across all entity services for consistency\n- Partial update support for efficient data modification without full object replacement\n- Bulk operation support with progress tracking and partial failure handling\n- Optimistic locking for concurrent modification prevention\n\n**Workflow Integration Approach**\n- Dedicated workflow methods that encapsulate business logic for state transitions\n- Action validation to ensure only permitted transitions based on current state and user permissions\n- Audit trail integration for compliance and tracking requirements\n- Real-time notification triggers for workflow events and status changes\n\n#### 5.2 Workflow Engine Implementation Strategy\n\n**Business Rule Engine Design**\n- Configurable approval thresholds that can be modified without code changes\n- Multi-criteria decision making based on amount, department, urgency, and item types\n- Conditional routing logic that adapts to organizational structure changes\n- Exception handling for special cases and emergency approvals\n\n**State Transition Management**\n- Finite state machine implementation for predictable workflow progression\n- Validation rules that prevent invalid state transitions and maintain data integrity\n- Rollback capabilities for correcting workflow errors and handling disputes\n- Audit logging for compliance and tracking of all workflow decisions\n\n**Permission-Based Action Filtering**\n- Dynamic action availability based on user roles and current purchase request state\n- Context-aware permissions that consider ownership, delegation, and temporary assignments\n- Hierarchical approval chains with automatic escalation for time-sensitive requests\n- Cross-departmental approval routing for complex organizational structures\n\n**Workflow Automation Features**\n- Timer-based automatic escalation for requests that exceed approval timeframes\n- Notification triggers for stakeholders at each workflow stage transition\n- Batch approval capabilities for routine, low-value purchase requests\n- Integration with external approval systems and document management platforms\n\n**Workflow Analytics and Monitoring**\n- Performance metrics tracking for approval times and bottleneck identification\n- Workflow efficiency analysis with recommendations for process improvement\n- Exception reporting for requests that require manual intervention\n- Historical workflow data for compliance auditing and process optimization\n\n### 6. Validation Implementation Strategy\n\n#### 6.1 Schema-Driven Validation Architecture\n\n**Type-Safe Validation Philosophy**\n- Runtime type checking using Zod schemas to ensure data integrity across client and server\n- Compile-time type generation from validation schemas for consistent TypeScript types\n- Centralized validation rules that can be shared between frontend and backend systems\n- Progressive validation that provides immediate feedback during user input\n\n**Field-Level Validation Rules**\n- String field validation with appropriate length limits and format requirements\n- Numeric field validation with business-appropriate ranges and precision constraints\n- Date validation with business logic for required dates and deadline constraints\n- Enum validation for controlled vocabularies and status fields\n\n**Cross-Field Validation Logic**\n- Budget allocation validation ensuring totals match line item amounts\n- Business rule validation for organizational policies and approval thresholds\n- Dependency validation between related fields (vendor selection affects pricing)\n- Conditional validation based on user roles and request characteristics\n\n**Custom Validation Rules**\n- Regular expression patterns for reference number formats and identifiers\n- Business logic validation for workflow transitions and state changes\n- External validation for vendor codes, budget codes, and organizational references\n- Asynchronous validation for duplicate checking and external system integration\n\n**Error Message Strategy**\n- User-friendly error messages with clear guidance for correction\n- Contextual validation messages that explain business rules and requirements\n- Field-specific error highlighting with accessible color and icon indicators\n- Summary validation messages for form-level errors and complex validation failures\n\n### 7. Testing Implementation Strategy\n\n#### 7.1 Component Testing Philosophy\n\n**Testing Library Integration Approach**\n- User-centric testing that focuses on behavior rather than implementation details\n- Accessibility-driven test queries using roles, labels, and text content\n- Real user interaction simulation with proper event handling and timing\n- Mock-free testing where possible to ensure realistic component behavior\n\n**Test Environment Setup Strategy**\n- Provider wrapper patterns for context providers and query clients\n- Test-specific configuration that disables retries and other production behaviors\n- Mock data factories for consistent and maintainable test scenarios\n- Cleanup utilities to ensure test isolation and prevent state leakage\n\n**Component Testing Patterns**\n- Rendering tests that verify proper component structure and content display\n- Interaction tests that simulate user workflows and verify expected outcomes\n- Validation testing that confirms form validation rules and error handling\n- State management testing that verifies proper state updates and side effects\n\n**Assertion Strategies**\n- Behavior-focused assertions that verify user-visible outcomes\n- Accessibility assertions using screen reader compatible queries\n- Async assertion patterns with proper waiting for state changes\n- Snapshot testing for complex component structures with careful maintenance\n\n**Mock Management Philosophy**\n- Minimal mocking to preserve realistic component behavior and integration\n- Service layer mocking to isolate component logic from external dependencies\n- User event mocking that accurately simulates real user interactions\n- Time-based mocking for testing time-sensitive features and workflows\n\n#### 7.2 Custom Hook Testing Strategy\n\n**Hook Testing Methodology**\n- Isolated hook testing that focuses on hook logic without component dependencies\n- Provider pattern testing that ensures proper context integration\n- State transition testing that verifies hook behavior across different states\n- Side effect testing that confirms proper cleanup and dependency management\n\n**Mock Strategy for External Dependencies**\n- Service layer mocking to control API responses and error conditions\n- Timer mocking for testing debounced operations and time-based logic\n- Browser API mocking for local storage, network status, and other web APIs\n- React Query testing utilities for cache management and query state verification\n\n**Async Hook Testing Patterns**\n- Loading state verification during asynchronous operations\n- Success state testing with proper data transformation and caching\n- Error state testing with various error types and recovery mechanisms\n- Race condition testing for concurrent operations and request cancellation\n\n**Hook Integration Testing**\n- Multi-hook interaction testing for complex state dependencies\n- Context provider integration testing for global state management\n- Custom hook composition testing for reusable hook patterns\n- Performance testing for expensive operations and memoization effectiveness\n\n**Test Data Management**\n- Mock data factories for consistent and varied test scenarios\n- Edge case data generation for boundary testing and error conditions\n- Realistic data patterns that reflect actual usage scenarios\n- Test data versioning for maintaining consistency across test suites\n\n#### 7.3 End-to-End Testing Strategy\n\n**User Journey Testing Philosophy**\n- Complete workflow testing that simulates real user scenarios from start to finish\n- Role-based testing that verifies different user permissions and access levels\n- Cross-browser testing to ensure consistent functionality across different environments\n- Mobile and responsive testing for optimal user experience on all devices\n\n**Test Environment Management**\n- Isolated test databases with predictable data states for consistent test results\n- User authentication setup with test accounts for different roles and permissions\n- Mock external services to eliminate dependencies on third-party systems\n- Test data seeding for complex scenarios and edge cases\n\n**Page Object Model Implementation**\n- Reusable page objects that encapsulate UI interactions and element selectors\n- Component-based page objects that match the application's component architecture\n- Action-based methods that focus on user workflows rather than technical implementation\n- Assertion helpers that provide meaningful error messages and debugging information\n\n**Workflow Testing Patterns**\n- Purchase request creation workflows with various templates and configurations\n- Approval workflow testing with different approval paths and decision points\n- Bulk operation testing for efficiency and error handling verification\n- Integration testing between related modules and external systems\n\n**Visual and Accessibility Testing**\n- Screenshot comparison testing for visual regression detection\n- Accessibility testing with automated tools and manual verification\n- Performance testing for page load times and user interaction responsiveness\n- Cross-device testing for responsive design and mobile functionality\n\n**Error Scenario Testing**\n- Network failure simulation and recovery testing\n- Validation error testing with various invalid input combinations\n- Permission error testing for unauthorized access attempts\n- System error testing for graceful degradation and error recovery\n\n### 8. Performance Implementation Strategy\n\n#### 8.1 Code Splitting and Lazy Loading Architecture\n\n**Dynamic Import Strategy**\n- Route-level code splitting for optimal initial bundle size and faster page loads\n- Component-level lazy loading for heavy components that are not immediately visible\n- Modal and overlay lazy loading to defer loading until user interaction requires them\n- Feature-based code splitting for optional functionality and advanced features\n\n**Suspense Integration Patterns**\n- Loading fallback components that provide immediate visual feedback during module loading\n- Error boundary integration for graceful handling of code splitting failures\n- Progressive loading strategies that prioritize critical content over supplementary features\n- Preloading strategies for anticipated user interactions and navigation patterns\n\n**Bundle Optimization Techniques**\n- Tree shaking configuration to eliminate unused dependencies and reduce bundle size\n- Dynamic imports with proper chunk naming for better caching and debugging\n- Library splitting to leverage browser caching for stable third-party dependencies\n- Critical path optimization to ensure essential functionality loads first\n\n#### 8.2 React Performance Optimization Strategy\n\n**Component Memoization Philosophy**\n- Strategic use of React.memo for components that receive stable props and render expensive content\n- Careful consideration of memoization overhead versus actual performance benefits\n- Props comparison strategies to ensure memoization effectiveness\n- Component splitting to maximize memoization benefits for specific component sections\n\n**Hook Optimization Patterns**\n- useMemo for expensive calculations that depend on specific dependencies\n- useCallback for event handlers passed to child components to prevent unnecessary re-renders\n- Custom hook memoization for complex business logic and derived state calculations\n- Dependency array optimization to minimize unnecessary recalculations\n\n**Render Optimization Techniques**\n- Stable key props for list rendering to optimize React's reconciliation process\n- Component composition patterns that minimize prop drilling and context usage\n- State co-location to prevent unnecessary parent component re-renders\n- Virtualization for large lists and data tables to manage DOM node count\n\n**Memory Management Strategy**\n- Cleanup functions for subscriptions, timers, and event listeners to prevent memory leaks\n- Proper dependency management to avoid closure-related memory retention\n- Image and asset optimization with appropriate sizing and format selection\n- Cache management strategies that balance performance with memory usage\n\n#### 8.3 Large Data Set Optimization Strategy\n\n**Virtualization Implementation Philosophy**\n- Virtual scrolling for lists exceeding 100 items to maintain consistent DOM performance\n- Dynamic item sizing for variable content heights while maintaining smooth scrolling\n- Viewport-based rendering that only creates DOM nodes for visible items\n- Buffer zone implementation to provide smooth scrolling experience with slight content preloading\n\n**Pagination and Infinite Loading Patterns**\n- Server-side pagination with appropriate page sizes based on user interaction patterns\n- Infinite scroll implementation with intersection observer for automatic data loading\n- Search result pagination with proper state management and URL synchronization\n- Load more patterns for user-controlled data fetching with clear progress indicators\n\n**Data Fetching Optimization**\n- Background data prefetching for anticipated user navigation and interactions\n- Incremental data loading that prioritizes essential information over supplementary details\n- Query batching to reduce network requests and improve perceived performance\n- Cache-first strategies that leverage previously fetched data for immediate display\n\n**Search and Filter Performance**\n- Debounced search input to balance responsiveness with API request frequency\n- Client-side filtering for small data sets with server-side filtering for large collections\n- Filter state optimization that minimizes unnecessary data refetching\n- Search result highlighting with efficient string matching algorithms\n\n### 9. Implementation Best Practices Summary\n\n#### 9.1 Development Workflow Guidelines\n\n**Code Quality Standards**\n- TypeScript strict mode enforcement for comprehensive type safety\n- ESLint and Prettier integration for consistent code formatting and style\n- Pre-commit hooks for automated testing and quality checks\n- Code review processes that emphasize maintainability and performance\n\n**Testing Integration Strategy**\n- Test-driven development approach for critical business logic and workflows\n- Continuous integration testing with automated test execution on code changes\n- Coverage requirements that ensure adequate testing without obsessing over arbitrary metrics\n- Performance testing integration for regression detection and optimization verification\n\n**Documentation and Knowledge Sharing**\n- Inline documentation for complex business logic and algorithmic decisions\n- Component documentation with usage examples and prop specifications\n- Architecture decision records for significant technical choices and trade-offs\n- Regular knowledge sharing sessions for team alignment and continuous learning\n\n#### 9.2 Deployment and Monitoring Considerations\n\n**Performance Monitoring Implementation**\n- Real User Monitoring (RUM) integration for actual user experience measurement\n- Core Web Vitals tracking for Google search performance optimization\n- Error tracking and alerting for proactive issue identification and resolution\n- Performance budgets with automated alerts for regression prevention\n\n**Scalability Planning**\n- Database query optimization for efficient data retrieval at scale\n- CDN integration for static asset delivery and global performance optimization\n- Caching strategies at multiple levels (browser, CDN, application, database)\n- Load balancing considerations for high-availability deployment scenarios\n\n**Security Implementation Guidelines**\n- Input sanitization and validation at both client and server levels\n- HTTPS enforcement for all data transmission and API communication\n- Role-based access control implementation with principle of least privilege\n- Regular security audits and dependency vulnerability scanning\n\n---\n\nThis implementation specification provides comprehensive guidance for developers to build the Purchase Request module according to established patterns and best practices, ensuring consistency, maintainability, performance, and scalability across the entire application. The focus on explanations rather than code examples allows developers to adapt these principles to their specific implementation needs while maintaining architectural integrity.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

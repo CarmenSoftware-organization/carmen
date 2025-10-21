@@ -28,7 +28,6 @@ interface StockCardValuationProps {
 export function StockCardValuation({ data }: StockCardValuationProps) {
   const { product, valuation } = data
   
-  const [valuationMethod, setValuationMethod] = useState<string>("FIFO")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
   
@@ -94,7 +93,7 @@ export function StockCardValuation({ data }: StockCardValuationProps) {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div>
@@ -106,7 +105,7 @@ export function StockCardValuation({ data }: StockCardValuationProps) {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div>
@@ -114,25 +113,6 @@ export function StockCardValuation({ data }: StockCardValuationProps) {
               <p className="text-2xl font-bold">{formatCurrency(summary.averageCost)}</p>
               <p className="text-xs text-muted-foreground">
                 Per {product.unit}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div>
-              <p className="text-sm text-muted-foreground">Valuation Method</p>
-              <p className="text-2xl font-bold">{valuationMethod}</p>
-              <p className="text-xs text-muted-foreground">
-                <Button 
-                  variant="link" 
-                  size="sm" 
-                  className="h-auto p-0 text-xs"
-                  onClick={() => setValuationMethod(prev => prev === "FIFO" ? "WEIGHTED_AVERAGE" : "FIFO")}
-                >
-                  Switch to {valuationMethod === "FIFO" ? "Weighted Average" : "FIFO"}
-                </Button>
               </p>
             </div>
           </CardContent>

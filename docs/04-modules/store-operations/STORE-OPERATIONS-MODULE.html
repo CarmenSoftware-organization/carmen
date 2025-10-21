@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Operations Module - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Store Operations / STORE OPERATIONS MODULE.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Store Operations Module\n\n**Module**: Store Operations\n**Route**: `/store-operations`\n**Status**: ✅ Production (Store Requisitions), 🚧 Prototype (Stock Replenishment, Wastage Reporting)\n**Last Updated**: 2025-10-02\n\n## Table of Contents\n\n- [Overview](#overview)\n- [Module Sitemap](#module-sitemap)\n- [Submodules](#submodules)\n- [Key Features](#key-features)\n- [Module Statistics](#module-statistics)\n- [Related Documentation](#related-documentation)\n\n## Overview\n\nThe Store Operations module manages day-to-day store activities including store requisitions, stock replenishment, and wastage reporting. It provides comprehensive tools for tracking inventory movements between locations, managing stock levels, and monitoring wastage across all stores and operational units.\n\n**Primary Functions**:\n- Store-to-store requisition management\n- Stock replenishment tracking and alerts\n- Wastage reporting and analysis\n- Inventory movement tracking\n- Approval workflows for requisitions\n\n## Module Sitemap\n\n```mermaid\ngraph TD\n    SO[\"Store Operations Dashboard<br/>/store-operations\"]\n\n    %% Submodules\n    SR[\"Store Requisitions<br/>/store-operations/store-requisitions\"]\n    STOCK[\"Stock Replenishment<br/>/store-operations/stock-replenishment\"]\n    WASTE[\"Wastage Reporting<br/>/store-operations/wastage-reporting\"]\n\n    %% Store Requisitions Pages\n    SR_LIST[\"SR List Page<br/>/store-operations/store-requisitions\"]\n    SR_DETAIL[\"SR Detail Page<br/>/store-operations/store-requisitions/SR-XXXX-XXX\"]\n\n    %% Connections\n    SO --> SR\n    SO --> STOCK\n    SO --> WASTE\n\n    SR --> SR_LIST\n    SR_LIST --> SR_DETAIL\n\n    %% Styling\n    classDef production fill:#22c55e,stroke:#16a34a,color:#fff\n    classDef prototype fill:#f59e0b,stroke:#d97706,color:#fff\n    classDef dashboard fill:#3b82f6,stroke:#2563eb,color:#fff\n\n    class SO dashboard\n    class SR,SR_LIST,SR_DETAIL production\n    class STOCK,WASTE prototype\n```\n\n## Submodules\n\n### 1. Store Requisitions\n**Route**: `/store-operations/store-requisitions`\n**Status**: ✅ Production\n**Purpose**: Manage store-to-store material requisitions with approval workflows\n**Documentation**: [STORE-REQUISITIONS.md](STORE-REQUISITIONS.md)\n\n**Key Pages**:\n- Store Requisition List Page (with filters, search, table/card views)\n- Store Requisition Detail Page (with tabs: Items, Comments, Attachments, Activity Log, Journal Entries)\n- Approval Workflow Component\n\n**Features**:\n- Create and manage requisitions\n- Multi-level approval workflow (HOD → Store Manager)\n- Item-level approval/rejection\n- Stock movement tracking\n- Journal entry generation\n- Comments and attachments\n- Activity logging\n\n### 2. Stock Replenishment\n**Route**: `/store-operations/stock-replenishment`\n**Status**: 🚧 Prototype\n**Purpose**: Monitor and manage stock replenishment needs across stores\n**Documentation**: [STOCK-REPLENISHMENT.md](STOCK-REPLENISHMENT.md)\n\n**Key Features**:\n- Stock level monitoring\n- Low stock alerts\n- Reorder point tracking\n- Par level management\n- Automated requisition creation\n\n### 3. Wastage Reporting\n**Route**: `/store-operations/wastage-reporting`\n**Status**: 🚧 Prototype\n**Purpose**: Track and analyze wastage across all operational units\n**Documentation**: [WASTAGE-REPORTING.md](WASTAGE-REPORTING.md)\n\n**Key Features**:\n- Wastage entry recording\n- Wastage categorization (Expiration, Damage, Quality Issues, Other)\n- Monthly trend analysis\n- Wastage by reason breakdown\n- Cost impact tracking\n\n## Key Features\n\n### Store Requisition Management\n- **Requisition Workflow**: Draft → Submission → HOD Approval → Store Manager Approval → Complete\n- **Multi-Level Approvals**: Configurable approval workflow with role-based stages\n- **Item-Level Control**: Approve/reject individual items within a requisition\n- **Stock Tracking**: Real-time inventory updates upon approval\n- **Document Management**: Attach supporting documents and add comments\n\n### Stock Monitoring\n- **Real-Time Alerts**: Low stock notifications based on reorder points\n- **Par Level Management**: Maintain optimal stock levels per location\n- **Usage Tracking**: Monitor consumption patterns\n- **Automated Reordering**: Create requisitions from stock alerts\n\n### Wastage Control\n- **Reason Tracking**: Categorize wastage by cause\n- **Cost Analysis**: Calculate financial impact of wastage\n- **Trend Monitoring**: Identify wastage patterns over time\n- **Approval Process**: Review and approve wastage entries\n\n## Module Statistics\n\n### Store Requisitions (Production)\n- **Total Requisitions**: 15 sample records\n- **Status Distribution**:\n  - In Process: 40%\n  - Complete: 33%\n  - Draft: 20%\n  - Reject: 7%\n  - Void: 0%\n- **Approval Stages**: 4 (Submission, HOD, Store Manager, Complete)\n- **Average Items per Requisition**: 7 items\n\n### Stock Replenishment (Prototype)\n- **Total SKUs**: 1,234\n- **Low Stock Items**: 28\n- **Items on Order**: 45\n- **Total Stock Value**: $45,678\n\n### Wastage Reporting (Prototype)\n- **Monthly Wastage**: $3,458.50\n- **Items Written Off**: 45\n- **Pending Reviews**: 12\n- **Wastage Reasons**: 4 categories\n\n## Related Documentation\n\n### Submodule Documentation\n1. **[STORE-REQUISITIONS.md](STORE-REQUISITIONS.md)** - Complete store requisitions specification\n2. **[STOCK-REPLENISHMENT.md](STOCK-REPLENISHMENT.md)** - Stock replenishment dashboard (prototype)\n3. **[WASTAGE-REPORTING.md](WASTAGE-REPORTING.md)** - Wastage reporting dashboard (prototype)\n\n### Supporting Documentation\n- **[SHARED-COMPONENTS.md](SHARED-COMPONENTS.md)** - Reusable UI components\n- **[FEATURE-GAPS.md](FEATURE-GAPS.md)** - Incomplete features and future development\n\n### Related Modules\n- **Inventory Management** - Stock tracking and movements\n- **Procurement** - Purchase orders and vendor management\n- **Finance** - Journal entries and cost tracking\n\n---\n\n**Module Version**: 1.0.0 (Store Requisitions), 0.5.0 (Stock Replenishment, Wastage Reporting)\n**Documentation Status**: In Progress\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order Module Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Purchase Orders</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Purchase Order Module Documentation\n\nWelcome to the comprehensive documentation for the Carmen ERP Purchase Order module. This documentation provides complete technical specifications, user guides, and implementation details.\n\n## 📚 Documentation Structure\n\n### 1. [Complete Technical Specification](./purchase-order-complete-specification.md)\n**Comprehensive overview of the entire Purchase Order module**\n- Module overview and key features\n- Complete site map with Mermaid diagrams\n- Page and component documentation\n- Data flow and user interactions\n- Technical architecture details\n- API endpoints and database schema\n\n### 2. [Detailed Component Documentation](./components-detailed-documentation.md)\n**In-depth analysis of all components and their interactions**\n- Page components (List, Detail, Create)\n- Form components and validation\n- Dialog components and workflows\n- Tab components and functionality\n- Utility and data components\n- Component interaction patterns\n\n### 3. [User Interaction Guide](./user-interaction-guide.md)\n**Complete guide for user workflows and interactions**\n- Navigation and entry points\n- Primary user workflows\n- Dialog and form interactions\n- Data management features\n- Advanced functionality\n\n### 4. [API Specification](./api-specification.md)\n**Technical API documentation for developers**\n- Authentication and authorization\n- Core endpoints and operations\n- Data models and schemas\n- Error handling and responses\n- Rate limiting and webhooks\n\n## 🖼️ Screenshots & Visual Documentation\n\nAll screenshots are stored in the [`screenshots/`](./screenshots/) directory:\n\n- **purchase-orders-list-page.png** - Main PO listing interface\n- **purchase-order-detail-page.png** - Detailed PO view with Items tab\n- **purchase-order-documents-tab.png** - Documents tab showing related GRNs\n- **purchase-order-new-po-menu.png** - New PO creation dropdown menu\n\n## 🗺️ Module Site Map\n\n```mermaid\ngraph TD\n    A[Purchase Orders Landing Page] --> B[PO List View]\n    A --> C[PO Card View]\n\n    B --> D[New PO Dropdown Menu]\n    D --> E[Create Blank PO]\n    D --> F[Create from Purchase Requests]\n    D --> G[Create from Template]\n    D --> H[Create Recurring PO]\n\n    B --> I[PO Detail Page]\n    I --> J[Items Tab]\n    I --> K[Documents Tab]\n    I --> L[Activity Log Sidebar]\n\n    J --> M[Enhanced Items Table]\n    M --> N[Item Details Panel]\n    M --> O[Add Item Dialog]\n    M --> P[Edit Item Dialog]\n\n    K --> Q[Related Documents Table]\n    Q --> R[GRN Links]\n    Q --> S[Credit Note Links]\n    Q --> T[Invoice Links]\n\n    I --> U[Action Buttons]\n    U --> V[Edit Mode]\n    U --> W[Delete Dialog]\n    U --> X[Print Options]\n    U --> Y[Email Dialog]\n    U --> Z[Export Dialog]\n```\n\n## 🚀 Key Features\n\n### Purchase Order Management\n- Complete PO lifecycle management (Draft → Sent → Received → Closed)\n- Multi-currency support with real-time exchange rates\n- Integration with Purchase Requests for seamless procurement flow\n- Comprehensive item management with inventory tracking\n\n### User Interface\n- Responsive design with table and card views\n- Advanced filtering and search capabilities\n- Bulk operations and template support\n- Export and print functionality\n\n### Document Management\n- Attachment handling for PO documents\n- Integration with GRNs, invoices, and credit notes\n- Activity logging and complete audit trail\n- Email notifications and vendor communication\n\n### Technical Architecture\n- Next.js 14 with App Router\n- TypeScript with strict mode\n- Tailwind CSS + Shadcn/ui components\n- React Hook Form + Zod validation\n\n## 📁 File Structure\n\n```\ndocs/documents/po/\n├── README.md                                   # This file\n├── purchase-order-complete-specification.md   # Complete technical spec\n├── components-detailed-documentation.md       # Component documentation\n├── user-interaction-guide.md                  # User workflows\n├── api-specification.md                       # API documentation\n└── screenshots/                               # Visual documentation\n    ├── purchase-orders-list-page.png\n    ├── purchase-order-detail-page.png\n    ├── purchase-order-documents-tab.png\n    └── purchase-order-new-po-menu.png\n```\n\n## 🔗 Source Code Structure\n\n```\napp/(main)/procurement/purchase-orders/\n├── page.tsx                                   # Main listing page\n├── [id]/page.tsx                             # Detail page route\n├── [id]/edit/page.tsx                        # Edit page route\n├── create/page.tsx                           # Create page route\n├── create/from-pr/page.tsx                   # Create from PR route\n├── create/bulk/page.tsx                      # Bulk create route\n└── components/                               # Component library\n    ├── PODetailPage.tsx                      # Main detail component\n    ├── PurchaseOrdersDataTable.tsx          # Data table component\n    ├── createpofrompr.tsx                    # PR selection dialog\n    ├── TransactionSummary.tsx               # Financial summary\n    ├── purchase-orders-columns.tsx          # Table columns\n    ├── purchase-orders-card-view.tsx        # Card view component\n    └── tabs/                                # Tab components\n        ├── EnhancedItemsTab.tsx             # Items management\n        ├── RelatedDocumentsTab.tsx          # Related documents\n        ├── ActivityLogTab.tsx               # Activity log\n        └── item-details.tsx                 # Item detail forms\n```\n\n## 🎯 Primary User Workflows\n\n### 1. Create Purchase Order from Scratch\n1. Navigate to PO List → Click \"New PO\" → \"Create Blank PO\"\n2. Fill vendor and header information\n3. Add items with pricing and quantities\n4. Review financial summary\n5. Save as Draft or Send to vendor\n\n### 2. Create from Purchase Requests\n1. Click \"New PO\" → \"Create from Purchase Requests\"\n2. Select approved PRs from dialog\n3. System groups by vendor and currency\n4. Review and modify items\n5. Generate PO(s) with traceability\n\n### 3. Process Purchase Order Items\n1. Open PO Detail → Items tab\n2. Review ordered vs received quantities\n3. Process goods receipt (links to GRN)\n4. Handle partial deliveries\n5. Close completed items\n\n## 🛠️ Technical Implementation\n\n### Component Architecture\n- **PODetailPage**: Main detail interface with edit capabilities\n- **EnhancedItemsTab**: Comprehensive item management\n- **RelatedDocumentsTab**: Document integration and tracking\n- **TransactionSummary**: Real-time financial calculations\n\n### State Management\n- React useState for local state\n- URL parameters for routing context\n- LocalStorage for temporary data (PR → PO conversion)\n- Mock data integration with future API readiness\n\n### Data Flow\n```mermaid\nflowchart TD\n    A[Mock Data Store] --> B[PO List Page]\n    B --> C[PO Detail Page]\n    C --> D[Items Tab]\n    C --> E[Documents Tab]\n    C --> F[Activity Log]\n\n    D --> G[Item Management]\n    G --> H[Add/Edit/Delete Items]\n\n    E --> I[Related Documents]\n    I --> J[GRN/Invoice Links]\n\n    F --> K[Status Changes]\n    F --> L[User Actions]\n```\n\n## 📊 Database Schema Overview\n\n### Main Tables\n- **purchase_orders** - Core PO information\n- **purchase_order_items** - Line items and quantities\n- **po_activity_log** - Complete audit trail\n\n### Key Relationships\n- PO → Items (One-to-Many)\n- PO → Activity Log (One-to-Many)\n- Items → Purchase Requests (Many-to-One, optional)\n\n## 🔄 Status Workflow\n\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n    Draft --> Sent\n    Sent --> PartiallyReceived\n    Sent --> FullyReceived\n    PartiallyReceived --> FullyReceived\n    FullyReceived --> Closed\n    Draft --> Voided\n    Sent --> Cancelled\n    PartiallyReceived --> Cancelled\n    Cancelled --> [*]\n    Voided --> [*]\n    Closed --> [*]\n```\n\n## 📧 Support & Contributions\n\nFor questions, issues, or contributions to this documentation:\n\n1. **Technical Issues**: Review the component documentation and API specification\n2. **User Workflow Questions**: Consult the user interaction guide\n3. **Feature Requests**: Reference the complete technical specification\n4. **Bug Reports**: Include relevant screenshots and component details\n\n---\n\n*Documentation generated on: $(date)*\n*Module Version: 1.0*\n*Carmen ERP - Hospitality Supply Chain Management*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

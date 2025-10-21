@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature: Inventory Management System - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>SR</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">SR</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Feature: Inventory Management System\n\n## Description\nThe Carmen ERP Inventory Management System provides comprehensive inventory control through multiple specialized modules including Stock Overview, Inventory Adjustments, Physical Count Management, Spot Checks, and Period End processing. The system features real-time inventory tracking with multiple views (stock cards, inventory balance, aging analysis), sophisticated count management with variance tracking, automated stock movement recording, and integration with procurement and production processes. The inventory system supports multi-location operations with location-specific stock tracking and movement history.\n\n## Process Flow (Step by Step)\n\n### Stock Overview Management\n1. User navigates to `/inventory-management/stock-overview` to access inventory dashboard\n2. System provides multiple views: Overview, Inventory Balance, Stock Cards, Slow Moving, Inventory Aging\n3. Stock Cards view displays detailed item-level information with lot tracking and valuation\n4. Inventory Balance provides real-time stock levels with movement history\n5. System applies filters for location, category, status, and date ranges\n6. User can drill down into specific items for detailed stock card information\n7. Movement history tracks all stock transactions with source document references\n\n### Physical Count Management\n8. User accesses `/inventory-management/physical-count-management` for count operations\n9. System supports creating new counts with location, department, and counter assignment\n10. Count setup includes item selection, location assignment, and counting instructions\n11. Physical count process tracks progress with completed vs. pending items\n12. System records variances between physical count and system quantities\n13. Count completion triggers inventory adjustments and variance analysis\n14. Approval workflow manages count acceptance and adjustment posting\n\n### Spot Check Operations\n15. User initiates spot checks via `/inventory-management/spot-check` for targeted counts\n16. Spot check wizard guides through: Setup → Item Selection → Location → Counting → Review\n17. System supports random item selection or specific item targeting\n18. Quick count interface allows rapid quantity verification\n19. Variance reporting highlights discrepancies requiring investigation\n20. Integration with adjustment process for immediate corrections\n\n### Inventory Adjustments\n21. User creates adjustments via `/inventory-management/inventory-adjustments`\n22. Adjustment types include: Physical Count Variance, Damage/Loss, Transfer, Conversion\n23. System requires reason codes and approval based on adjustment value thresholds\n24. Stock movements are automatically generated with journal entry integration\n25. Audit trail maintains complete history of all adjustment transactions\n\n### Period End Processing\n26. User initiates period end via `/inventory-management/period-end`\n27. System validates all pending transactions and count completions\n28. Inventory valuation calculations using FIFO, LIFO, or weighted average methods\n29. Period closing prevents backdated transactions and locks inventory balances\n30. Reporting generates period-end inventory statements and variance summaries\n\n## Flow Diagram (Mermaid)\n```mermaid\nflowchart TD\n    A[Access Inventory Management] --> B{Operation Type?}\n\n    B -->|Stock Inquiry| C[Stock Overview]\n    C --> D[Select View Type]\n    D --> E[Stock Cards]\n    D --> F[Inventory Balance]\n    D --> G[Aging Analysis]\n    E --> H[Item Detail View]\n    F --> I[Movement History]\n    G --> J[Aging Reports]\n\n    B -->|Physical Count| K[Physical Count Management]\n    K --> L[Create New Count]\n    L --> M[Setup Count Parameters]\n    M --> N[Assign Counters]\n    N --> O[Execute Count]\n    O --> P{Variances Found?}\n    P -->|Yes| Q[Record Variances]\n    P -->|No| R[Complete Count]\n    Q --> S[Generate Adjustments]\n\n    B -->|Spot Check| T[Spot Check Operations]\n    T --> U[Setup Spot Check]\n    U --> V[Select Items/Locations]\n    V --> W[Execute Count]\n    W --> X{Quick Variance?}\n    X -->|Yes| Y[Immediate Adjustment]\n    X -->|No| Z[Complete Spot Check]\n\n    B -->|Adjustments| AA[Inventory Adjustments]\n    AA --> BB[Select Adjustment Type]\n    BB --> CC[Enter Details & Reasons]\n    CC --> DD{Requires Approval?}\n    DD -->|Yes| EE[Submit for Approval]\n    DD -->|No| FF[Post Adjustment]\n    EE --> GG{Approved?}\n    GG -->|Yes| FF\n    GG -->|No| HH[Return for Revision]\n\n    B -->|Period End| II[Period End Processing]\n    II --> JJ[Validate Transactions]\n    JJ --> KK[Calculate Valuations]\n    KK --> LL[Generate Reports]\n    LL --> MM[Close Period]\n\n    S --> NN[Update Stock Levels]\n    Y --> NN\n    FF --> NN\n    MM --> OO[Integration Points]\n    NN --> OO\n    OO --> PP[Procurement Integration]\n    OO --> QQ[Accounting Integration]\n    OO --> RR[Production Integration]\n```\n\n## Screen Capture Locations\n- Capture: Stock overview dashboard with multiple view options and filters\n- Capture: Stock card detail showing lot information, movements, and valuation\n- Capture: Physical count management list with status indicators and progress tracking\n- Capture: Count creation wizard showing location and item selection\n- Capture: Spot check interface with quick count entry forms\n- Capture: Inventory adjustment form with reason codes and approval workflow\n- Capture: Period end processing screen with validation results\n- Capture: Movement history with detailed transaction tracking\n- Capture: Variance report showing discrepancies and resolution status\n\n## Schema Entities (Plain Text)\nInventoryItem: Core inventory entity with itemId, description, category, unit, location, currentQuantity, reservedQuantity, availableQuantity, reorderLevel, maxLevel, status.\nStockMovement: Transaction record with movementId, itemId, movementType, quantity, fromLocation, toLocation, documentReference, transactionDate, userId, notes.\nPhysicalCount: Count header with countId, countDate, location, department, counter, status, itemCount, varianceCount, totalVariance, approvedBy.\nCountDetail: Individual count lines with countId, itemId, systemQuantity, countedQuantity, variance, varianceValue, reason, status.\nInventoryAdjustment: Adjustment document with adjustmentId, adjustmentType, reason, items, totalValue, approvedBy, postingDate, journalReference.\nStockCard: Item-specific tracking with itemId, location, openingBalance, receipts, issues, adjustments, closingBalance, movements, lotDetails.\n\n## Major Inventory Management Features\n\n### Stock Overview & Tracking\n- **Real-Time Balances**: Live inventory levels across all locations\n- **Stock Cards**: Detailed item history with lot tracking and FIFO/LIFO calculations\n- **Movement History**: Complete audit trail of all stock transactions\n- **Multi-Location Support**: Location-specific stock tracking and transfers\n- **Aging Analysis**: Inventory aging reports for slow-moving identification\n\n### Physical Count Management\n- **Count Planning**: Scheduled and ad-hoc count creation with assignment management\n- **Progress Tracking**: Real-time count progress with completion percentages\n- **Variance Management**: Automatic variance calculation and investigation workflows\n- **Multi-User Counts**: Parallel counting with consolidation and review processes\n- **Approval Workflow**: Count approval process with variance thresholds\n\n### Spot Check Operations\n- **Random Selection**: System-generated random item selection for spot verification\n- **Targeted Checks**: Specific item or location-focused counting\n- **Quick Interface**: Streamlined counting interface for rapid verification\n- **Immediate Corrections**: Real-time adjustment capability for minor variances\n- **Exception Reporting**: Variance alerts and investigation queues\n\n### Adjustment Management\n- **Multiple Adjustment Types**: Support for various adjustment reasons and categories\n- **Approval Workflows**: Value-based approval routing with delegation capability\n- **Batch Processing**: Bulk adjustment creation and posting functionality\n- **Journal Integration**: Automatic accounting journal entry generation\n- **Audit Compliance**: Complete audit trail with reversal capabilities\n\n### Valuation & Reporting\n- **Costing Methods**: FIFO, LIFO, weighted average, and standard costing support\n- **Valuation Reports**: Period-end inventory valuation with variance analysis\n- **Movement Analysis**: Detailed transaction reporting with drill-down capability\n- **Performance Metrics**: Inventory turnover, accuracy, and variance trending\n- **Integration Reports**: Cross-module reporting with procurement and production data\n\n## Ambiguities & Assumptions\nAssumption: Stock movements are automatically generated from procurement (GRN) and production processes.\nAssumption: Physical count variances above defined thresholds require management approval before posting.\nAmbiguity: The specific business rules for automatic reorder point calculations and purchase suggestions are not defined.\nAssumption: Multi-location inventory transfers require approval and generate automatic stock movements.\nAmbiguity: Integration timing with external systems (POS, production) for real-time inventory updates needs clarification.\nAssumption: Period-end closing prevents all backdated inventory transactions and requires special permissions to reopen.\nAssumption: Lot tracking is supported with expiry date management and FEFO (First Expired, First Out) logic.\nAmbiguity: The exact workflow for handling negative inventory situations and backorder management requires specification.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

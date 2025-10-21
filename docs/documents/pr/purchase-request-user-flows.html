@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request User Flows - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Purchase Requests</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PR</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Purchase Request User Flows\n\nThis document details all user interaction flows within the Purchase Request system, including role-based workflows, UI interactions, and business process flows.\n\n## User Role Definitions\n\n```mermaid\ngraph TD\n    subgraph \"User Roles & Responsibilities\"\n        A[\"👤 Requestor\"] --> B[\"📝 Create PRs<br/>📋 Track Status<br/>💬 Respond to Returns\"]\n        C[\"👨‍💼 Department Manager\"] --> D[\"✅ Approve Department PRs<br/>❌ Reject with Comments<br/>🔄 Return for Changes\"]\n        E[\"💰 Finance Manager\"] --> F[\"💳 Budget Validation<br/>💰 Financial Approval<br/>📊 Cost Analysis\"]\n        G[\"🛒 Purchasing Staff\"] --> H[\"🏪 Vendor Management<br/>💲 Price Negotiation<br/>📦 Order Processing\"]\n        I[\"👔 General Manager\"] --> J[\"💎 High-Value Approvals<br/>🎯 Strategic Decisions<br/>📈 Executive Oversight\"]\n    end\n```\n\n## Main User Journey Map\n\n```mermaid\njourney\n    title Purchase Request User Journey\n    section Requestor\n        Login to System          : 5: Requestor\n        Navigate to PRs          : 4: Requestor\n        Create New PR            : 3: Requestor\n        Fill Item Details        : 2: Requestor\n        Submit for Approval      : 4: Requestor\n        Wait for Response        : 3: Requestor\n        Receive Approval         : 5: Requestor\n\n    section Manager\n        Review Pending PRs       : 4: Manager\n        Open PR for Review       : 3: Manager\n        Check Budget Impact      : 2: Manager\n        Make Approval Decision   : 3: Manager\n        Add Comments if Needed   : 2: Manager\n        Submit Decision          : 4: Manager\n\n    section Finance\n        Review Financial Impact  : 3: Finance\n        Validate Budget Codes    : 2: Finance\n        Check Spending Limits    : 3: Finance\n        Approve or Escalate      : 4: Finance\n\n    section Purchasing\n        Receive Approved PRs     : 4: Purchasing\n        Contact Vendors          : 3: Purchasing\n        Negotiate Pricing        : 2: Purchasing\n        Create Purchase Orders   : 4: Purchasing\n        Complete Process         : 5: Purchasing\n```\n\n## Create Purchase Request Flow\n\n```mermaid\nflowchart TD\n    A[\"🚀 Start: User wants to create PR\"] --> B[\"Click 'Create Purchase Request'\"]\n    B --> C[\"📋 Template Selection Modal\"]\n\n    C --> D{Select Template Type}\n    D -->|\"🏢 Office Supplies\"| E[\"Office Template\"]\n    D -->|\"💻 IT Equipment\"| F[\"IT Template\"]\n    D -->|\"🍽️ Kitchen/F&B\"| G[\"Kitchen Template\"]\n    D -->|\"🔧 Maintenance\"| H[\"Maintenance Template\"]\n    D -->|\"📝 Custom/Blank\"| I[\"Blank Form\"]\n\n    E --> J[\"Pre-filled with Common Office Items\"]\n    F --> K[\"Pre-filled with IT Categories\"]\n    G --> L[\"Pre-filled with F&B Items\"]\n    H --> M[\"Pre-filled with Maintenance Items\"]\n    I --> N[\"Empty Form\"]\n\n    J --> O[\"📝 PR Form Page\"]\n    K --> O\n    L --> O\n    M --> O\n    N --> O\n\n    O --> P[\"Fill Basic Information\"]\n    P --> Q[\"📦 Add Items Section\"]\n\n    Q --> R{Add More Items?}\n    R -->|\"Yes\"| S[\"➕ Add Item Modal\"]\n    S --> T[\"Fill Item Details\"]\n    T --> U[\"💾 Save Item\"]\n    U --> R\n\n    R -->|\"No\"| V[\"📊 Review Summary\"]\n    V --> W{Validation Check}\n    W -->|\"❌ Errors\"| X[\"🚨 Show Validation Errors\"]\n    X --> P\n\n    W -->|\"✅ Valid\"| Y{Save Action}\n    Y -->|\"💾 Save as Draft\"| Z[\"Save Draft State\"]\n    Y -->|\"📤 Submit for Approval\"| AA[\"Submit to Workflow\"]\n\n    Z --> BB[\"📍 Redirect to PR List\"]\n    AA --> CC[\"🔄 Workflow Engine Processing\"]\n    CC --> DD[\"📧 Send Notifications\"]\n    DD --> EE[\"📍 Redirect to PR Detail\"]\n```\n\n## Purchase Request Detail View Flow\n\n```mermaid\nflowchart TD\n    A[\"🔗 Access PR Detail\"] --> B[\"Load PR Data\"]\n    B --> C[\"🔐 Check User Permissions\"]\n    C --> D[\"📋 Render PR Header\"]\n    D --> E[\"📊 Display Workflow Progress\"]\n    E --> F[\"📑 Initialize Tab System\"]\n\n    F --> G{Default Tab Selection}\n    G -->|\"Items\"| H[\"📦 Items Tab Active\"]\n    G -->|\"Budget\"| I[\"💰 Budget Tab Active\"]\n    G -->|\"Workflow\"| J[\"🔄 Workflow Tab Active\"]\n\n    H --> K[\"📋 Items Data Table\"]\n    K --> L[\"🎯 Row Actions Available\"]\n    L --> M{User Action on Item}\n    M -->|\"Edit\"| N[\"✏️ Edit Item Modal\"]\n    M -->|\"Vendor Compare\"| O[\"🏪 Vendor Comparison Modal\"]\n    M -->|\"Price History\"| P[\"📈 Price History Modal\"]\n    M -->|\"Delete\"| Q[\"❌ Delete Confirmation\"]\n\n    I --> R[\"💳 Budget Allocation View\"]\n    R --> S[\"📊 Spending Analysis\"]\n    R --> T[\"⚠️ Budget Warnings\"]\n\n    J --> U[\"🔄 Workflow Timeline\"]\n    U --> V[\"📝 Approval Comments\"]\n    U --> W[\"🎯 Available Actions\"]\n\n    W --> X{Workflow Action}\n    X -->|\"Approve\"| Y[\"✅ Approval Confirmation\"]\n    X -->|\"Reject\"| Z[\"❌ Rejection with Comments\"]\n    X -->|\"Return\"| AA[\"🔄 Return Step Selector\"]\n\n    Y --> BB[\"🔄 Update Workflow State\"]\n    Z --> BB\n    AA --> BB\n    BB --> CC[\"📧 Send Notifications\"]\n    CC --> DD[\"🔄 Refresh Page Data\"]\n```\n\n## Approval Workflow Decision Tree\n\n```mermaid\nflowchart TD\n    A[\"📤 PR Submitted\"] --> B[\"🔄 Workflow Engine Analysis\"]\n    B --> C[\"💰 Calculate Total Value\"]\n    C --> D[\"📋 Analyze Item Categories\"]\n    D --> E[\"🎯 Determine Approval Path\"]\n\n    E --> F{Value Threshold Check}\n    F -->|\"< $1,000\"| G[\"🚀 Auto-Approve to Purchasing\"]\n    F -->|\"$1,000 - $5,000\"| H[\"👨‍💼 Department Manager Required\"]\n    F -->|\"$5,000 - $10,000\"| I[\"💰 Finance Manager Required\"]\n    F -->|\"> $10,000\"| J[\"👔 GM Approval Required\"]\n\n    H --> K{Manager Decision}\n    K -->|\"✅ Approve\"| L[\"Check Next Stage\"]\n    K -->|\"❌ Reject\"| M[\"📧 Rejection Notification\"]\n    K -->|\"🔄 Return\"| N[\"📧 Return Notification\"]\n\n    I --> O{Finance Decision}\n    O -->|\"✅ Approve\"| L\n    O -->|\"❌ Reject\"| M\n    O -->|\"🔄 Return\"| N\n\n    J --> P{GM Decision}\n    P -->|\"✅ Approve\"| L\n    P -->|\"❌ Reject\"| M\n    P -->|\"🔄 Return\"| N\n\n    L --> Q{Special Categories?}\n    Q -->|\"💻 IT Equipment\"| R[\"🔧 IT Manager Approval\"]\n    Q -->|\"🔒 Controlled Items\"| S[\"📋 Compliance Check\"]\n    Q -->|\"🏢 Standard Items\"| T[\"🛒 Route to Purchasing\"]\n\n    G --> T\n    R --> U{IT Manager Decision}\n    U -->|\"✅ Approve\"| T\n    U -->|\"❌ Reject\"| M\n    U -->|\"🔄 Return\"| N\n\n    S --> V{Compliance Check}\n    V -->|\"✅ Pass\"| T\n    V -->|\"❌ Fail\"| W[\"📋 Additional Documentation Required\"]\n    W --> X[\"📧 Documentation Request\"]\n\n    T --> Y[\"🛒 Purchasing Queue\"]\n    Y --> Z[\"✅ Process Complete\"]\n```\n\n## Bulk Operations Flow\n\n```mermaid\nflowchart TD\n    A[\"☑️ Select Multiple PRs\"] --> B[\"🎯 Bulk Actions Menu\"]\n    B --> C{Select Bulk Action}\n\n    C -->|\"✅ Bulk Approve\"| D[\"Validate Permissions\"]\n    C -->|\"❌ Bulk Reject\"| E[\"Collect Rejection Comments\"]\n    C -->|\"🔄 Bulk Return\"| F[\"Select Return Stage\"]\n    C -->|\"📊 Bulk Export\"| G[\"Export Configuration\"]\n    C -->|\"🗑️ Bulk Delete\"| H[\"Delete Confirmation\"]\n\n    D --> I{Mixed Status Check}\n    I -->|\"⚠️ Mixed Statuses\"| J[\"🚨 Mixed Status Warning\"]\n    I -->|\"✅ Consistent\"| K[\"📋 Bulk Approval Confirmation\"]\n\n    J --> L[\"🎯 Action Selection per PR\"]\n    L --> M[\"⚠️ Skip Invalid Items\"]\n    M --> N[\"📋 Process Valid Items\"]\n\n    K --> O[\"🔄 Process All Items\"]\n    E --> P[\"💬 Comment Collection Modal\"]\n    F --> Q[\"🔄 Stage Selection Modal\"]\n\n    P --> R[\"📋 Apply Comments to All\"]\n    Q --> S[\"🎯 Apply Return Stage to All\"]\n\n    R --> T[\"🔄 Bulk Rejection Process\"]\n    S --> U[\"🔄 Bulk Return Process\"]\n    O --> V[\"🔄 Bulk Approval Process\"]\n\n    T --> W[\"📧 Send Notifications\"]\n    U --> W\n    V --> W\n\n    W --> X[\"🔄 Refresh Data\"]\n    X --> Y[\"📊 Show Results Summary\"]\n\n    G --> Z[\"📄 Generate Export File\"]\n    Z --> AA[\"⬇️ Download File\"]\n\n    H --> BB[\"⚠️ Deletion Warning\"]\n    BB --> CC{Confirm Delete}\n    CC -->|\"✅ Yes\"| DD[\"🗑️ Delete Items\"]\n    CC -->|\"❌ No\"| EE[\"❌ Cancel Operation\"]\n    DD --> FF[\"📧 Deletion Notifications\"]\n    FF --> X\n```\n\n## Modal Interaction Flows\n\n### Vendor Comparison Modal\n\n```mermaid\nflowchart TD\n    A[\"🏪 Open Vendor Comparison\"] --> B[\"📊 Load Vendor Data\"]\n    B --> C[\"💰 Display Price Grid\"]\n    C --> D[\"⭐ Show Vendor Ratings\"]\n    D --> E[\"📋 Display Terms & Conditions\"]\n\n    E --> F{User Interaction}\n    F -->|\"Select Vendor\"| G[\"✅ Highlight Selection\"]\n    F -->|\"Override Price\"| H[\"💰 Price Override Input\"]\n    F -->|\"View Details\"| I[\"📋 Vendor Detail Popup\"]\n    F -->|\"Add Notes\"| J[\"📝 Notes Input Field\"]\n\n    G --> K[\"💾 Save Selection\"]\n    H --> L[\"🔍 Validate Override\"]\n    L --> M{Valid Override?}\n    M -->|\"✅ Yes\"| K\n    M -->|\"❌ No\"| N[\"🚨 Error Message\"]\n    N --> H\n\n    I --> O[\"📊 Vendor Performance History\"]\n    J --> P[\"💬 Save Notes\"]\n\n    K --> Q[\"🔄 Update PR Item\"]\n    P --> Q\n    Q --> R[\"📧 Change Notifications\"]\n    R --> S[\"❌ Close Modal\"]\n    S --> T[\"🔄 Refresh Parent View\"]\n```\n\n### Price History Modal\n\n```mermaid\nflowchart TD\n    A[\"📈 Open Price History\"] --> B[\"📊 Load Historical Data\"]\n    B --> C[\"📈 Render Price Chart\"]\n    C --> D[\"📋 Display Price Table\"]\n    D --> E[\"🏪 Show Vendor Breakdown\"]\n\n    E --> F{User Interaction}\n    F -->|\"Change Date Range\"| G[\"📅 Date Range Picker\"]\n    F -->|\"Filter by Vendor\"| H[\"🏪 Vendor Filter\"]\n    F -->|\"Export Data\"| I[\"📄 Export Options\"]\n    F -->|\"View Trends\"| J[\"📊 Trend Analysis\"]\n\n    G --> K[\"🔄 Update Chart Data\"]\n    H --> L[\"🎯 Filter Chart Points\"]\n    I --> M[\"⬇️ Download File\"]\n    J --> N[\"📊 Display Trend Analysis\"]\n\n    K --> O[\"📈 Re-render Chart\"]\n    L --> O\n    N --> P[\"📋 Show Insights\"]\n\n    O --> Q{More Actions?}\n    Q -->|\"Yes\"| F\n    Q -->|\"No\"| R[\"❌ Close Modal\"]\n    R --> S[\"🔄 Return to Parent\"]\n```\n\n## Error Handling and Recovery Flows\n\n```mermaid\nflowchart TD\n    A[\"🚨 Error Detected\"] --> B{Error Type Classification}\n\n    B -->|\"🔧 Validation Error\"| C[\"📋 Form Field Highlighting\"]\n    B -->|\"🌐 Network Error\"| D[\"🔄 Retry Mechanism\"]\n    B -->|\"🔐 Permission Error\"| E[\"🚫 Access Denied Message\"]\n    B -->|\"⚠️ Business Rule Error\"| F[\"📋 Business Rule Explanation\"]\n    B -->|\"💥 Unexpected Error\"| G[\"🚨 Generic Error Handler\"]\n\n    C --> H[\"📝 Display Field Errors\"]\n    H --> I[\"👤 User Correction Required\"]\n    I --> J[\"🔄 Re-validate on Change\"]\n\n    D --> K[\"⏰ Show Retry Button\"]\n    K --> L{User Choice}\n    L -->|\"🔄 Retry\"| M[\"🔄 Retry Request\"]\n    L -->|\"❌ Cancel\"| N[\"❌ Cancel Operation\"]\n    M --> O{Retry Success?}\n    O -->|\"✅ Yes\"| P[\"✅ Continue Normal Flow\"]\n    O -->|\"❌ No\"| Q[\"🚨 Escalate Error\"]\n\n    E --> R[\"🔐 Show Permission Details\"]\n    R --> S[\"📧 Contact Admin Option\"]\n\n    F --> T[\"📋 Show Rule Details\"]\n    T --> U[\"💡 Suggested Actions\"]\n    U --> V[\"🔄 Return to Form\"]\n\n    G --> W[\"📧 Error Logging\"]\n    W --> X[\"🚨 Show Generic Message\"]\n    X --> Y[\"📞 Support Contact Info\"]\n\n    Q --> Z[\"📊 Error Analytics\"]\n    Z --> AA[\"📧 Admin Notification\"]\n```\n\n## Notification System Flow\n\n```mermaid\nflowchart TD\n    A[\"🎯 System Event Triggered\"] --> B{Event Type}\n\n    B -->|\"✅ Success Action\"| C[\"🎉 Success Toast\"]\n    B -->|\"❌ Error Action\"| D[\"🚨 Error Toast\"]\n    B -->|\"⚠️ Warning\"| E[\"⚠️ Warning Alert\"]\n    B -->|\"ℹ️ Information\"| F[\"ℹ️ Info Banner\"]\n    B -->|\"📧 Workflow Update\"| G[\"📬 Email Notification\"]\n\n    C --> H[\"⏰ Auto-dismiss Timer (3s)\"]\n    H --> I[\"✨ Fade Out Animation\"]\n\n    D --> J[\"👤 Manual Dismiss Required\"]\n    J --> K[\"❌ Close Button\"]\n    K --> L[\"📊 Error Logging\"]\n\n    E --> M[\"⚠️ Action Required Indicator\"]\n    M --> N{User Action}\n    N -->|\"✅ Acknowledge\"| O[\"✅ Clear Warning\"]\n    N -->|\"🔄 Fix Issue\"| P[\"🔄 Navigate to Fix\"]\n\n    F --> Q[\"📍 Persistent Display\"]\n    Q --> R{Context Change}\n    R -->|\"🔄 Page Change\"| S[\"❌ Auto Clear\"]\n    R -->|\"📍 Same Context\"| T[\"📍 Keep Visible\"]\n\n    G --> U[\"📧 Email Composition\"]\n    U --> V[\"📤 Send to Recipients\"]\n    V --> W[\"📋 Delivery Tracking\"]\n\n    I --> X[\"🔄 Remove from DOM\"]\n    O --> X\n    S --> X\n```\n\n## Search and Filter Flow\n\n```mermaid\nflowchart TD\n    A[\"🔍 User Initiates Search\"] --> B{Search Type}\n\n    B -->|\"📝 Quick Search\"| C[\"🔍 Search Input Field\"]\n    B -->|\"🎯 Advanced Filter\"| D[\"📋 Filter Panel\"]\n\n    C --> E[\"⌨️ Real-time Typing\"]\n    E --> F[\"⏰ Debounce (300ms)\"]\n    F --> G[\"🔍 Execute Search\"]\n\n    D --> H[\"📋 Filter Categories\"]\n    H --> I[\"📅 Date Range\"]\n    H --> J[\"📊 Status Selection\"]\n    H --> K[\"👤 User Selection\"]\n    H --> L[\"💰 Amount Range\"]\n    H --> M[\"🏢 Department Filter\"]\n\n    I --> N[\"📅 Date Picker UI\"]\n    J --> O[\"☑️ Multi-select Checkboxes\"]\n    K --> P[\"👥 User Dropdown\"]\n    L --> Q[\"💰 Range Slider\"]\n    M --> R[\"🏢 Department Dropdown\"]\n\n    G --> S[\"🔄 Apply Search Query\"]\n    N --> T[\"🎯 Apply Date Filter\"]\n    O --> T\n    P --> T\n    Q --> T\n    R --> T\n\n    S --> U[\"📊 Filter Results\"]\n    T --> U\n\n    U --> V{Results Found?}\n    V -->|\"✅ Yes\"| W[\"📋 Display Results\"]\n    V -->|\"❌ No\"| X[\"📭 Empty State\"]\n\n    W --> Y[\"📊 Update Result Count\"]\n    X --> Z[\"💡 Search Suggestions\"]\n\n    Y --> AA[\"📄 Pagination Update\"]\n    Z --> BB[\"🔄 Clear Filters Option\"]\n\n    AA --> CC{More Actions?}\n    CC -->|\"Yes\"| DD[\"🔄 User Continues\"]\n    CC -->|\"No\"| EE[\"✅ Search Complete\"]\n\n    BB --> FF[\"🔄 Reset to Full List\"]\n    FF --> W\n```\n\n## Mobile Responsive Flows\n\n```mermaid\nflowchart TD\n    A[\"📱 Mobile Device Detection\"] --> B[\"🎨 Apply Mobile Styles\"]\n    B --> C[\"📋 Responsive Layout\"]\n\n    C --> D{Screen Size}\n    D -->|\"📱 < 640px\"| E[\"📱 Mobile Layout\"]\n    D -->|\"📟 640px-1024px\"| F[\"📟 Tablet Layout\"]\n    D -->|\"🖥️ > 1024px\"| G[\"🖥️ Desktop Layout\"]\n\n    E --> H[\"🍔 Hamburger Menu\"]\n    H --> I[\"📋 Collapsible Sidebar\"]\n    I --> J[\"🃏 Card-only View\"]\n    J --> K[\"📱 Touch-friendly Buttons\"]\n\n    F --> L[\"📟 Mixed Layout\"]\n    L --> M[\"📋 Collapsible Panels\"]\n    M --> N[\"🃏 Grid Card View\"]\n\n    G --> O[\"🖥️ Full Table View\"]\n    O --> P[\"📋 Extended Sidebar\"]\n    P --> Q[\"🖱️ Hover Interactions\"]\n\n    K --> R[\"👆 Touch Gestures\"]\n    R --> S[\"📱 Swipe Actions\"]\n    S --> T[\"📋 Pull to Refresh\"]\n\n    N --> U[\"👆 Touch & Mouse\"]\n    Q --> V[\"🖱️ Desktop Interactions\"]\n\n    T --> W[\"📱 Mobile Optimization\"]\n    U --> X[\"📟 Hybrid Experience\"]\n    V --> Y[\"🖥️ Full Feature Set\"]\n\n    W --> Z[\"✅ Mobile Flow Complete\"]\n    X --> Z\n    Y --> Z\n```\n\n---\n\nThis comprehensive user flow documentation provides detailed insight into all user interactions within the Purchase Request system, covering every aspect from basic navigation to complex workflow approvals and error handling scenarios.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

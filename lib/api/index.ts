@@ -12,6 +12,9 @@ export type { ApiResponse, ApiError, PaginationParams, RequestConfig } from './c
 export { vendorApi } from './vendors'
 export { productApi } from './products'
 export { procurementApi } from './procurement'
+export { posApprovalsApi } from './pos-approvals'
+export { posTransactionsApi } from './pos-transactions'
+export { posMappingsApi } from './pos-mappings'
 
 // Types
 export type {
@@ -48,6 +51,36 @@ export type {
   PriceHistoryResponse
 } from './vendors'
 
+export type {
+  // POS Approvals types
+  PendingTransactionsListResponse,
+  ApprovalStatsResponse,
+  ApprovalRequestWithNotes,
+  BulkApprovalRequestBody
+} from './pos-approvals'
+
+export type {
+  // POS Transactions types
+  TransactionListResponse,
+  TransactionDetailResponse,
+  FailedTransactionsListResponse,
+  TransactionFilters,
+  FailedTransactionFilters
+} from './pos-transactions'
+
+export type {
+  // POS Mappings types
+  MappingListResponse,
+  UnmappedItemsListResponse,
+  RecipeSearchResponse,
+  MappingStatsResponse,
+  MappingFilters,
+  RecipeSearchFilters,
+  CreateMappingRequest,
+  UpdateMappingRequest,
+  BulkMappingRequest
+} from './pos-mappings'
+
 // Utility functions
 export { buildQueryParams, isApiError } from './client'
 
@@ -70,13 +103,41 @@ export const API_ENDPOINTS = {
   PROCUREMENT_STATS: '/procurement/stats',
   VENDOR_COMPARISON: (itemId: string) => `/purchase-requests/items/${itemId}/vendor-comparison`,
   PRICE_HISTORY: (itemId: string) => `/purchase-requests/items/${itemId}/price-history`,
-  
+
   // Price management endpoints
   PRICE_MANAGEMENT: '/price-management',
   PRICE_ASSIGNMENTS: '/price-management/assignments',
   BUSINESS_RULES: '/price-management/business-rules',
   CAMPAIGNS: '/price-management/campaigns',
-  
+
+  // POS Integration endpoints
+  POS_APPROVALS_PENDING: '/pos/approvals/pending',
+  POS_APPROVALS_STATS: '/pos/approvals/stats',
+  POS_APPROVAL_DETAIL: (id: string) => `/pos/approvals/pending/${id}`,
+  POS_APPROVE: (id: string) => `/pos/approvals/${id}/approve`,
+  POS_REJECT: (id: string) => `/pos/approvals/${id}/reject`,
+  POS_BULK_APPROVE: '/pos/approvals/bulk-approve',
+  POS_BULK_REJECT: '/pos/approvals/bulk-reject',
+
+  POS_TRANSACTIONS: '/pos/transactions',
+  POS_TRANSACTIONS_STATS: '/pos/transactions/stats',
+  POS_TRANSACTIONS_FAILED: '/pos/transactions/failed',
+  POS_TRANSACTION_DETAIL: (id: string) => `/pos/transactions/${id}`,
+  POS_TRANSACTION_ERROR: (id: string) => `/pos/transactions/${id}/error`,
+  POS_TRANSACTION_AUDIT: (id: string) => `/pos/transactions/${id}/audit-log`,
+  POS_TRANSACTION_RETRY: (id: string) => `/pos/transactions/${id}/retry`,
+  POS_TRANSACTION_RESOLVE: (id: string) => `/pos/transactions/${id}/resolve`,
+
+  POS_MAPPINGS: '/pos/mappings',
+  POS_MAPPINGS_STATS: '/pos/mappings/stats',
+  POS_MAPPINGS_UNMAPPED: '/pos/mappings/unmapped',
+  POS_MAPPING_DETAIL: (id: string) => `/pos/mappings/${id}`,
+  POS_MAPPING_BY_POS_ITEM: (posItemId: string) => `/pos/mappings/pos-item/${posItemId}`,
+  POS_MAPPING_PREVIEW: '/pos/mappings/preview',
+  POS_RECIPE_SEARCH: '/pos/mappings/recipes/search',
+  POS_BULK_CREATE_MAPPINGS: '/pos/mappings/bulk-create',
+  POS_SYNC_ITEMS: '/pos/mappings/sync-items',
+
   // Authentication endpoints
   AUTH: '/auth',
   HEALTH: '/health'

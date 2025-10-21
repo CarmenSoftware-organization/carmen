@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Template Module Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Templates</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Purchase Request Template Module Documentation\n\nWelcome to the comprehensive documentation for the Carmen ERP Purchase Request Template module. This documentation provides complete technical specifications, user guides, and implementation details.\n\n## 📚 Documentation Structure\n\n### 1. [Complete Technical Specification](./purchase-request-template-complete-specification.md)\n**Comprehensive overview of the entire PRT module**\n- Module overview and key features\n- Complete site map with Mermaid diagrams\n- Page and component documentation\n- Data flow and user interactions\n- Technical architecture details\n- API endpoints and database schema\n\n### 2. [Detailed Component Documentation](./components-detailed-documentation.md)\n**In-depth analysis of all components and their interactions**\n- Page components (List, Detail, Create)\n- Form components and validation\n- Dialog components and workflows\n- Tab components and functionality\n- Utility and data components\n- Component interaction patterns\n\n### 3. [User Interaction Guide](./user-interaction-guide.md)\n**Complete guide for user workflows and interactions**\n- Navigation and entry points\n- Primary user workflows\n- Dialog and form interactions\n- Data management features\n- Advanced functionality\n\n### 4. [API Specification](./api-specification.md)\n**Technical API documentation for developers**\n- Authentication and authorization\n- Core endpoints and operations\n- Data models and schemas\n- Error handling and responses\n- Rate limiting and webhooks\n\n## 🖼️ Screenshots & Visual Documentation\n\nAll screenshots are stored in the [`screenshots/`](./screenshots/) directory:\n\n- **prt-list-page-table-view.png** - Main PRT listing interface (Table View)\n- **prt-list-page-card-view.png** - Main PRT listing interface (Card View)\n- **prt-detail-page-items-tab.png** - PRT detail page showing Items tab\n- **prt-detail-page-edit-mode.png** - PRT detail page in edit mode\n- **prt-add-item-dialog.png** - Add/Edit item dialog interface\n\n## 🗺️ Module Site Map\n\n```mermaid\ngraph TD\n    A[Purchase Request Templates Landing] --> B[PRT List View - Table]\n    A --> C[PRT List View - Card]\n\n    B --> D[New Template Creation]\n    C --> D\n\n    D --> E[Template Detail Page]\n\n    B --> F[Template Detail View]\n    C --> F\n    F --> E\n\n    E --> G[Items Tab]\n    E --> H[Budgets Tab]\n    E --> I[Activity Tab]\n\n    G --> J[Add Item Dialog]\n    G --> K[Edit Item Dialog]\n    G --> L[Delete Item Confirmation]\n\n    E --> M[Clone Template]\n    E --> N[Set as Default]\n    E --> O[Delete Template]\n\n    F --> P[Edit Mode]\n    P --> Q[Save Changes]\n    P --> R[Cancel Changes]\n\n    B --> S[Bulk Operations]\n    C --> S\n    S --> T[Bulk Delete]\n    S --> U[Bulk Clone]\n    S --> V[Set Default]\n```\n\n## 🚀 Key Features\n\n### Template Management\n- Complete template lifecycle management (Draft → Active → Archived)\n- Multi-type support (General Purchase, Asset Purchase, Service, Recurring)\n- Clone functionality for creating template variations\n- Department-specific default templates\n\n### User Interface\n- Responsive design with table and card views\n- Advanced filtering and search capabilities\n- Multi-mode interface (view/edit/add)\n- Export and print functionality\n- Real-time status updates\n\n### Item Management\n- Comprehensive item configuration with pricing\n- Unit of measure (UOM) support\n- Budget and account code integration\n- Real-time calculations for totals and taxes\n- Multi-currency support with exchange rates\n\n### Technical Architecture\n- Next.js 14 with App Router\n- TypeScript with strict mode\n- Tailwind CSS + Shadcn/ui components\n- React Hook Form + Zod validation\n- Reusable component architecture\n\n## 📁 File Structure\n\n```\ndocs/documents/prt/\n├── README.md                                           # This file\n├── purchase-request-template-complete-specification.md # Complete technical spec\n├── components-detailed-documentation.md               # Component documentation\n├── user-interaction-guide.md                         # User workflows\n├── api-specification.md                              # API documentation\n└── screenshots/                                      # Visual documentation\n    ├── prt-list-page-table-view.png\n    ├── prt-list-page-card-view.png\n    ├── prt-detail-page-items-tab.png\n    ├── prt-detail-page-edit-mode.png\n    └── prt-add-item-dialog.png\n```\n\n## 🔗 Source Code Structure\n\n```\napp/(main)/procurement/purchase-request-templates/\n├── page.tsx                                          # Main listing page\n├── [id]/page.tsx                                    # Detail page route\n├── components/                                      # Component library\n│   ├── ItemsTab.tsx                                # Items management tab\n│   ├── template-items-table.tsx                    # Items table component\n│   └── item-form-dialog.tsx                        # Item add/edit dialog\n└── types/\n    └── template-items.ts                           # Type definitions and mock data\n```\n\n## 🎯 Primary User Workflows\n\n### 1. Create New Template\n1. Navigate to PRT List → Click \"New Template\"\n2. Fill template header information (name, type, department)\n3. Add template items via Items tab with pricing and specifications\n4. Configure budget and account codes\n5. Save template for future use\n\n### 2. Use Template for Purchase Request\n1. Navigate to Purchase Requests → \"Create from Template\"\n2. Select desired template from list\n3. Customize items and quantities as needed\n4. Submit for approval following standard workflow\n\n### 3. Template Management\n1. Browse templates in table/card format\n2. Filter and search for specific templates\n3. Edit existing templates as requirements change\n4. Clone templates for creating variations\n5. Set department defaults for streamlined workflows\n\n## 🛠️ Technical Implementation\n\n### Component Architecture\n- **PRListTemplate**: Shared list component with dual-view support\n- **PRDetailTemplate**: Shared detail component with multi-mode operation\n- **ItemsTab**: Comprehensive item management interface\n- **ItemFormDialog**: Rich form dialog with validation and calculations\n\n### State Management\n- React useState for local state management\n- URL parameters for routing context\n- Mock data integration with future API readiness\n- Real-time calculations and validation\n\n### Data Flow\n```mermaid\nflowchart TD\n    A[Mock Data Store] --> B[PRT List Page]\n    B --> C[New Template Process]\n    C --> D[Template Detail Page]\n\n    D --> E[Items Tab]\n    D --> F[Budgets Tab]\n    D --> G[Activity Tab]\n\n    E --> H[Item Management]\n    H --> I[Add/Edit/Delete Items]\n\n    D --> J[Template Actions]\n    J --> K[Clone Template]\n    J --> L[Set as Default]\n    J --> M[Delete Template]\n```\n\n## 📊 Database Schema Overview\n\n### Main Tables\n- **purchase_request_templates** - Core template information\n- **template_items** - Template line items with specifications\n- **template_usage_log** - Template usage tracking\n- **template_versions** - Version history management\n\n### Key Relationships\n- Template → Items (One-to-Many)\n- Template → Usage Log (One-to-Many)\n- Template → Versions (One-to-Many)\n- Department → Default Templates (One-to-Many)\n\n## 🔄 Template Lifecycle\n\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n    Draft --> Active\n    Active --> Inactive\n    Inactive --> Active\n    Active --> Archived\n    Draft --> Archived\n    Archived --> [*]\n```\n\n## 📧 Support & Contributions\n\nFor questions, issues, or contributions to this documentation:\n\n1. **Technical Issues**: Review the component documentation and API specification\n2. **User Workflow Questions**: Consult the user interaction guide\n3. **Feature Requests**: Reference the complete technical specification\n4. **Bug Reports**: Include relevant screenshots and component details\n\n---\n\n*Documentation generated on: 2025-09-23*\n*Module Version: 1.0*\n*Carmen ERP - Hospitality Supply Chain Management*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

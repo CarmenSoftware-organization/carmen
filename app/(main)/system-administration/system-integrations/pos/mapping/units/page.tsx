@@ -17,10 +17,17 @@ import {
 
 import { UnitMapping, UnitType } from "./types"
 import { unitMappings, baseUnits } from "./data"
+import { UnitEditDrawer } from "../components/unit-edit-drawer"
+import { DeleteConfirmationDialog } from "../components/delete-confirmation-dialog"
+import { MappingHistoryDrawer } from "../components/mapping-history-drawer"
 
 export default function UnitMappingPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([])
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false)
+  const [selectedUnit, setSelectedUnit] = useState<UnitMapping | null>(null)
   
   // Setup filter groups
   const filterGroups: FilterGroup[] = [
@@ -63,8 +70,31 @@ export default function UnitMappingPage() {
 
   // Handle row actions
   const handleRowAction = (action: ActionType, unit: UnitMapping) => {
-    console.log(`${action} action on unit:`, unit)
-    // Implement action handlers here
+    setSelectedUnit(unit)
+
+    switch(action) {
+      case "edit":
+        setEditDrawerOpen(true)
+        break
+      case "delete":
+        setDeleteDialogOpen(true)
+        break
+      case "history":
+        setHistoryDrawerOpen(true)
+        break
+    }
+  }
+
+  // Handle save mapping
+  const handleSaveMapping = (updatedMapping: Partial<UnitMapping>) => {
+    console.log("Saving updated mapping:", updatedMapping)
+    // TODO: Implement actual save logic with API call
+  }
+
+  // Handle delete mapping
+  const handleDeleteMapping = (deleteType: "soft" | "hard", reason?: string) => {
+    console.log(`Deleting mapping (${deleteType}):`, selectedUnit?.id, "Reason:", reason)
+    // TODO: Implement actual delete logic with API call
   }
 
   // Format unit type for display
@@ -216,6 +246,29 @@ export default function UnitMappingPage() {
         columns={columns}
         data={filteredData}
         rowClassName={getRowClassName}
+      />
+
+      <UnitEditDrawer
+        open={editDrawerOpen}
+        onOpenChange={setEditDrawerOpen}
+        mapping={selectedUnit}
+        onSave={handleSaveMapping}
+      />
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        mapping={selectedUnit}
+        mappingType="unit"
+        onConfirm={handleDeleteMapping}
+      />
+
+      <MappingHistoryDrawer
+        open={historyDrawerOpen}
+        onOpenChange={setHistoryDrawerOpen}
+        mappingId={selectedUnit?.id || ""}
+        mappingType="unit"
+        mappingName={selectedUnit?.unitName || ""}
       />
     </div>
   )

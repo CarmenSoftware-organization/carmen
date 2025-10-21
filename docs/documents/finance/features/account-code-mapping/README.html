@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Code Mapping - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../index.html" class="back-link">← All Modules</a>
+            <h1>Finance</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../index.html">Documentation</a> / <a href="../../../index.html">FINANCE</a> / Features / Account Code Mapping</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Account Code Mapping\n\n> **Feature:** Finance > Account Code Mapping\n> **Pages:** 1\n> **Status:** ✅ Production Ready\n\n---\n\n## Overview\n\nAccount Code Mapping provides the critical link between Carmen ERP's inventory categories and external General Ledger (GL) systems. This feature enables automatic posting of transactions to the correct GL accounts based on store location, product category hierarchies, and department assignments.\n\n### Key Capabilities\n\n1. **Hierarchical Mapping** - Store → Category → Subcategory → Item Group → GL Account\n2. **Department Integration** - Link mappings to specific departments/cost centers\n3. **View Management** - Multiple mapping views for different purposes (AP posting, inventory, etc.)\n4. **Bulk Operations** - Import/export mappings via CSV/Excel\n5. **Search & Filter** - Quick lookup of specific mappings\n6. **Print Reports** - Generate mapping documentation\n\n---\n\n## Page Structure\n\n### Account Code Mapping Table\n**Route:** `/finance/account-code-mapping`\n\n---\n\n## Data Model\n\n```typescript\ninterface AccountCodeMapping {\n  // Location\n  store: string; // Store code or location identifier\n  storeDescription?: string;\n\n  // Product Hierarchy\n  category: string; // Top-level category\n  subCategory: string; // Secondary classification\n  itemGroup: string; // Detailed grouping\n\n  // Financial Assignment\n  department: string; // Department/cost center code\n  accountCode: string; // GL account code\n\n  // Metadata\n  viewName?: string; // Mapping view identifier\n  active?: boolean;\n  createdAt?: string;\n  updatedAt?: string;\n  createdBy?: string;\n}\n\ninterface MappingView {\n  id: string;\n  name: string; // e.g., \"Posting to AP\", \"Inventory\", \"Sales\"\n  description: string;\n  defaultView: boolean;\n  mappings: AccountCodeMapping[];\n}\n\n// Example Mapping Data\nconst exampleMappings: AccountCodeMapping[] = [\n  {\n    store: \"Mini Bar\",\n    category: \"Beverage\",\n    subCategory: \"Beers\",\n    itemGroup: \"Beer\",\n    department: \"35\",\n    accountCode: \"5000020\"\n  },\n  {\n    store: \"MIN1\",\n    category: \"2\",\n    subCategory: \"21\",\n    itemGroup: \"2100\",\n    department: \"35\",\n    accountCode: \"5000020\"\n  },\n  {\n    store: \"Rooms - Housekeeping\",\n    category: \"Food\",\n    subCategory: \"Dry Goods\",\n    itemGroup: \"Coffee/Tea/Hot Bev.\",\n    department: \"21\",\n    accountCode: \"1116007\"\n  }\n];\n```\n\n---\n\n## Features & Functionality\n\n### 1. Mapping Table View\n\n**Columns:**\n- **Store/Location**: Store code or location name\n- **Category**: Primary product category\n- **Sub-Category**: Secondary classification\n- **Item Group**: Specific item grouping\n- **Department**: Department/cost center code\n- **Account Code**: GL account number\n\n**Features:**\n- Sortable columns\n- Searchable across all fields\n- Filterable by view\n- Inline editing (future)\n- Row selection for bulk operations\n\n### 2. View Management\n\n**Purpose:** Different mapping views for different GL posting scenarios\n\n**Standard Views:**\n- **Posting to AP**: Accounts Payable posting rules\n- **Inventory**: Inventory account assignments\n- **Sales**: Revenue account mapping\n- **COGS**: Cost of Goods Sold accounts\n- **Custom Views**: User-defined mapping sets\n\n**View Selector:**\n- Dropdown in header\n- Switch between views instantly\n- Each view maintains separate mappings\n\n### 3. Search Functionality\n\n**Search Capabilities:**\n- Full-text search across all columns\n- Real-time filtering as you type\n- Case-insensitive matching\n- Highlights matching text\n\n**Search Fields:**\n- Store code/name\n- Category name\n- Subcategory name\n- Item group\n- Department code\n- Account code\n\n### 4. Bulk Operations\n\n**Import Functionality:**\n```typescript\ninterface MappingImportFormat {\n  // CSV/Excel Columns\n  storeCode: string;\n  storeName: string;\n  category: string;\n  subCategory: string;\n  itemGroup: string;\n  departmentCode: string;\n  accountCode: string;\n}\n\n// Import Process\n1. Upload CSV/Excel file\n2. Validate file format\n3. Map columns to system fields\n4. Validate account codes (optional GL system check)\n5. Preview import data\n6. Confirm and import\n7. Display import summary (success/failures)\n```\n\n**Export Functionality:**\n- Export current view to CSV\n- Export all mappings to Excel\n- Export selected rows\n- Include/exclude column headers\n\n### 5. Actions Toolbar\n\n**Available Actions:**\n\n**Scan** - Quick scan/search interface\n- Barcode scanning for quick lookup\n- QR code support\n- Fast item location\n\n**Import/Export** - Bulk data management\n- CSV import\n- Excel import/export\n- Template download\n- Data validation\n\n**Edit** - Modify mappings\n- Inline editing\n- Bulk edit selected rows\n- Field validation\n- Change tracking\n\n**Print** - Generate reports\n- Print current view\n- Print filtered results\n- Print mapping summary\n- PDF export\n\n---\n\n## Business Rules\n\n### Mapping Validation\n\n1. **Unique Combinations**: Each (Store, Category, SubCategory, ItemGroup) combination must be unique\n2. **Account Code Format**: Must match GL system format (typically 7-10 digits)\n3. **Department Required**: Department code mandatory for all mappings\n4. **Category Hierarchy**: Subcategory must belong to parent category\n5. **Store Validation**: Store code must exist in location master\n\n### Posting Rules\n\n1. **Priority**: Most specific mapping takes precedence\n   - Item Group match (highest priority)\n   - Subcategory match\n   - Category match\n   - Store default (lowest priority)\n\n2. **Fallback Logic**: If exact match not found, use parent level mapping\n\n3. **Multi-Store**: Same category can have different accounts per store\n\n### Data Integrity\n\n1. **Account Code Verification**: Optional integration with GL system to validate codes\n2. **Orphan Detection**: Alert for mappings referencing deleted stores/categories\n3. **Duplicate Prevention**: System prevents duplicate mapping combinations\n4. **Audit Trail**: Track all mapping changes with user and timestamp\n\n---\n\n## Integration Points\n\n### General Ledger Systems\n\n**Supported GL Systems:**\n- SAP\n- Oracle Financials\n- QuickBooks Enterprise\n- NetSuite\n- Custom GL via API\n\n**Integration Methods:**\n1. **Real-Time Posting**: API calls for each transaction\n2. **Batch Export**: Daily/weekly export files for GL import\n3. **Middleware**: Integration platform (e.g., Boomi, MuleSoft)\n\n### Inventory Management\n\n**Data Flow:**\n```\nInventory Transaction → Product Category → Account Mapping → GL Account Code\n```\n\n**Use Cases:**\n- Purchase receipt posting\n- Inventory adjustments\n- Stock transfers\n- Write-offs\n\n### Procurement\n\n**Purchase Order Posting:**\n```\nPO Line Item → Category/Department → Account Mapping → GL Expense Account\n```\n\n**Accounts Payable:**\n```\nVendor Invoice → Item Categories → Account Mapping → AP Posting\n```\n\n---\n\n## API Endpoints\n\n```http\n# Account Code Mappings\nGET /api/finance/account-mappings\nPOST /api/finance/account-mappings\nPUT /api/finance/account-mappings/:id\nDELETE /api/finance/account-mappings/:id\n\n# Bulk Operations\nPOST /api/finance/account-mappings/import\nGET /api/finance/account-mappings/export\nPOST /api/finance/account-mappings/validate\n\n# Views\nGET /api/finance/account-mappings/views\nGET /api/finance/account-mappings/views/:viewName\n\n# Lookup\nGET /api/finance/account-mappings/lookup?store=X&category=Y\nPOST /api/finance/account-mappings/resolve\n```\n\n---\n\n## User Guide\n\n### Creating a Mapping\n\n1. Navigate to Account Code Mapping page\n2. Select appropriate view\n3. Click \"Edit\" to enable editing mode\n4. Add new row or edit existing row\n5. Fill in all required fields:\n   - Store/Location\n   - Category\n   - Subcategory\n   - Item Group\n   - Department\n   - Account Code\n6. Save changes\n\n### Importing Mappings\n\n1. Click \"Import/Export\" button\n2. Download template if needed\n3. Prepare CSV/Excel file with mappings\n4. Click \"Import\" and select file\n5. Map columns if not using template\n6. Review preview of data\n7. Click \"Confirm Import\"\n8. Review import summary\n\n### Finding a Mapping\n\n**Method 1: Search**\n1. Use search box\n2. Type store, category, or account code\n3. Results filter automatically\n\n**Method 2: View Selection**\n1. Select appropriate view from dropdown\n2. Browse relevant mappings\n3. Use search within view\n\n### Printing Mappings\n\n1. Filter to desired mappings (optional)\n2. Click \"Print\" button\n3. Select print options\n4. Print or save as PDF\n\n---\n\n## Troubleshooting\n\n### Issue: Mapping Not Found\n**Cause**: No exact match for transaction attributes\n**Solution**: Check mapping hierarchy, add missing mapping level\n\n### Issue: Import Fails\n**Cause**: Invalid account codes or format errors\n**Solution**: Validate data against template, check account code format\n\n### Issue: Duplicate Mapping Error\n**Cause**: Attempting to create duplicate combination\n**Solution**: Edit existing mapping instead of creating new\n\n### Issue: GL Posting Errors\n**Cause**: Invalid or inactive account codes\n**Solution**: Verify account codes with GL system, update inactive codes\n\n---\n\n## Best Practices\n\n### Mapping Design\n\n1. **Start Generic**: Create category-level mappings first\n2. **Add Specificity**: Add subcategory/item group mappings as needed\n3. **Store Variations**: Only create store-specific mappings when necessary\n4. **Document Views**: Use descriptive view names\n5. **Regular Review**: Quarterly mapping review and cleanup\n\n### Data Quality\n\n1. **Standardized Codes**: Use consistent account code format\n2. **Validation**: Enable GL account validation if available\n3. **Testing**: Test new mappings before going live\n4. **Backup**: Export mappings before bulk changes\n5. **Version Control**: Maintain mapping documentation\n\n### Performance\n\n1. **Index Search**: Mappings indexed for fast lookup\n2. **Cache Strategy**: Frequently used mappings cached\n3. **Lazy Loading**: Load views on demand\n4. **Pagination**: Large mapping sets paginated\n\n---\n\n## Reporting\n\n### Available Reports\n\n1. **Mapping Summary**: Count of mappings by view/category\n2. **Unmapped Categories**: Categories without GL accounts\n3. **Account Usage**: Frequency of each GL account\n4. **Mapping Changes**: Audit trail of mapping modifications\n5. **Validation Report**: Account code validation results\n\n---\n\n## Future Enhancements\n\n**Planned Features:**\n- Inline editing with auto-save\n- AI-suggested mappings based on patterns\n- GL account lookup integration\n- Mapping approval workflow\n- Multi-GL system support\n- Advanced validation rules\n- Mapping templates library\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

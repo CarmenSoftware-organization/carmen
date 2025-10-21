@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumption Analytics - Feature Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Reporting / Features</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Consumption Analytics - Feature Documentation\n\n> **Module:** Reporting & Analytics\n> **Feature:** Consumption Analytics\n> **Status:** ✅ Production Ready\n> **Route:** `/reporting-analytics/consumption-analytics`\n> **Component:** `enhanced-consumption-dashboard.tsx` (733 lines)\n\n---\n\n## Overview\n\nThe **Consumption Analytics** feature provides real-time consumption tracking, variance analysis, and fractional sales analytics for hospitality operations. This comprehensive dashboard enables operators to monitor food costs, track waste, analyze consumption patterns, and optimize yield efficiency across multiple locations.\n\n### Key Capabilities\n\n1. **Real-Time Monitoring**: Live KPI tracking with 30-second auto-refresh intervals\n2. **Fractional Sales Analytics**: Specialized tracking for pizza slices, cake portions, bottle-by-glass\n3. **Variance Analysis**: Theoretical vs actual consumption comparison with trend indicators\n4. **Live Ingredient Tracking**: Real-time inventory levels with depletion projections\n5. **Efficiency Optimization**: Yield efficiency trends and improvement opportunities\n6. **Alert System**: Multi-severity alert system for critical operational issues\n\n### Target Users\n\n- **Kitchen Managers**: Monitor consumption and waste daily\n- **Purchasing Staff**: Track ingredient usage and reorder needs\n- **Department Managers**: Analyze variance and efficiency metrics\n- **Financial Managers**: Monitor food cost percentage and profit margins\n- **Chefs**: Optimize recipes based on actual consumption patterns\n\n---\n\n## Dashboard Architecture\n\n### Component Structure\n\n```\nEnhancedConsumptionDashboard (733 lines)\n├── Header & Controls (Location, Time Range, Auto-refresh, Export)\n├── Real-Time Alert Panel (Critical, Warning, Info alerts)\n├── KPI Cards (6 metrics)\n│   ├── Food Cost Percentage\n│   ├── Waste Percentage\n│   ├── Fractional Sales Rate\n│   ├── Average Transaction Value\n│   ├── Profit Margin\n│   └── Yield Efficiency\n└── Analytics Tabs (5 tabs)\n    ├── Overview (Consumption trends, Sales distribution)\n    ├── Fractional Sales (Efficiency by type, Today's breakdown)\n    ├── Variance Analysis (Top variance ingredients)\n    ├── Ingredients (Live inventory levels)\n    └── Efficiency (Yield trends, Optimization opportunities)\n```\n\n### State Management\n\n**Local State (useState)**:\n```typescript\nconst [activeTab, setActiveTab] = useState('overview')           // Current tab\nconst [timeRange, setTimeRange] = useState('today')              // Time filter\nconst [selectedLocation, setSelectedLocation] = useState(locationId) // Location filter\nconst [refreshInterval, setRefreshInterval] = useState<number | null>(30000) // Auto-refresh\n```\n\n**Auto-Refresh Logic** (useEffect):\n```typescript\nuseEffect(() => {\n  if (!refreshInterval) return\n\n  const interval = setInterval(() => {\n    // In production, this would trigger a data refresh\n    console.log('Refreshing consumption data...')\n  }, refreshInterval)\n\n  return () => clearInterval(interval)\n}, [refreshInterval])\n```\n\n---\n\n## Header Controls\n\n### Location Selector\n\n**Component**: `Select` with 3 locations\n\n**Options**:\n- Main Kitchen\n- Pastry Section\n- Bar Station\n\n**Purpose**: Filter all dashboard metrics by selected location\n\n**Implementation**:\n```typescript\n<Select value={selectedLocation} onValueChange={setSelectedLocation}>\n  <SelectTrigger className=\"w-48\">\n    <SelectValue />\n  </SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"main-kitchen\">Main Kitchen</SelectItem>\n    <SelectItem value=\"pastry-section\">Pastry Section</SelectItem>\n    <SelectItem value=\"bar-station\">Bar Station</SelectItem>\n  </SelectContent>\n</Select>\n```\n\n### Time Range Selector\n\n**Component**: `Select` with 3 time ranges\n\n**Options**:\n- Today\n- This Week\n- This Month\n\n**Purpose**: Control time window for trend analysis and aggregations\n\n**Implementation**:\n```typescript\n<Select value={timeRange} onValueChange={setTimeRange}>\n  <SelectTrigger className=\"w-40\">\n    <SelectValue />\n  </SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"today\">Today</SelectItem>\n    <SelectItem value=\"week\">This Week</SelectItem>\n    <SelectItem value=\"month\">This Month</SelectItem>\n  </SelectContent>\n</Select>\n```\n\n### Auto-Refresh Toggle\n\n**Component**: `Button` with toggle state\n\n**Functionality**:\n- Toggle between ON (30-second refresh) and OFF (manual only)\n- Visual indicator when active (green background)\n- Refresh icon animation when enabled\n\n**Implementation**:\n```typescript\n<Button\n  variant=\"outline\"\n  size=\"sm\"\n  onClick={() => setRefreshInterval(refreshInterval ? null : 30000)}\n  className={refreshInterval ? 'bg-green-50 border-green-200' : ''}\n>\n  <RefreshCcw className={`h-4 w-4 mr-2 ${refreshInterval ? 'text-green-600' : ''}`} />\n  Auto-refresh {refreshInterval ? 'ON' : 'OFF'}\n</Button>\n```\n\n### Export Button\n\n**Component**: `Button` with download icon\n\n**Purpose**: Export current dashboard data to CSV/Excel format\n\n**Implementation**:\n```typescript\n<Button variant=\"outline\" size=\"sm\">\n  <Download className=\"h-4 w-4 mr-2\" />\n  Export\n</Button>\n```\n\n---\n\n## Alert System\n\n### Alert Panel Component\n\n**Visibility**: Only shown when `currentData.alerts.length > 0`\n\n**Styling**: Amber/yellow theme for attention-grabbing display\n\n**Layout**:\n```typescript\n<Card className=\"border-amber-200 bg-amber-50\">\n  <CardHeader className=\"pb-3\">\n    <div className=\"flex items-center gap-2\">\n      <AlertTriangle className=\"h-5 w-5 text-amber-600\" />\n      <CardTitle className=\"text-lg text-amber-800\">Active Alerts</CardTitle>\n    </div>\n  </CardHeader>\n  <CardContent className=\"pt-0\">\n    {/* Alert cards */}\n  </CardContent>\n</Card>\n```\n\n### Alert Types\n\n| Type | Severity | Example Message | Recommended Action |\n|------|----------|----------------|-------------------|\n| `stock_low` | Critical | \"Fresh Vegetables are critically low\" | \"Order immediately\" |\n| `variance_high` | Warning | \"Chicken breast variance is above acceptable threshold\" | \"Review portion control procedures\" |\n| `waste_warning` | Info | \"Daily waste exceeds target\" | \"Investigate waste sources\" |\n| `efficiency_low` | Warning | \"Yield efficiency below target\" | \"Review recipe specifications\" |\n\n### Severity Styling\n\n**Critical** (Red):\n```typescript\nclassName=\"border-red-300 text-red-700 bg-red-50\"\n```\n\n**Warning** (Amber):\n```typescript\nclassName=\"border-amber-300 text-amber-700 bg-amber-50\"\n```\n\n**Info** (Blue):\n```typescript\nclassName=\"border-blue-300 text-blue-700 bg-blue-50\"\n```\n\n### Alert Data Structure\n\n```typescript\n{\n  type: 'stock_low' | 'variance_high' | 'waste_warning' | 'efficiency_low',\n  severity: 'info' | 'warning' | 'critical',\n  message: string,\n  ingredientId?: string,\n  recipeId?: string,\n  threshold?: number,\n  currentValue?: number,\n  recommendedAction?: string\n}\n```\n\n---\n\n## Key Performance Indicators (KPIs)\n\n### Grid Layout\n\n**Component**: 6 KPI cards in responsive grid\n\n**Layout**: `grid grid-cols-2 gap-4 lg:grid-cols-6`\n\n**Responsive Behavior**:\n- Mobile/Tablet: 2 columns\n- Desktop: 6 columns (all in one row)\n\n### 1. Food Cost Percentage\n\n**Icon**: `DollarSign` (Blue)\n\n**Metric**: `currentData.kpis.foodCostPercentage`\n\n**Target**: 30%\n\n**Display**:\n- Large percentage value (2xl font)\n- Progress bar visualization (max 50%)\n- Target reference text\n\n**Implementation**:\n```typescript\n<Card>\n  <CardContent className=\"pt-6\">\n    <div className=\"flex items-center justify-between\">\n      <div>\n        <p className=\"text-sm font-medium text-muted-foreground\">Food Cost %</p>\n        <p className=\"text-2xl font-bold\">{formatPercentage(currentData.kpis.foodCostPercentage)}</p>\n      </div>\n      <div className=\"h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center\">\n        <DollarSign className=\"h-4 w-4 text-blue-600\" />\n      </div>\n    </div>\n    <div className=\"mt-2\">\n      <Progress value={currentData.kpis.foodCostPercentage} max={50} className=\"h-1\" />\n      <p className=\"text-xs text-muted-foreground mt-1\">Target: 30%</p>\n    </div>\n  </CardContent>\n</Card>\n```\n\n**Business Rule**:\n- Acceptable: ≤ 30%\n- Warning: 30-35%\n- Critical: > 35%\n\n### 2. Waste Percentage\n\n**Icon**: `Package` (Red)\n\n**Metric**: `currentData.kpis.wastePercentage`\n\n**Target**: 3%\n\n**Display**:\n- Large percentage value\n- Progress bar visualization (max 10%)\n- Target reference text\n\n**Business Rule**:\n- Excellent: ≤ 3%\n- Acceptable: 3-5%\n- Warning: > 5%\n\n### 3. Fractional Sales Rate\n\n**Icon**: `PieChartIcon` (Purple)\n\n**Metric**: `currentData.kpis.fractionalSalesConversionRate`\n\n**Display**:\n- Conversion rate as percentage\n- Trend indicator (up/down arrow)\n- Change percentage (+2.3%)\n\n**Implementation**:\n```typescript\n<div className=\"flex items-center gap-1\">\n  <ArrowUpRight className=\"h-3 w-3 text-green-600\" />\n  <span className=\"text-xs text-green-600\">+2.3%</span>\n</div>\n```\n\n**Interpretation**:\n- Low: < 10% of transactions are fractional\n- Medium: 10-20%\n- High: > 20%\n\n### 4. Average Transaction Value\n\n**Icon**: `Activity` (Green)\n\n**Metric**: `currentData.kpis.averageTransactionValue`\n\n**Display**:\n- Currency-formatted value\n- Trend indicator\n- Change percentage (+5.7%)\n\n**Business Value**: Indicates upselling effectiveness and transaction optimization\n\n### 5. Profit Margin\n\n**Icon**: `Target` (Emerald)\n\n**Metric**: `currentData.kpis.profitMargin`\n\n**Display**:\n- Percentage value\n- Progress bar (max 100%)\n- Performance label (\"Excellent\")\n\n**Performance Grades**:\n- Excellent: > 60%\n- Good: 50-60%\n- Acceptable: 40-50%\n- Poor: < 40%\n\n### 6. Yield Efficiency\n\n**Icon**: `Zap` (Amber)\n\n**Metric**: `currentData.kpis.yieldEfficiency`\n\n**Target**: 95%\n\n**Display**:\n- Percentage value\n- Progress bar (max 100%)\n- Performance label (\"Good performance\")\n\n**Business Rule**:\n- Excellent: > 95%\n- Good: 90-95%\n- Acceptable: 85-90%\n- Poor: < 85%\n\n---\n\n## Tab 1: Overview\n\n### Purpose\n\nProvide high-level consumption trends and sales distribution visualizations for quick insights.\n\n### Charts\n\n#### 1. Consumption Trends Chart\n\n**Type**: Composed Chart (Bars + Lines)\n\n**Purpose**: Compare theoretical vs actual consumption with waste visualization\n\n**Data Structure**:\n```typescript\nconst consumptionTrendData = [\n  { day: '1', theoretical: 520, actual: 548, fractional: 320, whole: 228, waste: 28 },\n  { day: '2', theoretical: 485, actual: 502, fractional: 295, whole: 207, waste: 17 },\n  // ... 7 days total\n]\n```\n\n**Chart Elements**:\n- **X-Axis**: Day (1-7)\n- **Y-Axis**: Cost ($)\n- **Bars**: Waste amount (red, `#ef4444`)\n- **Line 1**: Theoretical consumption (blue, `#6366f1`, 2px width)\n- **Line 2**: Actual consumption (green, `#059669`, 2px width)\n\n**Implementation**:\n```typescript\n<ResponsiveContainer width=\"100%\" height=\"100%\">\n  <ComposedChart data={consumptionTrendData}>\n    <CartesianGrid strokeDasharray=\"3 3\" />\n    <XAxis dataKey=\"day\" />\n    <YAxis />\n    <Tooltip formatter={(value) => [formatCurrency(Number(value)), undefined]} />\n    <Legend />\n    <Bar dataKey=\"waste\" name=\"Waste\" fill=\"#ef4444\" />\n    <Line\n      type=\"monotone\"\n      dataKey=\"theoretical\"\n      name=\"Theoretical\"\n      stroke=\"#6366f1\"\n      strokeWidth={2}\n    />\n    <Line\n      type=\"monotone\"\n      dataKey=\"actual\"\n      name=\"Actual\"\n      stroke=\"#059669\"\n      strokeWidth={2}\n    />\n  </ComposedChart>\n</ResponsiveContainer>\n```\n\n**Insights Provided**:\n- Daily consumption patterns\n- Variance trends over time\n- Waste patterns and anomalies\n- Forecast accuracy (theoretical vs actual)\n\n#### 2. Sales Distribution Chart\n\n**Type**: Stacked Area Chart\n\n**Purpose**: Visualize fractional vs whole sales breakdown over time\n\n**Data Structure**: Same as Consumption Trends\n\n**Chart Elements**:\n- **X-Axis**: Day (1-7)\n- **Y-Axis**: Transaction count\n- **Area 1**: Fractional sales (purple, `#8b5cf6`, 60% opacity)\n- **Area 2**: Whole sales (cyan, `#06b6d4`, 60% opacity)\n\n**Implementation**:\n```typescript\n<ResponsiveContainer width=\"100%\" height=\"100%\">\n  <AreaChart data={consumptionTrendData}>\n    <CartesianGrid strokeDasharray=\"3 3\" />\n    <XAxis dataKey=\"day\" />\n    <YAxis />\n    <Tooltip formatter={(value) => [formatCurrency(Number(value)), undefined]} />\n    <Legend />\n    <Area\n      type=\"monotone\"\n      dataKey=\"fractional\"\n      name=\"Fractional Sales\"\n      stackId=\"1\"\n      stroke=\"#8b5cf6\"\n      fill=\"#8b5cf6\"\n      fillOpacity={0.6}\n    />\n    <Area\n      type=\"monotone\"\n      dataKey=\"whole\"\n      name=\"Whole Sales\"\n      stackId=\"1\"\n      stroke=\"#06b6d4\"\n      fill=\"#06b6d4\"\n      fillOpacity={0.6}\n    />\n  </AreaChart>\n</ResponsiveContainer>\n```\n\n**Insights Provided**:\n- Fractional sales adoption trends\n- Whole vs partial item preference patterns\n- Revenue distribution by sale type\n- Seasonal or weekly patterns\n\n---\n\n## Tab 2: Fractional Sales\n\n### Purpose\n\nDetailed analysis of fractional sales efficiency, revenue contribution, and type-specific performance.\n\n### Layout\n\n**Grid**: 2-column layout (lg:grid-cols-3)\n- Left: Efficiency chart (2 columns)\n- Right: Today's metrics card (1 column)\n\n### Chart: Fractional Sales Efficiency by Type\n\n**Type**: Dual-Axis Bar Chart\n\n**Purpose**: Compare revenue, transactions, and efficiency across fractional sale types\n\n**Data Structure**:\n```typescript\nconst fractionalEfficiencyData = [\n  { type: 'Pizza Slice', transactions: 89, revenue: 442.11, efficiency: 95.2, waste: 3.8 },\n  { type: 'Cake Slice', transactions: 34, revenue: 237.66, efficiency: 88.5, waste: 6.2 },\n  { type: 'Portion Control', transactions: 28, revenue: 168.00, efficiency: 92.1, waste: 4.1 },\n  { type: 'Bottle Glass', transactions: 6, revenue: 48.00, efficiency: 85.7, waste: 8.5 }\n]\n```\n\n**Chart Elements**:\n- **X-Axis**: Fractional sale type\n- **Y-Axis Left**: Revenue ($) and transaction count\n- **Y-Axis Right**: Efficiency percentage\n- **Bar 1**: Revenue (green, `#10b981`)\n- **Bar 2**: Transactions (blue, `#6366f1`)\n- **Line**: Efficiency percentage (amber, `#f59e0b`, 2px width)\n\n**Implementation**:\n```typescript\n<ResponsiveContainer width=\"100%\" height=\"100%\">\n  <BarChart data={fractionalEfficiencyData}>\n    <CartesianGrid strokeDasharray=\"3 3\" />\n    <XAxis dataKey=\"type\" />\n    <YAxis yAxisId=\"left\" />\n    <YAxis yAxisId=\"right\" orientation=\"right\" />\n    <Tooltip />\n    <Legend />\n    <Bar yAxisId=\"left\" dataKey=\"revenue\" name=\"Revenue ($)\" fill=\"#10b981\" />\n    <Bar yAxisId=\"left\" dataKey=\"transactions\" name=\"Transactions\" fill=\"#6366f1\" />\n    <Line\n      yAxisId=\"right\"\n      type=\"monotone\"\n      dataKey=\"efficiency\"\n      name=\"Efficiency %\"\n      stroke=\"#f59e0b\"\n      strokeWidth={2}\n    />\n  </BarChart>\n</ResponsiveContainer>\n```\n\n**Insights Provided**:\n- Revenue contribution per type\n- Transaction volume per type\n- Efficiency comparison across types\n- Identify highest-performing fractional types\n\n### Card: Today's Fractional Sales\n\n**Purpose**: Real-time breakdown of fractional sales by type\n\n**Layout**: Vertical list with progress bars\n\n**Components**:\n1. **Header**: Total fractional transactions\n2. **Breakdown**: 4 sale types with counts and percentages\n   - Pizza Slices: 89 (56.7%)\n   - Cake Slices: 34 (21.7%)\n   - Portions: 28 (17.8%)\n   - Others: 6 (3.8%)\n\n**Implementation**:\n```typescript\n<div className=\"space-y-3\">\n  <div className=\"flex items-center justify-between\">\n    <span className=\"text-sm\">Pizza Slices</span>\n    <div className=\"text-right\">\n      <div className=\"text-sm font-medium\">89</div>\n      <div className=\"text-xs text-muted-foreground\">56.7%</div>\n    </div>\n  </div>\n  <Progress value={56.7} className=\"h-1\" />\n  {/* Repeat for other types */}\n</div>\n```\n\n**Update Frequency**: Real-time with auto-refresh (30 seconds)\n\n---\n\n## Tab 3: Variance Analysis\n\n### Purpose\n\nIdentify and analyze ingredients with highest variance between theoretical and actual consumption.\n\n### Component: Top Variance Ingredients List\n\n**Type**: Card with ranked list\n\n**Data Structure**:\n```typescript\nconst varianceData = [\n  { ingredient: 'Fresh Vegetables', theoretical: 125, actual: 142, variance: 13.6, trend: 'up' },\n  { ingredient: 'Chicken Breast', theoretical: 210, actual: 234, variance: 11.4, trend: 'up' },\n  { ingredient: 'Fresh Herbs', theoretical: 45, actual: 48, variance: 6.7, trend: 'stable' },\n  { ingredient: 'Dairy Products', theoretical: 89, actual: 91, variance: 2.2, trend: 'down' },\n  { ingredient: 'Grains', theoretical: 78, actual: 76, variance: -2.6, trend: 'down' }\n]\n```\n\n### Item Display\n\n**Layout**: Horizontal card with 3 sections\n1. **Left**: Indicator dot + ingredient name + theoretical/actual values\n2. **Middle**: Variance percentage (color-coded)\n3. **Right**: Trend icon (up/down/stable)\n\n**Implementation**:\n```typescript\n<div className=\"flex items-center justify-between p-4 border rounded-lg\">\n  <div className=\"flex items-center gap-4\">\n    <div className=\"w-2 h-2 rounded-full bg-blue-500\" />\n    <div>\n      <div className=\"font-medium\">{item.ingredient}</div>\n      <div className=\"text-sm text-muted-foreground\">\n        Theoretical: {formatCurrency(item.theoretical)} | Actual: {formatCurrency(item.actual)}\n      </div>\n    </div>\n  </div>\n  <div className=\"flex items-center gap-4\">\n    <div className=\"text-right\">\n      <div className={`font-medium ${item.variance > 0 ? 'text-red-600' : 'text-green-600'}`}>\n        {item.variance > 0 ? '+' : ''}{formatPercentage(item.variance)}\n      </div>\n      <div className=\"text-xs text-muted-foreground\">variance</div>\n    </div>\n    <div className=\"w-6 h-6 flex items-center justify-center\">\n      {item.trend === 'up' ? (\n        <TrendingUp className=\"h-4 w-4 text-red-500\" />\n      ) : item.trend === 'down' ? (\n        <TrendingDown className=\"h-4 w-4 text-green-500\" />\n      ) : (\n        <div className=\"w-4 h-0.5 bg-gray-400\" />\n      )}\n    </div>\n  </div>\n</div>\n```\n\n### Variance Color Coding\n\n- **Positive Variance** (Over-consumption): Red text (`text-red-600`)\n- **Negative Variance** (Under-consumption): Green text (`text-green-600`)\n\n### Trend Indicators\n\n- **Up Trend** (`TrendingUp` icon, red): Variance increasing over time\n- **Down Trend** (`TrendingDown` icon, green): Variance decreasing\n- **Stable** (horizontal line, gray): No significant change\n\n### Variance Thresholds\n\n- **Acceptable**: ≤ 8% variance\n- **Warning**: 8-15% variance\n- **Critical**: > 15% variance\n\n---\n\n## Tab 4: Ingredients\n\n### Purpose\n\nMonitor real-time ingredient inventory levels with consumption-based depletion projections.\n\n### Component: Live Ingredient Levels Grid\n\n**Type**: Card grid (responsive 3-column layout)\n\n**Layout**: `grid gap-4 md:grid-cols-2 lg:grid-cols-3`\n\n**Data Source**: `currentData.liveIngredientLevels`\n\n### Ingredient Card Structure\n\n**Components**:\n1. **Header**: Ingredient name + status badge\n2. **Level Display**: Current level value + progress bar\n3. **Footer**: Reorder point + projected depletion date\n\n**Implementation**:\n```typescript\n<div className=\"p-4 border rounded-lg space-y-3\">\n  <div className=\"flex items-center justify-between\">\n    <span className=\"font-medium\">{ingredient.ingredientName}</span>\n    <Badge\n      variant=\"outline\"\n      className={\n        ingredient.status === 'critical'\n          ? 'border-red-300 text-red-700 bg-red-50'\n          : ingredient.status === 'low'\n          ? 'border-amber-300 text-amber-700 bg-amber-50'\n          : 'border-green-300 text-green-700 bg-green-50'\n      }\n    >\n      {ingredient.status.replace('_', ' ').toUpperCase()}\n    </Badge>\n  </div>\n  <div>\n    <div className=\"flex items-center justify-between mb-1\">\n      <span className=\"text-sm text-muted-foreground\">Current Level</span>\n      <span className=\"text-sm font-medium\">{ingredient.currentLevel} units</span>\n    </div>\n    <Progress\n      value={(ingredient.currentLevel / (ingredient.reorderPoint * 2)) * 100}\n      className=\"h-2\"\n    />\n    <div className=\"flex items-center justify-between mt-1\">\n      <span className=\"text-xs text-muted-foreground\">Reorder: {ingredient.reorderPoint}</span>\n      <span className=\"text-xs text-muted-foreground\">\n        {ingredient.projectedDepletion ? (\n          <>Depletion: {ingredient.projectedDepletion.toLocaleDateString()}</>\n        ) : (\n          'Stock adequate'\n        )}\n      </span>\n    </div>\n  </div>\n</div>\n```\n\n### Status Levels\n\n| Status | Badge Color | Condition | Action |\n|--------|------------|-----------|--------|\n| `adequate` | Green | Current level > 2x reorder point | None |\n| `low` | Amber | Current level < 2x reorder point | Monitor |\n| `critical` | Red | Current level < reorder point | Order immediately |\n| `out_of_stock` | Urgent Red | Current level = 0 | Emergency order |\n\n### Progress Bar Calculation\n\n**Formula**: `(currentLevel / (reorderPoint * 2)) * 100`\n\n**Explanation**: Progress bar shows current level as percentage of \"adequate\" stock (2x reorder point)\n\n### Projected Depletion\n\n**Calculation**: Based on consumption rate and current level\n\n**Display**:\n- If projected: Show date in localized format\n- If adequate: Show \"Stock adequate\" message\n\n---\n\n## Tab 5: Efficiency\n\n### Purpose\n\nTrack yield efficiency trends and identify optimization opportunities for cost savings.\n\n### Layout\n\n**Grid**: 2-column layout (lg:grid-cols-2)\n- Left: Yield efficiency trends chart\n- Right: Optimization opportunities list\n\n### Chart: Yield Efficiency Trends\n\n**Type**: Line Chart\n\n**Purpose**: Compare target vs actual yield efficiency over time\n\n**Data**: Reuses `consumptionTrendData` (theoretical = target, actual = efficiency)\n\n**Chart Elements**:\n- **X-Axis**: Day (1-7)\n- **Y-Axis**: Efficiency percentage (domain: 80-100%)\n- **Line 1**: Target Efficiency (blue, `#6366f1`, dashed line)\n- **Line 2**: Actual Efficiency (green, `#10b981`, solid 3px line)\n\n**Implementation**:\n```typescript\n<ResponsiveContainer width=\"100%\" height=\"100%\">\n  <LineChart data={consumptionTrendData}>\n    <CartesianGrid strokeDasharray=\"3 3\" />\n    <XAxis dataKey=\"day\" />\n    <YAxis domain={[80, 100]} />\n    <Tooltip formatter={(value) => [`${value}%`, 'Efficiency']} />\n    <Legend />\n    <Line\n      type=\"monotone\"\n      dataKey=\"theoretical\"\n      name=\"Target Efficiency\"\n      stroke=\"#6366f1\"\n      strokeWidth={2}\n      strokeDasharray=\"5 5\"\n    />\n    <Line\n      type=\"monotone\"\n      dataKey=\"actual\"\n      name=\"Actual Efficiency\"\n      stroke=\"#10b981\"\n      strokeWidth={3}\n    />\n  </LineChart>\n</ResponsiveContainer>\n```\n\n**Target**: 95% yield efficiency (industry standard)\n\n### Card: Optimization Opportunities\n\n**Type**: Vertical list of improvement recommendations\n\n**Item Count**: 3 prioritized opportunities\n\n### Opportunity Card Structure\n\n**Components**:\n1. **Header**: Opportunity title + impact badge\n2. **Description**: Explanation of issue and solution\n3. **Footer**: Potential savings + action button\n\n**Opportunity Types**:\n\n#### 1. Reduce Vegetable Waste\n\n**Impact**: High\n\n**Description**: \"Improve storage and handling procedures to reduce 13.6% variance\"\n\n**Potential Savings**: $125.50/day\n\n**Implementation**:\n```typescript\n<div className=\"p-4 border rounded-lg\">\n  <div className=\"flex items-center justify-between mb-2\">\n    <span className=\"font-medium\">Reduce Vegetable Waste</span>\n    <Badge>High Impact</Badge>\n  </div>\n  <p className=\"text-sm text-muted-foreground mb-2\">\n    Improve storage and handling procedures to reduce 13.6% variance\n  </p>\n  <div className=\"flex items-center justify-between\">\n    <span className=\"text-sm\">Potential Savings: {formatCurrency(125.50)}/day</span>\n    <Button size=\"sm\" variant=\"outline\">View Details</Button>\n  </div>\n</div>\n```\n\n#### 2. Optimize Portion Sizes\n\n**Impact**: Medium\n\n**Description**: \"Standardize fractional portion sizes for better yield control\"\n\n**Potential Savings**: $89.25/day\n\n#### 3. Recipe Standardization\n\n**Impact**: Long Term\n\n**Description**: \"Update recipe specifications based on actual consumption patterns\"\n\n**Potential Savings**: $67.80/day\n\n### Impact Badges\n\n- **High Impact**: Immediate, significant cost reduction\n- **Medium Impact**: Moderate improvement with quick wins\n- **Long Term**: Strategic improvements with sustained benefits\n\n---\n\n## Data Integration\n\n### Real-Time Data Flow\n\n```\nPOS System → Transaction Stream → Consumption Tracking Engine\n    ↓\nRecipe Management → Theoretical Calculation → Variance Engine\n    ↓\nInventory System → Actual Consumption → Alert Generator\n    ↓\nDashboard Component → Real-Time Display → User Actions\n```\n\n### Data Refresh Cycle\n\n**Interval**: 30 seconds (configurable)\n\n**Triggered Updates**:\n1. KPI recalculation\n2. Alert regeneration\n3. Ingredient level updates\n4. Chart data refresh\n5. Trend indicator updates\n\n**WebSocket Integration** (Production):\n```typescript\n// In production, replace interval with WebSocket connection\nconst ws = new WebSocket('wss://api.carmen-erp.com/consumption/realtime')\n\nws.onmessage = (event) => {\n  const updatedData = JSON.parse(event.data)\n  setCurrentData(updatedData)\n}\n```\n\n### API Endpoints\n\n**Get Real-Time Metrics**:\n```http\nGET /api/reporting/consumption/realtime\nQuery Parameters:\n  - locationId: string\n  - periodId: string\nResponse: RealTimeConsumptionMetrics\n```\n\n**Get Consumption Trends**:\n```http\nGET /api/reporting/consumption/trends\nQuery Parameters:\n  - locationId: string\n  - timeRange: 'today' | 'week' | 'month'\n  - startDate: ISO date\n  - endDate: ISO date\nResponse: ConsumptionTrendData[]\n```\n\n**Get Fractional Sales Report**:\n```http\nGET /api/reporting/fractional-sales/efficiency\nQuery Parameters:\n  - locationId: string\n  - timeRange: string\nResponse: FractionalSalesEfficiencyReport\n```\n\n**Get Variance Analysis**:\n```http\nGET /api/reporting/consumption/variance\nQuery Parameters:\n  - locationId: string\n  - periodId: string\nResponse: ConsumptionVarianceAnalysis\n```\n\n---\n\n## TypeScript Interfaces\n\n### RealTimeConsumptionMetrics\n\n**File**: `/lib/types/enhanced-consumption-tracking.ts`\n\n```typescript\nexport interface RealTimeConsumptionMetrics {\n  timestamp: Date;\n  location: string;\n  currentPeriodSales: number;\n  currentPeriodCosts: number;\n  currentPeriodProfit: number;\n  todayTransactionCount: number;\n  todayFractionalSales: number;\n  todayWholeSales: number;\n  todayWastage: number;\n  liveIngredientLevels: {\n    ingredientId: string;\n    ingredientName: string;\n    currentLevel: number;\n    projectedDepletion: Date | null;\n    reorderPoint: number;\n    status: 'adequate' | 'low' | 'critical' | 'out_of_stock';\n  }[];\n  kpis: {\n    foodCostPercentage: number;\n    wastePercentage: number;\n    fractionalSalesConversionRate: number;\n    averageTransactionValue: number;\n    profitMargin: number;\n    yieldEfficiency: number;\n  };\n  alerts: {\n    type: 'waste_warning' | 'stock_low' | 'variance_high' | 'efficiency_low';\n    severity: 'info' | 'warning' | 'critical';\n    message: string;\n    ingredientId?: string;\n    recipeId?: string;\n    threshold?: number;\n    currentValue?: number;\n    recommendedAction?: string;\n  }[];\n}\n```\n\n---\n\n## Business Rules\n\n### Consumption Calculation\n\n**Theoretical Consumption**:\n```\nFor each recipe sold:\n  Theoretical Cost = Σ (ingredient.quantity × ingredient.unitCost)\n\nFor fractional sales:\n  Theoretical Cost = Base Recipe Cost × Conversion Rate\n\nExample: Pizza Slice (1/8 conversion)\n  If whole pizza theoretical cost = $8.00\n  Then slice theoretical cost = $8.00 × 0.125 = $1.00\n```\n\n**Actual Consumption**:\n```\nActual Consumption = Beginning Inventory + Purchases - Ending Inventory - Waste\n```\n\n**Variance Calculation**:\n```\nVariance = Actual Consumption - Theoretical Consumption\nVariance % = (Variance / Theoretical Consumption) × 100\n```\n\n### Alert Generation Rules\n\n**Stock Low Alert**:\n```\nIF currentLevel < 2 × reorderPoint THEN\n  severity = 'warning'\n  recommendedAction = 'Monitor inventory levels'\n\nIF currentLevel < reorderPoint THEN\n  severity = 'critical'\n  recommendedAction = 'Order immediately'\n```\n\n**Variance High Alert**:\n```\nIF variancePercentage > 8% AND variancePercentage ≤ 15% THEN\n  severity = 'warning'\n  recommendedAction = 'Review portion control procedures'\n\nIF variancePercentage > 15% THEN\n  severity = 'critical'\n  recommendedAction = 'Immediate investigation required'\n```\n\n**Waste Warning Alert**:\n```\nIF wastePercentage > 3% AND wastePercentage ≤ 5% THEN\n  severity = 'info'\n  recommendedAction = 'Investigate waste sources'\n\nIF wastePercentage > 5% THEN\n  severity = 'warning'\n  recommendedAction = 'Implement waste reduction procedures'\n```\n\n---\n\n## User Guide\n\n### Monitoring Daily Operations\n\n**Step 1**: Access Dashboard\n- Navigate to Reporting & Analytics > Consumption Analytics\n- Dashboard loads with today's data and main kitchen location\n\n**Step 2**: Review Alerts\n- Check active alerts panel at top\n- Address critical alerts immediately\n- Review warning alerts and plan corrections\n\n**Step 3**: Monitor KPIs\n- Check food cost percentage (target: ≤ 30%)\n- Verify waste percentage (target: ≤ 3%)\n- Review other KPIs for abnormalities\n\n**Step 4**: Analyze Trends\n- Switch to Overview tab\n- Review 7-day consumption trends\n- Identify patterns and anomalies\n\n**Step 5**: Investigate Variance\n- Switch to Variance Analysis tab\n- Review top variance ingredients\n- Plan corrective actions for high variance items\n\n### Optimizing Fractional Sales\n\n**Step 1**: Access Fractional Sales Tab\n- Click \"Fractional Sales\" tab\n- Review efficiency chart\n\n**Step 2**: Identify Low Efficiency Types\n- Find types with efficiency < 90%\n- Note waste percentages\n\n**Step 3**: Review Real-Time Distribution\n- Check today's breakdown card\n- Identify underperforming types\n\n**Step 4**: Take Action\n- Adjust portion sizes\n- Train staff on proper portioning\n- Review storage procedures\n\n### Managing Ingredient Inventory\n\n**Step 1**: Access Ingredients Tab\n- Click \"Ingredients\" tab\n- Review ingredient level cards\n\n**Step 2**: Identify Critical Items\n- Look for red (critical) badges\n- Note projected depletion dates\n\n**Step 3**: Plan Orders\n- Create purchase requisitions for critical items\n- Schedule orders for low items\n- Monitor adequate items\n\n**Step 4**: Adjust Reorder Points\n- Review historical depletion patterns\n- Adjust reorder points if needed\n- Update lead times\n\n### Implementing Efficiency Improvements\n\n**Step 1**: Access Efficiency Tab\n- Click \"Efficiency\" tab\n- Review yield efficiency trends\n\n**Step 2**: Review Opportunities\n- Read optimization opportunity cards\n- Note potential savings\n\n**Step 3**: Prioritize Actions\n- Start with high-impact opportunities\n- Plan medium-impact improvements\n- Schedule long-term initiatives\n\n**Step 4**: Monitor Results\n- Track efficiency trend changes\n- Measure actual savings\n- Adjust strategies as needed\n\n---\n\n## Troubleshooting\n\n### Issue: Data Not Refreshing\n\n**Symptoms**:\n- Timestamp not updating\n- Auto-refresh toggle shows ON but data is stale\n\n**Solution**:\n1. Check auto-refresh toggle (click to OFF then ON)\n2. Verify browser console for WebSocket connection errors\n3. Manually refresh browser if needed\n4. Check network connectivity\n\n### Issue: Alerts Not Displaying\n\n**Symptoms**:\n- Alert panel not visible despite high variance or low stock\n\n**Solution**:\n1. Verify location filter is correct\n2. Check alert severity thresholds in settings\n3. Review alert generation logs in system administration\n4. Confirm consumption period is active\n\n### Issue: Incorrect KPI Values\n\n**Symptoms**:\n- KPI values don't match expected calculations\n- Percentages seem wrong\n\n**Solution**:\n1. Verify correct time range selected\n2. Check location filter\n3. Review consumption period setup\n4. Verify POS integration is working\n5. Check for pending inventory adjustments\n\n### Issue: Missing Ingredients in Grid\n\n**Symptoms**:\n- Expected ingredients not showing in Ingredients tab\n\n**Solution**:\n1. Verify ingredients are active in product management\n2. Check if ingredients have consumption records\n3. Confirm ingredients are assigned to selected location\n4. Review ingredient visibility settings\n\n---\n\n## Performance Optimization\n\n### Render Optimization\n\n**Component Memoization**:\n```typescript\nconst filteredData = useMemo(() => {\n  return consumptionTrendData.filter(/* filters */)\n}, [consumptionTrendData, filters])\n```\n\n**Chart Lazy Loading**:\n- Charts render only when tab is active\n- Reduce initial bundle size\n- Improve Time to Interactive (TTI)\n\n### Data Loading Strategy\n\n**Initial Load**:\n1. Load current period summary (lightweight)\n2. Load KPIs and alerts\n3. Lazy load chart data for active tab only\n\n**Tab Switch**:\n1. Check if tab data already loaded\n2. Load only if missing\n3. Cache loaded data\n\n**Auto-Refresh**:\n1. Fetch only changed data\n2. Merge with existing state\n3. Minimize re-renders\n\n### Bundle Size Optimization\n\n**Code Splitting**:\n```typescript\nconst EnhancedConsumptionDashboard = dynamic(\n  () => import('./components/enhanced-consumption-dashboard'),\n  { loading: () => <DashboardSkeleton /> }\n)\n```\n\n**Chart Library Tree-Shaking**:\n- Import only used chart components\n- Reduce Recharts bundle from ~100KB to ~40KB\n\n---\n\n## Testing Strategy\n\n### Unit Tests\n\n**KPI Calculations**:\n```typescript\ndescribe('KPI Calculations', () => {\n  it('should calculate food cost percentage correctly', () => {\n    expect(calculateFoodCostPercentage(costs, sales)).toBe(33.7)\n  })\n})\n```\n\n**Alert Generation**:\n```typescript\ndescribe('Alert Generation', () => {\n  it('should generate critical alert for stock below reorder point', () => {\n    const alerts = generateAlerts(ingredientLevels)\n    expect(alerts).toContainEqual(\n      expect.objectContaining({ severity: 'critical', type: 'stock_low' })\n    )\n  })\n})\n```\n\n### Integration Tests\n\n**Dashboard Rendering**:\n```typescript\ndescribe('Consumption Dashboard', () => {\n  it('should render all KPI cards', () => {\n    render(<EnhancedConsumptionDashboard />)\n    expect(screen.getByText('Food Cost %')).toBeInTheDocument()\n    expect(screen.getByText('Waste %')).toBeInTheDocument()\n    // ... test all 6 KPIs\n  })\n})\n```\n\n**Tab Navigation**:\n```typescript\nit('should switch tabs correctly', async () => {\n  render(<EnhancedConsumptionDashboard />)\n  await userEvent.click(screen.getByText('Fractional Sales'))\n  expect(screen.getByText('Fractional Sales Efficiency by Type')).toBeVisible()\n})\n```\n\n### E2E Tests\n\n**User Workflow**:\n```typescript\ntest('user can monitor daily consumption and take action on alerts', async () => {\n  await page.goto('/reporting-analytics/consumption-analytics')\n  await page.waitForSelector('[data-testid=\"consumption-dashboard\"]')\n\n  // Verify alerts are visible\n  await expect(page.locator('.alert-panel')).toBeVisible()\n\n  // Click on recommended action\n  await page.click('button:has-text(\"Order immediately\")')\n\n  // Verify navigation to purchase requisition\n  await expect(page).toHaveURL(/purchase-requisitions/)\n})\n```\n\n---\n\n## Future Enhancements\n\n### Planned Features\n\n1. **Predictive Analytics**\n   - Machine learning consumption forecasting\n   - Automated variance pattern detection\n   - Seasonal trend identification\n\n2. **Mobile App**\n   - Real-time KPI monitoring\n   - Push notifications for critical alerts\n   - Quick variance entry\n\n3. **Advanced Visualizations**\n   - Interactive drill-down charts\n   - Heatmaps for consumption patterns\n   - Sankey diagrams for cost flow\n\n4. **Automated Reporting**\n   - Scheduled PDF reports\n   - Email distribution\n   - Custom report builder\n\n5. **Benchmarking**\n   - Multi-location comparison\n   - Industry standard comparisons\n   - Best practice identification\n\n---\n\n**Last Updated**: 2025-01-17\n**Version**: 1.0.0\n**Status**: Production Ready\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

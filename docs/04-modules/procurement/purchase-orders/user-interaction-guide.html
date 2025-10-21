@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order Module - User Interaction Guide - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Purchase Orders</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Purchase Order Module - User Interaction Guide\n\n## Table of Contents\n1. [Navigation & Entry Points](#navigation--entry-points)\n2. [Primary User Workflows](#primary-user-workflows)\n3. [Dialog Interactions](#dialog-interactions)\n4. [Form Interactions](#form-interactions)\n5. [Data Management](#data-management)\n6. [Advanced Features](#advanced-features)\n\n## Navigation & Entry Points\n\n### Main Navigation\n- **Primary Access:** Procurement → Purchase Orders (sidebar menu)\n- **Breadcrumb:** Dashboard → Procurement → Purchase Orders\n- **URL Pattern:** `/procurement/purchase-orders`\n\n### Direct Links\n- **Specific PO:** `/procurement/purchase-orders/[PO-ID]`\n- **Create New:** `/procurement/purchase-orders/create`\n- **From PR:** `/procurement/purchase-orders/create/from-pr`\n- **Bulk Create:** `/procurement/purchase-orders/create/bulk`\n\n## Primary User Workflows\n\n### 1. Create Purchase Order from Scratch\n\n**Step-by-Step Process:**\n\n1. **Navigate to PO List**\n   - Click \"Procurement\" in sidebar\n   - Select \"Purchase Orders\"\n\n2. **Initiate Creation**\n   - Click \"New PO\" button\n   - Select \"Create Blank PO\" from dropdown\n\n3. **Fill Header Information**\n   - Enter Order Date (defaults to today)\n   - Select Vendor from dropdown\n   - Set Delivery Date\n   - Choose Currency\n   - Enter Exchange Rate (if applicable)\n   - Add Credit Terms\n   - Write Description and Remarks\n\n4. **Add Items**\n   - Navigate to Items tab\n   - Click \"Add Item\" button\n   - Fill item details:\n     - Product Name and Description\n     - Quantity and Units\n     - Unit Price\n     - Tax Rate\n     - Discount Rate\n   - Save item\n\n5. **Review Financial Summary**\n   - Check calculated totals\n   - Verify currency amounts\n   - Confirm tax calculations\n\n6. **Save and Send**\n   - Save as Draft for later editing\n   - Or change status to \"Sent\" to submit to vendor\n\n**Screenshot References:**\n- ![PO Creation Form](./screenshots/purchase-order-detail-page.png)\n\n### 2. Create Purchase Order from Purchase Requests\n\n**Step-by-Step Process:**\n\n1. **Access PR to PO Conversion**\n   - From PO List page\n   - Click \"New PO\" → \"Create from Purchase Requests\"\n\n2. **Select Purchase Requests**\n   - Dialog opens with available approved PRs\n   - Use search to find specific PRs\n   - Apply filters (vendor, date, amount)\n   - Select multiple PRs using checkboxes\n\n3. **Review Grouping**\n   - System automatically groups by vendor and currency\n   - Preview shows how many POs will be created\n   - Review items that will be included\n\n4. **Confirm Creation**\n   - Click \"Create PO(s)\" button\n   - System processes grouping logic\n   - Redirects to first PO or bulk creation page\n\n5. **Review Generated PO**\n   - Check vendor information is correct\n   - Verify all PR items are included\n   - Adjust quantities if needed\n   - Modify terms and conditions\n\n6. **Finalize**\n   - Save as Draft or Send to vendor\n   - System maintains PR traceability\n\n### 3. Process Purchase Order Items\n\n**Item Management Workflow:**\n\n1. **Access Items Tab**\n   - Open specific PO detail page\n   - Click on \"Items\" tab\n\n2. **Review Item Status**\n   - Check ordered vs received quantities\n   - Monitor delivery status\n   - Identify pending items\n\n3. **Process Goods Receipt**\n   - Click \"Related GRNs\" for item\n   - Navigate to Goods Received Note\n   - Record actual received quantities\n   - Update item status automatically\n\n4. **Handle Partial Deliveries**\n   - Use \"Split Line\" function for partial delivery\n   - Create separate line items\n   - Track multiple delivery dates\n\n5. **Close Completed Items**\n   - Mark items as \"Fully Received\"\n   - Close line items when complete\n   - Update PO status when all items complete\n\n### 4. Manage Purchase Order Status\n\n**Status Change Workflow:**\n\n1. **Access Status Controls**\n   - Open PO detail page\n   - Enter edit mode\n   - Use status dropdown\n\n2. **Select New Status**\n   - Choose from available status options\n   - System validates status progression\n\n3. **Provide Justification (if required)**\n   - For cancellation/void: reason required\n   - Enter detailed explanation\n   - Specify business justification\n\n4. **Confirm Change**\n   - Review status change impact\n   - Confirm action in dialog\n   - System updates activity log\n\n5. **Verify Update**\n   - Check status badge updated\n   - Review activity log entry\n   - Confirm workflow progression\n\n## Dialog Interactions\n\n### 1. Create from Purchase Requests Dialog\n\n**Interface Elements:**\n- Search bar for PR filtering\n- Filter buttons (status, vendor, date)\n- Checkbox selection for multiple PRs\n- Data table with PR details\n- Summary panel showing selection count\n- Preview of PO grouping\n\n**User Actions:**\n- **Search:** Type PR number or description\n- **Filter:** Click filter buttons to narrow results\n- **Select:** Use checkboxes to select PRs\n- **Select All:** Master checkbox for page selection\n- **Preview:** Review how PRs will be grouped\n- **Create:** Confirm selection and proceed\n\n**Validation:**\n- Only approved PRs selectable\n- Must select at least one PR\n- System checks for vendor conflicts\n\n### 2. Status Change Confirmation Dialog\n\n**Dialog Triggers:**\n- Status dropdown change in edit mode\n- Bulk status update operations\n- Workflow progression actions\n\n**Interface Elements:**\n- Warning icon for critical changes\n- Dynamic message based on status change\n- Required reason field (for void/cancel)\n- Confirm and Cancel buttons\n\n**Business Rules:**\n- Draft → Sent: Confirmation only\n- Any → Cancelled/Voided: Reason required\n- Cannot reverse certain progressions\n- System validates status workflow\n\n### 3. Export Configuration Dialog\n\n**Format Selection:**\n- Radio buttons for PDF, Excel, CSV\n- Format-specific options\n- Preview of output structure\n\n**Section Selection:**\n- Checkboxes for each section\n- Header Information\n- Items Detail\n- Financial Summary\n- Vendor Information\n- Comments and Attachments\n\n**Export Process:**\n- Validate selections\n- Generate file server-side\n- Download prompt\n- File naming convention\n\n### 4. Item Management Dialogs\n\n**Add Item Dialog:**\n- Product search/selection\n- Quantity and unit specification\n- Pricing information entry\n- Tax and discount configuration\n- Inventory information display\n\n**Edit Item Dialog:**\n- Pre-populated with current values\n- Modification tracking\n- Validation of changes\n- Impact on totals\n\n## Form Interactions\n\n### 1. Header Information Form\n\n**Field Types and Validation:**\n\n**Date Fields:**\n- HTML5 date picker\n- Default to current date\n- Future date validation for delivery\n- Weekend/holiday consideration\n\n**Text Fields:**\n- Auto-complete for vendor names\n- Character limits enforced\n- Required field indicators\n- Real-time validation\n\n**Numeric Fields:**\n- Exchange rate: 4 decimal places\n- Amount fields: 2 decimal places\n- Quantity fields: 3 decimal places\n- Negative value prevention\n\n**Dropdown Fields:**\n- Currency selection with search\n- Vendor selection with filtering\n- Status progression validation\n- Dynamic option loading\n\n### 2. Item Details Form\n\n**Product Selection:**\n- Searchable product catalog\n- Recent items quick access\n- Barcode scanning support\n- Custom item creation\n\n**Quantity Management:**\n- Multiple unit support\n- Conversion factor handling\n- Stock level checking\n- Reorder point alerts\n\n**Pricing Configuration:**\n- Multi-currency support\n- Bulk discount tiers\n- Tax calculation options\n- Price history display\n\n## Data Management\n\n### 1. Search and Filtering\n\n**Quick Filters:**\n- Status-based filtering\n- Date range selection\n- Vendor filtering\n- Amount range filtering\n- Currency filtering\n\n**Advanced Search:**\n- Multi-criteria search\n- Saved search preferences\n- Complex query building\n- Result sorting options\n\n**Search Features:**\n- Auto-complete suggestions\n- Fuzzy matching\n- Wildcard support\n- Search history\n\n### 2. Bulk Operations\n\n**Selection Methods:**\n- Individual row selection\n- Page-level select all\n- Filter-based selection\n- Manual range selection\n\n**Bulk Actions:**\n- Status updates\n- Export operations\n- Print batches\n- Email notifications\n- Archive operations\n\n**Progress Tracking:**\n- Operation progress bars\n- Success/failure reporting\n- Error detail display\n- Rollback capabilities\n\n### 3. Data Export and Import\n\n**Export Options:**\n- PDF formatted reports\n- Excel spreadsheets\n- CSV data files\n- XML structured data\n- JSON API format\n\n**Export Configurations:**\n- Column selection\n- Date range filtering\n- Format customization\n- Automated scheduling\n\n## Advanced Features\n\n### 1. Multi-Currency Handling\n\n**Currency Operations:**\n- Real-time exchange rates\n- Historical rate tracking\n- Currency conversion display\n- Local currency preference\n\n**Multi-Currency Display:**\n- Primary currency (PO currency)\n- Base currency (company default)\n- Side-by-side comparison\n- Conversion calculations\n\n### 2. Approval Workflows\n\n**Approval Routing:**\n- Amount-based approval limits\n- Department-based routing\n- Escalation procedures\n- Approval tracking\n\n**Notification System:**\n- Email notifications\n- In-app notifications\n- Mobile notifications\n- Reminder scheduling\n\n### 3. Integration Features\n\n**Purchase Request Integration:**\n- Seamless PR to PO conversion\n- Traceability maintenance\n- Status synchronization\n- Workflow continuation\n\n**Inventory Integration:**\n- Stock level checking\n- Reorder point monitoring\n- Availability validation\n- Reservation handling\n\n**Vendor Integration:**\n- Vendor catalog access\n- Price agreement checking\n- Contract compliance\n- Performance tracking\n\n---\n\n*Generated on: Latest*\n*User Interaction Guide Version: 1.0*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

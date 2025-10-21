@@ -150,7 +150,7 @@ export default function POSIntegrationPage() {
                   <AlertDescription className="flex items-center justify-between w-full">
                     <span>{systemStatus.failedTransactions} Failed Transactions</span>
                     <Button size="sm" variant="outline" asChild className="h-7 px-2 text-xs">
-                      <Link href="/system-administration/system-integrations/pos/transactions?filter=failed">
+                      <Link href="/system-administration/system-integrations/pos/transactions/failed">
                         Review
                       </Link>
                     </Button>
@@ -392,7 +392,7 @@ export default function POSIntegrationPage() {
                   </p>
                 </div>
                 <Button asChild variant="outline" size="sm" disabled={systemStatus.failedTransactions === 0}>
-                  <Link href="/system-administration/system-integrations/pos/transactions?filter=failed">
+                  <Link href="/system-administration/system-integrations/pos/transactions/failed">
                     Review
                   </Link>
                 </Button>

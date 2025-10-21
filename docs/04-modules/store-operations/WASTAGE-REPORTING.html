@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wastage Reporting Submodule - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Store Operations / WASTAGE REPORTING.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Wastage Reporting Submodule\n\n**Submodule**: Wastage Reporting\n**Route**: `/store-operations/wastage-reporting`\n**Status**: 🚧 Prototype/Demo Only\n**Last Updated**: 2025-10-02\n\n## Table of Contents\n\n1. [Overview](#overview)\n2. [Pages](#pages)\n3. [Components](#components)\n4. [Action Flows](#action-flows)\n5. [Future Features](#future-features)\n\n---\n\n## Overview\n\nThe Wastage Reporting module tracks and analyzes inventory wastage across all operational units. It helps identify wastage patterns, calculate financial impact, and implement corrective measures. This is currently a **prototype/demo** with mock data.\n\n**Key Capabilities**:\n- Record wastage events\n- Categorize wastage by reason\n- Track monthly wastage trends\n- Calculate cost impact\n- Manage approval workflows\n- Generate wastage reports\n\n**Screenshot**: ![Wastage Reporting Dashboard](wastage-reporting-dashboard.png)\n\n---\n\n## Pages\n\n### Wastage Reporting Dashboard\n\n**Path**: `/store-operations/wastage-reporting`\n**Component**: `WastageReportingDashboard`\n\n#### Page Structure\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│ ┌─── Dashboard Stats ───────────────────────────────────┐  │\n│ │ Total Wastage    Items Written Off   Pending Reviews  │  │\n│ │  $3,458.50             45                  12         │  │\n│ │  -12% vs last        +8% vs last      Requires        │  │\n│ └───────────────────────────────────────────────────────┘  │\n├─────────────────────────────────────────────────────────────┤\n│ ┌─ Monthly Wastage Trend ─┐ ┌─ Wastage by Reason ──────┐  │\n│ │ Line chart (6 months)   │ │ Pie chart                 │  │\n│ │                          │ │ - Expiration: 45%        │  │\n│ │                          │ │ - Damage: 25%            │  │\n│ │                          │ │ - Quality Issues: 20%    │  │\n│ │                          │ │ - Other: 10%             │  │\n│ └──────────────────────────┘ └───────────────────────────┘  │\n├─────────────────────────────────────────────────────────────┤\n│ Wastage Records                         [+ Report Wastage]  │\n│ [Search...] [Date Range] [Reason Filter] [Status Filter]    │\n├─────────────────────────────────────────────────────────────┤\n│  Date  Item   Qty  Unit Cost  Loss  Reason  Reporter  Status│\n│  ─────────────────────────────────────────────────────────...│\n│  Data rows with wastage details...                          │\n│                                                              │\n└─────────────────────────────────────────────────────────────┘\n```\n\n#### Dashboard Statistics\n\n**Total Wastage This Month Card**:\n- Shows monetary value of wasted inventory\n- Current Value: $3,458.50\n- Comparison: -12% vs last month (improvement)\n- Color: Red (loss indicator)\n\n**Items Written Off Card**:\n- Shows count of items marked as wastage\n- Current Value: 45 items\n- Comparison: +8% vs last month (increase)\n- Neutral indicator\n\n**Pending Reviews Card**:\n- Shows wastage entries awaiting approval\n- Current Value: 12\n- Status: Requires attention\n- Color: Orange (action needed)\n\n#### Monthly Wastage Trend Chart\n\n**Type**: Line Chart\n**Period**: 6 months (January-June)\n**Features**:\n- Time series visualization\n- Interactive tooltips\n- Trend identification\n- Responsive design\n\n**Monthly Data**:\n- January: $2,500\n- February: $1,800\n- March: $3,200\n- April: $2,200\n- May: $2,800\n- June: $1,900\n\n**Insights**:\n- Highest wastage: March ($3,200)\n- Lowest wastage: February ($1,800)\n- Average: $2,400/month\n- Current trend: Decreasing\n\n#### Wastage by Reason Chart\n\n**Type**: Donut/Pie Chart\n**Categories**: 4 wastage reasons\n\n**Breakdown**:\n- **Expiration**: 45% (Red)\n  - Expired products past shelf life\n  - Primary wastage cause\n- **Damage**: 25% (Orange)\n  - Physical damage during handling/storage\n  - Secondary cause\n- **Quality Issues**: 20% (Yellow)\n  - Failed quality inspections\n  - Contamination concerns\n- **Other**: 10% (Green)\n  - Miscellaneous reasons\n  - Includes spillage, customer returns, etc.\n\n#### Wastage Records Table\n\n**Features**:\n- Chronological wastage log\n- Searchable records\n- Multi-filter support\n- Status tracking\n- Export capability\n\n**Table Columns**:\n1. **Date** - When wastage occurred\n2. **Item Code** - Product SKU\n3. **Item Name** - Product description\n4. **Quantity** - Amount wasted\n5. **Unit Cost** - Cost per unit\n6. **Total Loss** - Calculated financial impact\n7. **Reason** - Wastage category\n8. **Reported By** - Staff member who logged\n9. **Status** - Approval status\n10. **Actions** - View/Edit/Approve/Delete\n\n**Sample Records**:\n\n**Record 1**:\n- Date: 2024-01-15\n- Item Code: BEV-001\n- Item Name: Thai Milk Tea (12 pack)\n- Quantity: 5\n- Unit Cost: $45.99\n- Total Loss: $229.95\n- Reason: Expiration\n- Reported By: John Smith\n- Status: Pending Review\n\n**Record 2**:\n- Date: 2024-01-14\n- Item Code: BEV-002\n- Item Name: Coffee Beans (1kg)\n- Quantity: 2\n- Unit Cost: $28.50\n- Total Loss: $57.00\n- Reason: Quality Issues\n- Reported By: Jane Doe\n- Status: Approved\n\n---\n\n## Components\n\n### Dashboard Stat Card\n\n**Component**: `Card` with wastage statistics\n**Features**:\n- Primary value display\n- Trend comparison\n- Color-coded indicators\n- Percentage change\n\n**Variants**:\n- **Total Wastage**: Red theme, currency format\n- **Items Written Off**: Neutral theme, count\n- **Pending Reviews**: Orange theme, action indicator\n\n### Monthly Wastage Chart\n\n**Component**: ResponsiveContainer with LineChart\n**Library**: Recharts\n**Configuration**:\n- Line color: Red (#ef4444)\n- Smooth curve\n- Grid lines\n- Month labels on X-axis\n- Dollar values on Y-axis\n\n### Wastage by Reason Chart\n\n**Component**: ResponsiveContainer with PieChart\n**Library**: Recharts\n**Configuration**:\n- Donut style (inner radius: 60, outer radius: 80)\n- 4 color segments\n- Padding between segments\n- Percentage labels\n- Interactive tooltips\n\n**Colors**:\n- Expiration: #ef4444 (Red)\n- Damage: #f97316 (Orange)\n- Quality Issues: #eab308 (Yellow)\n- Other: #84cc16 (Green)\n\n### Wastage Records Table\n\n**Component**: Custom data table\n**Features**:\n- Sortable columns\n- Row hover effects\n- Status badges\n- Action menus\n- Pagination support\n\n### Status Badge\n\n**Component**: Badge with color coding\n**Variants**:\n- **Pending Review**: Orange\n- **Approved**: Green\n- **Rejected**: Red\n- **Void**: Gray\n\n---\n\n## Action Flows\n\n### View Dashboard\n\n**Trigger**: Navigate to `/store-operations/wastage-reporting`\n\n```mermaid\nflowchart LR\n    Load[\"Load Page\"] --> Fetch[\"Fetch Wastage Data\"]\n    Fetch --> Stats[\"Render Statistics\"]\n    Stats --> Charts[\"Render Charts\"]\n    Charts --> Table[\"Load Wastage Records\"]\n```\n\n### Report New Wastage\n\n**Trigger**: Click \"+ Report Wastage\" button\n\n```mermaid\nflowchart LR\n    Click[\"Click Report Wastage\"] --> Open[\"Open Wastage Form\"]\n    Open --> Fill[\"Fill Form Fields\"]\n    Fill --> Validate[\"Validate Entry\"]\n    Validate --> Submit[\"Submit Wastage\"]\n    Submit --> Create[\"Create Record\"]\n    Create --> Notify[\"Send Approval Notification\"]\n    Notify --> Refresh[\"Refresh Dashboard\"]\n```\n\n### Search Wastage Records\n\n**Trigger**: Type in search box\n\n```mermaid\nflowchart LR\n    Type[\"Type Search Term\"] --> Filter[\"Filter Records\"]\n    Filter --> Highlight[\"Highlight Matches\"]\n    Highlight --> Update[\"Update Table\"]\n```\n\n### Filter by Date Range\n\n**Trigger**: Select date range\n\n```mermaid\nflowchart LR\n    Select[\"Select Date Range\"] --> Filter[\"Filter by Dates\"]\n    Filter --> Update[\"Update Table and Charts\"]\n```\n\n### Filter by Reason\n\n**Trigger**: Select wastage reason\n\n```mermaid\nflowchart LR\n    Select[\"Select Reason\"] --> Filter[\"Filter Records\"]\n    Filter --> Update[\"Update Display\"]\n```\n\n### Filter by Status\n\n**Trigger**: Select approval status\n\n```mermaid\nflowchart LR\n    Select[\"Select Status\"] --> Filter[\"Filter Records\"]\n    Filter --> Update[\"Update Table\"]\n```\n\n### Approve Wastage Entry\n\n**Trigger**: Click \"Approve\" in actions menu\n\n```mermaid\nflowchart LR\n    Click[\"Click Approve\"] --> Validate[\"Validate Permissions\"]\n    Validate --> Comment[\"Add Approval Comment\"]\n    Comment --> Update[\"Update Status to Approved\"]\n    Update --> Journal[\"Generate Journal Entry\"]\n    Journal --> Stock[\"Update Inventory\"]\n    Stock --> Notify[\"Notify Requester\"]\n    Notify --> Refresh[\"Refresh Display\"]\n```\n\n### Reject Wastage Entry\n\n**Trigger**: Click \"Reject\" in actions menu\n\n```mermaid\nflowchart LR\n    Click[\"Click Reject\"] --> Reason[\"Enter Rejection Reason\"]\n    Reason --> Validate[\"Validate Permissions\"]\n    Validate --> Update[\"Update Status to Rejected\"]\n    Update --> Notify[\"Notify Requester\"]\n    Notify --> Refresh[\"Refresh Display\"]\n```\n\n### Edit Wastage Entry\n\n**Trigger**: Click \"Edit\" in actions menu (if pending)\n\n```mermaid\nflowchart LR\n    Click[\"Click Edit\"] --> Check[\"Check Status\"]\n    Check --> Open[\"Open Edit Form\"]\n    Open --> Modify[\"Modify Fields\"]\n    Modify --> Validate[\"Validate Changes\"]\n    Validate --> Save[\"Save Updates\"]\n    Save --> Refresh[\"Refresh Display\"]\n```\n\n### Delete Wastage Entry\n\n**Trigger**: Click \"Delete\" in actions menu\n\n```mermaid\nflowchart LR\n    Click[\"Click Delete\"] --> Confirm[\"Show Confirmation\"]\n    Confirm --> Validate[\"Validate Permissions\"]\n    Validate --> Delete[\"Delete Record\"]\n    Delete --> Refresh[\"Refresh Display\"]\n```\n\n### Export Wastage Report\n\n**Trigger**: Click \"Export\" button\n\n```mermaid\nflowchart LR\n    Click[\"Click Export\"] --> Select[\"Select Format\"]\n    Select --> Filter[\"Apply Current Filters\"]\n    Filter --> Generate[\"Generate Report\"]\n    Generate --> Download[\"Download File\"]\n```\n\n### View Wastage Trends\n\n**Trigger**: Hover on chart elements\n\n```mermaid\nflowchart LR\n    Hover[\"Hover on Chart\"] --> Show[\"Show Tooltip\"]\n    Show --> Display[\"Display Value Details\"]\n```\n\n---\n\n## Future Features\n\n### Planned Enhancements\n\n**Advanced Analytics**:\n- Wastage by department/location\n- Wastage by product category\n- Wastage by vendor (product source)\n- Cost impact by time period\n- Predictive wastage alerts\n\n**Root Cause Analysis**:\n- Pattern recognition for recurring wastage\n- Correlation with purchase dates\n- Quality issue trending\n- Storage condition tracking\n- Supplier quality correlation\n\n**Workflow Automation**:\n- Auto-approval for small amounts\n- Escalation for high-value wastage\n- Recurring wastage alerts\n- Preventive action tracking\n- Corrective action workflows\n\n**Integration Features**:\n- Photo attachment for evidence\n- Barcode scanning for item entry\n- Inventory auto-adjustment\n- Finance system integration\n- Quality management linkage\n\n**Reporting Enhancements**:\n- Custom report builder\n- Scheduled reports\n- Wastage variance analysis\n- Benchmark comparisons\n- Sustainability metrics (waste reduction)\n\n**Mobile Capabilities**:\n- Mobile wastage reporting\n- Quick capture with camera\n- Offline data entry\n- Push notifications\n- Location-based logging\n\n---\n\n## Data Models\n\n### Wastage Record\n\n```typescript\ninterface WastageRecord {\n  id: number\n  date: string\n  itemCode: string\n  itemName: string\n  quantity: number\n  unit: string\n  unitCost: number\n  totalLoss: number\n  reason: 'Expiration' | 'Damage' | 'Quality Issues' | 'Other'\n  reasonDetails?: string\n  reportedBy: string\n  reportedById: string\n  location: string\n  locationCode: string\n  status: 'Pending Review' | 'Approved' | 'Rejected' | 'Void'\n  approver?: string\n  approvedAt?: string\n  approvalComments?: string\n  photoEvidence?: string[]\n  createdAt: string\n  updatedAt: string\n}\n```\n\n### Wastage Statistics\n\n```typescript\ninterface WastageStats {\n  totalWastageThisMonth: number\n  wastageChange: number // percentage vs last month\n  itemsWrittenOff: number\n  itemsChange: number // percentage vs last month\n  pendingReviews: number\n}\n```\n\n### Wastage Trend Data\n\n```typescript\ninterface WastageTrendData {\n  month: string\n  value: number\n}\n```\n\n### Wastage by Reason\n\n```typescript\ninterface WastageByReason {\n  name: string\n  value: number // percentage\n}\n```\n\n---\n\n## Validation Rules\n\n### Wastage Entry Form\n\n**Required Fields**:\n- Date (cannot be future date)\n- Item selection\n- Quantity (must be > 0)\n- Unit cost (must be >= 0)\n- Reason\n- Location\n\n**Business Rules**:\n- Quantity cannot exceed current stock\n- Date cannot be more than 30 days in past (configurable)\n- High-value wastage (> $1000) requires manager approval\n- Photo evidence required for Quality Issues\n- Detailed reason required for \"Other\" category\n\n**Permissions**:\n- All staff can report wastage\n- Department managers can approve up to $1000\n- Store managers can approve up to $5000\n- Financial managers can approve any amount\n- Only original reporter or manager can edit pending entries\n\n---\n\n## Technical Notes\n\n**Mock Data**: This module uses mock data for demonstration. Real implementation requires:\n- API integration for wastage data\n- Database for wastage records\n- Inventory system integration for stock adjustments\n- Finance system integration for journal entries\n- User permission validation\n- File upload for evidence photos\n\n**Performance Considerations**:\n- Paginated table for large datasets\n- Chart data aggregation for performance\n- Cached statistics calculations\n- Lazy loading of historical data\n\n**Accessibility**:\n- ARIA labels on all interactive elements\n- Keyboard navigation support\n- Screen reader compatible charts\n- High contrast color scheme\n- Focus indicators\n\n**Security**:\n- Role-based access control\n- Audit trail for all changes\n- Approval workflow enforcement\n- Data validation\n- SQL injection prevention\n\n---\n\n**Last Updated**: 2025-10-02\n**Module**: Store Operations > Wastage Reporting\n**Status**: 🚧 Prototype/Demo Only\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

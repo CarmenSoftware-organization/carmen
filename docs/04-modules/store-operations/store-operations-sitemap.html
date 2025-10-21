@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Operations Module - Sitemap - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Store Operations / Store Operations Sitemap.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Store Operations Module - Sitemap\n\n```mermaid\ngraph TD\n    SO[Store Operations] --> SOD[Store Operations Dashboard]\n    SO --> SR[Store Requisitions]\n    SO --> SRP[Stock Replenishment]\n    SO --> WR[Wastage Reporting]\n\n    %% Dashboard Components\n    SOD --> SOD_WIDGETS[Draggable Widgets]\n    SOD_WIDGETS --> SOD_W1[Stock Replenishment Trend Chart]\n    SOD_WIDGETS --> SOD_W2[Wastage by Type Chart]\n    SOD_WIDGETS --> SOD_W3[Top 5 Stores by Requisitions]\n    SOD_WIDGETS --> SOD_W4[Pending Approvals Count]\n    SOD_WIDGETS --> SOD_W5[Low Stock Alerts]\n    SOD_WIDGETS --> SOD_W6[Recent Activity Feed]\n\n    %% Store Requisitions Module\n    SR --> SRL[Store Requisitions List]\n    SR --> SRD[Store Requisition Detail]\n\n    %% Store Requisitions List Components\n    SRL --> SRL_FILTERS[Advanced Filters]\n    SRL --> SRL_SEARCH[Search Bar]\n    SRL --> SRL_TABLE[Data Table View]\n    SRL --> SRL_CARDS[Card View]\n    SRL --> SRL_PAGINATION[Pagination Controls]\n    SRL --> SRL_BULK[Bulk Actions]\n\n    %% Store Requisition Detail Components\n    SRD --> SRD_HEADER[Requisition Header]\n    SRD --> SRD_TABS[Tab Navigation]\n    SRD --> SRD_SIDEBAR[Activity Sidebar]\n\n    %% Requisition Detail Tabs\n    SRD_TABS --> SRD_T1[Items Tab]\n    SRD_TABS --> SRD_T2[Stock Movements Tab]\n    SRD_TABS --> SRD_T3[Journal Entries Tab]\n    SRD_TABS --> SRD_T4[Approval Workflow Tab]\n\n    %% Items Tab Components\n    SRD_T1 --> SRD_T1_TABLE[Items Data Table]\n    SRD_T1 --> SRD_T1_EDIT[Edit Item Modal]\n    SRD_T1 --> SRD_T1_APPROVAL[Item Approval Controls]\n    SRD_T1 --> SRD_T1_BULK[Bulk Item Actions]\n\n    %% Stock Movements Tab\n    SRD_T2 --> SRD_T2_MOVEMENTS[Stock Movement Records]\n    SRD_T2 --> SRD_T2_LOT[Lot Tracking]\n    SRD_T2 --> SRD_T2_HISTORY[Movement History]\n\n    %% Journal Entries Tab\n    SRD_T3 --> SRD_T3_ENTRIES[Journal Entry List]\n    SRD_T3 --> SRD_T3_DETAILS[Entry Details View]\n\n    %% Approval Workflow Tab\n    SRD_T4 --> SRD_T4_WORKFLOW[Workflow Status]\n    SRD_T4 --> SRD_T4_APPROVERS[Approver List]\n    SRD_T4 --> SRD_T4_ACTIONS[Approval Actions]\n\n    %% Activity Sidebar Components\n    SRD_SIDEBAR --> SRD_S1[Comments Section]\n    SRD_SIDEBAR --> SRD_S2[Attachments Section]\n    SRD_SIDEBAR --> SRD_S3[Activity Log]\n    SRD_SIDEBAR --> SRD_S4[Toggle Controls]\n\n    %% Stock Replenishment Components\n    SRP --> SRP_STATS[Summary Statistics Cards]\n    SRP --> SRP_CHART[Stock Level Trend Chart]\n    SRP --> SRP_ALERT[Low Stock Alert]\n    SRP --> SRP_TABLE[Inventory Status Table]\n    SRP --> SRP_FILTERS[Search and Filters]\n    SRP --> SRP_BULK[Bulk Selection]\n    SRP --> SRP_CREATE[Create Requisition Action]\n\n    %% Wastage Reporting Components\n    WR --> WR_STATS[Wastage Statistics Cards]\n    WR --> WR_CHART[Monthly Wastage Trend]\n    WR --> WR_TABLE[Wastage Records Table]\n    WR --> WR_FILTERS[Date and Category Filters]\n    WR --> WR_EXPORT[Export Actions]\n\n    %% Shared Components\n    SO --> SHARED[Shared Components]\n    SHARED --> FILTER_BUILDER[Advanced Filter Builder]\n    SHARED --> DATE_PICKER[Date Range Picker]\n    SHARED --> STATUS_BADGES[Status Badge Components]\n    SHARED --> PAGINATION[Pagination Component]\n    SHARED --> BULK_ACTIONS[Bulk Action Toolbar]\n    SHARED --> MODAL_DIALOGS[Modal Dialogs]\n    SHARED --> DROPDOWN_MENUS[Dropdown Menus]\n\n    %% Modal Dialogs\n    MODAL_DIALOGS --> EDIT_ITEM_MODAL[Edit Item Modal]\n    MODAL_DIALOGS --> CONFIRMATION_MODAL[Confirmation Dialog]\n    MODAL_DIALOGS --> FILTER_MODAL[Advanced Filter Modal]\n\n    %% Dropdown Menus\n    DROPDOWN_MENUS --> STATUS_DROPDOWN[Status Dropdown]\n    DROPDOWN_MENUS --> ACTIONS_DROPDOWN[Actions Dropdown]\n    DROPDOWN_MENUS --> UNIT_DROPDOWN[Unit Selection Dropdown]\n    DROPDOWN_MENUS --> LOCATION_DROPDOWN[Location Dropdown]\n\n    %% Navigation Links\n    SRL -.->|Navigate to Detail| SRD\n    SRP -.->|Create Requisition| SRL\n    SOD -.->|Quick Access| SR\n    SOD -.->|Quick Access| SRP\n    SOD -.->|Quick Access| WR\n\n    %% Style Classes\n    classDef dashboardNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px\n    classDef listNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px\n    classDef detailNode fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px\n    classDef componentNode fill:#fff3e0,stroke:#e65100,stroke-width:2px\n    classDef sharedNode fill:#fce4ec,stroke:#880e4f,stroke-width:2px\n\n    class SOD,SOD_WIDGETS,SOD_W1,SOD_W2,SOD_W3,SOD_W4,SOD_W5,SOD_W6 dashboardNode\n    class SRL,SRL_FILTERS,SRL_SEARCH,SRL_TABLE,SRL_CARDS,SRL_PAGINATION,SRL_BULK listNode\n    class SRD,SRD_HEADER,SRD_TABS,SRD_SIDEBAR,SRD_T1,SRD_T2,SRD_T3,SRD_T4,SRD_T1_TABLE,SRD_T1_EDIT,SRD_T1_APPROVAL,SRD_T1_BULK,SRD_T2_MOVEMENTS,SRD_T2_LOT,SRD_T2_HISTORY,SRD_T3_ENTRIES,SRD_T3_DETAILS,SRD_T4_WORKFLOW,SRD_T4_APPROVERS,SRD_T4_ACTIONS,SRD_S1,SRD_S2,SRD_S3,SRD_S4 detailNode\n    class SRP,SRP_STATS,SRP_CHART,SRP_ALERT,SRP_TABLE,SRP_FILTERS,SRP_BULK,SRP_CREATE,WR,WR_STATS,WR_CHART,WR_TABLE,WR_FILTERS,WR_EXPORT componentNode\n    class SHARED,FILTER_BUILDER,DATE_PICKER,STATUS_BADGES,PAGINATION,BULK_ACTIONS,MODAL_DIALOGS,DROPDOWN_MENUS,EDIT_ITEM_MODAL,CONFIRMATION_MODAL,FILTER_MODAL,STATUS_DROPDOWN,ACTIONS_DROPDOWN,UNIT_DROPDOWN,LOCATION_DROPDOWN sharedNode\n```\n\n## Navigation Flow\n\n```mermaid\nflowchart LR\n    A[Main Navigation] --> B[Store Operations]\n    B --> C{Select Module}\n\n    C -->|Dashboard| D[Store Operations Dashboard]\n    C -->|Requisitions| E[Store Requisitions List]\n    C -->|Replenishment| F[Stock Replenishment]\n    C -->|Wastage| G[Wastage Reporting]\n\n    D -->|Widget Actions| H[Quick Navigation]\n    E -->|View Detail| I[Store Requisition Detail]\n    F -->|Create Requisition| E\n\n    I --> J{Select Tab}\n    J -->|Items| K[Items Management]\n    J -->|Stock| L[Stock Movements]\n    J -->|Journal| M[Journal Entries]\n    J -->|Approval| N[Workflow Management]\n\n    K -->|Edit Item| O[Edit Item Modal]\n    K -->|Bulk Actions| P[Bulk Operations]\n\n    style D fill:#e1f5fe\n    style E fill:#f3e5f5\n    style F fill:#e8f5e8\n    style G fill:#fff3e0\n    style I fill:#e8f5e8\n```\n\n## User Interaction Patterns\n\n```mermaid\nsequenceDiagram\n    participant U as User\n    participant D as Dashboard\n    participant L as List View\n    participant DT as Detail View\n    participant M as Modal\n\n    U->>D: Access Store Operations\n    D->>U: Show draggable widgets\n\n    U->>D: Click \"View Requisitions\"\n    D->>L: Navigate to requisitions list\n\n    U->>L: Apply filters\n    L->>L: Update table data\n\n    U->>L: Click requisition row\n    L->>DT: Navigate to detail view\n\n    U->>DT: Select Items tab\n    DT->>DT: Show items table\n\n    U->>DT: Click \"Edit Item\"\n    DT->>M: Open edit modal\n\n    U->>M: Submit changes\n    M->>DT: Update item data\n    M->>M: Close modal\n\n    U->>DT: Toggle sidebar\n    DT->>DT: Show/hide activity panel\n```";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

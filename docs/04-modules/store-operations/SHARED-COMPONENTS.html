@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Components - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Store Operations / SHARED COMPONENTS.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Shared Components\n\n**Module**: Store Operations\n**Last Updated**: 2025-10-02\n\n## Table of Contents\n\n1. [Modals and Dialogues](#modals-and-dialogues)\n2. [Dropdown Components](#dropdown-components)\n3. [Form Components](#form-components)\n4. [Display Components](#display-components)\n5. [Navigation Components](#navigation-components)\n\n---\n\n## Modals and Dialogues\n\n### 1. Filter Builder Dialog\n\n**Component**: `FilterBuilder` inside `Dialog`\n**Used In**: Store Requisitions List\n**Trigger**: Click \"Add Filters\" button\n\n**Features**:\n- Dynamic filter condition rows\n- Add/remove conditions\n- Field, operator, and value selection\n- Apply filters action\n\n**Fields**:\n- Date\n- Requisition (Ref No)\n- Request To\n- To Location\n- Store Name\n- Description\n- Status\n- Workflow Stage\n- Process Status\n\n**Operators**:\n- Equals\n- Contains\n- Greater than\n- Less than\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Open[\"Open Dialog\"] --> Add[\"Add Filter Condition\"]\n    Add --> Select[\"Select Field, Operator, Value\"]\n    Select --> More{\"Add More?\"}\n    More -->|Yes| Add\n    More -->|No| Apply[\"Click Apply Filters\"]\n    Apply --> Filter[\"Apply to List\"]\n    Filter --> Close[\"Close Dialog\"]\n```\n\n---\n\n### 2. Approval Log Dialog\n\n**Component**: `ApprovalLogDialog`\n**Used In**: Store Requisition Detail - Approval Workflow\n**Trigger**: Click \"View Log\" button\n\n**Purpose**: Display complete approval history for a requisition\n\n**Content**:\n- Chronological approval steps\n- Approver information\n- Action taken (Approved/Rejected/Requested Changes)\n- Comments\n- Timestamps\n- Approval status\n\n**Fields Displayed**:\n- Stage Level\n- Approver Name\n- Approver Role\n- Action\n- Comments\n- Timestamp\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click View Log\"] --> Load[\"Load Approval History\"]\n    Load --> Display[\"Display in Dialog\"]\n    Display --> Close[\"Close Dialog\"]\n```\n\n---\n\n### 3. Item Info Popover\n\n**Component**: Custom Popover/Tooltip\n**Used In**: Store Requisition Detail - Items Tab\n**Trigger**: Hover on item name or info icon\n\n**Content**:\n- Item Name\n- Location and Location Code\n- Category\n- Sub-category\n- Item Group\n- Barcode\n- Location Type\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Hover[\"Hover on Item\"] --> Show[\"Show Popover\"]\n    Show --> Display[\"Display Item Info\"]\n    Leave[\"Mouse Leave\"] --> Hide[\"Hide Popover\"]\n```\n\n---\n\n### 4. Inventory Info Popover\n\n**Component**: Custom Popover/Tooltip\n**Used In**: Store Requisition Detail - Items Tab (Expanded Row)\n**Trigger**: Hover on inventory icon\n\n**Content**:\n- On Hand Quantity\n- On Order Quantity\n- Last Purchase Price\n- Last Vendor\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Hover[\"Hover on Icon\"] --> Show[\"Show Popover\"]\n    Show --> Display[\"Display Inventory Details\"]\n    Leave[\"Mouse Leave\"] --> Hide[\"Hide Popover\"]\n```\n\n---\n\n## Dropdown Components\n\n### 1. Status Filter Dropdown\n\n**Component**: `Select`\n**Used In**: Store Requisitions List, Wastage Reporting\n**Type**: Single Select\n\n**Options**:\n- All Status (default)\n- Draft\n- In Process\n- Complete\n- Reject\n- Void\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Dropdown\"] --> Open[\"Open Options\"]\n    Open --> Select[\"Select Status\"]\n    Select --> Apply[\"Apply Filter\"]\n    Apply --> Close[\"Close Dropdown\"]\n```\n\n---\n\n### 2. Location Filter Dropdown\n\n**Component**: `Select`\n**Used In**: Stock Replenishment, Wastage Reporting\n**Type**: Single Select\n\n**Options**: Dynamic list of locations\n- All Locations (default)\n- Central Kitchen (CK-001)\n- Roastery Store (RS-001)\n- Main Warehouse (MW-001)\n- [Additional locations...]\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Dropdown\"] --> Load[\"Load Locations\"]\n    Load --> Select[\"Select Location\"]\n    Select --> Filter[\"Filter Items\"]\n```\n\n---\n\n### 3. Reason Filter Dropdown\n\n**Component**: `Select`\n**Used In**: Wastage Reporting\n**Type**: Single Select\n\n**Options**:\n- All Reasons (default)\n- Expiration\n- Damage\n- Quality Issues\n- Other\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Dropdown\"] --> Open[\"Open Options\"]\n    Open --> Select[\"Select Reason\"]\n    Select --> Filter[\"Filter Wastage Records\"]\n```\n\n---\n\n### 4. Actions Dropdown Menu\n\n**Component**: `DropdownMenu`\n**Used In**: All list pages, detail pages\n**Trigger**: Click actions icon (⋮ or ⋯)\n\n**Variants**:\n\n**Store Requisitions List**:\n- View\n- Edit\n- Export\n- Delete\n\n**Store Requisition Detail**:\n- Edit Requisition\n- Print\n- Void\n- Copy\n- Delete\n- Export\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Actions Icon\"] --> Open[\"Open Menu\"]\n    Open --> Select[\"Select Action\"]\n    Select --> Execute[\"Execute Action\"]\n    Execute --> Close[\"Close Menu\"]\n```\n\n---\n\n### 5. Filter Field Dropdown\n\n**Component**: `Select`\n**Used In**: Filter Builder Dialog\n**Type**: Single Select\n\n**Options**:\n- Date\n- Requisition\n- Request To\n- To Location\n- Store Name\n- Description\n- Status\n- Workflow Stage\n- Process Status\n\n---\n\n### 6. Filter Operator Dropdown\n\n**Component**: `Select`\n**Used In**: Filter Builder Dialog\n**Type**: Single Select\n\n**Options**:\n- Equals\n- Contains\n- Greater than\n- Less than\n\n---\n\n## Form Components\n\n### 1. Search Input\n\n**Component**: `Input` with search icon\n**Used In**: All list pages\n\n**Features**:\n- Left-aligned search icon\n- Placeholder text\n- Real-time filtering\n- Clear button (optional)\n\n**Variants**:\n- Store Requisitions: \"Search requisitions...\"\n- Stock Replenishment: \"Search items...\"\n- Wastage Reporting: \"Search wastage records...\"\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Type[\"Type Search\"] --> Debounce[\"Debounce Input\"]\n    Debounce --> Filter[\"Filter Results\"]\n    Filter --> Update[\"Update Display\"]\n```\n\n---\n\n### 2. Pagination Controls\n\n**Component**: `Pagination`\n**Used In**: Store Requisitions List\n\n**Features**:\n- First page button (hidden on mobile)\n- Previous page button\n- Page number display\n- Go to page input\n- Next page button\n- Last page button (hidden on mobile)\n- Responsive design\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Control\"] --> Validate[\"Validate Page Number\"]\n    Validate --> Load[\"Load Page Data\"]\n    Load --> Update[\"Update Display\"]\n```\n\n---\n\n### 3. View Toggle\n\n**Component**: Button group\n**Used In**: Store Requisitions List\n\n**Options**:\n- Table View (List icon)\n- Card View (Grid icon)\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click View Toggle\"] --> Switch[\"Switch View Mode\"]\n    Switch --> Render[\"Re-render Layout\"]\n```\n\n---\n\n### 4. Date Range Picker\n\n**Component**: `DateRangePicker` (future)\n**Used In**: Wastage Reporting, Reports\n\n**Features**:\n- Start date selection\n- End date selection\n- Preset ranges (This Week, This Month, Last Month, etc.)\n- Calendar picker\n\n---\n\n## Display Components\n\n### 1. Status Badge\n\n**Component**: `StatusBadge` or `Badge`\n**Used In**: All modules\n\n**Variants**:\n\n**Store Requisitions**:\n- Draft (Gray)\n- In Process (Blue)\n- Complete (Green)\n- Reject (Red)\n- Void (Gray strikethrough)\n\n**Wastage**:\n- Pending Review (Orange)\n- Approved (Green)\n- Rejected (Red)\n- Void (Gray)\n\n**Stock Status**:\n- Low (Red)\n- Critical (Dark Red)\n- Normal (Green)\n- High (Blue)\n- Overstock (Orange)\n\n**Props**:\n```typescript\ninterface StatusBadgeProps {\n  status: string\n  variant?: 'default' | 'outline' | 'secondary'\n}\n```\n\n---\n\n### 2. Workflow Stage Badge\n\n**Component**: Custom badge with tooltip\n**Used In**: Store Requisitions\n\n**Features**:\n- Colored dot indicator\n- Stage name text\n- Hover tooltip with description\n- Color-coded by stage type\n\n**Stages**:\n- Submission (Blue)\n- HOD Approval (Purple)\n- Store Manager Approval (Amber)\n- Complete (Green)\n- Rejected (Red)\n\n**Props**:\n```typescript\ninterface WorkflowStageBadgeProps {\n  stage: string\n  tooltip: string\n}\n```\n\n---\n\n### 3. Stat Card\n\n**Component**: `Card` with statistics\n**Used In**: All dashboard pages\n\n**Structure**:\n- Title text\n- Large value display\n- Icon (optional)\n- Trend indicator (optional)\n- Comparison text (optional)\n\n**Variants**:\n- Numeric (e.g., \"1,234\")\n- Currency (e.g., \"$45,678\")\n- Percentage (e.g., \"45%\")\n- Count with trend (e.g., \"28 items +8%\")\n\n**Props**:\n```typescript\ninterface StatCardProps {\n  title: string\n  value: string | number\n  icon?: React.ReactNode\n  trend?: 'up' | 'down' | 'neutral'\n  trendValue?: string\n  trendLabel?: string\n}\n```\n\n---\n\n### 4. Data Table\n\n**Component**: `Table` from shadcn/ui\n**Used In**: All list views\n\n**Features**:\n- Sticky header\n- Sortable columns\n- Row hover effects\n- Responsive design\n- Horizontal scroll on mobile\n- Minimum column widths\n\n**Props**:\n```typescript\ninterface DataTableProps<T> {\n  columns: ColumnDef<T>[]\n  data: T[]\n  sorting?: SortingState\n  onSortingChange?: (sorting: SortingState) => void\n}\n```\n\n---\n\n### 5. Card View Item\n\n**Component**: Custom card component\n**Used In**: Store Requisitions Card View\n\n**Structure**:\n- Header with reference and status\n- Description\n- Key details in grid\n- Footer with metadata\n- Actions menu\n\n**Features**:\n- Responsive grid layout\n- Truncated text with ellipsis\n- Hover shadow effect\n- Conditional field display\n\n---\n\n### 6. Chart Components\n\n**Components**: Recharts library\n**Used In**: All dashboard pages\n\n**Chart Types**:\n\n**Line Chart**:\n- Stock level trends\n- Monthly wastage trends\n- Purpose: Time series visualization\n\n**Pie/Donut Chart**:\n- Wastage by reason\n- Stock distribution by location\n- Purpose: Proportion visualization\n\n**Bar Chart**:\n- Top stores by requisitions\n- Items by category\n- Purpose: Comparison visualization\n\n**Common Props**:\n```typescript\ninterface ChartProps {\n  data: any[]\n  width?: number | string\n  height?: number | string\n  responsive?: boolean\n}\n```\n\n---\n\n## Navigation Components\n\n### 1. Back Button\n\n**Component**: Button with ChevronLeft icon\n**Used In**: Detail pages\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Back\"] --> Navigate[\"Navigate to List Page\"]\n```\n\n---\n\n### 2. Tab Navigation\n\n**Component**: `Tabs` from shadcn/ui\n**Used In**: Store Requisition Detail\n\n**Tabs**:\n- Items\n- Stock Movements\n- Journal Entries\n- Approval Workflow\n\n**Action Flow**:\n```mermaid\nflowchart LR\n    Click[\"Click Tab\"] --> Switch[\"Switch Tab Content\"]\n    Switch --> Load[\"Load Tab Data\"]\n    Load --> Display[\"Display Content\"]\n```\n\n---\n\n### 3. Breadcrumbs\n\n**Component**: Breadcrumb navigation (future)\n**Used In**: All pages\n\n**Structure**:\n```\nStore Operations > Store Requisitions > SR-2024-001\n```\n\n---\n\n## Component Patterns\n\n### Button Patterns\n\n**Primary Actions**:\n- Solid background\n- High contrast\n- CTA (Call to Action)\n- Examples: \"New Request\", \"Create Requisition\", \"Report Wastage\"\n\n**Secondary Actions**:\n- Outline style\n- Medium contrast\n- Supporting actions\n- Examples: \"Export\", \"Saved Filters\"\n\n**Destructive Actions**:\n- Red color scheme\n- Warning indicators\n- Confirmation required\n- Examples: \"Delete\", \"Void\"\n\n**Icon Buttons**:\n- Ghost/minimal style\n- Icon only\n- Tooltip on hover\n- Examples: Actions menu (⋮), View toggle\n\n---\n\n### Loading States\n\n**Skeleton Loaders**:\n- Pulsing animation\n- Matches component structure\n- Used during data fetch\n\n**Spinners**:\n- Centered in container\n- Used for quick operations\n\n**Progressive Loading**:\n- Load critical content first\n- Lazy load secondary data\n\n---\n\n### Error States\n\n**Empty States**:\n- Icon\n- Message\n- Call to action\n- Example: \"No requisitions found. Try adjusting your filters.\"\n\n**Error Messages**:\n- Red alert banner\n- Error icon\n- Descriptive message\n- Retry action\n\n---\n\n### Responsive Patterns\n\n**Mobile Optimizations**:\n- Hide non-essential columns\n- Switch to card view\n- Simplified navigation\n- Touch-friendly targets (44x44px minimum)\n\n**Tablet Optimizations**:\n- Adaptive grid layouts\n- Collapsible sidebars\n- Optimized table columns\n\n**Desktop Optimizations**:\n- Full table display\n- Multi-column layouts\n- Hover states\n- Keyboard shortcuts\n\n---\n\n**Last Updated**: 2025-10-02\n**Module**: Store Operations\n**Status**: ✅ Production (Store Requisitions), 🚧 Prototype (Others)\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

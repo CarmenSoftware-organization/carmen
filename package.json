@@ -26,6 +26,9 @@
     "db:setup-abac": "npm run db:push && npm run db:seed",
     "db:full-setup": "./scripts/setup-database.sh && npm run db:setup-abac",
     "db:test-setup": "ts-node prisma/test-setup.ts",
+    "docs:convert": "cd docs && node convert-docs-new.js",
+    "docs:build": "npm run docs:convert",
+    "docs:watch": "cd docs && nodemon --watch '**/*.md' --exec 'node convert-docs-new.js'",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -106,6 +109,8 @@
     "depcheck": "^1.4.7",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.8",
+    "imagemin": "^9.0.1",
+    "imagemin-pngquant": "^10.0.0",
     "playwright": "^1.54.1",
     "postcss": "^8",
     "prisma": "^5.22.0",

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Count Module Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Inventory / Physical Count</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Physical Count Module Documentation\n\nThis directory contains comprehensive documentation for the Physical Count module of the Carmen ERP system.\n\n## 📁 Documentation Structure\n\n### Core Documentation\n- [`physical-count-specification.md`](./physical-count-specification.md) - Complete technical specification\n- [`physical-count-sitemap.md`](./physical-count-sitemap.md) - Mermaid site maps and flow diagrams\n- [`README.md`](./README.md) - This index file\n\n### Screenshots\n- [`physical-count-dashboard.png`](./screenshots/physical-count-dashboard.png) - Dashboard overview interface\n- [`physical-count-wizard-setup.png`](./screenshots/physical-count-wizard-setup.png) - Count creation wizard setup step\n- [`physical-count-management.png`](./screenshots/physical-count-management.png) - Management interface with list view\n\n## 🎯 Module Overview\n\nThe Physical Count module provides a comprehensive inventory counting system with:\n\n- **Multi-step creation wizard** for structured count setup\n- **Real-time counting interface** with location-based organization\n- **Administrative management** with filtering and search capabilities\n- **Progress tracking** and variance reporting\n- **Integration** with inventory adjustment workflows\n\n## 🗺️ Navigation Structure\n\n```\nPhysical Count Module\n├── Dashboard (/physical-count/dashboard)\n│   ├── Statistics Overview\n│   ├── Activity Charts\n│   ├── Recent Counts\n│   └── All Counts Table\n├── Creation Wizard (/physical-count)\n│   ├── Step 1: Setup\n│   ├── Step 2: Location Selection\n│   ├── Step 3: Item Review\n│   └── Step 4: Final Review\n├── Management Interface (/physical-count-management)\n│   ├── List/Grid View Toggle\n│   ├── Search & Filters\n│   ├── Count Operations\n│   └── Modal Forms\n└── Active Count Interface (/physical-count/active/[id])\n    ├── Count Header & Controls\n    ├── Location Navigation\n    ├── Item Counting Interface\n    └── Progress Tracking\n```\n\n## 📸 Screenshots Overview\n\n### Physical Count Dashboard\n![Physical Count Dashboard](./screenshots/physical-count-dashboard.png)\n\n**Key Features Shown:**\n- Statistics cards (Total Counts, In Progress, Active Counters, Pending Review)\n- Activity chart with time-based filtering\n- Recent counts panel with status indicators\n- Comprehensive counts table with search and export functionality\n\n### Physical Count Creation Wizard - Setup Step\n![Physical Count Wizard Setup](./screenshots/physical-count-wizard-setup.png)\n\n**Key Features Shown:**\n- 4-step progress indicator\n- Setup form with auto-populated counter name\n- Department selection dropdown\n- Date & time picker\n- Notes field for additional instructions\n- Form validation and navigation controls\n\n### Physical Count Management Interface\n![Physical Count Management](./screenshots/physical-count-management.png)\n\n**Key Features Shown:**\n- List view with detailed count information\n- Search functionality and filtering options\n- Status indicators (Pending, Completed, In Progress)\n- Progress bars and completion statistics\n- Action buttons for count operations\n- Expanded navigation showing inventory management hierarchy\n\n## 🔧 Technical Implementation\n\n### Framework & Technologies\n- **Next.js 14** with App Router\n- **TypeScript** for type safety\n- **Shadcn/ui** component library\n- **Tailwind CSS** for styling\n- **Recharts** for data visualization\n\n### Key Components\n\n#### Pages\n- `PhysicalCountPage` - Main wizard interface\n- `PhysicalCountDashboard` - Analytics and overview\n- `PhysicalCountManagement` - Administrative management\n- `PhysicalActiveCountPage` - Real-time counting interface\n\n#### Components\n- `PhysicalCountSetup` - Wizard setup step\n- `LocationSelection` - Location picker\n- `ItemReview` - Item configuration\n- `FinalReview` - Pre-submission review\n- `CountsTable` - Dashboard table\n- `NewCountForm` - Creation modal\n- `CountDetailForm` - Management modal\n\n### Data Flow\n1. **Creation Flow**: Wizard → Validation → Count Session → Active Interface\n2. **Management Flow**: Admin Interface → Filtering → CRUD Operations\n3. **Counting Flow**: Active Interface → Real-time Updates → Progress Tracking\n4. **Completion Flow**: Count Submission → Inventory Adjustments → Reporting\n\n## 🎨 UI/UX Patterns\n\n### Design Principles\n- **Progressive Disclosure**: Step-by-step wizard approach\n- **Location-Based Organization**: Clear location hierarchy\n- **Real-time Feedback**: Immediate progress updates\n- **Status Visualization**: Color-coded status indicators\n- **Responsive Design**: Mobile-first approach\n\n### User Interactions\n- **Multi-step Wizard**: Linear progression with validation\n- **Modal Overlays**: Non-intrusive form interactions\n- **Toggle Views**: List/Grid view options\n- **Filtering System**: Dynamic content filtering\n- **Search Functionality**: Real-time search capabilities\n\n## 📊 Data Models\n\n### Core Entities\n```typescript\ninterface CountData {\n  storeName: string\n  department: string\n  userName: string\n  date: string\n  status: \"pending\" | \"completed\" | \"in-progress\"\n  itemCount: number\n  lastCountDate: string\n  variance: number\n  notes: string\n  completedCount: number\n}\n```\n\n### API Integration\n- `GET /api/inventory/counts` - Retrieve counts with filtering\n- `POST /api/inventory/counts` - Create new count\n- `GET /api/inventory/counts/[id]` - Get count details\n- `POST /api/inventory/counts/[id]/start` - Start count execution\n\n## 🔗 Integration Points\n\n### System Integrations\n- **User Context** - Auto-population and permissions\n- **Inventory System** - Stock levels and variance calculation\n- **Location Management** - Multi-location support\n- **Department System** - Role-based access control\n- **Reporting System** - Analytics and trending data\n\n## 📋 Future Enhancements\n\n### Planned Features\n- **Barcode Scanning** - Mobile device integration\n- **Photo Documentation** - Image capture for discrepancies\n- **Batch Operations** - Multiple count scheduling\n- **Advanced Analytics** - Trend analysis and forecasting\n- **Mobile App** - Dedicated mobile counting interface\n\n### Performance Optimizations\n- **Real-time Updates** - WebSocket implementation\n- **Offline Capability** - Progressive Web App features\n- **Caching Strategy** - Optimistic updates and local storage\n- **Batch Processing** - Background count processing\n\n---\n\n## 📝 Documentation Notes\n\nThis documentation was generated through comprehensive codebase analysis and includes:\n\n- **Complete component mapping** of all Physical Count related files\n- **Detailed functionality documentation** based on actual implementation\n- **Visual site maps** showing navigation flow and relationships\n- **Actual screenshots** captured from the running application\n- **Technical specifications** for developers and stakeholders\n\nThe documentation reflects the current state of the Physical Count module as implemented in the Carmen ERP system codebase.\n\n---\n\n*Generated: September 25, 2025*\n*Source: `/app/(main)/inventory-management/physical-count*` and related components*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Settings - Technical Implementation Guide - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../../index.html" class="back-link">← All Modules</a>
+            <h1>System Administration</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../../index.html">Documentation</a> / <a href="../../../../index.html">SA</a> / Features / Notification Settings</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Notification Settings - Technical Implementation Guide\n\n**Module**: System Administration\n**Feature**: Notification Settings\n**Document Type**: Technical Implementation Guide\n**Version**: 1.0\n**Last Updated**: October 21, 2025\n\n---\n\n## Table of Contents\n\n1. [Architecture Overview](#architecture-overview)\n2. [Component Structure](#component-structure)\n3. [State Management](#state-management)\n4. [Data Flow](#data-flow)\n5. [API Integration](#api-integration)\n6. [Type Definitions](#type-definitions)\n7. [Implementation Details](#implementation-details)\n8. [Testing Strategy](#testing-strategy)\n\n---\n\n## Architecture Overview\n\n### Technology Stack\n\n- **Framework**: Next.js 14 with App Router\n- **Language**: TypeScript with strict mode enabled\n- **UI Components**: Shadcn/ui (Radix UI primitives)\n- **State Management**: React useState with local component state\n- **Form Handling**: React Hook Form + Zod validation (future enhancement)\n- **Styling**: Tailwind CSS\n\n### File Structure\n\n```\napp/(main)/system-administration/settings/notifications/\n├── page.tsx                          # Main notification settings page\n├── components/\n│   ├── global-defaults-tab.tsx       # Global defaults configuration\n│   ├── email-templates-tab.tsx       # Template management\n│   ├── delivery-settings-tab.tsx     # Delivery infrastructure\n│   ├── routing-rules-tab.tsx         # Routing configuration\n│   ├── notification-history-tab.tsx  # History and logs\n│   └── testing-tab.tsx               # Testing functionality\n\nlib/\n├── types/\n│   └── settings.ts                   # TypeScript interfaces\n├── mock-data/\n│   └── settings.ts                   # Mock data for development\n└── api/\n    └── notifications/                # API route handlers (future)\n```\n\n---\n\n## Component Structure\n\n### Main Page Component (`page.tsx`)\n\n```typescript\n\"use client\";\n\nimport { useState } from \"react\";\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from \"@/components/ui/tabs\";\n\nexport default function NotificationSettingsPage() {\n  const [activeTab, setActiveTab] = useState(\"defaults\");\n\n  return (\n    <div className=\"px-9 pt-9 pb-6\">\n      {/* Page Header */}\n      <div className=\"mb-8\">\n        <h1 className=\"text-3xl font-bold tracking-tight\">\n          Notification Settings\n        </h1>\n        <p className=\"text-muted-foreground mt-2\">\n          Manage organization-wide notification preferences, templates,\n          routing rules, and delivery settings\n        </p>\n      </div>\n\n      {/* Tab Navigation */}\n      <Tabs value={activeTab} onValueChange={setActiveTab}>\n        <TabsList className=\"grid w-full grid-cols-6\">\n          {/* Tab triggers with icons */}\n        </TabsList>\n\n        {/* Tab content areas */}\n        <TabsContent value=\"defaults\">\n          <GlobalDefaultsTab />\n        </TabsContent>\n        {/* Other tabs... */}\n      </Tabs>\n    </div>\n  );\n}\n```\n\n### Tab Components\n\nEach tab is a separate component with its own state management and logic:\n\n#### Global Defaults Tab (`global-defaults-tab.tsx`)\n\n**Key Features**:\n- Event category organization\n- Channel selection per event\n- Frequency configuration\n- Bulk enable/disable operations\n\n**State Management**:\n```typescript\nconst [preferences, setPreferences] = useState<NotificationPreference[]>(\n  mockNotificationPreferences\n);\nconst [hasChanges, setHasChanges] = useState(false);\n```\n\n**Event Handlers**:\n```typescript\nconst handleToggleChannel = (\n  eventType: NotificationEventType,\n  channel: keyof NotificationPreference['channels']\n) => {\n  setPreferences(prev => prev.map(pref => {\n    if (pref.eventType === eventType) {\n      return {\n        ...pref,\n        channels: { ...pref.channels, [channel]: !pref.channels[channel] }\n      };\n    }\n    return pref;\n  }));\n  setHasChanges(true);\n};\n```\n\n#### Delivery Settings Tab (`delivery-settings-tab.tsx`)\n\n**Key Features**:\n- Rate limiting configuration\n- Retry policy management\n- Batching settings\n- Channel infrastructure setup\n\n**State Management**:\n```typescript\nconst [settings, setSettings] = useState<DeliverySettings>(\n  mockDeliverySettings\n);\n```\n\n**Nested State Updates**:\n```typescript\nconst handleRateLimitingChange = (field: string, value: boolean | number) => {\n  setSettings(prev => ({\n    ...prev,\n    rateLimiting: { ...prev.rateLimiting, [field]: value }\n  }));\n  setHasChanges(true);\n};\n```\n\n---\n\n## State Management\n\n### Local Component State\n\nEach tab manages its own state using React's `useState` hook:\n\n```typescript\n// Global Defaults Tab\nconst [preferences, setPreferences] = useState<NotificationPreference[]>([]);\nconst [hasChanges, setHasChanges] = useState(false);\n\n// Delivery Settings Tab\nconst [settings, setSettings] = useState<DeliverySettings>({});\n\n// History Tab\nconst [filters, setFilters] = useState<HistoryFilters>({});\nconst [historyData, setHistoryData] = useState<NotificationHistoryEntry[]>([]);\n```\n\n### Change Detection\n\nTrack modifications to enable/disable save buttons:\n\n```typescript\nconst [hasChanges, setHasChanges] = useState(false);\n\n// Set to true on any modification\nconst handleChange = () => {\n  setHasChanges(true);\n};\n\n// Reset after save\nconst handleSave = async () => {\n  await saveSettings();\n  setHasChanges(false);\n};\n```\n\n### Future State Management\n\nFor production implementation, consider:\n- **React Query**: For server state management and caching\n- **Zustand**: For global notification settings state\n- **Context API**: For sharing settings across tabs\n\n---\n\n## Data Flow\n\n### Data Loading Flow\n\n```mermaid\ngraph LR\n    A[Page Load] --> B[Fetch Settings]\n    B --> C{API Success?}\n    C -->|Yes| D[Update State]\n    C -->|No| E[Show Error]\n    D --> F[Render UI]\n    E --> F\n```\n\n### Data Saving Flow\n\n```mermaid\ngraph LR\n    A[User Modification] --> B[Update Local State]\n    B --> C[Set hasChanges=true]\n    C --> D[User Clicks Save]\n    D --> E[Validate Data]\n    E --> F{Valid?}\n    F -->|Yes| G[API Request]\n    F -->|No| H[Show Validation Errors]\n    G --> I{Success?}\n    I -->|Yes| J[Show Success Toast]\n    I -->|No| K[Show Error Toast]\n    J --> L[Set hasChanges=false]\n```\n\n---\n\n## API Integration\n\n### API Endpoints (Future Implementation)\n\n```typescript\n// GET /api/notifications/settings\n// Fetch all notification settings\ninterface GetSettingsResponse {\n  globalDefaults: NotificationPreference[];\n  deliverySettings: DeliverySettings;\n  routingRules: RoutingRule[];\n  templates: NotificationTemplate[];\n}\n\n// PUT /api/notifications/settings/defaults\n// Update global defaults\ninterface UpdateDefaultsRequest {\n  preferences: NotificationPreference[];\n}\n\n// PUT /api/notifications/settings/delivery\n// Update delivery settings\ninterface UpdateDeliveryRequest {\n  settings: DeliverySettings;\n}\n\n// POST /api/notifications/test\n// Send test notification\ninterface TestNotificationRequest {\n  eventType: NotificationEventType;\n  recipient: string;\n  channels: string[];\n  templateData: Record<string, any>;\n}\n\n// GET /api/notifications/history\n// Fetch notification history\ninterface GetHistoryRequest {\n  startDate?: string;\n  endDate?: string;\n  eventType?: NotificationEventType;\n  status?: 'delivered' | 'failed' | 'pending';\n  limit?: number;\n  offset?: number;\n}\n```\n\n### API Client Implementation\n\n```typescript\n// lib/api/notifications.ts\nexport class NotificationAPI {\n  static async getSettings(): Promise<GetSettingsResponse> {\n    const response = await fetch('/api/notifications/settings');\n    if (!response.ok) throw new Error('Failed to fetch settings');\n    return response.json();\n  }\n\n  static async updateDefaults(\n    preferences: NotificationPreference[]\n  ): Promise<void> {\n    const response = await fetch('/api/notifications/settings/defaults', {\n      method: 'PUT',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ preferences }),\n    });\n    if (!response.ok) throw new Error('Failed to update defaults');\n  }\n\n  static async sendTestNotification(\n    request: TestNotificationRequest\n  ): Promise<TestNotificationResponse> {\n    const response = await fetch('/api/notifications/test', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify(request),\n    });\n    if (!response.ok) throw new Error('Failed to send test notification');\n    return response.json();\n  }\n}\n```\n\n---\n\n## Type Definitions\n\n### Core Types (`lib/types/settings.ts`)\n\n```typescript\n// Notification event types\nexport type NotificationEventType =\n  | 'purchase-request-submitted'\n  | 'purchase-request-approved'\n  | 'purchase-request-rejected'\n  | 'purchase-order-created'\n  | 'purchase-order-approved'\n  | 'goods-received'\n  | 'invoice-received'\n  | 'payment-due'\n  | 'low-stock-alert'\n  | 'stock-count-required'\n  | 'workflow-assignment'\n  | 'comment-mention'\n  | 'document-shared'\n  | 'price-update'\n  | 'vendor-update'\n  | 'system-maintenance'\n  | 'security-alert';\n\n// Notification preference for a single event type\nexport interface NotificationPreference {\n  id: string;\n  eventType: NotificationEventType;\n  enabled: boolean;\n  channels: {\n    email: boolean;\n    inApp: boolean;\n    sms: boolean;\n    push: boolean;\n  };\n  frequency: 'instant' | 'hourly' | 'daily' | 'weekly';\n}\n\n// Delivery settings configuration\nexport interface DeliverySettings {\n  rateLimiting: {\n    enabled: boolean;\n    perUserPerHour: number;\n    organizationPerHour: number;\n  };\n  retryPolicy: {\n    maxRetries: number;\n    initialDelaySeconds: number;\n    backoffMultiplier: number;\n  };\n  batching: {\n    enabled: boolean;\n    windowMinutes: number;\n    maxBatchSize: number;\n  };\n  channels: {\n    email: EmailChannelConfig;\n    sms: SmsChannelConfig;\n    push: PushChannelConfig;\n    webhook: WebhookChannelConfig;\n  };\n}\n\n// Channel-specific configurations\nexport interface EmailChannelConfig {\n  enabled: boolean;\n  quotaPerDay: number;\n  provider?: string;\n  fromAddress?: string;\n  smtpConfig?: {\n    host: string;\n    port: number;\n    secure: boolean;\n    auth: {\n      user: string;\n      pass: string;\n    };\n  };\n}\n\nexport interface SmsChannelConfig {\n  enabled: boolean;\n  quotaPerDay: number;\n  provider?: string;\n  apiKey?: string;\n  fromNumber?: string;\n}\n\nexport interface PushChannelConfig {\n  enabled: boolean;\n  quotaPerDay: number;\n  fcmServerKey?: string;\n  apnsKeyId?: string;\n  apnsTeamId?: string;\n}\n\nexport interface WebhookChannelConfig {\n  enabled: boolean;\n  endpoints: WebhookEndpoint[];\n}\n\nexport interface WebhookEndpoint {\n  id: string;\n  url: string;\n  events: NotificationEventType[];\n  headers?: Record<string, string>;\n  authType?: 'none' | 'bearer' | 'basic';\n  authToken?: string;\n}\n\n// Routing rule\nexport interface RoutingRule {\n  id: string;\n  name: string;\n  description?: string;\n  conditions: {\n    eventType?: NotificationEventType;\n    role?: string;\n    department?: string;\n    amountThreshold?: number;\n    customField?: Record<string, any>;\n  };\n  recipients: {\n    type: 'role' | 'user' | 'department';\n    values: string[];\n  };\n  escalation?: {\n    enabled: boolean;\n    delayMinutes: number;\n    escalateTo: {\n      type: 'role' | 'user';\n      values: string[];\n    };\n  };\n  priority: 'high' | 'medium' | 'low';\n  isActive: boolean;\n  createdAt: string;\n  updatedAt: string;\n}\n\n// Notification history entry\nexport interface NotificationHistoryEntry {\n  id: string;\n  eventType: NotificationEventType;\n  recipient: {\n    id: string;\n    name: string;\n    email: string;\n  };\n  channels: {\n    channel: 'email' | 'inApp' | 'sms' | 'push' | 'webhook';\n    status: 'delivered' | 'failed' | 'pending';\n    sentAt?: string;\n    deliveredAt?: string;\n    error?: string;\n  }[];\n  createdAt: string;\n  metadata?: Record<string, any>;\n}\n\n// Template definition\nexport interface NotificationTemplate {\n  id: string;\n  eventType: NotificationEventType;\n  name: string;\n  subject: string;\n  htmlBody: string;\n  textBody: string;\n  variables: TemplateVariable[];\n  isActive: boolean;\n  lastModifiedBy?: string;\n  lastModifiedAt?: string;\n}\n\nexport interface TemplateVariable {\n  name: string;\n  description: string;\n  required: boolean;\n  defaultValue?: string;\n}\n```\n\n---\n\n## Implementation Details\n\n### Component Best Practices\n\n#### 1. Immutable State Updates\n\nAlways use spread operators to maintain immutability:\n\n```typescript\n// ✅ Good\nsetPreferences(prev => prev.map(pref =>\n  pref.id === id ? { ...pref, enabled: !pref.enabled } : pref\n));\n\n// ❌ Bad\nsetPreferences(prev => {\n  const item = prev.find(p => p.id === id);\n  item.enabled = !item.enabled; // Mutates state directly\n  return prev;\n});\n```\n\n#### 2. Nested State Updates\n\nFor deeply nested objects, use helper functions:\n\n```typescript\nconst updateNestedSetting = (\n  path: string[],\n  value: any\n) => {\n  setSettings(prev => {\n    const updated = { ...prev };\n    let current: any = updated;\n\n    for (let i = 0; i < path.length - 1; i++) {\n      current[path[i]] = { ...current[path[i]] };\n      current = current[path[i]];\n    }\n\n    current[path[path.length - 1]] = value;\n    return updated;\n  });\n};\n\n// Usage\nupdateNestedSetting(['rateLimiting', 'perUserPerHour'], 100);\n```\n\n#### 3. Loading and Error States\n\nAlways handle loading and error states:\n\n```typescript\nconst [isLoading, setIsLoading] = useState(true);\nconst [error, setError] = useState<string | null>(null);\n\nuseEffect(() => {\n  async function loadSettings() {\n    try {\n      setIsLoading(true);\n      const data = await NotificationAPI.getSettings();\n      setPreferences(data.globalDefaults);\n      setError(null);\n    } catch (err) {\n      setError(err instanceof Error ? err.message : 'Failed to load settings');\n    } finally {\n      setIsLoading(false);\n    }\n  }\n\n  loadSettings();\n}, []);\n\nif (isLoading) return <LoadingSpinner />;\nif (error) return <ErrorMessage message={error} />;\n```\n\n#### 4. Debounced Save\n\nImplement auto-save with debouncing:\n\n```typescript\nimport { useCallback } from 'react';\nimport { debounce } from 'lodash';\n\nconst debouncedSave = useCallback(\n  debounce(async (settings: DeliverySettings) => {\n    try {\n      await NotificationAPI.updateDeliverySettings(settings);\n      toast({ title: 'Settings saved automatically' });\n    } catch (error) {\n      toast({\n        title: 'Auto-save failed',\n        variant: 'destructive'\n      });\n    }\n  }, 2000),\n  []\n);\n\n// Call on every change\nuseEffect(() => {\n  if (hasChanges) {\n    debouncedSave(settings);\n  }\n}, [settings, hasChanges]);\n```\n\n### Form Validation\n\nImplement validation rules:\n\n```typescript\nconst validateRateLimiting = (settings: DeliverySettings['rateLimiting']) => {\n  const errors: string[] = [];\n\n  if (settings.perUserPerHour < 1 || settings.perUserPerHour > 1000) {\n    errors.push('Per user rate limit must be between 1 and 1000');\n  }\n\n  if (settings.organizationPerHour < settings.perUserPerHour) {\n    errors.push('Organization limit must be >= per user limit');\n  }\n\n  return errors;\n};\n\nconst handleSave = async () => {\n  const errors = validateRateLimiting(settings.rateLimiting);\n\n  if (errors.length > 0) {\n    toast({\n      title: 'Validation Error',\n      description: errors.join('. '),\n      variant: 'destructive',\n    });\n    return;\n  }\n\n  // Proceed with save\n  await NotificationAPI.updateDeliverySettings(settings);\n};\n```\n\n---\n\n## Testing Strategy\n\n### Unit Tests\n\nTest individual functions and components:\n\n```typescript\n// global-defaults-tab.test.tsx\nimport { render, screen, fireEvent } from '@testing-library/react';\nimport { GlobalDefaultsTab } from './global-defaults-tab';\n\ndescribe('GlobalDefaultsTab', () => {\n  it('should toggle event enabled state', () => {\n    render(<GlobalDefaultsTab />);\n\n    const toggle = screen.getByLabelText('Purchase Request Submitted');\n    expect(toggle).not.toBeChecked();\n\n    fireEvent.click(toggle);\n    expect(toggle).toBeChecked();\n  });\n\n  it('should enable save button when changes made', () => {\n    render(<GlobalDefaultsTab />);\n\n    const saveButton = screen.getByText('Save Changes');\n    expect(saveButton).toBeDisabled();\n\n    const toggle = screen.getByLabelText('Purchase Request Submitted');\n    fireEvent.click(toggle);\n\n    expect(saveButton).not.toBeDisabled();\n  });\n});\n```\n\n### Integration Tests\n\nTest component interactions:\n\n```typescript\ndescribe('Notification Settings Integration', () => {\n  it('should save settings and show success message', async () => {\n    render(<NotificationSettingsPage />);\n\n    // Make changes\n    const toggle = screen.getByLabelText('Purchase Request Submitted');\n    fireEvent.click(toggle);\n\n    // Save\n    const saveButton = screen.getByText('Save Changes');\n    fireEvent.click(saveButton);\n\n    // Verify API call and toast\n    await waitFor(() => {\n      expect(screen.getByText('Settings Saved')).toBeInTheDocument();\n    });\n  });\n});\n```\n\n### E2E Tests\n\nTest complete user workflows:\n\n```typescript\n// e2e/notification-settings.spec.ts\nimport { test, expect } from '@playwright/test';\n\ntest('configure notification defaults', async ({ page }) => {\n  await page.goto('/system-administration/settings/notifications');\n\n  // Navigate to defaults tab\n  await page.click('button:has-text(\"Defaults\")');\n\n  // Enable email for purchase requests\n  await page.click('[data-testid=\"pr-submitted-toggle\"]');\n  await page.click('[data-testid=\"pr-submitted-email\"]');\n\n  // Save changes\n  await page.click('button:has-text(\"Save Changes\")');\n\n  // Verify success\n  await expect(page.locator('.toast')).toContainText('Settings Saved');\n});\n```\n\n---\n\n## Performance Optimization\n\n### Code Splitting\n\nLazy load tab components:\n\n```typescript\nimport dynamic from 'next/dynamic';\n\nconst GlobalDefaultsTab = dynamic(() =>\n  import('./components/global-defaults-tab').then(mod => ({\n    default: mod.GlobalDefaultsTab\n  }))\n);\n\nconst DeliverySettingsTab = dynamic(() =>\n  import('./components/delivery-settings-tab').then(mod => ({\n    default: mod.DeliverySettingsTab\n  }))\n);\n```\n\n### Memoization\n\nUse React.memo for expensive components:\n\n```typescript\nimport { memo } from 'react';\n\nexport const EventConfigCard = memo(({\n  eventType,\n  preference,\n  onToggle\n}: EventConfigCardProps) => {\n  // Component implementation\n}, (prevProps, nextProps) => {\n  // Custom comparison\n  return prevProps.preference === nextProps.preference;\n});\n```\n\n### Virtual Scrolling\n\nFor large lists in history tab:\n\n```typescript\nimport { useVirtualizer } from '@tanstack/react-virtual';\n\nconst HistoryList = ({ items }: { items: NotificationHistoryEntry[] }) => {\n  const parentRef = useRef<HTMLDivElement>(null);\n\n  const virtualizer = useVirtualizer({\n    count: items.length,\n    getScrollElement: () => parentRef.current,\n    estimateSize: () => 80,\n  });\n\n  return (\n    <div ref={parentRef} style={{ height: '600px', overflow: 'auto' }}>\n      <div style={{ height: `${virtualizer.getTotalSize()}px` }}>\n        {virtualizer.getVirtualItems().map(virtualItem => (\n          <div\n            key={virtualItem.key}\n            style={{\n              position: 'absolute',\n              top: 0,\n              left: 0,\n              width: '100%',\n              height: `${virtualItem.size}px`,\n              transform: `translateY(${virtualItem.start}px)`,\n            }}\n          >\n            <HistoryItem item={items[virtualItem.index]} />\n          </div>\n        ))}\n      </div>\n    </div>\n  );\n};\n```\n\n---\n\n## Deployment Checklist\n\n### Pre-Deployment\n\n- [ ] All TypeScript types defined\n- [ ] Component unit tests passing\n- [ ] Integration tests passing\n- [ ] E2E tests passing\n- [ ] Accessibility audit completed\n- [ ] Performance benchmarks met\n- [ ] Code review completed\n- [ ] Documentation updated\n\n### Post-Deployment\n\n- [ ] Monitor error rates\n- [ ] Check API performance\n- [ ] Verify notification delivery\n- [ ] Collect user feedback\n- [ ] Review analytics data\n\n---\n\n## Troubleshooting\n\n### Common Development Issues\n\n**Issue**: State not updating\n```typescript\n// Problem: Direct mutation\nsettings.rateLimiting.enabled = true;\n\n// Solution: Immutable update\nsetSettings(prev => ({\n  ...prev,\n  rateLimiting: { ...prev.rateLimiting, enabled: true }\n}));\n```\n\n**Issue**: Infinite re-render\n```typescript\n// Problem: Object dependency in useEffect\nuseEffect(() => {\n  fetchData();\n}, [settings]); // Object reference changes every render\n\n// Solution: Specific dependencies\nuseEffect(() => {\n  fetchData();\n}, [settings.rateLimiting.enabled]);\n```\n\n---\n\n## Support & Resources\n\n### Documentation\n- [React Documentation](https://react.dev)\n- [Next.js Documentation](https://nextjs.org/docs)\n- [Tailwind CSS](https://tailwindcss.com/docs)\n- [Shadcn/ui](https://ui.shadcn.com)\n\n### Internal Resources\n- Type Definitions: `lib/types/settings.ts`\n- Mock Data: `lib/mock-data/settings.ts`\n- API Specs: `docs/documents/sa/features/notification-settings/api/`\n\n---\n\n*Last Updated: October 21, 2025*\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

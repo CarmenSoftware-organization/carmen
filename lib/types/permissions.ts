@@ -428,9 +428,12 @@ export interface Department {
   id: string;
   name: string;
   code: string;
+  description?: string;
+  status: 'active' | 'inactive';
   parentDepartment?: string;
   costCenter?: string;
   manager?: string; // User ID
+  assignedUsers?: string[]; // Array of user IDs assigned to this department
 }
 
 export interface Location {

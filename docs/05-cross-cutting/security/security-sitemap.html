@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security (ABAC) Module - Sitemap - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Cross-Cutting Concerns</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Cross-Cutting Concerns</a> / Security Sitemap</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Security (ABAC) Module - Sitemap\n\n**Module**: Security & Access Control\n**System**: Attribute-Based Access Control (ABAC)\n**Navigation Structure**: 10-12 pages\n\n## Navigation Hierarchy\n\n### 1. Security Module Overview (`/security`)\n\n**Page Type**: Landing Page\n**Status**: Documentation Complete\n**Content**:\n- Module introduction and ABAC benefits\n- Quick links to key sections\n- System architecture diagram\n- Current implementation status\n\n**Key Sections**:\n- Why ABAC over RBAC\n- Key features summary (6 features)\n- Performance metrics overview\n- Getting started guide\n\n---\n\n### 2. Policy Management (`/security/policies`)\n\n**Page Type**: Management Interface\n**Status**: Backend Complete, UI 40% Complete\n**Content**: Policy CRUD operations with priority management\n\n**Sub-pages**:\n\n#### 2.1 Policy List View (`/security/policies/list`)\n- **Content**: Paginated policy listing with filters\n- **Features**:\n  - Search by name/description\n  - Filter by status (active, inactive, draft)\n  - Filter by category (approval_workflows, access_control, etc.)\n  - Sort by priority, name, createdAt\n  - Bulk operations (activate, deactivate, delete)\n\n#### 2.2 Policy Detail View (`/security/policies/[id]`)\n- **Content**: Complete policy configuration display\n- **Features**:\n  - Policy metadata (name, priority, effect, status)\n  - Target conditions (subjects, resources, actions, environment)\n  - Rule definitions with expression trees\n  - Obligations and advice\n  - Version history\n  - Test scenarios\n\n#### 2.3 Policy Creation Form (`/security/policies/new`)\n- **Content**: Multi-step policy creation wizard\n- **Steps**:\n  1. Basic Information (name, description, priority, effect)\n  2. Target Definition (subjects, resources, actions, environment)\n  3. Rule Creation (expression builder)\n  4. Obligations & Advice\n  5. Testing & Validation\n- **Features**:\n  - Expression builder with visual tree\n  - Attribute auto-completion\n  - Policy validation\n  - Test scenario runner\n  - Conflict detection\n\n#### 2.4 Policy Testing (`/security/policies/[id]/test`)\n- **Content**: Policy scenario testing interface\n- **Features**:\n  - Create test scenarios\n  - Run policy evaluation simulations\n  - View evaluation traces\n  - Compare expected vs actual results\n  - Save scenarios for regression testing\n\n---\n\n### 3. Role Management (`/security/roles`)\n\n**Page Type**: Management Interface\n**Status**: Backend Complete, UI 90% Complete\n**Content**: Role hierarchy and permission management\n\n**Sub-pages**:\n\n#### 3.1 Role List View (`/security/roles/list`)\n- **Content**: Hierarchical role display\n- **Features**:\n  - Role hierarchy visualization\n  - User count per role\n  - Permission summary\n  - Quick role assignment\n\n#### 3.2 Role Detail View (`/security/roles/[id]`)\n- **Content**: 3-tab interface with complete role management\n- **Tabs**:\n  1. **Permissions Tab**: Grouped/flat permission view\n  2. **Users Tab**: Split-panel user assignment\n  3. **Policies Tab**: Assigned policy management\n- **Features**:\n  - Inherited vs direct permissions\n  - Bulk user assignment\n  - Policy type categorization\n  - Effective permission calculation\n\n#### 3.3 Role Hierarchy View (`/security/roles/hierarchy`)\n- **Content**: Interactive role hierarchy tree\n- **Features**:\n  - Drag-and-drop role reordering\n  - Permission inheritance visualization\n  - Role comparison tool\n  - Impact analysis for changes\n\n---\n\n### 4. Attribute Management (`/security/attributes`)\n\n**Page Type**: Configuration Interface\n**Status**: Backend Complete, UI Planned\n**Content**: Attribute definition and resolution management\n\n**Sub-pages**:\n\n#### 4.1 Subject Attributes (`/security/attributes/subjects`)\n- **Content**: User attribute configuration\n- **26 Configurable Attributes**:\n  - Identity (3)\n  - Organizational (6)\n  - Employment (3)\n  - Permissions (3)\n  - Status (3)\n  - Financial (2)\n\n#### 4.2 Resource Attributes (`/security/attributes/resources`)\n- **Content**: Resource attribute configuration\n- **21 Configurable Attributes**:\n  - Identity (3)\n  - Ownership (4)\n  - Business Context (3)\n  - Financial (3)\n  - Temporal (4)\n  - Compliance (3)\n  - Relationships (3)\n\n#### 4.3 Environment Attributes (`/security/attributes/environment`)\n- **Content**: Environmental context configuration\n- **20 Configurable Attributes**:\n  - Temporal (4)\n  - Location (4)\n  - Device & Session (5)\n  - System State (3)\n  - Risk & Compliance (3)\n\n#### 4.4 Attribute Resolution Monitor (`/security/attributes/monitor`)\n- **Content**: Real-time attribute resolution monitoring\n- **Features**:\n  - Resolution time metrics\n  - Cache hit rates by attribute type\n  - Failed resolutions log\n  - Attribute source tracking\n\n---\n\n### 5. Audit & Compliance (`/security/audit`)\n\n**Page Type**: Monitoring & Reporting Interface\n**Status**: Backend Complete, UI Planned\n**Content**: Comprehensive audit logging and compliance reporting\n\n**Sub-pages**:\n\n#### 5.1 Audit Logs (`/security/audit/logs`)\n- **Content**: Permission evaluation audit trail\n- **Features**:\n  - Real-time audit log streaming\n  - Advanced filtering (user, resource, action, decision)\n  - Date range selection\n  - Export to CSV/PDF\n  - Full evaluation context display\n\n#### 5.2 User Activity (`/security/audit/users`)\n- **Content**: User access pattern analysis\n- **Features**:\n  - Access frequency charts\n  - Most accessed resources\n  - Failed attempt tracking\n  - Unusual activity detection\n  - Risk score calculation\n\n#### 5.3 Policy Usage Analytics (`/security/audit/policies`)\n- **Content**: Policy effectiveness metrics\n- **Features**:\n  - Policy match rates\n  - Permit/deny statistics\n  - Evaluation time analysis\n  - Unused policy detection\n  - Conflict analysis\n\n#### 5.4 Compliance Reports (`/security/audit/compliance`)\n- **Content**: Regulatory compliance reporting\n- **Features**:\n  - SOX compliance dashboard\n  - GDPR compliance tracking\n  - HIPAA audit reports\n  - Custom compliance frameworks\n  - Violation tracking\n  - Remediation workflows\n\n---\n\n### 6. Security Analytics (`/security/analytics`)\n\n**Page Type**: Monitoring Dashboard\n**Status**: Backend Complete, UI Planned\n**Content**: Real-time security monitoring and threat detection\n\n**Features**:\n- Security event dashboard\n- Threat indicator visualization\n- User risk profiles\n- Privilege escalation detection\n- Unusual access pattern alerts\n- Security recommendations\n\n---\n\n### 7. Performance Monitoring (`/security/performance`)\n\n**Page Type**: System Health Dashboard\n**Status**: Backend Complete, UI Planned\n**Content**: ABAC system performance metrics\n\n**Key Metrics**:\n- Evaluation time (avg, P95, P99)\n- Cache hit rates (policy, attribute, user)\n- Throughput (requests/minute)\n- Error rates\n- Timeout rates\n- Database performance\n\n**Features**:\n- Real-time metrics streaming\n- Historical trends\n- Bottleneck identification\n- Performance alerts\n- Optimization recommendations\n\n---\n\n### 8. System Administration (`/security/admin`)\n\n**Page Type**: Administrative Interface\n**Status**: Backend Complete, UI Planned\n**Content**: System configuration and maintenance\n\n**Sub-pages**:\n\n#### 8.1 Health Check (`/security/admin/health`)\n- System status monitoring\n- Component health checks\n- Warning and error tracking\n- Service uptime\n\n#### 8.2 Configuration (`/security/admin/config`)\n- Permission system settings\n- Cache configuration\n- Audit settings\n- Security parameters\n- Rate limiting configuration\n\n#### 8.3 Cache Management (`/security/admin/cache`)\n- Cache status dashboard\n- Manual cache clearing\n- Cache statistics\n- TTL configuration\n\n#### 8.4 Backup & Restore (`/security/admin/backup`)\n- Create system backups\n- Restore from backup\n- Backup history\n- Automated backup scheduling\n\n---\n\n## Page Count Summary\n\n**Total Pages**: 10-12 main pages\n**Implementation Status**:\n- Backend Complete: 95%\n- Frontend Complete: 40%\n- Documentation Complete: 100%\n\n### Page Breakdown:\n\n1. **Overview**: 1 page (documentation complete)\n2. **Policy Management**: 4 pages (UI 40% complete)\n3. **Role Management**: 3 pages (UI 90% complete)\n4. **Attribute Management**: 4 pages (UI planned)\n5. **Audit & Compliance**: 4 pages (UI planned)\n6. **Security Analytics**: 1 page (UI planned)\n7. **Performance Monitoring**: 1 page (UI planned)\n8. **System Administration**: 4 pages (UI planned)\n\n---\n\n## Technical Integration\n\n### Data Flow\n\n```\n┌─────────────────┐\n│   User Request  │\n└────────┬────────┘\n         │\n         ▼\n┌─────────────────────────────┐\n│  Policy Decision Point (PDP)│\n│  - Context Builder          │\n│  - Policy Retrieval         │\n│  - Rule Evaluation          │\n└────────┬────────────────────┘\n         │\n         ▼\n┌─────────────────────────────┐\n│   Attribute Resolution      │\n│  - Subject Attributes       │\n│  - Resource Attributes      │\n│  - Environment Attributes   │\n└────────┬────────────────────┘\n         │\n         ▼\n┌─────────────────────────────┐\n│   Policy Evaluation         │\n│  - Priority Sorting         │\n│  - Rule Matching            │\n│  - Expression Evaluation    │\n└────────┬────────────────────┘\n         │\n         ▼\n┌─────────────────────────────┐\n│   Decision Combination      │\n│  - Deny Overrides (default) │\n│  - Permit Overrides         │\n│  - First Applicable         │\n└────────┬────────────────────┘\n         │\n         ▼\n┌─────────────────────────────┐\n│   Audit Logging             │\n│  - Decision Record          │\n│  - Evaluation Trace         │\n│  - Compliance Log           │\n└────────┬────────────────────┘\n         │\n         ▼\n┌─────────────────────────────┐\n│   Access Decision           │\n│  - Permit / Deny            │\n│  - Obligations              │\n│  - Advice                   │\n└─────────────────────────────┘\n```\n\n### Component Integration\n\n**Frontend Components** (React + TypeScript):\n- `/app/(main)/system-administration/permission-management/`\n  - `policies/` - Policy management UI\n  - `roles/` - Role management UI (90% complete)\n  - `attributes/` - Attribute configuration UI (planned)\n\n**Backend Services** (Next.js API Routes):\n- `/app/api/v1/permissions/`\n  - Permission evaluation endpoints (4 endpoints)\n  - Policy management endpoints (7 endpoints)\n  - Attribute management endpoints (6 endpoints)\n  - User & role management endpoints (6 endpoints)\n  - Audit & analytics endpoints (6 endpoints)\n  - System administration endpoints (6 endpoints)\n\n**Database** (PostgreSQL port 5435):\n- 15 ABAC-specific tables\n- Comprehensive indexing for performance\n- 7-year audit log retention\n\n**TypeScript Types** (`/types/abac.ts`):\n- 246 lines of type definitions\n- SubjectAttributes interface (26 fields)\n- ResourceAttributes interface (21 fields)\n- EnvironmentAttributes interface (20 fields)\n- Policy, Rule, Expression interfaces\n\n---\n\n## API Integration\n\n**Base URL**: `/api/v1/permissions`\n\n**60+ API Endpoints** across 6 categories:\n1. **Permission Evaluation** (4 endpoints)\n2. **Policy Management** (7 endpoints)\n3. **Attribute Management** (6 endpoints)\n4. **User & Role Management** (6 endpoints)\n5. **Audit & Analytics** (6 endpoints)\n6. **System Administration** (6 endpoints)\n\n**Complete API Documentation**: `/docs/api/abac-permission-system-apis.md` (2,216 lines)\n\n---\n\n## Future Enhancements\n\n### Phase 1: UI Completion (Q1 2025)\n- Complete policy creation/editing interfaces\n- Implement expression builder\n- Add policy testing framework\n- Complete attribute management UI\n\n### Phase 2: Advanced Features (Q2 2025)\n- Machine learning for anomaly detection\n- Automated policy optimization\n- Risk-based adaptive authentication\n- Mobile-responsive interfaces\n\n### Phase 3: Integration Expansion (Q3 2025)\n- External identity provider integration (SSO, LDAP, AD)\n- Third-party compliance framework connectors\n- Webhook notification system\n- Real-time dashboard streaming\n\n### Phase 4: Enterprise Features (Q4 2025)\n- Multi-tenancy support\n- Distributed policy evaluation\n- Advanced threat modeling\n- Compliance automation engine\n\n---\n\n**Documentation Status**: ✅ Complete\n**Total Documentation Lines**: 1,850+ lines across 5 files\n**API Endpoints Documented**: 60+ endpoints\n**TypeScript Interfaces**: 15+ complete interfaces\n**Database Tables**: 15 tables documented\n**Performance Benchmarks**: Comprehensive metrics provided\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

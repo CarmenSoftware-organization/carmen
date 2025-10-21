@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Settings - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../index.html" class="back-link">← All Modules</a>
+            <h1>System Administration</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../index.html">Documentation</a> / <a href="../../../index.html">SA</a> / Features / General Settings</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# General Settings\n\n**Module**: System Administration\n**Feature**: General Settings\n**Route**: `/system-administration/settings`\n**Version**: 1.0\n**Last Updated**: October 21, 2025\n\n---\n\n## Overview\n\nThe General Settings feature provides administrators with centralized control over organization-wide configurations, security policies, application infrastructure, and company information. This comprehensive interface serves as the central hub for all system-level settings that apply across the entire Carmen ERP system.\n\n### Purpose\n\n- Configure company information and branding\n- Manage security policies and authentication\n- Set up application infrastructure and integrations\n- Control system-wide features and performance\n- Define operational parameters and preferences\n- Manage backup and data retention policies\n\n### Target Users\n\n- **Primary**: System Administrators managing organization-wide configurations\n- **Secondary**: IT Administrators configuring application infrastructure\n- **Tertiary**: Security Administrators managing security policies and compliance\n\n---\n\n## Key Features\n\n### 1. Settings Hub (Central Dashboard)\n\nThe settings hub provides quick access to all configuration areas with clear visual organization and navigation cards.\n\n**Settings Categories**:\n- **Company Settings**: Organization information, branding, and operational parameters\n- **Security Settings**: Security policies, authentication, and access control\n- **Application Settings**: Email, backup, integrations, and performance\n- **Notification Settings**: Notification preferences and delivery infrastructure\n- **Backup & Data** (Planned): Backup schedules and data retention\n- **Appearance & Branding** (Planned): Theme customization and visual settings\n\n### 2. Company Settings\n\nConfigure organizational information, branding assets, and operational parameters across three comprehensive tabs.\n\n#### Tab 1: General Information\n**Company Identity**:\n- Company name and legal entity name\n- Tax identification number (TIN/EIN)\n- Registration number and incorporation date\n- Company website URL\n\n**Contact Information**:\n- Primary phone number with extension\n- Secondary phone number\n- Primary email address\n- Support email address\n\n**Business Address**:\n- Street address and suite/unit\n- City, state/province, postal code\n- Country selection\n\n#### Tab 2: Branding\n**Logo Management**:\n- Logo URL for light mode display\n- Logo URL for dark mode display\n- Favicon URL for browser tabs\n- Logo display guidelines\n\n**Brand Colors**:\n- Primary brand color (hex code)\n- Secondary brand color (hex code)\n- Accent color for highlights\n- Color usage guidelines\n\n**Visual Identity**:\n- Brand guidelines documentation\n- Logo file format requirements\n- Color accessibility compliance\n\n#### Tab 3: Operational Settings\n**Localization**:\n- Default currency (multi-currency support)\n- System timezone configuration\n- Preferred language and locale\n- Date and time format preferences\n\n**Fiscal Configuration**:\n- Fiscal year start date\n- Fiscal year end date\n- Tax year alignment\n- Accounting period definitions\n\n**Operating Hours**:\n- Business hours (Monday-Sunday)\n- Holiday calendar management\n- Shift schedules\n- Service availability windows\n\n**Organizational Structure**:\n- Department hierarchy\n- Location management\n- Cost center definitions\n- Division structure\n\n### 3. Security Settings\n\nConfigure comprehensive security policies across four critical security domains.\n\n#### Tab 1: Password Policy\n**Password Requirements**:\n- Minimum password length (6-32 characters, recommended 12+)\n- Require uppercase letters (A-Z)\n- Require lowercase letters (a-z)\n- Require numeric digits (0-9)\n- Require special characters (!@#$%^&*)\n\n**Password Management**:\n- Password expiry period (days, 0 = never expires)\n- Password history count (prevent reuse of last N passwords)\n- Password strength indicator (Weak/Medium/Strong)\n- Password complexity enforcement\n\n#### Tab 2: Authentication\n**Two-Factor Authentication (2FA)**:\n- Enable/disable 2FA for organization\n- Require 2FA for all users (mandatory enforcement)\n- Allowed authentication methods:\n  - Authenticator app (TOTP)\n  - SMS verification\n  - Email verification\n- Grace period for 2FA enrollment (days)\n\n**Session Management**:\n- Session timeout duration (minutes of inactivity)\n- Maximum concurrent sessions per user\n- Allow \"Remember Me\" functionality\n- Absolute session timeout (force logout after maximum duration)\n- Session token rotation policy\n\n**Login Security**:\n- Maximum failed login attempts\n- Account lockout duration (minutes)\n- Administrator notification on lockout\n- CAPTCHA requirements after failed attempts\n\n#### Tab 3: Access Control\n**IP Access Control**:\n- Enable IP whitelisting\n- Whitelisted IP addresses and CIDR ranges\n- IP-based access restrictions\n- Geolocation-based access policies\n\n**Security Questions**:\n- Enable security questions for password recovery\n- Minimum number of questions required\n- Custom question management\n- Security question validation rules\n\n**Role-Based Access**:\n- Permission matrix management\n- Role hierarchy definitions\n- Department-level access control\n- Location-based restrictions\n\n#### Tab 4: Audit & Logging\n**Audit Logging**:\n- Enable comprehensive audit logging\n- Log retention period (days)\n- Events to log:\n  - User login/logout\n  - Data access\n  - Data modification\n  - Settings changes\n  - Security events\n\n**Data Encryption**:\n- Encrypt data at rest (AES-256, AES-128, RSA-2048)\n- Encrypt data in transit (HTTPS/TLS enforcement)\n- Encryption algorithm selection\n- Key rotation policies\n\n**Compliance**:\n- GDPR compliance settings\n- Data residency requirements\n- Privacy policy enforcement\n- Regulatory reporting\n\n### 4. Application Settings\n\nConfigure application infrastructure, integrations, and performance across four functional areas.\n\n#### Tab 1: Email Configuration\n**SMTP Settings**:\n- Email provider selection (SMTP, SendGrid, AWS SES, Custom)\n- SMTP host and port\n- Authentication credentials (username/password)\n- Encryption method (TLS, SSL, None)\n- Connection timeout settings\n\n**Email Templates**:\n- From email address and display name\n- Reply-to email address\n- Email signature template\n- Default email format (HTML, Plain Text, Both)\n\n**Email Testing**:\n- Send test email functionality\n- Email delivery monitoring\n- Bounce handling configuration\n- Email queue management\n\n#### Tab 2: Backup & Recovery\n**Automated Backup**:\n- Enable automatic backups\n- Backup frequency (Hourly, Daily, Weekly, Monthly)\n- Backup schedule (time and day selection)\n- Backup retention period (days)\n\n**Backup Storage**:\n- Storage location (Local, Cloud, Both)\n- Cloud provider selection (AWS S3, Azure Blob, Google Cloud)\n- Storage capacity management\n- Backup encryption settings\n\n**Recovery Options**:\n- Point-in-time recovery capability\n- Backup verification schedule\n- Recovery testing frequency\n- Disaster recovery procedures\n\n#### Tab 3: Integrations\n**POS Integration**:\n- Enable POS system integration\n- POS provider selection\n- API endpoint configuration\n- Authentication settings\n- Sync frequency and rules\n\n**ERP Integration**:\n- Enable external ERP integration\n- ERP system selection\n- Integration endpoint URL\n- Authentication credentials\n- Data mapping configuration\n\n**Accounting System**:\n- Enable accounting software integration\n- Accounting system type\n- Integration mode (Real-time, Batch)\n- Chart of accounts mapping\n- Transaction sync rules\n\n**Third-Party APIs**:\n- API key management\n- Webhook configurations\n- Rate limiting settings\n- Integration monitoring\n\n#### Tab 4: Features & Performance\n**Feature Toggles**:\n- Advanced search functionality\n- Real-time notifications\n- Mobile app access\n- Offline mode capability\n- Beta features access\n\n**Performance Optimization**:\n- Enable caching (In-Memory, Redis, Memcached)\n- Cache duration settings\n- CDN configuration\n- Image optimization settings\n- Database query caching\n\n**API Configuration**:\n- API rate limiting (requests per minute)\n- API versioning strategy\n- API documentation access\n- Developer API keys\n- Webhook retry policies\n\n---\n\n## Access Control\n\n### Required Permissions\n- `system_administration.settings.view` - View all settings\n- `system_administration.settings.company.manage` - Manage company settings\n- `system_administration.settings.security.manage` - Manage security settings\n- `system_administration.settings.application.manage` - Manage application settings\n\n### Role Requirements\n- **System Administrator**: Full access to all settings\n- **IT Administrator**: Can manage application settings and integrations\n- **Security Administrator**: Can manage security settings and policies\n- **Financial Manager**: Can view company settings and fiscal configuration\n\n---\n\n## User Interface\n\n### Settings Hub Layout\n```\n┌────────────────────────────────────────────────────────┐\n│ General Settings                                        │\n│ Configure system-wide settings and preferences          │\n├────────────────────────────────────────────────────────┤\n│ ┌─────────────────┐ ┌─────────────────┐ ┌────────────┐ │\n│ │ Company Settings│ │Security Settings│ │Application │ │\n│ │ Organization    │ │ Security policies│ │Email, backup│ │\n│ │ info & branding │ │ & authentication │ │& integration│ │\n│ │ [Configure Co.] │ │ [Configure Sec.]│ │ [Configure] │ │\n│ └─────────────────┘ └─────────────────┘ └────────────┘ │\n│ ┌─────────────────┐ ┌─────────────────┐ ┌────────────┐ │\n│ │  Notifications  │ │  Backup & Data  │ │ Appearance │ │\n│ │ Notification    │ │ Backup schedules│ │Theme & UI   │ │\n│ │ preferences     │ │ & data retention│ │customization│ │\n│ │ [Configure Not.]│ │   [Planned]     │ │ [Planned]  │ │\n│ └─────────────────┘ └─────────────────┘ └────────────┘ │\n└────────────────────────────────────────────────────────┘\n```\n\n### Tab Navigation Pattern\nAll settings screens use consistent horizontal tab navigation:\n\n**Company Settings Example**:\n```\n[General Information] [Branding] [Operational Settings]\n┌────────────────────────────────────────────────────┐\n│ Company Name: [Carmen Hospitality Group          ]│\n│ Legal Name:   [Carmen Hospitality Group LLC     ]│\n│ Tax ID:       [12-3456789                       ]│\n│                                                    │\n│ [Save Changes] [Reset to Default]                 │\n└────────────────────────────────────────────────────┘\n```\n\n### Key UI Components\n\n#### Settings Card\n```\n┌────────────────────────────────────┐\n│ Company Settings              🏢   │\n├────────────────────────────────────┤\n│ Organization information           │\n│ and branding                       │\n│                                    │\n│ [Configure Company Settings]       │\n└────────────────────────────────────┘\n```\n\n#### Form Input Pattern\n```\n┌────────────────────────────────────┐\n│ Label Name                         │\n│ [Input Field                     ] │\n│ Helper text or description         │\n└────────────────────────────────────┘\n```\n\n---\n\n## Data Model\n\n### Company Settings\n```typescript\ninterface CompanySettings {\n  general: {\n    companyName: string;\n    legalName: string;\n    taxId: string;\n    registrationNumber: string;\n    incorporationDate: string;\n    website: string;\n  };\n  contact: {\n    primaryPhone: string;\n    secondaryPhone?: string;\n    primaryEmail: string;\n    supportEmail: string;\n  };\n  address: {\n    street: string;\n    city: string;\n    state: string;\n    postalCode: string;\n    country: string;\n  };\n  branding: {\n    logoUrl: string;\n    darkModeLogoUrl: string;\n    faviconUrl: string;\n    primaryColor: string;\n    secondaryColor: string;\n    accentColor: string;\n  };\n  operational: {\n    defaultCurrency: string;\n    timezone: string;\n    language: string;\n    fiscalYearStart: string;\n    fiscalYearEnd: string;\n  };\n}\n```\n\n### Security Settings\n```typescript\ninterface SecuritySettings {\n  passwordPolicy: {\n    minLength: number;\n    requireUppercase: boolean;\n    requireLowercase: boolean;\n    requireNumbers: boolean;\n    requireSpecialChars: boolean;\n    expiryDays: number;\n    historyCount: number;\n  };\n  twoFactor: {\n    enabled: boolean;\n    required: boolean;\n    methods: ('authenticator' | 'sms' | 'email')[];\n    gracePeriodDays: number;\n  };\n  sessionSettings: {\n    timeout: number;\n    maxConcurrentSessions: number;\n    rememberMe: boolean;\n    absoluteTimeout: boolean;\n  };\n  loginAttempts: {\n    maxAttempts: number;\n    lockoutDuration: number;\n    notifyAdmin: boolean;\n  };\n  ipAccessControl: {\n    enabled: boolean;\n    whitelist: string[];\n  };\n  securityQuestions: {\n    enabled: boolean;\n    minRequired: number;\n  };\n  auditLogging: {\n    enabled: boolean;\n    retentionDays: number;\n    events: ('login' | 'logout' | 'dataAccess' | 'dataModification' | 'settingsChange')[];\n  };\n  dataEncryption: {\n    atRest: boolean;\n    inTransit: boolean;\n    algorithm: 'AES-256' | 'AES-128' | 'RSA-2048';\n  };\n}\n```\n\n### Application Settings\n```typescript\ninterface ApplicationSettings {\n  email: {\n    provider: 'smtp' | 'sendgrid' | 'aws-ses' | 'custom';\n    smtpHost: string;\n    smtpPort: number;\n    smtpUser: string;\n    smtpPassword: string;\n    encryption: 'tls' | 'ssl' | 'none';\n    fromEmail: string;\n    fromName: string;\n  };\n  backup: {\n    enabled: boolean;\n    frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';\n    retentionDays: number;\n    storageLocation: 'local' | 'cloud' | 'both';\n    cloudProvider?: string;\n  };\n  integrations: {\n    pos: {\n      enabled: boolean;\n      provider: string;\n      apiEndpoint: string;\n      apiKey: string;\n    };\n    erp: {\n      enabled: boolean;\n      system: string;\n      endpoint: string;\n    };\n    accounting: {\n      enabled: boolean;\n      system: string;\n      mode: 'realtime' | 'batch';\n    };\n  };\n  features: {\n    advancedSearch: boolean;\n    realtimeNotifications: boolean;\n    mobileAccess: boolean;\n    offlineMode: boolean;\n  };\n  performance: {\n    caching: {\n      enabled: boolean;\n      type: 'memory' | 'redis' | 'memcached';\n      duration: number;\n    };\n    apiRateLimit: number;\n  };\n}\n```\n\n---\n\n## Business Rules\n\n### Company Settings Rules\n1. **Company Name**: Required, 3-200 characters, unique within system\n2. **Tax ID**: Required, must follow country-specific format validation\n3. **Email Addresses**: Must be valid email format, unique within organization\n4. **Logo URLs**: Must be valid HTTPS URLs, recommended dimensions provided\n5. **Brand Colors**: Must be valid hex color codes (#RRGGBB format)\n6. **Fiscal Year**: Start and end dates must be exactly 12 months apart\n7. **Timezone**: Must be valid IANA timezone identifier\n\n### Security Settings Rules\n1. **Password Complexity**: Minimum 6 characters, recommended 12+ for strong security\n2. **Password Expiry**: 0 = never expires, otherwise enforced after specified days\n3. **2FA Grace Period**: Applied only when 2FA is required but not mandatory\n4. **Session Timeout**: Minimum 5 minutes, maximum 1440 minutes (24 hours)\n5. **Failed Login Attempts**: Minimum 3 attempts before lockout\n6. **IP Whitelist**: Must be valid IPv4/IPv6 addresses or CIDR notation\n7. **Audit Log Retention**: Minimum 30 days, recommended 365 days for compliance\n8. **Encryption Algorithm**: AES-256 recommended for production environments\n\n### Application Settings Rules\n1. **SMTP Configuration**: All fields required when email provider is SMTP\n2. **Backup Retention**: Minimum 7 days, maximum 3650 days (10 years)\n3. **Integration Endpoints**: Must be valid HTTPS URLs for security\n4. **API Rate Limit**: Minimum 10 requests/minute, maximum 10000 requests/minute\n5. **Cache Duration**: Minimum 60 seconds, maximum 86400 seconds (24 hours)\n6. **Cloud Storage**: Requires valid credentials and accessible endpoints\n\n---\n\n## Integration Points\n\n### Internal Integrations\n- **User Context System**: Retrieves current user permissions for settings access\n- **Notification System**: Sends alerts for critical security changes\n- **Audit System**: Logs all settings modifications with user identity and timestamp\n- **All Business Modules**: Apply company, security, and application settings\n\n### External Integrations\n- **Email Providers**: SMTP, SendGrid, AWS SES for email delivery\n- **Cloud Storage**: AWS S3, Azure Blob, Google Cloud for backups\n- **POS Systems**: Square, Toast, Clover for sales integration\n- **ERP Systems**: SAP, Oracle, Microsoft Dynamics for enterprise integration\n- **Accounting Systems**: QuickBooks, Xero, Sage for financial integration\n\n---\n\n## Workflows\n\n### Configure Company Settings Workflow\n1. Administrator navigates to Settings Hub → Company Settings\n2. Selects appropriate tab (General, Branding, or Operational)\n3. Updates required fields with new values\n4. Reviews changes before saving\n5. Clicks \"Save Changes\" button\n6. System validates all inputs against business rules\n7. Success notification displayed\n8. Changes applied immediately across system\n\n### Update Security Policy Workflow\n1. Security Administrator navigates to Security Settings\n2. Selects security domain tab to configure\n3. Adjusts security parameters (password policy, 2FA, etc.)\n4. Reviews security strength indicator\n5. Reads security warning about impact\n6. Clicks \"Save Changes\" button\n7. System validates security requirements\n8. Administrator notification sent if critical changes made\n9. Active user sessions affected by new policies\n10. Audit log entry created\n\n### Configure Application Integration Workflow\n1. IT Administrator navigates to Application Settings → Integrations\n2. Selects integration to configure (POS, ERP, Accounting)\n3. Enables integration toggle\n4. Enters API endpoint and credentials\n5. Tests connection using \"Test Connection\" button\n6. Verifies successful connection\n7. Configures sync frequency and mapping\n8. Saves integration settings\n9. Integration activated and monitoring begins\n10. First sync initiated automatically\n\n---\n\n## Performance Considerations\n\n### Loading Performance\n- Settings Hub load: < 1 second\n- Individual settings page load: < 2 seconds\n- Tab switching: < 200ms\n- Save operations: < 3 seconds\n- Integration testing: < 5 seconds\n\n### Optimization Strategies\n- Lazy loading for tab content\n- Debounced form validation\n- Optimistic UI updates for immediate feedback\n- Caching of static configuration options\n- Progressive enhancement for large forms\n\n---\n\n## Security & Compliance\n\n### Data Protection\n- Credentials encrypted at rest (AES-256)\n- API keys masked by default in UI\n- Sensitive settings require administrator authentication\n- Audit logging for all configuration changes\n- Permission checks before any save operation\n\n### Input Validation\n- Server-side validation for all inputs\n- Sanitization for text inputs to prevent XSS\n- Email format validation\n- URL format validation with HTTPS enforcement\n- Number range validation with min/max constraints\n\n### Audit Trail\n- All settings changes logged with:\n  - User identity and role\n  - Timestamp (UTC)\n  - Before and after values\n  - IP address and session information\n- Compliance reporting support\n- Change history retention per retention policy\n\n---\n\n## Testing\n\n### Functional Testing Scenarios\n1. **Company Settings**: Verify all fields save and persist correctly\n2. **Branding**: Test logo uploads and color picker functionality\n3. **Security Policy**: Validate password complexity enforcement\n4. **2FA Configuration**: Test all authentication methods\n5. **Session Management**: Verify timeout and concurrent session limits\n6. **Email Configuration**: Test email delivery with various providers\n7. **Integration Testing**: Verify successful connection to external systems\n8. **Permission Checks**: Ensure role-based access control works correctly\n\n### Edge Cases\n1. **Concurrent Modifications**: Handle multiple admins editing simultaneously\n2. **Invalid Credentials**: Graceful error handling for integration failures\n3. **Network Failures**: Retry logic and error recovery\n4. **Invalid Configurations**: Prevent saving invalid settings\n5. **Character Limits**: Enforce limits on text inputs\n6. **Special Characters**: Handle Unicode and special characters correctly\n\n### Performance Testing\n1. **Load Testing**: 50+ concurrent administrators\n2. **Save Operations**: Measure response time for large setting objects\n3. **Integration Testing**: Measure connection timeout handling\n4. **Cache Effectiveness**: Verify cache hit rates\n\n---\n\n## Accessibility\n\n### WCAG 2.1 AA Compliance\n- Full keyboard navigation support\n- ARIA labels on all interactive elements\n- Minimum 4.5:1 color contrast ratio\n- Clear visible focus indicators\n- Screen reader compatibility\n- Form error announcements\n\n### Keyboard Shortcuts\n- `Ctrl/Cmd + S`: Save changes\n- `Ctrl/Cmd + R`: Reset to defaults\n- `Tab`: Navigate between fields\n- `Space/Enter`: Toggle switches and activate buttons\n- `Esc`: Close dialogs and cancel operations\n\n---\n\n## Mobile Responsiveness\n\n### Responsive Breakpoints\n- **Desktop** (1024px+): Full layout with multi-column grids\n- **Tablet** (768px - 1023px): Adapted grid with condensed spacing\n- **Mobile** (< 768px): Stacked layout with full-width cards\n\n### Mobile Optimizations\n- Tab labels abbreviated on mobile\n- Form inputs stack vertically\n- Touch-friendly tap targets (minimum 44x44px)\n- Single column layout for all settings\n- Collapsible sections for better space usage\n\n---\n\n## Future Enhancements\n\n### Phase 2 Features\n- **Advanced Backup**: Incremental backups, point-in-time recovery\n- **Multi-Tenancy**: Organization-specific settings isolation\n- **Settings Templates**: Pre-configured setting bundles for common scenarios\n- **Change Approval Workflow**: Require approval for critical security changes\n- **Settings Import/Export**: Backup and restore settings configurations\n- **Bulk Updates**: Update multiple settings simultaneously\n\n### Phase 3 Features\n- **AI-Powered Recommendations**: Suggest optimal security and performance settings\n- **Compliance Presets**: One-click GDPR, HIPAA, SOC2 compliance configurations\n- **Settings Versioning**: Track and rollback settings changes\n- **Automated Testing**: Continuous validation of integration configurations\n- **Performance Analytics**: Real-time monitoring of settings impact on system performance\n\n---\n\n## Troubleshooting\n\n### Common Issues\n\n**Issue**: Changes not saving\n- **Check**: Verify all required fields are filled\n- **Check**: Ensure valid data formats (email, URL, hex colors)\n- **Check**: Check browser console for validation errors\n- **Solution**: Review error messages and correct invalid fields\n\n**Issue**: Email not sending\n- **Check**: Verify SMTP credentials are correct\n- **Check**: Confirm SMTP port and encryption settings\n- **Check**: Test connection using \"Test Email\" button\n- **Solution**: Review email provider documentation for correct settings\n\n**Issue**: Integration connection fails\n- **Check**: Verify API endpoint is accessible\n- **Check**: Confirm API credentials are valid and not expired\n- **Check**: Check firewall rules allow outbound connections\n- **Solution**: Contact integration provider support if issues persist\n\n**Issue**: Security policy too restrictive\n- **Check**: Review password strength requirements\n- **Check**: Verify 2FA grace period is sufficient\n- **Check**: Ensure session timeout allows adequate working time\n- **Solution**: Adjust policies based on user feedback and security needs\n\n---\n\n## Support & Documentation\n\n### Related Documentation\n- [Company Settings Implementation](/docs/documents/sa/features/general-settings/guides/company-settings.md)\n- [Security Settings Implementation](/docs/documents/sa/features/general-settings/guides/security-settings.md)\n- [Application Settings Implementation](/docs/documents/sa/features/general-settings/guides/application-settings.md)\n- [Notification Settings](/docs/documents/sa/features/notification-settings/) - Notification-specific settings\n\n### Technical References\n- Implementation: `app/(main)/system-administration/settings/`\n- Type Definitions: `lib/types/settings.ts`\n- Mock Data: `lib/mock-data/settings.ts`\n- Business Rules: `docs/documents/sa/features/general-settings/guides/business-rules.md`\n\n### Support Channels\n- **Product Owner**: System Administration Product Manager\n- **Technical Lead**: Senior Full-Stack Developer\n- **Documentation**: [GitHub Issues](https://github.com/organization/carmen/issues)\n\n---\n\n## Change Log\n\n| Version | Date | Author | Changes |\n|---------|------|---------|---------|\n| 1.0 | October 21, 2025 | Documentation Team | Initial general settings documentation covering company, security, and application settings |\n\n---\n\n*This documentation is part of the Carmen Hospitality ERP System Administration module.*\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

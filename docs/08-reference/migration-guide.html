@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Reorganization Migration Guide - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Reference</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Reference</a> / Migration Guide</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Documentation Reorganization Migration Guide\n\n> **Document Type:** Migration Reference\n> **Date:** October 20, 2025\n> **Version:** 1.0\n\n---\n\n## Overview\n\nThis guide documents the comprehensive reorganization of the Carmen ERP documentation from a flat structure to a hierarchical, numbered structure for improved navigation and maintainability.\n\n---\n\n## Migration Summary\n\n### Old Structure\n```\ndocs/\n├── documents/\n│   ├── pr/              # Purchase Requests\n│   ├── po/              # Purchase Orders\n│   ├── grn/             # Goods Received Notes\n│   ├── cn/              # Credit Notes\n│   ├── inv/             # Inventory\n│   ├── vm/              # Vendor Management\n│   ├── pm/              # Product Management\n│   └── [many more...]\n├── README.md\n├── architecture/\n├── api-specifications/\n└── [various other files]\n```\n\n### New Structure\n```\ndocs/\n├── 01-overview/\n├── 02-architecture/\n├── 03-data-model/\n├── 04-modules/\n│   ├── procurement/\n│   │   ├── purchase-requests/\n│   │   ├── purchase-orders/\n│   │   ├── goods-received-notes/\n│   │   ├── credit-notes/\n│   │   └── templates/\n│   ├── inventory/\n│   ├── finance/\n│   ├── vendor-management/\n│   └── [9 more modules]\n├── 05-cross-cutting/\n├── 06-api-reference/\n├── 07-development/\n└── 08-reference/\n```\n\n---\n\n## Path Mapping\n\n### Module Paths\n\n| Old Path | New Path | Description |\n|----------|----------|-------------|\n| `documents/pr/` | `04-modules/procurement/purchase-requests/` | Purchase Requests |\n| `documents/po/` | `04-modules/procurement/purchase-orders/` | Purchase Orders |\n| `documents/grn/` | `04-modules/procurement/goods-received-notes/` | Goods Received Notes |\n| `documents/cn/` | `04-modules/procurement/credit-notes/` | Credit Notes |\n| `documents/prt/` | `04-modules/procurement/templates/` | PR Templates |\n| `documents/inv/` or `documents/inventory/` | `04-modules/inventory/stock-management/` | Stock Management |\n| `documents/pc/` | `04-modules/inventory/physical-count/` | Physical Count |\n| `documents/sc/` | `04-modules/inventory/spot-check/` | Spot Check |\n| `documents/finance/` | `04-modules/finance/` | Finance Module |\n| `documents/vm/` | `04-modules/vendor-management/` | Vendor Management |\n| `documents/pm/` | `04-modules/product-management/` | Product Management |\n| `documents/so/` or `documents/store-ops/` | `04-modules/store-operations/` | Store Operations |\n| `documents/op/` | `04-modules/operational-planning/` | Operational Planning |\n| `documents/sa/` | `04-modules/system-administration/` | System Administration |\n| `documents/reporting/` | `04-modules/reporting/` | Reporting |\n| `documents/dashboard/` | `04-modules/dashboard/` | Dashboard |\n| `documents/production/` | `04-modules/production/` | Production |\n\n### Section Paths\n\n| Old Path | New Path | Description |\n|----------|----------|-------------|\n| `documents/architecture/` | `02-architecture/` | Architecture docs |\n| `api-specifications/` | `06-api-reference/` | API specifications |\n| `developer-guides/` | `07-development/` | Developer guides |\n| `documents/security/` | `05-cross-cutting/security/` | Security docs |\n| `prisma-schema/` | `03-data-model/` | Database schema |\n| `README.md` | `01-overview/README.md` | Main overview |\n\n---\n\n## Link Updates\n\nAll internal markdown links were automatically updated using a conversion script. The script applied the following transformations:\n\n### Module Links (from 04-modules context)\n```markdown\n# Old format\n[Purchase Requests](../pr/README.md)\n[Vendor Management](../vm/README.md)\n\n# New format\n[Purchase Requests](./procurement/purchase-requests/README.md)\n[Vendor Management](./vendor-management/README.md)\n```\n\n### Section Links\n```markdown\n# Old format\n[System Architecture](../architecture/SYSTEM-ARCHITECTURE.md)\n[API Documentation](../api/API-DOCUMENTATION.md)\n\n# New format\n[System Architecture](../02-architecture/system-architecture.md)\n[API Documentation](../06-api-reference/api-documentation.md)\n```\n\n### Overview Links\n```markdown\n# Old format\n[System Documentation Index](../SYSTEM-DOCUMENTATION-INDEX.md)\n\n# New format\n[System Documentation Index](./README.md)\n```\n\n---\n\n## Build System Updates\n\n### New Conversion Script\n\nCreated `convert-docs-new.js` to replace old conversion scripts:\n\n**Features:**\n- Processes all 8 numbered sections\n- Generates section badges\n- Creates proper breadcrumbs\n- Supports Mermaid diagrams\n- Better error handling\n\n### Package.json Scripts\n\nAdded new npm scripts:\n```json\n{\n  \"docs:convert\": \"cd docs && node convert-docs-new.js\",\n  \"docs:build\": \"npm run docs:convert\",\n  \"docs:watch\": \"cd docs && nodemon --watch '**/*.md' --exec 'node convert-docs-new.js'\"\n}\n```\n\n**Usage:**\n```bash\n# Convert all markdown to HTML\nnpm run docs:convert\n\n# Watch mode for development\nnpm run docs:watch\n```\n\n---\n\n## New Documentation Created\n\n### Added Files\n\n1. **tech-stack.md** (`01-overview/tech-stack.md`)\n   - Comprehensive technology stack documentation\n   - Framework versions and configurations\n   - Development tools and dependencies\n   - Browser support matrix\n\n2. **data-dictionary.md** (`03-data-model/data-dictionary.md`)\n   - Complete database schema documentation\n   - Table definitions and relationships\n   - Column descriptions and constraints\n   - Index and performance documentation\n\n3. **migration-guide.md** (`08-reference/migration-guide.md`)\n   - This document\n   - Path mapping reference\n   - Migration procedures\n\n---\n\n## File Statistics\n\n### Conversion Results\n\n| Section | Markdown Files | HTML Generated |\n|---------|---------------|----------------|\n| 01-overview | 3 | 3 |\n| 02-architecture | 1 | 1 |\n| 03-data-model | 1 | 1 |\n| 04-modules | 108 | 108 |\n| 05-cross-cutting | 2 | 2 |\n| 06-api-reference | 3 | 3 |\n| 07-development | 1 | 1 |\n| 08-reference | 4 | 4 |\n| **Total** | **123** | **123** |\n\n---\n\n## Validation\n\n### Automated Checks\n\nThe reorganization included:\n\n✓ All markdown files copied to new structure\n✓ All internal links updated\n✓ Conversion script updated\n✓ Build scripts updated\n✓ All markdown converted to HTML\n✓ New documentation created\n\n### Manual Verification\n\nRecommended checks:\n- [ ] Browse HTML output in browser\n- [ ] Verify all internal links work\n- [ ] Check all images load correctly\n- [ ] Confirm breadcrumb navigation works\n- [ ] Test search functionality\n\n---\n\n## Rollback Procedure\n\nIf needed, the old structure is preserved in:\n- Original `documents/` directory remains intact\n- Old conversion scripts available as backup\n- Git history contains all changes\n\n**To Rollback:**\n1. Revert commits from this reorganization\n2. Remove numbered directories (01-08)\n3. Restore original conversion scripts\n4. Regenerate HTML from old structure\n\n---\n\n## Benefits of New Structure\n\n### Improved Organization\n- **Numbered Sections:** Clear hierarchy and ordering\n- **Logical Grouping:** Related content co-located\n- **Scalability:** Easy to add new modules\n- **Consistency:** Standardized structure across all modules\n\n### Better Navigation\n- **Breadcrumbs:** Clear navigation path\n- **Section Badges:** Visual section identification\n- **Predictable Paths:** Easier to find content\n- **Table of Contents:** Organized documentation index\n\n### Enhanced Maintainability\n- **Modular Structure:** Isolated module documentation\n- **Clear Ownership:** Module boundaries well-defined\n- **Version Control:** Better merge conflict resolution\n- **Documentation Standards:** Consistent formatting\n\n---\n\n## Future Enhancements\n\n### Planned Improvements\n\n1. **Search Functionality**\n   - Full-text search across all documentation\n   - Module-specific search\n   - Tag-based filtering\n\n2. **Navigation Enhancements**\n   - Dynamic table of contents\n   - Previous/next page navigation\n   - Sidebar navigation tree\n\n3. **Documentation Automation**\n   - Auto-generate module documentation from code\n   - API documentation from TypeScript types\n   - Database schema from Prisma models\n\n4. **Quality Improvements**\n   - Link validation automation\n   - Broken link detection\n   - Image optimization\n   - Accessibility validation\n\n---\n\n## Support & Questions\n\nFor questions or issues with the new documentation structure:\n\n1. Check this migration guide\n2. Review the [Documentation Index](../01-overview/README.md)\n3. Contact the development team\n\n---\n\n## Change Log\n\n### Version 1.0 (October 20, 2025)\n- Initial migration from flat to hierarchical structure\n- Created 8 numbered sections\n- Updated all internal links\n- Converted all markdown to HTML\n- Added tech stack and data dictionary documentation\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

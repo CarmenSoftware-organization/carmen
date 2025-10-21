@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Note Module - Components Detailed Documentation - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Credit Notes</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Credit Note Module - Components Detailed Documentation\n\nComprehensive documentation for all Credit Note module components with technical specifications, props interfaces, and interaction patterns.\n\n## Table of Contents\n1. [Page Components](#page-components)\n2. [Form Components](#form-components)\n3. [Dialog Components](#dialog-components)\n4. [Tab Components](#tab-components)\n5. [Utility Components](#utility-components)\n6. [Component Interaction Patterns](#component-interaction-patterns)\n\n## Page Components\n\n### 1. Credit Note List Page (`page.tsx`)\n\n**Purpose**: Main landing page for Credit Note management with table and card view modes\n\n**Location**: `app/(main)/procurement/credit-note/page.tsx`\n\n**Component Structure**:\n```typescript\ninterface CreditNoteListPageProps {\n  searchParams?: {\n    view?: 'table' | 'card'\n    status?: string\n    vendor?: string\n  }\n}\n```\n\n**Key Features**:\n- Dynamic view mode switching (table/card)\n- Advanced filtering and search\n- Bulk operations support\n- Real-time status updates\n- Export functionality\n\n**State Management**:\n```typescript\nconst [creditNotes, setCreditNotes] = useState<CreditNote[]>(mockCreditNotes)\nconst [viewMode, setViewMode] = useState<'table' | 'card'>('card')\nconst [selectedNotes, setSelectedNotes] = useState<number[]>([])\nconst [searchQuery, setSearchQuery] = useState('')\nconst [statusFilter, setStatusFilter] = useState<string>('all')\n```\n\n**Child Components**:\n- `CreditNoteManagement` - Main list management component\n- `Header` - Page header with navigation\n- `FilterBar` - Search and filter controls\n- `ExportDialog` - Data export functionality\n\n### 2. Credit Note Detail Page (`[id]/page.tsx`)\n\n**Purpose**: Detailed view and management of individual credit notes\n\n**Location**: `app/(main)/procurement/credit-note/[id]/page.tsx`\n\n**Component Structure**:\n```typescript\ninterface CreditNoteDetailPageProps {\n  params: { id: string }\n  searchParams?: { mode?: 'view' | 'edit' | 'confirm' }\n}\n```\n\n**Key Features**:\n- Multi-mode support (view/edit/confirm)\n- Tab-based navigation for different aspects\n- Real-time validation and updates\n- Document attachment management\n- Activity logging\n\n**State Management**:\n```typescript\nconst [creditNote, setCreditNote] = useState<CreditNote | null>(null)\nconst [mode, setMode] = useState<'view' | 'edit' | 'confirm'>('view')\nconst [activeTab, setActiveTab] = useState('details')\nconst [isLoading, setIsLoading] = useState(true)\nconst [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)\n```\n\n**Child Components**:\n- `CreditNoteDetail` - Main detail component\n- `CreditNoteItems` - Items management tab\n- `DocumentsTab` - Document attachments\n- `ActivityLogTab` - Audit trail\n- `CommentsAttachmentsTab` - Comments and files\n\n### 3. New Credit Note Creation Pages\n\n#### Vendor Selection Page (`new/vendor-selection/page.tsx`)\n\n**Purpose**: First step in credit note creation - vendor selection\n\n**Component Structure**:\n```typescript\ninterface VendorSelectionPageProps {\n  searchParams?: {\n    returnUrl?: string\n    preselectedVendor?: string\n  }\n}\n```\n\n**Key Features**:\n- Searchable vendor list\n- Vendor information display\n- Quick filters for active vendors\n- Navigation breadcrumbs\n\n#### GRN Selection Page (`new/grn-selection/page.tsx`)\n\n**Purpose**: Second step - selecting GRNs from chosen vendor\n\n**Component Structure**:\n```typescript\ninterface GRNSelectionPageProps {\n  searchParams?: {\n    vendorId: string\n    returnUrl?: string\n  }\n}\n```\n\n**Key Features**:\n- Vendor-specific GRN filtering\n- Multi-select GRN capability\n- GRN summary information\n- Date range filtering\n\n#### Item & Lot Selection Page (`new/item-lot-selection/page.tsx`)\n\n**Purpose**: Final step - selecting specific items and lots for credit note\n\n**Component Structure**:\n```typescript\ninterface ItemLotSelectionPageProps {\n  searchParams?: {\n    vendorId: string\n    grnIds: string\n    returnUrl?: string\n  }\n}\n```\n\n**Key Features**:\n- Item-level selection from GRNs\n- Lot number tracking\n- Quantity specification\n- Reason code assignment\n\n## Form Components\n\n### 1. Credit Note Detail Form\n\n**Purpose**: Main form for credit note information management\n\n**Component**: `CreditNoteDetailForm`\n\n**Props Interface**:\n```typescript\ninterface CreditNoteDetailFormProps {\n  creditNote: CreditNote\n  mode: 'view' | 'edit' | 'confirm'\n  onSave: (data: CreditNoteFormData) => Promise<void>\n  onCancel: () => void\n  validationErrors?: ValidationError[]\n}\n```\n\n**Form Schema**:\n```typescript\nconst creditNoteSchema = z.object({\n  refNumber: z.string().min(1, 'Reference number is required'),\n  vendorId: z.string().min(1, 'Vendor is required'),\n  type: z.enum(['QUANTITY_RETURN', 'AMOUNT_DISCOUNT']),\n  date: z.date(),\n  totalAmount: z.number().positive(),\n  reason: z.string().min(10, 'Reason must be at least 10 characters'),\n  items: z.array(creditNoteItemSchema).min(1, 'At least one item is required')\n})\n```\n\n**Key Features**:\n- Real-time validation with Zod\n- Multi-step form navigation\n- Auto-save functionality\n- Field-level error display\n- Currency formatting\n\n### 2. Credit Note Item Form\n\n**Purpose**: Form for managing individual credit note items\n\n**Component**: `CreditNoteItemForm`\n\n**Props Interface**:\n```typescript\ninterface CreditNoteItemFormProps {\n  item?: CreditNoteItem\n  onSave: (item: CreditNoteItem) => void\n  onCancel: () => void\n  availableItems: InventoryItem[]\n  mode: 'add' | 'edit'\n}\n```\n\n**Form Schema**:\n```typescript\nconst creditNoteItemSchema = z.object({\n  productId: z.string().min(1, 'Product is required'),\n  quantity: z.number().positive('Quantity must be positive'),\n  unitPrice: z.number().positive('Unit price must be positive'),\n  reasonCode: z.string().min(1, 'Reason code is required'),\n  lotNumber: z.string().optional(),\n  expiryDate: z.date().optional(),\n  notes: z.string().optional()\n})\n```\n\n**Key Features**:\n- Product selection with search\n- Quantity validation against available stock\n- Automatic amount calculations\n- Lot number management\n- Reason code categorization\n\n### 3. Vendor Selection Form\n\n**Purpose**: Form for selecting vendors during credit note creation\n\n**Component**: `VendorSelectionForm`\n\n**Props Interface**:\n```typescript\ninterface VendorSelectionFormProps {\n  onVendorSelect: (vendor: Vendor) => void\n  preselectedVendor?: string\n  filters?: VendorFilters\n}\n```\n\n**Key Features**:\n- Real-time vendor search\n- Vendor information preview\n- Active vendor filtering\n- Recent vendor suggestions\n\n## Dialog Components\n\n### 1. New Credit Note Process Selector\n\n**Purpose**: Initial dialog for selecting credit note creation method\n\n**Component**: `NewCreditNoteProcessSelector`\n\n**Props Interface**:\n```typescript\ninterface NewCreditNoteProcessSelectorProps {\n  isOpen: boolean\n  onClose: () => void\n  onProcessSelect: (process: 'from-grn' | 'manual') => void\n}\n```\n\n**Process Options**:\n- **From GRN**: Create credit note based on existing goods received notes\n- **Manual**: Create credit note manually without GRN reference\n\n**Key Features**:\n- Process selection cards\n- Process description and guidance\n- Navigation to appropriate workflow\n\n### 2. Item Selection Dialog\n\n**Purpose**: Dialog for selecting items to include in credit note\n\n**Component**: `ItemSelectionDialog`\n\n**Props Interface**:\n```typescript\ninterface ItemSelectionDialogProps {\n  isOpen: boolean\n  onClose: () => void\n  availableItems: InventoryItem[]\n  selectedItems: CreditNoteItem[]\n  onItemsSelect: (items: CreditNoteItem[]) => void\n  grnContext?: GRN[]\n}\n```\n\n**Key Features**:\n- Multi-select item list\n- Item search and filtering\n- Quantity input per item\n- Real-time total calculation\n\n### 3. Credit Note Preview Dialog\n\n**Purpose**: Preview dialog before finalizing credit note\n\n**Component**: `CreditNotePreviewDialog`\n\n**Props Interface**:\n```typescript\ninterface CreditNotePreviewDialogProps {\n  isOpen: boolean\n  onClose: () => void\n  creditNote: CreditNote\n  onConfirm: () => Promise<void>\n  onEdit: () => void\n}\n```\n\n**Key Features**:\n- Complete credit note preview\n- Financial summary display\n- Edit/confirm actions\n- Print preview option\n\n### 4. Bulk Actions Dialog\n\n**Purpose**: Dialog for performing bulk operations on multiple credit notes\n\n**Component**: `BulkActionsDialog`\n\n**Props Interface**:\n```typescript\ninterface BulkActionsDialogProps {\n  isOpen: boolean\n  onClose: () => void\n  selectedItems: number[]\n  availableActions: BulkAction[]\n  onActionConfirm: (action: string, items: number[]) => Promise<void>\n}\n```\n\n**Available Actions**:\n- Export selected credit notes\n- Update status in bulk\n- Generate batch reports\n- Delete multiple credit notes\n\n## Tab Components\n\n### 1. Credit Note Items Tab\n\n**Purpose**: Tab component for managing credit note items\n\n**Component**: `CreditNoteItemsTab`\n\n**Props Interface**:\n```typescript\ninterface CreditNoteItemsTabProps {\n  creditNote: CreditNote\n  mode: 'view' | 'edit'\n  onItemsUpdate: (items: CreditNoteItem[]) => void\n}\n```\n\n**Key Features**:\n- Item list with edit capabilities\n- Add/remove item functionality\n- Bulk item operations\n- Real-time total calculations\n\n**Sub-components**:\n- `ItemDetailsEditForm` - Individual item editing\n- `ItemBulkActions` - Bulk operations menu\n- `ItemSearchSelector` - Product search and selection\n\n### 2. Documents Tab\n\n**Purpose**: Tab for managing credit note documents and attachments\n\n**Component**: `CreditNoteDocumentsTab`\n\n**Props Interface**:\n```typescript\ninterface CreditNoteDocumentsTabProps {\n  creditNote: CreditNote\n  onDocumentsUpdate: (documents: Document[]) => void\n  allowEdit: boolean\n}\n```\n\n**Key Features**:\n- File upload and management\n- Document preview\n- File type validation\n- Version control for documents\n\n### 3. Related GRNs Tab\n\n**Purpose**: Tab showing related Goods Received Notes\n\n**Component**: `RelatedGRNsTab`\n\n**Props Interface**:\n```typescript\ninterface RelatedGRNsTabProps {\n  creditNote: CreditNote\n  relatedGRNs: GRN[]\n  onGRNNavigate: (grnId: string) => void\n}\n```\n\n**Key Features**:\n- GRN list with details\n- Direct navigation to GRNs\n- GRN status tracking\n- Item mapping visualization\n\n### 4. Activity Log Tab\n\n**Purpose**: Tab displaying credit note activity history\n\n**Component**: `ActivityLogTab`\n\n**Props Interface**:\n```typescript\ninterface ActivityLogTabProps {\n  creditNote: CreditNote\n  activities: ActivityLogEntry[]\n  showUserDetails: boolean\n}\n```\n\n**Key Features**:\n- Chronological activity display\n- User action tracking\n- Status change history\n- Detailed change logs\n\n## Utility Components\n\n### 1. Credit Note Summary Card\n\n**Purpose**: Reusable summary card component\n\n**Component**: `CreditNoteSummaryCard`\n\n**Props Interface**:\n```typescript\ninterface CreditNoteSummaryCardProps {\n  creditNote: CreditNote\n  variant: 'compact' | 'detailed'\n  showActions?: boolean\n  onActionClick?: (action: string, id: number) => void\n}\n```\n\n**Key Features**:\n- Responsive card layout\n- Status indicators\n- Quick action buttons\n- Currency formatting\n\n### 2. Status Badge Component\n\n**Purpose**: Standardized status display component\n\n**Component**: `StatusBadge`\n\n**Props Interface**:\n```typescript\ninterface StatusBadgeProps {\n  status: CreditNoteStatus\n  size?: 'sm' | 'md' | 'lg'\n  variant?: 'default' | 'outline'\n}\n```\n\n**Status Types**:\n- `DRAFT` - Orange badge\n- `PENDING_APPROVAL` - Yellow badge\n- `APPROVED` - Blue badge\n- `PROCESSED` - Green badge\n- `REJECTED` - Red badge\n- `CANCELLED` - Gray badge\n\n### 3. Financial Summary Component\n\n**Purpose**: Component for displaying financial calculations\n\n**Component**: `FinancialSummary`\n\n**Props Interface**:\n```typescript\ninterface FinancialSummaryProps {\n  items: CreditNoteItem[]\n  currency: string\n  showBreakdown?: boolean\n  onCalculationUpdate?: (totals: FinancialTotals) => void\n}\n```\n\n**Key Features**:\n- Real-time calculations\n- Multi-currency support\n- Tax calculations\n- Discount applications\n\n### 4. Search and Filter Bar\n\n**Purpose**: Reusable search and filtering component\n\n**Component**: `SearchFilterBar`\n\n**Props Interface**:\n```typescript\ninterface SearchFilterBarProps {\n  onSearchChange: (query: string) => void\n  onFilterChange: (filters: FilterOptions) => void\n  availableFilters: FilterConfig[]\n  placeholder?: string\n}\n```\n\n**Filter Types**:\n- Status filters\n- Date range filters\n- Vendor filters\n- Amount range filters\n\n## Component Interaction Patterns\n\n### 1. Form Validation Pattern\n\n**Validation Strategy**:\n```typescript\n// Real-time validation with Zod\nconst form = useForm<CreditNoteFormData>({\n  resolver: zodResolver(creditNoteSchema),\n  mode: 'onChange'\n})\n\n// Field-level validation\nconst validateField = (field: string, value: any) => {\n  try {\n    creditNoteSchema.shape[field].parse(value)\n    return null\n  } catch (error) {\n    return error.errors[0]?.message\n  }\n}\n```\n\n### 2. State Management Pattern\n\n**Component State Flow**:\n```typescript\n// Parent component manages global state\nconst [creditNote, setCreditNote] = useState<CreditNote>()\n\n// Child components receive state via props\n<CreditNoteDetail\n  creditNote={creditNote}\n  onUpdate={setCreditNote}\n/>\n\n// State updates flow upward via callbacks\nconst handleItemUpdate = (items: CreditNoteItem[]) => {\n  setCreditNote(prev => ({\n    ...prev,\n    items,\n    totalAmount: calculateTotal(items)\n  }))\n}\n```\n\n### 3. Navigation Pattern\n\n**Tab Navigation**:\n```typescript\nconst tabs = [\n  { id: 'details', label: 'Details', icon: FileText },\n  { id: 'items', label: 'Items', icon: Package },\n  { id: 'documents', label: 'Documents', icon: Paperclip },\n  { id: 'activity', label: 'Activity', icon: Clock }\n]\n\nconst [activeTab, setActiveTab] = useState('details')\n```\n\n### 4. Error Handling Pattern\n\n**Error Display Strategy**:\n```typescript\ninterface ErrorBoundaryProps {\n  fallback: React.ComponentType<{ error: Error }>\n  onError?: (error: Error) => void\n}\n\n// Field-level errors\n<FormField error={errors.quantity?.message} />\n\n// Form-level errors\n<ErrorAlert errors={form.formState.errors} />\n\n// Page-level errors\n<ErrorBoundary fallback={ErrorFallback}>\n  <CreditNoteDetail />\n</ErrorBoundary>\n```\n\n### 5. Loading States Pattern\n\n**Loading Management**:\n```typescript\nconst [loadingStates, setLoadingStates] = useState({\n  saving: false,\n  deleting: false,\n  uploading: false\n})\n\n// Component loading states\n{loadingStates.saving ? (\n  <Spinner />\n) : (\n  <SaveButton onClick={handleSave} />\n)}\n```\n\n### 6. Modal Management Pattern\n\n**Dialog State Management**:\n```typescript\nconst [dialogs, setDialogs] = useState({\n  itemSelection: false,\n  preview: false,\n  confirmation: false\n})\n\nconst openDialog = (dialogName: string) => {\n  setDialogs(prev => ({ ...prev, [dialogName]: true }))\n}\n\nconst closeDialog = (dialogName: string) => {\n  setDialogs(prev => ({ ...prev, [dialogName]: false }))\n}\n```\n\n## Component Testing Patterns\n\n### 1. Unit Testing\n\n**Component Testing Strategy**:\n```typescript\ndescribe('CreditNoteDetail', () => {\n  it('renders credit note information correctly', () => {\n    render(<CreditNoteDetail creditNote={mockCreditNote} />)\n    expect(screen.getByText(mockCreditNote.refNumber)).toBeInTheDocument()\n  })\n\n  it('handles edit mode transitions', () => {\n    const onModeChange = jest.fn()\n    render(<CreditNoteDetail onModeChange={onModeChange} />)\n    fireEvent.click(screen.getByText('Edit'))\n    expect(onModeChange).toHaveBeenCalledWith('edit')\n  })\n})\n```\n\n### 2. Integration Testing\n\n**Multi-component Testing**:\n```typescript\ndescribe('Credit Note Creation Flow', () => {\n  it('completes full creation workflow', async () => {\n    render(<CreditNoteCreationFlow />)\n\n    // Step 1: Vendor selection\n    fireEvent.click(screen.getByText('Select Vendor'))\n    fireEvent.click(screen.getByText('ACME Corp'))\n\n    // Step 2: GRN selection\n    fireEvent.click(screen.getByText('Next'))\n    fireEvent.click(screen.getByTestId('grn-checkbox-1'))\n\n    // Step 3: Item selection\n    fireEvent.click(screen.getByText('Continue'))\n    fireEvent.change(screen.getByLabelText('Quantity'), { target: { value: '5' } })\n\n    // Final confirmation\n    fireEvent.click(screen.getByText('Create Credit Note'))\n\n    await waitFor(() => {\n      expect(screen.getByText('Credit Note Created Successfully')).toBeInTheDocument()\n    })\n  })\n})\n```\n\n---\n\n*Generated on: 2025-09-23*\n*Component Documentation Version: 1.0*\n*Carmen ERP - Credit Note Module*";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

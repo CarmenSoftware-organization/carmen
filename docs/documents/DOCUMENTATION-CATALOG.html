@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carmen ERP - Complete Documentation Catalog - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← All Modules</a>
+            <h1>DOCUMENTATION-CATALOG.MD</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="index.html">Module Overview</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="index.html">Documentation</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Carmen ERP - Complete Documentation Catalog\n\n> **Catalog Type:** Master Documentation Index\n> **Last Updated:** October 9, 2025\n> **Total Documents:** 98 Markdown Files + 147 Screenshots\n> **Coverage:** All Implemented Modules\n\n---\n\n## 📚 Related Documentation\n\n- **[System Documentation Index](./SYSTEM-DOCUMENTATION-INDEX.md)** - Main navigation hub\n- **[System Gaps & Roadmap](./SYSTEM-GAPS-AND-ROADMAP.md)** - Implementation gaps and timeline\n- **[System Architecture](./architecture/SYSTEM-ARCHITECTURE.md)** - Technical architecture\n- **[Documentation Summary](./DOCUMENTATION-SUMMARY-REPORT.md)** - Executive summary\n\n---\n\n## 📚 Documentation Assets Summary\n\n| Asset Type | Count | Location |\n|------------|-------|----------|\n| **Markdown Documentation** | 98 | `/docs/documents/` |\n| **Screenshots (PNG)** | 147 | Various module directories |\n| **System Architecture Docs** | 3 | `/docs/documents/architecture/` |\n| **Stakeholder Docs** | 1 | `/docs/documents/stakeholders/` |\n| **Module-Specific Docs** | 90+ | Module subdirectories |\n\n---\n\n## 🗂️ Documentation Structure by Module\n\n### Core System Documentation\n\n#### 📋 System-Wide Documentation\n**Location:** `/docs/documents/`\n\n| Document | Purpose | Status |\n|----------|---------|--------|\n| [SYSTEM-DOCUMENTATION-INDEX.md](./SYSTEM-DOCUMENTATION-INDEX.md) | Master navigation hub | ✅ Complete |\n| [SYSTEM-GAPS-AND-ROADMAP.md](./SYSTEM-GAPS-AND-ROADMAP.md) | Gap analysis & roadmap | ✅ Complete |\n| [DOCUMENTATION-SUMMARY-REPORT.md](./DOCUMENTATION-SUMMARY-REPORT.md) | This documentation summary | ✅ Complete |\n| [DOCUMENTATION-CATALOG.md](./DOCUMENTATION-CATALOG.md) | Complete doc catalog | ✅ Complete |\n| carmen-erp-system-requirements-documentation.md | System requirements | ✅ Complete |\n| comprehensive-schema-analysis.md | Database schema | ✅ Complete |\n| module-spec-template.md | Doc template | ✅ Complete |\n\n---\n\n### Architecture Documentation\n\n#### 🏗️ Architecture & Technical Specs\n**Location:** `/docs/documents/architecture/`\n\n| Document | Purpose | Diagrams | Status |\n|----------|---------|----------|--------|\n| [SYSTEM-ARCHITECTURE.md](./architecture/SYSTEM-ARCHITECTURE.md) | Complete system architecture | 10+ Mermaid | ✅ Complete |\n\n**Future:** Additional architecture documents to be added:\n- DATA-FLOW-DIAGRAMS.md\n- TECHNICAL-ARCHITECTURE.md\n- INTEGRATION-ARCHITECTURE.md\n\n---\n\n### Stakeholder Documentation\n\n#### 💼 Business & Executive Docs\n**Location:** `/docs/documents/stakeholders/`\n\n| Document | Audience | Purpose | Status |\n|----------|----------|---------|--------|\n| [BUSINESS-VALUE.md](./stakeholders/BUSINESS-VALUE.md) | C-Level, Business Leaders | ROI, business case | ✅ Complete |\n\n**Future:** Additional stakeholder docs to be added:\n- TECHNICAL-SUMMARY.md (for CTO, VP Engineering)\n- DEPLOYMENT-GUIDE.md (for DevOps, Infrastructure)\n\n---\n\n## 📦 Module-Specific Documentation\n\n### 1. Procurement Module\n\n#### 🛒 Purchase Requests (PR)\n**Location:** `/docs/documents/pr/`\n**Screenshots:** 9 images | **Docs:** 7 files | **Status:** ✅ Production Ready\n\n| Document | Purpose | Key Content |\n|----------|---------|-------------|\n| [README.md](./pr/README.md) | Module overview & navigation | Quick links, structure |\n| [purchase-request-system-analysis.md](./pr/purchase-request-system-analysis.md) | Complete technical analysis | Architecture, components, flows |\n| [purchase-request-component-map.md](./pr/purchase-request-component-map.md) | Technical component mapping | File structure, hierarchy, APIs |\n| [purchase-request-user-flows.md](./pr/purchase-request-user-flows.md) | User interaction documentation | Role flows, journeys, mobile |\n| [purchase-request-module-spec.md](./pr/purchase-request-module-spec.md) | Module requirements & specs | Functional, technical, testing |\n| [purchase-request-implementation-spec.md](./pr/purchase-request-implementation-spec.md) | Implementation guidance | Patterns, validation, performance |\n\n**Screenshots:**\n- `purchase-request-creation-form.png` - Form interface\n- `purchase-request-detail-view.png` - Detail page\n- `purchase-request-list-view.png` - List interface\n- `filter-dropdown-all-requester.png` - Filter UI\n- `filter-dropdown-all-stage.png` - Stage filter\n- `action-menu-popup.png` - Action menu\n- `bulk-operations-menu-pr-detail.png` - Bulk actions\n- `role-based-purchasing-staff-view.png` - Role-based view\n- `workflow-review-required-button.png` - Workflow buttons\n\n#### 🛒 Purchase Request Templates (PRT)\n**Location:** `/docs/documents/prt/`\n**Docs:** 3 files | **Status:** ✅ Production Ready\n\n| Document | Purpose |\n|----------|---------|\n| [README.md](./prt/README.md) | Module overview |\n| purchase-request-template-complete-specification.md | Complete specs |\n| user-interaction-guide.md | User guide |\n\n#### 📦 Purchase Orders (PO)\n**Location:** `/docs/documents/po/`\n**Screenshots:** 4 images | **Docs:** Multiple | **Status:** ✅ Production Ready\n\n**Screenshots:**\n- `purchase-order-detail-page.png` - PO detail view\n- `purchase-order-documents-tab.png` - Documents tab\n- `purchase-order-new-po-menu.png` - Creation menu\n- `purchase-orders-list-page.png` - List view\n\n#### 📥 Goods Received Note (GRN)\n**Location:** `/docs/documents/grn/`\n**Docs:** Multiple | **Status:** ✅ Production Ready\n\n#### 💳 Credit Notes (CN)\n**Location:** `/docs/documents/cn/`\n**Docs:** Multiple | **Status:** ✅ Production Ready\n\n---\n\n### 2. Vendor Management Module\n\n#### 👥 Vendor Management (VM)\n**Location:** `/docs/documents/vm/`\n**Screenshots:** 8+ images | **Docs:** 13 files | **Status:** ✅ Production Ready (Core), 🚧 Prototype (Price Mgmt)\n\n| Document | Purpose | Lines | Status |\n|----------|---------|-------|--------|\n| [README.md](./vm/README.md) | Comprehensive module overview | 835+ | ✅ Complete |\n| [VENDOR-MANAGEMENT-MODULE.md](./vm/VENDOR-MANAGEMENT-MODULE.md) | Module entry point | - | ✅ Complete |\n| [MANAGE-VENDORS.md](./vm/MANAGE-VENDORS.md) | Vendor CRUD operations | - | ✅ Complete |\n| [TEMPLATES.md](./vm/TEMPLATES.md) | Pricelist templates | - | 🚧 Prototype |\n| [CAMPAIGNS.md](./vm/CAMPAIGNS.md) | RFP/RFQ campaigns | - | 🚧 Prototype |\n| [PRICELISTS.md](./vm/PRICELISTS.md) | Pricelist management | - | 🚧 Prototype |\n| [VENDOR-PORTAL.md](./vm/VENDOR-PORTAL.md) | Vendor self-service | - | 🚧 Prototype |\n| [SHARED-COMPONENTS.md](./vm/SHARED-COMPONENTS.md) | Reusable components | - | ✅ Complete |\n| [PAGES-AND-COMPONENTS-SPEC.md](./vm/PAGES-AND-COMPONENTS-SPEC.md) | Legacy comprehensive spec | 51K+ | ✅ Reference |\n| [INDEX.md](./vm/INDEX.md) | Module index | - | ✅ Complete |\n| [COMPLETION_SUMMARY.md](./vm/COMPLETION_SUMMARY.md) | Implementation summary | - | ✅ Complete |\n| [ANALYSIS-COMPLETE.md](./vm/ANALYSIS-COMPLETE.md) | Analysis completion | - | ✅ Complete |\n| [sitemap.md](./vm/sitemap.md) | Navigation sitemap | - | ✅ Complete |\n\n**Screenshots:**\n- `vm-landing.png` - Main dashboard\n- `vm-vendor-list.png` - Vendor list table view\n- `vm-vendor-list-search.png` - Search interface\n- `vm-new-vendor-form.png` - Creation form\n- `vm-templates-list.png` - Template management\n- `vm-campaigns-list.png` - Campaign tracking\n- `vm-pricelists-list.png` - Pricelist interface\n- `vm-vendor-portal.png` - Vendor portal\n\n**Additional Subdirectories:**\n- `pages/` - Page-specific documentation\n- `components/` - Component documentation\n- `business-logic/` - Business rules\n- `api/` - API documentation\n- `screenshots/` - All module screenshots\n\n---\n\n### 3. Inventory Management Module\n\n#### 📦 Inventory Management (INV)\n**Location:** `/docs/documents/inv/`\n**Screenshots:** 15+ images | **Docs:** 9 files | **Status:** ✅ Production Ready\n\n| Document | Purpose | Status |\n|----------|---------|--------|\n| [README.md](./inv/README.md) | Module overview | ✅ Complete |\n| inventory-management-specification.md | Complete specs | ✅ Complete |\n| inventory-management-sitemap.md | Navigation map | ✅ Complete |\n| inventory-sitemap.md | Site structure | ✅ Complete |\n| pages-and-components-spec.md | Component specs | ✅ Complete |\n| glossary-and-gaps.md | Terms & gaps | ✅ Complete |\n| analysis-summary.md | Analysis report | ✅ Complete |\n| screenshot-capture-guide.md | Screenshot guide | ✅ Complete |\n\n**Screenshots:**\n- `inventory-management-dashboard.png` - Main dashboard\n- `inventory-balance-report.png` - Balance report\n- `inventory-adjustments-list.png` - Adjustments list\n- `physical-count-setup.png` - Physical count setup\n- `spot-check-dashboard.png` - Spot check interface\n- Plus 10+ more inventory screenshots\n\n#### 🔍 Spot Check (SC)\n**Location:** `/docs/documents/sc/`\n**Docs:** 3 files | **Status:** ✅ Production Ready\n\n| Document | Purpose |\n|----------|---------|\n| [README.md](./sc/README.md) | Module overview |\n| spot-check-specification.md | Complete specs |\n| spot-check-sitemap.md | Navigation map |\n\n#### 📊 Physical Count (PC)\n**Location:** `/docs/documents/pc/`\n**Docs:** 3 files | **Status:** ✅ Production Ready\n\n| Document | Purpose |\n|----------|---------|\n| [README.md](./pc/README.md) | Module overview |\n| physical-count-specification.md | Complete specs |\n| physical-count-sitemap.md | Navigation map |\n\n#### 📁 Additional Inventory Docs\n**Location:** `/docs/documents/inventory/`\n**Docs:** Multiple files | **Status:** ✅ Production Ready\n\n---\n\n### 4. Store Operations Module\n\n#### 🏪 Store Operations (SO, SR, Store-Ops)\n**Location:** `/docs/documents/store-ops/`\n**Screenshots:** 10+ images | **Docs:** 11 files | **Status:** ✅ Production Ready\n\n| Document | Purpose | Lines | Status |\n|----------|---------|-------|--------|\n| [README.md](./store-ops/README.md) | Module overview | 210+ | ✅ Complete |\n| [STORE-OPERATIONS-MODULE.md](./store-ops/STORE-OPERATIONS-MODULE.md) | Module entry point | - | ✅ Complete |\n| [STORE-REQUISITIONS.md](./store-ops/STORE-REQUISITIONS.md) | Complete SR specs | - | ✅ Production |\n| [STOCK-REPLENISHMENT.md](./store-ops/STOCK-REPLENISHMENT.md) | Replenishment docs | - | 🚧 Prototype |\n| [WASTAGE-REPORTING.md](./store-ops/WASTAGE-REPORTING.md) | Wastage tracking | - | 🚧 Prototype |\n| [SHARED-COMPONENTS.md](./store-ops/SHARED-COMPONENTS.md) | Reusable components | - | ✅ Complete |\n| [GLOSSARY.md](./store-ops/GLOSSARY.md) | 100+ terms defined | - | ✅ Complete |\n| [FEATURE-GAPS.md](./store-ops/FEATURE-GAPS.md) | 50+ gaps identified | - | ✅ Complete |\n| [SCREENSHOT-SUMMARY.md](./store-ops/SCREENSHOT-SUMMARY.md) | Visual documentation | - | ✅ Complete |\n| [CAPTURE-LOG.md](./store-ops/CAPTURE-LOG.md) | Screenshot log | - | ✅ Complete |\n| index.html | Interactive gallery | - | ✅ Complete |\n\n**Screenshots:**\n- `store-operations-dashboard.png` - Dashboard\n- `store-requisitions-list-table.png` - Table view\n- `store-requisitions-list-card.png` - Card view\n- `store-requisitions-filters.png` - Filter UI\n- `store-requisition-detail-items.png` - Items tab\n- `store-requisition-detail-stock-movements.png` - Stock tab\n- `store-requisition-detail-journal.png` - Journal tab\n- `store-requisition-detail-approval-workflow.png` - Workflow\n- `stock-replenishment-dashboard.png` - Replenishment\n- `wastage-reporting-dashboard.png` - Wastage\n\n**Additional Locations:**\n- `/docs/documents/sr/` - Additional Store Requisitions docs\n- `/docs/documents/so/` - Additional Store Operations docs\n\n---\n\n### 5. Product Management Module\n\n#### 📦 Product Management (PM)\n**Location:** `/docs/documents/pm/`\n**Docs:** 3 files | **Status:** ✅ Production Ready (75%)\n\n| Document | Purpose |\n|----------|---------|\n| [README.md](./pm/README.md) | Module overview |\n| product-management-specification.md | Complete specs |\n| product-management-sitemap.md | Navigation map |\n\n---\n\n### 6. Dashboard Module\n\n#### 📊 Dashboard\n**Location:** `/docs/documents/dashboard/`\n**Docs:** Multiple files | **Status:** ✅ Production Ready\n\n---\n\n## 📸 Screenshot Inventory\n\n### Screenshot Distribution by Module\n\n| Module | Screenshot Count | Format | Resolution |\n|--------|-----------------|--------|------------|\n| **Procurement (PR, PO, GRN)** | 25+ | PNG | 1920x1080 |\n| **Vendor Management** | 8+ | PNG | 1920x1080 |\n| **Inventory Management** | 15+ | PNG | 1920x1080 |\n| **Store Operations** | 10+ | PNG | 1920x1080 |\n| **Product Management** | 5+ | PNG | 1920x1080 |\n| **Dashboard** | 5+ | PNG | 1920x1080 |\n| **Miscellaneous** | 79+ | PNG | Various |\n| **TOTAL** | **147** | PNG | Primarily 1920x1080 |\n\n### Screenshot Naming Conventions\n\n```\n{module}-{feature}-{view-type}.png\n\nExamples:\n- purchase-request-list-view.png\n- vm-vendor-list-search.png\n- inventory-balance-report.png\n- store-requisition-detail-items.png\n```\n\n---\n\n## 🔗 Documentation Cross-References\n\n### Inter-Module Dependencies\n\n```mermaid\ngraph LR\n    PR[Purchase Requests] --> VM[Vendor Management]\n    PR --> PM[Product Management]\n    PO[Purchase Orders] --> PR\n    PO --> VM\n    GRN[Goods Received] --> PO\n    GRN --> INV[Inventory]\n    SR[Store Requisitions] --> INV\n    SR --> PM\n    PC[Physical Count] --> INV\n    SC[Spot Check] --> INV\n```\n\n### Documentation Links Matrix\n\n| Source Module | References | Target Modules |\n|---------------|------------|----------------|\n| Procurement | Vendors, Products | VM, PM |\n| Inventory | Products, Locations | PM, System Admin |\n| Store Ops | Inventory, Products | INV, PM |\n| Vendor Mgmt | Procurement, Finance | PR, PO, Finance |\n\n---\n\n## 📋 Documentation Completeness Matrix\n\n### By Module\n\n| Module | Specification | User Guide | API Docs | Screenshots | Component Docs | Status |\n|--------|--------------|------------|----------|-------------|----------------|--------|\n| **Purchase Requests** | ✅ | ✅ | ✅ | ✅ (9) | ✅ | 100% |\n| **Vendor Management** | ✅ | ✅ | ✅ | ✅ (8+) | ✅ | 100% |\n| **Inventory Mgmt** | ✅ | ✅ | ⚠️ | ✅ (15+) | ✅ | 90% |\n| **Store Operations** | ✅ | ✅ | ⚠️ | ✅ (10+) | ✅ | 95% |\n| **Product Management** | ✅ | ⚠️ | ❌ | ✅ (5+) | ⚠️ | 70% |\n| **Physical Count** | ✅ | ⚠️ | ❌ | ✅ | ⚠️ | 65% |\n| **Spot Check** | ✅ | ⚠️ | ❌ | ✅ | ⚠️ | 65% |\n| **Purchase Orders** | ⚠️ | ❌ | ❌ | ✅ (4) | ❌ | 40% |\n| **GRN** | ⚠️ | ❌ | ❌ | ⚠️ | ❌ | 30% |\n| **Credit Notes** | ⚠️ | ❌ | ❌ | ⚠️ | ❌ | 30% |\n\n**Legend:**\n- ✅ Complete\n- ⚠️ Partial\n- ❌ Missing\n\n---\n\n## 🎯 Documentation Best Practices\n\n### Naming Conventions\n\n#### Files\n- Use kebab-case for all markdown files\n- Include module prefix for clarity\n- Use descriptive names\n\n```\n✅ Good: purchase-request-specification.md\n❌ Bad: spec.md, pr-spec.md\n```\n\n#### Screenshots\n- Include module, feature, and view type\n- Use consistent resolution (1920x1080)\n- PNG format for quality\n\n```\n✅ Good: vendor-management-vendor-list.png\n❌ Bad: screenshot1.png, vm-1.png\n```\n\n### Directory Structure\n\n```\ndocs/documents/\n├── {module-abbreviation}/     # Module-specific docs\n│   ├── README.md              # Module overview\n│   ├── {module}-specification.md\n│   ├── {module}-sitemap.md\n│   ├── screenshots/           # Module screenshots\n│   └── components/            # Component docs\n```\n\n---\n\n## 📊 Documentation Metrics\n\n### Total Documentation Assets\n\n| Category | Count | Size |\n|----------|-------|------|\n| **Markdown Files** | 98 | ~5MB |\n| **Screenshots** | 147 | ~75MB |\n| **Mermaid Diagrams** | 50+ | N/A |\n| **Code Examples** | 100+ | N/A |\n| **Tables/Charts** | 200+ | N/A |\n\n### Documentation Quality Scores\n\n| Module | Completeness | Accuracy | Maintainability | Overall |\n|--------|--------------|----------|-----------------|---------|\n| Purchase Requests | 95% | 98% | 95% | ⭐⭐⭐⭐⭐ |\n| Vendor Management | 98% | 99% | 98% | ⭐⭐⭐⭐⭐ |\n| Store Operations | 92% | 95% | 90% | ⭐⭐⭐⭐⭐ |\n| Inventory Management | 88% | 92% | 85% | ⭐⭐⭐⭐ |\n| Product Management | 70% | 80% | 75% | ⭐⭐⭐ |\n\n---\n\n## 🔄 Documentation Maintenance\n\n### Update Frequency\n\n- **System-wide docs:** Monthly or upon major changes\n- **Module docs:** Upon feature additions/changes\n- **Screenshots:** Upon UI changes\n- **API docs:** Upon endpoint changes\n\n### Review Schedule\n\n| Documentation Type | Review Frequency | Owner |\n|-------------------|------------------|-------|\n| System Architecture | Quarterly | Tech Lead |\n| Module Specs | Monthly | Product Manager |\n| User Guides | Bi-monthly | UX Team |\n| API Documentation | Continuous | Backend Team |\n| Screenshots | As needed | QA Team |\n\n---\n\n## 📞 Documentation Support\n\n### For Documentation Questions\n\n**Technical Documentation:**\n- Email: tech-docs@carmen-erp.com\n- Slack: #carmen-documentation\n\n**Module-Specific:**\n- Check module README.md first\n- Contact module tech lead\n- Submit documentation issue\n\n### Contributing to Documentation\n\n1. Follow naming conventions\n2. Use provided templates\n3. Include Mermaid diagrams where helpful\n4. Capture screenshots at 1920x1080\n5. Update this catalog when adding new docs\n\n---\n\n## 📜 Version History\n\n| Version | Date | Changes | Author |\n|---------|------|---------|--------|\n| 1.0 | 2025-10-09 | Initial comprehensive catalog | Documentation Team |\n\n---\n\n**Last Updated:** October 9, 2025\n**Total Assets:** 245+ (98 docs + 147 screenshots)\n**Catalog Status:** Complete\n**Next Review:** November 9, 2025\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

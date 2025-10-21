@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Template Module Documentation - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>Purchase Request Templates</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">PRT</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Purchase Request Template Module Documentation\n\nWelcome to the comprehensive documentation for the Carmen ERP Purchase Request Template module. This documentation provides complete technical specifications, user guides, and implementation details.\n\n## 📚 Documentation Structure\n\n### 1. [Complete Technical Specification](./purchase-request-template-complete-specification.md)\n**Comprehensive overview of the entire PRT module**\n- Module overview and key features\n- Complete site map with Mermaid diagrams\n- Page and component documentation\n- Data flow and user interactions\n- Technical architecture details\n- API endpoints and database schema\n\n### 2. [Detailed Component Documentation](./components-detailed-documentation.md)\n**In-depth analysis of all components and their interactions**\n- Page components (List, Detail, Create)\n- Form components and validation\n- Dialog components and workflows\n- Tab components and functionality\n- Utility and data components\n- Component interaction patterns\n\n### 3. [User Interaction Guide](./user-interaction-guide.md)\n**Complete guide for user workflows and interactions**\n- Navigation and entry points\n- Primary user workflows\n- Dialog and form interactions\n- Data management features\n- Advanced functionality\n\n### 4. [API Specification](./api-specification.md)\n**Technical API documentation for developers**\n- Authentication and authorization\n- Core endpoints and operations\n- Data models and schemas\n- Error handling and responses\n- Rate limiting and webhooks\n\n## 🖼️ Screenshots & Visual Documentation\n\nAll screenshots are stored in the [`screenshots/`](./screenshots/) directory:\n\n- **prt-list-page-table-view.png** - Main PRT listing interface (Table View)\n- **prt-list-page-card-view.png** - Main PRT listing interface (Card View)\n- **prt-detail-page-items-tab.png** - PRT detail page showing Items tab\n- **prt-detail-page-edit-mode.png** - PRT detail page in edit mode\n- **prt-add-item-dialog.png** - Add/Edit item dialog interface\n\n## 🗺️ Module Site Map\n\n```mermaid\ngraph TD\n    A[Purchase Request Templates Landing] --> B[PRT List View - Table]\n    A --> C[PRT List View - Card]\n\n    B --> D[New Template Creation]\n    C --> D\n\n    D --> E[Template Detail Page]\n\n    B --> F[Template Detail View]\n    C --> F\n    F --> E\n\n    E --> G[Items Tab]\n    E --> H[Budgets Tab]\n    E --> I[Activity Tab]\n\n    G --> J[Add Item Dialog]\n    G --> K[Edit Item Dialog]\n    G --> L[Delete Item Confirmation]\n\n    E --> M[Clone Template]\n    E --> N[Set as Default]\n    E --> O[Delete Template]\n\n    F --> P[Edit Mode]\n    P --> Q[Save Changes]\n    P --> R[Cancel Changes]\n\n    B --> S[Bulk Operations]\n    C --> S\n    S --> T[Bulk Delete]\n    S --> U[Bulk Clone]\n    S --> V[Set Default]\n```\n\n## 🚀 Key Features\n\n### Template Management\n- Complete template lifecycle management (Draft → Active → Archived)\n- Multi-type support (General Purchase, Asset Purchase, Service, Recurring)\n- Clone functionality for creating template variations\n- Department-specific default templates\n\n### User Interface\n- Responsive design with table and card views\n- Advanced filtering and search capabilities\n- Multi-mode interface (view/edit/add)\n- Export and print functionality\n- Real-time status updates\n\n### Item Management\n- Comprehensive item configuration with pricing\n- Unit of measure (UOM) support\n- Budget and account code integration\n- Real-time calculations for totals and taxes\n- Multi-currency support with exchange rates\n\n### Technical Architecture\n- Next.js 14 with App Router\n- TypeScript with strict mode\n- Tailwind CSS + Shadcn/ui components\n- React Hook Form + Zod validation\n- Reusable component architecture\n\n## 📁 File Structure\n\n```\ndocs/documents/prt/\n├── README.md                                           # This file\n├── purchase-request-template-complete-specification.md # Complete technical spec\n├── components-detailed-documentation.md               # Component documentation\n├── user-interaction-guide.md                         # User workflows\n├── api-specification.md                              # API documentation\n└── screenshots/                                      # Visual documentation\n    ├── prt-list-page-table-view.png\n    ├── prt-list-page-card-view.png\n    ├── prt-detail-page-items-tab.png\n    ├── prt-detail-page-edit-mode.png\n    └── prt-add-item-dialog.png\n```\n\n## 🔗 Source Code Structure\n\n```\napp/(main)/procurement/purchase-request-templates/\n├── page.tsx                                          # Main listing page\n├── [id]/page.tsx                                    # Detail page route\n├── components/                                      # Component library\n│   ├── ItemsTab.tsx                                # Items management tab\n│   ├── template-items-table.tsx                    # Items table component\n│   └── item-form-dialog.tsx                        # Item add/edit dialog\n└── types/\n    └── template-items.ts                           # Type definitions and mock data\n```\n\n## 🎯 Primary User Workflows\n\n### 1. Create New Template\n1. Navigate to PRT List → Click \"New Template\"\n2. Fill template header information (name, type, department)\n3. Add template items via Items tab with pricing and specifications\n4. Configure budget and account codes\n5. Save template for future use\n\n### 2. Use Template for Purchase Request\n1. Navigate to Purchase Requests → \"Create from Template\"\n2. Select desired template from list\n3. Customize items and quantities as needed\n4. Submit for approval following standard workflow\n\n### 3. Template Management\n1. Browse templates in table/card format\n2. Filter and search for specific templates\n3. Edit existing templates as requirements change\n4. Clone templates for creating variations\n5. Set department defaults for streamlined workflows\n\n## 🛠️ Technical Implementation\n\n### Component Architecture\n- **PRListTemplate**: Shared list component with dual-view support\n- **PRDetailTemplate**: Shared detail component with multi-mode operation\n- **ItemsTab**: Comprehensive item management interface\n- **ItemFormDialog**: Rich form dialog with validation and calculations\n\n### State Management\n- React useState for local state management\n- URL parameters for routing context\n- Mock data integration with future API readiness\n- Real-time calculations and validation\n\n### Data Flow\n```mermaid\nflowchart TD\n    A[Mock Data Store] --> B[PRT List Page]\n    B --> C[New Template Process]\n    C --> D[Template Detail Page]\n\n    D --> E[Items Tab]\n    D --> F[Budgets Tab]\n    D --> G[Activity Tab]\n\n    E --> H[Item Management]\n    H --> I[Add/Edit/Delete Items]\n\n    D --> J[Template Actions]\n    J --> K[Clone Template]\n    J --> L[Set as Default]\n    J --> M[Delete Template]\n```\n\n## 📊 Database Schema Overview\n\n### Main Tables\n- **purchase_request_templates** - Core template information\n- **template_items** - Template line items with specifications\n- **template_usage_log** - Template usage tracking\n- **template_versions** - Version history management\n\n### Key Relationships\n- Template → Items (One-to-Many)\n- Template → Usage Log (One-to-Many)\n- Template → Versions (One-to-Many)\n- Department → Default Templates (One-to-Many)\n\n## 🔄 Template Lifecycle\n\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n    Draft --> Active\n    Active --> Inactive\n    Inactive --> Active\n    Active --> Archived\n    Draft --> Archived\n    Archived --> [*]\n```\n\n## 📧 Support & Contributions\n\nFor questions, issues, or contributions to this documentation:\n\n1. **Technical Issues**: Review the component documentation and API specification\n2. **User Workflow Questions**: Consult the user interaction guide\n3. **Feature Requests**: Reference the complete technical specification\n4. **Bug Reports**: Include relevant screenshots and component details\n\n---\n\n*Documentation generated on: 2025-09-23*\n*Module Version: 1.0*\n*Carmen ERP - Hospitality Supply Chain Management*";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

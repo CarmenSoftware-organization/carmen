@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Component Map - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Procurement / Purchase Requests</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Purchase Request Component Map\n\nThis document provides detailed component mapping for the Purchase Request system, including file locations, component relationships, and interaction patterns.\n\n## File Structure Map\n\n```mermaid\ngraph TD\n    subgraph \"File System Architecture\"\n        A[\"app/(main)/procurement/purchase-requests/\"] --> B[\"📄 page.tsx<br/>(Main List Page)\"]\n        A --> C[\"📁 [id]/\"]\n        A --> D[\"📁 new-pr/\"]\n        A --> E[\"📁 enhanced-demo/\"]\n        A --> F[\"📁 components/\"]\n        A --> G[\"📁 services/\"]\n\n        C --> H[\"📄 page.tsx<br/>(Detail Page)\"]\n        D --> I[\"📄 page.tsx<br/>(Create Page)\"]\n        E --> J[\"📄 page.tsx<br/>(Demo Page)\"]\n\n        F --> K[\"📄 ModernPurchaseRequestList.tsx\"]\n        F --> L[\"📄 PRDetailPage.tsx\"]\n        F --> M[\"📄 PRForm.tsx\"]\n        F --> N[\"📄 purchase-requests-data-table.tsx\"]\n        F --> O[\"📄 purchase-requests-card-view.tsx\"]\n        F --> P[\"📄 VendorComparisonModal.tsx\"]\n        F --> Q[\"📄 PriceHistoryModal.tsx\"]\n        F --> R[\"📁 tabs/\"]\n\n        R --> S[\"📄 ItemsTab.tsx\"]\n        R --> T[\"📄 BudgetsTab.tsx\"]\n        R --> U[\"📄 WorkflowTab.tsx\"]\n        R --> V[\"📄 AttachmentsTab.tsx\"]\n        R --> W[\"📄 ActivityTab.tsx\"]\n        R --> X[\"📄 PRCommentsAttachmentsTab.tsx\"]\n\n        G --> Y[\"📄 rbac-service.ts\"]\n        G --> Z[\"📄 workflow-decision-engine.ts\"]\n    end\n```\n\n## Component Hierarchy Detailed Map\n\n```mermaid\ngraph TD\n    subgraph \"Main List Page Flow\"\n        A1[\"page.tsx<br/>/procurement/purchase-requests\"] --> B1[\"ModernPurchaseRequestList\"]\n\n        B1 --> C1[\"🎯 View Toggle<br/>(Table/Card)\"]\n        B1 --> C2[\"🔧 Filter Controls\"]\n        B1 --> C3[\"➕ Create Button\"]\n        B1 --> C4[\"📊 Data Display\"]\n\n        C1 --> D1[\"PurchaseRequestsDataTable\"]\n        C1 --> D2[\"PurchaseRequestsCardView\"]\n\n        C4 --> D1\n        C4 --> D2\n\n        D1 --> E1[\"📋 Row Actions\"]\n        D1 --> E2[\"☑️ Bulk Selection\"]\n        D1 --> E3[\"🔄 Sorting\"]\n        D1 --> E4[\"📄 Pagination\"]\n\n        D2 --> F1[\"🃏 PR Cards\"]\n        D2 --> F2[\"📱 Responsive Grid\"]\n\n        E1 --> G1[\"👁️ View\"]\n        E1 --> G2[\"✏️ Edit\"]\n        E1 --> G3[\"🗑️ Delete\"]\n    end\n\n    subgraph \"Detail Page Flow\"\n        H1[\"page.tsx<br/>/procurement/purchase-requests/[id]\"] --> I1[\"PRDetailPage\"]\n\n        I1 --> J1[\"📋 PRHeader\"]\n        I1 --> J2[\"📊 CompactWorkflowIndicator\"]\n        I1 --> J3[\"📑 Tab System\"]\n        I1 --> J4[\"💰 SummaryTotal\"]\n        I1 --> J5[\"🎯 FloatingActionMenu\"]\n        I1 --> J6[\"📱 Sidebar\"]\n\n        J3 --> K1[\"ItemsTab\"]\n        J3 --> K2[\"BudgetsTab\"]\n        J3 --> K3[\"WorkflowTab\"]\n\n        J6 --> L1[\"PRCommentsAttachmentsTab\"]\n        J6 --> L2[\"ActivityTab\"]\n\n        K1 --> M1[\"📦 Item Management\"]\n        K1 --> M2[\"🏪 Vendor Selection\"]\n        K1 --> M3[\"💲 Price History\"]\n        K1 --> M4[\"📊 Bulk Operations\"]\n    end\n\n    subgraph \"Modal System\"\n        N1[\"VendorComparisonModal\"] --> O1[\"🏪 Vendor Grid\"]\n        N1 --> O2[\"💰 Price Comparison\"]\n        N1 --> O3[\"⭐ Rating System\"]\n\n        N2[\"PriceHistoryModal\"] --> P1[\"📈 Price Chart\"]\n        N2 --> P2[\"📊 Historical Data\"]\n        N2 --> P3[\"📝 Vendor Notes\"]\n\n        N3[\"ReturnStepSelector\"] --> Q1[\"🔄 Workflow Stages\"]\n        N3 --> Q2[\"💬 Comment Input\"]\n        N3 --> Q3[\"✅ Confirmation\"]\n    end\n```\n\n## Component Interaction Flow\n\n```mermaid\nflowchart TD\n    subgraph \"User Interaction Patterns\"\n        A[\"User Action\"] --> B{Action Type}\n\n        B -->|\"Navigation\"| C[\"Router Push\"]\n        B -->|\"State Change\"| D[\"Component Handler\"]\n        B -->|\"Modal Trigger\"| E[\"Modal State\"]\n        B -->|\"Form Action\"| F[\"Form Handler\"]\n\n        C --> G[\"Next.js Router\"]\n        G --> H[\"Page Component\"]\n\n        D --> I[\"Local State Update\"]\n        I --> J[\"Re-render\"]\n\n        E --> K[\"Modal Component\"]\n        K --> L[\"Overlay Display\"]\n\n        F --> M[\"Validation\"]\n        M --> N{Valid?}\n        N -->|Yes| O[\"API Call\"]\n        N -->|No| P[\"Error Display\"]\n\n        O --> Q[\"Optimistic Update\"]\n        Q --> R[\"Background Sync\"]\n    end\n```\n\n## Data Flow Architecture\n\n```mermaid\ngraph LR\n    subgraph \"Data Layer Structure\"\n        A[\"📁 lib/types/\"] --> B[\"🔧 procurement.ts\"]\n        A --> C[\"🔧 user.ts\"]\n        A --> D[\"🔧 workflow.ts\"]\n\n        E[\"📁 lib/mock-data/\"] --> F[\"📋 purchase-requests.ts\"]\n        E --> G[\"👥 users.ts\"]\n        E --> H[\"🏪 vendors.ts\"]\n\n        I[\"📁 lib/api/\"] --> J[\"🌐 procurement.ts\"]\n        I --> K[\"🔐 auth.ts\"]\n\n        L[\"📁 lib/hooks/\"] --> M[\"📡 use-procurement.ts\"]\n        L --> N[\"👤 use-user.ts\"]\n\n        B --> O[\"Component Props\"]\n        F --> O\n        J --> P[\"React Query\"]\n        P --> O\n    end\n```\n\n## Modal System Architecture\n\n```mermaid\ngraph TD\n    subgraph \"Modal Management System\"\n        A[\"Component Trigger\"] --> B[\"Modal State Hook\"]\n        B --> C[\"Modal Provider\"]\n        C --> D[\"Modal Component\"]\n\n        D --> E{Modal Type}\n        E -->|\"Vendor\"| F[\"VendorComparisonModal\"]\n        E -->|\"Price\"| G[\"PriceHistoryModal\"]\n        E -->|\"Return\"| H[\"ReturnStepSelector\"]\n        E -->|\"Item\"| I[\"ItemDetailsModal\"]\n        E -->|\"Bulk\"| J[\"BulkOperationModal\"]\n\n        F --> K[\"📊 Vendor Data Grid\"]\n        F --> L[\"💰 Price Comparison\"]\n        F --> M[\"⭐ Rating Display\"]\n        F --> N[\"✅ Selection Actions\"]\n\n        G --> O[\"📈 Price Trend Chart\"]\n        G --> P[\"📋 Historical Records\"]\n        G --> Q[\"📊 Analytics View\"]\n\n        H --> R[\"🔄 Stage Selection\"]\n        H --> S[\"💬 Comment Field\"]\n        H --> T[\"📤 Submit Action\"]\n\n        I --> U[\"📦 Inventory Status\"]\n        I --> V[\"📍 Location Info\"]\n        I --> W[\"🔗 Related Items\"]\n\n        J --> X[\"☑️ Item Selection\"]\n        J --> Y[\"🎯 Bulk Actions\"]\n        J --> Z[\"✅ Confirmation\"]\n    end\n```\n\n## Form System Architecture\n\n```mermaid\ngraph TD\n    subgraph \"Form Management\"\n        A[\"PRForm Component\"] --> B[\"React Hook Form\"]\n        B --> C[\"Zod Validation\"]\n        C --> D[\"Form Fields\"]\n\n        D --> E[\"📝 Basic Info Fields\"]\n        D --> F[\"📦 Items Array\"]\n        D --> G[\"💰 Budget Fields\"]\n        D --> H[\"📋 Workflow Fields\"]\n\n        E --> I[\"🏷️ Reference Number\"]\n        E --> J[\"📅 Date Picker\"]\n        E --> K[\"👤 Requestor Info\"]\n        E --> L[\"🏢 Department\"]\n\n        F --> M[\"🔄 Dynamic Item List\"]\n        M --> N[\"➕ Add Item Button\"]\n        M --> O[\"❌ Remove Item\"]\n        M --> P[\"✏️ Edit Item\"]\n\n        G --> Q[\"💳 Budget Code\"]\n        G --> R[\"💰 Amount Limits\"]\n        G --> S[\"📊 Allocation\"]\n\n        H --> T[\"📋 Approval Route\"]\n        H --> U[\"⏰ Priority Level\"]\n        H --> V[\"📝 Comments\"]\n    end\n```\n\n## State Management Flow\n\n```mermaid\nflowchart LR\n    subgraph \"State Flow Architecture\"\n        A[\"User Action\"] --> B[\"Component Handler\"]\n        B --> C[\"Local State\"]\n        C --> D[\"React Query Cache\"]\n        D --> E[\"API Service\"]\n\n        E --> F{Response}\n        F -->|Success| G[\"Update Cache\"]\n        F -->|Error| H[\"Error State\"]\n\n        G --> I[\"Component Re-render\"]\n        H --> J[\"Error Display\"]\n\n        K[\"Global State\"] --> L[\"User Context\"]\n        K --> M[\"Workflow Context\"]\n        K --> N[\"Theme Context\"]\n\n        L --> O[\"Authentication\"]\n        L --> P[\"Permissions\"]\n        M --> Q[\"Workflow Rules\"]\n        M --> R[\"Stage Validation\"]\n\n        O --> S[\"Component Access\"]\n        P --> S\n        Q --> T[\"Action Availability\"]\n        R --> T\n    end\n```\n\n## Navigation Flow\n\n```mermaid\ngraph TD\n    subgraph \"Navigation Architecture\"\n        A[\"Navigation Trigger\"] --> B{Route Type}\n\n        B -->|\"List View\"| C[\"/procurement/purchase-requests\"]\n        B -->|\"Detail View\"| D[\"/procurement/purchase-requests/[id]\"]\n        B -->|\"Create\"| E[\"/procurement/purchase-requests/new-pr\"]\n        B -->|\"Edit\"| F[\"/procurement/purchase-requests/[id]?mode=edit\"]\n\n        C --> G[\"ModernPurchaseRequestList\"]\n        G --> H[\"📊 Data Table\"]\n        G --> I[\"🃏 Card View\"]\n        G --> J[\"🔍 Filters\"]\n\n        D --> K[\"PRDetailPage\"]\n        K --> L[\"📋 Header Info\"]\n        K --> M[\"📑 Tab System\"]\n        K --> N[\"💰 Summary\"]\n\n        E --> O[\"PRForm\"]\n        O --> P[\"📝 Form Fields\"]\n        O --> Q[\"📦 Item Management\"]\n        O --> R[\"💾 Save Actions\"]\n\n        F --> S[\"PRDetailPage (Edit Mode)\"]\n        S --> T[\"✏️ Editable Fields\"]\n        S --> U[\"💾 Save Changes\"]\n        S --> V[\"❌ Cancel Edit\"]\n    end\n```\n\n## API Integration Map\n\n```mermaid\ngraph TD\n    subgraph \"API Service Architecture\"\n        A[\"Frontend Component\"] --> B[\"Custom Hook\"]\n        B --> C[\"React Query\"]\n        C --> D[\"API Service\"]\n        D --> E[\"HTTP Client\"]\n\n        E --> F{Endpoint}\n        F -->|\"GET /purchase-requests\"| G[\"List PRs\"]\n        F -->|\"GET /purchase-requests/[id]\"| H[\"Get PR Detail\"]\n        F -->|\"POST /purchase-requests\"| I[\"Create PR\"]\n        F -->|\"PUT /purchase-requests/[id]\"| J[\"Update PR\"]\n        F -->|\"DELETE /purchase-requests/[id]\"| K[\"Delete PR\"]\n        F -->|\"POST /purchase-requests/[id]/workflow\"| L[\"Workflow Action\"]\n\n        G --> M[\"Mock Data Response\"]\n        H --> M\n        I --> M\n        J --> M\n        K --> M\n        L --> M\n\n        M --> N[\"Data Processing\"]\n        N --> O[\"Cache Update\"]\n        O --> P[\"Component Update\"]\n    end\n```\n\n## Error Handling Flow\n\n```mermaid\nflowchart TD\n    A[\"Component Action\"] --> B[\"Try Block\"]\n    B --> C{Success?}\n\n    C -->|Yes| D[\"Success Path\"]\n    C -->|No| E[\"Error Catch\"]\n\n    D --> F[\"Update State\"]\n    F --> G[\"Success Notification\"]\n    G --> H[\"UI Update\"]\n\n    E --> I[\"Error Analysis\"]\n    I --> J{Error Type}\n\n    J -->|\"Validation\"| K[\"Form Errors\"]\n    J -->|\"Network\"| L[\"Retry Prompt\"]\n    J -->|\"Auth\"| M[\"Login Redirect\"]\n    J -->|\"Server\"| N[\"Error Message\"]\n\n    K --> O[\"Field Highlights\"]\n    L --> P[\"Retry Button\"]\n    M --> Q[\"Auth Flow\"]\n    N --> R[\"Toast Notification\"]\n\n    O --> S[\"User Correction\"]\n    P --> T[\"Retry Action\"]\n    Q --> U[\"Re-authenticate\"]\n    R --> V[\"Manual Recovery\"]\n```\n\n## Component Lifecycle Management\n\n```mermaid\nsequenceDiagram\n    participant User\n    participant Component\n    participant Hook\n    participant API\n    participant Cache\n\n    User->>Component: Page Load\n    Component->>Hook: useQuery\n    Hook->>Cache: Check Cache\n\n    alt Cache Hit\n        Cache-->>Hook: Return Cached Data\n        Hook-->>Component: Render with Data\n    else Cache Miss\n        Hook->>API: Fetch Data\n        API-->>Hook: Return Data\n        Hook->>Cache: Update Cache\n        Hook-->>Component: Render with Data\n    end\n\n    Component-->>User: Display UI\n\n    User->>Component: User Action\n    Component->>Hook: useMutation\n    Hook->>API: Submit Changes\n    API-->>Hook: Response\n    Hook->>Cache: Invalidate/Update\n    Hook-->>Component: Update State\n    Component-->>User: Show Result\n```\n\n---\n\nThis component map provides a comprehensive technical reference for understanding the Purchase Request system architecture, including detailed file locations, component relationships, data flow patterns, and interaction mechanisms.";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

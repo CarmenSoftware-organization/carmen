@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Module - Sitemap - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Inventory / Stock Management</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Inventory Management Module - Sitemap\n\n```mermaid\ngraph TD\n    IM[Inventory Management] --> IMD[Inventory Dashboard]\n    IM --> SO[Stock Overview]\n    IM --> IA[Inventory Adjustments]\n    IM --> SC[Spot Check]\n    IM --> PC[Physical Count]\n    IM --> PE[Period End]\n    IM --> FI[Fractional Inventory]\n    IM --> SI[Stock In]\n\n    %% Inventory Dashboard Components\n    IMD --> IMD_WIDGETS[Draggable Widgets]\n    IMD_WIDGETS --> IMD_W1[Inventory Levels Chart]\n    IMD_WIDGETS --> IMD_W2[Inventory Value Trend]\n    IMD_WIDGETS --> IMD_W3[Inventory Turnover]\n    IMD_WIDGETS --> IMD_W4[Low Stock Alerts]\n    IMD_WIDGETS --> IMD_W5[Upcoming Stock Takes]\n    IMD_WIDGETS --> IMD_W6[Recent Transfers]\n\n    %% Stock Overview Module\n    SO --> SO_OVERVIEW[Overview Dashboard]\n    SO --> IB[Inventory Balance]\n    SO --> STOCK_CARDS[Stock Cards]\n    SO --> SM[Slow Moving Items]\n    SO --> IA_AGING[Inventory Aging]\n\n    %% Inventory Balance Components\n    IB --> IB_REPORT[Balance Report Tab]\n    IB --> IB_MOVEMENT[Movement History Tab]\n    IB --> IB_FILTERS[Advanced Filters]\n    IB --> IB_EXPORT[Export Functions]\n    IB --> IB_PRINT[Print Functions]\n    IB --> IB_LOTS[Lot Tracking Toggle]\n\n    %% Stock Cards Components\n    STOCK_CARDS --> SC_LIST[Stock Card List]\n    STOCK_CARDS --> SC_DETAIL[Individual Stock Card]\n    STOCK_CARDS --> SC_FILTERS[Filtering Options]\n    STOCK_CARDS --> SC_SEARCH[Search Functionality]\n\n    %% Inventory Adjustments Module\n    IA --> IA_LIST[Adjustments List]\n    IA --> IA_DETAIL[Adjustment Detail]\n    IA --> IA_NEW[New Adjustment]\n\n    %% Inventory Adjustments List Components\n    IA_LIST --> IA_L_SEARCH[Search Adjustments]\n    IA_LIST --> IA_L_FILTER[Filter & Sort Options]\n    IA_L_FILTER --> IA_L_F_STATUS[Status Filter]\n    IA_L_FILTER --> IA_L_F_TYPE[Type Filter]\n    IA_L_FILTER --> IA_L_F_LOCATION[Location Filter]\n    IA_L_FILTER --> IA_L_F_DATE[Date Range Filter]\n    IA_LIST --> IA_L_TABLE[Adjustments Data Table]\n    IA_LIST --> IA_L_ACTIONS[Row Actions Menu]\n\n    %% Inventory Adjustment Detail Components\n    IA_DETAIL --> IA_D_HEADER[Adjustment Header Info]\n    IA_DETAIL --> IA_D_ITEMS[Items Being Adjusted]\n    IA_DETAIL --> IA_D_NOTES[Notes and Comments]\n    IA_DETAIL --> IA_D_APPROVAL[Approval Workflow]\n    IA_DETAIL --> IA_D_HISTORY[Change History]\n\n    %% Spot Check Module\n    SC --> SC_DASH[Spot Check Dashboard]\n    SC --> SC_NEW[New Spot Check]\n    SC --> SC_ACTIVE[Active Spot Checks]\n    SC --> SC_COMPLETED[Completed Spot Checks]\n\n    %% Spot Check Dashboard Components\n    SC_DASH --> SC_D_SEARCH[Search Spot Checks]\n    SC_DASH --> SC_D_FILTERS[Status and Department Filters]\n    SC_DASH --> SC_D_CARDS[Spot Check Cards]\n    SC_D_CARDS --> SC_D_C_INFO[Location and Status Info]\n    SC_D_CARDS --> SC_D_C_PROGRESS[Progress Tracking]\n    SC_D_CARDS --> SC_D_C_ACTIONS[Check Actions]\n\n    %% New Spot Check Workflow\n    SC_NEW --> SC_N_SETUP[Setup Form]\n    SC_N_SETUP --> SC_N_LOCATION[Location Selection]\n    SC_N_SETUP --> SC_N_ITEMS[Item Selection]\n    SC_N_SETUP --> SC_N_SCHEDULE[Schedule Settings]\n\n    %% Active Spot Check Components\n    SC_ACTIVE --> SC_A_LIST[Active Checks List]\n    SC_ACTIVE --> SC_A_DETAIL[Check Detail View]\n    SC_A_DETAIL --> SC_A_D_ITEMS[Item Counting Interface]\n    SC_A_DETAIL --> SC_A_D_VARIANCE[Variance Detection]\n    SC_A_DETAIL --> SC_A_D_NOTES[Count Notes]\n\n    %% Physical Count Module\n    PC --> PC_MGMT[Physical Count Management]\n    PC --> PC_SETUP[Count Setup Wizard]\n    PC --> PC_ACTIVE[Active Counts]\n    PC --> PC_DASHBOARD[Count Dashboard]\n\n    %% Physical Count Setup Wizard\n    PC_SETUP --> PC_S_BASIC[Basic Information]\n    PC_SETUP --> PC_S_LOCATION[Location Selection]\n    PC_SETUP --> PC_S_ITEMS[Items Review]\n    PC_SETUP --> PC_S_REVIEW[Final Review]\n\n    %% Physical Count Basic Info\n    PC_S_BASIC --> PC_S_B_COUNTER[Counter Assignment]\n    PC_S_BASIC --> PC_S_B_DEPT[Department Selection]\n    PC_S_BASIC --> PC_S_B_DATE[Date & Time Setup]\n    PC_S_BASIC --> PC_S_B_NOTES[Additional Notes]\n\n    %% Period End Module\n    PE --> PE_LIST[Period End List]\n    PE --> PE_DETAIL[Period End Detail]\n    PE --> PE_PROCESS[End Processing]\n\n    %% Fractional Inventory Module\n    FI --> FI_DASH[Fractional Dashboard]\n    FI --> FI_ITEMS[Fractional Items]\n    FI --> FI_CONVERSION[Unit Conversions]\n\n    %% Stock In Module\n    SI --> SI_RECEIPT[Stock Receipt]\n    SI --> SI_VALIDATION[Quality Validation]\n    SI --> SI_POSTING[Inventory Posting]\n\n    %% Shared Components\n    IM --> SHARED[Shared Components]\n    SHARED --> STATUS_BADGES[Status Badge System]\n    SHARED --> SEARCH_FILTERS[Search & Filter Components]\n    SHARED --> DATE_PICKERS[Date Range Pickers]\n    SHARED --> EXPORT_TOOLS[Export Utilities]\n    SHARED --> PRINT_TOOLS[Print Utilities]\n    SHARED --> PROGRESS_BARS[Progress Indicators]\n    SHARED --> ACTION_MENUS[Action Dropdown Menus]\n\n    %% Status Badge Types\n    STATUS_BADGES --> SB_DRAFT[Draft Status]\n    STATUS_BADGES --> SB_POSTED[Posted Status]\n    STATUS_BADGES --> SB_VOIDED[Voided Status]\n    STATUS_BADGES --> SB_PENDING[Pending Status]\n    STATUS_BADGES --> SB_IN_PROGRESS[In Progress Status]\n    STATUS_BADGES --> SB_COMPLETED[Completed Status]\n    STATUS_BADGES --> SB_IN_OUT[IN/OUT Type Badges]\n\n    %% Navigation Relationships\n    IA_LIST -.->|View Details| IA_DETAIL\n    SC_DASH -.->|Start Check| SC_ACTIVE\n    SC_DASH -.->|New Check| SC_NEW\n    PC_SETUP -.->|Complete Setup| PC_ACTIVE\n    IMD -.->|Quick Access| IA_LIST\n    IMD -.->|Quick Access| SC_DASH\n    IMD -.->|Quick Access| SO\n\n    %% Style Classes\n    classDef dashboardNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px\n    classDef moduleNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px\n    classDef listNode fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px\n    classDef detailNode fill:#fff3e0,stroke:#e65100,stroke-width:2px\n    classDef processNode fill:#fce4ec,stroke:#880e4f,stroke-width:2px\n    classDef sharedNode fill:#f1f8e9,stroke:#33691e,stroke-width:2px\n\n    class IMD,IMD_WIDGETS,IMD_W1,IMD_W2,IMD_W3,IMD_W4,IMD_W5,IMD_W6 dashboardNode\n    class SO,IA,SC,PC,PE,FI,SI moduleNode\n    class IA_LIST,SC_DASH,PC_MGMT,IB_REPORT,SC_A_LIST,PE_LIST listNode\n    class IA_DETAIL,SC_A_DETAIL,PC_S_BASIC,IB_MOVEMENT,FI_DASH detailNode\n    class PC_SETUP,SC_NEW,PE_PROCESS,SC_N_SETUP processNode\n    class SHARED,STATUS_BADGES,SEARCH_FILTERS,DATE_PICKERS,EXPORT_TOOLS,PRINT_TOOLS,PROGRESS_BARS,ACTION_MENUS sharedNode\n```\n\n## Module Navigation Flow\n\n```mermaid\nflowchart LR\n    A[Main Navigation] --> B[Inventory Management]\n    B --> C{Select Module}\n\n    C -->|Dashboard| D[Inventory Dashboard]\n    C -->|Stock Overview| E[Stock Overview Menu]\n    C -->|Adjustments| F[Inventory Adjustments]\n    C -->|Spot Check| G[Spot Check]\n    C -->|Physical Count| H[Physical Count Management]\n    C -->|Period End| I[Period End]\n\n    E --> E1[Overview]\n    E --> E2[Inventory Balance]\n    E --> E3[Stock Cards]\n    E --> E4[Slow Moving]\n    E --> E5[Inventory Aging]\n\n    F --> F1[Adjustments List]\n    F1 --> F2[Adjustment Detail]\n\n    G --> G1[Spot Check Dashboard]\n    G1 --> G2[New Spot Check]\n    G1 --> G3[Active Checks]\n\n    H --> H1[Count Setup Wizard]\n    H1 --> H2[Active Count]\n\n    D -->|Quick Links| F1\n    D -->|Quick Links| G1\n    D -->|Quick Links| E\n\n    style D fill:#e1f5fe\n    style E fill:#f3e5f5\n    style F fill:#e8f5e8\n    style G fill:#fff3e0\n    style H fill:#fce4ec\n```\n\n## Data Flow Patterns\n\n```mermaid\nsequenceDiagram\n    participant U as User\n    participant D as Dashboard\n    participant L as List View\n    participant Det as Detail View\n    participant API as Backend API\n\n    U->>D: Access Inventory Management\n    D->>API: Fetch dashboard metrics\n    API->>D: Return aggregated data\n    D->>U: Display dashboard widgets\n\n    U->>D: Click \"View Adjustments\"\n    D->>L: Navigate to adjustments list\n    L->>API: Fetch adjustments with filters\n    API->>L: Return paginated results\n\n    U->>L: Apply search/filters\n    L->>API: Fetch filtered data\n    API->>L: Return filtered results\n\n    U->>L: Click adjustment row\n    L->>Det: Navigate to detail view\n    Det->>API: Fetch adjustment details\n    API->>Det: Return full adjustment data\n\n    U->>Det: Make changes\n    Det->>API: Submit updates\n    API->>Det: Confirm changes\n    Det->>L: Return to list with updates\n```\n\n## Workflow State Diagrams\n\n### Inventory Adjustment Workflow\n```mermaid\nstateDiagram-v2\n    [*] --> Draft\n    Draft --> Submitted : Submit for Approval\n    Draft --> Voided : Cancel/Delete\n    Submitted --> Under_Review : Automatic\n    Under_Review --> Approved : Approve\n    Under_Review --> Rejected : Reject\n    Under_Review --> Draft : Request Changes\n    Rejected --> Draft : Revise\n    Approved --> Posted : Post to Inventory\n    Posted --> [*] : Complete\n    Voided --> [*] : End Process\n```\n\n### Spot Check Workflow\n```mermaid\nstateDiagram-v2\n    [*] --> Planning\n    Planning --> Scheduled : Schedule Check\n    Scheduled --> In_Progress : Start Check\n    In_Progress --> Paused : Pause/Break\n    Paused --> In_Progress : Resume\n    In_Progress --> Completed : Complete All Items\n    Completed --> Under_Review : Submit Results\n    Under_Review --> Approved : Approve Results\n    Under_Review --> Requires_Adjustment : Variances Found\n    Requires_Adjustment --> Adjustment_Created : Create Adjustment\n    Adjustment_Created --> Completed : Complete Process\n    Approved --> [*] : Archive\n```\n\n### Physical Count Workflow\n```mermaid\nstateDiagram-v2\n    [*] --> Setup\n    Setup --> Location_Selection : Continue\n    Location_Selection --> Item_Review : Select Locations\n    Item_Review --> Final_Review : Review Items\n    Final_Review --> Scheduled : Schedule Count\n    Scheduled --> In_Progress : Start Count\n    In_Progress --> Counting : Begin Counting\n    Counting --> Variance_Review : Count Complete\n    Variance_Review --> Approved : No Significant Variances\n    Variance_Review --> Adjustment_Required : Variances Found\n    Adjustment_Required --> Adjustments_Created : Create Adjustments\n    Adjustments_Created --> Approved : Complete Process\n    Approved --> Posted : Post to System\n    Posted --> [*] : Archive Count\n```";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

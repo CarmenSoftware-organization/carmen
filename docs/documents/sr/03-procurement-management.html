@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature: Procurement Management System - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>SR</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">SR</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# Feature: Procurement Management System\n\n## Description\nThe Carmen ERP Procurement Management System provides a comprehensive end-to-end procurement workflow encompassing Purchase Requests, Purchase Orders, Goods Received Notes, Credit Notes, and My Approvals. The system features a sophisticated workflow engine with role-based approvals, vendor comparison capabilities, multi-level item management with pricing transparency controls, and integrated inventory tracking. The procurement process supports both manual entry and automated creation from templates, with real-time status tracking and document lifecycle management.\n\n## Process Flow (Step by Step)\n\n### Purchase Request Flow\n1. User navigates to `/procurement/purchase-requests` to view existing requests or create new ones\n2. System displays ModernPurchaseRequestList with filtering, sorting, and status-based organization\n3. User can create new PR via \"New PR\" button or from templates\n4. PR creation form loads with tabs: Items, Details, Budgets, Workflow, Attachments\n5. User adds items using ItemsTab component with search functionality and vendor comparison\n6. System applies role-based pricing visibility (user.context.showPrices controls price display)\n7. Workflow engine determines approval routing based on business rules and user roles\n8. PR submits for approval and enters workflow status tracking\n9. Approvers receive notifications and can view/approve via My Approvals section\n10. Upon approval, PR can be converted to Purchase Order automatically or manually\n\n### Purchase Order Flow\n11. Approved PRs convert to POs via `/procurement/purchase-orders/create/from-pr` workflow\n12. PO creation supports bulk operations and vendor consolidation\n13. PO tabs include: Items, Vendor Info, Financial Details, Related Documents, Activity Log\n14. System tracks PO status: Draft, Sent, Acknowledged, Partially Received, Completed\n15. Vendor receives PO and can update delivery schedules via vendor portal integration\n\n### Goods Received Note Flow\n16. Users create GRN from `/procurement/goods-received-note/new` with vendor/PO selection\n17. GRN creation wizard: PO Selection → Item Selection → Location Assignment → Confirmation\n18. System supports manual entry mode for non-PO receipts\n19. GRN tabs manage: Items, Stock Movement, Extra Costs, Tax, Financial Summary, Comments\n20. Stock movements automatically update inventory levels upon GRN completion\n21. System generates journal entries for accounting integration\n\n## Flow Diagram (Mermaid)\n```mermaid\nflowchart TD\n    A[Create Purchase Request] --> B[Add Items & Details]\n    B --> C{Requires Approval?}\n    C -->|Yes| D[Submit for Workflow Approval]\n    C -->|No| E[Auto-Approve PR]\n    D --> F[Approver Reviews in My Approvals]\n    F --> G{Approval Decision}\n    G -->|Approve| H[PR Approved]\n    G -->|Reject| I[Return to Requester]\n    G -->|Request Changes| J[Send Back for Modification]\n    E --> H\n    H --> K[Convert PR to PO]\n    K --> L[Create Purchase Order]\n    L --> M[Send to Vendor]\n    M --> N[Vendor Acknowledges]\n    N --> O[Goods Delivery]\n    O --> P[Create Goods Received Note]\n    P --> Q[Verify Items & Quantities]\n    Q --> R{Items Match?}\n    R -->|Yes| S[Complete GRN]\n    R -->|No| T[Create Credit Note/Adjustment]\n    S --> U[Update Inventory]\n    U --> V[Generate Journal Entries]\n    I --> W[Modify PR]\n    J --> W\n    W --> B\n    T --> X[Process Credit Note]\n    X --> Y[Adjust Financial Records]\n```\n\n## Screen Capture Locations\n- Capture: Purchase Requests list with various status filters and search functionality\n- Capture: PR detail page showing all tabs (Items, Details, Budgets, Workflow, Attachments)\n- Capture: Item addition form with vendor comparison modal open\n- Capture: My Approvals page showing pending approvals with workflow timeline\n- Capture: PO creation from PR with item consolidation and vendor selection\n- Capture: GRN creation wizard showing step-by-step process\n- Capture: GRN detail with stock movement tab showing inventory updates\n- Capture: Credit Note creation linked to GRN discrepancies\n- Capture: Role-based price visibility differences (staff vs manager view)\n\n## Schema Entities (Plain Text)\nPurchaseRequest: Core document with id, requestNumber, description, requestDate, requiredDate, department, requestedBy, status, workflow stage, priority level, and items array.\nPurchaseRequestItem: Individual line items with productId, description, quantity, unit, estimatedPrice, preferredVendor, notes, and status tracking.\nPurchaseOrder: Generated from PR with vendorId, orderDate, deliveryDate, terms, paymentTerms, currency, exchangeRate, and lineItems.\nGoodsReceiveNote: Receipt document with grnNumber, date, vendorId, invoiceNumber, receivedBy, items, stockMovements, extraCosts, and financialTotals.\nWorkflowStep: Approval stages with stepNumber, approverRole, status, comments, decisionDate, and nextStep routing.\nCreditNote: Adjustment document for discrepancies with originalGRN, reason, adjustmentType, items, and financial impact.\n\n## Major Procurement Features\n\n### Purchase Request Management\n- **List View**: Filter by status, date range, department, requester with search functionality\n- **Detail View**: Tabbed interface for Items, Details, Budgets, Workflow, Attachments\n- **Item Management**: Add/edit items with vendor comparison and price history\n- **Template System**: Reusable PR templates for common requests\n- **Workflow Integration**: Role-based approval routing with status tracking\n\n### Purchase Order Management\n- **Creation Methods**: Convert from PR, bulk creation, manual entry\n- **Vendor Management**: Vendor selection with pricelist integration\n- **Financial Controls**: Currency management, tax calculations, budget validation\n- **Document Tracking**: Status progression from draft to completion\n- **Related Documents**: Link to originating PRs and resulting GRNs\n\n### Goods Received Note Management\n- **Multi-Source Creation**: From PO, manual entry, or partial receipts\n- **Verification Process**: Item-by-item quantity and quality validation\n- **Inventory Integration**: Automatic stock level updates and location assignment\n- **Cost Management**: Handle extra costs, freight, taxes separately\n- **Discrepancy Handling**: Generate credit notes for variances\n\n### Approval Workflow System\n- **My Approvals**: Centralized approval queue for all pending items\n- **Workflow Engine**: Business rule-driven approval routing\n- **Decision Types**: Approve, reject, request changes, delegate approval\n- **Audit Trail**: Complete workflow history with timestamps and comments\n- **Escalation**: Automatic escalation for overdue approvals\n\n### Vendor Comparison & Pricing\n- **Price Comparison**: Side-by-side vendor pricing for items\n- **Historical Pricing**: Track price trends and vendor performance\n- **Role-Based Visibility**: Price display controlled by user permissions\n- **Vendor Rating**: Quality and delivery performance metrics\n\n## Ambiguities & Assumptions\nAssumption: Workflow approval rules are configured in System Administration and applied automatically based on user roles and document values.\nAssumption: Price visibility is controlled by user.context.showPrices setting, with different roles having different access levels.\nAmbiguity: The exact business rules for workflow routing (amount thresholds, department-specific approvals) are not explicitly defined in the code.\nAssumption: GRN creation automatically updates inventory levels and generates accounting journal entries.\nAmbiguity: Credit note approval workflow and its integration with the main procurement workflow is not clearly specified.\nAssumption: Multiple currencies are supported with automatic exchange rate conversion for reporting purposes.\nAssumption: Template system allows for both organization-wide and department-specific PR templates.\nAmbiguity: Integration points with external vendor portals and their data synchronization methods are not detailed.";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

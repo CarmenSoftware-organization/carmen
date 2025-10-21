@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting & Analytics Module - Sitemap - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / Reporting / Reporting Analytics Sitemap.md</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Reporting & Analytics Module - Sitemap\n\n> **Module:** Reporting & Analytics\n> **Total Pages:** 15-20\n> **Route Base:** `/reporting-analytics`\n\n---\n\n## Navigation Hierarchy\n\n```\nReporting & Analytics (15-20 pages)\n├── Main Dashboard (1 page)\n│   └── /reporting-analytics\n└── Consumption Analytics (14-19 pages)\n    ├── Enhanced Dashboard (2 pages)\n    │   ├── /reporting-analytics/consumption-analytics\n    │   └── Real-Time KPI Monitoring\n    ├── Fractional Sales Analytics (3 pages)\n    │   ├── Efficiency by Type\n    │   ├── Transaction Volume\n    │   └── Today's Distribution\n    ├── Variance Analysis (3 pages)\n    │   ├── Top Variance Ingredients\n    │   ├── Trend Analysis\n    │   └── Root Cause Identification\n    ├── Live Ingredient Tracking (2 pages)\n    │   ├── Real-Time Inventory Levels\n    │   └── Depletion Projections\n    ├── Efficiency Analysis (2 pages)\n    │   ├── Yield Efficiency Trends\n    │   └── Optimization Opportunities\n    ├── Executive Summary Dashboard (2 pages - planned)\n    │   ├── High-Level KPIs\n    │   └── Executive Reporting\n    └── Automated Reporting (2-5 pages - planned)\n        ├── Report Scheduling\n        ├── Email Distribution\n        └── Custom Report Builder\n```\n\n---\n\n## Page Details\n\n### 1. Main Dashboard (1 page)\n\n**Route:** `/reporting-analytics`\n\n**Status:** Coming Soon\n\n**Purpose**: Central hub for all reporting and analytics features.\n\n**Planned Features**:\n- Quick access to consumption analytics\n- Summary KPI widgets\n- Recent reports list\n- Scheduled reports management\n- Custom report builder access\n\n---\n\n### 2. Consumption Analytics Dashboard (2 pages)\n\n**Route:** `/reporting-analytics/consumption-analytics`\n\n**Status:** ✅ Production Ready\n\n**Purpose**: Enhanced real-time consumption tracking with fractional sales analytics.\n\n#### Main Dashboard Features\n\n**Page Components**:\n1. **Header Controls**:\n   - Location selector (Main Kitchen, Pastry Section, Bar Station)\n   - Time range selector (Today, This Week, This Month)\n   - Auto-refresh toggle (30-second intervals)\n   - Export button\n\n2. **Active Alerts Panel**:\n   - Critical, Warning, and Info severity levels\n   - Alert message and affected items\n   - Recommended actions\n   - Visual severity indicators (red, yellow, blue)\n\n3. **KPI Cards (6 metrics)**:\n   - Food Cost Percentage (Target: 30%)\n   - Waste Percentage (Target: 3%)\n   - Fractional Sales Rate (Conversion tracking)\n   - Average Transaction Value (Trend indicators)\n   - Profit Margin (Performance grading)\n   - Yield Efficiency (Performance rating)\n\n4. **Tab Navigation**:\n   - Overview\n   - Fractional Sales\n   - Variance Analysis\n   - Ingredients\n   - Efficiency\n\n#### Real-Time Data\n\n**Auto-Refresh Features**:\n- 30-second refresh interval (configurable)\n- Live KPI updates\n- Real-time alert generation\n- Dynamic chart updates\n- Automatic data synchronization\n\n**Data Sources**:\n- POS transaction stream\n- Inventory management system\n- Recipe management system\n- Consumption period tracking\n\n---\n\n### 3. Overview Tab (Part of Consumption Analytics - 1 page)\n\n**Features**:\n\n#### Consumption Trends Chart\n- **Chart Type**: Composed chart (bars + lines)\n- **Data**: 7-day rolling consumption\n- **Metrics**:\n  - Theoretical consumption (blue line)\n  - Actual consumption (green line)\n  - Waste amount (red bars)\n- **X-Axis**: Day (1-7)\n- **Y-Axis**: Cost ($)\n- **Tooltip**: Currency-formatted values\n\n#### Sales Distribution Chart\n- **Chart Type**: Stacked area chart\n- **Data**: Fractional vs whole item sales\n- **Metrics**:\n  - Fractional sales (purple area)\n  - Whole sales (cyan area)\n- **X-Axis**: Day (1-7)\n- **Y-Axis**: Transaction count\n- **Tooltip**: Transaction counts\n\n---\n\n### 4. Fractional Sales Tab (3 pages worth of content)\n\n**Features**:\n\n#### Efficiency by Type Chart\n- **Chart Type**: Dual-axis bar + line chart\n- **Types Tracked**:\n  - Pizza Slice (1/8 conversion)\n  - Cake Slice (1/12 conversion)\n  - Portion Control (variable)\n  - Bottle Glass (1/5 conversion)\n- **Left Y-Axis**: Revenue ($) and transaction count\n- **Right Y-Axis**: Efficiency percentage\n- **Metrics**:\n  - Revenue per type (green bars)\n  - Transactions per type (blue bars)\n  - Efficiency percentage (orange line)\n\n#### Real-Time Distribution Panel\n- **Today's Fractional Sales**: Total transaction count\n- **Breakdown by Type**:\n  - Pizza Slices: Count + percentage\n  - Cake Slices: Count + percentage\n  - Portions: Count + percentage\n  - Others: Count + percentage\n- **Visual**: Progress bars for each type\n- **Updates**: Real-time with auto-refresh\n\n#### Performance Metrics\n- **Efficiency Target**: 90%+\n- **Waste Target**: < 5%\n- **Revenue Contribution**: Percentage of total revenue\n- **Transaction Volume**: Daily/weekly/monthly trends\n\n---\n\n### 5. Variance Analysis Tab (3 pages worth of content)\n\n**Features**:\n\n#### Top Variance Ingredients List\n- **Display**: Ranked list (top 5 default, expandable)\n- **Columns**:\n  - Ingredient name\n  - Theoretical cost\n  - Actual cost\n  - Variance percentage\n  - Trend indicator (up/down/stable)\n- **Visual Indicators**:\n  - Green: < 8% variance (acceptable)\n  - Yellow: 8-15% variance (warning)\n  - Red: > 15% variance (critical)\n\n**Example Variance Items**:\n1. **Fresh Vegetables**: 13.6% variance (high, up trend)\n   - Theoretical: $125.00\n   - Actual: $142.00\n   - Recommended action: Improve storage procedures\n\n2. **Chicken Breast**: 11.4% variance (high, up trend)\n   - Theoretical: $210.00\n   - Actual: $234.00\n   - Recommended action: Review portion control\n\n3. **Fresh Herbs**: 6.7% variance (acceptable, stable)\n   - Theoretical: $45.00\n   - Actual: $48.00\n   - No action required\n\n#### Variance Drivers Analysis\n- **Wastage**: Spoilage, prep waste, disposal\n- **Over-Portioning**: Inconsistent portions, training gaps\n- **Ingredient Cost Changes**: Price fluctuations\n- **Recipe Deviation**: Non-standard preparation\n- **Spillage**: Accidental loss\n- **Theft**: Shrinkage, unauthorized use\n\n#### Statistical Analysis\n- **Mean Variance**: Average across all ingredients\n- **Median Variance**: Middle value (less affected by outliers)\n- **Standard Deviation**: Variance consistency measure\n- **Confidence Intervals**: Statistical confidence levels\n- **Outlier Detection**: Items beyond 2-3 standard deviations\n\n---\n\n### 6. Ingredients Tab (2 pages worth of content)\n\n**Features**:\n\n#### Live Ingredient Levels Grid\n- **Display**: Card grid (3 columns on desktop)\n- **Per Card Information**:\n  - Ingredient name\n  - Status badge (Adequate, Low, Critical, Out of Stock)\n  - Current level (numeric)\n  - Progress bar (vs reorder point)\n  - Reorder point threshold\n  - Projected depletion date\n\n**Status Thresholds**:\n- **Adequate** (Green): > 2x reorder point\n- **Low** (Yellow): Between reorder point and 2x reorder point\n- **Critical** (Red): Below reorder point\n- **Out of Stock** (Urgent): Zero inventory\n\n#### Depletion Projections\n- **Algorithm**: Consumption rate × remaining quantity\n- **Factors**:\n  - Historical consumption patterns\n  - Current sales velocity\n  - Day of week adjustments\n  - Seasonal variations\n- **Accuracy**: ± 1 day for stable consumption patterns\n\n#### Real-Time Updates\n- **Frequency**: Every 60 seconds\n- **Trigger Events**:\n  - New POS transaction\n  - Inventory adjustment\n  - Stock receipt\n  - Waste/spoilage recording\n\n---\n\n### 7. Efficiency Tab (2 pages worth of content)\n\n**Features**:\n\n#### Yield Efficiency Trends Chart\n- **Chart Type**: Dual-line chart\n- **Time Range**: 7-day rolling window\n- **Lines**:\n  - Target efficiency (blue dashed line, 95%)\n  - Actual efficiency (green solid line)\n- **Y-Axis Range**: 80-100%\n- **Tooltip**: Percentage format\n\n#### Optimization Opportunities Panel\n- **Display**: Prioritized list of improvement opportunities\n- **Per Opportunity**:\n  - Title and description\n  - Impact badge (High, Medium, Long Term)\n  - Detailed explanation\n  - Potential savings ($/day)\n  - Implementation button (\"View Details\")\n\n**Example Opportunities**:\n\n1. **Reduce Vegetable Waste**\n   - **Impact**: High\n   - **Description**: Improve storage and handling procedures to reduce 13.6% variance\n   - **Potential Savings**: $125.50/day\n   - **Action**: Review storage temperatures, rotation procedures, prep schedules\n\n2. **Optimize Portion Sizes**\n   - **Impact**: Medium\n   - **Description**: Standardize fractional portion sizes for better yield control\n   - **Potential Savings**: $89.25/day\n   - **Action**: Implement portion control tools, staff training\n\n3. **Recipe Standardization**\n   - **Impact**: Long Term\n   - **Description**: Update recipe specifications based on actual consumption patterns\n   - **Potential Savings**: $67.80/day\n   - **Action**: Analyze 30+ days of consumption data, revise recipes\n\n#### Efficiency Metrics\n- **Current Yield Efficiency**: 92.8%\n- **Target**: 95%\n- **Gap to Target**: 2.2 percentage points\n- **Trend**: Improving / Stable / Declining\n- **Projected Impact**: Cost savings if target achieved\n\n---\n\n### 8. Executive Summary Dashboard (2 pages - Planned)\n\n**Status:** 🚧 Planned\n\n**Purpose**: High-level executive dashboard with strategic KPIs and trends.\n\n**Planned Features**:\n- **Key Financial Metrics**:\n  - Total revenue (period)\n  - Total costs (period)\n  - Gross profit and margin\n  - Variance impact on profitability\n\n- **Strategic KPIs**:\n  - Food cost percentage trends\n  - Waste reduction progress\n  - Efficiency improvement rate\n  - Revenue per location\n\n- **Executive Charts**:\n  - Monthly P&L trends\n  - Location comparison matrix\n  - Category performance heatmap\n  - Improvement opportunity ranking\n\n- **Automated Insights**:\n  - Top 3 improvement opportunities\n  - Critical variances requiring attention\n  - Cost savings achieved (vs baseline)\n  - Forecasted next period performance\n\n---\n\n### 9. Automated Reporting (2-5 pages - Planned)\n\n**Status:** 🚧 Planned\n\n**Purpose**: Scheduled report generation and distribution system.\n\n#### Report Scheduling (1 page)\n\n**Features**:\n- **Schedule Types**:\n  - Daily summary (end of day)\n  - Weekly performance (Monday mornings)\n  - Monthly comprehensive (month-end + 1 day)\n  - Custom schedules (cron-like syntax)\n\n- **Report Templates**:\n  - Consumption analytics summary\n  - Variance analysis report\n  - Fractional sales performance\n  - Efficiency opportunities\n  - Executive summary\n\n- **Delivery Options**:\n  - Email distribution (multiple recipients)\n  - Shared folder (PDF/Excel)\n  - API webhook (JSON)\n  - Dashboard archive\n\n#### Custom Report Builder (2-3 pages)\n\n**Features**:\n- **Data Source Selection**:\n  - Consumption metrics\n  - Variance analysis\n  - Fractional sales\n  - Ingredient tracking\n  - Efficiency metrics\n\n- **Filter Configuration**:\n  - Date range (custom)\n  - Location filter\n  - Category filter\n  - Ingredient filter\n  - Recipe filter\n\n- **Metric Selection**:\n  - Drag-and-drop metric builder\n  - Calculated fields\n  - Aggregations (sum, average, min, max)\n  - Comparisons (vs prior period, vs budget)\n\n- **Visualization Options**:\n  - Chart type selection\n  - Table formatting\n  - Conditional formatting\n  - Export formats (PDF, Excel, CSV)\n\n#### Report Archive (1 page)\n\n**Features**:\n- **Report History**:\n  - Generated reports list\n  - Download links\n  - Regenerate option\n  - Archive/delete\n\n- **Report Metadata**:\n  - Generation timestamp\n  - Parameters used\n  - Data period\n  - Generated by (user/automated)\n\n---\n\n## Technical Integration\n\n### Data Flow\n\n```\nPOS System → Real-Time Transaction Stream → Consumption Tracking Engine\n    ↓\nRecipe System → Theoretical Consumption Calculator\n    ↓\nInventory System → Actual Consumption Tracker\n    ↓\nVariance Analysis Engine → Alert Generator\n    ↓\nDashboard Visualization Layer → User Interface\n```\n\n### Performance Requirements\n\n- **Dashboard Load**: < 2 seconds initial load\n- **Auto-Refresh**: < 500ms incremental update\n- **Chart Rendering**: < 1 second per chart\n- **Data Export**: < 5 seconds standard ranges\n- **WebSocket Latency**: < 100ms for real-time updates\n\n### Technology Stack\n\n- **Frontend**: React, TypeScript, Recharts\n- **Real-Time**: WebSocket connections\n- **State Management**: React hooks, React Query\n- **Charts**: Recharts (Composed, Area, Line, Bar, Scatter charts)\n- **UI Components**: Shadcn/ui (Cards, Tabs, Progress, Badges, Buttons)\n\n---\n\n## Component Files\n\n### Primary Components\n\n1. **enhanced-consumption-dashboard.tsx** (733 lines)\n   - Main dashboard orchestrator\n   - Tab management\n   - Real-time data handling\n   - Chart rendering\n   - Alert display\n\n2. **executive-summary-dashboard.tsx** (planned)\n   - High-level KPI cards\n   - Strategic trend charts\n   - Executive reporting interface\n\n3. **automated-reporting-dashboard.tsx** (planned)\n   - Report scheduling interface\n   - Custom report builder\n   - Report archive management\n\n4. **compliance-reports.tsx** (planned)\n   - Regulatory compliance reporting\n   - Audit trail reports\n   - Variance compliance tracking\n\n5. **cross-location-efficiency.tsx** (planned)\n   - Multi-location comparison\n   - Efficiency benchmarking\n   - Best practice sharing\n\n6. **fractional-comparison-reports.tsx** (planned)\n   - Detailed fractional sales analysis\n   - Cross-type comparisons\n   - Efficiency deep-dive\n\n7. **operational-dashboard.tsx** (planned)\n   - Operational metrics\n   - Shift-level analytics\n   - Staff performance tracking\n\n8. **recipe-variant-performance.tsx** (planned)\n   - Recipe-level consumption tracking\n   - Variant performance comparison\n   - Recipe optimization suggestions\n\n9. **time-pattern-analysis.tsx** (planned)\n   - Time-of-day consumption patterns\n   - Day-of-week trends\n   - Seasonal variations\n   - Predictive analytics\n\n---\n\n## Future Enhancements\n\n### Planned Features (Next 6 Months)\n\n1. **Predictive Analytics**:\n   - Machine learning consumption forecasting\n   - Automated variance pattern detection\n   - Anomaly detection and alerting\n\n2. **Mobile App**:\n   - Real-time KPI monitoring on mobile\n   - Push notifications for critical alerts\n   - Quick variance entry and review\n\n3. **Advanced Visualizations**:\n   - Interactive drill-down charts\n   - Heatmaps for pattern identification\n   - Sankey diagrams for cost flow\n   - Statistical process control charts\n\n4. **Expanded Reporting**:\n   - Custom dashboard builder\n   - Scheduled PDF reports via email\n   - API for third-party BI tool integration\n   - Data warehouse export\n\n5. **Enhanced Analytics**:\n   - Multi-location comparison dashboards\n   - Benchmark against industry standards\n   - What-if scenario modeling\n   - ROI calculator for improvements\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>
