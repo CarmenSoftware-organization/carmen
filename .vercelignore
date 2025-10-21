@@ -10,10 +10,11 @@ __tests__
 .next/cache
 *.log
 npm-debug.log*
+.serena
+generated
 
 # Docs (not needed for app)
-docs/documents
-docs/04-modules
+docs
 
 # Scripts
 optimize-images.mjs
@@ -25,3 +26,11 @@ optimize-pngs.sh
 # Temporary files
 *.tmp
 *.temp
+
+# Build artifacts
+tsconfig.tsbuildinfo
+web-bundles
+backup_cleanup_*
+.superdesign
+playwright-report
+prd
