@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Administration Module - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>System Administration</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">SA</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# System Administration Module\n\n> **Module Status:** ✅ Production Ready (Core Features) | 🚧 Partial (Advanced Features)\n> **Last Updated:** 2025-01-17\n> **Total Pages:** 47+ implemented pages\n> **Documentation Coverage:** Comprehensive\n\n---\n\n## 📚 Quick Navigation\n\n- [Module Overview](#module-overview)\n- [Sub-Modules](#sub-modules)\n- [Features Summary](#features-summary)\n- [Documentation Index](#documentation-index)\n- [Getting Started](#getting-started)\n\n---\n\n## Module Overview\n\nThe System Administration module provides comprehensive tools for managing system-wide configurations, user access, workflows, integrations, and security policies. This is the central hub for all administrative functions in the Carmen ERP system.\n\n### Purpose\n\n- **User & Access Management**: Manage users, roles, and permissions\n- **Workflow Configuration**: Configure approval workflows and business processes\n- **System Integration**: Connect with external systems (POS, ERP, etc.)\n- **Security & Compliance**: Enforce business rules and monitor compliance\n- **Location & Certification Management**: Manage organizational locations and certifications\n- **Monitoring**: Track system health and performance\n\n### Key Capabilities\n\n✅ **Permission Management** - Advanced RBAC and ABAC policy management\n✅ **Workflow Engine** - Configurable approval workflows\n✅ **POS Integration** - Complete Point of Sale system integration\n✅ **Location Management** - Multi-location support with hierarchy\n✅ **Business Rules** - Enforce organizational policies\n✅ **Certifications** - Track vendor and staff certifications\n✅ **User Management** - Complete user lifecycle management\n✅ **Account Code Mapping** - Financial system integration\n\n---\n\n## 📸 System Screenshots\n\n### Permission Management\n\n#### Role Management\n![Role Management List](./screenshots/role-management-list.png)\n*The Role Management interface displays a comprehensive hierarchy of 10 organizational roles including System Administrator, General Manager, Finance Director, Procurement Manager, Kitchen Manager, Line Cook, Store Manager, Inventory Clerk, Vendor Manager, and Accountant. Each role shows permission counts, user assignments, hierarchy levels (1-5), and status indicators (Active/Inactive) for effective role-based access control management.*\n\n#### Policy Management\n![Policy Management List](./screenshots/policy-management-list.png)\n*The Policy Management screen shows 6 RBAC policies including Finance Manager Access, General Staff Access, Inventory Management Access, Procurement Management Access, Store Manager Access, and Vendor Management Access. Each policy displays its category, resource types, effects (PERMIT), priority level (100), and enabled status for comprehensive attribute-based access control configuration.*\n\n### User & Location Management\n\n#### User Management\n![User Management List](./screenshots/user-management-list.png)\n*The User Management interface displays 5 system users with complete profile information: John Doe (General Manager), Sarah Johnson (Purchasing Agent), Michael Chen (Executive Chef), Emily Rodriguez (Finance Director), and David Park (Store Manager). Each entry shows role assignments, department affiliations, permissions, approval limits, and status for comprehensive user lifecycle management.*\n\n#### Location Management\n![Location Management List](./screenshots/location-management-list.png)\n*The Location Management screen shows 5 business locations including Chicago Processing Plant, LA Distribution, Miami Seafood Center, NYC Restaurant Central Kitchen, and Phoenix Dry Storage. Each location displays location codes, types, EOP status, delivery points, and active/inactive status for multi-location organizational structure management.*\n\n### Workflow & Business Rules\n\n#### Workflow Configuration\n![Workflow Configuration List](./screenshots/workflow-configuration-list.png)\n*The Workflow Configuration interface displays 2 workflow configurations: General Purchase Workflow (6 stages) and Market List Workflow (4 stages). Each workflow shows workflow type (Purchase Request), number of stages, active users, status, and last modified dates for managing approval processes and business logic.*\n\n#### Business Rules Dashboard\n![Business Rules Management](./screenshots/business-rules-management.png)\n*The Business Rules Dashboard provides comprehensive oversight with 3 active rules showing a 94.5% success rate, 92.3% compliance score, and 1 critical violation alert. Detailed rules include Pizza Cutting Standards, Pizza Slice Holding Time Limits, and Cake Cutting Standards, each displaying category (fractional sales, food safety), priority levels (8-10), success rates (91-97.8%), and trigger conditions.*\n\n### Financial Configuration\n\n#### Account Code Mapping\n![Account Code Mapping](./screenshots/account-code-mapping.png)\n*The Account Code Mapping interface displays a mapping table with 6 entries showing the relationship between Store/Location, Category, Sub-Category, Item Group, Department, and Account Code. The \"Posting to AP\" view provides search, scan, import/export, edit, and print functions for financial system integration.*\n\n### User Dashboard\n\n#### Administrator Dashboard\n![User Dashboard](./screenshots/user-dashboard.png)\n*The User Dashboard provides an overview with 5 total users (2 active, 2 inactive, 1 pending). The interface shows user listings including John Doe, Jane Smith, Bob Johnson (pending), Alice Williams, and Tom Davis, with search functionality and an add user button for quick user administration.*\n\n### POS System Integration\n\n#### POS Configuration Settings\n![POS Settings Config](./screenshots/pos-settings-config.png)\n*The POS Configuration settings page features three main sections: POS System Selection (with dropdown and interface type selection), Connection Settings (API endpoint URL, security token, test connection), and Data Format Settings (field mapping table showing 4 mappings for Item Code, Description, Price, and Quantity). The interface includes breadcrumb navigation, keyboard shortcuts (Alt+S Save, Alt+T Test), and comprehensive help documentation for Point of Sale system integration.*\n\n#### POS Location Mapping\n![POS Mapping Locations](./screenshots/pos-mapping-locations.png)\n*The POS Location Mapping interface displays 8 location mappings (LOC001-LOC008) showing integration between various POS system types including Comanche, HotelTime, Infrasys, and Soraso. Each mapping shows status tracking with last sync dates for maintaining synchronized location data across systems.*\n\n#### POS Recipe Mapping (Fractional Sales)\n![POS Mapping Recipes](./screenshots/pos-mapping-recipes.png)\n*The POS Recipe Mapping interface demonstrates the fractional sales system with 10 recipe entries. Key feature: Chocolate Pound Cake shows 4 fractional variants (POS005 Slice with 0.0625 conversion for 1/16th portions, POS005Q Quarter at 0.25, POS005H Half at 0.5, and POS005W Whole at 1.0). Standard recipes include Chicken Curry, Vegetable Pasta, Caesar Salad, and Margarita. The interface displays search functionality, filters, location/units/recipes tabs, and status tracking (Mapped/Unmapped/Error) for comprehensive menu item integration.*\n\n### Planned Features (Coming Soon)\n\nThe following screenshots document features that are planned but not yet implemented:\n\n#### General Settings\n![General Settings](./screenshots/general-settings.png)\n*Planned feature: System-wide general configuration settings for customizing Carmen ERP behavior and preferences. Coming in Q1 2026.*\n\n#### Notification Preferences\n![Notification Preferences](./screenshots/notification-preferences.png)\n*Planned feature: User-level and system-level notification configuration for alerts, emails, and in-app notifications. Coming in Q1 2026.*\n\n#### License Management\n![License Management](./screenshots/license-management.png)\n*Planned feature: Software licensing and subscription management interface for tracking feature access and user limits. Coming in Q1 2026.*\n\n#### Data Backup and Recovery\n![Data Backup and Recovery](./screenshots/data-backup-recovery.png)\n*Planned feature: Automated backup configuration and recovery tools for ensuring data protection and business continuity. Coming in Q1 2026.*\n\n---\n\n## Sub-Modules\n\n### 1. Permission Management\n**Status:** ✅ Production Ready\n**Pages:** 12\n**Path:** `/system-administration/permission-management`\n\nAdvanced permission management with:\n- **Roles Management**: Create, edit, and assign roles\n- **Policy Management**: ABAC policies with visual policy builder\n- **Subscriptions**: License and feature subscription management\n- **Policy Builder**: Visual interface for creating complex policies\n\n**Key Features:**\n- Role-based access control (RBAC)\n- Attribute-based access control (ABAC)\n- Policy versioning and testing\n- Subscription tier management\n\n📄 **Documentation:** [Permission Management Specification](./permission-management-specification.md)\n\n---\n\n### 2. Business Rules & Compliance\n**Status:** ✅ Production Ready\n**Pages:** 2\n**Path:** `/system-administration/business-rules`\n\nConfigure and monitor business rules:\n- **Business Rules**: Define organizational policies and rules\n- **Compliance Monitoring**: Track compliance with regulatory requirements\n\n**Key Features:**\n- Rule definition and validation\n- Compliance dashboards\n- Violation tracking and alerts\n\n📄 **Documentation:** [Business Rules Specification](./business-rules-specification.md)\n\n---\n\n### 3. Certifications Management\n**Status:** ✅ Production Ready\n**Pages:** 3\n**Path:** `/system-administration/certifications`\n\nManage organizational certifications:\n- Certificate CRUD operations\n- Expiration tracking\n- Compliance documentation\n- Renewal workflows\n\n**Key Features:**\n- Vendor certifications\n- Staff certifications\n- Expiration alerts\n- Document management\n\n📄 **Documentation:** [Certifications Specification](./certifications-specification.md)\n\n---\n\n### 4. Location Management\n**Status:** ✅ Production Ready\n**Pages:** 4\n**Path:** `/system-administration/location-management`\n\nMulti-location organizational structure:\n- **Location CRUD**: Create, view, edit locations\n- **Location Hierarchy**: Parent-child relationships\n- **Location Settings**: Configure location-specific settings\n\n**Key Features:**\n- Hierarchical location structure\n- Location-specific configurations\n- Address and contact management\n- Location status tracking\n\n📄 **Documentation:** [Location Management Specification](./location-management-specification.md)\n\n---\n\n### 5. User Management\n**Status:** ✅ Production Ready\n**Pages:** 2\n**Path:** `/system-administration/user-management`\n\nComplete user lifecycle management:\n- User account creation\n- Profile management\n- Role assignment\n- Access control\n\n**Key Features:**\n- User CRUD operations\n- Role and permission assignment\n- Department and location assignment\n- User status management\n\n📄 **Documentation:** [User Management Specification](./user-management-specification.md)\n\n---\n\n### 6. Workflow Management\n**Status:** ✅ Production Ready\n**Pages:** 4\n**Path:** `/system-administration/workflow`\n\nConfigurable approval workflows:\n- **Workflow Configuration**: Define approval chains\n- **Role Assignment**: Assign roles to workflow steps\n- **Workflow Templates**: Reusable workflow patterns\n\n**Key Features:**\n- Visual workflow designer\n- Multi-step approval chains\n- Conditional routing\n- Escalation rules\n\n📄 **Documentation:** [Workflow Management Specification](./workflow-management-specification.md)\n\n---\n\n### 7. POS System Integration\n**Status:** ✅ Production Ready\n**Pages:** 15\n**Path:** `/system-administration/system-integrations/pos`\n\nComprehensive Point of Sale integration:\n\n#### Settings\n- **Configuration**: API endpoints, credentials\n- **System Settings**: Sync frequency, data mapping\n\n#### Mapping\n- **Locations**: Map POS locations to Carmen locations\n- **Units**: Map measurement units\n- **Recipes**: Map menu items to recipes\n- **Fractional Variants**: Handle portion sizes\n\n#### Reports\n- **Consumption**: Ingredient consumption from sales\n- **Gross Profit**: Profitability analysis\n\n#### Transactions\n- Real-time transaction sync\n- Historical data import\n\n**Key Features:**\n- Real-time data synchronization\n- Bi-directional data flow\n- Comprehensive mapping tools\n- Transaction reconciliation\n\n📄 **Documentation:** [POS Integration Specification](./pos-integration-specification.md)\n\n---\n\n### 8. Account Code Mapping\n**Status:** ✅ Production Ready\n**Pages:** 1\n**Path:** `/system-administration/account-code-mapping`\n\nFinancial system integration:\n- Map internal categories to GL accounts\n- Support for multiple accounting systems\n- Bulk import/export\n\n📄 **Documentation:** [Account Code Mapping Specification](./account-code-mapping-specification.md)\n\n---\n\n### 9. User Dashboard\n**Status:** ✅ Production Ready\n**Pages:** 1\n**Path:** `/system-administration/user-dashboard`\n\nAdministrator overview dashboard:\n- System health metrics\n- User activity summary\n- Recent changes log\n- Quick actions\n\n---\n\n### 10. Monitoring\n**Status:** ✅ Production Ready\n**Pages:** 1\n**Path:** `/system-administration/monitoring`\n\nSystem monitoring and health:\n- Performance metrics\n- Error tracking\n- Usage statistics\n- System alerts\n\n📄 **Documentation:** [Monitoring Specification](./monitoring-specification.md)\n\n---\n\n## Features Summary\n\n### Implemented Features\n\n| Feature | Status | Pages | Description |\n|---------|--------|-------|-------------|\n| **Permission Management** | ✅ Complete | 12 | RBAC/ABAC with policy builder |\n| **Business Rules** | ✅ Complete | 2 | Rule definition and compliance |\n| **Certifications** | ✅ Complete | 3 | Certification tracking |\n| **Location Management** | ✅ Complete | 4 | Multi-location support |\n| **User Management** | ✅ Complete | 2 | User lifecycle |\n| **Workflow** | ✅ Complete | 4 | Approval workflows |\n| **POS Integration** | ✅ Complete | 15 | Complete POS sync |\n| **Account Mapping** | ✅ Complete | 1 | Financial integration |\n| **User Dashboard** | ✅ Complete | 1 | Admin dashboard |\n| **Monitoring** | ✅ Complete | 1 | System health |\n\n### Future Enhancements\n\n| Feature | Priority | Status | Target |\n|---------|----------|--------|--------|\n| General Settings | Medium | 🚧 Planned | Q1 2026 |\n| Notification Preferences | Medium | 🚧 Planned | Q1 2026 |\n| License Management | Medium | 🚧 Planned | Q1 2026 |\n| Backup & Recovery | High | 🚧 Planned | Q1 2026 |\n| Audit Logs | Medium | 🚧 Planned | Q2 2026 |\n\n---\n\n## Documentation Index\n\n### Specifications\n- [Complete System Administration Specification](./system-administration-complete-specification.md)\n- [Permission Management Specification](./permission-management-specification.md)\n- [Business Rules Specification](./business-rules-specification.md)\n- [Certifications Specification](./certifications-specification.md)\n- [Location Management Specification](./location-management-specification.md)\n- [User Management Specification](./user-management-specification.md)\n- [Workflow Management Specification](./workflow-management-specification.md)\n- [POS Integration Specification](./pos-integration-specification.md)\n- [Monitoring Specification](./monitoring-specification.md)\n\n### Technical Documentation\n- [System Administration Sitemap](./system-administration-sitemap.md)\n- [API Documentation](./api/README.md)\n- [Component Documentation](./components/README.md)\n\n### User Guides\n- [Administrator Guide](./guides/administrator-guide.md)\n- [Permission Management Guide](./guides/permission-management-guide.md)\n- [Workflow Configuration Guide](./guides/workflow-guide.md)\n- [POS Integration Setup Guide](./guides/pos-integration-guide.md)\n\n---\n\n## Getting Started\n\n### For Administrators\n\n1. **User Management**\n   - Navigate to System Administration > User Management\n   - Create user accounts and assign roles\n   - Configure permissions and access levels\n\n2. **Workflow Setup**\n   - Go to Workflow Management\n   - Create approval workflows\n   - Assign approvers to workflow steps\n\n3. **POS Integration**\n   - Configure POS connection in System Integrations\n   - Map locations, units, and recipes\n   - Test synchronization\n\n### For Developers\n\n```typescript\n// Example: Check user permissions\nimport { userHasPermission } from '@/lib/types/guards';\n\nconst canApprove = userHasPermission(user, 'approve_purchase_request');\n```\n\n---\n\n## File Structure\n\n```\napp/(main)/system-administration/\n├── page.tsx                           # Main dashboard\n├── account-code-mapping/              # Financial mapping\n├── business-rules/                    # Business rules\n│   ├── page.tsx\n│   └── compliance-monitoring/\n├── certifications/                    # Certification mgmt\n│   ├── page.tsx\n│   ├── [id]/edit/\n│   └── create/\n├── location-management/               # Location mgmt\n│   ├── page.tsx\n│   ├── [id]/view/\n│   ├── [id]/edit/\n│   └── new/\n├── permission-management/             # RBAC/ABAC\n│   ├── page.tsx\n│   ├── roles/\n│   ├── policies/\n│   └── subscriptions/\n├── system-integrations/               # External integrations\n│   └── pos/                          # POS integration\n│       ├── settings/\n│       ├── mapping/\n│       ├── reports/\n│       └── transactions/\n├── user-management/                   # User mgmt\n│   ├── page.tsx\n│   └── [id]/\n├── workflow/                          # Workflow engine\n│   ├── page.tsx\n│   ├── role-assignment/\n│   └── workflow-configuration/\n├── user-dashboard/                    # Admin dashboard\n├── monitoring/                        # System monitoring\n└── [subItem]/                         # Dynamic routing\n```\n\n---\n\n## Related Modules\n\n- **Security Module** - ABAC policy implementation\n- **Finance Module** - Account code mapping integration\n- **Procurement Module** - Workflow usage\n- **User Profile** - User management integration\n\n---\n\n## Change Log\n\n| Version | Date | Changes |\n|---------|------|---------|\n| 1.0.0 | 2025-01-17 | Initial documentation created |\n\n---\n\n## Support & Contacts\n\n**Module Owner:** System Administration Team\n**Documentation:** documentation@carmen-erp.com\n**Technical Support:** support@carmen-erp.com\n\n---\n\n**Next:** [Permission Management Specification](./permission-management-specification.md)\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

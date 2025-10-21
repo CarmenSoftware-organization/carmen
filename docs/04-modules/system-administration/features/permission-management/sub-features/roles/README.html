@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roles Management - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / System Administration / Features</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Roles Management\n\n> **Feature:** Permission Management > Roles\n> **Pages:** 4\n> **Status:** ✅ Production Ready\n\n---\n\n## Overview\n\nThe Roles Management sub-feature provides a comprehensive interface for creating, managing, and assigning user roles within Carmen ERP. Roles serve as containers for permissions, enabling administrators to group related permissions and assign them to users efficiently.\n\n### Key Features\n\n1. **Role Creation & Editing** - Define roles with custom permissions and hierarchy\n2. **Hierarchical Structure** - Support parent-child role relationships with inheritance\n3. **User Assignment** - Assign roles to users individually or in bulk\n4. **Dual View Modes** - Switch between table and card views\n5. **System Roles** - Pre-defined roles that cannot be modified\n6. **Permission Inheritance** - Child roles automatically inherit parent permissions\n\n---\n\n## Page Structure\n\n### 1. Role List Page\n**Route:** `/system-administration/permission-management/roles`\n\n#### Components:\n- **Header Section**: Title, description, action buttons\n- **View Toggle**: Switch between table and card views\n- **Search & Filter**: Search by name, filter by department/hierarchy\n- **Bulk Actions**: Export, delete multiple roles\n- **Action Buttons**: Create Role, Settings\n\n#### Features:\n- Sortable columns (name, hierarchy, users, created date)\n- Quick actions menu for each role\n- User count indicators\n- System role badges\n- Status indicators\n\n#### User Actions:\n- **Create**: Opens role creation form\n- **View**: Navigate to role detail page\n- **Edit**: Opens role edit form\n- **Duplicate**: Clone existing role\n- **Assign Users**: Open user assignment dialog\n- **Delete**: Remove role (with confirmation)\n- **Export**: Export selected roles to CSV/Excel\n\n### 2. Create Role Page\n**Route:** `/system-administration/permission-management/roles/new`\n\n#### Form Fields:\n- **Basic Information**\n  - Name (required)\n  - Description (optional)\n  - Department (optional)\n\n- **Hierarchy**\n  - Hierarchy Level (0-100, required)\n  - Parent Roles (multi-select, optional)\n\n- **Permissions**\n  - Permission Categories (expandable tree)\n  - Individual Permissions (checkboxes)\n  - Search Permissions (filter)\n\n- **Advanced**\n  - System Role (checkbox, admin only)\n  - Active Status (toggle)\n\n#### Validation Rules:\n- Name must be unique\n- Hierarchy level cannot be higher than current user's role\n- Parent roles must have higher hierarchy\n- At least one permission must be selected\n- Cannot create circular hierarchy\n\n#### User Workflow:\n1. Fill basic information\n2. Set hierarchy level\n3. Select parent roles (optional)\n4. Choose permissions from tree\n5. Review and save\n6. Confirmation message with role ID\n\n### 3. Role Detail Page\n**Route:** `/system-administration/permission-management/roles/[id]`\n\n#### Sections:\n- **Role Overview**\n  - Name, description, status\n  - Hierarchy level indicator\n  - Created/updated metadata\n  - Edit button\n\n- **Statistics Cards**\n  - User Count\n  - Permission Count\n  - Parent Roles Count\n  - Inheritance Depth\n\n- **Permissions List**\n  - Grouped by category\n  - Inherited permissions marked\n  - Source role for inherited permissions\n\n- **Assigned Users**\n  - Table of users with this role\n  - Quick user actions\n  - Bulk unassign\n\n- **Activity Timeline**\n  - Recent changes to role\n  - User assignments/unassignments\n  - Permission modifications\n\n#### User Actions:\n- Edit role details\n- Assign/unassign users\n- View permission details\n- View role hierarchy\n- Delete role\n\n### 4. Edit Role Page\n**Route:** `/system-administration/permission-management/roles/edit/[id]`\n\n#### Features:\n- Pre-populated form with existing role data\n- Same validation as create form\n- Change tracking (highlights modified fields)\n- Version comparison (before/after)\n- Audit trail of changes\n\n#### Special Handling:\n- **System Roles**: Read-only mode, no editing allowed\n- **Active Roles**: Warning when modifying roles with users\n- **Hierarchy Changes**: Validation to prevent circular dependencies\n- **Permission Removal**: Warning when removing permissions that users rely on\n\n---\n\n## Data Model\n\n```typescript\ninterface Role {\n  // Identity\n  id: string;\n  name: string;\n  description: string;\n\n  // Hierarchy\n  hierarchy: number; // 0-100\n  parentRoles: string[]; // Parent role IDs\n\n  // Permissions\n  permissions: string[];\n  inheritedPermissions?: string[]; // Computed\n\n  // Classification\n  type: 'system' | 'custom' | 'department';\n  department?: string;\n  location?: string;\n\n  // Status\n  isSystemRole: boolean;\n  isActive: boolean;\n\n  // Statistics\n  userCount: number;\n\n  // Audit\n  createdBy: string;\n  createdAt: Date;\n  updatedBy: string;\n  updatedAt: Date;\n}\n```\n\n---\n\n## Component Architecture\n\n### RoleDataTable Component\n**File:** `components/permissions/role-manager/role-data-table.tsx`\n\n**Purpose**: Displays roles in table format with sorting, filtering, and pagination\n\n**Props**:\n- `columns`: Column definitions\n- `data`: Array of roles\n- `viewMode`: 'table' | 'card'\n- `onViewModeChange`: Callback for view mode toggle\n- `cardView`: React node for card view\n\n**Features**:\n- Column sorting\n- Multi-column filtering\n- Row selection\n- Pagination\n- Bulk actions\n\n### RoleCardView Component\n**File:** `components/permissions/role-manager/role-card-view.tsx`\n\n**Purpose**: Displays roles as cards with visual hierarchy indicators\n\n**Props**:\n- `data`: Array of roles\n- `selectedItems`: Array of selected role IDs\n- `onSelectItem`: Callback for item selection\n- `onSelectAll`: Callback for select all\n- `onView`, `onEdit`, `onDelete`, `onDuplicate`, `onAssignUsers`: Action callbacks\n\n**Features**:\n- Visual hierarchy representation\n- User count badges\n- System role indicators\n- Quick action menu\n- Multi-select mode\n\n### RoleForm Component\n**File:** `components/permissions/role-manager/role-form.tsx`\n\n**Purpose**: Form for creating and editing roles\n\n**Props**:\n- `role`: Optional existing role for editing\n- `onSave`: Callback with form data\n- `onCancel`: Callback for cancellation\n- `isLoading`: Loading state\n\n**Features**:\n- React Hook Form integration\n- Zod validation\n- Permission tree selector\n- Parent role multi-select\n- Real-time validation\n- Auto-save draft\n\n---\n\n## State Management\n\n### useRoleStore (Zustand)\n\n```typescript\ninterface RoleStore {\n  // State\n  roles: Role[];\n  selectedRole: Role | null;\n  isLoading: boolean;\n  error: string | null;\n\n  // Actions\n  fetchRoles: () => Promise<void>;\n  addRole: (data: RoleFormData) => Role;\n  updateRole: (id: string, data: Partial<Role>) => boolean;\n  deleteRole: (id: string) => boolean;\n  getRole: (id: string) => Role | undefined;\n  assignUsers: (roleId: string, userIds: string[]) => Promise<void>;\n\n  // Computed\n  getEffectivePermissions: (roleId: string) => string[];\n  getRoleHierarchy: (roleId: string) => Role[];\n}\n```\n\n**Store Location:** `lib/stores/role-store.ts`\n\n**Persistence**: LocalStorage (key: 'carmen-roles')\n\n---\n\n## API Integration\n\n### Endpoints\n\n#### GET /api/roles\nList all roles with optional filters\n\n**Query Parameters**:\n- `department`: Filter by department\n- `hierarchy`: Filter by hierarchy level\n- `type`: Filter by role type\n- `search`: Search term\n- `limit`, `offset`: Pagination\n\n**Response**:\n```json\n{\n  \"roles\": Role[],\n  \"total\": number,\n  \"limit\": number,\n  \"offset\": number\n}\n```\n\n#### POST /api/roles\nCreate a new role\n\n**Request Body**:\n```json\n{\n  \"name\": \"Department Manager\",\n  \"description\": \"Manages department operations\",\n  \"hierarchy\": 50,\n  \"permissions\": [\"view_users\", \"manage_inventory\"],\n  \"parentRoles\": [\"staff\"],\n  \"department\": \"procurement\"\n}\n```\n\n**Response**: `201 Created` with created role\n\n#### GET /api/roles/:id\nGet role details including effective permissions\n\n**Response**:\n```json\n{\n  \"role\": Role,\n  \"users\": User[],\n  \"effectivePermissions\": string[]\n}\n```\n\n#### PUT /api/roles/:id\nUpdate role details\n\n**Request Body**: Partial<Role>\n\n**Response**: `200 OK` with updated role\n\n#### DELETE /api/roles/:id\nDelete a role\n\n**Query Parameters**:\n- `force`: boolean - Force delete even if users assigned\n\n**Response**: `204 No Content`\n\n#### POST /api/roles/:id/assign\nAssign users to role\n\n**Request Body**:\n```json\n{\n  \"userIds\": [\"user1\", \"user2\"]\n}\n```\n\n**Response**:\n```json\n{\n  \"assigned\": 2,\n  \"failed\": 0,\n  \"errors\": []\n}\n```\n\n---\n\n## Business Rules\n\n### Role Creation\n\n1. **Name Uniqueness**: Role names must be unique within organization\n2. **Hierarchy Constraint**: User can only create roles with hierarchy ≤ own hierarchy - 10\n3. **Parent Role Validation**: Parent roles must have hierarchy > child role\n4. **Permission Requirement**: At least one permission must be assigned\n5. **System Role Restriction**: Only super admins can create system roles\n\n### Role Modification\n\n1. **System Role Protection**: System roles cannot be edited or deleted\n2. **Active Role Warning**: Warn when modifying roles with assigned users\n3. **Hierarchy Change Validation**: Cannot create circular dependencies\n4. **Permission Removal Impact**: Show users affected by permission removal\n\n### Role Assignment\n\n1. **Department Scope**: Users can only assign roles within their department\n2. **Hierarchy Enforcement**: Users can only assign roles with hierarchy ≤ own hierarchy\n3. **Multi-Role Support**: Users can have multiple roles (permissions aggregate)\n4. **Conflict Detection**: Warn if role assignments create permission conflicts\n\n### Permission Inheritance\n\n1. **Automatic Inheritance**: Child roles inherit all parent permissions\n2. **Transitive Inheritance**: Inheritance follows full hierarchy chain\n3. **No Duplicate**: Inherited permissions don't duplicate direct permissions\n4. **Real-time Update**: Permission changes propagate immediately\n\n---\n\n## User Guide\n\n### Creating a Role\n\n**Step 1: Navigate to Roles**\n- Go to System Administration → Permission Management → Roles\n- Click \"Create Role\" button\n\n**Step 2: Fill Basic Information**\n- Enter unique role name\n- Add descriptive text\n- Select department (optional)\n\n**Step 3: Set Hierarchy**\n- Choose hierarchy level (0-100)\n- Higher number = more privileged\n- Must be lower than your own role\n\n**Step 4: Select Parent Roles** (Optional)\n- Choose roles to inherit permissions from\n- Parent roles must have higher hierarchy\n- Can select multiple parents\n\n**Step 5: Assign Permissions**\n- Browse permission categories\n- Check desired permissions\n- Use search to find specific permissions\n- Inherited permissions shown as read-only\n\n**Step 6: Review and Save**\n- Review all settings\n- Click \"Create Role\"\n- Confirmation message appears\n\n### Editing a Role\n\n1. Navigate to Roles list\n2. Find role to edit\n3. Click Edit action\n4. Modify fields as needed\n5. Save changes\n\n**Note**: Cannot edit system roles\n\n### Assigning Users to Role\n\n**Method 1: From Role Detail**\n1. Navigate to role detail page\n2. Click \"Assign Users\" button\n3. Search for users\n4. Select users to assign\n5. Click \"Assign\"\n\n**Method 2: From Role List**\n1. Click role action menu\n2. Select \"Assign Users\"\n3. Follow assignment dialog\n\n---\n\n## Troubleshooting\n\n### Issue: Cannot create role\n\n**Symptoms**: Create button disabled or error on save\n\n**Solutions**:\n- Check if you have `manage_roles` permission\n- Verify hierarchy level is valid\n- Ensure role name is unique\n- Check for required fields\n\n### Issue: Permission not taking effect\n\n**Symptoms**: User doesn't have expected permissions\n\n**Solutions**:\n- Clear user session and re-login\n- Verify role is assigned to user\n- Check role is active\n- Review permission inheritance chain\n\n### Issue: Circular dependency error\n\n**Symptoms**: Cannot save role with parent selection\n\n**Solutions**:\n- Check parent role hierarchy\n- Remove circular parent selections\n- Verify inheritance chain\n\n### Issue: Cannot delete role\n\n**Symptoms**: Delete action fails or disabled\n\n**Solutions**:\n- Check if role is assigned to users (unassign first)\n- Verify role is not a system role\n- Ensure you have delete permission\n- Use force delete flag if necessary\n\n---\n\n## Screenshots\n\nSee [screenshots directory](./screenshots/) for visual examples.\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

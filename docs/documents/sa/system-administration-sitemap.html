@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Administration Module - Complete Sitemap - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← All Modules</a>
+            <h1>System Administration</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../index.html">Module Overview</a></li>
+                    <li><a href="../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../index.html">Documentation</a> / <a href="../index.html">SA</a></div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# System Administration Module - Complete Sitemap\n\n> **Module:** System Administration\n> **Total Pages:** 47+\n> **Last Updated:** 2025-01-17\n\n---\n\n## Navigation Hierarchy\n\n```\nSystem Administration\n├── Dashboard (Landing Page)\n│   └── /system-administration\n│\n├── Permission Management\n│   ├── /system-administration/permission-management\n│   │\n│   ├── Roles\n│   │   ├── /system-administration/permission-management/roles\n│   │   ├── /system-administration/permission-management/roles/new\n│   │   ├── /system-administration/permission-management/roles/[id]\n│   │   └── /system-administration/permission-management/roles/edit/[id]\n│   │\n│   ├── Policies\n│   │   ├── /system-administration/permission-management/policies\n│   │   ├── /system-administration/permission-management/policies/simple\n│   │   ├── /system-administration/permission-management/policies/builder\n│   │   ├── /system-administration/permission-management/policies/demo\n│   │   ├── /system-administration/permission-management/policies/[id]\n│   │   └── /system-administration/permission-management/policies/[id]/edit\n│   │\n│   └── Subscriptions\n│       ├── /system-administration/permission-management/subscription\n│       └── /system-administration/permission-management/subscriptions\n│\n├── Business Rules\n│   ├── /system-administration/business-rules\n│   └── /system-administration/business-rules/compliance-monitoring\n│\n├── Certifications\n│   ├── /system-administration/certifications\n│   ├── /system-administration/certifications/create\n│   └── /system-administration/certifications/[id]/edit\n│\n├── Location Management\n│   ├── /system-administration/location-management\n│   ├── /system-administration/location-management/new\n│   ├── /system-administration/location-management/[id]/view\n│   └── /system-administration/location-management/[id]/edit\n│\n├── User Management\n│   ├── /system-administration/user-management\n│   └── /system-administration/user-management/[id]\n│\n├── Workflow\n│   ├── /system-administration/workflow\n│   ├── /system-administration/workflow/role-assignment\n│   ├── /system-administration/workflow/workflow-configuration\n│   └── /system-administration/workflow/workflow-configuration/[id]\n│\n├── System Integrations\n│   ├── /system-administration/system-integrations\n│   ├── /system-administration/system-integration\n│   │\n│   └── POS Integration\n│       ├── /system-administration/system-integration/pos\n│       ├── /system-administration/system-integrations/pos\n│       │\n│       ├── Settings\n│       │   ├── /system-administration/system-integrations/pos/settings\n│       │   ├── /system-administration/system-integrations/pos/settings/config\n│       │   └── /system-administration/system-integrations/pos/settings/system\n│       │\n│       ├── Mapping\n│       │   ├── /system-administration/system-integrations/pos/mapping/locations\n│       │   ├── /system-administration/system-integrations/pos/mapping/units\n│       │   ├── /system-administration/system-integrations/pos/mapping/recipes\n│       │   └── /system-administration/system-integrations/pos/mapping/recipes/fractional-variants\n│       │\n│       ├── Reports\n│       │   ├── /system-administration/system-integrations/pos/reports\n│       │   ├── /system-administration/system-integrations/pos/reports/consumption\n│       │   └── /system-administration/system-integrations/pos/reports/gross-profit\n│       │\n│       └── Transactions\n│           └── /system-administration/system-integrations/pos/transactions\n│\n├── Account Code Mapping\n│   └── /system-administration/account-code-mapping\n│\n├── User Dashboard\n│   └── /system-administration/user-dashboard\n│\n└── Monitoring\n    └── /system-administration/monitoring\n```\n\n---\n\n## Page Count by Sub-Module\n\n| Sub-Module | Page Count | Status |\n|------------|------------|--------|\n| Permission Management | 12 | ✅ Complete |\n| POS Integration | 15 | ✅ Complete |\n| Location Management | 4 | ✅ Complete |\n| Workflow | 4 | ✅ Complete |\n| Certifications | 3 | ✅ Complete |\n| Business Rules | 2 | ✅ Complete |\n| User Management | 2 | ✅ Complete |\n| Account Code Mapping | 1 | ✅ Complete |\n| User Dashboard | 1 | ✅ Complete |\n| Monitoring | 1 | ✅ Complete |\n| System Integrations (main) | 2 | ✅ Complete |\n| **TOTAL** | **47** | **✅ Complete** |\n\n---\n\n## Detailed Page Descriptions\n\n### Permission Management (12 pages)\n\n#### Roles Management (4 pages)\n1. **Roles List** `/roles` - View all roles with filtering\n2. **New Role** `/roles/new` - Create new role\n3. **Role Detail** `/roles/[id]` - View role details and assignments\n4. **Edit Role** `/roles/edit/[id]` - Edit role properties\n\n#### Policies Management (7 pages)\n1. **Policies List** `/policies` - View all ABAC policies\n2. **Simple Policy** `/policies/simple` - Basic policy interface\n3. **Policy Builder** `/policies/builder` - Visual policy builder\n4. **Policy Demo** `/policies/demo` - Policy demonstration\n5. **Policy Detail** `/policies/[id]` - View policy details\n6. **Edit Policy** `/policies/[id]/edit` - Edit policy\n7. **Permission Management Home** `/permission-management` - Overview\n\n#### Subscriptions (2 pages)\n1. **Subscription** `/subscription` - Subscription management\n2. **Subscriptions** `/subscriptions` - Multiple subscription view\n\n---\n\n### POS Integration (15 pages)\n\n#### Settings (3 pages)\n1. **Settings Main** `/pos/settings` - POS settings overview\n2. **Configuration** `/pos/settings/config` - API & connection config\n3. **System Settings** `/pos/settings/system` - System-wide POS settings\n\n#### Mapping (4 pages)\n1. **Locations Mapping** `/pos/mapping/locations` - Map POS locations\n2. **Units Mapping** `/pos/mapping/units` - Map measurement units\n3. **Recipes Mapping** `/pos/mapping/recipes` - Map menu items\n4. **Fractional Variants** `/pos/mapping/recipes/fractional-variants` - Portion sizes\n\n#### Reports (3 pages)\n1. **Reports Home** `/pos/reports` - POS reports overview\n2. **Consumption Report** `/pos/reports/consumption` - Ingredient usage\n3. **Gross Profit Report** `/pos/reports/gross-profit` - Profitability\n\n#### Transactions (1 page)\n1. **Transactions** `/pos/transactions` - POS transaction sync\n\n#### Integration Home (2 pages)\n1. **POS Home** `/system-integration/pos` - POS integration landing\n2. **POS Main** `/system-integrations/pos` - POS integration main\n\n#### System Integrations Home (1 page)\n1. **Integrations** `/system-integrations` - All integrations overview\n\n---\n\n### Location Management (4 pages)\n\n1. **Locations List** `/location-management` - Browse all locations\n2. **New Location** `/location-management/new` - Create location\n3. **View Location** `/location-management/[id]/view` - Location details\n4. **Edit Location** `/location-management/[id]/edit` - Modify location\n\n**Features:**\n- Hierarchical location structure\n- Address management\n- Contact information\n- Location status tracking\n\n---\n\n### Workflow (4 pages)\n\n1. **Workflow Home** `/workflow` - Workflow management overview\n2. **Role Assignment** `/workflow/role-assignment` - Assign roles to workflows\n3. **Workflow Configuration** `/workflow/workflow-configuration` - Configure workflows\n4. **Edit Workflow** `/workflow/workflow-configuration/[id]` - Edit specific workflow\n\n**Features:**\n- Multi-step approval chains\n- Conditional routing\n- Role-based assignments\n- Escalation rules\n\n---\n\n### Certifications (3 pages)\n\n1. **Certifications List** `/certifications` - View all certifications\n2. **Create Certification** `/certifications/create` - Add new certification\n3. **Edit Certification** `/certifications/[id]/edit` - Modify certification\n\n**Features:**\n- Vendor certifications\n- Staff certifications\n- Expiration tracking\n- Document attachments\n\n---\n\n### Business Rules (2 pages)\n\n1. **Business Rules** `/business-rules` - Configure organizational rules\n2. **Compliance Monitoring** `/business-rules/compliance-monitoring` - Track compliance\n\n**Features:**\n- Rule definition\n- Violation tracking\n- Compliance dashboards\n- Automated alerts\n\n---\n\n### User Management (2 pages)\n\n1. **Users List** `/user-management` - Manage all users\n2. **User Detail** `/user-management/[id]` - View/edit user\n\n**Features:**\n- User CRUD operations\n- Role assignment\n- Department/location assignment\n- Status management\n\n---\n\n### Account Code Mapping (1 page)\n\n1. **Account Mapping** `/account-code-mapping` - Map accounts to GL codes\n\n**Features:**\n- Financial system integration\n- Category to GL code mapping\n- Bulk import/export\n\n---\n\n### User Dashboard (1 page)\n\n1. **Dashboard** `/user-dashboard` - Admin overview\n\n**Features:**\n- System health metrics\n- User activity\n- Recent changes\n- Quick actions\n\n---\n\n### Monitoring (1 page)\n\n1. **Monitoring** `/monitoring` - System monitoring\n\n**Features:**\n- Performance metrics\n- Error tracking\n- Usage statistics\n- Alert management\n\n---\n\n## User Flows\n\n### Common User Journeys\n\n#### 1. Create New User\n```\n/system-administration\n  → User Management\n    → /user-management\n      → [Add New User]\n        → Fill form\n          → Assign roles (/permission-management/roles)\n            → Save\n```\n\n#### 2. Configure POS Integration\n```\n/system-administration\n  → System Integrations\n    → /system-integrations/pos\n      → Settings (/pos/settings/config)\n        → Configure API\n          → Mapping (/pos/mapping/locations)\n            → Map locations\n              → Test sync (/pos/transactions)\n```\n\n#### 3. Create Approval Workflow\n```\n/system-administration\n  → Workflow\n    → /workflow/workflow-configuration\n      → Create new workflow\n        → Define steps\n          → Assign roles (/workflow/role-assignment)\n            → Save and activate\n```\n\n---\n\n## Access Control\n\n### Role-Based Access\n\n| Feature | Admin | Manager | Staff |\n|---------|-------|---------|-------|\n| User Management | Full | View | None |\n| Permission Management | Full | None | None |\n| Workflow Config | Full | Limited | None |\n| POS Integration | Full | View | None |\n| Location Management | Full | Edit Own | View |\n| Business Rules | Full | View | None |\n| Certifications | Full | Manage Own | View Own |\n\n---\n\n## Technical Notes\n\n### Dynamic Routes\n\n- `[id]` - Resource identifier\n- `[subItem]` - Dynamic sub-navigation\n\n### Route Guards\n\nAll routes implement permission checks using ABAC policies.\n\n```typescript\n// Example permission check\nif (!userHasPermission(user, 'manage_users')) {\n  redirect('/unauthorized');\n}\n```\n\n---\n\n## Related Documentation\n\n- [System Administration README](./README.md)\n- [Permission Management Specification](./permission-management-specification.md)\n- [POS Integration Specification](./pos-integration-specification.md)\n- [Workflow Management Specification](./workflow-management-specification.md)\n\n---\n\n**Last Updated:** 2025-01-17\n**Module Version:** 1.0.0\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>

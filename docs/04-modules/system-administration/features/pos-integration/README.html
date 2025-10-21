@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Integration - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / System Administration / Features</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# POS Integration\n\n> **Feature:** System Administration > POS Integration\n> **Pages:** 15\n> **Status:** ✅ Production Ready\n\n---\n\n## Overview\n\nThe POS Integration feature provides comprehensive connectivity between Carmen ERP and external Point-of-Sale (POS) systems. This integration enables automated synchronization of sales data, inventory deductions, mapping of POS items to system recipes, and detailed reporting on consumption and profitability.\n\n### Key Capabilities\n\n1. **Real-Time Synchronization** - Automatic sync of sales transactions from POS to ERP\n2. **Intelligent Mapping** - Map POS items to recipes, units, and locations\n3. **Fractional Sales Management** - Handle pizza slices, cake portions, and multi-yield items\n4. **Consumption Tracking** - Monitor actual vs. theoretical ingredient usage\n5. **Profitability Analysis** - Calculate gross profit by category and item\n6. **Automated Inventory Deduction** - Automatic stock-out based on POS sales\n7. **Stock-out Approval Workflow** - Review and approve inventory deductions\n\n### Supported POS Systems\n\n- Comanche POS (Primary integration)\n- Square (via API connector)\n- Toast (via API connector)\n- Custom POS (via webhook integration)\n\n---\n\n## Feature Architecture\n\n```\nPOS Integration\n├── Setup (Configuration & Settings)\n│   ├── POS Configuration\n│   ├── System Settings\n│   └── Connection Status\n├── Mapping (Data Synchronization)\n│   ├── Recipe Mapping\n│   ├── Fractional Variants Mapping\n│   ├── Unit Mapping\n│   └── Location Mapping\n├── Operations (Transaction Management)\n│   ├── Transaction View\n│   ├── Failed Transactions\n│   └── Stock-out Review\n└── Reporting (Analytics)\n    ├── Gross Profit Report\n    ├── Consumption Report\n    └── Sales Analytics\n```\n\n---\n\n## Page Structure\n\n### 1. POS Integration Dashboard\n**Route:** `/system-administration/system-integrations/pos`\n\n#### Purpose\nCentral hub for POS integration management with real-time status and quick access to all features.\n\n#### Sections:\n\n**System Status Card**\n- Connection status (Connected/Disconnected)\n- Last sync timestamp\n- Alert indicators:\n  - Unmapped items count\n  - Failed transactions count\n  - Pending approvals count\n  - Unmapped fractional variants count\n- Quick action buttons to resolve issues\n\n**Setup Section**\n- POS Configuration\n- System Settings\n- Connection status with refresh\n- Quick setup access\n\n**Mapping Section**\n- Recipe Mapping (with unmapped count)\n- Unit Mapping\n- Location Mapping\n- Fractional Sales Management (pizza slices, cake portions)\n- Quick mapping access\n\n**Operations Section**\n- View Transactions\n- Failed Transactions (with count)\n- Stock-out Review (with pending count)\n- Quick operations access\n\n**Reporting Section**\n- Gross Profit Analysis\n- Consumption Report\n- Today's sales summary with progress bar\n\n**Recent Activity Table**\n- Recent transactions\n- Mapping updates\n- Stock-out approvals\n- Fractional sales activity\n- Time, type, description, status, actions\n\n### 2. POS Configuration\n**Route:** `/system-administration/system-integrations/pos/settings/config`\n\n#### Form Sections:\n\n**API Configuration**\n- POS System Type (dropdown: Comanche, Square, Toast, Custom)\n- API Endpoint URL\n- API Key/Token (secured input)\n- API Version\n- Connection timeout settings\n\n**Sync Settings**\n- Auto-sync enabled toggle\n- Sync frequency (minutes)\n- Sync time range (hours back to fetch)\n- Retry attempts on failure\n- Error notification recipients\n\n**Transaction Settings**\n- Transaction batch size\n- Include voided transactions toggle\n- Include refunds toggle\n- Minimum transaction amount filter\n\n**Advanced Settings**\n- Debug mode toggle\n- Webhook URL (for push updates)\n- Custom headers (JSON editor)\n- SSL certificate verification\n\n**Test Connection**\n- Test button to validate configuration\n- Connection status display\n- Error messages with troubleshooting tips\n\n### 3. System Settings\n**Route:** `/system-administration/system-integrations/pos/settings/system`\n\n#### Workflow Settings:\n\n**Stock-out Approval**\n- Require approval for stock-outs toggle\n- Auto-approve threshold amount\n- Approval routing (user/role)\n- Notification settings\n\n**Mapping Automation**\n- Auto-create recipes for unmapped items toggle\n- Default category for new items\n- Require manual review toggle\n\n**Notifications**\n- Email notifications for failed transactions\n- Slack/Teams webhooks for alerts\n- Notification frequency (immediate, daily digest)\n\n**Data Retention**\n- Transaction history retention (days)\n- Log retention (days)\n- Auto-archive old data toggle\n\n### 4. Recipe Mapping\n**Route:** `/system-administration/system-integrations/pos/mapping/recipes`\n\n#### Features:\n\n**Mapping Table**\n- Columns:\n  - POS Item ID\n  - POS Item Name\n  - POS Category\n  - Mapped Recipe (dropdown)\n  - Mapping Status (badge)\n  - Portion Size\n  - Actions\n- Filters:\n  - Status (Mapped, Unmapped, All)\n  - Category\n  - Search by name\n- Bulk actions:\n  - Bulk map to recipe\n  - Export mappings\n  - Import mappings (CSV)\n\n**Mapping Drawer**\n- POS item details\n- Recipe selector (searchable dropdown)\n- Portion size input\n- Unit selector\n- Cost override (optional)\n- Save mapping button\n\n**Auto-Mapping Suggestions**\n- AI-suggested mappings based on name similarity\n- Accept/reject suggestions\n- Confidence score indicator\n\n### 5. Fractional Variants Mapping\n**Route:** `/system-administration/system-integrations/pos/mapping/recipes/fractional-variants`\n\n#### Purpose\nManage mapping for items sold in fractions (pizza slices, cake slices, etc.).\n\n#### Features:\n\n**Fractional Recipe Table**\n- Base Recipe (e.g., \"Large Pepperoni Pizza\")\n- Total Yield (e.g., 8 slices)\n- POS Variant Items (list of slice SKUs)\n- Fractional Units (e.g., \"1/8 pizza\")\n- Inventory Deduction Logic\n- Status\n\n**Variant Mapping Interface**\n- Select base recipe\n- Define total yield (portions)\n- Map POS slice items\n- Set fractional deduction (1/8, 1/6, etc.)\n- Preview inventory impact\n\n**Supported Fractional Types**\n- Pizza (by slice)\n- Cakes (by slice/portion)\n- Whole items with partial sales\n- Multi-yield recipes (e.g., batch items)\n\n**Deduction Logic**\n- Automatic fractional inventory deduction\n- Rounding rules (nearest whole, ceiling, floor)\n- Threshold for full unit deduction\n- Audit trail of fractional deductions\n\n### 6. Unit Mapping\n**Route:** `/system-administration/system-integrations/pos/mapping/units`\n\n#### Purpose\nMap POS measurement units to system units with conversion factors.\n\n#### Mapping Table:\n- POS Unit (e.g., \"oz\", \"lb\", \"each\")\n- System Unit (dropdown)\n- Conversion Factor\n- Status\n- Actions\n\n#### Unit Converter:\n- Source unit\n- Target unit\n- Conversion factor calculation\n- Test conversion\n\n### 7. Location Mapping\n**Route:** `/system-administration/system-integrations/pos/mapping/locations`\n\n#### Purpose\nMap POS store locations to Carmen ERP locations.\n\n#### Mapping Table:\n- POS Location ID\n- POS Location Name\n- System Location (dropdown)\n- Default Department\n- Status\n- Actions\n\n#### Multi-Location Support:\n- Handle franchises\n- Central kitchen mappings\n- Transfer tracking between locations\n\n### 8. Transactions View\n**Route:** `/system-administration/system-integrations/pos/transactions`\n\n#### Features:\n\n**Transaction Table**\n- Columns:\n  - Transaction ID\n  - Date/Time\n  - POS Location\n  - Item Count\n  - Total Amount\n  - Status (Success, Failed, Pending)\n  - Actions\n- Filters:\n  - Date range\n  - Location\n  - Status\n  - Amount range\n- Bulk actions:\n  - Retry failed transactions\n  - Export to CSV\n  - Generate report\n\n**Transaction Detail Drawer**\n- Transaction header (ID, date, location, amount)\n- Line items table\n- Inventory deductions applied\n- Error details (if failed)\n- Retry/resolve buttons\n- Audit log\n\n**Failed Transaction Handling**\n- Error categorization\n- Retry logic\n- Manual resolution\n- Error notifications\n\n### 9. Stock-out Review\n**Route:** `/system-administration/system-integrations/pos/transactions/stock-out-review`\n\n#### Purpose\nReview and approve inventory deductions from POS sales before finalizing.\n\n#### Approval Queue Table:\n- Transaction ID\n- Date/Time\n- Location\n- Items Sold\n- Inventory Impact\n- Requester\n- Status\n- Actions (Approve, Reject, Review)\n\n#### Approval Workflow:\n1. POS transaction synced\n2. Inventory impact calculated\n3. Approval request generated\n4. Reviewer notified\n5. Review item details\n6. Approve/reject/request changes\n7. Inventory deducted (if approved)\n\n#### Bulk Approval:\n- Select multiple transactions\n- Review aggregate impact\n- Bulk approve/reject\n- Approval notes\n\n### 10. Reports Home\n**Route:** `/system-administration/system-integrations/pos/reports`\n\n#### Available Reports:\n- Gross Profit Analysis\n- Consumption Report\n- Sales Trends\n- Top Selling Items\n- Slow-Moving Items\n- Variance Analysis\n\n#### Quick Stats:\n- Today's sales\n- This week's sales\n- Top categories\n- Average transaction value\n\n### 11. Gross Profit Report\n**Route:** `/system-administration/system-integrations/pos/reports/gross-profit`\n\n#### Features:\n\n**Report Filters**\n- Date range\n- Location\n- Category\n- Item\n\n**Report Sections**\n\n**Summary Cards**\n- Total Sales Revenue\n- Total Cost of Goods Sold (COGS)\n- Gross Profit Amount\n- Gross Profit Margin %\n\n**Profit by Category**\n- Table with columns:\n  - Category\n  - Revenue\n  - COGS\n  - Gross Profit\n  - Margin %\n  - Units Sold\n- Bar chart visualization\n- Drill-down to items\n\n**Profit by Item**\n- Item name\n- Quantity sold\n- Revenue\n- Unit cost\n- Total COGS\n- Gross profit\n- Margin %\n- Sortable columns\n\n**Trend Analysis**\n- Line chart: Profit over time\n- Comparison to previous period\n- Seasonal trends\n\n**Export Options**\n- PDF report\n- Excel spreadsheet\n- CSV data\n\n### 12. Consumption Report\n**Route:** `/system-administration/system-integrations/pos/reports/consumption`\n\n#### Purpose\nCompare theoretical ingredient usage (based on recipes) vs. actual inventory deductions.\n\n#### Report Sections:\n\n**Variance Summary**\n- Total Theoretical Usage\n- Total Actual Usage\n- Total Variance\n- Variance %\n\n**Variance by Ingredient**\n- Table columns:\n  - Ingredient Name\n  - Theoretical Qty\n  - Actual Qty\n  - Variance Qty\n  - Variance %\n  - Value Impact\n  - Status (Over/Under/Normal)\n- Color-coded variance indicators\n- Drill-down to transactions\n\n**Variance Analysis**\n- Identify ingredients with high variance\n- Possible causes (wastage, theft, recipe errors)\n- Recommendations\n\n**Trend Charts**\n- Variance trends over time\n- By location\n- By category\n\n**Investigation Tools**\n- Filter by high variance threshold\n- Analyze specific time periods\n- Compare locations\n- Export detailed transaction log\n\n---\n\n## Data Models\n\n### POS Transaction\n\n```typescript\ninterface POSTransaction {\n  // Identity\n  id: string;\n  posTransactionId: string;\n  posSystemType: 'comanche' | 'square' | 'toast' | 'custom';\n\n  // Transaction Details\n  transactionDate: Date;\n  locationId: string;\n  locationName: string;\n  terminalId?: string;\n  employeeId?: string;\n\n  // Items\n  items: POSTransactionItem[];\n\n  // Totals\n  subtotal: number;\n  tax: number;\n  discount: number;\n  total: number;\n  currency: string;\n\n  // Processing\n  status: 'success' | 'failed' | 'pending' | 'processing';\n  syncedAt: Date;\n  errorMessage?: string;\n  retryCount: number;\n\n  // Inventory Impact\n  inventoryDeducted: boolean;\n  deductionApproved?: boolean;\n  approvedBy?: string;\n  approvedAt?: Date;\n\n  // Audit\n  createdAt: Date;\n  updatedAt: Date;\n}\n\ninterface POSTransactionItem {\n  id: string;\n  posItemId: string;\n  posItemName: string;\n  quantity: number;\n  unitPrice: number;\n  total: number;\n  modifiers?: POSModifier[];\n\n  // Mapping\n  recipeId?: string;\n  recipeName?: string;\n  isFractional: boolean;\n  fractionalDeduction?: {\n    baseRecipeId: string;\n    fractionalAmount: number; // e.g., 0.125 for 1/8\n    totalYield: number; // e.g., 8 slices\n  };\n\n  // Inventory\n  inventoryImpact?: IngredientDeduction[];\n}\n\ninterface POSModifier {\n  id: string;\n  name: string;\n  price: number;\n  recipeId?: string; // If modifier has recipe\n}\n\ninterface IngredientDeduction {\n  ingredientId: string;\n  ingredientName: string;\n  quantity: number;\n  unit: string;\n  cost: number;\n}\n```\n\n### POS Mapping\n\n```typescript\ninterface RecipeMapping {\n  id: string;\n  posItemId: string;\n  posItemName: string;\n  posCategory?: string;\n\n  recipeId: string;\n  recipeName: string;\n\n  portionSize: number;\n  portionUnit: string;\n\n  isFractional: boolean;\n  fractionalConfig?: FractionalConfig;\n\n  costOverride?: number;\n\n  status: 'active' | 'inactive';\n  autoMapped: boolean;\n  confidence?: number; // For AI suggestions\n\n  createdBy: string;\n  createdAt: Date;\n  updatedAt: Date;\n}\n\ninterface FractionalConfig {\n  baseRecipeId: string;\n  totalYield: number;\n  fractionalUnit: string; // e.g., \"1/8 pizza\"\n  deductionLogic: 'fractional' | 'threshold' | 'batch';\n  roundingRule: 'nearest' | 'ceiling' | 'floor';\n  thresholdForFullUnit?: number; // e.g., 6 slices triggers full pizza deduction\n}\n\ninterface UnitMapping {\n  id: string;\n  posUnit: string;\n  systemUnitId: string;\n  systemUnitName: string;\n  conversionFactor: number;\n  status: 'active' | 'inactive';\n}\n\ninterface LocationMapping {\n  id: string;\n  posLocationId: string;\n  posLocationName: string;\n  systemLocationId: string;\n  systemLocationName: string;\n  defaultDepartment?: string;\n  status: 'active' | 'inactive';\n}\n```\n\n### POS Configuration\n\n```typescript\ninterface POSConfiguration {\n  id: string;\n  organizationId: string;\n\n  // API Settings\n  posSystemType: 'comanche' | 'square' | 'toast' | 'custom';\n  apiEndpoint: string;\n  apiKey: string; // Encrypted\n  apiVersion?: string;\n  connectionTimeout: number; // seconds\n\n  // Sync Settings\n  autoSyncEnabled: boolean;\n  syncFrequency: number; // minutes\n  syncTimeRange: number; // hours back\n  retryAttempts: number;\n  errorNotificationEmails: string[];\n\n  // Transaction Settings\n  batchSize: number;\n  includeVoidedTransactions: boolean;\n  includeRefunds: boolean;\n  minTransactionAmount?: number;\n\n  // Advanced\n  debugMode: boolean;\n  webhookUrl?: string;\n  customHeaders?: Record<string, string>;\n  verifySsl: boolean;\n\n  // Status\n  connectionStatus: 'connected' | 'disconnected' | 'error';\n  lastSync?: Date;\n  lastError?: string;\n\n  createdAt: Date;\n  updatedAt: Date;\n}\n\ninterface SystemSettings {\n  // Stock-out Approval\n  requireStockoutApproval: boolean;\n  autoApproveThreshold?: number;\n  approvalRoutingUserId?: string;\n  approvalRoutingRoleId?: string;\n\n  // Mapping Automation\n  autoCreateRecipes: boolean;\n  defaultCategory?: string;\n  requireManualReview: boolean;\n\n  // Notifications\n  emailNotificationsEnabled: boolean;\n  slackWebhookUrl?: string;\n  teamsWebhookUrl?: string;\n  notificationFrequency: 'immediate' | 'daily_digest';\n\n  // Data Retention\n  transactionRetentionDays: number;\n  logRetentionDays: number;\n  autoArchive: boolean;\n}\n```\n\n---\n\n## Component Architecture\n\n### POSIntegrationDashboard\n**File:** `app/(main)/system-administration/system-integrations/pos/page.tsx`\n\n**Features**:\n- System status overview\n- Quick action cards (Setup, Mapping, Operations, Reporting)\n- Alert indicators\n- Recent activity table\n- Responsive grid layout\n\n### MappingDataTable\n**File:** `pos/mapping/components/data-table.tsx`\n\n**Props**:\n- `data`: Array of mapping items\n- `columns`: Column definitions\n- `filters`: Active filters\n- `onMapItem`: Mapping callback\n- `onBulkAction`: Bulk operation callback\n\n**Features**:\n- Sortable columns\n- Advanced filtering\n- Bulk selection\n- Quick actions menu\n- Export functionality\n\n### TransactionDetailDrawer\n**Features**:\n- Transaction header\n- Line items table\n- Inventory impact breakdown\n- Error details\n- Action buttons (retry, resolve)\n- Audit trail\n\n### FractionalVariantMapper\n**Features**:\n- Base recipe selector\n- Yield configuration\n- POS variant mapping\n- Deduction logic settings\n- Preview calculations\n\n### GrossProfitChart\n**Features**:\n- Recharts integration\n- Category breakdown\n- Trend visualization\n- Interactive tooltips\n- Export options\n\n---\n\n## State Management\n\n### usePOSStore (Zustand)\n\n```typescript\ninterface POSStore {\n  // Configuration\n  configuration: POSConfiguration | null;\n  systemSettings: SystemSettings | null;\n\n  // Mappings\n  recipeMappings: RecipeMapping[];\n  unitMappings: UnitMapping[];\n  locationMappings: LocationMapping[];\n\n  // Transactions\n  transactions: POSTransaction[];\n  pendingApprovals: POSTransaction[];\n\n  // Status\n  connectionStatus: 'connected' | 'disconnected' | 'error';\n  lastSync: Date | null;\n  isLoading: boolean;\n\n  // Actions\n  fetchConfiguration: () => Promise<void>;\n  updateConfiguration: (config: Partial<POSConfiguration>) => Promise<void>;\n  testConnection: () => Promise<boolean>;\n\n  fetchMappings: (type: 'recipe' | 'unit' | 'location') => Promise<void>;\n  createMapping: (type: string, mapping: any) => Promise<void>;\n  updateMapping: (type: string, id: string, mapping: any) => Promise<void>;\n\n  fetchTransactions: (filters: any) => Promise<void>;\n  retryTransaction: (id: string) => Promise<void>;\n  approveStockout: (ids: string[], notes?: string) => Promise<void>;\n\n  triggerSync: () => Promise<void>;\n}\n```\n\n---\n\n## API Integration\n\n### Configuration Endpoints\n\n```http\nGET /api/pos/configuration\nPUT /api/pos/configuration\nPOST /api/pos/configuration/test-connection\nPOST /api/pos/configuration/trigger-sync\n```\n\n### Mapping Endpoints\n\n```http\nGET /api/pos/mappings/recipes\nPOST /api/pos/mappings/recipes\nPUT /api/pos/mappings/recipes/:id\nDELETE /api/pos/mappings/recipes/:id\nPOST /api/pos/mappings/recipes/bulk\nPOST /api/pos/mappings/recipes/import (CSV upload)\nGET /api/pos/mappings/recipes/export\n\nGET /api/pos/mappings/units\nPOST /api/pos/mappings/units\nPUT /api/pos/mappings/units/:id\n\nGET /api/pos/mappings/locations\nPOST /api/pos/mappings/locations\nPUT /api/pos/mappings/locations/:id\n```\n\n### Transaction Endpoints\n\n```http\nGET /api/pos/transactions\nGET /api/pos/transactions/:id\nPOST /api/pos/transactions/:id/retry\nPOST /api/pos/transactions/bulk-retry\n\nGET /api/pos/stockout-approvals\nPOST /api/pos/stockout-approvals/approve\nPOST /api/pos/stockout-approvals/reject\n```\n\n### Reporting Endpoints\n\n```http\nGET /api/pos/reports/gross-profit\nGET /api/pos/reports/consumption\nGET /api/pos/reports/sales-summary\nPOST /api/pos/reports/export\n```\n\n---\n\n## Business Rules\n\n### Transaction Sync\n\n1. **Sync Frequency**: Configurable (default: every 15 minutes)\n2. **Batch Processing**: Process in batches of 100 transactions\n3. **Retry Logic**: 3 automatic retries with exponential backoff\n4. **Error Handling**: Failed transactions logged and flagged for manual review\n5. **Duplicate Prevention**: Transaction ID uniqueness check\n\n### Inventory Deduction\n\n1. **Mapping Required**: Only mapped items trigger inventory deduction\n2. **Approval Workflow**: Optional approval for stock-outs above threshold\n3. **Fractional Handling**: Automatic fractional deduction with rounding\n4. **Cost Calculation**: Use recipe cost or cost override\n5. **Audit Trail**: All deductions logged with transaction reference\n\n### Fractional Sales\n\n1. **Yield Validation**: Total yield must be positive integer\n2. **Fractional Accuracy**: Deductions accurate to 1/100th of unit\n3. **Threshold Deduction**: Option to deduct full unit at threshold (e.g., 6/8 slices sold)\n4. **Rounding Rules**: Configurable rounding (nearest, ceiling, floor)\n5. **Multi-Variant Support**: Multiple POS items can map to same base recipe\n\n---\n\n## User Guide\n\n### Setting Up POS Integration\n\n**Step 1: Configure API Connection**\n1. Navigate to Settings → POS Configuration\n2. Select POS system type\n3. Enter API endpoint and credentials\n4. Test connection\n5. Configure sync frequency\n6. Save configuration\n\n**Step 2: Map Locations**\n1. Navigate to Mapping → Locations\n2. View detected POS locations\n3. Map each POS location to system location\n4. Save mappings\n\n**Step 3: Map Units**\n1. Navigate to Mapping → Units\n2. Map POS units to system units\n3. Set conversion factors\n4. Test conversions\n5. Save mappings\n\n**Step 4: Map Recipes**\n1. Navigate to Mapping → Recipes\n2. Review unmapped POS items\n3. For each item:\n   - Select matching recipe\n   - Set portion size\n   - Choose unit\n4. Use auto-suggest for similar names\n5. Save mappings\n\n**Step 5: Configure Fractional Items** (If applicable)\n1. Navigate to Mapping → Fractional Variants\n2. Select base recipe (e.g., Large Pizza)\n3. Set total yield (e.g., 8 slices)\n4. Map POS slice items\n5. Configure deduction logic\n6. Save variant configuration\n\n**Step 6: Enable Auto-Sync**\n1. Return to Settings → System Settings\n2. Enable auto-sync\n3. Set sync frequency\n4. Configure notifications\n5. Save settings\n\n### Daily Operations\n\n**Reviewing Transactions**:\n1. Navigate to Transactions\n2. Filter by date, location, status\n3. Review failed transactions\n4. Retry or resolve errors\n\n**Approving Stock-outs**:\n1. Navigate to Stock-out Review\n2. Review pending approvals\n3. Check inventory impact\n4. Approve or reject\n5. Add approval notes\n\n**Monitoring Reports**:\n1. Navigate to Reports\n2. Select report type\n3. Set date range and filters\n4. Review metrics\n5. Export data if needed\n\n---\n\n## Troubleshooting\n\n### Connection Issues\n\n**Issue**: Cannot connect to POS system\n\n**Solutions**:\n- Verify API endpoint URL\n- Check API credentials\n- Ensure network connectivity\n- Check firewall rules\n- Verify SSL certificate (if applicable)\n- Review error logs\n\n### Mapping Issues\n\n**Issue**: POS items not appearing for mapping\n\n**Solutions**:\n- Trigger manual sync\n- Check sync time range settings\n- Verify POS API permissions\n- Review sync logs for errors\n\n**Issue**: Fractional deductions incorrect\n\n**Solutions**:\n- Verify total yield configuration\n- Check fractional unit settings\n- Review rounding rules\n- Test with sample transactions\n- Check audit trail\n\n### Transaction Sync Issues\n\n**Issue**: Transactions failing to sync\n\n**Solutions**:\n- Check transaction batch size\n- Review error messages\n- Verify mapping completeness\n- Check for data format issues\n- Retry failed transactions\n- Contact support if persistent\n\n### Inventory Deduction Issues\n\n**Issue**: Inventory not deducting\n\n**Solutions**:\n- Verify recipe mapping exists\n- Check if approval required\n- Review stock-out approval queue\n- Ensure sufficient inventory\n- Check inventory adjustment permissions\n\n---\n\n## Screenshots\n\nSee [screenshots directory](./screenshots/) for visual examples.\n\n---\n\n## Related Documentation\n\n### Detailed Documentation (Coming Soon)\n\nThe following detailed documentation pages are in development:\n\n- **Settings Configuration** - POS Configuration and System Settings deep dive\n- **Mapping Management** - Recipe, Unit, and Location mapping guides\n- **Reports & Analytics** - Gross Profit and Consumption reporting details\n- **Transactions Management** - Transaction sync and stock-out approval workflows\n- **POS Integration API** - API reference and integration guides\n\nFor now, all functionality is documented in the sections above.\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n**Status:** Production Ready\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

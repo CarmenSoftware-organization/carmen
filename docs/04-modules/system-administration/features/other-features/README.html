@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Other System Administration Features - Carmen ERP Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-mermaid@latest/dist/css/marked-mermaid.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background: var(--text-primary);
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-badge">Application Modules</div>
+        <div class="breadcrumb"><a href="../../index.html">Documentation</a> / <a href="../index.html">Application Modules</a> / System Administration / Features</div>
+        <a href="../../index.html" class="back-link">← Back to Documentation Home</a>
+        <div class="content" id="markdown-content"></div>
+    </div>
+    <script>
+        const markdownContent = "# Other System Administration Features\n\n> **Module:** System Administration\n> **Features:** Certifications, Business Rules, User Management, Account Code Mapping, User Dashboard, Monitoring\n> **Total Pages:** 10\n\n---\n\n## Certifications (3 pages)\n\n**Route:** `/system-administration/certifications`\n\n### Purpose\nManage vendor and staff certifications with expiration tracking and document storage.\n\n### Pages:\n1. **Certifications List** - View all certifications\n2. **Create Certification** - Add new certification\n3. **Edit Certification** - Modify existing certification\n\n### Features:\n- Certification types (Food Safety, Health, Business License, etc.)\n- Expiration date tracking\n- Automated renewal reminders\n- Document attachment\n- Vendor/Staff association\n\n### Data Model:\n```typescript\ninterface Certification {\n  id: string;\n  name: string;\n  type: CertificationType;\n  issuedTo: string; // Vendor or Staff ID\n  issuedBy: string;\n  issuedDate: Date;\n  expiryDate: Date;\n  documentUrl?: string;\n  status: 'active' | 'expired' | 'expiring_soon';\n  notes?: string;\n}\n```\n\n---\n\n## Business Rules (2 pages)\n\n**Route:** `/system-administration/business-rules`\n\n### Purpose\nConfigure organizational business rules and compliance monitoring.\n\n### Pages:\n1. **Business Rules** - Main configuration page\n2. **Compliance Monitoring** - Track rule compliance\n\n### Features:\n- Rule definition (pricing rules, approval thresholds, etc.)\n- Violation tracking\n- Automated alerts\n- Compliance dashboards\n- Exception handling\n\n### Rule Types:\n- Pricing rules (min/max margins)\n- Approval thresholds (amount-based)\n- Inventory rules (min/max stock)\n- Vendor rules (payment terms)\n- Department budgets\n\n---\n\n## User Management (2 pages)\n\n**Route:** `/system-administration/user-management`\n\n### Purpose\nManage system users, roles, and access.\n\n### Pages:\n1. **Users List** - View and manage all users\n2. **User Detail** - View/edit individual user\n\n### Features:\n- User CRUD operations\n- Role assignment\n- Department/Location assignment\n- Status management (active/inactive)\n- Password reset\n- Login history\n- Session management\n\n### Data Model:\n```typescript\ninterface User {\n  id: string;\n  email: string;\n  firstName: string;\n  lastName: string;\n  roles: string[];\n  department?: string;\n  location?: string;\n  isActive: boolean;\n  lastLogin?: Date;\n  createdAt: Date;\n}\n```\n\n---\n\n## Account Code Mapping (1 page)\n\n**Route:** `/system-administration/account-code-mapping`\n\n### Purpose\nMap system categories and transactions to general ledger account codes for financial integration.\n\n### Features:\n- Category to GL code mapping\n- Transaction type mapping\n- Bulk import/export\n- Validation rules\n- Financial system integration\n\n### Mapping Types:\n- Product categories → Revenue accounts\n- Expense categories → Expense accounts\n- Asset categories → Asset accounts\n- Liability categories → Liability accounts\n\n### Data Model:\n```typescript\ninterface AccountCodeMapping {\n  id: string;\n  sourceType: 'category' | 'transaction_type';\n  sourceId: string;\n  sourceName: string;\n  accountCode: string;\n  accountName: string;\n  debitCredit: 'debit' | 'credit';\n  isActive: boolean;\n}\n```\n\n---\n\n## User Dashboard (1 page)\n\n**Route:** `/system-administration/user-dashboard`\n\n### Purpose\nAdministrative overview dashboard with system health metrics and quick actions.\n\n### Widgets:\n- System health status\n- Active users count\n- Recent user activity\n- Failed login attempts\n- Pending approvals\n- System resource usage\n- Recent configuration changes\n- Quick action buttons\n\n### Metrics:\n- Total users\n- Active sessions\n- Failed authentications (last 24h)\n- Average response time\n- API usage statistics\n\n---\n\n## Monitoring (1 page)\n\n**Route:** `/system-administration/monitoring`\n\n### Purpose\nSystem monitoring and performance tracking.\n\n### Features:\n- Performance metrics dashboard\n- Error tracking and logs\n- Usage statistics\n- Alert management\n- Health checks\n- Resource monitoring (CPU, memory, disk)\n\n### Monitoring Categories:\n- **Application**: Error rates, response times, throughput\n- **Database**: Query performance, connection pool, slow queries\n- **Infrastructure**: CPU, memory, disk I/O\n- **Business**: Transaction volumes, user activity, feature usage\n\n### Data Model:\n```typescript\ninterface SystemMetrics {\n  timestamp: Date;\n  cpuUsage: number;\n  memoryUsage: number;\n  diskUsage: number;\n  activeConnections: number;\n  requestsPerMinute: number;\n  errorRate: number;\n  avgResponseTime: number;\n}\n```\n\n### Alert Rules:\n- CPU usage > 80%\n- Memory usage > 90%\n- Error rate > 5%\n- Response time > 2000ms\n- Failed auth attempts > 10/hour\n\n---\n\n## API Endpoints\n\n### Certifications\n```http\nGET /api/certifications\nPOST /api/certifications\nGET /api/certifications/:id\nPUT /api/certifications/:id\nDELETE /api/certifications/:id\nGET /api/certifications/expiring\n```\n\n### Business Rules\n```http\nGET /api/business-rules\nPOST /api/business-rules\nPUT /api/business-rules/:id\nGET /api/business-rules/violations\n```\n\n### User Management\n```http\nGET /api/users\nPOST /api/users\nGET /api/users/:id\nPUT /api/users/:id\nDELETE /api/users/:id\nPOST /api/users/:id/reset-password\nGET /api/users/:id/sessions\n```\n\n### Account Code Mapping\n```http\nGET /api/account-code-mapping\nPOST /api/account-code-mapping\nPUT /api/account-code-mapping/:id\nPOST /api/account-code-mapping/import\nGET /api/account-code-mapping/export\n```\n\n### Monitoring\n```http\nGET /api/monitoring/metrics\nGET /api/monitoring/alerts\nPOST /api/monitoring/alerts/:id/acknowledge\nGET /api/monitoring/health\n```\n\n---\n\n## Business Rules\n\n### Certifications\n- Expiration reminder sent 30 days before expiry\n- Automated status change when expired\n- Document upload required for certain types\n\n### User Management\n- Unique email addresses\n- Minimum password complexity\n- Session timeout after 30 minutes inactivity\n- Maximum 3 failed login attempts\n\n### Monitoring\n- Metrics collected every 60 seconds\n- Alerts retained for 90 days\n- Critical alerts trigger notifications\n\n---\n\n**Last Updated:** 2025-01-17\n**Version:** 1.0.0\n";
+
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
+
+        // Render mermaid diagrams
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

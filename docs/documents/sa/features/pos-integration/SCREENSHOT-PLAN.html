@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Integration Screenshot Capture Plan - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            display: block;
+        }
+
+        .mermaid {
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#0f172a',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                background: '#ffffff',
+                mainBkg: '#f8fafc',
+                secondBkg: '#e2e8f0',
+                border1: '#cbd5e1',
+                border2: '#94a3b8'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+
+        // Expose mermaid globally and signal it's ready
+        window.mermaid = mermaid;
+        window.mermaidReady = true;
+
+        // Dispatch event when mermaid is ready
+        window.dispatchEvent(new Event('mermaidLoaded'));
+    </script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../../index.html" class="back-link">← All Modules</a>
+            <h1>System Administration</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="../../../index.html">Module Overview</a></li>
+                    <li><a href="../../../index.html#features">Features</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb"><a href="../../../index.html">Documentation</a> / <a href="../../../index.html">SA</a> / Features / Pos Integration</div>
+
+        <div class="content-wrapper">
+            <div class="document-content" id="markdown-content"></div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list" id="toc-list"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const markdownContent = "# POS Integration Screenshot Capture Plan\n\n## Module Overview\n- **Total Pages**: 15\n- **Current Screenshots**: 0 in local directory (some exist in SA screenshots)\n- **Priority**: High - Critical integration feature\n- **Status**: 🔴 Missing all page screenshots\n\n---\n\n## Required Screenshots\n\n### 1. POS Integration Dashboard\n**Route:** `/system-administration/system-integrations/pos`\n**Filename:** `pos-dashboard.png`\n**Priority:** ⭐⭐⭐ Critical\n\n**What to Capture:**\n- System Status Card with connection status\n- Alert indicators (unmapped items, failed transactions, pending approvals)\n- Setup, Mapping, Operations, and Reporting sections\n- Recent Activity Table\n- Quick action buttons\n\n**Test Data Needed:**\n- Mock connection status (connected)\n- Sample unmapped items count (e.g., 5)\n- Sample failed transactions (e.g., 2)\n- Sample pending approvals (e.g., 3)\n- Recent activity entries (5-10 items)\n\n---\n\n### 2. POS Configuration Page\n**Route:** `/system-administration/system-integrations/pos/settings/config`\n**Filename:** `pos-settings-config.png`\n**Priority:** ⭐⭐⭐ Critical\n**Status:** ✅ Already exists in `/sa/screenshots/`\n\n**What to Capture:**\n- API Configuration section (Comanche POS selected)\n- Sync Settings (auto-sync enabled, 15 min frequency)\n- Transaction Settings\n- Advanced Settings\n- Test Connection button and status\n\n**Test Data:**\n- POS System: Comanche\n- API Endpoint: https://api.comanche.example.com\n- Sync Frequency: 15 minutes\n- Connection Status: Connected\n\n---\n\n### 3. System Settings Page\n**Route:** `/system-administration/system-integrations/pos/settings/system`\n**Filename:** `pos-settings-system.png`\n**Priority:** ⭐⭐ High\n\n**What to Capture:**\n- Stock-out Approval settings\n- Mapping Automation toggles\n- Notification configuration\n- Data Retention settings\n\n**Test Data:**\n- Require approval: Yes\n- Auto-approve threshold: $100\n- Email notifications: Enabled\n- Transaction retention: 90 days\n\n---\n\n### 4. Recipe Mapping Page\n**Route:** `/system-administration/system-integrations/pos/mapping/recipes`\n**Filename:** `pos-mapping-recipes.png`\n**Priority:** ⭐⭐⭐ Critical\n**Status:** ✅ Already exists in `/sa/screenshots/`\n\n**What to Capture:**\n- Mapping table with columns (POS Item ID, Name, Category, Mapped Recipe, Status)\n- Filter options (Status, Category, Search)\n- Bulk action buttons\n- Sample mappings showing Mapped and Unmapped statuses\n- Auto-mapping suggestions panel\n\n**Test Data:**\n- 10-15 POS items\n- Mix of mapped (green badge) and unmapped (red badge) items\n- Sample categories: Beverages, Appetizers, Mains, Desserts\n- Auto-suggestions showing confidence scores\n\n---\n\n### 5. Fractional Variants Mapping\n**Route:** `/system-administration/system-integrations/pos/mapping/recipes/fractional-variants`\n**Filename:** `pos-mapping-fractional-variants.png`\n**Priority:** ⭐⭐⭐ Critical\n\n**What to Capture:**\n- Fractional Recipe Table\n- Base recipe examples (Large Pizza, Whole Cake)\n- Total yield configuration (8 slices, 12 portions)\n- POS variant items mapped\n- Deduction logic settings\n- Preview inventory impact\n\n**Test Data:**\n- Large Pepperoni Pizza → 8 slices\n- Chocolate Cake → 12 portions\n- POS items: \"Pizza Slice - Pepperoni\", \"Cake Slice - Chocolate\"\n- Fractional units: 1/8, 1/12\n- Rounding rule: Nearest whole\n\n---\n\n### 6. Unit Mapping Page\n**Route:** `/system-administration/system-integrations/pos/mapping/units`\n**Filename:** `pos-mapping-units.png`\n**Priority:** ⭐⭐ High\n**Status:** ✅ Already exists in `/sa/screenshots/` (pos-mapping-units.png)\n\n**What to Capture:**\n- Unit mapping table\n- POS units (oz, lb, each) mapped to system units\n- Conversion factors\n- Unit converter tool\n- Test conversion examples\n\n**Test Data:**\n- oz → grams (28.35 conversion factor)\n- lb → kg (0.4536 conversion factor)\n- each → unit (1.0 conversion factor)\n\n---\n\n### 7. Location Mapping Page\n**Route:** `/system-administration/system-integrations/pos/mapping/locations`\n**Filename:** `pos-mapping-locations.png`\n**Priority:** ⭐⭐⭐ Critical\n**Status:** ✅ Already exists in `/sa/screenshots/`\n\n**What to Capture:**\n- Location mapping table\n- POS location names mapped to system locations\n- Default department assignments\n- Multi-location support indicators\n\n**Test Data:**\n- Downtown Store → Main Kitchen\n- Airport Branch → Airport Kitchen\n- Mall Location → Central Kitchen\n\n---\n\n### 8. Transactions View Page\n**Route:** `/system-administration/system-integrations/pos/transactions`\n**Filename:** `pos-transactions-list.png`\n**Priority:** ⭐⭐⭐ Critical\n**Status:** ✅ Already exists in `/sa/screenshots/` (pos-transactions.png)\n\n**What to Capture:**\n- Transaction table with all columns\n- Status indicators (Success, Failed, Pending)\n- Filter controls (date range, location, status)\n- Bulk action buttons\n- Sample transactions showing different statuses\n\n**Test Data:**\n- 15-20 transactions\n- Mix of statuses: 12 Success, 2 Failed, 1 Pending\n- Date range: Last 7 days\n- Various locations\n- Different amounts\n\n---\n\n### 9. Transaction Detail Drawer\n**Route:** `/system-administration/system-integrations/pos/transactions/[id]`\n**Filename:** `pos-transaction-detail.png`\n**Priority:** ⭐⭐ High\n\n**What to Capture:**\n- Transaction header (ID, date, location, amount)\n- Line items table\n- Inventory deductions applied section\n- Error details (for failed transaction)\n- Retry/Resolve buttons\n- Audit log\n\n**Test Data:**\n- Transaction ID: TXN-2025-001234\n- Date: Today's date\n- Location: Downtown Store\n- 5 line items\n- Total: $125.50\n- Status: Success\n- Inventory impact showing deductions\n\n---\n\n### 10. Stock-out Review Page\n**Route:** `/system-administration/system-integrations/pos/transactions/stock-out-review`\n**Filename:** `pos-stockout-review.png`\n**Priority:** ⭐⭐⭐ Critical\n\n**What to Capture:**\n- Approval Queue Table\n- Pending approvals with inventory impact preview\n- Bulk approval controls\n- Transaction details expandable view\n- Approve/Reject/Review action buttons\n\n**Test Data:**\n- 5-7 pending approvals\n- Inventory impact showing quantities to be deducted\n- Different item types\n- Various requesters\n- Approval notes field\n\n---\n\n### 11. Reports Home Page\n**Route:** `/system-administration/system-integrations/pos/reports`\n**Filename:** `pos-reports-home.png`\n**Priority:** ⭐⭐ High\n\n**What to Capture:**\n- Available reports cards\n- Quick stats section\n- Report selection interface\n- Date range selector\n- Export options\n\n**Test Data:**\n- Today's sales: $2,450.00\n- This week's sales: $15,320.00\n- Top category: Beverages\n- Average transaction: $35.25\n\n---\n\n### 12. Gross Profit Report\n**Route:** `/system-administration/system-integrations/pos/reports/gross-profit`\n**Filename:** `pos-reports-gross-profit.png`\n**Priority:** ⭐⭐⭐ Critical\n**Status:** ✅ Already exists in `/sa/screenshots/`\n\n**What to Capture:**\n- Summary cards (Revenue, COGS, Gross Profit, Margin %)\n- Profit by Category table with bar chart\n- Profit by Item breakdown\n- Trend analysis chart\n- Export options (PDF, Excel, CSV)\n\n**Test Data:**\n- Total Revenue: $45,200\n- Total COGS: $18,080\n- Gross Profit: $27,120\n- Margin: 60%\n- 5 categories with different margins\n- Trend chart showing last 30 days\n\n---\n\n### 13. Consumption Report\n**Route:** `/system-administration/system-integrations/pos/reports/consumption`\n**Filename:** `pos-reports-consumption.png`\n**Priority:** ⭐⭐⭐ Critical\n**Status:** ✅ Already exists in `/sa/screenshots/`\n\n**What to Capture:**\n- Variance Summary cards\n- Variance by Ingredient table with color coding\n- Variance analysis section\n- Trend charts (by time, location, category)\n- Investigation tools\n- High variance filter\n\n**Test Data:**\n- Total Theoretical: 1,200 units\n- Total Actual: 1,245 units\n- Total Variance: +45 units (+3.75%)\n- 10 ingredients with varying variance levels\n- Color coding: Green (normal), Yellow (over), Red (high variance)\n\n---\n\n### 14. Mapping Drawer Component\n**Route:** Modal on Recipe Mapping page\n**Filename:** `pos-mapping-drawer.png`\n**Priority:** ⭐⭐ High\n\n**What to Capture:**\n- POS item details section\n- Recipe selector dropdown (searchable)\n- Portion size input\n- Unit selector\n- Cost override field (optional)\n- Save mapping button\n\n**Test Data:**\n- POS Item: \"Iced Coffee - Large\"\n- Selected Recipe: \"House Iced Coffee\"\n- Portion Size: 16\n- Unit: oz\n- Cost Override: $2.50\n\n---\n\n### 15. Failed Transaction Error View\n**Route:** Transaction detail with error\n**Filename:** `pos-transaction-failed.png`\n**Priority:** ⭐⭐ High\n\n**What to Capture:**\n- Failed transaction detail\n- Error categorization\n- Error message details\n- Troubleshooting tips\n- Retry button\n- Manual resolution options\n\n**Test Data:**\n- Error: \"Recipe mapping not found\"\n- Category: Mapping Error\n- Affected items: 2\n- Suggestions: \"Map items in Recipe Mapping page\"\n- Retry available: Yes\n\n---\n\n## Screenshot Specifications\n\n### Technical Requirements\n- **Resolution**: 1920x1080 (desktop view)\n- **Browser**: Chrome (latest)\n- **Format**: PNG\n- **Compression**: Optimized for web\n- **Naming**: kebab-case with descriptive names\n\n### Capture Guidelines\n1. Use realistic test data (no lorem ipsum)\n2. Show all key UI elements\n3. Capture full page with scrolling if needed\n4. Include hover states for interactive elements\n5. Show both empty and populated states where applicable\n6. Capture error states and validation messages\n\n### Required States to Capture\n- ✅ **Default state**: Normal operation\n- ⚠️ **Populated state**: With realistic data\n- ❌ **Error state**: Showing validation/errors (where applicable)\n- 🔄 **Loading state**: Processing indicators (where applicable)\n\n---\n\n## Implementation Notes\n\n### Existing Screenshots (Already in SA screenshots)\n✅ `pos-settings-config.png` - POS Configuration\n✅ `pos-mapping-recipes.png` - Recipe Mapping\n✅ `pos-mapping-units.png` - Unit Mapping\n✅ `pos-mapping-locations.png` - Location Mapping\n✅ `pos-transactions.png` - Transactions List\n✅ `pos-reports-gross-profit.png` - Gross Profit Report\n✅ `pos-reports-consumption.png` - Consumption Report\n\n### Newly Captured Screenshots (2025-10-18)\n1. ✅ `pos-dashboard.png` - Main dashboard (**CAPTURED**)\n2. ✅ `pos-settings-system.png` - System settings (**CAPTURED**)\n3. ✅ `pos-mapping-fractional-variants.png` - Fractional variants (**CAPTURED**)\n4. ✅ `pos-reports-home.png` - Reports landing page (**CAPTURED**)\n\n### Screenshots Not Available (Page Not Implemented)\n5. ⚠️ `pos-stockout-review.png` - Stock-out approval queue (404 - not implemented)\n6. ⚠️ `pos-transaction-detail.png` - Transaction detail drawer (requires implementation)\n7. ⚠️ `pos-mapping-drawer.png` - Mapping drawer modal (requires modal trigger)\n8. ⚠️ `pos-transaction-failed.png` - Failed transaction view (requires failed transaction)\n\n### Priority Order for Capture\n1. **Critical (Capture First)**\n   - POS Dashboard\n   - Fractional Variants Mapping\n   - Stock-out Review\n\n2. **High (Capture Second)**\n   - System Settings\n   - Transaction Detail\n   - Reports Home\n\n3. **Nice to Have (Capture Last)**\n   - Mapping Drawer\n   - Failed Transaction View\n\n---\n\n## Playwright Automation Script\n\n```javascript\n// Script to automate screenshot capture\nconst pages = [\n  {\n    url: '/system-administration/system-integrations/pos',\n    name: 'pos-dashboard',\n    waitFor: '.status-card, .recent-activity',\n  },\n  {\n    url: '/system-administration/system-integrations/pos/settings/system',\n    name: 'pos-settings-system',\n    waitFor: 'form',\n  },\n  {\n    url: '/system-administration/system-integrations/pos/mapping/recipes/fractional-variants',\n    name: 'pos-mapping-fractional-variants',\n    waitFor: 'table',\n  },\n  {\n    url: '/system-administration/system-integrations/pos/transactions/stock-out-review',\n    name: 'pos-stockout-review',\n    waitFor: '.approval-queue',\n  },\n  {\n    url: '/system-administration/system-integrations/pos/reports',\n    name: 'pos-reports-home',\n    waitFor: '.report-card',\n  },\n];\n\n// Run with: node capture-pos-screenshots.js\n```\n\n---\n\n**Last Updated:** 2025-10-18\n**Status:** 🟢 Capture Complete - 11/15 Screenshots Available\n**Progress:** 73% Complete (11 existing + 4 newly captured / 15 total planned)\n\n**Summary:**\n- ✅ 7 screenshots already existed in `/sa/screenshots/`\n- ✅ 4 screenshots newly captured (Dashboard, System Settings, Fractional Variants, Reports Home)\n- ⚠️ 4 screenshots pending page implementation (Stock-out Review, Transaction Detail, Mapping Drawer, Failed Transaction)\n";
+
+        // Configure marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                return code;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Render markdown
+        const contentDiv = document.getElementById('markdown-content');
+        contentDiv.innerHTML = marked.parse(markdownContent);
+
+        // Function to render Mermaid diagrams
+        function renderMermaidDiagrams() {
+            if (!window.mermaid) {
+                console.log('Mermaid not loaded yet, waiting...');
+                return;
+            }
+
+            // Find all code blocks with mermaid language
+            const mermaidBlocks = contentDiv.querySelectorAll('pre code.language-mermaid, pre code[class*="mermaid"]');
+
+            if (mermaidBlocks.length === 0) {
+                console.log('No mermaid blocks found');
+                return;
+            }
+
+            console.log('Found', mermaidBlocks.length, 'mermaid blocks');
+
+            mermaidBlocks.forEach((block, index) => {
+                const mermaidCode = block.textContent;
+                const pre = block.parentElement;
+
+                // Create a div for mermaid diagram
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                mermaidDiv.id = 'mermaid-diagram-' + index;
+
+                // Replace the pre block with mermaid div
+                pre.replaceWith(mermaidDiv);
+            });
+
+            // Run mermaid rendering
+            window.mermaid.run({
+                querySelector: '.mermaid'
+            }).then(() => {
+                console.log('Mermaid diagrams rendered successfully');
+            }).catch(err => {
+                console.error('Mermaid rendering error:', err);
+            });
+        }
+
+        // Wait for mermaid to load before rendering
+        if (window.mermaidReady) {
+            renderMermaidDiagrams();
+        } else {
+            window.addEventListener('mermaidLoaded', renderMermaidDiagrams);
+            // Fallback timeout
+            setTimeout(renderMermaidDiagrams, 1000);
+        }
+
+        // Generate TOC from headings
+        const tocList = document.getElementById('toc-list');
+        const headings = contentDiv.querySelectorAll('h2, h3, h4');
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.className = 'toc-' + heading.tagName.toLowerCase();
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        // Highlight active TOC item on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocList.querySelectorAll('a').forEach(a => {
+                        a.style.color = a.getAttribute('href') === '#' + id ? 'var(--primary)' : 'var(--text-secondary)';
+                        a.style.fontWeight = a.getAttribute('href') === '#' + id ? '600' : '400';
+                    });
+                }
+            });
+        }, { threshold: 1.0 });
+
+        headings.forEach(heading => observer.observe(heading));
+    </script>
+</body>
+</html>
