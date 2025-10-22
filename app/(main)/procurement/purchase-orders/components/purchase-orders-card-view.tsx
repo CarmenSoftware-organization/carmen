@@ -122,9 +122,9 @@ export function PurchaseOrderCardView({
                       Net Amount
                     </p>
                     <p className="text-xs font-medium">
-                      {po.netAmount.toLocaleString(undefined, { 
+                      {(typeof (po as any).netAmount === 'number' ? (po as any).netAmount : (po as any).netAmount?.amount || 0).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
-                        maximumFractionDigits: 2 
+                        maximumFractionDigits: 2
                       })}
                     </p>
                   </div>
@@ -133,23 +133,23 @@ export function PurchaseOrderCardView({
                       Tax Amount
                     </p>
                     <p className="text-xs font-medium">
-                      {po.taxAmount.toLocaleString(undefined, { 
+                      {(typeof (po as any).taxAmount === 'number' ? (po as any).taxAmount : (po as any).taxAmount?.amount || 0).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
-                        maximumFractionDigits: 2 
+                        maximumFractionDigits: 2
                       })}
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Total Amount
                     </p>
                     <p className="text-sm font-bold text-foreground">
-                      {po.totalAmount.toLocaleString(undefined, { 
+                      {(typeof (po as any).totalAmount === 'number' ? (po as any).totalAmount : (po as any).totalAmount?.amount || 0).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
-                        maximumFractionDigits: 2 
+                        maximumFractionDigits: 2
                       })}
                     </p>
                   </div>
