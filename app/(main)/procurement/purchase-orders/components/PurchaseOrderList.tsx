@@ -679,25 +679,26 @@ export function PurchaseOrderList() {
     if (selectedPRs.length > 0) {
       // Group PRs by vendor and currency - each group becomes a separate PO
       const groupedPRs = selectedPRs.reduce((groups, pr) => {
-        const key = `${pr.vendor}-${pr.currency}`;
+        const prAny = pr as any;
+        const key = `${prAny.vendor || 'Unknown'}-${prAny.currency || 'USD'}`;
         if (!groups[key]) {
           groups[key] = {
-            vendor: pr.vendor,
-            vendorId: pr.vendorId,
-            currency: pr.currency,
+            vendor: prAny.vendor || 'Unknown',
+            vendorId: prAny.vendorId || 0,
+            currency: prAny.currency || 'USD',
             prs: [],
             totalAmount: 0
           };
         }
         groups[key].prs.push(pr);
-        groups[key].totalAmount += pr.totalAmount;
+        groups[key].totalAmount += (typeof prAny.totalAmount === 'number' ? prAny.totalAmount : prAny.totalAmount?.amount || 0);
         return groups;
-      }, {} as Record<string, { 
-        vendor: string; 
-        vendorId: number; 
-        currency: string; 
-        prs: PurchaseRequest[]; 
-        totalAmount: number 
+      }, {} as Record<string, {
+        vendor: string;
+        vendorId: number;
+        currency: string;
+        prs: PurchaseRequest[];
+        totalAmount: number
       }>);
 
       // Store grouped PRs for PO creation
