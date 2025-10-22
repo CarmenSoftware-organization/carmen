@@ -369,30 +369,31 @@ export default function PODetailPage({ params }: PODetailPageProps) {
     if (!poData || !pendingStatus) return "";
     
     const oldStatus = poData.status;
+    const newStatus = pendingStatus as any; // Cast to any for comparison with string literals
 
     // Note: PurchaseOrder interface uses lowercase string literals, not enum values
-    if (oldStatus === 'draft' && pendingStatus === 'sent') {
+    if (oldStatus === 'draft' && newStatus === 'sent') {
       return "This will mark the purchase order as sent to the vendor. Continue?";
     }
 
-    if (pendingStatus === 'cancelled') {
+    if (newStatus === 'cancelled') {
       return "This action cannot be undone. Please provide a reason for cancelling this purchase order.";
     }
 
-    if (pendingStatus === 'closed') {
+    if (newStatus === 'closed') {
       return "This will mark the purchase order as closed. Any remaining quantities will no longer be available for receiving. Continue?";
     }
 
-    if (pendingStatus === 'fully_received') {
+    if (newStatus === 'fully_received') {
       return "This will mark the purchase order as fully received. Continue?";
     }
 
-    return `Are you sure you want to change the status from "${oldStatus}" to "${pendingStatus}"?`;
+    return `Are you sure you want to change the status from "${oldStatus}" to "${newStatus}"?`;
   };
 
   const requiresReason = () => {
     if (!pendingStatus) return false;
-    return pendingStatus === 'cancelled';
+    return (pendingStatus as any) === 'cancelled';
   };
 
   const toggleSidebar = () => {
