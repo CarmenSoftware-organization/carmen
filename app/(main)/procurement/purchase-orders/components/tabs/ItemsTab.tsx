@@ -73,26 +73,6 @@ interface ItemsTabProps {
 
 export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [newItem, setNewItem] = useState<Partial<PurchaseOrderItem>>({
-    itemName: "",
-    description: "",
-    orderedQuantity: 0,
-    orderUnit: "",
-    baseQuantity: 0,
-    baseUnit: "",
-    baseReceivingQty: 0,
-    unitPrice: 0,
-    isFOC: false,
-    taxIncluded: false,
-    adjustments: {
-      discount: false,
-      tax: false,
-    },
-    taxRate: 0.07,
-    taxAmount: 0.0,
-    discountRate: 0.0,
-    discountAmount: 0.0,
-  });
 
   const [editingItem, setEditingItem] = useState<PurchaseOrderItem | null>(
     null
