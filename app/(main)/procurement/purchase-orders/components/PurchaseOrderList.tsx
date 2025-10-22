@@ -369,12 +369,12 @@ export function PurchaseOrderList() {
                 </div>
               </TableHead>
               <TableHead className="font-medium">
-                <div 
+                <div
                   className="flex items-center cursor-pointer"
-                  onClick={() => handleSort('DeliveryDate')}
+                  onClick={() => handleSort('expectedDeliveryDate')}
                 >
                   Delivery Date
-                  {sortConfig.field === 'DeliveryDate' && (
+                  {sortConfig.field === 'expectedDeliveryDate' && (
                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortConfig.direction === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                 </div>
