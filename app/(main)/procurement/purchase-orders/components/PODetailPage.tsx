@@ -612,16 +612,16 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             Description
           </Label>
           {isEditing ? (
-            <Textarea 
+            <Textarea
               name="description"
-              value={poData?.description || ""}
-              onChange={(e) => poData && setPOData({ ...poData, description: e.target.value })}
+              value={(poData as any)?.description || ""}
+              onChange={(e) => poData && setPOData({ ...poData, description: e.target.value } as any)}
               className="w-full h-20"
               placeholder="Add purchase order description..."
             />
           ) : (
             <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
-              {poData?.description || "No description"}
+              {(poData as any)?.description || "No description"}
             </div>
           )}
         </div>
@@ -631,16 +631,16 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             Remarks
           </Label>
           {isEditing ? (
-            <Textarea 
+            <Textarea
               name="remarks"
-              value={poData?.remarks || ""}
-              onChange={(e) => poData && setPOData({ ...poData, remarks: e.target.value })}
+              value={(poData as any)?.remarks || ""}
+              onChange={(e) => poData && setPOData({ ...poData, remarks: e.target.value } as any)}
               className="w-full h-20"
               placeholder="Add any additional remarks or notes..."
             />
           ) : (
             <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
-              {poData?.remarks || "No remarks"}
+              {(poData as any)?.remarks || "No remarks"}
             </div>
           )}
         </div>
