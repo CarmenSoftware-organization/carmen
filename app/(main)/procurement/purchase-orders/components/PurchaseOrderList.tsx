@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CurrencyCode, PurchaseOrder, PurchaseRequest, PurchaseOrderStatus } from "@/lib/types";
+import { Currency, PurchaseOrder, PurchaseRequest, PurchaseOrderStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
