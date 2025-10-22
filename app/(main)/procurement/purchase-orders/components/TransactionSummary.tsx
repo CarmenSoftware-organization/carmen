@@ -14,19 +14,26 @@ export default function TransactionSummary({ poData, isEditing = false }: Transa
   const [discountOverride, setDiscountOverride] = useState(false);
   const [taxOverride, setTaxOverride] = useState(false);
 
-  // Calculate values
-  const subtotal = poData.subTotalPrice ?? 0;
-  const discount = poData.discountAmount ?? 0;
-  const netAmount = poData.netAmount ?? 0;
-  const tax = poData.taxAmount ?? 0;
-  const totalAmount = poData.totalAmount ?? 0;
+  // Helper function to extract numeric value from Money object or number
+  const getNumericValue = (value: any): number => {
+    if (typeof value === 'number') return value;
+    if (value && typeof value === 'object' && 'amount' in value) return value.amount;
+    return 0;
+  };
 
-  // Base currency values
-  const baseSubtotal = poData.baseSubTotalPrice ?? 0;
-  const baseDiscount = poData.baseDiscAmount ?? 0;
-  const baseNetAmount = poData.baseNetAmount ?? 0;
-  const baseTax = poData.baseTaxAmount ?? 0;
-  const baseTotalAmount = poData.baseTotalAmount ?? 0;
+  // Calculate values - handle both Money objects and direct numbers
+  const subtotal = getNumericValue((poData as any).subtotal);
+  const discount = getNumericValue((poData as any).discountAmount);
+  const netAmount = subtotal - discount;
+  const tax = getNumericValue((poData as any).taxAmount);
+  const totalAmount = getNumericValue((poData as any).totalAmount);
+
+  // Base currency values (if available)
+  const baseSubtotal = getNumericValue((poData as any).baseSubTotalPrice);
+  const baseDiscount = getNumericValue((poData as any).baseDiscAmount);
+  const baseNetAmount = baseSubtotal - baseDiscount;
+  const baseTax = getNumericValue((poData as any).baseTaxAmount);
+  const baseTotalAmount = getNumericValue((poData as any).baseTotalAmount);
 
   const summaryItems = [
     {
@@ -79,7 +86,7 @@ export default function TransactionSummary({ poData, isEditing = false }: Transa
     <div className="space-y-4 sm:space-y-6">
       {/* Title */}
       <h3 className="text-sm sm:text-lg lg:text-xl font-semibold text-black">
-        Transaction Summary ({poData.currencyCode || 'USD'})
+        Transaction Summary ({(poData as any).currency || 'USD'})
       </h3>
       
       {/* Summary Cards Row - Responsive Layout */}
