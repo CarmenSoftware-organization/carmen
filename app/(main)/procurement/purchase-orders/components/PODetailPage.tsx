@@ -592,14 +592,14 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             Credit Terms
           </Label>
           {isEditing ? (
-            <Input 
+            <Input
               name="creditTerms"
-              value={poData?.creditTerms || ""}
+              value={(poData as any)?.creditTerms || ""}
               onChange={handleInputChange}
               className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-xs text-gray-900 font-medium">{poData?.creditTerms || "Not specified"}</div>
+            <div className="text-xs text-gray-900 font-medium">{(poData as any)?.creditTerms || "Not specified"}</div>
           )}
         </div>
       </div>
