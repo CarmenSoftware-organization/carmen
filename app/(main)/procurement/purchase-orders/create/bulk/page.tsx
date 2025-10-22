@@ -84,7 +84,7 @@ export default function BulkPOCreationPage() {
           vendorName: group.vendor,
           orderDate: new Date(),
           DeliveryDate: group.deliveryDate,
-          status: PurchaseOrderStatus.Draft,
+          status: PurchaseOrderStatus.DRAFT,
           currencyCode: group.currency,
           baseCurrencyCode: 'USD',
           exchangeRate: 1,
