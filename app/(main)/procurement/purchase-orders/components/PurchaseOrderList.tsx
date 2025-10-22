@@ -336,12 +336,12 @@ export function PurchaseOrderList() {
                 />
               </TableHead>
               <TableHead className="font-medium">
-                <div 
+                <div
                   className="flex items-center cursor-pointer"
-                  onClick={() => handleSort('number')}
+                  onClick={() => handleSort('orderNumber')}
                 >
                   PO Number
-                  {sortConfig.field === 'number' && (
+                  {sortConfig.field === 'orderNumber' && (
                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortConfig.direction === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                 </div>
