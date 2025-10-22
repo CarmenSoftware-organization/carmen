@@ -504,12 +504,12 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             <Input
               type="text"
               name="buyer"
-              value={poData?.buyer || ""}
+              value={(poData as any)?.buyer || poData?.approvedBy || ""}
               onChange={handleInputChange}
               className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-xs text-gray-900 font-medium">{poData?.buyer || ""}</div>
+            <div className="text-xs text-gray-900 font-medium">{(poData as any)?.buyer || poData?.approvedBy || ""}</div>
           )}
         </div>
         <div>
