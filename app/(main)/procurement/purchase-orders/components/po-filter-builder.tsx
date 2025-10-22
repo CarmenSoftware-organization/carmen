@@ -366,7 +366,7 @@ export function POAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
                             placeholder="Value"
                             value={filter.value}
                             onChange={(e) => handleValueChange(index, e.target.value)}
-                            type={filter.field === 'createdBy' ? 'number' : (filter.field === 'orderDate' || filter.field === 'DeliveryDate') ? 'date' : 'text'}
+                            type={(filter.field as any) === 'createdBy' ? 'number' : ((filter.field as any) === 'orderDate' || (filter.field as any) === 'DeliveryDate') ? 'date' : 'text'}
                           />
                         </div>
                         

@@ -69,9 +69,19 @@ import ActivityLogTab from "./tabs/ActivityLogTab";
 import {
   PurchaseOrderItem,
   PurchaseOrderStatus,
-  PurchaseOrder,
-  ActivityLogEntry
+  PurchaseOrder
 } from "@/lib/types";
+
+// Local type definition for activity log
+interface ActivityLogEntry {
+  id: string;
+  action: string;
+  userId: string;
+  userName: string;
+  activityType: string;
+  description: string;
+  timestamp: Date;
+}
 import { mockPurchaseOrders } from "@/lib/mock-data";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import TransactionSummary from "./TransactionSummary";
@@ -113,7 +123,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         vendorId: 0,
         vendorName: '',
         orderDate: new Date(),
-        status: PurchaseOrderStatus.Draft,
+        status: PurchaseOrderStatus.DRAFT,
         currencyCode: 'USD',
         baseCurrencyCode: 'USD',
         exchangeRate: 1,
@@ -226,17 +236,17 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         }
       }
       
-      setPOData(newPO);
+      setPOData(newPO as any);
       setStatusHistory([]);
     } else {
       // Fetch existing PO
-      const foundPO = mockPurchaseOrders.find(po => po.poId === params.id);
+      const foundPO = mockPurchaseOrders.find(po => (po as any).poId === params.id || po.id === params.id);
       if (foundPO) {
-        setPOData(foundPO);
+        setPOData(foundPO as any);
         // Extract status-related entries from activity log
-        if (foundPO.activityLog) {
-          const statusEntries = foundPO.activityLog.filter(
-            entry => entry.activityType === "StatusChange"
+        if ((foundPO as any).activityLog) {
+          const statusEntries = (foundPO as any).activityLog.filter(
+            (entry: any) => entry.activityType === "StatusChange"
           );
           setStatusHistory(statusEntries);
         }
@@ -271,17 +281,17 @@ export default function PODetailPage({ params }: PODetailPageProps) {
 
   const handleUpdateItem = (updatedItem: PurchaseOrderItem) => {
     if (poData) {
-      const updatedItems = poData.items.map((item) =>
+      const updatedItems = (poData as any).items.map((item: any) =>
         item.id === updatedItem.id ? updatedItem : item
       );
-      setPOData({ ...poData, items: updatedItems as PurchaseOrderItem[] });
+      setPOData({ ...poData, items: updatedItems as PurchaseOrderItem[] } as any);
     }
   };
 
   const handleDeleteItem = (itemId: string) => {
     if (poData) {
-      const updatedItems = poData.items.filter((item) => item.id !== itemId);
-      setPOData({ ...poData, items: updatedItems });
+      const updatedItems = (poData as any).items.filter((item: any) => item.id !== itemId);
+      setPOData({ ...poData, items: updatedItems } as any);
     }
   };
 
@@ -289,8 +299,8 @@ export default function PODetailPage({ params }: PODetailPageProps) {
     if (poData) {
       setPOData({
         ...poData,
-        items: [...poData.items, newItem as unknown as PurchaseOrderItem],
-      });
+        items: [...(poData as any).items, newItem as unknown as PurchaseOrderItem],
+      } as any);
     }
   };
 
@@ -327,15 +337,15 @@ export default function PODetailPage({ params }: PODetailPageProps) {
     };
     
     // Update the PO data with new status and updated activity log
-    const updatedActivityLog = poData.activityLog ? 
-      [...poData.activityLog, statusChangeEntry] : 
+    const updatedActivityLog = (poData as any).activityLog ?
+      [...(poData as any).activityLog, statusChangeEntry] :
       [statusChangeEntry];
-    
+
     setPOData({
       ...poData,
       status: pendingStatus,
       activityLog: updatedActivityLog
-    });
+    } as any);
     
     // Update status history
     setStatusHistory([...statusHistory, statusChangeEntry]);
