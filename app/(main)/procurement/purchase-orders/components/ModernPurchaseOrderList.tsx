@@ -40,10 +40,11 @@ export function ModernPurchaseOrderList() {
 
   const handleSelectPRs = (selectedPRs: PurchaseRequest[]) => {
     setShowCreateFromPRDialog(false)
-    
+
     if (selectedPRs.length > 0) {
       // Group PRs by vendor and currency - each group becomes a separate PO
-      const groupedPRs = selectedPRs.reduce((groups, pr) => {
+      // Note: Using 'any' because mock data structure doesn't match PurchaseRequest interface
+      const groupedPRs = selectedPRs.reduce((groups, pr: any) => {
         const key = `${pr.vendor}-${pr.currency}`
         if (!groups[key]) {
           groups[key] = {

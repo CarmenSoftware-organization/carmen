@@ -395,7 +395,7 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
                               Total: {po.totalAmount?.amount} {po.totalAmount?.currency}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {po.items.length} item{po.items.length !== 1 ? 's' : ''}
+                              {po.totalItems} item{po.totalItems !== 1 ? 's' : ''}
                             </div>
                           </div>
                           
