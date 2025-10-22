@@ -207,7 +207,7 @@ export function PurchaseOrderList() {
 
   const handleSelectAllPOs = (checked: boolean) => {
     if (checked) {
-      setSelectedPOs(paginatedPOs.map(po => po.poId));
+      setSelectedPOs(paginatedPOs.map(po => (po as any).poId || po.id));
     } else {
       setSelectedPOs([]);
     }
@@ -430,15 +430,15 @@ export function PurchaseOrderList() {
               </TableRow>
             ) : (
               paginatedPOs.map((po) => (
-                <TableRow 
-                  key={po.poId} 
+                <TableRow
+                  key={(po as any).poId || po.id}
                   className="hover:bg-muted/10 transition-colors cursor-pointer"
-                  onClick={() => router.push(`/procurement/purchase-orders/${po.poId}`)}
+                  onClick={() => router.push(`/procurement/purchase-orders/${(po as any).poId || po.id}`)}
                 >
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <Checkbox 
-                      checked={selectedPOs.includes(po.poId)} 
-                      onCheckedChange={(checked) => handleSelectPO(po.poId, checked as boolean)}
+                    <Checkbox
+                      checked={selectedPOs.includes((po as any).poId || po.id)}
+                      onCheckedChange={(checked) => handleSelectPO((po as any).poId || po.id, checked as boolean)}
                     />
                   </TableCell>
                   <TableCell className="font-medium">
@@ -452,7 +452,7 @@ export function PurchaseOrderList() {
                   </TableCell>
                   <TableCell>{po.vendorName}</TableCell>
                   <TableCell>{po.orderDate.toLocaleDateString()}</TableCell>
-                  <TableCell>{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</TableCell>
+                  <TableCell>{((po as any).DeliveryDate || po.expectedDeliveryDate) ? ((po as any).DeliveryDate || po.expectedDeliveryDate).toLocaleDateString() : "N/A"}</TableCell>
                   <TableCell>
                     <StatusBadge status={po.status} />
                   </TableCell>
@@ -460,7 +460,7 @@ export function PurchaseOrderList() {
                     {po.totalAmount.toFixed(2)}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {po.currencyCode}
+                    {(po as any).currencyCode || po.currency}
                   </TableCell>
                   <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end space-x-1">
@@ -521,20 +521,20 @@ export function PurchaseOrderList() {
         </div>
       ) : (
         paginatedPOs.map((po) => (
-          <Card 
-            key={po.poId} 
+          <Card
+            key={(po as any).poId || po.id}
             className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm cursor-pointer"
-            onClick={() => router.push(`/procurement/purchase-orders/${po.poId}`)}
+            onClick={() => router.push(`/procurement/purchase-orders/${(po as any).poId || po.id}`)}
           >
             <div className="flex flex-col h-full">
               {/* Card Header */}
               <div className="p-5 pb-3 bg-muted/30 border-b">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
-                    <Checkbox 
-                      checked={selectedPOs.includes(po.poId)} 
+                    <Checkbox
+                      checked={selectedPOs.includes((po as any).poId || po.id)}
                       onCheckedChange={(checked) => {
-                        handleSelectPO(po.poId, checked as boolean);
+                        handleSelectPO((po as any).poId || po.id, checked as boolean);
                       }}
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -563,7 +563,7 @@ export function PurchaseOrderList() {
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Delivery Date</p>
-                    <p className="text-sm font-medium">{po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "N/A"}</p>
+                    <p className="text-sm font-medium">{((po as any).DeliveryDate || po.expectedDeliveryDate) ? ((po as any).DeliveryDate || po.expectedDeliveryDate).toLocaleDateString() : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Tax Amount</p>
