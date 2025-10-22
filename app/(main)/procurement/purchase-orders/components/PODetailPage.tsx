@@ -369,20 +369,21 @@ export default function PODetailPage({ params }: PODetailPageProps) {
     if (!poData || !pendingStatus) return "";
     
     const oldStatus = poData.status;
-    
-    if (oldStatus === PurchaseOrderStatus.DRAFT && pendingStatus === PurchaseOrderStatus.SENT) {
+
+    // Note: PurchaseOrder interface uses lowercase string literals, not enum values
+    if (oldStatus === 'draft' && pendingStatus === 'sent') {
       return "This will mark the purchase order as sent to the vendor. Continue?";
     }
 
-    if (pendingStatus === PurchaseOrderStatus.VOIDED || pendingStatus === PurchaseOrderStatus.CANCELLED) {
-      return "This action cannot be undone. Please provide a reason for cancelling or voiding this purchase order.";
+    if (pendingStatus === 'cancelled') {
+      return "This action cannot be undone. Please provide a reason for cancelling this purchase order.";
     }
-    
-    if (pendingStatus === PurchaseOrderStatus.CLOSED) {
+
+    if (pendingStatus === 'closed') {
       return "This will mark the purchase order as closed. Any remaining quantities will no longer be available for receiving. Continue?";
     }
 
-    if (pendingStatus === PurchaseOrderStatus.FULLY_RECEIVED) {
+    if (pendingStatus === 'fully_received') {
       return "This will mark the purchase order as fully received. Continue?";
     }
 
@@ -391,7 +392,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
 
   const requiresReason = () => {
     if (!pendingStatus) return false;
-    return pendingStatus === PurchaseOrderStatus.VOIDED || pendingStatus === PurchaseOrderStatus.CANCELLED;
+    return pendingStatus === 'cancelled';
   };
 
   const toggleSidebar = () => {
