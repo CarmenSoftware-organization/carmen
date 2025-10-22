@@ -184,7 +184,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
     const updatedItem = poData.items.find((item) => item.id === itemId);
     if (!updatedItem) return;
 
-    updatedItem.orderUnit = newUnit;
+    updatedItem.unit = newUnit;
     onUpdateItem(updatedItem);
   }
 
@@ -335,22 +335,23 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
                   <TableCell className="text-right">
                     {item.orderedQuantity}
                   </TableCell>
-                  <TableCell>{item.orderUnit}</TableCell>
+                  <TableCell>{item.unit}</TableCell>
                   <TableCell className="text-right">
-                    {item.unitPrice?.toFixed(2)}
+                    {typeof item.unitPrice === 'object' && item.unitPrice !== null ? (item.unitPrice as any).amount?.toFixed(2) : (item.unitPrice as any)?.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right">
-                    {item.taxAmount?.toFixed(2)}
+                    {typeof item.taxAmount === 'object' && item.taxAmount !== null ? (item.taxAmount as any).amount?.toFixed(2) : (item.taxAmount as any)?.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right">
-                    {item.discountAmount?.toFixed(2)}
+                    {typeof item.discountAmount === 'object' && item.discountAmount !== null ? (item.discountAmount as any).amount?.toFixed(2) : (item.discountAmount as any)?.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    {(
-                      item.orderedQuantity * item.unitPrice -
-                      (item.discountAmount || 0) +
-                      (item.taxAmount || 0)
-                    ).toFixed(2)}
+                    {(() => {
+                      const unitPriceValue = typeof item.unitPrice === 'object' && item.unitPrice !== null ? (item.unitPrice as any).amount || 0 : (item.unitPrice as any) || 0;
+                      const taxAmountValue = typeof item.taxAmount === 'object' && item.taxAmount !== null ? (item.taxAmount as any).amount || 0 : (item.taxAmount as any) || 0;
+                      const discountAmountValue = typeof item.discountAmount === 'object' && item.discountAmount !== null ? (item.discountAmount as any).amount || 0 : (item.discountAmount as any) || 0;
+                      return (item.orderedQuantity * unitPriceValue - discountAmountValue + taxAmountValue).toFixed(2);
+                    })()}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
