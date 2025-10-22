@@ -435,8 +435,8 @@ export default function PODetailPage({ params }: PODetailPageProps) {
         <span className="sr-only">Back to Purchase Orders</span>
       </Button>
       <div className="flex flex-col">
-        <h1 className="text-lg font-bold">{poData?.number || 'Purchase Order'}</h1>
-        {poData?.number && poData.number !== 'New PO' && (
+        <h1 className="text-lg font-bold">{(poData as any)?.number || poData?.orderNumber || 'Purchase Order'}</h1>
+        {((poData as any)?.number || poData?.orderNumber) && (poData as any)?.number !== 'New PO' && (
           <p className="text-xs text-muted-foreground mt-1">Purchase Order</p>
         )}
       </div>
