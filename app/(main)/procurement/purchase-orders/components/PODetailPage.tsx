@@ -743,7 +743,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
 
                   <TabsContent value="items" className="p-4">
                     <EnhancedItemsTab
-                      poData={poData}
+                      poData={poData as any}
                       onUpdateItem={handleUpdateItem}
                       onDeleteItem={handleDeleteItem}
                       onAddItem={handleAddItem}
