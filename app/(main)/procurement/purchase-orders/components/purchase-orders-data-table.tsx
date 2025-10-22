@@ -96,7 +96,7 @@ export function PurchaseOrdersDataTable<TData extends PurchaseOrder, TValue>({
           case 'delivery-date':
             if (quickFilter.value === 'all-delivery-date') return true
             const today = new Date()
-            const deliveryDate = new Date(item.DeliveryDate || item.orderDate)
+            const deliveryDate = new Date((item as any).DeliveryDate || item.expectedDeliveryDate || item.orderDate)
             
             switch (quickFilter.value) {
               case 'overdue':
@@ -217,7 +217,7 @@ export function PurchaseOrdersDataTable<TData extends PurchaseOrder, TValue>({
 
   const handleRowClick = (row: any) => {
     const po = row.original as PurchaseOrder
-    router.push(`/procurement/purchase-orders/${po.poId}`)
+    router.push(`/procurement/purchase-orders/${(po as any).poId || po.id}`)
   }
 
   return (
