@@ -172,7 +172,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                 // Convert items to PO items
                 items: firstGroup.items.map((item: any) => ({
                   id: `po-item-${Math.random().toString(36).substr(2, 9)}`,
-                  name: item.name,
+                  itemName: item.itemName || item.name,
                   description: item.description,
                   convRate: 1,
                   orderedQuantity: item.quantityApproved || item.quantityRequested,
