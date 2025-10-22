@@ -32,7 +32,7 @@ export function PurchaseOrderCardView({
   const router = useRouter()
 
   const handleCardClick = (po: PurchaseOrder) => {
-    router.push(`/procurement/purchase-orders/${po.poId}`)
+    router.push(`/procurement/purchase-orders/${(po as any).poId || po.id}`)
   }
 
   if (data.length === 0) {
@@ -51,29 +51,29 @@ export function PurchaseOrderCardView({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {data.map((po) => (
-        <Card 
-          key={po.poId} 
+        <Card
+          key={(po as any).poId || po.id}
           className="group overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer border-border/50 hover:border-border"
           onClick={() => handleCardClick(po)}
         >
           <CardHeader className="pb-3 bg-muted/30 border-b">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3 min-w-0 flex-1">
-                <Checkbox 
-                  checked={selectedIds.includes(po.poId)} 
+                <Checkbox
+                  checked={selectedIds.includes((po as any).poId || po.id)}
                   onCheckedChange={(checked) => {
-                    onSelectionChange(po.poId, checked as boolean)
+                    onSelectionChange((po as any).poId || po.id, checked as boolean)
                   }}
                   onClick={(e) => e.stopPropagation()}
                   className="mt-1"
                 />
                 <div className="min-w-0 flex-1">
-                  <Link 
-                    href={`/procurement/purchase-orders/${po.poId}`}
+                  <Link
+                    href={`/procurement/purchase-orders/${(po as any).poId || po.id}`}
                     className="text-sm font-semibold text-primary hover:text-primary/80 hover:underline block truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {po.number}
+                    {(po as any).number || po.orderNumber}
                   </Link>
                   <p className="text-xs text-muted-foreground mt-1">
                     {po.orderDate.toLocaleDateString()}
@@ -103,14 +103,14 @@ export function PurchaseOrderCardView({
                     Delivery Date
                   </p>
                   <p className="text-xs font-medium">
-                    {po.DeliveryDate ? po.DeliveryDate.toLocaleDateString() : "Not set"}
+                    {((po as any).DeliveryDate || po.expectedDeliveryDate) ? ((po as any).DeliveryDate || po.expectedDeliveryDate).toLocaleDateString() : "Not set"}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                     Currency
                   </p>
-                  <p className="text-xs font-medium">{po.currencyCode}</p>
+                  <p className="text-xs font-medium">{(po as any).currencyCode || po.currency}</p>
                 </div>
               </div>
               
