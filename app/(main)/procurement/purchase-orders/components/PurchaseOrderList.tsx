@@ -107,7 +107,7 @@ export function PurchaseOrderList() {
     // First apply search and status filters
     let result = mockPurchaseOrders.filter(
       (po) =>
-        (po.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (((po as any).number || po.orderNumber)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           po.vendorName.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (statusFilter === "" || po.status === statusFilter)
     );
@@ -442,12 +442,12 @@ export function PurchaseOrderList() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">
-                    <Link 
-                      href={`/procurement/purchase-orders/${po.poId}`}
+                    <Link
+                      href={`/procurement/purchase-orders/${(po as any).poId || po.id}`}
                       className="text-primary hover:text-primary/80 hover:underline font-medium"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {po.number}
+                      {(po as any).number || po.orderNumber}
                     </Link>
                   </TableCell>
                   <TableCell>{po.vendorName}</TableCell>
@@ -539,12 +539,12 @@ export function PurchaseOrderList() {
                       onClick={(e) => e.stopPropagation()}
                     />
                     <div>
-                      <Link 
-                        href={`/procurement/purchase-orders/${po.poId}`}
+                      <Link
+                        href={`/procurement/purchase-orders/${(po as any).poId || po.id}`}
                         className="text-lg font-semibold text-primary hover:text-primary/80 hover:underline"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {po.number}
+                        {(po as any).number || po.orderNumber}
                       </Link>
                       <p className="text-sm text-muted-foreground">{po.orderDate.toLocaleDateString()}</p>
                     </div>
