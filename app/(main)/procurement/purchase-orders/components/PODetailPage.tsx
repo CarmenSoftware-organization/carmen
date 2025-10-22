@@ -539,16 +539,16 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             Delivery Date
           </Label>
           {isEditing ? (
-            <Input 
+            <Input
               type="date"
               name="DeliveryDate"
-              value={poData?.DeliveryDate?.toISOString().split("T")[0] || ""}
+              value={((poData as any)?.DeliveryDate || poData?.expectedDeliveryDate)?.toISOString().split("T")[0] || ""}
               onChange={handleInputChange}
               className="w-full h-8 text-xs"
             />
           ) : (
             <div className="text-xs text-gray-900 font-medium">
-              {poData?.DeliveryDate?.toISOString().split("T")[0] || "Not set"}
+              {((poData as any)?.DeliveryDate || poData?.expectedDeliveryDate)?.toISOString().split("T")[0] || "Not set"}
             </div>
           )}
         </div>
