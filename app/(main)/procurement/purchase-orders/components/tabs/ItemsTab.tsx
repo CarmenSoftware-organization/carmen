@@ -75,7 +75,7 @@ interface ItemsTabProps {
 export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem }: ItemsTabProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState<Partial<PurchaseOrderItem>>({
-    name: "",
+    itemName: "",
     description: "",
     orderedQuantity: 0,
     orderUnit: "",
@@ -349,7 +349,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
                     />
                   </TableCell>
                   <TableCell>{item.id.substring(0, 6)}</TableCell>
-                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.itemName}</TableCell>
                   <TableCell className="max-w-[200px] truncate">
                     {item.description}
                   </TableCell>
