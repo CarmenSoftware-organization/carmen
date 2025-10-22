@@ -68,8 +68,8 @@ export default function EnhancedItemsTab({
   // Filter items based on search term
   const filteredItems = useMemo(() => {
     return poData.items.filter((item) => {
-      const matchesSearch = 
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      const matchesSearch =
+        item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
       return matchesSearch;
     });
@@ -79,10 +79,28 @@ export default function EnhancedItemsTab({
   const summaryStats = useMemo(() => {
     const totalItems = filteredItems.length;
     const totalValue = filteredItems.reduce((sum, item) => {
-      const lineTotal = (item.orderedQuantity || 0) * (item.unitPrice || 0);
-      const taxAmount = lineTotal * (item.taxRate || 0);
-      const discountAmount = lineTotal * (item.discountRate || 0);
-      return sum + (lineTotal + taxAmount - discountAmount);
+      // Handle Money type for unitPrice - use amount property or treat as any for mock data compatibility
+      const unitPriceValue = typeof item.unitPrice === 'object' && item.unitPrice !== null
+        ? (item.unitPrice as any).amount || 0
+        : (item.unitPrice as any) || 0;
+
+      const lineTotal = (item.orderedQuantity || 0) * unitPriceValue;
+
+      // Handle tax amount - can be Money type or calculated from rate
+      const taxAmountValue = item.taxAmount
+        ? (typeof item.taxAmount === 'object' && item.taxAmount !== null
+            ? (item.taxAmount as any).amount || 0
+            : (item.taxAmount as any) || 0)
+        : lineTotal * (item.taxRate || 0);
+
+      // Handle discount amount - can be Money type or calculated from percentage
+      const discountAmountValue = item.discountAmount
+        ? (typeof item.discountAmount === 'object' && item.discountAmount !== null
+            ? (item.discountAmount as any).amount || 0
+            : (item.discountAmount as any) || 0)
+        : lineTotal * ((item.discount || 0) / 100);
+
+      return sum + (lineTotal + taxAmountValue - discountAmountValue);
     }, 0);
     const statusCounts = filteredItems.reduce((acc, item) => {
       const status = item.status || 'Not Received';
