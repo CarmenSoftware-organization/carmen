@@ -200,7 +200,7 @@ export default function POSelectionPage() {
                              {(po as any).items && (po as any).items.length > 0 ? (
                                (po as any).items.map((item: any) => (
                                  <div key={item.id}>
-                                   - {item.name} (Base Unit: {item.baseUnit || 'N/A'}, Currency: {(po as any).currencyCode || po.currency || 'N/A'})
+                                   - {item.itemName || (item as any).name} (Base Unit: {item.baseUnit || 'N/A'}, Currency: {(po as any).currencyCode || po.currency || 'N/A'})
                                  </div>
                                ))
                              ) : (
