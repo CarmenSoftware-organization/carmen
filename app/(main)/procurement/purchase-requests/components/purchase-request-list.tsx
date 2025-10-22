@@ -54,7 +54,7 @@ import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import { AdvancedFilter } from '@/components/ui/advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
-import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, CurrencyCode } from '@/lib/types'
+import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/lib/types'
 import { mockPRListData } from './mockPRListData'
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
