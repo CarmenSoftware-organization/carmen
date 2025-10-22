@@ -558,14 +558,14 @@ export default function PODetailPage({ params }: PODetailPageProps) {
             Currency
           </Label>
           {isEditing ? (
-            <Input 
+            <Input
               name="currencyCode"
-              value={poData?.currencyCode || ""}
+              value={(poData as any)?.currencyCode || poData?.currency || ""}
               onChange={handleInputChange}
               className="w-full h-8 text-xs"
             />
           ) : (
-            <div className="text-xs text-gray-900 font-medium">{poData?.currencyCode || ""}</div>
+            <div className="text-xs text-gray-900 font-medium">{(poData as any)?.currencyCode || poData?.currency || ""}</div>
           )}
         </div>
         <div>
