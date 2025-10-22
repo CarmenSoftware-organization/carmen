@@ -220,7 +220,7 @@ export default function StockOverviewPage() {
             <div className="text-2xl font-bold text-red-600">
               {selectedLocation === 'all'
                 ? aggregateMetrics.totalLowStock
-                : currentLocationMetrics?.lowStockCount || 0
+                : (currentLocationMetrics && 'lowStockCount' in currentLocationMetrics ? currentLocationMetrics.lowStockCount : 0)
               }
             </div>
             <p className="text-xs text-muted-foreground">
@@ -238,7 +238,7 @@ export default function StockOverviewPage() {
             <div className="text-2xl font-bold text-orange-600">
               {selectedLocation === 'all'
                 ? aggregateMetrics.totalExpiring
-                : currentLocationMetrics?.expiringCount || 0
+                : (currentLocationMetrics && 'expiringCount' in currentLocationMetrics ? currentLocationMetrics.expiringCount : 0)
               }
             </div>
             <p className="text-xs text-muted-foreground">

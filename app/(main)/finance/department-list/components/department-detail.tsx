@@ -168,7 +168,7 @@ export function DepartmentDetail({ department, onEdit, onDelete }: DepartmentDet
                 >
                   <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                     <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                      {user.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">

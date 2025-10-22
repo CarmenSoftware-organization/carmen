@@ -289,7 +289,7 @@ export function GRNShadcnDataTable({ data }: GRNShadcnDataTableProps) {
   }
 
   const calculateTotalAmount = (grn: GoodsReceiveNote) => {
-    return grn.items.reduce((total, item) => total + item.netAmount, 0)
+    return (grn as any).items?.reduce((total: number, item: any) => total + item.netAmount, 0) || 0
   }
 
   const renderCardView = () => (
@@ -311,11 +311,11 @@ export function GRNShadcnDataTable({ data }: GRNShadcnDataTableProps) {
                         href={`/procurement/goods-received-note/${grn.id}?mode=view`}
                         className="text-primary hover:text-primary/80 hover:underline"
                       >
-                        {grn.ref}
+                        {grn.grnNumber}
                       </Link>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(grn.date), 'MMM dd, yyyy')}
+                      {format(new Date(grn.receiptDate), 'MMM dd, yyyy')}
                     </p>
                   </div>
                 </div>
@@ -326,11 +326,11 @@ export function GRNShadcnDataTable({ data }: GRNShadcnDataTableProps) {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Vendor</p>
-                  <p className="text-sm font-medium">{grn.vendor}</p>
+                  <p className="text-sm font-medium">{grn.vendorName}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Items</p>
-                  <p className="text-sm font-medium">{grn.items.length} items</p>
+                  <p className="text-sm font-medium">{(grn as any).items?.length || 0} items</p>
                 </div>
                 <div className="pt-2 border-t">
                   <p className="text-sm font-medium text-muted-foreground">Total Amount</p>

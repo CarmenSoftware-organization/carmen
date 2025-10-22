@@ -101,7 +101,6 @@ export interface Recipe {
   approvedAt?: Date;
   lastTestedDate?: Date;
   reviewNotes?: string;
-  ...AuditTimestamp;
 }
 
 // ====== RECIPE INGREDIENTS ======
@@ -282,7 +281,6 @@ export interface CuisineType {
   // Status
   isActive: boolean;
   displayOrder: number;
-  ...AuditTimestamp;
 }
 
 // ====== NUTRITIONAL INFORMATION ======
@@ -425,7 +423,6 @@ export interface RecipeProductionBatch {
   // Status
   status: 'planned' | 'in_progress' | 'completed' | 'quality_check' | 'approved' | 'rejected';
   notes?: string;
-  ...AuditTimestamp;
 }
 
 /**

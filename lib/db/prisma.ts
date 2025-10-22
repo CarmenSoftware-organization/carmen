@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../generated/client'
+import { PrismaClient } from '@prisma/client'
 import { databaseCircuitBreaker, CircuitState } from './circuit-breaker'
 import { createDatabaseMonitor, getDatabaseMonitor } from './connection-monitor'
 import { databaseTimeoutHandler, TimeoutUtils } from './timeout-handler'
@@ -374,7 +374,7 @@ export { databaseCircuitBreaker, getDatabaseMonitor, databaseTimeoutHandler, Tim
 export { CircuitState } from './circuit-breaker'
 
 // Export types for use throughout the application
-export type { PrismaClient } from '../../generated/client'
+export type { PrismaClient } from '@prisma/client'
 export type { CircuitBreakerMetrics } from './circuit-breaker'
 export type { ConnectionPoolMetrics, HealthCheckResult } from './connection-monitor'
 export type { TimeoutResult, OperationContext } from './timeout-handler'

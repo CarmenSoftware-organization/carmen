@@ -37,21 +37,21 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
   const [currentLocation, setCurrentLocation] = useState<string>('');
 
   // Get count session from mock data
-  const countSession = mockCounts.find(count => count.id === params.id && count.type === 'physical') || 
-    mockCounts.find(count => count.type === 'physical')!;
-    
-  const countLocations = countSession.locations.map((locId: string) => 
-    mockLocations.find(loc => loc.id === locId)
-  ).filter((loc: any) => loc) as typeof mockLocations;
-  
-  // If no location is selected, use the first one
-  if (!currentLocation && countLocations.length > 0) {
-    setCurrentLocation(countLocations[0].id);
+  const countSession = mockCounts.find(count => count.id === params.id && count.countType === 'full') ||
+    mockCounts.find(count => count.countType === 'full') ||
+    mockCounts[0]!;
+
+  // Get location for this count
+  const countLocation = mockLocations.find(loc => loc.id === countSession.locationId);
+
+  // If no location is selected, use the count's location
+  if (!currentLocation && countLocation) {
+    setCurrentLocation(countLocation.id);
   }
 
   // Get products for current location
-  const locationProducts = mockInventoryProducts.filter(product => 
-    currentLocation ? product.locationId === currentLocation : countSession.locations.includes(product.locationId)
+  const locationProducts = mockInventoryProducts.filter(product =>
+    product.locationId === (currentLocation || countSession.locationId)
   );
 
   const handleCount = (itemId: string, data: { count?: number; status?: string }) => {
@@ -69,9 +69,9 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto p-4">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold mb-1">Physical Count: {countSession.id}</h1>
+            <h1 className="text-xl font-bold mb-1">Physical Count: {countSession.countNumber}</h1>
             <p className="text-sm text-gray-500">
-              Started: {countSession.startDate.toLocaleString()} | Counter: {countSession.counter}
+              Started: {countSession.startTime?.toLocaleString() || countSession.countDate.toLocaleString()} | Counter: {countSession.countedBy.join(', ')}
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -89,7 +89,7 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
         <div className="flex items-center space-x-8 mt-4">
           <div className="flex items-center space-x-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>Duration: {Math.floor((new Date().getTime() - countSession.startDate.getTime()) / (1000 * 60))}m</span>
+            <span>Duration: {Math.floor((new Date().getTime() - (countSession.startTime?.getTime() || countSession.countDate.getTime())) / (1000 * 60))}m</span>
           </div>
           <div className="flex items-center space-x-2">
             <Layers className="h-4 w-4 text-muted-foreground" />
@@ -104,20 +104,16 @@ export default function PhysicalActiveCountPage({ params }: PageProps) {
     <div className="bg-gray-50 border-b">
       <div className="max-w-7xl mx-auto p-4">
         <div className="flex space-x-4">
-          {countLocations.map((loc) => (
-            <div 
-              key={loc.id}
-              onClick={() => setCurrentLocation(loc.id)}
-              className={`px-4 py-2 rounded-lg cursor-pointer ${
-                loc.id === currentLocation ? 'bg-blue-50 border border-blue-200' : 'bg-white border'
-              }`}
+          {countLocation && (
+            <div
+              className="px-4 py-2 rounded-lg bg-blue-50 border border-blue-200"
             >
-              {loc.name}
+              {countLocation.name}
               <Badge variant="secondary" className="ml-2">
-                {mockInventoryProducts.filter(p => p.locationId === loc.id).length} items
+                {locationProducts.length} items
               </Badge>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

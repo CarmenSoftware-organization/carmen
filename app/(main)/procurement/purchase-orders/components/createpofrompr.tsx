@@ -2,14 +2,6 @@
 
 import React, { useState, useMemo } from "react";
 import {
-  CurrencyCode,
-  DocumentStatus,
-  PurchaseRequest,
-  WorkflowStage,
-  WorkflowStatus,
-} from "@/lib/types";
-import { PRType } from "@/lib/types";
-import {
   Table,
   TableBody,
   TableCell,
@@ -21,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown } from "lucide-react";
+import { PurchaseRequest } from "@/lib/types";
 import {
   Select,
   SelectContent,
@@ -32,12 +25,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
 // Import the actual sample PR data from purchase-requests - using the same data from PR list
-const sampleData: PurchaseRequest[] = [
+const sampleData = [
   {
     id: 'sample-pr-001',
     refNumber: 'PR-2023-001',
     date: new Date('2023-01-01'),
-    type: PRType.GeneralPurchase,
+    type: 'goods',
     description: 'Sample purchase request for office supplies',
     requestorId: 'user-1',
     requestor: {
@@ -45,9 +38,7 @@ const sampleData: PurchaseRequest[] = [
       id: 'user-1',
       department: 'Administration'
     },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
+    status: 'approved',
     location: 'Head Office',
     department: 'Administration',
     jobCode: 'JOB-001',
@@ -72,7 +63,7 @@ const sampleData: PurchaseRequest[] = [
     id: 'sample-pr-002',
     refNumber: 'PR-2023-002',
     date: new Date('2023-01-02'),
-    type: PRType.GeneralPurchase,
+    type: 'goods',
     description: 'IT Equipment and Supplies',
     requestorId: 'user-1',
     requestor: {
@@ -80,9 +71,7 @@ const sampleData: PurchaseRequest[] = [
       id: 'user-1',
       department: 'Administration'
     },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
+    status: 'approved',
     location: 'Branch Office',
     department: 'IT',
     jobCode: 'JOB-002',
@@ -107,7 +96,7 @@ const sampleData: PurchaseRequest[] = [
     id: 'sample-pr-003',
     refNumber: 'PR-2023-003',
     date: new Date('2023-01-03'),
-    type: PRType.GeneralPurchase,
+    type: 'goods',
     description: 'Marketing Materials',
     requestorId: 'user-002',
     requestor: {
@@ -115,9 +104,7 @@ const sampleData: PurchaseRequest[] = [
       id: 'user-002',
       department: 'Marketing'
     },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
+    status: 'approved',
     location: 'Main Office',
     department: 'Marketing',
     jobCode: 'JOB-003',
@@ -142,7 +129,7 @@ const sampleData: PurchaseRequest[] = [
     id: 'sample-pr-004',
     refNumber: 'PR-2023-004',
     date: new Date('2023-01-04'),
-    type: PRType.GeneralPurchase,
+    type: 'goods',
     description: 'Kitchen Equipment',
     requestorId: 'user-003',
     requestor: {
@@ -150,9 +137,7 @@ const sampleData: PurchaseRequest[] = [
       id: 'user-003',
       department: 'Kitchen'
     },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
+    status: 'approved',
     location: 'Main Kitchen',
     department: 'Kitchen',
     jobCode: 'JOB-004',
@@ -177,7 +162,7 @@ const sampleData: PurchaseRequest[] = [
     id: 'sample-pr-005',
     refNumber: 'PR-2023-005',
     date: new Date('2023-01-05'),
-    type: PRType.GeneralPurchase,
+    type: 'goods',
     description: 'Office Supplies - Stationery',
     requestorId: 'user-1',
     requestor: {
@@ -185,9 +170,7 @@ const sampleData: PurchaseRequest[] = [
       id: 'user-1',
       department: 'Administration'
     },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
+    status: 'approved',
     location: 'Head Office',
     department: 'Administration',
     jobCode: 'JOB-005',
@@ -212,7 +195,7 @@ const sampleData: PurchaseRequest[] = [
     id: 'sample-pr-006',
     refNumber: 'PR-2023-006',
     date: new Date('2023-01-06'),
-    type: PRType.GeneralPurchase,
+    type: 'goods',
     description: 'International Supplies',
     requestorId: 'user-004',
     requestor: {
@@ -220,9 +203,7 @@ const sampleData: PurchaseRequest[] = [
       id: 'user-004',
       department: 'International'
     },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
+    status: 'approved',
     location: 'International Office',
     department: 'International',
     jobCode: 'JOB-006',
@@ -247,7 +228,7 @@ const sampleData: PurchaseRequest[] = [
     id: 'sample-pr-007',
     refNumber: 'PR-2023-007',
     date: new Date('2023-01-07'),
-    type: PRType.GeneralPurchase,
+    type: 'goods',
     description: 'European Office Equipment',
     requestorId: 'user-004',
     requestor: {
@@ -255,9 +236,7 @@ const sampleData: PurchaseRequest[] = [
       id: 'user-004',
       department: 'International'
     },
-    status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
-    currentWorkflowStage: WorkflowStage.completed,
+    status: 'approved',
     location: 'International Office',
     department: 'International',
     jobCode: 'JOB-007',
@@ -293,7 +272,7 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
   const [selectedPRIds, setSelectedPRIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    key: "date",
+    key: "requestDate",
     direction: "asc",
   });
 
@@ -305,7 +284,7 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
           pr.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
           pr.vendor.toLowerCase().includes(searchTerm.toLowerCase())
       )
-      .sort((a, b) => {
+      .sort((a: any, b: any) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
         
@@ -341,9 +320,9 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
   };
 
 
-  const handleSort = (key: keyof PurchaseRequest) => {
+  const handleSort = (key: any) => {
     setSortConfig((prevConfig) => ({
-      key,
+      key: key as keyof PurchaseRequest,
       direction:
         prevConfig.key === key && prevConfig.direction === "asc"
           ? "desc"
@@ -483,7 +462,7 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
                   groups[key].prs.push(pr);
                   groups[key].totalAmount += pr.totalAmount;
                   return groups;
-                }, {} as Record<string, { vendor: string; currency: string; prs: PurchaseRequest[]; totalAmount: number }>);
+                }, {} as Record<string, { vendor: string; currency: string; prs: any[]; totalAmount: number }>);
                 
                 return (
                   <ul className="mt-2 space-y-1">
@@ -502,7 +481,7 @@ export default function CreatePOFromPR({ onSelectPRs }: CreatePOFromPRProps) {
           type="button"
           onClick={() => {
             const selectedPRs = filteredAndSortedPurchaseRequests.filter(pr => selectedPRIds.includes(pr.id));
-            onSelectPRs(selectedPRs);
+            onSelectPRs(selectedPRs as any);
           }}
           disabled={selectedPRIds.length === 0}
         >

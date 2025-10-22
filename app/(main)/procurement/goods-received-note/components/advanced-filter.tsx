@@ -24,18 +24,15 @@ interface AdvancedFilterProps {
 }
 
 const filterFields: { value: keyof GoodsReceiveNote; label: string }[] = [
-  { value: 'ref', label: 'GRN Number' },
-  { value: 'date', label: 'Date' },
+  { value: 'grnNumber', label: 'GRN Number' },
+  { value: 'receiptDate', label: 'Date' },
   { value: 'invoiceDate', label: 'Invoice Date' },
   { value: 'status', label: 'Status' },
-  { value: 'vendor', label: 'Vendor' },
+  { value: 'vendorName', label: 'Vendor' },
   { value: 'invoiceNumber', label: 'Invoice Number' },
-  { value: 'totalAmount', label: 'Total Amount' },
-  { value: 'receiver', label: 'Received By' },
-  { value: 'location', label: 'Location' },
-  { value: 'currency', label: 'Currency' },
-  { value: 'isConsignment', label: 'Is Consignment' },
-  { value: 'isCash', label: 'Is Cash Purchase' }
+  { value: 'totalValue', label: 'Total Amount' },
+  { value: 'receivedBy', label: 'Received By' },
+  { value: 'locationId', label: 'Location' }
 ]
 
 export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilterProps) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporting & Analytics Module - Carmen ERP Documentation</title>
+    <title>Carmen ERP Reports Documentation</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +23,6 @@
             --text-secondary: #64748b;
             --border: #e2e8f0;
             --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         }
 
         body {
@@ -31,124 +30,47 @@
             background: var(--bg-light);
             color: var(--text-primary);
             line-height: 1.6;
-            display: flex;
-            min-height: 100vh;
         }
 
-        .sidebar {
-            width: 280px;
+        .header {
             background: var(--bg-white);
-            border-right: 1px solid var(--border);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 2rem 0;
-        }
-
-        .sidebar-header {
-            padding: 0 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-header h1 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-
-        .back-link:hover {
-            color: var(--primary);
-        }
-
-        .sidebar nav {
-            padding: 0 1rem;
-        }
-
-        .nav-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .nav-section h3 {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            padding: 0 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-section ul {
-            list-style: none;
-        }
-
-        .nav-section a {
-            display: block;
-            padding: 0.5rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .nav-section a:hover {
-            background: var(--bg-light);
-            color: var(--primary);
-        }
-
-        .main-content {
-            margin-left: 280px;
-            flex: 1;
+            border-bottom: 1px solid var(--border);
             padding: 2rem;
-        }
-
-        header {
-            background: var(--bg-white);
-            padding: 2rem;
-            border-radius: 0.75rem;
             box-shadow: var(--shadow);
-            margin-bottom: 2rem;
         }
 
-        header h1 {
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
             font-size: 2rem;
+            color: var(--primary);
             margin-bottom: 0.5rem;
         }
 
-        .breadcrumb {
+        .header p {
             color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
+            font-size: 1.125rem;
         }
 
-        .breadcrumb a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .stats-grid {
+        .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            margin: 1.5rem 0;
+            margin-top: 1.5rem;
         }
 
-        .stat {
+        .stat-card {
             background: var(--bg-light);
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
-        .stat-value {
-            font-size: 1.5rem;
+        .stat-number {
+            font-size: 2rem;
             font-weight: 700;
             color: var(--primary);
         }
@@ -156,212 +78,672 @@
         .stat-label {
             font-size: 0.875rem;
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        .feature-card {
+        .search-section {
             background: var(--bg-white);
-            border-radius: 0.75rem;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
             box-shadow: var(--shadow);
-            overflow: hidden;
-            transition: all 0.3s;
         }
 
-        .feature-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-
-        .feature-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .feature-header h3 {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-meta {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .feature-body {
-            padding: 1.5rem;
-        }
-
-        .feature-description {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .sub-features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-
-        .sub-feature-tag {
-            background: var(--bg-light);
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .feature-footer {
-            padding: 1rem 1.5rem;
-            background: var(--bg-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
+        .search-box {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
             transition: all 0.2s;
         }
 
-        .btn:hover {
-            background: #1d4ed8;
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .btn-outline {
-            background: white;
+        .category-section {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .category-count {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            background: var(--bg-light);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .report-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            background: var(--bg-white);
+        }
+
+        .report-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .report-id {
+            font-size: 0.75rem;
+            font-weight: 600;
             color: var(--primary);
-            border: 1px solid var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.75rem;
         }
 
-        .btn-outline:hover {
+        .report-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .report-links {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .report-link {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .link-prd {
             background: var(--primary);
             color: white;
         }
 
-        .status-badge {
+        .link-prd:hover {
+            background: #1d4ed8;
+        }
+
+        .link-template {
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .link-template:hover {
+            background: var(--border);
+        }
+
+        .priority-badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
             font-size: 0.75rem;
             font-weight: 600;
+            margin-top: 0.5rem;
         }
 
-        .status-badge.complete {
-            background: #dcfce7;
-            color: #166534;
+        .priority-critical {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
-        @media (max-width: 1024px) {
-            .sidebar {
-                display: none;
-            }
+        .priority-high {
+            background: #fef3c7;
+            color: #92400e;
+        }
 
-            .main-content {
-                margin-left: 0;
+        .priority-medium {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .priority-standard {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a href="../index.html" class="back-link">← All Modules</a>
-            <h1>Reporting & Analytics</h1>
-            <p style="font-size: 0.875rem; color: var(--text-secondary);">2 pages | 1 feature</p>
+    <div class="header">
+        <div class="header-content">
+            <h1>📊 Carmen ERP Reports Documentation</h1>
+            <p>Comprehensive reporting system for hospitality ERP</p>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">35</div>
+                    <div class="stat-label">Total Reports</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Modules</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">70</div>
+                    <div class="stat-label">Documents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Critical Priority</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-section">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search reports by name or ID...">
         </div>
 
-        <nav>
-            <div class="nav-section">
-                <h3>Features</h3>
-                <ul>
-                    <li><a href="#consumption-analytics">Consumption Analytics</a></li>
-                </ul>
+        <!-- Purchase Request Reports -->
+        <div class="category-section" data-category="purchase-request">
+            <div class="category-header">
+                <h2 class="category-title">Purchase Request (PR) Reports</h2>
+                <span class="category-count">3 Reports</span>
             </div>
-        </nav>
-    </aside>
-
-    <main class="main-content">
-        <header>
-            <div class="breadcrumb">
-                <a href="../index.html">Documentation</a> / Reporting & Analytics
-            </div>
-            <h1>📊 Reporting & Analytics</h1>
-            <p style="color: var(--text-secondary); margin-top: 0.5rem;">
-                Business intelligence and analytics for consumption tracking and operational insights.
-            </p>
-
-            <div class="stats-grid">
-                <div class="stat">
-                    <div class="stat-value">2</div>
-                    <div class="stat-label">Total Pages</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">1</div>
-                    <div class="stat-label">Features</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">100%</div>
-                    <div class="stat-label">Implemented</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">✅</div>
-                    <div class="stat-label">Production Ready</div>
-                </div>
-            </div>
-        </header>
-
-        <section>
-            <h2 style="margin-bottom: 1.5rem;">Features & Sub-Modules</h2>
-
-            <div class="features-grid">
-                <!-- Consumption Analytics -->
-                <div class="feature-card" id="consumption-analytics">
-                    <div class="feature-header">
-                        <h3>📈 Consumption Analytics</h3>
-                        <div class="feature-meta">
-                            <span class="status-badge complete">Fully Implemented</span>
-                            <span> • 2 pages</span>
-                        </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="pr-001 purchase request list">
+                    <span class="report-id">PR-001</span>
+                    <div class="report-name">Purchase Request List</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="01-pr-001-purchase-request-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="01-pr-001-purchase-request-list/TEMPLATE.html" class="report-link link-template">Template</a>
                     </div>
-                    <div class="feature-body">
-                        <p class="feature-description">
-                            Analyze consumption patterns, trends, and variances with interactive dashboards and reports.
-                        </p>
-                        <div class="sub-features">
-                            <span class="sub-feature-tag">Dashboard</span>
-                            <span class="sub-feature-tag">Trend Analysis</span>
-                            <span class="sub-feature-tag">Variance Reports</span>
-                            <span class="sub-feature-tag">Export Data</span>
-                        </div>
+                </div>
+                <div class="report-card" data-search="pr-002 purchase request detail">
+                    <span class="report-id">PR-002</span>
+                    <div class="report-name">Purchase Request Detail</div>
+                    <span class="priority-badge priority-critical">Critical Priority</span>
+                    <div class="report-links">
+                        <a href="02-pr-002-purchase-request-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="02-pr-002-purchase-request-detail/TEMPLATE.html" class="report-link link-template">Template</a>
                     </div>
-                    <div class="feature-footer">
-                        <span style="font-size: 0.875rem; color: var(--text-secondary);">100% implemented</span>
-                        <a href="#consumption-analytics" class="btn">View Docs →</a>
+                </div>
+                <div class="report-card" data-search="pr-003 price list product">
+                    <span class="report-id">PR-003</span>
+                    <div class="report-name">Price List by Product</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="03-pr-003-price-list-by-product/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="03-pr-003-price-list-by-product/TEMPLATE.html" class="report-link link-template">Template</a>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section style="margin-top: 3rem; padding: 2rem; background: var(--bg-white); border-radius: 0.75rem; box-shadow: var(--shadow);">
-            <h2 style="margin-bottom: 1rem;">Quick Links</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                <a href="../index.html" class="btn btn-outline" style="text-align: center;">← Back to All Modules</a>
+        <!-- Purchase Order Reports -->
+        <div class="category-section" data-category="purchase-order">
+            <div class="category-header">
+                <h2 class="category-title">Purchase Order (PO) Reports</h2>
+                <span class="category-count">3 Reports</span>
             </div>
-        </section>
-    </main>
+            <div class="reports-grid">
+                <div class="report-card" data-search="po-001 order pending">
+                    <span class="report-id">PO-001</span>
+                    <div class="report-name">Order Pending (Merged with PO-002)</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="04-po-001-order-pending/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="04-po-001-order-pending/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="po-002 purchase order detail">
+                    <span class="report-id">PO-002</span>
+                    <div class="report-name">Purchase Order Detail</div>
+                    <span class="priority-badge priority-critical">Critical Priority</span>
+                    <div class="report-links">
+                        <a href="05-po-002-purchase-order-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="05-po-002-purchase-order-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="po-003 purchase order list">
+                    <span class="report-id">PO-003</span>
+                    <div class="report-name">Purchase Order List</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="06-po-003-purchase-order-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="06-po-003-purchase-order-list/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receiving Reports -->
+        <div class="category-section" data-category="receiving">
+            <div class="category-header">
+                <h2 class="category-title">Receiving (RC) Reports</h2>
+                <span class="category-count">4 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="rc-001 receiving list">
+                    <span class="report-id">RC-001</span>
+                    <div class="report-name">Receiving List</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="07-rc-001-receiving-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="07-rc-001-receiving-list/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="rc-002 receiving detail">
+                    <span class="report-id">RC-002</span>
+                    <div class="report-name">Receiving Detail</div>
+                    <span class="priority-badge priority-critical">Critical Priority</span>
+                    <div class="report-links">
+                        <a href="08-rc-002-receiving-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="08-rc-002-receiving-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="rc-003 top purchasing">
+                    <span class="report-id">RC-003</span>
+                    <div class="report-name">Top Purchasing</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="09-rc-003-top-purchasing/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="09-rc-003-top-purchasing/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="rc-004 purchase analysis item">
+                    <span class="report-id">RC-004</span>
+                    <div class="report-name">Purchase Analysis by Item</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="10-rc-004-purchase-analysis-by-item/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="10-rc-004-purchase-analysis-by-item/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credit Note Reports -->
+        <div class="category-section" data-category="credit-note">
+            <div class="category-header">
+                <h2 class="category-title">Credit Note (CN) Reports</h2>
+                <span class="category-count">2 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="cn-001 credit note list">
+                    <span class="report-id">CN-001</span>
+                    <div class="report-name">Credit Note List</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="11-cn-001-credit-note-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="11-cn-001-credit-note-list/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="cn-002 credit note detail">
+                    <span class="report-id">CN-002</span>
+                    <div class="report-name">Credit Note Detail</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="12-cn-002-credit-note-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="12-cn-002-credit-note-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendor Reports -->
+        <div class="category-section" data-category="vendor">
+            <div class="category-header">
+                <h2 class="category-title">Vendor (VD) Reports</h2>
+                <span class="category-count">2 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="vd-001 vendor list">
+                    <span class="report-id">VD-001</span>
+                    <div class="report-name">Vendor List</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="13-vd-001-vendor-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="13-vd-001-vendor-list/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="vd-002 vendor detailed">
+                    <span class="report-id">VD-002</span>
+                    <div class="report-name">Vendor Detailed</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="14-vd-002-vendor-detailed/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="14-vd-002-vendor-detailed/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Reports -->
+        <div class="category-section" data-category="product">
+            <div class="category-header">
+                <h2 class="category-title">Product (PD) Reports</h2>
+                <span class="category-count">2 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="pd-001 product list">
+                    <span class="report-id">PD-001</span>
+                    <div class="report-name">Product List</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="15-pd-001-product-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="15-pd-001-product-list/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="pd-002 product category">
+                    <span class="report-id">PD-002</span>
+                    <div class="report-name">Product Category</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="16-pd-002-product-category/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="16-pd-002-product-category/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Store Requisition Reports -->
+        <div class="category-section" data-category="store-requisition">
+            <div class="category-header">
+                <h2 class="category-title">Store Requisition (SR) Reports</h2>
+                <span class="category-count">4 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="sr-001 store requisition detail">
+                    <span class="report-id">SR-001</span>
+                    <div class="report-name">Store Requisition Detail</div>
+                    <span class="priority-badge priority-medium">Medium Priority</span>
+                    <div class="report-links">
+                        <a href="17-sr-001-store-requisition-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="17-sr-001-store-requisition-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="sr-002 store requisition summary">
+                    <span class="report-id">SR-002</span>
+                    <div class="report-name">Store Requisition Summary</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="18-sr-002-store-requisition-summary/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="18-sr-002-store-requisition-summary/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="sr-003 store requisition list">
+                    <span class="report-id">SR-003</span>
+                    <div class="report-name">Store Requisition List</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="19-sr-003-store-requisition-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="19-sr-003-store-requisition-list/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="sr-004 issue detail">
+                    <span class="report-id">SR-004</span>
+                    <div class="report-name">Issue Detail</div>
+                    <span class="priority-badge priority-medium">Medium Priority</span>
+                    <div class="report-links">
+                        <a href="20-sr-004-issue-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="20-sr-004-issue-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Movement Reports -->
+        <div class="category-section" data-category="stock-movement">
+            <div class="category-header">
+                <h2 class="category-title">Stock Movement Reports</h2>
+                <span class="category-count">2 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="si-001 stock in detail">
+                    <span class="report-id">SI-001</span>
+                    <div class="report-name">Stock In Detail</div>
+                    <span class="priority-badge priority-medium">Medium Priority</span>
+                    <div class="report-links">
+                        <a href="21-si-001-stock-in-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="21-si-001-stock-in-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="so-001 stock out detail">
+                    <span class="report-id">SO-001</span>
+                    <div class="report-name">Stock Out Detail</div>
+                    <span class="priority-badge priority-medium">Medium Priority</span>
+                    <div class="report-links">
+                        <a href="22-so-001-stock-out-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="22-so-001-stock-out-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Period Closing Reports -->
+        <div class="category-section" data-category="period-closing">
+            <div class="category-header">
+                <h2 class="category-title">Period Closing (CL) Reports</h2>
+                <span class="category-count">1 Report</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="cl-001 eop adjustment">
+                    <span class="report-id">CL-001</span>
+                    <div class="report-name">EOP Adjustment</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="23-cl-001-eop-adjustment/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="23-cl-001-eop-adjustment/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Reports -->
+        <div class="category-section" data-category="inventory">
+            <div class="category-header">
+                <h2 class="category-title">Inventory (INV) Reports</h2>
+                <span class="category-count">9 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="inv-001 inventory balance">
+                    <span class="report-id">INV-001</span>
+                    <div class="report-name">Inventory Balance</div>
+                    <span class="priority-badge priority-critical">Critical Priority</span>
+                    <div class="report-links">
+                        <a href="24-inv-001-inventory-balance/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="24-inv-001-inventory-balance/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-002 inventory movement detail">
+                    <span class="report-id">INV-002</span>
+                    <div class="report-name">Inventory Movement Detail</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="25-inv-002-inventory-movement-detail/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="25-inv-002-inventory-movement-detail/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-003 inventory movement summary">
+                    <span class="report-id">INV-003</span>
+                    <div class="report-name">Inventory Movement Summary</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="26-inv-003-inventory-movement-summary/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="26-inv-003-inventory-movement-summary/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-004 slow moving">
+                    <span class="report-id">INV-004</span>
+                    <div class="report-name">Slow Moving</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="27-inv-004-slow-moving/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="27-inv-004-slow-moving/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-008 stock card detailed">
+                    <span class="report-id">INV-008</span>
+                    <div class="report-name">Stock Card Detailed</div>
+                    <span class="priority-badge priority-critical">Critical Priority</span>
+                    <div class="report-links">
+                        <a href="28-inv-008-stock-card-detailed/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="28-inv-008-stock-card-detailed/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-009 stock card summary">
+                    <span class="report-id">INV-009</span>
+                    <div class="report-name">Stock Card Summary</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="29-inv-009-stock-card-summary/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="29-inv-009-stock-card-summary/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-010 deviation item">
+                    <span class="report-id">INV-010</span>
+                    <div class="report-name">Deviation by Item</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="30-inv-010-deviation-by-item/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="30-inv-010-deviation-by-item/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-011 inventory aging">
+                    <span class="report-id">INV-011</span>
+                    <div class="report-name">Inventory Aging</div>
+                    <span class="priority-badge priority-medium">Medium Priority</span>
+                    <div class="report-links">
+                        <a href="31-inv-011-inventory-aging/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="31-inv-011-inventory-aging/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="inv-012 expired items">
+                    <span class="report-id">INV-012</span>
+                    <div class="report-name">Expired Items</div>
+                    <span class="priority-badge priority-high">High Priority</span>
+                    <div class="report-links">
+                        <a href="32-inv-012-expired-items/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="32-inv-012-expired-items/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe Management Reports -->
+        <div class="category-section" data-category="recipe-management">
+            <div class="category-header">
+                <h2 class="category-title">Recipe Management (RM) Reports</h2>
+                <span class="category-count">3 Reports</span>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card" data-search="rm-001 recipe list">
+                    <span class="report-id">RM-001</span>
+                    <div class="report-name">Recipe List</div>
+                    <span class="priority-badge priority-standard">Standard</span>
+                    <div class="report-links">
+                        <a href="33-rm-001-recipe-list/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="33-rm-001-recipe-list/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="rm-002 recipe card">
+                    <span class="report-id">RM-002</span>
+                    <div class="report-name">Recipe Card</div>
+                    <span class="priority-badge priority-medium">Medium Priority</span>
+                    <div class="report-links">
+                        <a href="34-rm-002-recipe-card/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="34-rm-002-recipe-card/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+                <div class="report-card" data-search="rm-003 material consumption">
+                    <span class="report-id">RM-003</span>
+                    <div class="report-name">Material Consumption</div>
+                    <span class="priority-badge priority-medium">Medium Priority</span>
+                    <div class="report-links">
+                        <a href="35-rm-003-material-consumption/PRD.html" class="report-link link-prd">PRD</a>
+                        <a href="35-rm-003-material-consumption/TEMPLATE.html" class="report-link link-template">Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Carmen ERP Documentation - Generated from Markdown</p>
+            <p>Total Reports: 35 | Total Documents: 70 | Report Index: <a href="00-REPORTS-INDEX.html" style="color: var(--primary);">00-REPORTS-INDEX.html</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchBox = document.getElementById('searchBox');
+        const reportCards = document.querySelectorAll('.report-card');
+        const categorySections = document.querySelectorAll('.category-section');
+
+        searchBox.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+
+            reportCards.forEach(card => {
+                const searchData = card.getAttribute('data-search');
+                const shouldShow = searchData.includes(searchTerm);
+                card.style.display = shouldShow ? '' : 'none';
+            });
+
+            // Hide empty category sections
+            categorySections.forEach(section => {
+                const visibleCards = section.querySelectorAll('.report-card:not([style*="display: none"])');
+                section.style.display = visibleCards.length > 0 ? '' : 'none';
+            });
+        });
+    </script>
 </body>
 </html>

@@ -24,15 +24,15 @@ interface AdvancedFilterProps {
 }
 
 const filterFields: { value: keyof PurchaseOrder; label: string }[] = [
-  { value: 'number', label: 'PO Number' },
+  { value: 'orderNumber', label: 'PO Number' },
   { value: 'orderDate', label: 'Order Date' },
-  { value: 'DeliveryDate', label: 'Delivery Date' },
+  { value: 'expectedDeliveryDate', label: 'Delivery Date' },
   { value: 'vendorName', label: 'Vendor' },
   { value: 'status', label: 'Status' },
   { value: 'totalAmount', label: 'Total Amount' },
-  { value: 'currencyCode', label: 'Currency' },
-  { value: 'buyer', label: 'Buyer' },
-  { value: 'description', label: 'Description' }
+  { value: 'currency', label: 'Currency' },
+  { value: 'approvedBy', label: 'Buyer' },
+  { value: 'notes', label: 'Notes' }
 ]
 
 export function AdvancedFilter({ onApplyFilters, onClearFilters }: AdvancedFilterProps) {

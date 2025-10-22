@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNoteComponent} from '../components/goods-receive-note'
-import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
+import { GoodsReceiveNote } from '@/lib/types'
 import { mockGoodsReceiveNotes } from '@/lib/mock-data'
+import { GRNDetailMode } from '../components/GoodsReceiveNoteDetail'
 
 export default function EditGoodsReceiveNote({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const [mode, setMode] = useState<GoodsReceiveNoteMode>('edit')
+  const [mode, setMode] = useState<GRNDetailMode>('edit')
   const [loading, setLoading] = useState(true)
   const [grnData, setGrnData] = useState<GoodsReceiveNote | null>(null)
 
@@ -25,7 +26,7 @@ export default function EditGoodsReceiveNote({ params }: { params: { id: string 
     setLoading(false)
   }, [params.id, router])
 
-  const handleModeChange = (newMode: GoodsReceiveNoteMode) => {
+  const handleModeChange = (newMode: GRNDetailMode) => {
     if (newMode === 'view') {
       // Navigate back to the view page
       router.push(`/procurement/goods-received-note/${params.id}`)

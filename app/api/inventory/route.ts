@@ -196,8 +196,9 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/inventory/statistics
  * Get inventory statistics and overview
+ * NOTE: This should be moved to app/api/inventory/statistics/route.ts
  */
-export async function getStatistics(request: NextRequest) {
+async function getStatistics(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -232,8 +233,9 @@ export async function getStatistics(request: NextRequest) {
 /**
  * GET /api/inventory/valuation
  * Get inventory valuation summary
+ * NOTE: This should be moved to app/api/inventory/valuation/route.ts
  */
-export async function getValuation(request: NextRequest) {
+async function getValuation(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {

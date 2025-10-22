@@ -16,17 +16,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  GoodsReceiveNoteMode,
-  ExtraCost,
-  CostType,
-  CostDistributionMethod,
-} from "@/lib/types";
+// ExtraCost, CostType, and CostDistributionMethod are not exported from '@/lib/types'
+// Using any type for now
+type ExtraCost = any;
+type CostType = any;
+type CostDistributionMethod = any;
+const CostDistributionMethod = {
+  NET_AMOUNT: 'NET_AMOUNT',
+  QUANTITY: 'QUANTITY',
+  EQUAL: 'EQUAL'
+} as const;
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { GRNDetailMode } from '../GoodsReceiveNoteDetail';
 
 interface ExtraCostsTabProps {
-  mode: GoodsReceiveNoteMode;
+  mode: GRNDetailMode;
   initialCosts: ExtraCost[];
   onCostsChange: (
     costs: ExtraCost[],

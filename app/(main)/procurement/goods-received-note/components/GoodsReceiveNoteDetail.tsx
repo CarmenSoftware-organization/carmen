@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { GoodsReceiveNoteItems } from './tabs/GoodsReceiveNoteItems'
-import { GoodsReceiveNoteMode, GoodsReceiveNote, GoodsReceiveNoteItem, ExtraCost, FinancialSummary, GoodsReceiveNoteStatus } from '@/lib/types'
+import { GoodsReceiveNote, GoodsReceiveNoteItem, GRNStatus } from '@/lib/types'
 import { ExtraCostsTab } from './tabs/ExtraCostsTab'
 import { GoodsReceiveNoteItemsBulkActions } from './tabs/GoodsReceiveNoteItemsBulkActions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,8 +22,8 @@ import StockMovementContent from './tabs/stock-movement'
 import SummaryTotal from './SummaryTotal'
 import { format } from 'date-fns'
 
-// Extend GoodsReceiveNoteMode to include 'confirm'
-export type GRNDetailMode = GoodsReceiveNoteMode | 'confirm';
+// GRN Detail Mode types
+export type GRNDetailMode = 'view' | 'edit' | 'add' | 'confirm';
 
 interface GoodsReceiveNoteDetailProps {
   id?: string
@@ -33,7 +33,7 @@ interface GoodsReceiveNoteDetailProps {
 }
 
 // Define a default empty GoodsReceiveNote object
-const emptyGoodsReceiveNote: GoodsReceiveNote = {
+const emptyGoodsReceiveNote = {
   id: '',
   ref: '',
   selectedItems: [],
@@ -46,7 +46,7 @@ const emptyGoodsReceiveNote: GoodsReceiveNote = {
   vendorId: '',
   location: '',
   currency: '',
-  status: 'Received',
+  status: GRNStatus.RECEIVED,
   cashBook: '',
   items: [],
   stockMovements: [],
@@ -75,7 +75,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
   const router = useRouter()
   const [formData, setFormData] = useState<GoodsReceiveNote>(initialData);
   const [currentMode, setCurrentMode] = useState<GRNDetailMode>(mode);
-  const [extraCosts, setExtraCosts] = useState<ExtraCost[]>(initialData.extraCosts || [])
+  const [extraCosts, setExtraCosts] = useState<any[]>((initialData as any).extraCosts || [])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -83,7 +83,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
 
   useEffect(() => {
     setFormData(initialData);
-    setExtraCosts(initialData.extraCosts || []);
+    setExtraCosts((initialData as any).extraCosts || []);
     setSelectedItems([]);
     setExpandedItems([]);
     setCurrentMode(mode);
@@ -121,7 +121,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
     handleModeChange('edit');
   }
 
-  const handleExtraCostsChange = (costs: ExtraCost[]) => {
+  const handleExtraCostsChange = (costs: any[]) => {
     setExtraCosts(costs);
     setFormData(prev => ({ ...prev, extraCosts: costs }));
   };
@@ -129,7 +129,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
   const handleItemSelection = (itemId: string, isSelected: boolean) => {
     if (itemId === "") {
       if (isSelected) {
-        setSelectedItems(formData.items.map(item => item.id))
+        setSelectedItems((formData as any).items.map((item: any) => item.id))
       } else {
         setSelectedItems([])
       }
@@ -147,8 +147,8 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
     if (action === 'delete') {
       setFormData(prev => ({
         ...prev,
-        items: prev.items.filter(item => !selectedItems.includes(item.id))
-      }))
+        items: (prev as any).items?.filter((item: any) => !selectedItems.includes(item.id)) || []
+      } as any))
     }
     setSelectedItems([])
   }
@@ -182,29 +182,29 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
     }
   }
 
-  const calculateFinancialSummary = (): FinancialSummary => {
-    const netAmount = formData.items.reduce((sum, item) => sum + item.netAmount, 0);
-    const taxAmount = formData.items.reduce((sum, item) => sum + item.taxAmount, 0);
+  const calculateFinancialSummary = (): any => {
+    const netAmount = (formData as any).items.reduce((sum: number, item: any) => sum + item.netAmount, 0);
+    const taxAmount = (formData as any).items.reduce((sum: number, item: any) => sum + item.taxAmount, 0);
     const totalAmount = netAmount + taxAmount;
-    const exchangeRate = formData.exchangeRate || 1.2;
-    const baseCurrency = formData.baseCurrency || 'USD';
+    const exchangeRate = (formData as any).exchangeRate || 1.2;
+    const baseCurrency = (formData as any).baseCurrency || 'USD';
 
     return {
-      id: formData.financialSummary?.id || 'temp-summary-1',
+      id: (formData as any).financialSummary?.id || 'temp-summary-1',
       netAmount,
       taxAmount,
       totalAmount,
-      currency: formData.currency,
+      currency: (formData as any).currency,
       baseNetAmount: netAmount * exchangeRate,
       baseTaxAmount: taxAmount * exchangeRate,
       baseTotalAmount: totalAmount * exchangeRate,
       baseCurrency: baseCurrency,
       jvType: 'GRN',
-      jvNumber: `JV-${formData.ref}`,
-      jvDate: formData.date,
-      jvDescription: formData.description,
+      jvNumber: `JV-${(formData as any).grnNumber}`,
+      jvDate: (formData as any).receiptDate,
+      jvDescription: (formData as any).description,
       jvStatus: 'Pending',
-      jvReference: formData.ref,
+      jvReference: (formData as any).grnNumber,
       jvDetail: [],
       jvTotal: {
         debit: totalAmount,
@@ -234,9 +234,9 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             <ChevronLeft className="mr-2 h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">
-            {currentMode === 'confirm' ? `Confirm New GRN (${formData.ref})` : 
-              currentMode === 'add' ? 'New Goods Receive Note' : 
-              `Goods Receive Note (${formData.ref})`}
+            {currentMode === 'confirm' ? `Confirm New GRN (${formData.grnNumber})` :
+              currentMode === 'add' ? 'New Goods Receive Note' :
+              `Goods Receive Note (${formData.grnNumber})`}
           </h1>
         </div>
         <div className="flex items-center gap-2">
@@ -261,12 +261,12 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
           <div className="grid grid-cols-6 gap-6">
             <div className="space-y-2 col-span-1">
               <Label htmlFor="ref">Requisition</Label>
-              <Input id="ref" readOnly value={formData.ref} />
+              <Input id="ref" readOnly value={formData.grnNumber} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="date">Date</Label>
-              <Input id="date" type="date" readOnly={isReadOnly} value={formData.date ? format(new Date(formData.date), 'yyyy-MM-dd') : ''} onChange={e => {
-                setFormData({...formData, date: new Date(e.target.value)})
+              <Input id="date" type="date" readOnly={isReadOnly} value={formData.receiptDate ? format(new Date(formData.receiptDate), 'yyyy-MM-dd') : ''} onChange={e => {
+                setFormData({...formData, receiptDate: new Date(e.target.value)})
                 setHasUnsavedChanges(true)
               }} />
             </div>
@@ -286,23 +286,23 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="taxInvoiceDate">Tax Invoice Date</Label>
-              <Input id="taxInvoiceDate" type="date" readOnly={isReadOnly} value={formData.taxInvoiceDate ? format(new Date(formData.taxInvoiceDate), 'yyyy-MM-dd') : ''} onChange={e => setFormData({...formData, taxInvoiceDate: new Date(e.target.value)})}/>
+              <Input id="taxInvoiceDate" type="date" readOnly={isReadOnly} value={formData.invoiceDate ? format(new Date(formData.invoiceDate), 'yyyy-MM-dd') : ''} onChange={e => setFormData({...formData, invoiceDate: new Date(e.target.value)})}/>
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="taxInvoiceNumber">Tax Invoice#</Label>
-              <Input id="taxInvoiceNumber" readOnly={isReadOnly} value={formData.taxInvoiceNumber || ''} onChange={e => setFormData({...formData, taxInvoiceNumber: e.target.value})} />
+              <Input id="taxInvoiceNumber" readOnly={isReadOnly} value={(formData as any).taxInvoiceNumber || ''} onChange={e => setFormData({...formData, taxInvoiceNumber: e.target.value} as any)} />
             </div>
             <div className="space-y-2 col-span-3">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" readOnly={isReadOnly} value={formData.description} onChange={e => {
-                setFormData({...formData, description: e.target.value})
+              <Textarea id="description" readOnly={isReadOnly} value={(formData as any).description} onChange={e => {
+                setFormData({...formData, description: e.target.value} as any)
                 setHasUnsavedChanges(true)
               }} />
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="receiver">Receiver</Label>
-              <Select disabled={isReadOnly} value={formData.receiver} onValueChange={(value) => {
-                setFormData(prev => ({ ...prev, receiver: value }))
+              <Select disabled={isReadOnly} value={formData.receivedBy} onValueChange={(value) => {
+                setFormData(prev => ({ ...prev, receivedBy: value }))
                 setHasUnsavedChanges(true)
               }}>
                 <SelectTrigger id="receiver">
@@ -319,9 +319,9 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             <div className="space-y-2 col-span-1">
               <Label htmlFor="vendor">Vendor</Label>
               {isReadOnly ? (
-                <Input readOnly value={formData.vendor} />
+                <Input readOnly value={formData.vendorName} />
               ) : (
-                <Select value={formData.vendor} onValueChange={(value) => setFormData(prev => ({ ...prev, vendor: value }))}>
+                <Select value={formData.vendorName} onValueChange={(value) => setFormData(prev => ({ ...prev, vendorName: value }))}>
                   <SelectTrigger id="vendor">
                     <SelectValue placeholder="Select vendor" />
                   </SelectTrigger>
@@ -338,9 +338,9 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             <div className="space-y-2 col-span-1">
               <Label htmlFor="currency">Currency</Label>
               {isReadOnly ? (
-                <Input readOnly value={formData.currency} />
+                <Input readOnly value={(formData as any).currency} />
               ) : (
-                <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
+                <Select value={(formData as any).currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value } as any))}>
                   <SelectTrigger id="currency">
                     <SelectValue placeholder="Select currency" />
                   </SelectTrigger>
@@ -359,7 +359,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             </div>
             <div className="space-y-2 col-span-1">
               <Label htmlFor="cashBook">Cash Book</Label>
-              <Select disabled={isReadOnly} value={formData.cashBook} onValueChange={(value) => setFormData(prev => ({ ...prev, cashBook: value }))}>
+              <Select disabled={isReadOnly} value={(formData as any).cashBook} onValueChange={(value) => setFormData(prev => ({ ...prev, cashBook: value } as any))}>
                 <SelectTrigger id="cashBook">
                   <SelectValue placeholder="Select cash book" />
                 </SelectTrigger>
@@ -372,11 +372,11 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
               </Select>
             </div>
             <div className="flex items-center space-x-2 col-span-1">
-              <Checkbox id="consignment" disabled={isReadOnly} checked={formData.isConsignment} onCheckedChange={(checked) => setFormData({...formData, isConsignment: !!checked})} />
+              <Checkbox id="consignment" disabled={isReadOnly} checked={(formData as any).isConsignment} onCheckedChange={(checked) => setFormData({...formData, isConsignment: !!checked} as any)} />
               <Label htmlFor="consignment">Consignment</Label>
             </div>
             <div className="flex items-center space-x-2 col-span-1">
-              <Checkbox id="cash" disabled={isReadOnly} checked={formData.isCash} onCheckedChange={(checked) => setFormData({...formData, isCash: !!checked})}/>
+              <Checkbox id="cash" disabled={isReadOnly} checked={(formData as any).isCash} onCheckedChange={(checked) => setFormData({...formData, isCash: !!checked} as any)}/>
               <Label htmlFor="cash">Cash</Label>
             </div>
           </div>
@@ -401,19 +401,19 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
           )}
           <GoodsReceiveNoteItems
             mode={currentMode === 'confirm' ? 'view' : currentMode}
-            items={formData.items}
+            items={(formData as any).items}
             onItemsChange={handleItemsChange}
             selectedItems={selectedItems}
             onItemSelect={handleItemSelection}
-            exchangeRate={formData.exchangeRate}
-            baseCurrency={formData.baseCurrency}
-            currency={formData.currency}
+            exchangeRate={(formData as any).exchangeRate}
+            baseCurrency={(formData as any).baseCurrency}
+            currency={(formData as any).currency}
           />
         </TabsContent>
         <TabsContent value="extra-costs">
           <ExtraCostsTab
             mode={currentMode === 'confirm' ? 'view' : currentMode}
-            initialCosts={formData.extraCosts}
+            initialCosts={(formData as any).extraCosts}
             onCostsChange={handleExtraCostsChange}
           />
         </TabsContent>
@@ -424,9 +424,9 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
         <TabsContent value="financial-summary">
           <FinancialSummaryTab
             mode={currentMode === 'confirm' ? 'view' : currentMode}
-            summary={formData.financialSummary || calculateFinancialSummary()}
-            currency={formData.currency}
-            baseCurrency={formData.baseCurrency}
+            summary={(formData as any).financialSummary || calculateFinancialSummary()}
+            currency={(formData as any).currency}
+            baseCurrency={(formData as any).baseCurrency}
           />
         </TabsContent>
       </Tabs>
@@ -434,7 +434,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
       {/* Transaction Summary */}
       <Card className="shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Transaction Summary ({formData.currency || 'USD'})</CardTitle>
+          <CardTitle className="text-lg">Transaction Summary ({(formData as any).currency || 'USD'})</CardTitle>
         </CardHeader>
         <CardContent className="pb-6">
           <SummaryTotal poData={formData} />
@@ -460,7 +460,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
 
       {/* Floating Action Menu for Context-Specific Actions */}
       <FloatingActionMenu
-        visible={currentMode === 'confirm' || (currentMode === 'view' && formData.status === 'Received')}
+        visible={currentMode === 'confirm' || (currentMode === 'view' && formData.status === GRNStatus.RECEIVED)}
         position="bottom-right"
         summary={{
           title: currentMode === 'confirm' ? 'Confirmation Required' : 'GRN Status',
@@ -468,8 +468,8 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
             ? 'Review all details before saving' 
             : `Status: ${formData.status}`,
           metadata: currentMode === 'confirm' 
-            ? `${formData.items?.length || 0} items to process`
-            : `Last updated: ${formData.date ? new Date(formData.date).toLocaleDateString() : 'N/A'}`
+            ? `${(formData as any).items?.length || 0} items to process`
+            : `Last updated: ${formData.receiptDate ? new Date(formData.receiptDate).toLocaleDateString() : 'N/A'}`
         }}
         actions={getFloatingActions()}
       />
@@ -499,7 +499,7 @@ export function GoodsReceiveNoteDetail({ id, mode = 'view', onModeChange, initia
           className: 'bg-green-600 hover:bg-green-700'
         }
       )
-    } else if (currentMode === 'view' && formData.status === 'Received') {
+    } else if (currentMode === 'view' && formData.status === GRNStatus.RECEIVED) {
       actions.push(
         {
           id: 'delete',

@@ -3,11 +3,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { GoodsReceiveNoteMode, Attachment } from '@/lib/types'
+import { FileAttachment as Attachment } from '@/lib/types'
 import { Edit, Trash2, Download } from 'lucide-react'
+import { GRNDetailMode } from '../GoodsReceiveNoteDetail'
 
 interface AttachmentTabProps {
-  mode: GoodsReceiveNoteMode
+  mode: GRNDetailMode
   attachments: Attachment[]
   onAddAttachment: (attachment: Omit<Attachment, 'id' | 'number' | 'date' | 'uploader'>) => void
   onEditAttachment: (id: string, description: string, publicAccess: boolean) => void
@@ -26,15 +27,13 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
   const handleAddAttachment = () => {
     if (newFileName.trim()) {
       onAddAttachment({
-        fileName: newFileName,
-        description: newDescription,
-        publicAccess: newPublicAccess,
-        fileType: '',
-        fileSize: 0,
-        fileUrl: '',
-        uploadDate: new Date(),
-        userId: '',
-        userName: ''
+        name: newFileName,
+        originalName: newFileName,
+        url: '',
+        mimeType: '',
+        size: 0,
+        uploadedBy: '',
+        uploadedAt: new Date()
       })
       setNewFileName('')
       setNewDescription('')
@@ -44,8 +43,8 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
 
   const handleEditClick = (attachment: Attachment) => {
     setEditingAttachmentId(attachment.id)
-    setEditedDescription(attachment.description || '')
-    setEditedPublicAccess(attachment.publicAccess)
+    setEditedDescription((attachment as any).description || '')
+    setEditedPublicAccess((attachment as any).publicAccess)
   }
 
   const handleSaveEdit = () => {
@@ -73,7 +72,7 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
           {attachments.map((attachment) => (
             <TableRow key={attachment.id}>
               <TableCell>{attachment.id}</TableCell>
-              <TableCell>{attachment.fileName}</TableCell>
+              <TableCell>{attachment.name}</TableCell>
               <TableCell>
                 {editingAttachmentId === attachment.id ? (
                   <Input
@@ -81,7 +80,7 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
                     onChange={(e) => setEditedDescription(e.target.value)}
                   />
                 ) : (
-                  attachment.description
+                  (attachment as any).description
                 )}
               </TableCell>
               <TableCell>
@@ -91,11 +90,11 @@ export function AttachmentTab({ mode, attachments, onAddAttachment, onEditAttach
                     onCheckedChange={(checked) => setEditedPublicAccess(checked as boolean)}
                   />
                 ) : (
-                  attachment.publicAccess ? 'Yes' : 'No'
+                  (attachment as any).publicAccess ? 'Yes' : 'No'
                 )}
               </TableCell>
-              <TableCell>{attachment.uploadDate.toISOString()}</TableCell>
-              <TableCell>{attachment.userName}</TableCell>
+              <TableCell>{attachment.uploadedAt.toISOString()}</TableCell>
+              <TableCell>{(attachment as any).userName}</TableCell>
               {mode !== 'view' && (
                 <TableCell>
                   {editingAttachmentId === attachment.id ? (

@@ -62,7 +62,6 @@ export interface Vendor {
   approvedAt?: Date;
   lastReviewDate?: Date;
   nextReviewDate?: Date;
-  ...AuditTimestamp;
 }
 
 /**
@@ -118,7 +117,6 @@ export interface VendorCertification {
   verifiedAt?: Date;
   documentUrl?: string;
   notificationDays?: number; // Days before expiry to notify
-  ...AuditTimestamp;
 }
 
 // ====== VENDOR BANKING ======
@@ -143,7 +141,6 @@ export interface VendorBankAccount {
   isActive: boolean;
   verifiedBy?: string;
   verifiedAt?: Date;
-  ...AuditTimestamp;
 }
 
 // ====== VENDOR PRICE LISTS ======
@@ -185,7 +182,6 @@ export interface VendorPriceList {
   publishedAt?: Date;
   notes?: string;
   attachments?: string[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -251,7 +247,6 @@ export interface VendorCategory {
   requiresApproval: boolean;
   approvalLimit?: Money;
   defaultPaymentTerms?: string;
-  ...AuditTimestamp;
 }
 
 /**
@@ -348,7 +343,6 @@ export interface VendorContract {
   // Notifications
   expiryNotificationSent: boolean;
   lastNotificationDate?: Date;
-  ...AuditTimestamp;
 }
 
 // ====== VENDOR ONBOARDING ======
@@ -380,7 +374,6 @@ export interface VendorOnboarding {
   rejectedAt?: Date;
   rejectionReason?: string;
   notes?: string;
-  ...AuditTimestamp;
 }
 
 /**
@@ -445,5 +438,4 @@ export interface VendorCommunication {
   // Categorization
   category?: string;
   priority: 'low' | 'normal' | 'high';
-  ...AuditTimestamp;
 }

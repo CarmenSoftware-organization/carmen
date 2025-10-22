@@ -50,10 +50,10 @@ export default function ManualEntryPage() {
     (currentItem as any)[field] = value;
 
     // If item is selected from lookup, populate unit
-    if (field === 'name') {
+    if ((field as string) === 'name') {
         const selectedMockItem = MOCK_ITEMS.find(i => i.name === value);
         if (selectedMockItem) {
-            currentItem.unit = selectedMockItem.unit;
+            (currentItem as any).unit = selectedMockItem.unit;
             // Optionally set description or other fields based on lookup
             currentItem.description = selectedMockItem.name; // Example
         }
@@ -74,7 +74,7 @@ export default function ManualEntryPage() {
 
   const handleNext = () => {
     // Basic validation
-    if (!localDetails.vendor || !localDetails.date || localItems.length === 0 || localItems.some(item => !item.name || !item.receivedQuantity || !item.location))
+    if (!localDetails.vendor || !localDetails.date || localItems.length === 0 || localItems.some(item => !(item as any).name || !(item as any).receivedQuantity || !(item as any).location))
     {
       alert("Please fill in Vendor, Date, and ensure all items have Name, Quantity, and Location.");
       return;
@@ -85,76 +85,108 @@ export default function ManualEntryPage() {
 
     // Filter out potentially empty rows and ensure required fields are present
     // Also add default/calculated values if needed
-    const finalItems = localItems.filter(item => item.name && item.receivedQuantity && item.location)
-                                .map(item => ({
+    const finalItems = localItems.filter(item => (item as any).name && (item as any).receivedQuantity && (item as any).location)
+                                .map((item, index) => ({
                                     id: item.id || crypto.randomUUID(),
-                                    name: item.name || '',
-                                    description: item.description || '',
-                                    orderedQuantity: item.orderedQuantity || 0, // Manual doesn't have ordered quantity
-                                    receivedQuantity: item.receivedQuantity || 0,
-                                    unit: item.unit || '',
-                                    unitPrice: item.unitPrice || 0,
-                                    // TODO: Implement proper calculation based on PRD 3.4.5.5
-                                    subTotalAmount: (item.receivedQuantity || 0) * (item.unitPrice || 0), // Simplified
-                                    totalAmount: (item.receivedQuantity || 0) * (item.unitPrice || 0), // Simplified
-                                    taxRate: 0, // Default
-                                    taxAmount: 0, // Simplified
-                                    discountRate: 0, // Default
-                                    discountAmount: 0, // Simplified
-                                    netAmount: (item.receivedQuantity || 0) * (item.unitPrice || 0), // Simplified
-                                    baseCurrency: 'USD', // Default or get from settings
-                                    baseQuantity: item.receivedQuantity || 0, // Assuming 1:1 conversion for manual
-                                    baseUnitPrice: item.unitPrice || 0,
-                                    baseUnit: item.unit || '',
-                                    baseSubTotalAmount: (item.receivedQuantity || 0) * (item.unitPrice || 0), // Simplified
-                                    baseNetAmount: (item.receivedQuantity || 0) * (item.unitPrice || 0), // Simplified
-                                    baseTotalAmount: (item.receivedQuantity || 0) * (item.unitPrice || 0), // Simplified
-                                    baseTaxRate: 0, // Default
-                                    baseTaxAmount: 0, // Simplified
-                                    baseDiscountRate: 0, // Default
-                                    baseDiscountAmount: 0, // Simplified
-                                    conversionRate: 1, // Default
-                                    currency: 'USD', // Default or get from settings
-                                    exchangeRate: 1, // Default
-                                    extraCost: 0, // Default
-                                    inventoryOnHand: 0, // TBD - fetch if needed
+                                    grnId: '', // Will be set after GRN creation
+                                    lineNumber: index + 1,
+                                    itemId: (item as any).itemId || crypto.randomUUID(),
+                                    itemCode: (item as any).itemCode || '',
+                                    itemName: (item as any).name || '',
+                                    description: (item as any).description || '',
+                                    orderedQuantity: (item as any).orderedQuantity || 0,
+                                    deliveredQuantity: (item as any).receivedQuantity || 0,
+                                    receivedQuantity: (item as any).receivedQuantity || 0,
+                                    rejectedQuantity: 0,
+                                    damagedQuantity: 0,
+                                    unit: (item as any).unit || '',
+                                    unitPrice: {
+                                        amount: (item as any).unitPrice || 0,
+                                        currency: 'USD'
+                                    },
+                                    totalValue: {
+                                        amount: ((item as any).receivedQuantity || 0) * ((item as any).unitPrice || 0),
+                                        currency: 'USD'
+                                    },
+                                    lotNumber: (item as any).lotNumber || '',
+                                    storageLocationId: (item as any).location || '',
+                                    qualityStatus: 'pending' as const,
+                                    hasDiscrepancy: false,
+                                    // Legacy fields for compatibility (remove in future refactor)
+                                    name: (item as any).name || '',
+                                    subTotalAmount: ((item as any).receivedQuantity || 0) * ((item as any).unitPrice || 0),
+                                    totalAmount: ((item as any).receivedQuantity || 0) * ((item as any).unitPrice || 0),
+                                    taxRate: 0,
+                                    taxAmount: 0,
+                                    discountRate: 0,
+                                    discountAmount: 0,
+                                    netAmount: ((item as any).receivedQuantity || 0) * ((item as any).unitPrice || 0),
+                                    baseCurrency: 'USD',
+                                    baseQuantity: (item as any).receivedQuantity || 0,
+                                    baseUnitPrice: (item as any).unitPrice || 0,
+                                    baseUnit: (item as any).unit || '',
+                                    baseSubTotalAmount: ((item as any).receivedQuantity || 0) * ((item as any).unitPrice || 0),
+                                    baseNetAmount: ((item as any).receivedQuantity || 0) * ((item as any).unitPrice || 0),
+                                    baseTotalAmount: ((item as any).receivedQuantity || 0) * ((item as any).unitPrice || 0),
+                                    baseTaxRate: 0,
+                                    baseTaxAmount: 0,
+                                    baseDiscountRate: 0,
+                                    baseDiscountAmount: 0,
+                                    conversionRate: 1,
+                                    currency: 'USD',
+                                    exchangeRate: 1,
+                                    extraCost: 0,
+                                    inventoryOnHand: 0,
                                     inventoryOnOrder: 0,
                                     inventoryReorderThreshold: 0,
                                     inventoryRestockLevel: 0,
-                                    purchaseOrderRef: 'Manual', // Indicate manual entry
+                                    purchaseOrderRef: 'Manual',
                                     lastPurchasePrice: 0,
                                     lastOrderDate: new Date(),
                                     lastVendor: localDetails.vendor || '',
-                                    lotNumber: '', // TBD
-                                    deliveryPoint: item.location || '',
+                                    deliveryPoint: (item as any).location || '',
                                     deliveryDate: localDetails.date || new Date(),
-                                    location: item.location || '',
-                                    isFreeOfCharge: false, // Default
-                                    taxIncluded: false, // Default
-                                    jobCode: '', // Default
-                                    adjustments: { discount: false, tax: false }, // Default
-                                }) as GoodsReceiveNoteItem);
+                                    location: (item as any).location || '',
+                                    isFreeOfCharge: false,
+                                    taxIncluded: false,
+                                    jobCode: '',
+                                    adjustments: { discount: false, tax: false },
+                                }) as any);
 
     // Construct the main GRN object
     const tempId = `new-${crypto.randomUUID()}`;
-    const newGRNData: GoodsReceiveNote = {
+    const newGRNData = {
         id: tempId,
-        ref: localDetails.reference || `GRN-MANUAL-${tempId.substring(0, 8)}`, // Generate manual ref
+        grnNumber: localDetails.reference || `GRN-MANUAL-${tempId.substring(0, 8)}`,
+        receiptDate: localDetails.date || new Date(),
+        vendorId: MOCK_VENDORS.find(v => v.companyName === localDetails.vendor)?.id || '',
+        vendorName: localDetails.vendor || '',
+        invoiceNumber: '',
+        invoiceDate: localDetails.date || new Date(),
+        status: 'RECEIVED' as any,
+        receivedBy: 'Current User',
+        locationId: 'Main Warehouse',
+        totalItems: finalItems.length,
+        totalQuantity: finalItems.reduce((sum, item) => sum + (item.receivedQuantity || 0), 0),
+        totalValue: {
+            amount: finalItems.reduce((sum, item) => sum + ((item as any).totalAmount || 0), 0),
+            currency: 'USD'
+        },
+        discrepancies: 0,
+        qualityCheckRequired: false,
+        // Legacy/extra fields for compatibility
+        ref: localDetails.reference || `GRN-MANUAL-${tempId.substring(0, 8)}`,
         selectedItems: [],
         date: localDetails.date || new Date(),
-        invoiceDate: localDetails.date || new Date(), // Use GRN date as default
-        invoiceNumber: '', // Manual entry might not have invoice initially
         description: localDetails.remarks || `Manual GRN created on ${format(new Date(), 'PPP')}`,
-        receiver: 'Current User', // Get current user
+        receiver: 'Current User',
         vendor: localDetails.vendor || '',
-        vendorId: MOCK_VENDORS.find(v => v.companyName === localDetails.vendor)?.id || '', // Get ID from mock data
-        location: 'Main Warehouse', // Default or TBD
-        currency: 'USD', // Default
-        status: 'Received', // Initial status
+        location: 'Main Warehouse',
+        currency: 'USD',
         items: finalItems,
         stockMovements: [],
-        isConsignment: false, // Default
-        isCash: false, // Default
+        isConsignment: false,
+        isCash: false,
         extraCosts: [],
         comments: [],
         attachments: [],
@@ -275,8 +307,8 @@ export default function ManualEntryPage() {
                             <TableCell>
                                  {/* Basic Input - Replace with Autocomplete/Combobox later */}
                                 <Input
-                                    value={item.name || ''}
-                                    onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                                    value={(item as any).name || ''}
+                                    onChange={(e) => handleItemChange(index, 'name' as any, e.target.value)}
                                     placeholder="Type to search item..."
                                 />
                             </TableCell>
@@ -302,7 +334,7 @@ export default function ManualEntryPage() {
                                 />
                             </TableCell>
                             <TableCell>
-                                 <Select onValueChange={(value) => handleItemChange(index, 'location', value)} value={item.location as string | undefined}>
+                                 <Select onValueChange={(value) => handleItemChange(index, 'location' as any, value)} value={(item as any).location as string | undefined}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select location" />
                                     </SelectTrigger>
@@ -314,8 +346,8 @@ export default function ManualEntryPage() {
                             <TableCell>
                                 <Input
                                     type="number"
-                                    value={item.unitPrice || ''}
-                                    onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
+                                    value={typeof (item as any).unitPrice === 'object' ? (item as any).unitPrice?.amount : (item as any).unitPrice || ''}
+                                    onChange={(e) => handleItemChange(index, 'unitPrice' as any, parseFloat(e.target.value) || 0)}
                                      className="text-right"
                                     min="0"
                                 />

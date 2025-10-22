@@ -15,39 +15,34 @@ export interface Money {
   currency: string;
 }
 
-/**
- * Currency definition
- */
-export interface Currency {
-  id: number;
-  code: string; // ISO currency code (USD, EUR, etc.)
-  description: string;
-  symbol?: string; // Currency symbol ($, €, etc.)
-  active: boolean;
-}
-
-/**
- * Exchange rate information
- */
-export interface ExchangeRate {
-  id: number;
-  currencyCode: string;
-  currencyName: string;
-  rate: number;
-  lastUpdated: string;
-}
+// Currency and ExchangeRate types moved to finance.ts for better organization
 
 // ====== STATUS TYPES ======
 
 /**
  * Common document status types used across modules
  */
-export type DocumentStatus = 'draft' | 'inprogress' | 'approved' | 'converted' | 'rejected' | 'void';
+export enum DocumentStatus {
+  Draft = 'draft',
+  InProgress = 'inprogress',
+  Approved = 'approved',
+  Converted = 'converted',
+  Rejected = 'rejected',
+  Void = 'void',
+  // Aliases for common usage
+  Completed = 'converted'
+}
 
 /**
  * Workflow stage status
  */
-export type WorkflowStatus = 'draft' | 'pending' | 'approved' | 'review' | 'rejected';
+export enum WorkflowStatus {
+  Draft = 'draft',
+  Pending = 'pending',
+  Approved = 'approved',
+  Review = 'review',
+  Rejected = 'rejected'
+}
 
 /**
  * Generic approval status
@@ -192,9 +187,10 @@ export interface Quantity {
 // ====== WORKFLOW AND APPROVAL ======
 
 /**
- * Workflow stage definition
+ * Workflow stage definition (generic workflow configuration)
+ * Note: For procurement-specific workflow stages, use the WorkflowStage enum from procurement.ts
  */
-export interface WorkflowStage {
+export interface WorkflowStageDefinition {
   id: string;
   name: string;
   description?: string;

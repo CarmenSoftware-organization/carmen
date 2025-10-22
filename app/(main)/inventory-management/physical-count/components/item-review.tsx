@@ -33,7 +33,7 @@ interface ItemReviewProps {
 // Get unique categories from mock products
 const categories = [
   { value: 'all', label: 'All Categories' },
-  ...Array.from(new Set(mockProducts.map(p => p.category))).map(category => ({
+  ...Array.from(new Set(mockProducts.map(p => p.categoryId || 'Uncategorized'))).map(category => ({
     value: category.toLowerCase(),
     label: category
   }))
@@ -64,23 +64,23 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
 
   const filteredItems = uniqueProducts.filter((item) => {
     const matchesSearch =
-      item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      item.itemCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.itemName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
-      selectedCategory === 'all' || item.category.toLowerCase() === selectedCategory.toLowerCase();
+      selectedCategory === 'all' || (item.categoryId || 'Uncategorized').toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
     if (!sortField) return 0;
     
-    let aValue = a[sortField as keyof Product];
-    let bValue = b[sortField as keyof Product];
+    let aValue = a[sortField as keyof typeof a];
+    let bValue = b[sortField as keyof typeof b];
     
     // Handle dates
-    if (sortField === 'lastCountDate') {
-      aValue = aValue ? new Date(aValue).getTime() : 0;
-      bValue = bValue ? new Date(bValue).getTime() : 0;
+    if (sortField === 'lastPurchaseDate') {
+      aValue = aValue && aValue instanceof Date ? new Date(aValue).getTime() : 0;
+      bValue = bValue && bValue instanceof Date ? new Date(bValue).getTime() : 0;
     }
 
     // Handle undefined values
@@ -165,13 +165,12 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
                 </TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>UOM</TableHead>
-                <TableHead className="text-right">Current Stock</TableHead>
                 <TableHead className="text-right">
                   <div
                     className="flex items-center justify-end gap-1 cursor-pointer"
-                    onClick={() => handleSort('lastCountDate')}
+                    onClick={() => handleSort('lastPurchaseDate')}
                   >
-                    Last Count
+                    Last Purchase
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
@@ -180,21 +179,20 @@ export function ItemReview({ formData, setFormData }: ItemReviewProps) {
             <TableBody>
               {sortedItems.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
                     No items found
                   </TableCell>
                 </TableRow>
               ) : (
                 sortedItems.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.code}</TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.uom}</TableCell>
-                    <TableCell className="text-right">{item.currentStock}</TableCell>
+                    <TableCell className="font-medium">{item.itemCode}</TableCell>
+                    <TableCell>{item.itemName}</TableCell>
+                    <TableCell>{item.categoryId || 'Uncategorized'}</TableCell>
+                    <TableCell>{item.baseUnitId}</TableCell>
                     <TableCell className="text-right">
-                      {item.lastCountDate
-                        ? new Date(item.lastCountDate).toLocaleDateString()
+                      {item.lastPurchaseDate
+                        ? new Date(item.lastPurchaseDate).toLocaleDateString()
                         : 'Never'}
                     </TableCell>
                   </TableRow>

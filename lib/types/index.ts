@@ -10,6 +10,8 @@
 
 // Common shared types
 export * from './common'
+// Explicit re-exports for commonly used enums and types to ensure proper resolution
+export { DocumentStatus, WorkflowStatus } from './common'
 
 // User and authentication types
 export * from './user'
@@ -19,6 +21,9 @@ export * from './inventory'
 
 // Procurement types
 export * from './procurement'
+// Explicit re-exports for procurement enums and interfaces
+export { PRType, WorkflowStage } from './procurement'
+export type { Requestor } from './procurement'
 
 // Vendor management types
 export * from './vendor'

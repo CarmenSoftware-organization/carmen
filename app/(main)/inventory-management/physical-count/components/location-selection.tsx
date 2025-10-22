@@ -48,9 +48,8 @@ export function LocationSelection({ formData, setFormData, onNext, onBack }: Loc
     : [];
 
   const filteredLocations = departmentLocations.filter((location) => {
-    const matchesSearch = 
-      location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      location.code.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      location.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'all' || location.type === selectedType;
     return matchesSearch && matchesType;
   });
@@ -114,19 +113,19 @@ export function LocationSelection({ formData, setFormData, onNext, onBack }: Loc
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h3 className="font-medium">{location.name}</h3>
-                    <p className="text-sm text-muted-foreground">{location.code}</p>
+                    {location.address && (
+                      <p className="text-sm text-muted-foreground">{location.address}</p>
+                    )}
                   </div>
                   <Badge variant="secondary">
                     {location.type}
                   </Badge>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  <p>Floor {location.floor}</p>
-                  <p>{location.building}</p>
-                  {location.capacity && (
-                    <p>Capacity: {location.capacity} items</p>
-                  )}
-                </div>
+                {location.parentLocation && (
+                  <div className="text-sm text-muted-foreground mt-2">
+                    <p>Parent: {location.parentLocation}</p>
+                  </div>
+                )}
               </div>
             ))
           )}

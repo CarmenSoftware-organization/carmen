@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TemplateItem } from "../types/template-items"
-import { CurrencyCode } from "@/lib/types"
 
 const formSchema = z.object({
   itemCode: z.string().min(1, "Item code is required"),
@@ -46,7 +45,7 @@ const formSchema = z.object({
   accountCode: z.string().min(1, "Account code is required"),
   department: z.string().min(1, "Department is required"),
   taxCode: z.string().min(1, "Tax code is required"),
-  currency: z.nativeEnum(CurrencyCode),
+  currency: z.string(),
   currencyRate: z.number().min(0.01, "Exchange rate must be positive"),
   taxIncluded: z.boolean().default(false),
   discountRate: z.number().min(0, "Discount rate must be non-negative"),
@@ -87,7 +86,7 @@ export function ItemFormDialog({
       accountCode: "",
       department: "",
       taxCode: "",
-      currency: CurrencyCode.USD,
+      currency: 'USD',
       currencyRate: 1,
       taxIncluded: false,
       discountRate: 0,
@@ -258,9 +257,9 @@ export function ItemFormDialog({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value={CurrencyCode.USD}>USD</SelectItem>
-                              <SelectItem value={CurrencyCode.EUR}>EUR</SelectItem>
-                              <SelectItem value={CurrencyCode.GBP}>GBP</SelectItem>
+                              <SelectItem value={'USD'}>USD</SelectItem>
+                              <SelectItem value={'EUR'}>EUR</SelectItem>
+                              <SelectItem value={'GBP'}>GBP</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />

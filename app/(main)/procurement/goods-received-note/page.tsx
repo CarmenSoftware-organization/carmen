@@ -33,7 +33,7 @@ export default function GoodsReceiveNotePage() {
       console.log('[handleProcessSelection] Generated tempId:', tempId);
 
       // Create placeholder data for the store
-      const placeholderData: GoodsReceiveNote = {
+      const placeholderData: any = {
         id: tempId, // Use the generated temp ID
         ref: 'NEW GRN',
         date: new Date(),
@@ -49,7 +49,7 @@ export default function GoodsReceiveNotePage() {
         currency: 'USD', // Default or get from settings
         exchangeRate: 1,
         baseCurrency: 'USD', // Default or get from settings
-        status: 'Received', // Use 'Received' as the default valid status
+        status: 'RECEIVED' as any, // Use 'RECEIVED' as the default valid status
         isConsignment: false,
         isCash: false,
         cashBook: '',

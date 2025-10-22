@@ -15,9 +15,43 @@ import { AuditTimestamp, DocumentStatus, Money, WorkflowStatus, ApprovalRecord }
 export type PurchaseRequestPriority = 'low' | 'normal' | 'high' | 'urgent' | 'emergency';
 
 /**
- * Purchase request types
+ * Purchase request types (enum for consistency with existing code)
+ */
+export enum PRType {
+  GeneralPurchase = 'GeneralPurchase',
+  ServiceRequest = 'ServiceRequest',
+  CapitalExpenditure = 'CapitalExpenditure',
+  Maintenance = 'Maintenance',
+  Emergency = 'Emergency'
+}
+
+/**
+ * Purchase request types (legacy type, prefer using PRType enum)
  */
 export type PurchaseRequestType = 'goods' | 'services' | 'capital' | 'maintenance' | 'emergency';
+
+/**
+ * Workflow stages for purchase requests
+ */
+export enum WorkflowStage {
+  requester = 'requester',
+  departmentHeadApproval = 'departmentHeadApproval',
+  purchaseCoordinatorReview = 'purchaseCoordinatorReview',
+  financeManagerApproval = 'financeManagerApproval',
+  generalManagerApproval = 'generalManagerApproval',
+  completed = 'completed'
+}
+
+/**
+ * Requestor information for purchase requests
+ */
+export interface Requestor {
+  id: string;
+  name: string;
+  email?: string;
+  departmentId: string;
+  departmentName?: string;
+}
 
 /**
  * Purchase request header
@@ -49,7 +83,6 @@ export interface PurchaseRequest {
   workflowStages: ApprovalRecord[];
   currentStage?: string;
   notes?: string;
-  ...AuditTimestamp;
 }
 
 /**
@@ -89,6 +122,21 @@ export interface PurchaseRequestItem {
 }
 
 // ====== PURCHASE ORDER ======
+
+/**
+ * Purchase order status types
+ */
+export enum PurchaseOrderStatus {
+  DRAFT = "Draft",
+  SENT = "Sent",
+  OPEN = "Open",
+  PARTIAL = "Partial",
+  FULLY_RECEIVED = "FullyReceived",
+  CLOSED = "Closed",
+  CANCELLED = "Cancelled",
+  VOIDED = "Voided",
+  DELETED = "Deleted"
+}
 
 /**
  * Purchase order terms and conditions
@@ -138,7 +186,6 @@ export interface PurchaseOrder {
   pendingItems: number;
   notes?: string;
   attachments?: string[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -172,6 +219,14 @@ export interface PurchaseOrderItem {
 }
 
 // ====== GOODS RECEIPT NOTE ======
+
+/**
+ * Cost distribution method for extra costs in GRN
+ */
+export enum CostDistributionMethod {
+  NET_AMOUNT = "net-amount",
+  QUANTITY_RATIO = "quantity-ratio",
+}
 
 /**
  * GRN status types
@@ -214,7 +269,6 @@ export interface GoodsReceiveNote {
   qualityCheckPassed?: boolean;
   qualityCheckedBy?: string;
   qualityCheckedAt?: Date;
-  ...AuditTimestamp;
 }
 
 /**
@@ -278,7 +332,6 @@ export interface CreditNote {
   approvedAt?: Date;
   notes?: string;
   attachments?: string[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -346,7 +399,6 @@ export interface VendorQuotation {
   reviewedAt?: Date;
   notes?: string;
   attachments?: string[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -406,7 +458,6 @@ export interface VendorEvaluation {
   issues: string[];
   actionItems: string[];
   nextReviewDate: Date;
-  ...AuditTimestamp;
 }
 
 // ====== PROCUREMENT ANALYTICS ======
@@ -512,5 +563,4 @@ export interface CostCenter {
   departmentId: string;
   managerId: string;
   isActive: boolean;
-  ...AuditTimestamp;
 }

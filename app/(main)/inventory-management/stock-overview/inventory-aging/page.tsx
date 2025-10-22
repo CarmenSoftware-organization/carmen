@@ -92,6 +92,16 @@ export default function InventoryAgingPage() {
     { key: 'expiryStatus', label: 'Expiry Status', type: 'text' }
   ]
 
+  // Helper function to compute expiry status
+  const getExpiryStatus = (expiryDate?: Date): 'good' | 'expiring-soon' | 'critical' | 'expired' | 'no-expiry' => {
+    if (!expiryDate) return 'no-expiry'
+    const daysToExpiry = Math.ceil((new Date(expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    if (daysToExpiry < 0) return 'expired'
+    if (daysToExpiry < 30) return 'critical'
+    if (daysToExpiry < 90) return 'expiring-soon'
+    return 'good'
+  }
+
   // Load mock data
   useEffect(() => {
     setIsLoading(true)
@@ -140,7 +150,7 @@ export default function InventoryAgingPage() {
       // Search filter
       if (searchTerm && !item.productName.toLowerCase().includes(searchTerm.toLowerCase()) &&
           !item.productCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          !item.batchNumber.toLowerCase().includes(searchTerm.toLowerCase())) {
+          !(item.lotNumber || '').toLowerCase().includes(searchTerm.toLowerCase())) {
         return false
       }
 
@@ -155,8 +165,18 @@ export default function InventoryAgingPage() {
       }
 
       // Expiry status filter
-      if (expiryStatusFilter !== "all" && item.expiryStatus !== expiryStatusFilter) {
-        return false
+      if (expiryStatusFilter !== "all") {
+        if (!item.expiryDate) {
+          if (expiryStatusFilter !== "no-expiry") return false
+        } else {
+          const daysToExpiry = Math.ceil((new Date(item.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+          let computedStatus = "expired"
+          if (daysToExpiry > 90) computedStatus = "good"
+          else if (daysToExpiry > 30) computedStatus = "expiring-soon"
+          else if (daysToExpiry >= 0) computedStatus = "critical"
+
+          if (computedStatus !== expiryStatusFilter) return false
+        }
       }
 
       // Location filter
@@ -183,25 +203,28 @@ export default function InventoryAgingPage() {
           comparison = a.category.localeCompare(b.category)
           break
         case "batchNumber":
-          comparison = a.batchNumber.localeCompare(b.batchNumber)
+          comparison = (a.lotNumber || '').localeCompare(b.lotNumber || '')
           break
         case "daysOld":
-          comparison = a.daysOld - b.daysOld
+          comparison = a.ageInDays - b.ageInDays
           break
         case "currentStock":
-          comparison = a.currentStock - b.currentStock
+          comparison = a.quantity - b.quantity
           break
         case "value":
           comparison = a.value - b.value
           break
         case "expiryDate":
-          comparison = new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()
+          comparison = (a.expiryDate ? new Date(a.expiryDate).getTime() : 0) -
+                      (b.expiryDate ? new Date(b.expiryDate).getTime() : 0)
           break
         case "daysToExpiry":
-          comparison = a.daysToExpiry - b.daysToExpiry
+          const aDaysToExpiry = a.expiryDate ? Math.ceil((new Date(a.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0
+          const bDaysToExpiry = b.expiryDate ? Math.ceil((new Date(b.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0
+          comparison = aDaysToExpiry - bDaysToExpiry
           break
         default:
-          comparison = a.daysOld - b.daysOld
+          comparison = a.ageInDays - b.ageInDays
       }
 
       return sortDirection === "asc" ? comparison : -comparison
@@ -241,17 +264,23 @@ export default function InventoryAgingPage() {
   }
 
   // Render expiry status badge
-  const renderExpiryStatusBadge = (status: AgingItem['expiryStatus']) => {
+  const renderExpiryStatusBadge = (status: 'fresh' | 'near-expiry' | 'expired' | 'no-expiry' | 'good' | 'expiring-soon' | 'critical') => {
     const variants = {
       fresh: { variant: "outline" as const, className: "bg-green-50 text-green-700 border-green-200" },
+      good: { variant: "outline" as const, className: "bg-green-50 text-green-700 border-green-200" },
       'near-expiry': { variant: "outline" as const, className: "bg-yellow-50 text-yellow-700 border-yellow-200" },
+      'expiring-soon': { variant: "outline" as const, className: "bg-yellow-50 text-yellow-700 border-yellow-200" },
+      critical: { variant: "destructive" as const, className: "" },
       expired: { variant: "destructive" as const, className: "" },
       'no-expiry': { variant: "secondary" as const, className: "" }
     }
 
     const labels = {
       fresh: 'Fresh',
+      good: 'Good',
       'near-expiry': 'Near Expiry',
+      'expiring-soon': 'Expiring Soon',
+      critical: 'Critical',
       expired: 'Expired',
       'no-expiry': 'No Expiry'
     }
@@ -270,9 +299,16 @@ export default function InventoryAgingPage() {
   const summaryStats = useMemo(() => {
     const totalItems = filteredItems.length
     const totalValue = filteredItems.reduce((sum, item) => sum + item.value, 0)
-    const avgAge = totalItems > 0 ? filteredItems.reduce((sum, item) => sum + item.daysOld, 0) / totalItems : 0
-    const expiredItems = filteredItems.filter(item => item.expiryStatus === 'expired').length
-    const nearExpiryItems = filteredItems.filter(item => item.expiryStatus === 'near-expiry').length
+    const avgAge = totalItems > 0 ? filteredItems.reduce((sum, item) => sum + item.ageInDays, 0) / totalItems : 0
+    const expiredItems = filteredItems.filter(item => {
+      if (!item.expiryDate) return false
+      return new Date(item.expiryDate) < new Date()
+    }).length
+    const nearExpiryItems = filteredItems.filter(item => {
+      if (!item.expiryDate) return false
+      const daysToExpiry = Math.ceil((new Date(item.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      return daysToExpiry > 0 && daysToExpiry <= 30
+    }).length
 
     return {
       totalItems,
@@ -304,12 +340,12 @@ export default function InventoryAgingPage() {
 
     const avgAge = totalItems > 0 ?
       (viewMode === 'grouped' ?
-        groups.reduce((sum, group) => sum + group.items.reduce((gsum, item) => gsum + item.daysOld, 0), 0) :
-        filteredItems.reduce((sum, item) => sum + item.daysOld, 0)) / totalItems : 0
+        groups.reduce((sum, group) => sum + group.items.reduce((gsum, item) => gsum + item.ageInDays, 0), 0) :
+        filteredItems.reduce((sum, item) => sum + item.ageInDays, 0)) / totalItems : 0
 
     const expiredCount = viewMode === 'grouped' ?
-      groups.reduce((sum, group) => sum + group.items.filter(item => item.expiryStatus === 'expired').length, 0) :
-      filteredItems.filter(item => item.expiryStatus === 'expired').length
+      groups.reduce((sum, group) => sum + group.items.filter(item => getExpiryStatus(item.expiryDate) === 'expired').length, 0) :
+      filteredItems.filter(item => getExpiryStatus(item.expiryDate) === 'expired').length
 
     const summary = {
       'Total Items': totalItems,
@@ -317,8 +353,14 @@ export default function InventoryAgingPage() {
       'Average Age (days)': Math.round(avgAge),
       'Expired Items': expiredCount,
       'Near Expiry Items': viewMode === 'grouped' ?
-        groups.reduce((sum, group) => sum + group.items.filter(item => item.expiryStatus === 'near-expiry').length, 0) :
-        filteredItems.filter(item => item.expiryStatus === 'near-expiry').length,
+        groups.reduce((sum, group) => sum + group.items.filter(item => {
+          const status = getExpiryStatus(item.expiryDate)
+          return status === 'critical' || status === 'expiring-soon'
+        }).length, 0) :
+        filteredItems.filter(item => {
+          const status = getExpiryStatus(item.expiryDate)
+          return status === 'critical' || status === 'expiring-soon'
+        }).length,
       'Grouping Mode': groupingMode === 'location' ? 'By Location' : 'By Age Bucket',
       'View Mode': viewMode === 'grouped' ? 'Grouped View' : 'List View'
     }
@@ -713,33 +755,33 @@ export default function InventoryAgingPage() {
                       ) : (
                         filteredItems.map((item) => (
                           <TableRow
-                            key={`${item.locationId}-${item.productId}-${item.batchNumber}`}
+                            key={`${item.locationId}-${item.productId}-${item.lotNumber ?? 'no-lot'}`}
                             className="hover:bg-gray-50/50"
                           >
                             <TableCell>{item.productCode}</TableCell>
                             <TableCell className="font-medium">{item.productName}</TableCell>
-                            <TableCell>{item.batchNumber}</TableCell>
+                            <TableCell>{item.lotNumber ?? 'N/A'}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
                                 <MapPin className="h-4 w-4 text-muted-foreground" />
                                 {item.locationName}
                               </div>
                             </TableCell>
-                            <TableCell className="text-right">{item.daysOld} days</TableCell>
+                            <TableCell className="text-right">{item.ageInDays} days</TableCell>
                             <TableCell className="text-center">
                               {renderAgeBucketBadge(item.ageBucket)}
                             </TableCell>
                             <TableCell className="text-right">
-                              {formatNumber(item.currentStock)} {item.unit}
+                              {formatNumber(item.quantity)} {item.unit}
                             </TableCell>
                             <TableCell className="text-right">
                               {formatCurrency(item.value)}
                             </TableCell>
                             <TableCell className="text-right">
-                              {item.expiryDate ? formatDate(item.expiryDate) : 'No expiry'}
+                              {item.expiryDate ? formatDate(item.expiryDate.toISOString()) : 'No expiry'}
                             </TableCell>
                             <TableCell className="text-center">
-                              {renderExpiryStatusBadge(item.expiryStatus)}
+                              {renderExpiryStatusBadge(getExpiryStatus(item.expiryDate))}
                             </TableCell>
                           </TableRow>
                         ))
@@ -755,17 +797,17 @@ export default function InventoryAgingPage() {
                   { key: 'group', label: groupingMode === 'location' ? 'Location' : 'Age Bucket', type: 'text' },
                   { key: 'productCode', label: 'Code', type: 'text' },
                   { key: 'productName', label: 'Product', type: 'text' },
-                  { key: 'batchNumber', label: 'Batch', type: 'text' },
-                  { key: 'daysOld', label: 'Age (Days)', type: 'number' },
+                  { key: 'lotNumber', label: 'Lot', type: 'text' },
+                  { key: 'ageInDays', label: 'Age (Days)', type: 'number' },
                   { key: 'ageBucket', label: 'Age Bucket', type: 'badge' },
-                  { key: 'currentStock', label: 'Stock', type: 'number' },
+                  { key: 'quantity', label: 'Stock', type: 'number' },
                   { key: 'value', label: 'Value', type: 'currency' },
                   { key: 'expiryDate', label: 'Expiry Date', type: 'date' },
                   { key: 'expiryStatus', label: 'Expiry Status', type: 'badge' }
                 ]}
                 renderRow={(item: AgingItem) => (
                   <TableRow
-                    key={`${item.locationId}-${item.productId}-${item.batchNumber}`}
+                    key={`${item.locationId}-${item.productId}-${item.lotNumber ?? 'no-lot'}`}
                     className="hover:bg-gray-50/50"
                   >
                     <TableCell>
@@ -785,22 +827,22 @@ export default function InventoryAgingPage() {
                     </TableCell>
                     <TableCell>{item.productCode}</TableCell>
                     <TableCell className="font-medium">{item.productName}</TableCell>
-                    <TableCell>{item.batchNumber}</TableCell>
-                    <TableCell className="text-right">{item.daysOld} days</TableCell>
+                    <TableCell>{item.lotNumber ?? 'N/A'}</TableCell>
+                    <TableCell className="text-right">{item.ageInDays} days</TableCell>
                     <TableCell className="text-center">
                       {renderAgeBucketBadge(item.ageBucket)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatNumber(item.currentStock)} {item.unit}
+                      {formatNumber(item.quantity)} {item.unit}
                     </TableCell>
                     <TableCell className="text-right">
                       {formatCurrency(item.value)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {item.expiryDate ? formatDate(item.expiryDate) : 'No expiry'}
+                      {item.expiryDate ? formatDate(item.expiryDate.toISOString()) : 'No expiry'}
                     </TableCell>
                     <TableCell className="text-center">
-                      {renderExpiryStatusBadge(item.expiryStatus)}
+                      {renderExpiryStatusBadge(getExpiryStatus(item.expiryDate))}
                     </TableCell>
                   </TableRow>
                 )}

@@ -106,17 +106,18 @@ export function Review({ formData, onNext, onBack, onStartCount }: ReviewProps) 
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h4 className="font-medium">{location.name}</h4>
-                    <p className="text-sm text-muted-foreground">{location.code}</p>
+                    {location.address && (
+                      <p className="text-sm text-muted-foreground">{location.address}</p>
+                    )}
                   </div>
                   <Badge>{location.type}</Badge>
                 </div>
-                <p className="text-sm">
-                  <span className="text-muted-foreground">Floor:</span>{' '}
-                  {location.floor}
-                  {location.building && (
-                    <>, <span className="text-muted-foreground">Building:</span> {location.building}</>
-                  )}
-                </p>
+                {location.parentLocation && (
+                  <p className="text-sm">
+                    <span className="text-muted-foreground">Parent Location:</span>{' '}
+                    {location.parentLocation}
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}

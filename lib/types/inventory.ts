@@ -31,7 +31,6 @@ export interface InventoryItem {
   lastPurchasePrice?: Money;
   lastSaleDate?: Date;
   lastSalePrice?: Money;
-  ...AuditTimestamp;
 }
 
 /**
@@ -59,7 +58,6 @@ export interface StockBalance {
   totalValue: Money;
   lastMovementDate?: Date;
   lastCountDate?: Date;
-  ...AuditTimestamp;
 }
 
 // ====== INVENTORY TRANSACTIONS ======
@@ -100,7 +98,6 @@ export interface InventoryTransaction {
   expiryDate?: Date;
   userId: string;
   notes?: string;
-  ...AuditTimestamp;
 }
 
 // ====== PHYSICAL COUNT ======
@@ -133,7 +130,6 @@ export interface PhysicalCount {
   isFinalized: boolean;
   finalizedBy?: string;
   finalizedAt?: Date;
-  ...AuditTimestamp;
 }
 
 /**
@@ -179,7 +175,6 @@ export interface SpotCheck {
   itemsChecked: number;
   discrepancies: number;
   notes?: string;
-  ...AuditTimestamp;
 }
 
 /**
@@ -233,7 +228,6 @@ export interface InventoryAdjustment {
   totalValue: Money;
   description?: string;
   attachments?: string[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -275,7 +269,6 @@ export interface StockMovement {
   totalValue: Money;
   priority: 'normal' | 'urgent' | 'emergency';
   notes?: string;
-  ...AuditTimestamp;
 }
 
 /**
@@ -365,7 +358,6 @@ export interface InventoryAlert {
   acknowledgedAt?: Date;
   resolvedBy?: string;
   resolvedAt?: Date;
-  ...AuditTimestamp;
 }
 
 // ====== COUNT ITEM INTERFACE ======

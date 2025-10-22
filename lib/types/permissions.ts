@@ -104,7 +104,7 @@ export interface ResourceAttributes {
   dataClassification: 'public' | 'internal' | 'confidential' | 'restricted' | 'top_secret';
   
   // Business Context
-  documentStatus?: DocumentStatus;
+  documentStatus?: PermissionDocumentStatus;
   workflowStage?: string;
   approvalLevel?: number;
   priority?: 'low' | 'normal' | 'high' | 'urgent' | 'critical';
@@ -463,7 +463,7 @@ export interface BudgetScope {
   period: string;
 }
 
-export interface DocumentStatus {
+export interface PermissionDocumentStatus {
   status: string;
   stage: string;
   approvalRequired: boolean;

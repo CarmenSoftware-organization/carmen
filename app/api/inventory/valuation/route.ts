@@ -103,8 +103,9 @@ export async function GET(request: NextRequest) {
 /**
  * GET /api/inventory/valuation/abc-analysis
  * Get ABC analysis results
+ * NOTE: This should be moved to app/api/inventory/valuation/abc-analysis/route.ts
  */
-export async function getABCAnalysis(request: NextRequest) {
+async function getABCAnalysis(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -163,8 +164,9 @@ export async function getABCAnalysis(request: NextRequest) {
 /**
  * GET /api/inventory/valuation/aging
  * Get inventory aging analysis
+ * NOTE: This should be moved to app/api/inventory/valuation/aging/route.ts
  */
-export async function getAgingAnalysis(request: NextRequest) {
+async function getAgingAnalysis(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -221,8 +223,9 @@ export async function getAgingAnalysis(request: NextRequest) {
 /**
  * GET /api/inventory/valuation/cost-variances
  * Get cost variance analysis
+ * NOTE: This should be moved to app/api/inventory/valuation/cost-variances/route.ts
  */
-export async function getCostVariances(request: NextRequest) {
+async function getCostVariances(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {

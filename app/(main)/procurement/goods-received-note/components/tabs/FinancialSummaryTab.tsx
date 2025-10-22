@@ -1,11 +1,14 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { GoodsReceiveNoteMode, FinancialSummary } from '@/lib/types'
+// FinancialSummary type is not exported from '@/lib/types'
+// Using any type for now
+type FinancialSummary = any
 import { Calculator } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { GRNDetailMode } from '../GoodsReceiveNoteDetail'
 
 interface FinancialSummaryTabProps {
-  mode: GoodsReceiveNoteMode
+  mode: GRNDetailMode
   summary: FinancialSummary | null
   currency: string
   baseCurrency: string
@@ -77,7 +80,7 @@ export function FinancialSummaryTab({ mode, summary, currency, baseCurrency }: F
               </TableRow>
             </TableHeader>
             <TableBody>
-              {summary.jvDetail?.map((entry, index) => (
+              {summary.jvDetail?.map((entry: any, index: number) => (
                 <TableRow key={index}>
                   <TableCell className="w-[200px]">
                     <div className="font-medium">{entry.accountName}</div>

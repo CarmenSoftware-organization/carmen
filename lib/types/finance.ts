@@ -12,7 +12,7 @@ import { AuditTimestamp, Money, DocumentStatus } from './common'
 /**
  * Enhanced currency with additional properties
  */
-export interface Currency {
+export interface Currency extends AuditTimestamp {
   id: string;
   code: string; // ISO 4217 currency code (USD, EUR, etc.)
   name: string;
@@ -37,13 +37,12 @@ export interface Currency {
   roundingMethod: 'round' | 'floor' | 'ceil';
   minimumAmount?: number;
   maximumAmount?: number;
-  ...AuditTimestamp;
 }
 
 /**
  * Enhanced exchange rate with historical tracking
  */
-export interface ExchangeRate {
+export interface ExchangeRate extends AuditTimestamp {
   id: string;
   fromCurrency: string; // Currency code
   toCurrency: string; // Currency code
@@ -66,7 +65,6 @@ export interface ExchangeRate {
   setBy?: string; // User who set manual rate
   reason?: string; // Reason for manual rate
   expiresAt?: Date; // For manual rates
-  ...AuditTimestamp;
 }
 
 /**
@@ -99,7 +97,6 @@ export interface ExchangeRateHistory {
   averageRate: number;
   volume?: number;
   source: ExchangeRateSource;
-  ...AuditTimestamp;
 }
 
 // ====== PAYMENT TERMS ======
@@ -130,7 +127,6 @@ export interface PaymentTerms {
   // Status
   isActive: boolean;
   isDefault: boolean;
-  ...AuditTimestamp;
 }
 
 /**
@@ -184,7 +180,6 @@ export interface ChartOfAccounts {
   // Reporting
   reportingCategory?: string;
   consolidationAccount?: string;
-  ...AuditTimestamp;
 }
 
 // ====== INVOICING ======
@@ -257,7 +252,6 @@ export interface Invoice {
   isRecurring: boolean;
   recurringSchedule?: RecurringSchedule;
   // Audit trail
-  ...AuditTimestamp;
 }
 
 /**
@@ -382,7 +376,6 @@ export interface Payment {
   notes?: string;
   internalNotes?: string;
   attachments?: string[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -440,7 +433,6 @@ export interface BankAccount {
   // Audit
   lastStatementDate?: Date;
   nextStatementDate?: Date;
-  ...AuditTimestamp;
 }
 
 /**
@@ -480,7 +472,6 @@ export interface FinancialPeriod {
   openingBalance: Money;
   closingBalance: Money;
   netIncome: Money;
-  ...AuditTimestamp;
 }
 
 /**
@@ -512,7 +503,6 @@ export interface Budget {
   // Tracking
   lastUpdated: Date;
   alerts: BudgetAlert[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -563,7 +553,6 @@ export interface TaxCode {
   // Reporting
   reportingCategory?: string;
   governmentCode?: string;
-  ...AuditTimestamp;
 }
 
 /**
@@ -584,5 +573,4 @@ export interface CostCenter {
   actualAmount: Money;
   // Status
   isActive: boolean;
-  ...AuditTimestamp;
 }

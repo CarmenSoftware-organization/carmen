@@ -80,7 +80,6 @@ export interface MenuEngineeringMatrix {
   averageContribution: Money;
   // Recommendations
   recommendations: MenuEngineeringRecommendation[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -141,7 +140,6 @@ export interface SalesDataImport {
   startedAt: Date;
   completedAt?: Date;
   processingTime?: number; // seconds
-  ...AuditTimestamp;
 }
 
 /**
@@ -198,7 +196,6 @@ export interface SalesDataRecord {
   matchedRecipeId?: string;
   matchConfidence?: number; // 0-1
   needsReview: boolean;
-  ...AuditTimestamp;
 }
 
 // ====== COST TRACKING AND ALERTS ======
@@ -224,7 +221,6 @@ export interface RecipeCostTracking {
   alertLevel?: 'info' | 'warning' | 'critical';
   // Contributing factors
   ingredientPriceChanges: IngredientCostChange[];
-  ...AuditTimestamp;
 }
 
 /**
@@ -268,7 +264,6 @@ export interface CostAlertConfig {
   minimumOrderVolume?: number;
   onlyBusinessHours?: boolean;
   excludeWeekends?: boolean;
-  ...AuditTimestamp;
 }
 
 /**
@@ -383,5 +378,4 @@ export interface MenuEngineeringReportConfig {
     startDate: Date;
     endDate: Date;
   };
-  ...AuditTimestamp;
 }

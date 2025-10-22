@@ -81,7 +81,6 @@ export interface Product {
   tags: string[];
   notes?: string;
   isActive: boolean;
-  ...AuditTimestamp;
 }
 
 /**
@@ -245,7 +244,6 @@ export interface ProductBrand {
   website?: string;
   countryOfOrigin?: string;
   isActive: boolean;
-  ...AuditTimestamp;
 }
 
 // ====== PRODUCT MANUFACTURERS ======
@@ -266,7 +264,6 @@ export interface ProductManufacturer {
   countryOfOrigin?: string;
   certifications: string[];
   isActive: boolean;
-  ...AuditTimestamp;
 }
 
 // ====== PRODUCT VARIANTS ======
@@ -295,7 +292,6 @@ export interface ProductVariant {
   barcode?: string;
   // Status
   isActive: boolean;
-  ...AuditTimestamp;
 }
 
 /**
@@ -331,7 +327,6 @@ export interface ProductBundle {
   assemblyTimeMins?: number;
   // Status
   isActive: boolean;
-  ...AuditTimestamp;
 }
 
 /**
@@ -372,7 +367,6 @@ export interface ProductPriceList {
   createdBy: string;
   approvedBy?: string;
   approvedAt?: Date;
-  ...AuditTimestamp;
 }
 
 /**
@@ -408,7 +402,6 @@ export interface ProductAttribute {
   categoryIds: string[]; // Categories where this attribute applies
   displayOrder: number;
   isActive: boolean;
-  ...AuditTimestamp;
 }
 
 /**
@@ -444,7 +437,6 @@ export interface ProductLifecycle {
   replacementProductId?: string;
   isEndOfLifeNotified: boolean;
   notifications: LifecycleNotification[];
-  ...AuditTimestamp;
 }
 
 /**

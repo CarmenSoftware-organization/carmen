@@ -155,3 +155,6 @@ tasks/
 # Serena cache files
 .serena/
 .playwright-mcp
+
+# Documentation
+docs/

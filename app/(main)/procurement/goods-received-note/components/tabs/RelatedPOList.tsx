@@ -22,16 +22,16 @@ async function getPurchaseOrderSummary(poRef: string): Promise<Partial<PurchaseO
             number: poRef,
             vendorName: 'Professional Kitchen Supplies',
             orderDate: new Date('2023-08-01'),
-            status: PurchaseOrderStatus.Closed,
-        };
+            status: PurchaseOrderStatus.CLOSED,
+        } as any;
     } else if (poRef === 'PO-2023-007') {
          return {
             poId: 'PO007',
             number: poRef,
             vendorName: 'General Foodstuffs Inc.',
             orderDate: new Date('2023-08-05'),
-            status: PurchaseOrderStatus.Open,
-        };
+            status: PurchaseOrderStatus.OPEN,
+        } as any;
     }
     return null;
 }
@@ -90,15 +90,15 @@ export function RelatedPOList({ poRefs }: RelatedPOListProps) {
                     </TableHeader>
                     <TableBody>
                         {poSummaries.map((po) => (
-                            <TableRow key={po.poId || po.number}>
-                                <TableCell>{po.number || 'N/A'}</TableCell>
-                                <TableCell>{po.vendorName || 'N/A'}</TableCell>
-                                <TableCell>{po.orderDate ? new Date(po.orderDate).toLocaleDateString() : 'N/A'}</TableCell>
-                                <TableCell><Badge variant={po.status === 'Closed' ? 'secondary' : 'default'}>{po.status || 'N/A'}</Badge></TableCell>
+                            <TableRow key={(po as any).poId || (po as any).number}>
+                                <TableCell>{(po as any).number || 'N/A'}</TableCell>
+                                <TableCell>{(po as any).vendorName || 'N/A'}</TableCell>
+                                <TableCell>{(po as any).orderDate ? new Date((po as any).orderDate).toLocaleDateString() : 'N/A'}</TableCell>
+                                <TableCell><Badge variant={(po as any).status === 'Closed' ? 'secondary' : 'default'}>{(po as any).status || 'N/A'}</Badge></TableCell>
                                 <TableCell>
-                                    {po.poId && (
+                                    {(po as any).poId && (
                                         <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/procurement/purchase-orders/${po.poId}`} target="_blank">
+                                            <Link href={`/procurement/purchase-orders/${(po as any).poId}`} target="_blank">
                                                 View PO <ExternalLink className="ml-2 h-3 w-3" />
                                             </Link>
                                         </Button>

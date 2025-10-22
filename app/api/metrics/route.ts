@@ -292,8 +292,9 @@ const alertMetrics = withSecurity(
 
 /**
  * Prometheus-compatible metrics endpoint
+ * NOTE: This should be moved to app/api/metrics/prometheus/route.ts as GET
  */
-export async function GET_PROMETHEUS(request: NextRequest) {
+async function GET_PROMETHEUS(request: NextRequest) {
   try {
     const healthStatus = await infrastructureMonitor.getHealthStatus()
     const businessData = businessMetricsTracker.getBusinessMetrics()

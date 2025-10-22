@@ -1,13 +1,26 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { GoodsReceiveNoteMode, StockMovement } from '@/lib/types'
 
-interface StockMovementTabProps {
-  mode: GoodsReceiveNoteMode
-  movements?: StockMovement[]
+// Type for credit note stock movements (different from standard StockMovement)
+interface CreditNoteStockMovement {
+  id?: string
+  toLocation: string
+  itemName: string
+  itemDescription?: string
+  lotNumber?: string
+  unit: string
+  quantity: number
+  cost: number
+  totalCost: number
+  netAmount: number
+  extraCost?: number
 }
 
-export function StockMovementTab({ mode, movements = [] }: StockMovementTabProps) {
+interface StockMovementTabProps {
+  movements?: CreditNoteStockMovement[]
+}
+
+export function StockMovementTab({ movements = [] }: StockMovementTabProps) {
   if (movements.length === 0) {
     return <div>No stock movements available.</div>
   }

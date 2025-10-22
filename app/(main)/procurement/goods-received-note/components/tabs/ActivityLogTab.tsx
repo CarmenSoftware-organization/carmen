@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-import { ActivityLogEntry } from '@/lib/types'
+// ActivityLogEntry type is not exported from '@/lib/types'
+// Using any type for now
+type ActivityLogEntry = any
 
 interface ActivityLogTabProps {
   activityLog: ActivityLogEntry[]

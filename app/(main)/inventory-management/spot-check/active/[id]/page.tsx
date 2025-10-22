@@ -44,12 +44,11 @@ export default function ActiveCountPage({ params }: PageProps) {
 
   // Get count session from mock data
   const countSession = mockCounts.find(count => count.id === params.id) || mockCounts[0];
-  const countLocations = countSession.locations.map((locId: string) => 
-    mockLocations.find(loc => loc.id === locId)
-  ).filter((loc: any) => loc) as typeof mockLocations;
-  
-  const countProducts = mockInventoryProducts.filter(product => 
-    countSession.locations.includes(product.locationId)
+  const countLocation = mockLocations.find(loc => loc.id === countSession.locationId);
+  const countLocations = countLocation ? [countLocation] : [];
+
+  const countProducts = mockInventoryProducts.filter(product =>
+    product.locationId === countSession.locationId
   );
 
   const handleSubmit = (data: CountDetailData) => {
@@ -103,16 +102,20 @@ export default function ActiveCountPage({ params }: PageProps) {
                   <User className="h-4 w-4" />
                   <span>Counter</span>
                 </div>
-                <p className="font-medium">{countSession.counter}</p>
+                <p className="font-medium">{countSession.countedBy.join(', ') || 'Not assigned'}</p>
               </div>
-              
+
               {/* Date */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4" />
                   <span>Date</span>
                 </div>
-                <p className="font-medium">{countSession.startDate.toLocaleDateString()}</p>
+                <p className="font-medium">
+                  {countSession.startTime
+                    ? new Date(countSession.startTime).toLocaleDateString()
+                    : new Date(countSession.countDate).toLocaleDateString()}
+                </p>
               </div>
               
               {/* Reason */}
@@ -136,8 +139,10 @@ export default function ActiveCountPage({ params }: PageProps) {
             unit: product.uom || 'pcs'
           }))}
           locationName={countLocations[0]?.name || ''}
-          userName={countSession.counter}
-          date={countSession.startDate.toLocaleDateString()}
+          userName={countSession.countedBy.join(', ') || 'Not assigned'}
+          date={countSession.startTime
+            ? new Date(countSession.startTime).toLocaleDateString()
+            : new Date(countSession.countDate).toLocaleDateString()}
           reference={countSession.id}
           onClose={handleClose}
           onSubmit={handleSubmit}

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
-import { GoodsReceiveNote } from '@/lib/types'
+import { GoodsReceiveNote, GRNStatus } from '@/lib/types'
 import { AdvancedFilter } from './advanced-filter'
 import { GRNQuickFilters, QuickFilterOption } from './grn-quick-filters'
 import { Filter as FilterType } from '@/lib/utils/filter-storage'
@@ -60,8 +60,8 @@ export function GRNDataTable({
     // Apply global search filter
     if (globalFilter) {
       filtered = filtered.filter(grn =>
-        grn.ref.toLowerCase().includes(globalFilter.toLowerCase()) ||
-        grn.vendor.toLowerCase().includes(globalFilter.toLowerCase()) ||
+        grn.grnNumber.toLowerCase().includes(globalFilter.toLowerCase()) ||
+        grn.vendorName.toLowerCase().includes(globalFilter.toLowerCase()) ||
         grn.status.toLowerCase().includes(globalFilter.toLowerCase())
       )
     }
@@ -71,8 +71,8 @@ export function GRNDataTable({
       switch (quickFilter.type) {
         case 'view':
           if (quickFilter.value === 'pending') {
-            filtered = filtered.filter(grn => 
-              grn.status === 'Received'
+            filtered = filtered.filter(grn =>
+              grn.status === GRNStatus.RECEIVED
             )
           }
           break
@@ -82,15 +82,15 @@ export function GRNDataTable({
         case 'type':
           // Filter by GRN type based on properties
           if (quickFilter.value === 'consignment') {
-            filtered = filtered.filter(grn => grn.isConsignment)
+            filtered = filtered.filter(grn => (grn as any).isConsignment)
           } else if (quickFilter.value === 'cash') {
-            filtered = filtered.filter(grn => grn.isCash)
+            filtered = filtered.filter(grn => (grn as any).isCash)
           } else if (quickFilter.value === 'from-po') {
             // Assuming GRNs from PO have items with PO references
-            filtered = filtered.filter(grn => grn.items.some(item => (item as any).poLineId))
+            filtered = filtered.filter(grn => (grn as any).items?.some((item: any) => item.poLineId))
           } else if (quickFilter.value === 'manual') {
             // Manual GRNs don't have PO references
-            filtered = filtered.filter(grn => !grn.items.some(item => (item as any).poLineId))
+            filtered = filtered.filter(grn => !(grn as any).items?.some((item: any) => item.poLineId))
           }
           break
       }
@@ -205,7 +205,7 @@ export function GRNDataTable({
   }
 
   const calculateTotalAmount = (grn: GoodsReceiveNote) => {
-    return grn.items.reduce((total, item) => total + (item.netAmount || 0), 0)
+    return (grn as any).items?.reduce((total: number, item: any) => total + (item.netAmount || 0), 0) || 0
   }
 
   return (
@@ -365,13 +365,13 @@ export function GRNDataTable({
                         href={`/procurement/goods-received-note/${grn.id}?mode=view`}
                         className="text-primary hover:text-primary/80 hover:underline"
                       >
-                        {grn.ref}
+                        {grn.grnNumber}
                       </Link>
                     </TableCell>
                   )}
-                  {visibleColumns.vendor && <TableCell>{grn.vendor}</TableCell>}
+                  {visibleColumns.vendor && <TableCell>{grn.vendorName}</TableCell>}
                   {visibleColumns.date && (
-                    <TableCell>{format(new Date(grn.date), 'MMM dd, yyyy')}</TableCell>
+                    <TableCell>{format(new Date(grn.receiptDate), 'MMM dd, yyyy')}</TableCell>
                   )}
                   {visibleColumns.status && (
                     <TableCell>

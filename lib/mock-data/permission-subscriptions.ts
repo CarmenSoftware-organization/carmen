@@ -674,3 +674,13 @@ export function isResourceActivated(subscription: UserSubscription, resourceType
     activation => activation.resourceType === resourceType && activation.isActive
   ) ?? false;
 }
+
+// ============================================================================
+// Convenience Exports
+// ============================================================================
+
+// Export the first subscription as the current subscription for easy access
+export const mockCurrentSubscription = mockUserSubscriptions[0];
+
+// Export payment history from the current subscription
+export const mockPaymentHistory = mockCurrentSubscription.paymentHistory;

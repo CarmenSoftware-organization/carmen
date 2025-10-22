@@ -2,11 +2,11 @@
 
 import React, { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { 
-  usePurchaseOrders, 
+import {
+  usePurchaseOrders,
   useCreatePurchaseOrder,
-  useSendPurchaseOrder,
-  useAcknowledgePurchaseOrder
+  // useSendPurchaseOrder, // TODO: Add this hook
+  // useAcknowledgePurchaseOrder // TODO: Add this hook
 } from "@/lib/hooks/api"
 import { PurchaseOrderFilters } from "@/lib/api/procurement"
 import { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types"
@@ -54,26 +54,24 @@ interface ModernPurchaseOrderListProps {
   className?: string
 }
 
-const STATUS_COLORS: Record<PurchaseOrderStatus, string> = {
-  draft: "bg-gray-100 text-gray-800",
-  sent: "bg-blue-100 text-blue-800",
-  acknowledged: "bg-yellow-100 text-yellow-800",
-  "in-transit": "bg-purple-100 text-purple-800",
-  "partially-received": "bg-orange-100 text-orange-800",
-  received: "bg-green-100 text-green-800",
-  closed: "bg-emerald-100 text-emerald-800",
-  cancelled: "bg-red-100 text-red-600"
+const STATUS_COLORS: Record<string, string> = {
+  'draft': "bg-gray-100 text-gray-800",
+  'sent': "bg-blue-100 text-blue-800",
+  'acknowledged': "bg-yellow-100 text-yellow-800",
+  'partial_received': "bg-orange-100 text-orange-800",
+  'fully_received': "bg-green-100 text-green-800",
+  'closed': "bg-emerald-100 text-emerald-800",
+  'cancelled': "bg-red-100 text-red-600"
 }
 
-const STATUS_ICONS: Record<PurchaseOrderStatus, React.ReactNode> = {
-  draft: <FileText className="h-3 w-3" />,
-  sent: <Send className="h-3 w-3" />,
-  acknowledged: <Check className="h-3 w-3" />,
-  "in-transit": <Truck className="h-3 w-3" />,
-  "partially-received": <Package className="h-3 w-3" />,
-  received: <Package className="h-3 w-3" />,
-  closed: <Check className="h-3 w-3" />,
-  cancelled: <AlertTriangle className="h-3 w-3" />
+const STATUS_ICONS: Record<string, React.ReactNode> = {
+  'draft': <FileText className="h-3 w-3" />,
+  'sent': <Send className="h-3 w-3" />,
+  'acknowledged': <Package className="h-3 w-3" />,
+  'partial_received': <Package className="h-3 w-3" />,
+  'fully_received': <Check className="h-3 w-3" />,
+  'closed': <Check className="h-3 w-3" />,
+  'cancelled': <AlertTriangle className="h-3 w-3" />
 }
 
 export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderListProps) {
@@ -116,33 +114,23 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
     refetch 
   } = usePurchaseOrders(filters, { page, limit })
 
-  const createPOMutation = useCreatePurchaseOrder({
-    onSuccess: () => {
-      toast({ title: "Purchase order created successfully" })
-      refetch()
-    },
-    onError: (error: Error) => {
-      toast({ 
-        variant: "destructive",
-        title: "Failed to create purchase order",
-        description: error.message 
-      })
-    }
-  })
+  const createPOMutation = useCreatePurchaseOrder()
 
-  const sendPOMutation = useSendPurchaseOrder({
-    onSuccess: () => {
-      toast({ title: "Purchase order sent successfully" })
-      refetch()
-    }
-  })
+  // TODO: Re-enable when useSendPurchaseOrder hook is available
+  // const sendPOMutation = useSendPurchaseOrder({
+  //   onSuccess: () => {
+  //     toast({ title: "Purchase order sent successfully" })
+  //     refetch()
+  //   }
+  // })
 
-  const acknowledgePOMutation = useAcknowledgePurchaseOrder({
-    onSuccess: () => {
-      toast({ title: "Purchase order acknowledged successfully" })
-      refetch()
-    }
-  })
+  // TODO: Re-enable when useAcknowledgePurchaseOrder hook is available
+  // const acknowledgePOMutation = useAcknowledgePurchaseOrder({
+  //   onSuccess: () => {
+  //     toast({ title: "Purchase order acknowledged successfully" })
+  //     refetch()
+  //   }
+  // })
 
   // Event handlers
   const handleCreatePO = () => {
@@ -158,18 +146,22 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
   }
 
   const handleSend = async (po: PurchaseOrder) => {
-    await sendPOMutation.mutateAsync(po.id)
+    // TODO: Re-enable when useSendPurchaseOrder hook is available
+    // await sendPOMutation.mutateAsync(po.id)
+    toast({ title: "Send functionality not yet available", variant: "default" })
   }
 
   const handleAcknowledge = async (po: PurchaseOrder) => {
-    const expectedDate = prompt("Expected delivery date (YYYY-MM-DD):")
-    const notes = prompt("Additional notes (optional):")
-    
-    await acknowledgePOMutation.mutateAsync({
-      id: po.id,
-      expectedDate: expectedDate || undefined,
-      notes: notes || undefined
-    })
+    // TODO: Re-enable when useAcknowledgePurchaseOrder hook is available
+    // const expectedDate = prompt("Expected delivery date (YYYY-MM-DD):")
+    // const notes = prompt("Additional notes (optional):")
+    //
+    // await acknowledgePOMutation.mutateAsync({
+    //   id: po.id,
+    //   expectedDate: expectedDate || undefined,
+    //   notes: notes || undefined
+    // })
+    toast({ title: "Acknowledge functionality not yet available", variant: "default" })
   }
 
   const handleSelectItem = (id: string) => {
@@ -241,8 +233,8 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
       draft: purchaseOrders.filter(po => po.status === 'draft'),
       sent: purchaseOrders.filter(po => po.status === 'sent'),
       acknowledged: purchaseOrders.filter(po => po.status === 'acknowledged'),
-      "in-transit": purchaseOrders.filter(po => po.status === 'in-transit'),
-      received: purchaseOrders.filter(po => po.status === 'received')
+      partial: purchaseOrders.filter(po => po.status === 'partial_received'),
+      received: purchaseOrders.filter(po => po.status === 'fully_received')
     }
   }, [purchaseOrders])
 
@@ -338,8 +330,8 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
             <TabsTrigger value="draft">Draft ({groupedPOs.draft.length})</TabsTrigger>
             <TabsTrigger value="sent">Sent ({groupedPOs.sent.length})</TabsTrigger>
             <TabsTrigger value="acknowledged">Acknowledged ({groupedPOs.acknowledged.length})</TabsTrigger>
-            <TabsTrigger value="in-transit">In Transit ({groupedPOs["in-transit"].length})</TabsTrigger>
-            <TabsTrigger value="received">Received ({groupedPOs.received.length})</TabsTrigger>
+            <TabsTrigger value="partial">Partially Received ({groupedPOs.partial.length})</TabsTrigger>
+            <TabsTrigger value="received">Fully Received ({groupedPOs.received.length})</TabsTrigger>
           </TabsList>
 
           {Object.entries(groupedPOs).map(([status, pos]) => (
@@ -374,9 +366,9 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
                               </CardTitle>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span>{po.vendor?.name || 'Unknown Vendor'}</span>
+                              <span>{po.vendorName || 'Unknown Vendor'}</span>
                               <span>•</span>
-                              <span>{po.buyer?.name || 'Unknown Buyer'}</span>
+                              <span>{po.approvedBy || 'Unknown Buyer'}</span>
                               <span>•</span>
                               <span>Created: {new Date(po.orderDate).toLocaleDateString()}</span>
                             </div>
@@ -431,7 +423,7 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleSend(po)}
-                                disabled={sendPOMutation.isPending}
+                                disabled={false}
                               >
                                 <Send className="h-3 w-3 mr-1" />
                                 Send
@@ -443,7 +435,7 @@ export function ModernPurchaseOrderListAPI({ className }: ModernPurchaseOrderLis
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleAcknowledge(po)}
-                                disabled={acknowledgePOMutation.isPending}
+                                disabled={false}
                               >
                                 <Check className="h-3 w-3 mr-1" />
                                 Acknowledge

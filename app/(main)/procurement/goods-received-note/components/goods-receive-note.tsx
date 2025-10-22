@@ -26,8 +26,8 @@ import {
 import { ChevronLeft, ChevronUp, HelpCircle, ChevronDown, PlusCircle, Plus, Edit, Trash2, X, Printer, CheckSquare, Save, ChevronRight, CalendarIcon, PanelRightClose, PanelRightOpen, Download, Share, Send, Archive, TagIcon, UserIcon, BuildingIcon, DollarSign as DollarSignIcon, TrendingUp as TrendingUpIcon, CreditCard as CreditCardIcon, FileText as FileTextIcon } from "lucide-react";
 import {
   GoodsReceiveNote,
-  GoodsReceiveNoteMode,
   GoodsReceiveNoteItem,
+  GRNStatus,
 } from "@/lib/types";
 import { GoodsReceiveNoteItems } from "./tabs/GoodsReceiveNoteItems";
 import {
@@ -86,12 +86,12 @@ export function GoodsReceiveNoteComponent({
   
   const [formData, setFormData] = React.useState<GoodsReceiveNote>(() => ({
     ...initialData,
-    date: new Date(initialData.date),
-    invoiceDate: new Date(initialData.invoiceDate),
-    taxInvoiceDate: initialData.taxInvoiceDate
-      ? new Date(initialData.taxInvoiceDate)
+    date: new Date((initialData as any).date || initialData.receiptDate),
+    invoiceDate: initialData.invoiceDate ? new Date(initialData.invoiceDate) : new Date(),
+    taxInvoiceDate: (initialData as any).taxInvoiceDate
+      ? new Date((initialData as any).taxInvoiceDate)
       : undefined,
-  }));
+  } as any));
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false)
   const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
@@ -101,12 +101,12 @@ export function GoodsReceiveNoteComponent({
 
   // Extract unique Purchase Order References from items
   const relatedPurchaseOrderRefs = React.useMemo(() => {
-      if (!formData?.items) return [];
-      const refs = formData.items
-          .map(item => item.purchaseOrderRef)
-          .filter((ref, index, self) => ref && self.indexOf(ref) === index); // Filter out empty/null and get unique
+      if (!(formData as any)?.items) return [];
+      const refs = (formData as any).items
+          .map((item: any) => item.purchaseOrderRef)
+          .filter((ref: any, index: number, self: any[]) => ref && self.indexOf(ref) === index); // Filter out empty/null and get unique
       return refs;
-  }, [formData?.items]);
+  }, [(formData as any)?.items]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -186,7 +186,7 @@ export function GoodsReceiveNoteComponent({
       // Handle select all case
       if (isSelected) {
         // Select all items
-        setSelectedItems(formData.items.map(item => item.id));
+        setSelectedItems((formData as any).items?.map((item: any) => item.id) || []);
       } else {
         // Deselect all items
         setSelectedItems([]);
@@ -201,13 +201,13 @@ export function GoodsReceiveNoteComponent({
 
   const handleBulkAction = (action: string) => {
     console.log(`Applying ${action} to items:`, selectedItems);
-    
+
     switch (action) {
       case "delete":
         setFormData((prev) => ({
           ...prev,
-          items: prev.items.filter((item) => !selectedItems.includes(item.id)),
-        }));
+          items: (prev as any).items?.filter((item: any) => !selectedItems.includes(item.id)) || [],
+        } as any));
         break;
       
       case "changeQuantity":
@@ -228,16 +228,16 @@ export function GoodsReceiveNoteComponent({
   };
 
   const calculateTotals = () => {
-    const subtotal = formData.items.reduce(
-      (sum, item) => sum + item.subTotalAmount,
+    const subtotal = ((formData as any).items || []).reduce(
+      (sum: number, item: any) => sum + item.subTotalAmount,
       0
     );
-    const taxTotal = formData.items.reduce(
-      (sum, item) => sum + item.taxAmount,
+    const taxTotal = ((formData as any).items || []).reduce(
+      (sum: number, item: any) => sum + item.taxAmount,
       0
     );
-    const extraCostsTotal = formData.extraCosts.reduce(
-      (sum, cost) => sum + cost.amount,
+    const extraCostsTotal = ((formData as any).extraCosts || []).reduce(
+      (sum: number, cost: any) => sum + cost.amount,
       0
     );
     const grandTotal = subtotal + taxTotal + extraCostsTotal;
@@ -246,8 +246,8 @@ export function GoodsReceiveNoteComponent({
   };
 
   const calculateDocumentTotals = () => {
-    const netAmount = formData.items.reduce((sum, item) => sum + item.netAmount, 0);
-    const taxAmount = formData.items.reduce((sum, item) => sum + item.taxAmount, 0);
+    const netAmount = ((formData as any).items || []).reduce((sum: number, item: any) => sum + item.netAmount, 0);
+    const taxAmount = ((formData as any).items || []).reduce((sum: number, item: any) => sum + item.taxAmount, 0);
     const totalAmount = netAmount + taxAmount;
 
     return {
@@ -257,9 +257,9 @@ export function GoodsReceiveNoteComponent({
         totalAmount,
       },
       baseCurrency: {
-        netAmount: netAmount * formData.exchangeRate,
-        taxAmount: taxAmount * formData.exchangeRate,
-        totalAmount: totalAmount * formData.exchangeRate,
+        netAmount: netAmount * ((formData as any).exchangeRate || 1),
+        taxAmount: taxAmount * ((formData as any).exchangeRate || 1),
+        totalAmount: totalAmount * ((formData as any).exchangeRate || 1),
       },
     };
   };
@@ -282,7 +282,7 @@ export function GoodsReceiveNoteComponent({
     setIsSidebarVisible(!isSidebarVisible);
   };
 
-  const childMode: GoodsReceiveNoteMode = internalMode as GoodsReceiveNoteMode;
+  const childMode: GRNDetailMode = internalMode as GRNDetailMode;
 
   // Additional actions for view mode
   const getAdditionalActions = (): ActionItem[] => {
@@ -291,7 +291,7 @@ export function GoodsReceiveNoteComponent({
     const actions: ActionItem[] = [];
     
     // Add Send action for received GRNs
-    if (formData.status === 'Received') {
+    if (formData.status === GRNStatus.RECEIVED) {
       actions.push({
         id: 'send',
         label: 'Send',
@@ -345,7 +345,7 @@ export function GoodsReceiveNoteComponent({
                     </Button>
                     <div className="flex flex-col">
                       <h1 className="text-2xl font-bold">
-                        {formData.ref || "Goods Receive Note"}
+                        {formData.grnNumber || "Goods Receive Note"}
                       </h1>
                       <p className="text-sm text-muted-foreground mt-1">Goods Receive Note</p>
                     </div>
@@ -458,13 +458,13 @@ export function GoodsReceiveNoteComponent({
                           id="date"
                           name="date"
                           type="date"
-                          value={formData.date.toISOString().split("T")[0]}
+                          value={formData.receiptDate.toISOString().split("T")[0]}
                           onChange={handleInputChange}
                           className="w-full"
                         />
                       ) : (
                         <div className="text-gray-900 font-medium">
-                          {formData.date.toLocaleDateString('en-GB')}
+                          {formData.receiptDate.toLocaleDateString('en-GB')}
                         </div>
                       )}
                     </div>
@@ -477,12 +477,12 @@ export function GoodsReceiveNoteComponent({
                         <Input
                           id="ref"
                           name="ref"
-                          value={formData.ref}
+                          value={formData.grnNumber}
                           onChange={handleInputChange}
                           className="w-full"
                         />
                       ) : (
-                        <div className="text-gray-900 font-medium">{formData.ref}</div>
+                        <div className="text-gray-900 font-medium">{formData.grnNumber}</div>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -492,16 +492,16 @@ export function GoodsReceiveNoteComponent({
                       </Label>
                       {isEditable ? (
                         <Select
-                          value={formData.vendor || undefined}
+                          value={formData.vendorName || undefined}
                           onValueChange={(value) => handleSelectChange("vendor", value)}
                         >
                           <SelectTrigger id="vendor" className="w-full">
                             <SelectValue placeholder="Select vendor" />
                           </SelectTrigger>
                           <SelectContent>
-                            {formData.vendor ? (
-                              <SelectItem value={formData.vendor}>
-                                {formData.vendor}
+                            {formData.vendorName ? (
+                              <SelectItem value={formData.vendorName}>
+                                {formData.vendorName}
                               </SelectItem>
                             ) : (
                               <SelectItem value="no-vendor">No vendor selected</SelectItem>
@@ -509,7 +509,7 @@ export function GoodsReceiveNoteComponent({
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="text-gray-900 font-medium">{formData.vendor || "Not specified"}</div>
+                        <div className="text-gray-900 font-medium">{formData.vendorName || "Not specified"}</div>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -543,13 +543,13 @@ export function GoodsReceiveNoteComponent({
                           id="invoice-date"
                           name="invoiceDate"
                           type="date"
-                          value={formData.invoiceDate.toISOString().split("T")[0]}
+                          value={formData.invoiceDate?.toISOString().split("T")[0] || ''}
                           onChange={handleInputChange}
                           className="w-full"
                         />
                       ) : (
                         <div className="text-gray-900 font-medium">
-                          {formData.invoiceDate.toLocaleDateString('en-GB')}
+                          {formData.invoiceDate?.toLocaleDateString('en-GB') || 'N/A'}
                         </div>
                       )}
                     </div>
@@ -560,16 +560,16 @@ export function GoodsReceiveNoteComponent({
                       </Label>
                       {isEditable ? (
                         <Select
-                          value={formData.currency || undefined}
+                          value={(formData as any).currency || undefined}
                           onValueChange={(value) => handleSelectChange("currency", value)}
                         >
                           <SelectTrigger id="currency" className="w-full">
                             <SelectValue placeholder="Select currency" />
                           </SelectTrigger>
                           <SelectContent>
-                            {formData.currency ? (
-                              <SelectItem value={formData.currency}>
-                                {formData.currency}
+                            {(formData as any).currency ? (
+                              <SelectItem value={(formData as any).currency}>
+                                {(formData as any).currency}
                               </SelectItem>
                             ) : (
                               <SelectItem value="no-currency">No currency selected</SelectItem>
@@ -577,7 +577,7 @@ export function GoodsReceiveNoteComponent({
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="text-gray-900 font-medium">{formData.currency || ""}</div>
+                        <div className="text-gray-900 font-medium">{(formData as any).currency || ""}</div>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -590,14 +590,14 @@ export function GoodsReceiveNoteComponent({
                           id="exchangeRate"
                           name="exchangeRate"
                           type="number"
-                          value={formData.exchangeRate}
+                          value={(formData as any).exchangeRate}
                           onChange={handleInputChange}
                           className="w-full"
                           step="0.0001"
                           min="0"
                         />
                       ) : (
-                        <div className="text-gray-900 font-medium">{formData.exchangeRate || "1"}</div>
+                        <div className="text-gray-900 font-medium">{(formData as any).exchangeRate || "1"}</div>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -635,14 +635,14 @@ export function GoodsReceiveNoteComponent({
                       {isEditable ? (
                         <Textarea 
                           name="description"
-                          value={formData.description || ""}
+                          value={(formData as any).description || ""}
                           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                           className="w-full h-20"
                           placeholder="Add goods receive note description..."
                         />
                       ) : (
                         <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
-                          {formData.description || "No description"}
+                          {(formData as any).description || "No description"}
                         </div>
                       )}
                     </div>
@@ -656,13 +656,13 @@ export function GoodsReceiveNoteComponent({
                           id="dueDate" 
                           name="dueDate"
                           type="date" 
-                          value={formData.dueDate ? formData.dueDate.toISOString().split('T')[0] : ''}
+                          value={(formData as any).dueDate ? (formData as any).dueDate.toISOString().split('T')[0] : ''}
                           onChange={handleInputChange}
                           className="w-full"
                         />
                       ) : (
                         <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center">
-                          {formData.dueDate ? formData.dueDate.toLocaleDateString('en-GB') : "No due date set"}
+                          {(formData as any).dueDate ? (formData as any).dueDate.toLocaleDateString('en-GB') : "No due date set"}
                         </div>
                       )}
                     </div>
@@ -676,7 +676,7 @@ export function GoodsReceiveNoteComponent({
                           <div className="flex items-center space-x-2">
                             <Checkbox
                               id="consignment"
-                              checked={formData.isConsignment}
+                              checked={(formData as any).isConsignment}
                               onCheckedChange={(checked) =>
                                 handleCheckboxChange("isConsignment", checked as boolean)
                               }
@@ -699,7 +699,7 @@ export function GoodsReceiveNoteComponent({
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="cash"
-                        checked={formData.isCash}
+                        checked={(formData as any).isCash}
                         onCheckedChange={(checked) =>
                           handleCheckboxChange("isCash", checked as boolean)
                         }
@@ -728,13 +728,13 @@ export function GoodsReceiveNoteComponent({
                 <TabsContent value="items" className="mt-4">
                   <GoodsReceiveNoteItems
                     mode={childMode}
-                    items={formData.items || []}
+                    items={(formData as any).items || [] || []}
                     onItemsChange={handleItemsChange}
                     selectedItems={selectedItems}
                     onItemSelect={handleItemSelect}
-                    exchangeRate={formData.exchangeRate || 1}
-                    baseCurrency={formData.baseCurrency || ''}
-                    currency={formData.currency || ''}
+                    exchangeRate={(formData as any).exchangeRate || 1}
+                    baseCurrency={(formData as any).baseCurrency || ''}
+                    currency={(formData as any).currency || ''}
                     bulkActions={selectedItems.length > 0 && (
                       <GoodsReceiveNoteItemsBulkActions
                         selectedItems={selectedItems}
@@ -749,7 +749,7 @@ export function GoodsReceiveNoteComponent({
                 <TabsContent value="extra-costs" className="mt-4">
                   <ExtraCostsTab
                      mode={childMode}
-                     initialCosts={formData.extraCosts || []}
+                     initialCosts={(formData as any).extraCosts || []}
                      onCostsChange={(newCosts) => {
                        setFormData((prev) => ({
                          ...prev,
@@ -764,20 +764,20 @@ export function GoodsReceiveNoteComponent({
                 <TabsContent value="financials" className="mt-4">
                   <FinancialSummaryTab
                     mode={childMode}
-                    summary={formData.financialSummary || null}
-                    currency={formData.currency}
-                    baseCurrency={formData.baseCurrency}
+                    summary={(formData as any).financialSummary || null}
+                    currency={(formData as any).currency}
+                    baseCurrency={(formData as any).baseCurrency}
                   />
                   <TaxTab
                      mode={childMode}
-                     taxInvoiceNumber={formData.taxInvoiceNumber}
-                     taxInvoiceDate={formData.taxInvoiceDate}
+                     taxInvoiceNumber={(formData as any).taxInvoiceNumber}
+                     taxInvoiceDate={(formData as any).taxInvoiceDate}
                      onTaxInvoiceChange={(field, value) => {
                        setFormData(prev => ({ ...prev, [field]: value }));
                      }}
                      documentTotals={documentTotals}
-                     currency={formData.currency}
-                     baseCurrency={formData.baseCurrency}
+                     currency={(formData as any).currency}
+                     baseCurrency={(formData as any).baseCurrency}
                    />
                 </TabsContent>
               </Tabs>
@@ -787,22 +787,22 @@ export function GoodsReceiveNoteComponent({
           <Card>
             <CardHeader>
               <CardTitle>
-                Transaction Summary ({formData.currency || 'USD'}
-                {formData.baseCurrency && formData.baseCurrency !== formData.currency && 
-                  ` / ${formData.baseCurrency}`
+                Transaction Summary ({(formData as any).currency || 'USD'}
+                {(formData as any).baseCurrency && (formData as any).baseCurrency !== (formData as any).currency && 
+                  ` / ${(formData as any).baseCurrency}`
                 })
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ModernTransactionSummary
-                subtotal={formData.subTotalPrice || 0}
-                discount={formData.discountAmount || 0}
-                netAmount={formData.netAmount || 0}
-                tax={formData.taxAmount || 0}
-                totalAmount={formData.totalAmount || 0}
-                currency={formData.currency || 'USD'}
-                baseCurrency={formData.baseCurrency}
-                exchangeRate={formData.exchangeRate || 1}
+                subtotal={(formData as any).subTotalPrice || 0}
+                discount={(formData as any).discountAmount || 0}
+                netAmount={(formData as any).netAmount || 0}
+                tax={(formData as any).taxAmount || 0}
+                totalAmount={(formData as any).totalAmount || 0}
+                currency={(formData as any).currency || 'USD'}
+                baseCurrency={(formData as any).baseCurrency}
+                exchangeRate={(formData as any).exchangeRate || 1}
               />
             </CardContent>
           </Card>
@@ -823,7 +823,7 @@ export function GoodsReceiveNoteComponent({
               <CardTitle>Activity Log</CardTitle>
             </CardHeader>
             <CardContent>
-              <ActivityLogTab activityLog={formData.activityLog} />
+              <ActivityLogTab activityLog={(formData as any).activityLog} />
             </CardContent>
           </Card>
         </div>

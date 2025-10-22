@@ -665,6 +665,13 @@ export interface ActivityLogEntry {
 export interface Department {
   id: string;
   name: string;
+  code: string;
+  description?: string;
+  status: 'active' | 'inactive';
+  manager?: string;
+  costCenter?: string;
+  parentDepartment?: string;
+  assignedUsers?: string[]; // Array of user IDs assigned to this department
 }
 
 export interface AccountCode {

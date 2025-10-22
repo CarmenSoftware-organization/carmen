@@ -41,7 +41,7 @@ export function FinalReview({ formData }: FinalReviewProps) {
   // Calculate statistics
   const totalItems = uniqueProducts.length;
   const totalLocations = selectedLocationDetails.length;
-  const categories = Array.from(new Set(uniqueProducts.map(p => p.category)));
+  const categories = Array.from(new Set(uniqueProducts.map(p => p.categoryId)));
   const locationTypes = Array.from(new Set(selectedLocationDetails.map(l => l.type)));
   const estimatedDuration = Math.ceil(totalItems / 100) * 30; // 30 minutes per 100 items
 
@@ -131,7 +131,7 @@ export function FinalReview({ formData }: FinalReviewProps) {
           <h3 className="font-medium">Categories Breakdown</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {categories.map(category => {
-              const itemsInCategory = uniqueProducts.filter(p => p.category === category);
+              const itemsInCategory = uniqueProducts.filter(p => p.categoryId === category);
               return (
                 <div key={category} className="p-3 rounded-lg border">
                   <div className="font-medium">{category}</div>
@@ -161,11 +161,13 @@ export function FinalReview({ formData }: FinalReviewProps) {
                     <div>
                       <div className="font-medium">{location.name}</div>
                       <div className="text-sm text-muted-foreground">
-                        {location.code} • {location.type}
+                        {location.type}
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Floor {location.floor} • {location.building}
-                      </div>
+                      {location.address && (
+                        <div className="text-sm text-muted-foreground">
+                          {location.address}
+                        </div>
+                      )}
                     </div>
                     <div className="text-right">
                       <Badge variant="secondary">

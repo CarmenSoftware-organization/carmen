@@ -650,6 +650,9 @@ export function getAvailableActions(resourceType: ResourceType): string[] {
   ];
 }
 
+// Alias for backward compatibility
+export const getResourceActions = getAvailableActions;
+
 export function isResourceAuditable(resourceType: ResourceType): boolean {
   const metadata = getResourceMetadata(resourceType);
   return metadata?.isAuditable || false;

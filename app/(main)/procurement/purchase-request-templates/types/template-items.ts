@@ -1,5 +1,3 @@
-import { CurrencyCode } from "@/lib/types"
-
 export interface TemplateItem {
   id: string
   itemCode: string
@@ -12,7 +10,7 @@ export interface TemplateItem {
   accountCode: string
   department: string
   taxCode: string
-  currency: CurrencyCode
+  currency: string
 }
 
 export const mockTemplateItems: TemplateItem[] = [
@@ -28,7 +26,7 @@ export const mockTemplateItems: TemplateItem[] = [
     accountCode: "5001",
     department: "Kitchen",
     taxCode: "VAT7",
-    currency: CurrencyCode.USD
+    currency: 'USD'
   },
   {
     id: "2",
@@ -42,7 +40,7 @@ export const mockTemplateItems: TemplateItem[] = [
     accountCode: "5001",
     department: "Kitchen",
     taxCode: "VAT7",
-    currency: CurrencyCode.USD
+    currency: 'USD'
   },
   {
     id: "3",
@@ -56,7 +54,7 @@ export const mockTemplateItems: TemplateItem[] = [
     accountCode: "5002",
     department: "Housekeeping",
     taxCode: "VAT7",
-    currency: CurrencyCode.USD
+    currency: 'USD'
   },
   {
     id: "4",
@@ -70,7 +68,7 @@ export const mockTemplateItems: TemplateItem[] = [
     accountCode: "5002",
     department: "Housekeeping",
     taxCode: "VAT7",
-    currency: CurrencyCode.USD
+    currency: 'USD'
   },
   {
     id: "5",
@@ -84,6 +82,6 @@ export const mockTemplateItems: TemplateItem[] = [
     accountCode: "5003",
     department: "Housekeeping",
     taxCode: "VAT7",
-    currency: CurrencyCode.USD
+    currency: 'USD'
   }
 ] 

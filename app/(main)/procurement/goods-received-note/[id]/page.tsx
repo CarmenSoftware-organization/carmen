@@ -3,14 +3,15 @@
 import { useSearchParams, useRouter } from 'next/navigation'
 import { GoodsReceiveNoteComponent } from '../components/goods-receive-note'
 import { mockGoodsReceiveNotes } from '@/lib/mock-data'
-import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
+import { GoodsReceiveNote, GRNStatus } from '@/lib/types'
 import { useGRNCreationStore } from '@/lib/store/grn-creation.store'
 import { useEffect, useState } from 'react'
+import { GRNDetailMode } from '../components/GoodsReceiveNoteDetail'
 
 export default function GoodsReceiveNotePage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const modeParam = searchParams?.get('mode') as GoodsReceiveNoteMode | 'confirm' || 'view'
+  const modeParam = searchParams?.get('mode') as GRNDetailMode | 'confirm' || 'view'
   const id = params.id
 
   // Select state using the hook outside useEffect
@@ -36,10 +37,10 @@ export default function GoodsReceiveNotePage({ params }: { params: { id: string 
         console.log('[Effect] Loaded from store via hook:', data);
       } else {
         console.warn('[Effect] No data in store for new GRN. Creating default draft GRN.');
-        data = {
+        data = ({
           id: id, // Use the ID from the URL
-          ref: 'NEW GRN',
-          date: new Date(),
+          grnNumber: 'NEW GRN',
+          receiptDate: new Date(),
           invoiceDate: new Date(),
           invoiceNumber: '',
           taxInvoiceDate: undefined,
@@ -52,7 +53,7 @@ export default function GoodsReceiveNotePage({ params }: { params: { id: string 
           currency: 'USD',
           exchangeRate: 1,
           baseCurrency: 'USD',
-          status: 'Received',
+          status: GRNStatus.RECEIVED,
           isConsignment: false,
           isCash: false,
           cashBook: '',
@@ -73,13 +74,13 @@ export default function GoodsReceiveNotePage({ params }: { params: { id: string 
           taxAmount: 0,
           baseTotalAmount: 0,
           totalAmount: 0,
-        };
+        } as any);
         // finalMode = 'add'; // No longer needed here
         console.log('[Effect] Created new draft GRN:', data);
       }
     } else if (id === '0') {
       console.warn('[Effect] Accessing ID 0 - likely deprecated flow.')
-      data = {
+      data = ({
         id: '0',
         ref: '',
         date: new Date(),
@@ -116,7 +117,7 @@ export default function GoodsReceiveNotePage({ params }: { params: { id: string 
         taxAmount: 0,
         baseTotalAmount: 0,
         totalAmount: 0,
-      }
+      } as any)
       // finalMode = 'add' // No longer needed here
     } else {
       console.log('[Effect] Fetching existing GRN with ID:', id)

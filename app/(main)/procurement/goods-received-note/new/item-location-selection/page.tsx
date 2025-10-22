@@ -26,20 +26,20 @@ const flattenPOItems = (pos: PurchaseOrder[]): (PurchaseOrderItem & {
     receivingQuantity?: number 
 })[] => {
   return pos.flatMap(po =>
-    po.items.map((item, index) => {
+    (po as any).items.map((item: any, index: number) => {
       // Assign more diverse mock locations based on PO number or index
       let mockLocation = 'Main Warehouse';
-      if (po.number === 'PO-002') mockLocation = 'Store Room A';
-      else if (po.number === 'PO-003') mockLocation = 'Kitchen Prep Area';
-      else if (index % 2 === 0 && po.number === 'PO-001') mockLocation = 'Receiving Bay'; // Example for variety within a PO
+      if ((po as any).number === 'PO-002') mockLocation = 'Store Room A';
+      else if ((po as any).number === 'PO-003') mockLocation = 'Kitchen Prep Area';
+      else if (index % 2 === 0 && (po as any).number === 'PO-001') mockLocation = 'Receiving Bay'; // Example for variety within a PO
 
       return {
         ...item,
-        poNumber: po.number,
-        poCurrencyCode: po.currencyCode,
-        poExchangeRate: po.exchangeRate, // Add Exchange Rate from PO
-        poBaseCurrencyCode: po.baseCurrencyCode, // Add Base Currency Code from PO
-        location: mockLocation 
+        poNumber: (po as any).number,
+        poCurrencyCode: (po as any).currencyCode,
+        poExchangeRate: (po as any).exchangeRate, // Add Exchange Rate from PO
+        poBaseCurrencyCode: (po as any).baseCurrencyCode, // Add Base Currency Code from PO
+        location: mockLocation
       };
     })
   );
@@ -73,7 +73,7 @@ export default function ItemLocationSelectionPage() {
     }
 
     // Extract unique locations
-    const uniqueLocations = Array.from(new Set(allPOItems.map(item => item.location).filter(Boolean))) as string[];
+    const uniqueLocations = Array.from(new Set(allPOItems.map(item => (item as any).location).filter(Boolean))) as string[];
     setLocations(uniqueLocations);
     setSelectedLocations(new Set(uniqueLocations)); // Select all by default
 
@@ -91,7 +91,7 @@ export default function ItemLocationSelectionPage() {
     // Initialize receiving units state
     const initialUnits: Record<string, string> = {};
     allPOItems.forEach(item => {
-        initialUnits[item.id] = item.orderUnit; // Default to order unit
+        initialUnits[item.id] = (item as any).orderUnit; // Default to order unit
     });
     setItemReceivingUnits(initialUnits);
 
@@ -101,10 +101,10 @@ export default function ItemLocationSelectionPage() {
   useEffect(() => {
     const lowerCaseSearch = searchTerm.toLowerCase();
     const filtered = allPOItems.filter(item =>
-      selectedLocations.has(item.location || '') &&
-      (item.name.toLowerCase().includes(lowerCaseSearch) ||
-       item.description.toLowerCase().includes(lowerCaseSearch) ||
-       item.poNumber.toLowerCase().includes(lowerCaseSearch))
+      selectedLocations.has((item as any).location || '') &&
+      ((item as any).name.toLowerCase().includes(lowerCaseSearch) ||
+       (item as any).description.toLowerCase().includes(lowerCaseSearch) ||
+       (item as any).poNumber.toLowerCase().includes(lowerCaseSearch))
     );
     setDisplayItems(filtered);
   }, [selectedLocations, searchTerm, allPOItems]);
@@ -139,7 +139,7 @@ export default function ItemLocationSelectionPage() {
          // Initialize quantity if needed (e.g., default to remaining)
          const item = allPOItems.find(i => i.id === itemId);
          if(item && !itemQuantities[itemId]) {
-            handleQuantityChange(itemId, item.remainingQuantity); // Default to remaining
+            handleQuantityChange(itemId, (item as any).pendingQuantity || (item as any).remainingQuantity); // Default to remaining
          }
       }
       return newSet;
@@ -152,7 +152,7 @@ export default function ItemLocationSelectionPage() {
     if (!item) return;
 
     // Prevent negative or exceeding remaining quantity
-    const maxQuantity = item.remainingQuantity;
+    const maxQuantity = (item as any).pendingQuantity || (item as any).remainingQuantity;
     const validatedQuantity = Math.max(0, Math.min(isNaN(quantity) ? 0 : quantity, maxQuantity));
 
     setItemQuantities(prev => ({
@@ -193,7 +193,7 @@ export default function ItemLocationSelectionPage() {
           const newQuantities = { ...itemQuantities };
           displayItems.forEach(item => {
               if (!newQuantities[item.id]) {
-                  newQuantities[item.id] = item.remainingQuantity;
+                  newQuantities[item.id] = (item as any).pendingQuantity || (item as any).remainingQuantity;
               }
           });
           setItemQuantities(newQuantities);
@@ -218,50 +218,50 @@ export default function ItemLocationSelectionPage() {
         // Mapping from PurchaseOrderItem to GoodsReceiveNoteItem
         itemsToSave.push({
           id: `temp-grnitem-${crypto.randomUUID()}`, // Temporary unique ID for GRN item
-          purchaseOrderRef: poItem.poNumber,
-          name: poItem.name,
-          description: poItem.description,
-          orderedQuantity: poItem.orderedQuantity,
-          orderUnit: poItem.orderUnit,
+          purchaseOrderRef: (poItem as any).poNumber,
+          name: (poItem as any).name,
+          description: (poItem as any).description,
+          orderedQuantity: (poItem as any).orderedQuantity,
+          orderUnit: (poItem as any).orderUnit,
           receivedQuantity: receivingQty,
-          unit: poItem.orderUnit,
-          unitPrice: poItem.unitPrice,
+          unit: (poItem as any).orderUnit,
+          unitPrice: (poItem as any).unitPrice,
           // TODO: Implement proper calculation based on PRD 3.4.5.5
-          subTotalAmount: receivingQty * poItem.unitPrice,
-          totalAmount: receivingQty * poItem.unitPrice, // Simplified
-          taxRate: poItem.taxRate,
+          subTotalAmount: receivingQty * (poItem as any).unitPrice,
+          totalAmount: receivingQty * (poItem as any).unitPrice, // Simplified
+          taxRate: (poItem as any).taxRate,
           taxAmount: 0, // Simplified
-          discountRate: poItem.discountRate,
+          discountRate: (poItem as any).discountRate,
           discountAmount: 0, // Simplified
-          netAmount: receivingQty * poItem.unitPrice, // Simplified
-          baseCurrency: poItem.baseUnit, // Assuming baseUnit is base currency
-          baseQuantity: receivingQty * poItem.convRate,
-          baseUnitPrice: poItem.unitPrice, // Needs adjustment based on taxIncluded?
-          baseUnit: poItem.baseUnit,
-          baseSubTotalAmount: receivingQty * poItem.unitPrice, // Simplified
-          baseNetAmount: receivingQty * poItem.unitPrice, // Simplified
-          baseTotalAmount: receivingQty * poItem.unitPrice, // Simplified
-          baseTaxRate: poItem.taxRate,
+          netAmount: receivingQty * (poItem as any).unitPrice, // Simplified
+          baseCurrency: (poItem as any).baseUnit, // Assuming baseUnit is base currency
+          baseQuantity: receivingQty * (poItem as any).convRate,
+          baseUnitPrice: (poItem as any).unitPrice, // Needs adjustment based on taxIncluded?
+          baseUnit: (poItem as any).baseUnit,
+          baseSubTotalAmount: receivingQty * (poItem as any).unitPrice, // Simplified
+          baseNetAmount: receivingQty * (poItem as any).unitPrice, // Simplified
+          baseTotalAmount: receivingQty * (poItem as any).unitPrice, // Simplified
+          baseTaxRate: (poItem as any).taxRate,
           baseTaxAmount: 0, // Simplified
-          baseDiscountRate: poItem.discountRate,
+          baseDiscountRate: (poItem as any).discountRate,
           baseDiscountAmount: 0, // Simplified
-          conversionRate: poItem.convRate,
-          currency: selectedPOs[0]?.currencyCode || 'USD', // Get from first PO
-          exchangeRate: selectedPOs[0]?.exchangeRate || 1, // Get from first PO
+          conversionRate: (poItem as any).convRate,
+          currency: (selectedPOs[0] as any)?.currency || 'USD', // Get from first PO
+          exchangeRate: (selectedPOs[0] as any)?.exchangeRate || 1, // Get from first PO
           extraCost: 0,
-          inventoryOnHand: poItem.inventoryInfo.onHand,
-          inventoryOnOrder: poItem.inventoryInfo.onOrdered,
-          inventoryReorderThreshold: poItem.inventoryInfo.reorderLevel,
-          inventoryRestockLevel: poItem.inventoryInfo.restockLevel,
-          lastPurchasePrice: poItem.inventoryInfo.lastPrice,
-          lastOrderDate: poItem.inventoryInfo.lastOrderDate,
-          lastVendor: poItem.inventoryInfo.lastVendor,
+          inventoryOnHand: (poItem as any).inventoryInfo.onHand,
+          inventoryOnOrder: (poItem as any).inventoryInfo.onOrdered,
+          inventoryReorderThreshold: (poItem as any).inventoryInfo.reorderLevel,
+          inventoryRestockLevel: (poItem as any).inventoryInfo.restockLevel,
+          lastPurchasePrice: (poItem as any).inventoryInfo.lastPrice,
+          lastOrderDate: (poItem as any).inventoryInfo.lastOrderDate,
+          lastVendor: (poItem as any).inventoryInfo.lastVendor,
           lotNumber: '', // TBD
-          deliveryPoint: poItem.location || 'Default Location', // Use item's determined location
+          deliveryPoint: (poItem as any).location || 'Default Location', // Use item's determined location
           deliveryDate: new Date(), // TBD
-          location: poItem.location || 'Default Location',
-          isFreeOfCharge: poItem.isFOC,
-          taxIncluded: poItem.taxIncluded,
+          location: (poItem as any).location || 'Default Location',
+          isFreeOfCharge: (poItem as any).isFOC,
+          taxIncluded: (poItem as any).taxIncluded,
           jobCode: '', // TBD
           adjustments: { discount: false, tax: false },
           // Missing fields from GoodsReceiveNoteItem to consider:
@@ -273,28 +273,28 @@ export default function ItemLocationSelectionPage() {
           // focConversionRate?: number;
           // isConsignment?: boolean;
           // isTaxInclusive?: boolean;
-        });
+        } as any);
       }
     });
 
     // Construct the main GRN object
     const tempId = `new-${crypto.randomUUID()}`;
-    const newGRNData: GoodsReceiveNote = {
+    const newGRNData = {
         id: tempId,
         ref: 'GRN-TEMP-REF', // Placeholder - generate properly later
         selectedItems: [], // This seems unused in GoodsReceiveNote type?
         date: new Date(),
         invoiceDate: new Date(), // Default or TBD
         invoiceNumber: '', // TBD
-        description: `GRN created from PO(s): ${selectedPOs.map(p => p.number).join(', ')}`,
+        description: `GRN created from PO(s): ${selectedPOs.map(p => (p as any).number).join(', ')}`,
         receiver: '', // TODO: Get from user context
         vendor: selectedVendor?.companyName || '',
         vendorId: selectedVendor?.id || '',
         location: '', // TODO: Determine primary location or leave blank?
-        currency: selectedPOs[0]?.currencyCode || 'USD', // Assume first PO's currency for now
-        exchangeRate: selectedPOs[0]?.exchangeRate || 1,
-        baseCurrency: selectedPOs[0]?.baseCurrencyCode || 'USD',
-        status: 'Received', // Use 'Received' instead of 'Pending'
+        currency: (selectedPOs[0] as any)?.currency || 'USD', // Assume first PO's currency for now
+        exchangeRate: (selectedPOs[0] as any)?.exchangeRate || 1,
+        baseCurrency: (selectedPOs[0] as any)?.baseCurrency || 'USD',
+        status: 'RECEIVED' as any, // Use 'RECEIVED' instead of 'Pending'
         isConsignment: false, // Default
         isCash: false, // Default
         cashBook: '',
@@ -316,7 +316,7 @@ export default function ItemLocationSelectionPage() {
         taxAmount: 0,
         baseTotalAmount: 0,
         totalAmount: 0,
-    };
+    } as any as GoodsReceiveNote;
 
     console.log("Constructed GRN Data:", newGRNData);
     setNewlyCreatedGRNData(newGRNData); // Save to store
@@ -345,7 +345,7 @@ export default function ItemLocationSelectionPage() {
           <div>
             <CardTitle>Select Items and Locations</CardTitle>
             <CardDescription>
-              Select items to receive for Vendor: <span className="font-semibold">{selectedVendor.companyName}</span> from PO(s): {selectedPOs.map(p => p.number).join(', ')}
+              Select items to receive for Vendor: <span className="font-semibold">{selectedVendor.companyName}</span> from PO(s): {selectedPOs.map(p => (p as any).number).join(', ')}
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={handleBack}>
@@ -409,14 +409,15 @@ export default function ItemLocationSelectionPage() {
                 {displayItems.length > 0 ? (
                   displayItems.map((item) => {
                     const receivingQty = itemQuantities[item.id] ?? 0;
-                    const amount = receivingQty * item.unitPrice;
-                    const baseAmount = amount * (item.poExchangeRate || 1);
-                    const remainingBaseQty = item.remainingQuantity * item.convRate;
-                    const currentReceivingUnit = itemReceivingUnits[item.id] || item.orderUnit;
-                    const baseReceivingQty = receivingQty * item.convRate; // Calculation assumes convRate is based on orderUnit, needs adjustment if unit changes
+                    const unitPrice = typeof item.unitPrice === 'number' ? item.unitPrice : (item.unitPrice as any)?.amount || 0;
+                    const amount = receivingQty * unitPrice;
+                    const baseAmount = amount * ((item as any).poExchangeRate || 1);
+                    const remainingBaseQty = (item as any).pendingQuantity || (item as any).remainingQuantity * (item as any).convRate;
+                    const currentReceivingUnit = itemReceivingUnits[item.id] || (item as any).orderUnit;
+                    const baseReceivingQty = receivingQty * (item as any).convRate; // Calculation assumes convRate is based on orderUnit, needs adjustment if unit changes
 
                     // Placeholder units - replace with dynamic ones if available
-                    const availableUnits = [item.orderUnit, 'Kg', 'Pcs', 'Box', 'Pack'].filter((v, i, a) => a.indexOf(v) === i); 
+                    const availableUnits = [(item as any).orderUnit, 'Kg', 'Pcs', 'Box', 'Pack'].filter((v, i, a) => a.indexOf(v) === i); 
 
                     return (
                       <TableRow key={item.id} data-state={selectedItemIds.has(item.id) ? "selected" : undefined}>
@@ -424,22 +425,22 @@ export default function ItemLocationSelectionPage() {
                           <Checkbox
                             checked={selectedItemIds.has(item.id)}
                             onCheckedChange={() => handleToggleSelectItem(item.id)}
-                            aria-label={`Select item ${item.name}`}
+                            aria-label={`Select item ${(item as any).name}`}
                           />
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium">{item.name}</div>
-                          <div className="text-xs text-muted-foreground">{item.description}</div>
+                          <div className="font-medium">{(item as any).name}</div>
+                          <div className="text-xs text-muted-foreground">{(item as any).description}</div>
                         </TableCell>
-                        <TableCell>{item.poNumber}</TableCell>
-                        <TableCell>{item.location}</TableCell>
+                        <TableCell>{(item as any).poNumber}</TableCell>
+                        <TableCell>{(item as any).location}</TableCell>
                         <TableCell className="text-right">
-                          {item.orderedQuantity} {item.orderUnit}
+                          {(item as any).orderedQuantity} {(item as any).orderUnit}
                         </TableCell>
                         <TableCell className="text-right">
-                          <div>{item.remainingQuantity} {item.orderUnit}</div>
+                          <div>{(item as any).pendingQuantity || (item as any).remainingQuantity} {(item as any).orderUnit}</div>
                           <div className="text-xs text-muted-foreground mt-1">
-                            Base: {remainingBaseQty.toFixed(2)} {item.baseUnit || 'N/A'}
+                            Base: {remainingBaseQty.toFixed(2)} {(item as any).baseUnit || 'N/A'}
                           </div>
                         </TableCell>
                         {/* Receiving Qty & Unit Cell */}
@@ -451,7 +452,7 @@ export default function ItemLocationSelectionPage() {
                                 onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                                 onFocus={(e) => e.target.select()}
                                 className="h-8 w-[60px] text-right" // Adjust width
-                                max={item.remainingQuantity}
+                                max={(item as any).pendingQuantity || (item as any).remainingQuantity}
                                 min={0}
                                 step="any"
                                 disabled={!selectedItemIds.has(item.id)}
@@ -474,13 +475,13 @@ export default function ItemLocationSelectionPage() {
                           {/* Display Base Receiving Qty */}
                           <div className="text-xs text-muted-foreground mt-1 text-right">
                             {/* Note: Base calc might be inaccurate if unit changes without factor update */}
-                            Base: {baseReceivingQty.toFixed(2)} {item.baseUnit || 'N/A'}
+                            Base: {baseReceivingQty.toFixed(2)} {(item as any).baseUnit || 'N/A'}
                           </div>
                         </TableCell>
                         {/* Amount Cell (incl. Base Amount) */}
                         <TableCell className="text-right">
                            <div>{amount.toFixed(2)}</div>
-                           <div className="text-xs text-muted-foreground">{item.poCurrencyCode || 'N/A'}</div>
+                           <div className="text-xs text-muted-foreground">{(item as any).poCurrencyCode || 'N/A'}</div>
                            {/* Base Amount Below */}
                            <div className="text-xs text-muted-foreground mt-1">
                              Base: {baseAmount.toFixed(2)} {item.poBaseCurrencyCode || 'N/A'}

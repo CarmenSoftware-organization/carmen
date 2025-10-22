@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GoodsReceiveNoteDetail, GRNDetailMode } from '@/app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail'
-import { GoodsReceiveNoteMode, GoodsReceiveNote } from '@/lib/types'
+import { GoodsReceiveNote } from '@/lib/types'
 import { mockGoodsReceiveNotes } from '@/lib/mock-data'
 
 export default function EditGoodsReceiveNote({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const [mode, setMode] = useState<GoodsReceiveNoteMode>('edit')
+  const [mode, setMode] = useState<GRNDetailMode>('edit')
   const [loading, setLoading] = useState(true)
   const [grnData, setGrnData] = useState<GoodsReceiveNote | null>(null)
 
@@ -30,8 +30,8 @@ export default function EditGoodsReceiveNote({ params }: { params: { id: string 
       // Navigate back to the view page, ensuring mode=view is in the URL
       router.push(`/procurement/goods-received-note/${params.id}?mode=view`)
     } else if (newMode === 'edit' || newMode === 'add') {
-      // Only set local state if the new mode is compatible with GoodsReceiveNoteMode
-      setMode(newMode as GoodsReceiveNoteMode)
+      // Only set local state if the new mode is compatible with
+      setMode(newMode)
     }
     // 'confirm' mode doesn't directly change the local 'mode' state here
   }

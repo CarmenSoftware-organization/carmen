@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { FileText, Edit, Trash2, Plus, MoreHorizontal } from "lucide-react";
-import { GoodsReceiveNoteMode, GoodsReceiveNoteItem, Product, UnitConversion, LocationInfo } from "@/lib/types";
+import { GoodsReceiveNoteItem, Product, Location as LocationInfo } from "@/lib/types";
+// UnitConversion type is not exported from '@/lib/types'
+// Using any type for now
+type UnitConversion = any;
+import { GRNDetailMode } from "../GoodsReceiveNoteDetail";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/custom-dialog";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -65,19 +69,19 @@ async function getProductDetails(grnItemId: string): Promise<Product | null> {
   await new Promise(resolve => setTimeout(resolve, 300));
   // IMPORTANT: Uses productId derived from the temporary mapping above
   if (productId === 'PROD-123') { // Check against mapped Product ID
-    const mockConcreteProduct: Product = {
-        id: "PROD-123", productCode: "CONC-ALPHA", name: "Concrete Mix - Project Alpha", description: "Standard Portland cement mix", localDescription: "ปูนซีเมนต์ผสมมาตรฐาน", categoryId: "PROJECT_MATERIAL", subCategoryId: "SCAT-BULK", itemGroupId: "GRP-CONSTRUCTION", primaryInventoryUnitId: "KG", size: "25kg Bag Equivalent", color: "Grey", barcode: "9876543210123", isActive: true, basePrice: 5, currency: "USD", taxType: "Standard", taxRate: 7, standardCost: 4.5, lastCost: 4.6, priceDeviationLimit: 10, quantityDeviationLimit: 5, minStockLevel: 500, maxStockLevel: 10000, isForSale: false, isIngredient: false, weight: 25000, shelfLife: 180, storageInstructions: "Store in a dry place, away from moisture.",
+    const mockConcreteProduct = {
+        id: "PROD-123", productCode: "CONC-ALPHA", name: "Concrete Mix - Project Alpha", description: "Standard Portland cement mix", localDescription: "ปูนซีเมนต์ผสมมาตรฐาน", categoryId: "PROJECT_MATERIAL", subCategoryId: "SCAT-BULK", itemGroupId: "GRP-CONSTRUCTION", primaryInventoryUnitId: "KG", size: "25kg Bag Equivalent", color: "Grey", barcode: "9876543210123", isActive: true, basePrice: { amount: 5, currency: "USD" }, currency: "USD", taxType: "Standard", taxRate: 7, standardCost: { amount: 4.5, currency: "USD" }, lastCost: { amount: 4.6, currency: "USD" }, priceDeviationLimit: 10, quantityDeviationLimit: 5, minStockLevel: 500, maxStockLevel: 10000, isForSale: false, isIngredient: false, weight: 25000, shelfLife: 180, storageInstructions: "Store in a dry place, away from moisture.",
         unitConversions: [ { id: "uc1", unitId: "BAG", fromUnit: "Bag", toUnit: "Kg", unitName: "Bag (25kg)", conversionFactor: 25, unitType: "ORDER" }, { id: "uc2", unitId: "KG", fromUnit: "Kg", toUnit: "Kg", unitName: "Kilogram", conversionFactor: 1, unitType: "INVENTORY" }, ], 
         imagesUrl: "/images/placeholder-concrete.jpg", carbonFootprint: 50,
     };
-    return mockConcreteProduct;
+    return mockConcreteProduct as unknown as Product;
   } else if (productId === 'PROD-456') { // Check against mapped Product ID
-    const mockAppleProduct: Product = {
-        id: "PROD-456", productCode: "FRUIT-APP-ORG", name: "Organic Apples", description: "Fresh organic Gala apples", localDescription: "แอปเปิ้ลออร์แกนิคสด", categoryId: "FOOD", subCategoryId: "SCAT-FRESHFRUIT", itemGroupId: "GRP-PRODUCE", primaryInventoryUnitId: "KG", size: "Medium", color: "Red", barcode: "1234567890123", isActive: true, basePrice: 3, currency: "USD", taxType: "Exempt", taxRate: 0, standardCost: 2.5, lastCost: 2.6, priceDeviationLimit: 15, quantityDeviationLimit: 10, minStockLevel: 50, maxStockLevel: 500, isForSale: true, isIngredient: true, weight: 150, shelfLife: 14, storageInstructions: "Refrigerate after opening.",
+    const mockAppleProduct = {
+        id: "PROD-456", productCode: "FRUIT-APP-ORG", name: "Organic Apples", description: "Fresh organic Gala apples", localDescription: "แอปเปิ้ลออร์แกนิคสด", categoryId: "FOOD", subCategoryId: "SCAT-FRESHFRUIT", itemGroupId: "GRP-PRODUCE", primaryInventoryUnitId: "KG", size: "Medium", color: "Red", barcode: "1234567890123", isActive: true, basePrice: { amount: 3, currency: "USD" }, currency: "USD", taxType: "Exempt", taxRate: 0, standardCost: { amount: 2.5, currency: "USD" }, lastCost: { amount: 2.6, currency: "USD" }, priceDeviationLimit: 15, quantityDeviationLimit: 10, minStockLevel: 50, maxStockLevel: 500, isForSale: true, isIngredient: true, weight: 150, shelfLife: 14, storageInstructions: "Refrigerate after opening.",
         unitConversions: [ { id: "uc3", unitId: "BOX", fromUnit: "Box", toUnit: "Kg", unitName: "Box (10kg)", conversionFactor: 10, unitType: "ORDER" }, { id: "uc4", unitId: "KG", fromUnit: "Kg", toUnit: "Kg", unitName: "Kilogram", conversionFactor: 1, unitType: "INVENTORY" }, ], 
         imagesUrl: "/images/placeholder-apples.jpg", sustainableCertification: 'ORGANIC',
     };
-    return mockAppleProduct;
+    return mockAppleProduct as unknown as Product;
   }
    return null;
 }
@@ -92,16 +96,16 @@ async function getLocationDetails(locationIdentifier: string): Promise<LocationI
     // Using previous placeholder logic
     await new Promise(resolve => setTimeout(resolve, 200));
     if (locationIdentifier === 'Main Warehouse') {
-        return { code: 'WH-MAIN', name: 'Main Warehouse', type: 'INV', displayType: 'Inventory' };
+        return { code: 'WH-MAIN', name: 'Main Warehouse', type: 'warehouse', displayType: 'Inventory' } as any;
     } else if (locationIdentifier === 'Kitchen Storage') { // Match screenshot example
-         return { code: 'KITCH-S', name: 'Kitchen Storage', type: 'DIR', displayType: 'Direct' };
+         return { code: 'KITCH-S', name: 'Kitchen Storage', type: 'kitchen', displayType: 'Direct' } as any;
     }
     return null;
 }
 // --- End Hypothetical Service ---
 
 interface GoodsReceiveNoteItemsProps {
-  mode: GoodsReceiveNoteMode;
+  mode: GRNDetailMode;
   items: GoodsReceiveNoteItem[];
   onItemsChange: (items: GoodsReceiveNoteItem[]) => void;
   selectedItems: string[];
@@ -124,7 +128,7 @@ export function GoodsReceiveNoteItems({
   bulkActions,
 }: GoodsReceiveNoteItemsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<GoodsReceiveNoteMode | 'add'>('view');
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'add'>('view');
   const [selectedItem, setSelectedItem] = useState<GoodsReceiveNoteItem | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [itemUnits, setItemUnits] = useState<Record<string, string>>({});
@@ -146,7 +150,7 @@ export function GoodsReceiveNoteItems({
       // Use the hypothetical API functions
       Promise.all([
         getProductDetails(selectedItem.id), // Pass GRN Item ID (assuming it maps to product ID for now)
-        getLocationDetails(selectedItem.location) // Pass location name/string
+        getLocationDetails((selectedItem as any).location) // Pass location name/string
       ]).then(([productData, locationData]) => {
         setSelectedProductData(productData);
         setSelectedLocationInfo(locationData);
@@ -171,7 +175,7 @@ export function GoodsReceiveNoteItems({
 
   const handleItemChange = (
     id: string,
-    field: keyof GoodsReceiveNoteItem,
+    field: keyof GoodsReceiveNoteItem | string,
     value: string | number | boolean
   ) => {
     const updatedItems = items.map((item) =>
@@ -227,8 +231,9 @@ export function GoodsReceiveNoteItems({
   const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
 
   // Format amount without currency symbol
-  const formatAmount = (amount: number) => {
-    return amount.toLocaleString('en-US', {
+  const formatAmount = (amount: number | any) => {
+    const value = typeof amount === 'number' ? amount : (amount?.amount || 0);
+    return value.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
@@ -243,13 +248,14 @@ export function GoodsReceiveNoteItems({
   };
 
   const calculateNetAmount = (item: GoodsReceiveNoteItem) => {
-    const subtotal = item.unitPrice * item.receivedQuantity;
-    return subtotal - (subtotal * (item.discountRate || 0) / 100);
+    const unitPrice = typeof item.unitPrice === 'number' ? item.unitPrice : (item.unitPrice as any).amount || 0;
+    const subtotal = unitPrice * item.receivedQuantity;
+    return subtotal - (subtotal * ((item as any).discountRate || 0) / 100);
   };
 
   const calculateTaxAmount = (item: GoodsReceiveNoteItem) => {
     const netAmount = calculateNetAmount(item);
-    return netAmount * (item.taxRate || 0) / 100;
+    return netAmount * ((item as any).taxRate || 0) / 100;
   };
 
   const numberCellClass = "text-right";
@@ -365,34 +371,34 @@ export function GoodsReceiveNoteItems({
                    />
                  </TableCell>
                  {/* Location Cell */} 
-                 <TableCell className="align-top">{item.location || "N/A"}</TableCell>
+                 <TableCell className="align-top">{(item as any).location || "N/A"}</TableCell>
                  {/* Product Name Cell */} 
                  <TableCell className="align-top">
                    <div className="flex items-center space-x-2">
                      <div>
-                       {item.name}
+                       {(item as any).name}
                        <div className="text-xs text-muted-foreground">
-                         {item.description || "No description available"}
+                         {(item as any).description || "No description available"}
                        </div>
                      </div>
-                     {item.isConsignment && (
+                     {(item as any).isConsignment && (
                        <Badge variant="outline">Consignment</Badge>
                      )}
-                     {item.isTaxInclusive && (
+                     {(item as any).isTaxInclusive && (
                        <Badge variant="outline">Tax Inclusive</Badge>
                      )}
                    </div>
                  </TableCell>
                  
                  {/* Ordered Qty Cell (Add Base info back) */}
-                 <TableCell className={`${numberCellClass} align-top`}> 
+                 <TableCell className={`${numberCellClass} align-top`}>
                    {item.orderedQuantity}
-                   <div className="text-xs text-muted-foreground"> 
-                    Base: {(item.orderedQuantity * item.conversionRate).toFixed(2)} {item.baseUnit || 'N/A'}
+                   <div className="text-xs text-muted-foreground">
+                    Base: {((item.orderedQuantity || 0) * (item as any).conversionRate).toFixed(2)} {(item as any).baseUnit || 'N/A'}
                    </div>
                  </TableCell>
                  {/* Ordered Unit Cell */} 
-                 <TableCell className="align-top">{item.orderUnit}</TableCell>
+                 <TableCell className="align-top">{(item as any).orderUnit}</TableCell>
                  
                  {/* Received Qty Cell (Add Base info back) */} 
                  <TableCell className={`${numberCellClass} align-top`}> 
@@ -410,7 +416,7 @@ export function GoodsReceiveNoteItems({
                        className="text-right"
                     />
                     <div className="text-xs text-muted-foreground"> 
-                     Base: {(item.receivedQuantity * item.conversionRate).toFixed(2)} {item.baseUnit || 'N/A'}
+                     Base: {(item.receivedQuantity * (item as any).conversionRate).toFixed(2)} {(item as any).baseUnit || 'N/A'}
                     </div>
                  </TableCell>
                  {/* Received Unit Cell */} 
@@ -431,7 +437,7 @@ export function GoodsReceiveNoteItems({
                       </SelectContent>
                     </Select>
                     <div className="text-xs text-muted-foreground mt-1"> 
-                       1 {itemUnits[item.id] || item.unit} = {item.conversionRate} {item.baseUnit} 
+                       1 {itemUnits[item.id] || item.unit} = {(item as any).conversionRate} {(item as any).baseUnit} 
                     </div>
                  </TableCell>
 
@@ -439,7 +445,7 @@ export function GoodsReceiveNoteItems({
                  <TableCell className={`${numberCellClass} align-top`}> 
                     <Input 
                        type="number"
-                       value={item.focQuantity || 0}
+                       value={(item as any).focQuantity || 0}
                        onChange={(e) =>
                          handleItemChange(
                            item.id,
@@ -451,13 +457,13 @@ export function GoodsReceiveNoteItems({
                        className="text-right"
                     />
                     <div className="text-xs text-muted-foreground">
-                     Base: {((item.focQuantity || 0) * (item.focConversionRate || item.conversionRate)).toFixed(2)} {item.baseUnit || 'N/A'}
+                     Base: {(((item as any).focQuantity || 0) * ((item as any).focConversionRate || (item as any).conversionRate)).toFixed(2)} {(item as any).baseUnit || 'N/A'}
                     </div>
                  </TableCell>
                  {/* FOC Unit Cell */} 
                  <TableCell className="align-top"> 
                     <select 
-                      value={item.focUnit || item.unit}
+                      value={(item as any).focUnit || item.unit}
                       onChange={(e) =>
                         handleItemChange(
                           item.id,
@@ -469,7 +475,7 @@ export function GoodsReceiveNoteItems({
                       className="w-full border rounded h-9 px-2 text-sm"
                      >
                       <option value={item.unit}>{item.unit}</option>
-                      <option value={item.baseUnit}>{item.baseUnit}</option>
+                      <option value={(item as any).baseUnit}>{(item as any).baseUnit}</option>
                       {unitOptions.map((unit) => (
                         <option key={unit} value={unit}>{unit}</option>
                       ))}
@@ -483,7 +489,7 @@ export function GoodsReceiveNoteItems({
                  
                  {/* Discount Cell */}
                  <TableCell className={`${numberCellClass} align-top`}>
-                   {item.discountRate ? `${item.discountRate}%` : '-'}
+                   {(item as any).discountRate ? `${(item as any).discountRate}%` : '-'}
                  </TableCell>
                  
                  {/* Net Amount Cell */}
@@ -552,12 +558,12 @@ export function GoodsReceiveNoteItems({
             <div>Loading item details...</div>
           ) : selectedItem ? (
             <ItemDetailForm
-              mode={dialogMode}
+              mode={dialogMode as any}
               item={selectedItem}
               categoryId={selectedProductData?.categoryId}
               productCode={selectedProductData?.productCode}
-              locationCode={selectedLocationInfo?.code}
-              unitConversions={selectedProductData?.unitConversions}
+              locationCode={(selectedLocationInfo as any)?.code}
+              unitConversions={(selectedProductData as any)?.unitConversions}
               onSave={handleSaveItemDetail}
               onClose={handleCloseItemDetail}
               onAddNewRecord={handleAddNewRecord}

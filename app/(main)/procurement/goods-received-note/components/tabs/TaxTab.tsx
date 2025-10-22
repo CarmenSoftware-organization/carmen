@@ -2,11 +2,12 @@ import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { GoodsReceiveNoteMode } from "@/lib/types";
+import {  } from "@/lib/types";
+import { GRNDetailMode } from "../GoodsReceiveNoteDetail";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TaxTabProps {
-  mode: GoodsReceiveNoteMode;
+  mode: GRNDetailMode;
   taxInvoiceNumber?: string;
   taxInvoiceDate?: Date | undefined;
   taxStatus?: string;

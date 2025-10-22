@@ -3,11 +3,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { GoodsReceiveNoteMode, Comment } from '@/lib/types'
+// Comment type is not exported from '@/lib/types'
+// Using any type for now
+type Comment = any
 import { Edit, Trash2 } from 'lucide-react'
+import { GRNDetailMode } from '../GoodsReceiveNoteDetail'
 
 interface CommentTabProps {
-  mode: GoodsReceiveNoteMode
+  mode: GRNDetailMode
   comments: Comment[]
   onAddComment: (comment: Omit<Comment, 'id' | 'number' | 'date'>) => void
   onEditComment: (id: string, text: string) => void

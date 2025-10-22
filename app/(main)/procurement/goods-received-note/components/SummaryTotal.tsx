@@ -16,38 +16,38 @@ export default function SummaryTotal({ poData }: ISummaryTotalProps) {
   const data = [
     {
       Label: "Subtotal Amount",
-      localCurrency: poData.currency,
-      localAmt: poData.baseSubTotalPrice ?? 0,
-      currentCurrency: poData.baseCurrency,
-      currentAmt: poData.subTotalPrice ?? 0,
+      localCurrency: (poData as any).currency,
+      localAmt: (poData as any).baseSubTotalPrice ?? 0,
+      currentCurrency: (poData as any).baseCurrency,
+      currentAmt: (poData as any).subTotalPrice ?? 0,
     },
     {
       Label: "Discount Amount",
-      localCurrency: poData.baseCurrency,
-      localAmt: poData.baseDiscAmount ?? 0,
-      currentCurrency: poData.currency,
-      currentAmt: poData.discountAmount ?? 0,
+      localCurrency: (poData as any).baseCurrency,
+      localAmt: (poData as any).baseDiscAmount ?? 0,
+      currentCurrency: (poData as any).currency,
+      currentAmt: (poData as any).discountAmount ?? 0,
     },
     {
       Label: "Net Amount",
-      localCurrency: poData.baseCurrency,
-      localAmt: poData.baseNetAmount ?? 0,
-      currentCurrency: poData.currency,
-      currentAmt: poData.netAmount ?? 0,
+      localCurrency: (poData as any).baseCurrency,
+      localAmt: (poData as any).baseNetAmount ?? 0,
+      currentCurrency: (poData as any).currency,
+      currentAmt: (poData as any).netAmount ?? 0,
     },
     {
       Label: "Tax Amount",
-      localCurrency: poData.baseCurrency,
-      localAmt: poData.baseTaxAmount ?? 0,
-      currentCurrency: poData.currency,
-      currentAmt: poData.taxAmount ?? 0,
+      localCurrency: (poData as any).baseCurrency,
+      localAmt: (poData as any).baseTaxAmount ?? 0,
+      currentCurrency: (poData as any).currency,
+      currentAmt: (poData as any).taxAmount ?? 0,
     },
     {
       Label: "Total Amount",
-      localCurrency: poData.baseCurrency,
-      localAmt: poData.baseTotalAmount ?? 0,
-      currentCurrency: poData.currency,
-      currentAmt: poData.totalAmount ?? 0,
+      localCurrency: (poData as any).baseCurrency,
+      localAmt: (poData as any).baseTotalAmount ?? 0,
+      currentCurrency: (poData as any).currency,
+      currentAmt: (poData as any).totalAmount ?? 0,
     }
   ];
 
@@ -56,8 +56,8 @@ export default function SummaryTotal({ poData }: ISummaryTotalProps) {
       <TableHeader>
         <TableRow>
           <TableHead className="font-bold whitespace-nowrap">Description</TableHead>
-          <TableHead className="text-right font-bold whitespace-nowrap">Amount ({poData.currency})</TableHead>
-          <TableHead className="text-right text-gray-500 text-xs whitespace-nowrap hidden md:table-cell">Base Amount ({poData.baseCurrency})</TableHead>
+          <TableHead className="text-right font-bold whitespace-nowrap">Amount ({(poData as any).currency})</TableHead>
+          <TableHead className="text-right text-gray-500 text-xs whitespace-nowrap hidden md:table-cell">Base Amount ({(poData as any).baseCurrency})</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

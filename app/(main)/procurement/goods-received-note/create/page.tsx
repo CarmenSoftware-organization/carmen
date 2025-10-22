@@ -1,26 +1,31 @@
 'use client'
 import { useState, Suspense } from 'react'
 import { GoodsReceiveNoteComponent } from '../components/goods-receive-note'
-import { GoodsReceiveNote, GoodsReceiveNoteMode } from '@/lib/types'
+import { GoodsReceiveNote } from '@/lib/types'
 
 export default function CreateGoodsReceiveNote() {
   const [initialGrnData] = useState<GoodsReceiveNote>(() => ({
     id: `new-${crypto.randomUUID()}`,
+    grnNumber: '',
     ref: '',
     date: new Date(),
+    receiptDate: new Date(),
     invoiceDate: new Date(),
     invoiceNumber: '',
     taxInvoiceDate: undefined,
     taxInvoiceNumber: '',
     description: '',
     receiver: '',
+    receivedBy: '',
     vendor: '',
     vendorId: '',
+    vendorName: '',
     location: '',
+    locationId: '',
     currency: 'USD',
     exchangeRate: 1,
     baseCurrency: 'USD',
-    status: 'Received',
+    status: 'RECEIVED' as any,
     isConsignment: false,
     isCash: false,
     cashBook: '',
@@ -32,6 +37,10 @@ export default function CreateGoodsReceiveNote() {
     attachments: [],
     activityLog: [],
     financialSummary: null,
+    purchaseOrderRefs: [],
+    totalItems: 0,
+    totalQuantity: 0,
+    totalValue: 0,
     baseSubTotalPrice: 0,
     subTotalPrice: 0,
     baseNetAmount: 0,
@@ -42,7 +51,7 @@ export default function CreateGoodsReceiveNote() {
     taxAmount: 0,
     baseTotalAmount: 0,
     totalAmount: 0
-  }));
+  } as unknown as GoodsReceiveNote));
 
   return (
     <div className="container mx-auto p-6">

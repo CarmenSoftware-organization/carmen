@@ -3,7 +3,7 @@
  * Provides timeout management, query cancellation, and operation-specific timeouts
  */
 
-import { PrismaClient } from '../../generated/client'
+import { PrismaClient } from '@prisma/client'
 
 export interface TimeoutConfig {
   // Default timeout for different operation types (ms)
