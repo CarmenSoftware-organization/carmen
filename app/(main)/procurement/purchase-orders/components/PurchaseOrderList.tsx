@@ -457,7 +457,7 @@ export function PurchaseOrderList() {
                     <StatusBadge status={po.status} />
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    {typeof po.totalAmount === 'number' ? po.totalAmount.toFixed(2) : (po.totalAmount as any).amount?.toFixed(2) || '0.00'}
+                    {(typeof (po as any).totalAmount === 'number' ? (po as any).totalAmount : (po as any).totalAmount?.amount || 0).toFixed(2)}
                   </TableCell>
                   <TableCell className="font-medium">
                     {(po as any).currencyCode || po.currency}
@@ -567,18 +567,18 @@ export function PurchaseOrderList() {
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Tax Amount</p>
-                    <p className="text-sm font-medium">{typeof po.taxAmount === 'number' ? po.taxAmount.toFixed(2) : (po.taxAmount as any).amount?.toFixed(2) || '0.00'}</p>
+                    <p className="text-sm font-medium">{(typeof (po as any).taxAmount === 'number' ? (po as any).taxAmount : (po as any).taxAmount?.amount || 0).toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Net Amount</p>
-                    <p className="text-sm font-medium">{typeof po.netAmount === 'number' ? po.netAmount.toFixed(2) : (po.netAmount as any).amount?.toFixed(2) || '0.00'}</p>
+                    <p className="text-sm font-medium">{(typeof (po as any).netAmount === 'number' ? (po as any).netAmount : (po as any).netAmount?.amount || 0).toFixed(2)}</p>
                   </div>
                 </div>
                 
                 <div className="flex justify-between items-center mt-4 pt-3 border-t border-border/50">
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Total Amount</p>
-                    <p className="text-base font-semibold">{typeof po.totalAmount === 'number' ? po.totalAmount.toFixed(2) : (po.totalAmount as any).amount?.toFixed(2) || '0.00'}</p>
+                    <p className="text-base font-semibold">{(typeof (po as any).totalAmount === 'number' ? (po as any).totalAmount : (po as any).totalAmount?.amount || 0).toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Currency</p>
