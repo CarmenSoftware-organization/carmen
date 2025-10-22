@@ -181,7 +181,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
     itemId: string,
     newUnit: string
   ) {
-    const updatedItem = poData.items.find((item) => item.id === itemId);
+    const updatedItem = (poData as any).items.find((item: any) => item.id === itemId);
     if (!updatedItem) return;
 
     updatedItem.unit = newUnit;
@@ -286,13 +286,13 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
                 <TableHead className="w-[40px]">
                   <Checkbox
                     checked={
-                      selectedItems.length === poData.items.length &&
-                      poData.items.length > 0
+                      selectedItems.length === (poData as any).items.length &&
+                      (poData as any).items.length > 0
                     }
                     onCheckedChange={(checked) => {
                       if (checked) {
                         setSelectedItems(
-                          poData.items.map((item) => item.id)
+                          (poData as any).items.map((item: any) => item.id)
                         );
                       } else {
                         setSelectedItems([]);
@@ -314,7 +314,7 @@ export default function ItemsTab({ poData, onUpdateItem, onAddItem, onDeleteItem
               </TableRow>
             </TableHeader>
             <TableBody>
-              {poData?.items.map((item, index) => (
+              {(poData as any)?.items.map((item: any, index: number) => (
                 <TableRow
                   key={item.id}
                   className={
