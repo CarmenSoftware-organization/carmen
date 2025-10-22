@@ -57,12 +57,12 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
     cell: ({ row }) => {
       const po = row.original
       return (
-        <Link 
-          href={`/procurement/purchase-orders/${po.poId}`}
+        <Link
+          href={`/procurement/purchase-orders/${(po as any).poId || po.id}`}
           className="font-medium text-primary hover:text-primary/80 hover:underline"
           onClick={(e) => e.stopPropagation()}
         >
-          {po.number}
+          {(po as any).number || po.orderNumber}
         </Link>
       )
     },
@@ -103,7 +103,7 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
     },
   },
   {
-    accessorKey: "DeliveryDate",
+    accessorKey: "expectedDeliveryDate",
     header: ({ column }) => {
       return (
         <Button
@@ -117,7 +117,8 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
       )
     },
     cell: ({ row }) => {
-      const date = row.getValue("DeliveryDate") as Date | null
+      const po = row.original
+      const date = ((po as any).DeliveryDate || po.expectedDeliveryDate) as Date | null
       return <div className="text-xs">{date ? date.toLocaleDateString() : "N/A"}</div>
     },
   },
@@ -158,7 +159,7 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
     },
   },
   {
-    accessorKey: "currencyCode",
+    accessorKey: "currency",
     header: ({ column }) => {
       return (
         <Button
@@ -171,7 +172,11 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="font-medium text-xs">{row.getValue("currencyCode")}</div>,
+    cell: ({ row }) => {
+      const po = row.original
+      const currencyCode = (po as any).currencyCode || po.currency
+      return <div className="font-medium text-xs">{currencyCode}</div>
+    },
   },
   {
     id: "actions",
