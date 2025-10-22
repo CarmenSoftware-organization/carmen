@@ -102,7 +102,7 @@ export default function ItemLocationSelectionPage() {
     const lowerCaseSearch = searchTerm.toLowerCase();
     const filtered = allPOItems.filter(item =>
       selectedLocations.has((item as any).location || '') &&
-      ((item as any).name.toLowerCase().includes(lowerCaseSearch) ||
+      (((item as any).itemName || (item as any).name).toLowerCase().includes(lowerCaseSearch) ||
        (item as any).description.toLowerCase().includes(lowerCaseSearch) ||
        (item as any).poNumber.toLowerCase().includes(lowerCaseSearch))
     );
@@ -219,7 +219,7 @@ export default function ItemLocationSelectionPage() {
         itemsToSave.push({
           id: `temp-grnitem-${crypto.randomUUID()}`, // Temporary unique ID for GRN item
           purchaseOrderRef: (poItem as any).poNumber,
-          name: (poItem as any).name,
+          name: (poItem as any).itemName || (poItem as any).name,
           description: (poItem as any).description,
           orderedQuantity: (poItem as any).orderedQuantity,
           orderUnit: (poItem as any).orderUnit,
@@ -425,11 +425,11 @@ export default function ItemLocationSelectionPage() {
                           <Checkbox
                             checked={selectedItemIds.has(item.id)}
                             onCheckedChange={() => handleToggleSelectItem(item.id)}
-                            aria-label={`Select item ${(item as any).name}`}
+                            aria-label={`Select item ${(item as any).itemName || (item as any).name}`}
                           />
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium">{(item as any).name}</div>
+                          <div className="font-medium">{(item as any).itemName || (item as any).name}</div>
                           <div className="text-xs text-muted-foreground">{(item as any).description}</div>
                         </TableCell>
                         <TableCell>{(item as any).poNumber}</TableCell>
