@@ -90,15 +90,15 @@ export function RelatedPOList({ poRefs }: RelatedPOListProps) {
                     </TableHeader>
                     <TableBody>
                         {poSummaries.map((po) => (
-                            <TableRow key={(po as any).poId || (po as any).number}>
-                                <TableCell>{(po as any).number || 'N/A'}</TableCell>
+                            <TableRow key={(po as any).poId || po.id}>
+                                <TableCell>{(po as any).number || po.orderNumber || 'N/A'}</TableCell>
                                 <TableCell>{(po as any).vendorName || 'N/A'}</TableCell>
-                                <TableCell>{(po as any).orderDate ? new Date((po as any).orderDate).toLocaleDateString() : 'N/A'}</TableCell>
+                                <TableCell>{((po as any).orderDate || po.expectedDeliveryDate) ? new Date((po as any).orderDate || po.expectedDeliveryDate).toLocaleDateString() : 'N/A'}</TableCell>
                                 <TableCell><Badge variant={(po as any).status === 'Closed' ? 'secondary' : 'default'}>{(po as any).status || 'N/A'}</Badge></TableCell>
                                 <TableCell>
-                                    {(po as any).poId && (
+                                    {((po as any).poId || po.id) && (
                                         <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/procurement/purchase-orders/${(po as any).poId}`} target="_blank">
+                                            <Link href={`/procurement/purchase-orders/${(po as any).poId || po.id}`} target="_blank">
                                                 View PO <ExternalLink className="ml-2 h-3 w-3" />
                                             </Link>
                                         </Button>
