@@ -60,9 +60,24 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Extended PurchaseRequest with mock-only fields for display purposes
+type ExtendedPurchaseRequest = PurchaseRequest & {
+  refNumber?: string;
+  date?: Date;
+  type?: string;
+  description?: string;
+  requestor?: { name: string };
+  department?: string;
+  location?: string;
+  totalAmount?: number;
+  currency?: string;
+  currentWorkflowStage?: string;
+  requestorId?: string;
+};
+
 interface FieldConfig {
   label: string;
-  field: keyof PurchaseRequest | 'requestor.name';
+  field: keyof ExtendedPurchaseRequest | 'requestor.name';
   format?: (value: any) => string;
 }
 
@@ -74,20 +89,20 @@ interface CustomFilterType<T> {
 }
 
 interface TableHeader {
-  key: keyof PurchaseRequest
+  key: keyof ExtendedPurchaseRequest
   label: string
   className?: string
 }
 
 interface SortConfig {
-  field: keyof PurchaseRequest
+  field: keyof ExtendedPurchaseRequest
   direction: "asc" | "desc"
 }
 
-// Use mockup data from our comprehensive PR list
-const sampleData: PurchaseRequest[] = mockPRListData;
+// Use mockup data from our comprehensive PR list - cast to ExtendedPurchaseRequest
+const sampleData: ExtendedPurchaseRequest[] = mockPRListData as any;
 
-const filterFields: { value: keyof PurchaseRequest; label: string }[] = [
+const filterFields: { value: keyof ExtendedPurchaseRequest; label: string }[] = [
   { value: 'refNumber', label: 'PR Number' },
   { value: 'type', label: 'Type' },
   { value: 'status', label: 'Status' },
@@ -98,7 +113,7 @@ const filterFields: { value: keyof PurchaseRequest; label: string }[] = [
 
 interface Row {
   getValue: (key: string) => any;
-  original: PurchaseRequest;
+  original: ExtendedPurchaseRequest;
   getIsSelected: () => boolean;
   toggleSelected: (value: boolean) => void;
 }
@@ -110,7 +125,7 @@ interface Table {
 
 interface ColumnDef {
   id?: string;
-  accessorKey?: keyof PurchaseRequest | 'requestor.name';
+  accessorKey?: keyof ExtendedPurchaseRequest | 'requestor.name';
   header: string | ((props: { table: Table }) => React.ReactNode);
   cell?: (props: { row: Row }) => React.ReactNode;
   enableSorting?: boolean;
@@ -264,8 +279,8 @@ export function PurchaseRequestList() {
   });
   const [itemsPerPage = 7, setItemsPerPage] = React.useState(7);
   const [selectedPRs, setSelectedPRs] = useState<string[]>([]);
-  const [advancedFilters, setAdvancedFilters] = useState<FilterType<PurchaseRequest>[]>([]);
-  const [filteredData, setFilteredData] = useState<PurchaseRequest[]>(sampleData);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterType<ExtendedPurchaseRequest>[]>([]);
+  const [filteredData, setFilteredData] = useState<ExtendedPurchaseRequest[]>(sampleData);
   const [filterStatus, setFilterStatus] = useState<DocumentStatus | 'All'>('All');
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
@@ -323,11 +338,11 @@ export function PurchaseRequestList() {
     });
     return Array.from(unique).map(id => {
       const pr = sampleData.find(pr => pr.requestorId === id);
-      return { value: id, label: pr ? pr.requestor.name : id };
+      return { value: id, label: pr?.requestor?.name || id };
     });
   }, []);
 
-  const handleApplyAdvancedFilters = (filters: FilterType<PurchaseRequest>[]) => {
+  const handleApplyAdvancedFilters = (filters: FilterType<ExtendedPurchaseRequest>[]) => {
     setAdvancedFilters(filters);
     const filtered = sampleData.filter((pr) => {
       return filters.every((filter) => {
@@ -395,7 +410,7 @@ export function PurchaseRequestList() {
     setCurrentPage(1);
   };
 
-  const handleSort = (field: keyof PurchaseRequest) => {
+  const handleSort = (field: keyof ExtendedPurchaseRequest) => {
     setSortConfig((prevConfig) => ({
       field,
       direction:
@@ -448,12 +463,12 @@ export function PurchaseRequestList() {
             pr.status !== DocumentStatus.Completed;
           
           // PRs pending my approval (if user has assigned stages)
-          const pendingMyApproval = userAssignedStages.length > 0 ? 
-            userAssignedStages.includes(pr.currentWorkflowStage) && 
-            [DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status) : false;
-          
+          const pendingMyApproval = userAssignedStages.length > 0 ?
+            userAssignedStages.includes(pr.currentWorkflowStage || '') &&
+            [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status) : false;
+
           // For demo purposes: if no user context, show all non-completed items
-          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status);
+          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status);
           
           return myUncompletedPRs || pendingMyApproval || demoMode;
         });
@@ -539,12 +554,12 @@ export function PurchaseRequestList() {
       case 'myPending':
         const userAssignedStages = user?.assignedWorkflowStages || [];
         baseData = baseData.filter(pr => {
-          const myUncompletedPRs = pr.requestorId === currentUserId && 
+          const myUncompletedPRs = pr.requestorId === currentUserId &&
             pr.status !== DocumentStatus.Completed;
-          const pendingMyApproval = userAssignedStages.length > 0 ? 
-            userAssignedStages.includes(pr.currentWorkflowStage) && 
-            [DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status) : false;
-          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.Submitted, DocumentStatus.InProgress].includes(pr.status);
+          const pendingMyApproval = userAssignedStages.length > 0 ?
+            userAssignedStages.includes(pr.currentWorkflowStage || '') &&
+            [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status) : false;
+          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status);
           return myUncompletedPRs || pendingMyApproval || demoMode;
         });
         break;
@@ -566,10 +581,12 @@ export function PurchaseRequestList() {
         
         // Add available workflow stages
         uniqueStages.forEach(stage => {
-          stageFilters.push({
-            value: stage,
-            label: stage.replace(/([A-Z])/g, ' $1').trim()
-          });
+          if (stage) {
+            stageFilters.push({
+              value: stage,
+              label: stage.replace(/([A-Z])/g, ' $1').trim()
+            });
+          }
         });
         
         return stageFilters;
@@ -651,7 +668,7 @@ export function PurchaseRequestList() {
           </Select>
         </div>
         <div className="flex items-center space-x-2">
-          <AdvancedFilter<PurchaseRequest>
+          <AdvancedFilter<ExtendedPurchaseRequest>
             filterFields={filterFields}
             onApplyFilters={handleApplyAdvancedFilters}
             onClearFilters={handleClearAdvancedFilters}
@@ -736,36 +753,36 @@ export function PurchaseRequestList() {
   );
 
   const fieldConfigs: FieldConfig[] = [
-    { 
-      label: "Date", 
+    {
+      label: "Date",
       field: "date",
       format: (value: Date) => value.toLocaleDateString()
     },
-    { 
-      label: "Type", 
-      field: "type" 
+    {
+      label: "Type",
+      field: "type"
     },
-    { 
-      label: "Description", 
-      field: "description" 
+    {
+      label: "Description",
+      field: "description"
     },
-    { 
-      label: "Requestor", 
+    {
+      label: "Requestor",
       field: "requestor.name",
-      format: (pr: PurchaseRequest) => pr.requestor.name
+      format: (pr: ExtendedPurchaseRequest) => pr.requestor?.name || ''
     },
-    { 
-      label: "Department", 
-      field: "department" 
+    {
+      label: "Department",
+      field: "department"
     },
-    { 
-      label: "Amount", 
+    {
+      label: "Amount",
       field: "totalAmount",
-      format: (value: number) => value.toFixed(2)
+      format: (value: number) => value?.toFixed(2) || '0.00'
     },
-    { 
-      label: "Workflow Stage", 
-      field: "currentWorkflowStage" 
+    {
+      label: "Workflow Stage",
+      field: "currentWorkflowStage"
     }
   ]
 
@@ -803,7 +820,7 @@ export function PurchaseRequestList() {
                     />
                     <div>
                       <h3 className="text-lg font-semibold text-primary">{pr.refNumber}</h3>
-                      <p className="text-sm text-muted-foreground">{isMounted ? format(pr.date, "dd MMM yyyy") : pr.date.toISOString().split('T')[0]}</p>
+                      <p className="text-sm text-muted-foreground">{isMounted && pr.date ? format(pr.date, "dd MMM yyyy") : pr.date?.toISOString().split('T')[0] || ''}</p>
                     </div>
                   </div>
                   <StatusBadge status={pr.status} />
@@ -827,7 +844,7 @@ export function PurchaseRequestList() {
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Requestor</p>
-                    <p className="text-sm font-medium">{pr.requestor.name}</p>
+                    <p className="text-sm font-medium">{pr.requestor?.name || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Location</p>
@@ -839,13 +856,13 @@ export function PurchaseRequestList() {
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Amount</p>
                     <p className="text-base font-semibold">
-                      {isMounted 
+                      {isMounted && pr.totalAmount !== undefined
                         ? new Intl.NumberFormat("en-US", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           }).format(pr.totalAmount)
-                        : pr.totalAmount.toFixed(2)
-                      } {pr.currency}
+                        : pr.totalAmount?.toFixed(2) || '0.00'
+                      } {pr.currency || 'USD'}
                     </p>
                   </div>
                   <div className="text-right">
@@ -938,7 +955,7 @@ export function PurchaseRequestList() {
                     {pr.refNumber}
                   </TableCell>
                   <TableCell>
-                    {isMounted ? format(pr.date, "dd MMM yyyy") : pr.date.toISOString().split('T')[0]}
+                    {isMounted && pr.date ? format(pr.date, "dd MMM yyyy") : pr.date?.toISOString().split('T')[0] || ''}
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center text-sm">
@@ -955,7 +972,7 @@ export function PurchaseRequestList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">{pr.requestor.name}</span>
+                      <span className="text-sm">{pr.requestor?.name || 'N/A'}</span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -964,12 +981,12 @@ export function PurchaseRequestList() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    {isMounted 
+                    {isMounted && pr.totalAmount !== undefined
                       ? new Intl.NumberFormat("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(pr.totalAmount)
-                      : pr.totalAmount.toFixed(2)
+                      : pr.totalAmount?.toFixed(2) || '0.00'
                     }
                   </TableCell>
                   <TableCell className="text-center">

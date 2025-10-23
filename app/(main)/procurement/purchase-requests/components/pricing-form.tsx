@@ -13,8 +13,41 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import SummaryPRTable from "./tabs/Summary-pr-table";
-import { IBaseSummary, PurchaseRequestItem } from "@/lib/types";
+import { PurchaseRequestItem } from "@/lib/types";
 import { Package, XIcon } from "lucide-react";
+
+// Summary interface for pricing calculations
+interface IBaseSummary {
+  baseSubTotalPrice: number;
+  subTotalPrice: number;
+  baseNetAmount: number;
+  netAmount: number;
+  baseDiscAmount: number;
+  discountAmount: number;
+  baseTaxAmount: number;
+  taxAmount: number;
+  baseTotalAmount: number;
+  totalAmount: number;
+}
+
+// Extended PurchaseRequestItem with mock-only fields for UI purposes
+type ExtendedPurchaseRequestItem = PurchaseRequestItem & {
+  currency?: string;
+  currencyRate?: number;
+  price?: number;
+  adjustments?: {
+    discount: boolean;
+    tax: boolean;
+  };
+  taxIncluded?: boolean;
+  discountRate?: number;
+  taxRate?: number;
+  taxType?: string;
+  discountType?: string;
+  taxAmount?: number;
+  discountAmount?: number;
+  quantityApproved?: number;
+};
 import {
   Dialog,
   DialogContent,
@@ -27,7 +60,7 @@ import VendorComparison from "./vendor-comparison";
 
 type FormMode = "add" | "edit" | "view";
 
-const initialFormData: Partial<PurchaseRequestItem> = {
+const initialFormData: Partial<ExtendedPurchaseRequestItem> = {
   currency: "USD",
   currencyRate: 1,
   price: 3.99,
@@ -47,11 +80,11 @@ export function PricingFormComponent({
   initialMode,
   pricePermission = true,
 }: {
-  data?: Partial<PurchaseRequestItem>;
+  data?: Partial<ExtendedPurchaseRequestItem>;
   initialMode: FormMode;
   pricePermission?: boolean;
 }) {
-  const [formData, setFormData] = useState<Partial<PurchaseRequestItem>>(
+  const [formData, setFormData] = useState<Partial<ExtendedPurchaseRequestItem>>(
     data || initialFormData
   );
   const [mode, setMode] = useState<FormMode>(initialMode);
