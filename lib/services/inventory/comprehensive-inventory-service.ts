@@ -9,18 +9,17 @@
 import { prisma, type PrismaClient } from '@/lib/db'
 import { InventoryCalculations } from '../calculations/inventory-calculations'
 import { CachedInventoryCalculations } from '../cache/cached-inventory-calculations'
-import { financialCalculationService } from '../calculations/financial-calculations'
-import type { 
+import type {
   InventoryItem,
   StockBalance,
   InventoryTransaction,
   TransactionType,
-  CostingMethod,
   InventoryAlert,
   InventoryAlertType,
   InventoryAging,
   SlowMovingInventory
 } from '@/lib/types/inventory'
+import { CostingMethod } from '@/lib/types/inventory'
 import type { Money, DocumentStatus } from '@/lib/types/common'
 import type { Vendor } from '@/lib/types/vendor'
 import type { Product } from '@/lib/types/product'
@@ -176,14 +175,14 @@ export interface EnhancedServiceResult<T> {
 }
 
 export class ComprehensiveInventoryService {
-  private db: PrismaClient
+  private db: any
   private inventoryCalculations: InventoryCalculations
   private cachedCalculations: CachedInventoryCalculations
 
-  constructor(prismaClient?: PrismaClient) {
+  constructor(prismaClient?: any) {
     this.db = prismaClient || prisma
-    this.inventoryCalculations = new InventoryCalculations()
-    this.cachedCalculations = new CachedInventoryCalculations()
+    this.inventoryCalculations = new InventoryCalculations(this.db)
+    this.cachedCalculations = new CachedInventoryCalculations(this.db)
   }
 
   /**
@@ -218,19 +217,19 @@ export class ComprehensiveInventoryService {
       const enhancedStatuses: EnhancedStockStatus[] = []
 
       for (const item of items) {
-        const locationBreakdown: LocationStock[] = item.stock_balances.map(balance => ({
+        const locationBreakdown: LocationStock[] = item.stock_balances.map((balance: any) => ({
           locationId: balance.location_id,
-          locationName: (balance as any).locations?.name || 'Unknown Location',
+          locationName: balance.locations?.name || 'Unknown Location',
           quantityOnHand: balance.quantity_on_hand,
           quantityReserved: balance.quantity_reserved,
           quantityAvailable: balance.quantity_available,
           averageCost: {
             amount: balance.average_cost_amount,
-            currencyCode: balance.average_cost_currency
+            currency: balance.average_cost_currency
           },
           totalValue: {
             amount: balance.total_value_amount,
-            currencyCode: balance.total_value_currency
+            currency: balance.total_value_currency
           },
           lastMovementDate: balance.last_movement_date || undefined,
           lastCountDate: balance.last_count_date || undefined,
@@ -338,11 +337,11 @@ export class ComprehensiveInventoryService {
         const averageCost = this.calculateAverageTransactionCost(item.inventory_transactions)
         const annualValue = {
           amount: annualUsage * averageCost.amount,
-          currencyCode: averageCost.currencyCode
+          currency: averageCost.currency
         }
 
         const usageFrequency = item.inventory_transactions.filter(
-          t => ['ISSUE', 'TRANSFER_OUT', 'WASTE'].includes(t.transaction_type)
+          (t: any) => ['ISSUE', 'TRANSFER_OUT', 'WASTE'].includes(t.transaction_type)
         ).length
 
         const stockTurnover = await this.calculateTurnoverRate(item.id)
@@ -571,7 +570,7 @@ export class ComprehensiveInventoryService {
         const unitCost = await this.calculateCostByMethod(item, method, asOfDate)
         const totalValue = {
           amount: totalQuantity * unitCost.amount,
-          currencyCode: currency
+          currency: currency
         }
 
         totalValueAmount += totalValue.amount
@@ -600,7 +599,7 @@ export class ComprehensiveInventoryService {
         data: {
           totalValue: {
             amount: totalValueAmount,
-            currencyCode: currency
+            currency: currency
           },
           itemBreakdown,
           summary
@@ -685,8 +684,8 @@ export class ComprehensiveInventoryService {
 
   private calculateTotalValue(locations: LocationStock[]): Money {
     const totalAmount = locations.reduce((sum, loc) => sum + loc.totalValue.amount, 0)
-    const currencyCode = locations[0]?.totalValue.currencyCode || 'USD'
-    return { amount: totalAmount, currencyCode }
+    const currency = locations[0]?.totalValue.currency || 'USD'
+    return { amount: totalAmount, currency }
   }
 
   private determineStockStatus(
@@ -713,7 +712,7 @@ export class ComprehensiveInventoryService {
       }
     })
 
-    const totalIssued = transactions.reduce((sum, txn) => sum + txn.quantity, 0)
+    const totalIssued = transactions.reduce((sum: number, txn: any) => sum + txn.quantity, 0)
     const averageStock = await this.calculateAverageStock(itemId, startDate, endDate)
 
     return averageStock > 0 ? totalIssued / averageStock : 0
@@ -737,7 +736,7 @@ export class ComprehensiveInventoryService {
       }
     })
 
-    const totalUsed = transactions.reduce((sum, txn) => sum + Math.abs(txn.quantity), 0)
+    const totalUsed = transactions.reduce((sum: number, txn: any) => sum + Math.abs(txn.quantity), 0)
     const daysDiff = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)))
     
     return totalUsed / daysDiff
@@ -772,13 +771,13 @@ export class ComprehensiveInventoryService {
 
   private calculateAverageTransactionCost(transactions: any[]): Money {
     if (transactions.length === 0) {
-      return { amount: 0, currencyCode: 'USD' }
+      return { amount: 0, currency: 'USD' }
     }
 
     const totalCost = transactions.reduce((sum, txn) => sum + txn.unit_cost_amount, 0)
     return {
       amount: totalCost / transactions.length,
-      currencyCode: transactions[0]?.unit_cost_currency || 'USD'
+      currency: transactions[0]?.unit_cost_currency || 'USD'
     }
   }
 
@@ -792,30 +791,21 @@ export class ComprehensiveInventoryService {
       where: whereClause
     })
 
-    return balances.reduce((sum, balance) => sum + balance.quantity_on_hand, 0)
+    return balances.reduce((sum: number, balance: any) => sum + balance.quantity_on_hand, 0)
   }
 
   private async cacheABCAnalysis(classifications: ABCClassification[]): Promise<void> {
     // Cache the ABC analysis results
-    await this.cachedCalculations.cacheABCAnalysis(classifications)
+    // TODO: Implement caching when method is available
+    // await this.cachedCalculations.cacheABCAnalysis(classifications)
   }
 
   private async getItemsNeedingReorder(includeAll: boolean, locationIds?: string[]): Promise<any[]> {
     const whereClause: any = { is_active: true }
 
-    if (!includeAll) {
-      // Only get items where current stock <= reorder point
-      whereClause.stock_balances = {
-        some: {
-          quantity_on_hand: {
-            lte: this.db.raw('reorder_point')
-          },
-          ...(locationIds && { location_id: { in: locationIds } })
-        }
-      }
-    }
-
-    return await this.db.inventory_items.findMany({
+    // For now, fetch all items and filter in application code
+    // TODO: Implement proper Prisma raw query when needed
+    const items = await this.db.inventory_items.findMany({
       where: whereClause,
       include: {
         stock_balances: locationIds ? {
@@ -823,6 +813,19 @@ export class ComprehensiveInventoryService {
         } : true
       }
     })
+
+    if (!includeAll) {
+      // Filter items where current stock <= reorder point
+      return items.filter((item: any) => {
+        const totalStock = item.stock_balances.reduce(
+          (sum: number, balance: any) => sum + balance.quantity_on_hand,
+          0
+        )
+        return item.reorder_point && totalStock <= item.reorder_point
+      })
+    }
+
+    return items
   }
 
   private async getSuggestedVendorsForItem(itemId: string): Promise<ReorderSuggestion['suggestedVendors']> {
@@ -869,12 +872,12 @@ export class ComprehensiveInventoryService {
     })
 
     if (transactions.length === 0) {
-      return { amount: 0, currencyCode: 'USD' }
+      return { amount: 0, currency: 'USD' }
     }
 
     return {
       amount: transactions[0].unit_cost_amount,
-      currencyCode: transactions[0].unit_cost_currency
+      currency: transactions[0].unit_cost_currency
     }
   }
 
@@ -890,12 +893,12 @@ export class ComprehensiveInventoryService {
     })
 
     if (transactions.length === 0) {
-      return { amount: 0, currencyCode: 'USD' }
+      return { amount: 0, currency: 'USD' }
     }
 
     return {
       amount: transactions[0].unit_cost_amount,
-      currencyCode: transactions[0].unit_cost_currency
+      currency: transactions[0].unit_cost_currency
     }
   }
 
@@ -909,15 +912,15 @@ export class ComprehensiveInventoryService {
     })
 
     if (transactions.length === 0) {
-      return { amount: 0, currencyCode: 'USD' }
+      return { amount: 0, currency: 'USD' }
     }
 
-    const totalCost = transactions.reduce((sum, txn) => sum + (txn.quantity * txn.unit_cost_amount), 0)
-    const totalQuantity = transactions.reduce((sum, txn) => sum + txn.quantity, 0)
+    const totalCost = transactions.reduce((sum: number, txn: any) => sum + (txn.quantity * txn.unit_cost_amount), 0)
+    const totalQuantity = transactions.reduce((sum: number, txn: any) => sum + txn.quantity, 0)
 
     return {
       amount: totalQuantity > 0 ? totalCost / totalQuantity : 0,
-      currencyCode: transactions[0].unit_cost_currency
+      currency: transactions[0].unit_cost_currency
     }
   }
 
@@ -934,7 +937,7 @@ export class ComprehensiveInventoryService {
 
     return {
       amount: item?.last_purchase_price_amount || 0,
-      currencyCode: item?.last_purchase_price_currency || 'USD'
+      currency: item?.last_purchase_price_currency || 'USD'
     }
   }
 

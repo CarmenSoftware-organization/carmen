@@ -9,7 +9,7 @@
 import { prisma, type PrismaClient } from '@/lib/db'
 import { InventoryCalculations } from '../calculations/inventory-calculations'
 import { CachedInventoryCalculations } from '../cache/cached-inventory-calculations'
-import type { 
+import type {
   InventoryItem,
   StockBalance,
   InventoryTransaction,
@@ -29,9 +29,9 @@ import type {
   InventoryAlert,
   InventoryAlertType,
   InventoryAging,
-  SlowMovingInventory,
-  CostingMethod
+  SlowMovingInventory
 } from '@/lib/types/inventory'
+import { CostingMethod } from '@/lib/types/inventory'
 import type { Money, DocumentStatus } from '@/lib/types/common'
 
 /**
@@ -196,11 +196,11 @@ export interface PaginationOptions {
 }
 
 export class InventoryService {
-  private db: PrismaClient
+  private db: any
   private inventoryCalculations: InventoryCalculations
   private cachedCalculations: CachedInventoryCalculations
 
-  constructor(prismaClient?: PrismaClient) {
+  constructor(prismaClient?: any) {
     this.db = prismaClient || prisma
     this.inventoryCalculations = new InventoryCalculations()
     this.cachedCalculations = new CachedInventoryCalculations()
@@ -291,27 +291,27 @@ export class InventoryService {
 
       // Transform to application format
       const transformedItems = await Promise.all(
-        items.map(async (dbItem) => await this.transformDbItemToInventoryItem(dbItem))
+        items.map(async (dbItem: any) => await this.transformDbItemToInventoryItem(dbItem))
       )
 
       // Apply stock-based filters
       let filteredItems = transformedItems
       if (filters.hasStock !== undefined) {
-        filteredItems = filteredItems.filter(item => {
+        filteredItems = filteredItems.filter((item: InventoryItem) => {
           const hasStock = this.getTotalStockQuantity(item) > 0
           return filters.hasStock ? hasStock : !hasStock
         })
       }
 
       if (filters.isLowStock) {
-        filteredItems = filteredItems.filter(item => {
+        filteredItems = filteredItems.filter((item: InventoryItem) => {
           const totalStock = this.getTotalStockQuantity(item)
           return item.reorderPoint ? totalStock <= item.reorderPoint : false
         })
       }
 
       if (filters.isOutOfStock) {
-        filteredItems = filteredItems.filter(item => this.getTotalStockQuantity(item) === 0)
+        filteredItems = filteredItems.filter((item: InventoryItem) => this.getTotalStockQuantity(item) === 0)
       }
 
       return {
@@ -523,7 +523,7 @@ export class InventoryService {
       const quantityAvailable = Math.max(0, input.quantityOnHand - (input.quantityReserved || 0))
       const totalValue = {
         amount: input.quantityOnHand * input.averageCost.amount,
-        currencyCode: input.averageCost.currencyCode
+        currency: input.averageCost.currency
       }
 
       const dbBalance = await this.db.stock_balances.upsert({
@@ -540,9 +540,9 @@ export class InventoryService {
           quantity_reserved: input.quantityReserved || 0,
           quantity_available: quantityAvailable,
           average_cost_amount: input.averageCost.amount,
-          average_cost_currency: input.averageCost.currencyCode,
+          average_cost_currency: input.averageCost.currency,
           total_value_amount: totalValue.amount,
-          total_value_currency: totalValue.currencyCode,
+          total_value_currency: totalValue.currency,
           last_movement_date: input.lastMovementDate,
           last_count_date: input.lastCountDate,
           created_by: input.createdBy
@@ -552,9 +552,9 @@ export class InventoryService {
           quantity_reserved: input.quantityReserved || 0,
           quantity_available: quantityAvailable,
           average_cost_amount: input.averageCost.amount,
-          average_cost_currency: input.averageCost.currencyCode,
+          average_cost_currency: input.averageCost.currency,
           total_value_amount: totalValue.amount,
-          total_value_currency: totalValue.currencyCode,
+          total_value_currency: totalValue.currency,
           last_movement_date: input.lastMovementDate,
           last_count_date: input.lastCountDate,
           updated_by: input.createdBy,
@@ -588,7 +588,7 @@ export class InventoryService {
       const transactionId = `TXN-${Date.now()}`
       const totalCost = {
         amount: input.quantity * input.unitCost.amount,
-        currencyCode: input.unitCost.currencyCode
+        currency: input.unitCost.currency
       }
 
       // Get current stock balance
@@ -605,15 +605,12 @@ export class InventoryService {
           quantityReserved: 0,
           quantityAvailable: 0,
           averageCost: input.unitCost,
-          totalValue: { amount: 0, currencyCode: input.unitCost.currencyCode },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          createdBy: input.userId
+          totalValue: { amount: 0, currency: input.unitCost.currency }
         }
       }
 
       // Calculate new balance
-      let newQuantity = currentBalance.quantityOnHand
+      let newQuantity = currentBalance?.quantityOnHand || 0
       
       if (['RECEIVE', 'ADJUST_UP', 'TRANSFER_IN'].includes(input.transactionType)) {
         newQuantity += input.quantity
@@ -630,9 +627,9 @@ export class InventoryService {
           transaction_type: input.transactionType,
           quantity: input.quantity,
           unit_cost_amount: input.unitCost.amount,
-          unit_cost_currency: input.unitCost.currencyCode,
+          unit_cost_currency: input.unitCost.currency,
           total_cost_amount: totalCost.amount,
-          total_cost_currency: totalCost.currencyCode,
+          total_cost_currency: totalCost.currency,
           balance_after: newQuantity,
           transaction_date: transactionDate,
           reference_no: input.referenceNo,
@@ -648,7 +645,7 @@ export class InventoryService {
 
       // Update stock balance
       const newAverageCost = await this.calculateNewAverageCost(
-        currentBalance,
+        currentBalance!,
         input.transactionType,
         input.quantity,
         input.unitCost
@@ -658,7 +655,7 @@ export class InventoryService {
         itemId: input.itemId,
         locationId: input.locationId,
         quantityOnHand: newQuantity,
-        quantityReserved: currentBalance.quantityReserved,
+        quantityReserved: currentBalance?.quantityReserved || 0,
         averageCost: newAverageCost,
         lastMovementDate: transactionDate,
         createdBy: input.userId
@@ -738,16 +735,16 @@ export class InventoryService {
       })
 
       const stats = {
-        totalItems: itemCounts.reduce((sum, group) => sum + group._count.is_active, 0),
-        activeItems: itemCounts.find(g => g.is_active)?._count.is_active || 0,
-        inactiveItems: itemCounts.find(g => !g.is_active)?._count.is_active || 0,
+        totalItems: itemCounts.reduce((sum: number, group: any) => sum + group._count.is_active, 0),
+        activeItems: itemCounts.find((g: any) => g.is_active)?._count.is_active || 0,
+        inactiveItems: itemCounts.find((g: any) => !g.is_active)?._count.is_active || 0,
         totalLocations: await this.db.stock_balances.findMany({
           select: { location_id: true },
           distinct: ['location_id']
-        }).then(locations => locations.length),
+        }).then((locations: any[]) => locations.length),
         totalValue: {
           amount: balanceStats._sum.total_value_amount || 0,
-          currencyCode: 'USD'
+          currency: 'USD'
         },
         lowStockItems,
         outOfStockItems,
@@ -800,7 +797,7 @@ export class InventoryService {
       if (totalQuantity > 0) {
         return {
           amount: totalValue / totalQuantity,
-          currencyCode: unitCost.currencyCode
+          currency: unitCost.currency
         }
       }
     }
@@ -839,16 +836,12 @@ export class InventoryService {
       leadTime: dbItem.lead_time_days || undefined,
       lastPurchaseDate: dbItem.last_purchase_date || undefined,
       lastPurchasePrice: dbItem.last_purchase_price_amount && dbItem.last_purchase_price_currency
-        ? { amount: dbItem.last_purchase_price_amount, currencyCode: dbItem.last_purchase_price_currency }
+        ? { amount: dbItem.last_purchase_price_amount, currency: dbItem.last_purchase_price_currency }
         : undefined,
       lastSaleDate: dbItem.last_sale_date || undefined,
       lastSalePrice: dbItem.last_sale_price_amount && dbItem.last_sale_price_currency
-        ? { amount: dbItem.last_sale_price_amount, currencyCode: dbItem.last_sale_price_currency }
-        : undefined,
-      createdAt: dbItem.created_at,
-      updatedAt: dbItem.updated_at,
-      createdBy: dbItem.created_by,
-      updatedBy: dbItem.updated_by || undefined
+        ? { amount: dbItem.last_sale_price_amount, currency: dbItem.last_sale_price_currency }
+        : undefined
     }
   }
 
@@ -865,18 +858,14 @@ export class InventoryService {
       quantityAvailable: dbBalance.quantity_available,
       averageCost: {
         amount: dbBalance.average_cost_amount,
-        currencyCode: dbBalance.average_cost_currency
+        currency: dbBalance.average_cost_currency
       },
       totalValue: {
         amount: dbBalance.total_value_amount,
-        currencyCode: dbBalance.total_value_currency
+        currency: dbBalance.total_value_currency
       },
       lastMovementDate: dbBalance.last_movement_date || undefined,
-      lastCountDate: dbBalance.last_count_date || undefined,
-      createdAt: dbBalance.created_at,
-      updatedAt: dbBalance.updated_at,
-      createdBy: dbBalance.created_by,
-      updatedBy: dbBalance.updated_by || undefined
+      lastCountDate: dbBalance.last_count_date || undefined
     }
   }
 
@@ -893,11 +882,11 @@ export class InventoryService {
       quantity: dbTransaction.quantity,
       unitCost: {
         amount: dbTransaction.unit_cost_amount,
-        currencyCode: dbTransaction.unit_cost_currency
+        currency: dbTransaction.unit_cost_currency
       },
       totalCost: {
         amount: dbTransaction.total_cost_amount,
-        currencyCode: dbTransaction.total_cost_currency
+        currency: dbTransaction.total_cost_currency
       },
       balanceAfter: dbTransaction.balance_after,
       transactionDate: dbTransaction.transaction_date,
@@ -907,11 +896,7 @@ export class InventoryService {
       lotNo: dbTransaction.lot_no || undefined,
       expiryDate: dbTransaction.expiry_date || undefined,
       userId: dbTransaction.user_id,
-      notes: dbTransaction.notes || undefined,
-      createdAt: dbTransaction.created_at,
-      updatedAt: dbTransaction.updated_at,
-      createdBy: dbTransaction.created_by,
-      updatedBy: dbTransaction.updated_by || undefined
+      notes: dbTransaction.notes || undefined
     }
   }
 }

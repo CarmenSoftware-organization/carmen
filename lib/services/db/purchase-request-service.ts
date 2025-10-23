@@ -207,7 +207,7 @@ export class PurchaseRequestService {
       }
 
       const [purchaseRequests, total] = await Promise.all([
-        this.db.purchase_requests.findMany({
+        (this.db as any).purchase_requests.findMany({
           where: whereClause,
           include: {
             items: {
@@ -223,13 +223,13 @@ export class PurchaseRequestService {
           skip: offset,
           take: limit
         }),
-        this.db.purchase_requests.count({
+        (this.db as any).purchase_requests.count({
           where: whereClause
         })
       ])
 
       const transformedRequests = await Promise.all(
-        purchaseRequests.map(dbRequest => this.transformDbPurchaseRequest(dbRequest))
+        purchaseRequests.map((dbRequest: any) => this.transformDbPurchaseRequest(dbRequest))
       )
 
       return {
@@ -255,7 +255,7 @@ export class PurchaseRequestService {
    */
   async getPurchaseRequestById(id: string): Promise<ServiceResult<PurchaseRequest>> {
     try {
-      const dbRequest = await this.db.purchase_requests.findUnique({
+      const dbRequest = await (this.db as any).purchase_requests.findUnique({
         where: { id },
         include: {
           items: {
@@ -325,7 +325,7 @@ export class PurchaseRequestService {
       // Create in transaction
       const result = await this.db.$transaction(async (tx) => {
         // Create main request
-        const dbRequest = await tx.purchase_requests.create({
+        const dbRequest = await (tx as any).purchase_requests.create({
           data: {
             request_number: requestNumber,
             request_date: input.requestDate,
@@ -338,7 +338,7 @@ export class PurchaseRequestService {
             requested_by: input.requestedBy,
             total_items: input.items.length,
             estimated_total_amount: estimatedTotal.amount,
-            estimated_total_currency: estimatedTotal.currencyCode,
+            estimated_total_currency: estimatedTotal.currency,
             budget_code: input.budgetCode,
             project_code: input.projectCode,
             cost_center: input.costCenter,
@@ -351,7 +351,7 @@ export class PurchaseRequestService {
         // Create items
         const dbItems = await Promise.all(
           input.items.map((item, index) =>
-            tx.purchase_request_items.create({
+            (tx as any).purchase_request_items.create({
               data: {
                 request_id: dbRequest.id,
                 line_number: index + 1,
@@ -363,11 +363,11 @@ export class PurchaseRequestService {
                 requested_quantity: item.requestedQuantity,
                 unit: item.unit,
                 estimated_unit_price_amount: item.estimatedUnitPrice?.amount,
-                estimated_unit_price_currency: item.estimatedUnitPrice?.currencyCode,
+                estimated_unit_price_currency: item.estimatedUnitPrice?.currency,
                 estimated_total_amount: item.estimatedUnitPrice
                   ? item.estimatedUnitPrice.amount * item.requestedQuantity
                   : null,
-                estimated_total_currency: item.estimatedUnitPrice?.currencyCode,
+                estimated_total_currency: item.estimatedUnitPrice?.currency,
                 budget_code: item.budgetCode,
                 account_code: item.accountCode,
                 delivery_location_id: item.deliveryLocationId,
@@ -383,7 +383,7 @@ export class PurchaseRequestService {
         )
 
         // Initialize workflow stage
-        await tx.purchase_request_workflow_stages.create({
+        await (tx as any).purchase_request_workflow_stages.create({
           data: {
             request_id: dbRequest.id,
             stage_name: 'request',
@@ -426,7 +426,7 @@ export class PurchaseRequestService {
   ): Promise<ServiceResult<PurchaseRequest>> {
     try {
       // Check if request exists and is editable
-      const existingRequest = await this.db.purchase_requests.findUnique({
+      const existingRequest = await (this.db as any).purchase_requests.findUnique({
         where: { id }
       })
 
@@ -450,7 +450,7 @@ export class PurchaseRequestService {
           input.budgetCode,
           {
             amount: existingRequest.estimated_total_amount,
-            currencyCode: existingRequest.estimated_total_currency
+            currency: existingRequest.estimated_total_currency
           }
         )
         
@@ -460,7 +460,7 @@ export class PurchaseRequestService {
       }
 
       // Update request
-      const dbRequest = await this.db.purchase_requests.update({
+      const dbRequest = await (this.db as any).purchase_requests.update({
         where: { id },
         data: {
           required_date: input.requiredDate,
@@ -491,7 +491,7 @@ export class PurchaseRequestService {
    */
   async submitPurchaseRequest(id: string, submittedBy: string): Promise<ServiceResult<PurchaseRequest>> {
     try {
-      const request = await this.db.purchase_requests.findUnique({
+      const request = await (this.db as any).purchase_requests.findUnique({
         where: { id },
         include: { items: true }
       })
@@ -523,7 +523,7 @@ export class PurchaseRequestService {
 
       await this.db.$transaction(async (tx) => {
         // Update request status
-        await tx.purchase_requests.update({
+        await (tx as any).purchase_requests.update({
           where: { id },
           data: {
             status: 'pending_approval',
@@ -533,7 +533,7 @@ export class PurchaseRequestService {
         })
 
         // Update all items status
-        await tx.purchase_request_items.updateMany({
+        await (tx as any).purchase_request_items.updateMany({
           where: { request_id: id },
           data: {
             status: 'pending_approval',
@@ -542,7 +542,7 @@ export class PurchaseRequestService {
         })
 
         // Create workflow stage
-        await tx.purchase_request_workflow_stages.create({
+        await (tx as any).purchase_request_workflow_stages.create({
           data: {
             request_id: id,
             stage_name: nextStage,
@@ -571,7 +571,7 @@ export class PurchaseRequestService {
     input: ApprovalInput
   ): Promise<ServiceResult<PurchaseRequest>> {
     try {
-      const request = await this.db.purchase_requests.findUnique({
+      const request = await (this.db as any).purchase_requests.findUnique({
         where: { id },
         include: {
           workflow_stages: true,
@@ -594,7 +594,7 @@ export class PurchaseRequestService {
       }
 
       const currentStage = request.workflow_stages.find(
-        stage => stage.stage_name === request.current_stage && stage.status === 'pending'
+        (stage: any) => stage.stage_name === request.current_stage && stage.status === 'pending'
       )
 
       if (!currentStage) {
@@ -615,7 +615,7 @@ export class PurchaseRequestService {
 
       await this.db.$transaction(async (tx) => {
         // Update current workflow stage
-        await tx.purchase_request_workflow_stages.update({
+        await (tx as any).purchase_request_workflow_stages.update({
           where: { id: currentStage.id },
           data: {
             status: input.action === 'approve' ? 'completed' : 'rejected',
@@ -631,7 +631,7 @@ export class PurchaseRequestService {
           
           if (nextStage) {
             // Create next workflow stage
-            await tx.purchase_request_workflow_stages.create({
+            await (tx as any).purchase_request_workflow_stages.create({
               data: {
                 request_id: id,
                 stage_name: nextStage,
@@ -642,7 +642,7 @@ export class PurchaseRequestService {
             })
 
             // Update request to next stage
-            await tx.purchase_requests.update({
+            await (tx as any).purchase_requests.update({
               where: { id },
               data: {
                 current_stage: nextStage,
@@ -651,7 +651,7 @@ export class PurchaseRequestService {
             })
           } else {
             // Final approval - mark as approved
-            await tx.purchase_requests.update({
+            await (tx as any).purchase_requests.update({
               where: { id },
               data: {
                 status: 'approved',
@@ -663,13 +663,13 @@ export class PurchaseRequestService {
             })
 
             // Update all items
-            await tx.purchase_request_items.updateMany({
+            await (tx as any).purchase_request_items.updateMany({
               where: { request_id: id },
               data: {
                 status: 'approved',
                 approved_quantity: input.approvedQuantity,
                 approved_unit_price_amount: input.approvedUnitPrice?.amount,
-                approved_unit_price_currency: input.approvedUnitPrice?.currencyCode,
+                approved_unit_price_currency: input.approvedUnitPrice?.currency,
                 approved_vendor: input.approvedVendor,
                 updated_at: new Date()
               }
@@ -677,7 +677,7 @@ export class PurchaseRequestService {
           }
         } else {
           // Rejected - update request and items
-          await tx.purchase_requests.update({
+          await (tx as any).purchase_requests.update({
             where: { id },
             data: {
               status: 'rejected',
@@ -689,7 +689,7 @@ export class PurchaseRequestService {
             }
           })
 
-          await tx.purchase_request_items.updateMany({
+          await (tx as any).purchase_request_items.updateMany({
             where: { request_id: id },
             data: {
               status: 'rejected',
@@ -718,7 +718,7 @@ export class PurchaseRequestService {
     itemIds?: string[]
   ): Promise<ServiceResult<string>> {
     try {
-      const request = await this.db.purchase_requests.findUnique({
+      const request = await (this.db as any).purchase_requests.findUnique({
         where: { id: requestId },
         include: {
           items: true
@@ -740,8 +740,8 @@ export class PurchaseRequestService {
       }
 
       // Filter items if specific items selected
-      const itemsToConvert = itemIds 
-        ? request.items.filter(item => itemIds.includes(item.id))
+      const itemsToConvert = itemIds
+        ? request.items.filter((item: any) => itemIds.includes(item.id))
         : request.items
 
       if (itemsToConvert.length === 0) {
@@ -754,7 +754,7 @@ export class PurchaseRequestService {
       // This would integrate with PurchaseOrderService
       // For now, we'll just mark items as converted
       await this.db.$transaction(async (tx) => {
-        await tx.purchase_request_items.updateMany({
+        await (tx as any).purchase_request_items.updateMany({
           where: {
             id: { in: itemsToConvert.map(item => item.id) }
           },
@@ -766,7 +766,7 @@ export class PurchaseRequestService {
         })
 
         // Check if all items are converted
-        const remainingItems = await tx.purchase_request_items.count({
+        const remainingItems = await (tx as any).purchase_request_items.count({
           where: {
             request_id: requestId,
             converted_to_po: false
@@ -774,7 +774,7 @@ export class PurchaseRequestService {
         })
 
         if (remainingItems === 0) {
-          await tx.purchase_requests.update({
+          await (tx as any).purchase_requests.update({
             where: { id: requestId },
             data: {
               status: 'closed',
@@ -811,24 +811,24 @@ export class PurchaseRequestService {
   }>> {
     try {
       const [statusCounts, priorityCounts, typeCounts, valueStats, pendingCount] = await Promise.all([
-        this.db.purchase_requests.groupBy({
+        (this.db as any).purchase_requests.groupBy({
           by: ['status'],
           _count: { status: true }
         }),
-        this.db.purchase_requests.groupBy({
+        (this.db as any).purchase_requests.groupBy({
           by: ['priority'],
           _count: { priority: true }
         }),
-        this.db.purchase_requests.groupBy({
+        (this.db as any).purchase_requests.groupBy({
           by: ['request_type'],
           _count: { request_type: true }
         }),
-        this.db.purchase_requests.aggregate({
+        (this.db as any).purchase_requests.aggregate({
           _count: { id: true },
           _sum: { estimated_total_amount: true },
           _avg: { estimated_total_amount: true }
         }),
-        this.db.purchase_requests.count({
+        (this.db as any).purchase_requests.count({
           where: { status: 'pending_approval' }
         })
       ])
@@ -849,11 +849,11 @@ export class PurchaseRequestService {
         }, {} as Record<string, number>),
         totalValue: {
           amount: valueStats._sum.estimated_total_amount || 0,
-          currencyCode: 'USD' // Would be configurable
+          currency: 'USD' // Would be configurable
         },
         averageValue: {
           amount: valueStats._avg.estimated_total_amount || 0,
-          currencyCode: 'USD'
+          currency: 'USD'
         },
         pendingApprovals: pendingCount
       }
@@ -876,8 +876,8 @@ export class PurchaseRequestService {
     const year = new Date().getFullYear()
     const month = String(new Date().getMonth() + 1).padStart(2, '0')
     const prefix = `PR-${year}${month}`
-    
-    const count = await this.db.purchase_requests.count({
+
+    const count = await (this.db as any).purchase_requests.count({
       where: {
         request_number: {
           startsWith: prefix
@@ -898,7 +898,7 @@ export class PurchaseRequestService {
 
     return {
       amount: total,
-      currencyCode: 'USD' // Would be configurable
+      currency: 'USD' // Would be configurable
     }
   }
 
@@ -979,11 +979,11 @@ export class PurchaseRequestService {
       unit: item.unit,
       estimatedUnitPrice: item.estimated_unit_price_amount ? {
         amount: item.estimated_unit_price_amount,
-        currencyCode: item.estimated_unit_price_currency
+        currency: item.estimated_unit_price_currency
       } : undefined,
       estimatedTotal: item.estimated_total_amount ? {
         amount: item.estimated_total_amount,
-        currencyCode: item.estimated_total_currency
+        currency: item.estimated_total_currency
       } : undefined,
       budgetCode: item.budget_code,
       accountCode: item.account_code,
@@ -997,11 +997,11 @@ export class PurchaseRequestService {
       approvedQuantity: item.approved_quantity,
       approvedUnitPrice: item.approved_unit_price_amount ? {
         amount: item.approved_unit_price_amount,
-        currencyCode: item.approved_unit_price_currency
+        currency: item.approved_unit_price_currency
       } : undefined,
       approvedTotal: item.approved_total_amount ? {
         amount: item.approved_total_amount,
-        currencyCode: item.approved_total_currency
+        currency: item.approved_total_currency
       } : undefined,
       approvedVendor: item.approved_vendor,
       convertedToPO: item.converted_to_po,
@@ -1029,11 +1029,11 @@ export class PurchaseRequestService {
       totalItems: dbRequest.total_items,
       estimatedTotal: {
         amount: dbRequest.estimated_total_amount,
-        currencyCode: dbRequest.estimated_total_currency
+        currency: dbRequest.estimated_total_currency
       },
       actualTotal: dbRequest.actual_total_amount ? {
         amount: dbRequest.actual_total_amount,
-        currencyCode: dbRequest.actual_total_currency
+        currency: dbRequest.actual_total_currency
       } : undefined,
       budgetCode: dbRequest.budget_code,
       projectCode: dbRequest.project_code,

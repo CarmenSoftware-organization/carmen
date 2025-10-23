@@ -53,22 +53,20 @@ export const commonPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.department.name',
         operator: Operator.IN,
-        value: ['procurement', 'kitchen', 'finance', 'housekeeping'],
-        logicalOperator: LogicalOperator.AND
+        value: ['procurement', 'kitchen', 'finance', 'housekeeping']
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.ownerDepartment',
         operator: Operator.EQUALS,
-        value: '{{subject.department.name}}',
-        logicalOperator: LogicalOperator.AND
+        value: '{{subject.department.name}}'
       }
     ],
     actionConditions: ['read', 'view', 'list'],
     environmentConditions: [],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 100,
     
@@ -102,22 +100,20 @@ export const commonPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.role.name',
         operator: Operator.IN,
-        value: ['admin', 'manager', 'staff'],
-        logicalOperator: LogicalOperator.AND
+        value: ['admin', 'manager', 'staff']
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.dataClassification',
         operator: Operator.NOT_EQUALS,
-        value: 'top_secret',
-        logicalOperator: LogicalOperator.AND
+        value: 'top_secret'
       }
     ],
     actionConditions: ['read', 'create', 'update'],
     environmentConditions: [],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 200,
     
@@ -151,8 +147,7 @@ export const commonPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.accountStatus',
         operator: Operator.EQUALS,
-        value: 'active',
-        logicalOperator: LogicalOperator.AND
+        value: 'active'
       }
     ],
     resourceConditions: [],
@@ -161,12 +156,11 @@ export const commonPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.isBusinessHours',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.AND
+        value: true
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 150,
     
@@ -206,28 +200,24 @@ export const financialPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.role.name',
         operator: Operator.IN,
-        value: ['purchasing-staff', 'department-manager', 'financial-manager'],
-        logicalOperator: LogicalOperator.AND
+        value: ['purchasing-staff', 'department-manager', 'financial-manager']
       },
       {
         attribute: 'subject.approvalLimit.amount',
         operator: Operator.GREATER_THAN,
-        value: '{{resource.totalValue.amount}}',
-        logicalOperator: LogicalOperator.AND
+        value: '{{resource.totalValue.amount}}'
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.resourceType',
         operator: Operator.EQUALS,
-        value: 'purchase_request',
-        logicalOperator: LogicalOperator.AND
+        value: 'purchase_request'
       },
       {
         attribute: 'resource.totalValue.amount',
         operator: Operator.GREATER_THAN,
-        value: 1000,
-        logicalOperator: LogicalOperator.AND
+        value: 1000
       }
     ],
     actionConditions: ['approve_purchase_request'],
@@ -235,12 +225,11 @@ export const financialPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.isBusinessHours',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.AND
+        value: true
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 300,
     
@@ -279,34 +268,30 @@ export const financialPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.department.name',
         operator: Operator.IN,
-        value: ['procurement', 'kitchen', 'finance', 'housekeeping'],
-        logicalOperator: LogicalOperator.AND
+        value: ['procurement', 'kitchen', 'finance', 'housekeeping']
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.resourceType',
         operator: Operator.IN,
-        value: ['budget', 'financial_report'],
-        logicalOperator: LogicalOperator.AND
+        value: ['budget', 'financial_report']
       },
       {
         attribute: 'resource.ownerDepartment',
         operator: Operator.EQUALS,
-        value: '{{subject.department.name}}',
-        logicalOperator: LogicalOperator.OR
+        value: '{{subject.department.name}}'
       },
       {
         attribute: 'resource.dataClassification',
         operator: Operator.EQUALS,
-        value: 'internal',
-        logicalOperator: LogicalOperator.AND
+        value: 'internal'
       }
     ],
     actionConditions: ['view', 'monitor_budget'],
     environmentConditions: [],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 250,
     
@@ -350,16 +335,14 @@ export const securityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.accountStatus',
         operator: Operator.EQUALS,
-        value: 'active',
-        logicalOperator: LogicalOperator.AND
+        value: 'active'
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.dataClassification',
         operator: Operator.IN,
-        value: ['confidential', 'restricted'],
-        logicalOperator: LogicalOperator.AND
+        value: ['confidential', 'restricted']
       }
     ],
     actionConditions: ['view', 'update', 'export_data'],
@@ -367,18 +350,16 @@ export const securityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.isInternalNetwork',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.AND
+        value: true
       },
       {
         attribute: 'environment.requestIP',
         operator: Operator.STARTS_WITH,
-        value: '192.168.',
-        logicalOperator: LogicalOperator.OR
+        value: '192.168.'
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 400,
     
@@ -416,14 +397,12 @@ export const securityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.role.name',
         operator: Operator.IN,
-        value: ['admin', 'department-manager', 'financial-manager'],
-        logicalOperator: LogicalOperator.AND
+        value: ['admin', 'department-manager', 'financial-manager']
       },
       {
         attribute: 'subject.clearanceLevel',
         operator: Operator.IN,
-        value: ['confidential', 'restricted'],
-        logicalOperator: LogicalOperator.AND
+        value: ['confidential', 'restricted']
       }
     ],
     resourceConditions: [],
@@ -432,12 +411,11 @@ export const securityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.emergencyMode',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.AND
+        value: true
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 500,
     
@@ -477,8 +455,7 @@ export const securityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'resource.requiresAudit',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.AND
+        value: true
       }
     ],
     actionConditions: ['create', 'update', 'delete', 'approve', 'process_payment'],
@@ -486,12 +463,11 @@ export const securityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.auditMode',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.AND
+        value: true
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 350,
     
@@ -536,22 +512,19 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.role.name',
         operator: Operator.IN,
-        value: ['chef', 'kitchen-staff'],
-        logicalOperator: LogicalOperator.AND
+        value: ['chef', 'kitchen-staff']
       },
       {
         attribute: 'subject.department.name',
         operator: Operator.EQUALS,
-        value: 'kitchen',
-        logicalOperator: LogicalOperator.AND
+        value: 'kitchen'
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.resourceType',
         operator: Operator.EQUALS,
-        value: 'recipe',
-        logicalOperator: LogicalOperator.AND
+        value: 'recipe'
       }
     ],
     actionConditions: ['view_recipe', 'modify_recipe'],
@@ -559,12 +532,11 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.isBusinessHours',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.AND
+        value: true
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 200,
     
@@ -598,28 +570,24 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.role.name',
         operator: Operator.EQUALS,
-        value: 'vendor',
-        logicalOperator: LogicalOperator.AND
+        value: 'vendor'
       },
       {
         attribute: 'subject.accountStatus',
         operator: Operator.EQUALS,
-        value: 'active',
-        logicalOperator: LogicalOperator.AND
+        value: 'active'
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.resourceType',
         operator: Operator.IN,
-        value: ['invoice', 'purchase_order'],
-        logicalOperator: LogicalOperator.AND
+        value: ['invoice', 'purchase_order']
       },
       {
         attribute: 'resource.owner',
         operator: Operator.EQUALS,
-        value: '{{subject.userId}}',
-        logicalOperator: LogicalOperator.AND
+        value: '{{subject.userId}}'
       }
     ],
     actionConditions: ['create_invoice', 'view', 'update'],
@@ -627,18 +595,16 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.isInternalNetwork',
         operator: Operator.EQUALS,
-        value: false,
-        logicalOperator: LogicalOperator.AND
+        value: false
       },
       {
         attribute: 'environment.authenticationMethod',
         operator: Operator.EQUALS,
-        value: 'sso',
-        logicalOperator: LogicalOperator.AND
+        value: 'sso'
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 300,
     
@@ -677,14 +643,12 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.role.name',
         operator: Operator.IN,
-        value: ['department-manager', 'financial-manager'],
-        logicalOperator: LogicalOperator.AND
+        value: ['department-manager', 'financial-manager']
       },
       {
         attribute: 'subject.seniority',
         operator: Operator.GREATER_THAN,
-        value: 2,
-        logicalOperator: LogicalOperator.AND
+        value: 2
       }
     ],
     resourceConditions: [],
@@ -693,18 +657,16 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.emergencyMode',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.OR
+        value: true
       },
       {
         attribute: 'environment.isHoliday',
         operator: Operator.EQUALS,
-        value: true,
-        logicalOperator: LogicalOperator.OR
+        value: true
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 450,
     
@@ -743,16 +705,14 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'subject.role.name',
         operator: Operator.IN,
-        value: ['chef', 'menu-manager'],
-        logicalOperator: LogicalOperator.AND
+        value: ['chef', 'menu-manager']
       }
     ],
     resourceConditions: [
       {
         attribute: 'resource.resourceType',
         operator: Operator.IN,
-        value: ['recipe', 'menu'],
-        logicalOperator: LogicalOperator.AND
+        value: ['recipe', 'menu']
       }
     ],
     actionConditions: ['modify_recipe', 'approve_menu_change', 'create'],
@@ -760,18 +720,16 @@ export const hospitalityPolicyTemplates: PolicyTemplate[] = [
       {
         attribute: 'environment.currentTime',
         operator: Operator.GREATER_THAN,
-        value: '2024-02-01',
-        logicalOperator: LogicalOperator.AND
+        value: '2024-02-01'
       },
       {
         attribute: 'environment.currentTime',
         operator: Operator.LESS_THAN,
-        value: '2024-02-15',
-        logicalOperator: LogicalOperator.AND
+        value: '2024-02-15'
       }
     ],
-    
-    effect: EffectType.ALLOW,
+
+    effect: EffectType.PERMIT,
     logicalOperator: LogicalOperator.AND,
     priority: 275,
     
