@@ -514,7 +514,7 @@ export const DEFAULT_PACKAGES: Record<PackageType, Partial<SubscriptionPackage>>
       advancedReporting: false,
       multiCurrency: false,
       supportLevel: 'basic'
-    },
+    } as Partial<PackageFeatures> as PackageFeatures,
     highlights: [
       'Up to 10 users',
       '2 locations',
@@ -539,7 +539,7 @@ export const DEFAULT_PACKAGES: Record<PackageType, Partial<SubscriptionPackage>>
       advancedReporting: true,
       multiCurrency: true,
       supportLevel: 'standard'
-    },
+    } as Partial<PackageFeatures> as PackageFeatures,
     highlights: [
       'Up to 50 users',
       '5 locations',
@@ -568,7 +568,7 @@ export const DEFAULT_PACKAGES: Record<PackageType, Partial<SubscriptionPackage>>
       multiCurrency: true,
       whiteLabel: true,
       supportLevel: 'premium'
-    },
+    } as Partial<PackageFeatures> as PackageFeatures,
     highlights: [
       'Unlimited users',
       'Unlimited locations',

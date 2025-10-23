@@ -6,7 +6,8 @@
  */
 
 import { getCalculationCacheService } from '../calculation-cache-service';
-import { Money, CostingMethod } from '@/lib/types';
+import { Money } from '@/lib/types';
+import { CostingMethod } from '@/lib/types/inventory';
 
 /**
  * Demo: Financial calculations with caching
@@ -123,8 +124,7 @@ async function demoInventoryCalculations() {
       { itemId: 'mouse-002', annualValue: { amount: 1000, currency: 'USD' }, annualUsage: 200 },
       { itemId: 'keyboard-003', annualValue: { amount: 5000, currency: 'USD' }, annualUsage: 100 },
       { itemId: 'monitor-004', annualValue: { amount: 15000, currency: 'USD' }, annualUsage: 40 }
-    ],
-    currencyCode: 'USD'
+    ]
   });
   
   abcResult.value.forEach(item => {
@@ -191,6 +191,10 @@ async function demoVendorMetrics() {
   console.log(`   Risk Score: ${performanceResult.value.riskScore}/100`);
   console.log(`   Recommendations: ${performanceResult.value.recommendations.join(', ')}`);
 
+  // Note: Risk assessment demo commented out as assessVendorRisk is not yet implemented in CachedVendorMetrics
+  // TODO: Implement assessVendorRisk in CachedVendorMetrics when the base method is available
+
+  /*
   // Demo: Risk assessment
   console.log('\n2. Vendor Risk Assessment');
   const riskResult = await vendor.assessVendorRisk({
@@ -218,6 +222,7 @@ async function demoVendorMetrics() {
   console.log(`   Financial Risk: ${riskResult.value.riskFactors.financial.score} (${riskResult.value.riskFactors.financial.impact})`);
   console.log(`   Operational Risk: ${riskResult.value.riskFactors.operational.score} (${riskResult.value.riskFactors.operational.impact})`);
   console.log(`   Next Review: ${riskResult.value.nextReviewDate.toDateString()}`);
+  */
 }
 
 /**

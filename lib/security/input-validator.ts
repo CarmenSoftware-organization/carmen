@@ -237,13 +237,13 @@ export class SecurityInputValidator {
     checkValue(data)
 
     // Check if threats should block the request
-    const blockingThreats = threats.filter(threat => 
-      threat.includes('xss') || 
-      threat.includes('sql_injection') || 
+    const blockingThreats = threats.filter(threat =>
+      threat.includes('xss') ||
+      threat.includes('sql_injection') ||
       threat.includes('command_injection')
     )
 
-    if (blockingThreats.length > 0 || riskLevel === 'critical') {
+    if (blockingThreats.length > 0 || (riskLevel as string) === 'critical') {
       return {
         success: false,
         errors: ['Malicious input detected'],
@@ -664,6 +664,3 @@ export const SecureSchemas = {
   // Phone number validation
   phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format')
 }
-
-// Export types
-export type { ValidationResult, SanitizationOptions }

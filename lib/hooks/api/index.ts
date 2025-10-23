@@ -4,6 +4,19 @@
  * Centralizes all API-related React Query hooks for easy import throughout the application
  */
 
+// Import query keys first
+import {
+  VENDOR_QUERY_KEYS
+} from './use-vendors'
+
+import {
+  PRODUCT_QUERY_KEYS
+} from './use-products'
+
+import {
+  PROCUREMENT_QUERY_KEYS
+} from './use-procurement'
+
 // Vendor hooks
 export {
   useVendors,

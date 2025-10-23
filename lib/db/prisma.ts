@@ -295,13 +295,13 @@ export class ReliablePrismaClient {
     timeout?: number
     useCircuitBreaker?: boolean
   }): Promise<T> {
-    const { 
-      operationName = 'transaction', 
-      timeout, 
-      useCircuitBreaker = DB_CONFIG.enableCircuitBreaker 
+    const {
+      operationName = 'transaction',
+      timeout,
+      useCircuitBreaker = DB_CONFIG.enableCircuitBreaker
     } = options || {}
-    
-    const operation = async () => {
+
+    const operation = async (): Promise<T> => {
       if (DB_CONFIG.enableTimeouts) {
         const result = await databaseTimeoutHandler.executeTransaction(
           this.client,
@@ -309,17 +309,20 @@ export class ReliablePrismaClient {
           { operationName },
           timeout
         )
-        
+
         if (!result.success) {
           throw result.error
         }
-        
-        return result.result!
+
+        return result.result as T
       } else {
-        return this.client.$transaction(transactionFn)
+        // Use $transaction with proper type handling
+        return await this.client.$transaction(async (tx) => {
+          return transactionFn(tx as unknown as PrismaClient)
+        }) as T
       }
     }
-    
+
     if (useCircuitBreaker) {
       return databaseCircuitBreaker.execute(operation, operationName)
     } else {

@@ -125,7 +125,7 @@ export class MenuEngineeringIntegrationService extends BaseCalculator {
     
     // Validate and set configuration
     const validatedConfig = MenuEngineeringModuleConfigSchema.parse(config || {});
-    this.config = validatedConfig;
+    this.config = validatedConfig as MenuEngineeringModuleConfig;
     
     // Initialize cache layer
     this.cache = createEnhancedCacheLayer({
@@ -587,9 +587,9 @@ export class MenuEngineeringIntegrationService extends BaseCalculator {
     context: any
   ) {
     // Generate recommendations based on integrated data
-    const immediate = [];
-    const shortTerm = [];
-    const longTerm = [];
+    const immediate: any[] = [];
+    const shortTerm: any[] = [];
+    const longTerm: any[] = [];
 
     // Add cost-based recommendations
     for (const variance of costVariations.recipeVariances.slice(0, 3)) {

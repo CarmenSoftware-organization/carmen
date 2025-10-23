@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthManager } from '@/lib/api'
 import { toast } from 'sonner'
 
@@ -62,25 +61,8 @@ queryClient.setMutationDefaults(['*'], {
   },
 })
 
-// Set up global query error handler
-queryClient.setQueryDefaults(['*'], {
-  onError: (error) => {
-    console.error('Query error:', error)
-    
-    // Handle authentication errors globally
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      const statusCode = (error as any).statusCode
-      if (statusCode === 401) {
-        AuthManager.clearTokens()
-        toast.error('Session expired. Please log in again.')
-        // Clear all queries and redirect
-        queryClient.clear()
-        window.location.href = '/auth/login'
-        return
-      }
-    }
-  },
-})
+// Note: Query error handlers should be set up at query level
+// Global error handling is managed through QueryCache configuration
 
 interface ApiProviderProps {
   children: React.ReactNode
@@ -137,10 +119,6 @@ export function ApiProvider({ children, initialAuth }: ApiProviderProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {/* Only show devtools in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <ReactQueryDevtools initialIsOpen={false} />
-      )}
     </QueryClientProvider>
   )
 }

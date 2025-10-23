@@ -3,49 +3,151 @@
  * Centralized vendor mock data for the Carmen ERP application
  */
 
-import { Vendor } from '@/lib/types'
+import type { Vendor } from '@/lib/types'
 
 export const mockVendors: Vendor[] = [
   {
     id: 'vendor-001',
+    vendorCode: 'VEN-001',
     companyName: 'Premium Food Suppliers Ltd',
-    contactName: 'John Smith',
-    email: 'john@premiumfood.com',
-    phone: '+1-555-0101',
-    address: '123 Food Street, Culinary District, CD 12345',
-    isActive: true,
-    category: 'Food & Beverage',
+    displayName: 'Premium Food',
+    businessRegistrationNumber: 'BRN123456',
     taxId: 'TAX123456',
-    paymentTerms: 'Net 30',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-08-15')
+    vatNumber: 'VAT123456',
+    establishmentDate: '2020-01-15',
+    businessType: 'distributor',
+    industryCategory: 'Food & Beverage',
+    status: 'active',
+    rating: 4.5,
+    isActive: true,
+    addresses: [
+      {
+        id: 'addr-001',
+        vendorId: 'vendor-001',
+        addressLine: '123 Food Street, Culinary District, CD 12345',
+        addressType: 'MAIN' as any,
+        isPrimary: true,
+        isHeadOffice: true
+      }
+    ],
+    contacts: [
+      {
+        id: 'contact-001',
+        vendorId: 'vendor-001',
+        name: 'John Smith',
+        email: 'john@premiumfood.com',
+        phone: '+1-555-0101',
+        position: 'Sales Manager',
+        isPrimary: true,
+        canReceiveOrders: true,
+        canReceiveInvoices: true,
+        canReceivePayments: false
+      }
+    ],
+    certifications: [],
+    bankAccounts: [],
+    preferredCurrency: 'USD',
+    preferredPaymentTerms: 'Net 30',
+    onTimeDeliveryRate: 95,
+    qualityRating: 4.5,
+    priceCompetitiveness: 4.0
   },
   {
     id: 'vendor-002',
+    vendorCode: 'VEN-002',
     companyName: 'Fresh Produce Market',
-    contactName: 'Maria Garcia',
-    email: 'maria@freshproduce.com',
-    phone: '+1-555-0102',
-    address: '456 Garden Ave, Fresh Valley, FV 67890',
-    isActive: true,
-    category: 'Produce',
+    displayName: 'Fresh Produce',
+    businessRegistrationNumber: 'BRN789012',
     taxId: 'TAX789012',
-    paymentTerms: 'Net 15',
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-08-10')
+    vatNumber: 'VAT789012',
+    establishmentDate: '2019-06-01',
+    businessType: 'wholesaler',
+    industryCategory: 'Produce',
+    status: 'active',
+    rating: 4.8,
+    isActive: true,
+    addresses: [
+      {
+        id: 'addr-002',
+        vendorId: 'vendor-002',
+        addressLine: '456 Garden Ave, Fresh Valley, FV 67890',
+        addressType: 'MAIN' as any,
+        isPrimary: true,
+        isHeadOffice: true
+      }
+    ],
+    contacts: [
+      {
+        id: 'contact-002',
+        vendorId: 'vendor-002',
+        name: 'Maria Garcia',
+        email: 'maria@freshproduce.com',
+        phone: '+1-555-0102',
+        position: 'Account Manager',
+        isPrimary: true,
+        canReceiveOrders: true,
+        canReceiveInvoices: true,
+        canReceivePayments: true
+      }
+    ],
+    certifications: [],
+    bankAccounts: [],
+    preferredCurrency: 'USD',
+    preferredPaymentTerms: 'Net 15',
+    onTimeDeliveryRate: 98,
+    qualityRating: 4.8,
+    priceCompetitiveness: 4.5
   },
   {
     id: 'vendor-003',
+    vendorCode: 'VEN-003',
     companyName: 'Kitchen Equipment Co',
-    contactName: 'David Chen',
-    email: 'david@kitchenequip.com',
-    phone: '+1-555-0103',
-    address: '789 Equipment Blvd, Industrial Park, IP 11111',
-    isActive: true,
-    category: 'Equipment',
+    displayName: 'Kitchen Equipment',
+    businessRegistrationNumber: 'BRN345678',
     taxId: 'TAX345678',
-    paymentTerms: 'Net 45',
-    createdAt: new Date('2024-01-20'),
-    updatedAt: new Date('2024-07-30')
+    vatNumber: 'VAT345678',
+    establishmentDate: '2018-03-20',
+    businessType: 'manufacturer',
+    industryCategory: 'Equipment',
+    status: 'active',
+    rating: 4.2,
+    isActive: true,
+    addresses: [
+      {
+        id: 'addr-003',
+        vendorId: 'vendor-003',
+        addressLine: '789 Equipment Blvd, Industrial Park, IP 11111',
+        addressType: 'MAIN' as any,
+        isPrimary: true,
+        isHeadOffice: true,
+        isWarehouse: true
+      }
+    ],
+    contacts: [
+      {
+        id: 'contact-003',
+        vendorId: 'vendor-003',
+        name: 'David Chen',
+        email: 'david@kitchenequip.com',
+        phone: '+1-555-0103',
+        position: 'Director of Sales',
+        isPrimary: true,
+        canReceiveOrders: true,
+        canReceiveInvoices: false,
+        canReceivePayments: false
+      }
+    ],
+    certifications: [],
+    bankAccounts: [],
+    preferredCurrency: 'USD',
+    preferredPaymentTerms: 'Net 45',
+    creditLimit: {
+      amount: 100000,
+      currency: 'USD'
+    },
+    creditDays: 45,
+    onTimeDeliveryRate: 92,
+    qualityRating: 4.2,
+    priceCompetitiveness: 3.8
   }
 ]
