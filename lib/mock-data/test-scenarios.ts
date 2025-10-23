@@ -3,15 +3,16 @@
  * Complex mock scenarios for testing and development
  */
 
-import { 
-  mockUsers, 
-  mockVendors, 
-  mockProducts, 
+import {
+  mockUsers,
+  mockVendors,
+  mockProducts,
   mockRecipes,
   createMockPurchaseRequest,
   createMockUser,
   createMockVendor
 } from './index'
+import { DocumentStatus } from '../types'
 
 /**
  * Test scenario: Complete procurement workflow
@@ -30,8 +31,7 @@ export const procurementWorkflowScenario = {
       id: 'user-approver',
       name: 'Sarah Approver',
       role: 'department-manager',
-      department: 'kitchen',
-      permissions: ['read', 'write', 'approve']
+      department: 'kitchen'
     }),
     vendor: createMockVendor({
       id: 'vendor-workflow',
@@ -39,10 +39,10 @@ export const procurementWorkflowScenario = {
     }),
     purchaseRequest: createMockPurchaseRequest({
       id: 'PR-WORKFLOW-001',
-      description: 'Kitchen supplies for workflow test',
+      justification: 'Kitchen supplies for workflow test',
       requestedBy: 'user-requester',
-      department: 'kitchen',
-      status: 'pending_approval'
+      departmentId: 'kitchen',
+      status: DocumentStatus.InProgress
     })
   }
 }
@@ -57,17 +57,17 @@ export const multiCurrencyScenario = {
     usdVendor: createMockVendor({
       id: 'vendor-usd',
       companyName: 'US Vendor',
-      currency: 'USD'
+      preferredCurrency: 'USD'
     }),
     eurVendor: createMockVendor({
       id: 'vendor-eur',
       companyName: 'European Vendor',
-      currency: 'EUR'
+      preferredCurrency: 'EUR'
     }),
     gbpVendor: createMockVendor({
       id: 'vendor-gbp',
       companyName: 'UK Vendor',
-      currency: 'GBP'
+      preferredCurrency: 'GBP'
     })
   }
 }
@@ -90,7 +90,7 @@ export const largeDatasetScenario = {
     })),
     purchaseRequests: Array.from({ length: 200 }, (_, i) => createMockPurchaseRequest({
       id: `PR-PERF-${String(i + 1).padStart(3, '0')}`,
-      description: `Performance test PR ${i + 1}`
+      justification: `Performance test PR ${i + 1}`
     }))
   }
 }
@@ -105,8 +105,7 @@ export const edgeCasesScenario = {
     // User with no permissions
     restrictedUser: createMockUser({
       id: 'user-restricted',
-      name: 'Restricted User',
-      permissions: []
+      name: 'Restricted User'
     }),
     // Inactive vendor
     inactiveVendor: createMockVendor({
@@ -117,7 +116,7 @@ export const edgeCasesScenario = {
     // PR with special characters
     specialCharPR: createMockPurchaseRequest({
       id: 'PR-SPECIAL-001',
-      description: 'Special characters: åçčéñtëd & símböls!'
+      justification: 'Special characters: åçčéñtëd & símböls!'
     })
   }
 }

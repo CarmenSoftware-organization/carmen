@@ -146,7 +146,7 @@ export class CachedInventoryCalculations extends InventoryCalculations {
    * Calculate inventory turnover with caching
    */
   async calculateInventoryTurnover(
-    costOfGoodsSold: Money, 
+    costOfGoodsSold: Money,
     averageInventoryValue: Money
   ): Promise<CalculationResult<number>> {
     const dependencies: CacheDependency[] = [
@@ -163,7 +163,7 @@ export class CachedInventoryCalculations extends InventoryCalculations {
       {
         type: 'field',
         identifier: 'currency_rates',
-        version: costOfGoodsSold.currencyCode
+        version: costOfGoodsSold.currency
       }
     ];
 
@@ -171,7 +171,27 @@ export class CachedInventoryCalculations extends InventoryCalculations {
       'InventoryCalculations',
       'calculateInventoryTurnover',
       { costOfGoodsSold, averageInventoryValue },
-      () => super.calculateInventoryTurnover(costOfGoodsSold, averageInventoryValue),
+      async () => {
+        // Calculate inventory turnover: COGS / Average Inventory Value
+        if (averageInventoryValue.amount === 0) {
+          return {
+            value: 0,
+            calculatedAt: new Date(),
+            calculationId: `inventory-turnover-${Date.now()}`,
+            confidence: 0,
+            errors: ['Average inventory value cannot be zero']
+          };
+        }
+
+        const turnover = costOfGoodsSold.amount / averageInventoryValue.amount;
+
+        return {
+          value: turnover,
+          calculatedAt: new Date(),
+          calculationId: `inventory-turnover-${Date.now()}`,
+          confidence: 1.0
+        };
+      },
       dependencies
     );
   }
@@ -206,7 +226,27 @@ export class CachedInventoryCalculations extends InventoryCalculations {
       'InventoryCalculations',
       'calculateDaysSalesInventory',
       { averageInventoryValue, costOfGoodsSold, periodDays },
-      () => super.calculateDaysSalesInventory(averageInventoryValue, costOfGoodsSold, periodDays),
+      async () => {
+        // Calculate DSI: (Average Inventory Value / COGS) * Period Days
+        if (costOfGoodsSold.amount === 0) {
+          return {
+            value: 0,
+            calculatedAt: new Date(),
+            calculationId: `days-sales-inventory-${Date.now()}`,
+            confidence: 0,
+            errors: ['Cost of goods sold cannot be zero']
+          };
+        }
+
+        const dsi = (averageInventoryValue.amount / costOfGoodsSold.amount) * periodDays;
+
+        return {
+          value: dsi,
+          calculatedAt: new Date(),
+          calculationId: `days-sales-inventory-${Date.now()}`,
+          confidence: 1.0
+        };
+      },
       dependencies
     );
   }
@@ -232,7 +272,7 @@ export class CachedInventoryCalculations extends InventoryCalculations {
       {
         type: 'field',
         identifier: 'currency_rates',
-        version: averageInventoryValue.currencyCode
+        version: averageInventoryValue.currency
       }
     ];
 
@@ -240,7 +280,20 @@ export class CachedInventoryCalculations extends InventoryCalculations {
       'InventoryCalculations',
       'calculateCarryingCost',
       { averageInventoryValue, carryingCostRate },
-      () => super.calculateCarryingCost(averageInventoryValue, carryingCostRate),
+      async () => {
+        // Calculate carrying cost: Average Inventory Value * Carrying Cost Rate
+        const carryingCost = averageInventoryValue.amount * carryingCostRate;
+
+        return {
+          value: {
+            amount: carryingCost,
+            currency: averageInventoryValue.currency
+          },
+          calculatedAt: new Date(),
+          calculationId: `carrying-cost-${Date.now()}`,
+          confidence: 1.0
+        };
+      },
       dependencies
     );
   }
@@ -275,7 +328,29 @@ export class CachedInventoryCalculations extends InventoryCalculations {
       'InventoryCalculations',
       'calculateEOQ',
       { annualDemand, orderingCost, holdingCostPerUnit },
-      () => super.calculateEOQ(annualDemand, orderingCost, holdingCostPerUnit),
+      async () => {
+        // Calculate EOQ: sqrt((2 * Annual Demand * Ordering Cost) / Holding Cost Per Unit)
+        if (holdingCostPerUnit.amount === 0) {
+          return {
+            value: 0,
+            calculatedAt: new Date(),
+            calculationId: `eoq-${Date.now()}`,
+            confidence: 0,
+            errors: ['Holding cost per unit cannot be zero']
+          };
+        }
+
+        const eoq = Math.sqrt(
+          (2 * annualDemand * orderingCost.amount) / holdingCostPerUnit.amount
+        );
+
+        return {
+          value: eoq,
+          calculatedAt: new Date(),
+          calculationId: `eoq-${Date.now()}`,
+          confidence: 1.0
+        };
+      },
       dependencies
     );
   }
@@ -380,8 +455,8 @@ export class CachedInventoryCalculations extends InventoryCalculations {
             averageInventoryValue: { amount: inventoryValue, currencyCode: 'USD' }
           },
           computeFn: () => this.calculateInventoryTurnover(
-            { amount: cogs, currencyCode: 'USD' },
-            { amount: inventoryValue, currencyCode: 'USD' }
+            { amount: cogs, currency: 'USD' },
+            { amount: inventoryValue, currency: 'USD' }
           ),
           priority: 1
         });

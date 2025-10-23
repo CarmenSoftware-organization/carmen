@@ -86,6 +86,8 @@ export type {
   CostCenter
 } from './finance'
 
+export { ExchangeRateSource } from './finance'
+
 // Settings and preferences types (PRIMARY SOURCE for NotificationSettings)
 export type {
   NotificationSettings,

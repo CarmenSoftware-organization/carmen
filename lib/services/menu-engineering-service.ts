@@ -15,6 +15,15 @@ import { z } from 'zod';
 // ====== TYPE DEFINITIONS ======
 
 /**
+ * Extended sales transaction with recipe information
+ */
+export interface SalesTransactionWithRecipe extends SalesTransaction {
+  recipeId: string;
+  recipeName: string;
+  recipeCode: string;
+}
+
+/**
  * Menu Engineering Classification (Boston Matrix)
  */
 export type MenuClassification = 'STAR' | 'PLOWHORSES' | 'PUZZLE' | 'DOG';
@@ -644,26 +653,26 @@ export class MenuEngineeringService extends BaseCalculator {
     locationIds?: string[],
     recipeIds?: string[],
     context?: CalculationContext
-  ): Promise<SalesTransaction[]> {
-    // This would query the database for sales transactions
+  ): Promise<SalesTransactionWithRecipe[]> {
+    // This would query the database for sales transactions with recipe mapping
     // For now, return mock data
     return [];
   }
 
   private async calculateItemPerformances(
-    salesData: SalesTransaction[],
+    salesData: SalesTransactionWithRecipe[],
     periodStart: Date,
     periodEnd: Date,
     config: MenuEngineeeringConfig,
     context: CalculationContext
   ): Promise<MenuItemPerformance[]> {
     // Group sales by recipe
-    const recipeGroups = new Map<string, SalesTransaction[]>();
+    const recipeGroups = new Map<string, SalesTransactionWithRecipe[]>();
     salesData.forEach(sale => {
-      if (!recipeGroups.has(sale.recipeId!)) {
-        recipeGroups.set(sale.recipeId!, []);
+      if (!recipeGroups.has(sale.recipeId)) {
+        recipeGroups.set(sale.recipeId, []);
       }
-      recipeGroups.get(sale.recipeId!)!.push(sale);
+      recipeGroups.get(sale.recipeId)!.push(sale);
     });
 
     const performances: MenuItemPerformance[] = [];
@@ -671,7 +680,7 @@ export class MenuEngineeringService extends BaseCalculator {
     // Calculate popularity scores
     const popularityInput = {
       salesData: salesData.map(s => ({
-        recipeId: s.recipeId || '',
+        recipeId: s.recipeId,
         quantitySold: s.quantitySold,
         saleDate: s.saleDate
       })),
@@ -690,7 +699,7 @@ export class MenuEngineeringService extends BaseCalculator {
       salesData: salesData
         .filter(s => s.grossProfit !== undefined && s.netRevenue > 0)
         .map(s => ({
-          recipeId: s.recipeId || '',
+          recipeId: s.recipeId,
           grossProfit: s.grossProfit!,
           netRevenue: s.netRevenue,
           saleDate: s.saleDate
@@ -741,8 +750,8 @@ export class MenuEngineeringService extends BaseCalculator {
 
       const performance: MenuItemPerformance = {
         recipeId,
-        recipeName: sales[0].recipeName || `Recipe ${recipeId}`,
-        recipeCode: sales[0].recipeCode || '',
+        recipeName: sales[0].recipeName,
+        recipeCode: sales[0].recipeCode,
         totalSales,
         totalRevenue,
         totalQuantitySold,
@@ -806,24 +815,24 @@ export class MenuEngineeringService extends BaseCalculator {
     return sortedValues[Math.max(0, Math.min(index, sortedValues.length - 1))];
   }
 
-  private calculateDataQuality(sales: SalesTransaction[], sampleSize: number): number {
+  private calculateDataQuality(sales: SalesTransactionWithRecipe[], sampleSize: number): number {
     let qualityScore = 1.0;
-    
+
     // Reduce score for small sample size
     if (sampleSize < 10) {
       qualityScore *= 0.5;
     } else if (sampleSize < 25) {
       qualityScore *= 0.8;
     }
-    
+
     // Reduce score for missing data
-    const missingDataPoints = sales.filter(sale => 
+    const missingDataPoints = sales.filter(sale =>
       !sale.grossProfit || !sale.calculatedFoodCost
     ).length;
-    
+
     const missingDataRatio = missingDataPoints / sales.length;
     qualityScore *= (1 - missingDataRatio);
-    
+
     return Math.max(0.1, qualityScore);
   }
 
@@ -903,7 +912,7 @@ export class MenuEngineeringService extends BaseCalculator {
 
   private async generateAnalysisInsights(
     analysis: MenuAnalysisResult,
-    salesData: SalesTransaction[],
+    salesData: SalesTransactionWithRecipe[],
     context: CalculationContext
   ): Promise<AnalysisInsight[]> {
     const insights: AnalysisInsight[] = [];
