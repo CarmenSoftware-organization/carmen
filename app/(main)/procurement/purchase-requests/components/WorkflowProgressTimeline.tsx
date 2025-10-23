@@ -66,16 +66,16 @@ export function WorkflowProgressTimeline({ prData, className }: WorkflowProgress
     return steps.map((step) => {
       let status: WorkflowStep['status'] = 'pending';
 
-      if (prData.status === DocumentStatus.Rejected && step.stage === prData.currentWorkflowStage) {
+      if (prData.status === DocumentStatus.Rejected && step.stage === (prData as any).currentWorkflowStage) {
         status = 'rejected';
-      } else if (step.stage === prData.currentWorkflowStage) {
+      } else if (step.stage === (prData as any).currentWorkflowStage) {
         status = 'current';
       } else {
         // Check if this step is before the current stage (completed)
-        const currentStageIndex = steps.findIndex(s => s.stage === prData.currentWorkflowStage);
+        const currentStageIndex = steps.findIndex(s => s.stage === (prData as any).currentWorkflowStage);
         const stepIndex = steps.findIndex(s => s.stage === step.stage);
-        
-        if (stepIndex < currentStageIndex || prData.currentWorkflowStage === WorkflowStage.completed) {
+
+        if (stepIndex < currentStageIndex || (prData as any).currentWorkflowStage === WorkflowStage.completed) {
           status = 'completed';
         }
       }
