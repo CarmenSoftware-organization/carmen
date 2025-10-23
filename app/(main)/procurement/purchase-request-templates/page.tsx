@@ -66,7 +66,7 @@ export default function PRTemplatesPage() {
   const typeOptions = [
     { label: "All Types", value: "all" },
     { label: "General Purchase", value: PRType.GeneralPurchase },
-    { label: "Asset Purchase", value: PRType.AssetPurchase },
+    { label: "Capital Expenditure", value: PRType.CapitalExpenditure },
   ]
 
   const statusOptions = [
