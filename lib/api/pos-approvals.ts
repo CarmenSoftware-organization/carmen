@@ -9,16 +9,16 @@
  */
 
 import { apiClient, type ApiResponse, type PaginationParams } from './client'
+import { type POSTransaction } from '@/lib/types'
 import {
   type PendingTransaction,
-  type POSTransaction,
   type InventoryImpact,
   type ApprovalQueueFilters,
   type BulkApprovalRequest,
   type BulkApprovalResult,
   type ApprovalRequest,
   type RejectionRequest
-} from '@/lib/types'
+} from '@/lib/types/pos-integration'
 
 // API response types
 export interface PendingTransactionsListResponse {
@@ -234,11 +234,3 @@ export class POSApprovalsApiService {
 
 // Create singleton instance
 export const posApprovalsApi = new POSApprovalsApiService()
-
-// Export types for external use
-export type {
-  PendingTransactionsListResponse,
-  ApprovalStatsResponse,
-  ApprovalRequestWithNotes,
-  BulkApprovalRequestBody
-}

@@ -41,7 +41,7 @@ export class CachedFinancialCalculations extends FinancialCalculations {
       {
         type: 'field',
         identifier: 'currency_rates',
-        version: input.currencyCode || input.subtotal.currencyCode
+        version: input.currencyCode || input.subtotal.currency
       }
     ];
 
@@ -67,7 +67,7 @@ export class CachedFinancialCalculations extends FinancialCalculations {
       {
         type: 'field',
         identifier: 'currency_rates',
-        version: input.currencyCode || input.subtotal.currencyCode
+        version: input.currencyCode || input.subtotal.currency
       }
     ];
 
@@ -92,7 +92,7 @@ export class CachedFinancialCalculations extends FinancialCalculations {
       },
       {
         type: 'field',
-        identifier: `currency_pair:${input.amount.currencyCode}_${input.toCurrency}`,
+        identifier: `currency_pair:${input.amount.currency}_${input.toCurrency}`,
         version: input.exchangeRate?.toString() || 'live'
       }
     ];
@@ -124,7 +124,7 @@ export class CachedFinancialCalculations extends FinancialCalculations {
       {
         type: 'field',
         identifier: 'currency_rates',
-        version: input.currencyCode || input.unitPrice.currencyCode
+        version: input.currencyCode || input.unitPrice.currency
       }
     ];
 
@@ -149,7 +149,7 @@ export class CachedFinancialCalculations extends FinancialCalculations {
       {
         type: 'field',
         identifier: 'currency_validation',
-        version: amounts[0].currencyCode
+        version: amounts[0].currency
       }
     ];
 
@@ -170,7 +170,7 @@ export class CachedFinancialCalculations extends FinancialCalculations {
       {
         type: 'field',
         identifier: 'currency_rates',
-        version: amount.currencyCode
+        version: amount.currency
       }
     ];
 
@@ -191,7 +191,7 @@ export class CachedFinancialCalculations extends FinancialCalculations {
       {
         type: 'field',
         identifier: 'currency_validation',
-        version: `${amount1.currencyCode}_${amount2.currencyCode}`
+        version: `${amount1.currency}_${amount2.currency}`
       }
     ];
 
@@ -240,12 +240,12 @@ export class CachedFinancialCalculations extends FinancialCalculations {
           serviceClass: 'FinancialCalculations',
           method: 'calculateTax',
           inputs: {
-            subtotal: { amount: 100, currencyCode: currency },
+            subtotal: { amount: 100, currency: currency },
             taxRate,
             taxIncluded: false
           },
           computeFn: () => this.calculateTax({
-            subtotal: { amount: 100, currencyCode: currency },
+            subtotal: { amount: 100, currency: currency },
             taxRate,
             taxIncluded: false
           }),
@@ -261,11 +261,11 @@ export class CachedFinancialCalculations extends FinancialCalculations {
           serviceClass: 'FinancialCalculations',
           method: 'calculateDiscount',
           inputs: {
-            subtotal: { amount: 100, currencyCode: currency },
+            subtotal: { amount: 100, currency: currency },
             discountRate
           },
           computeFn: () => this.calculateDiscount({
-            subtotal: { amount: 100, currencyCode: currency },
+            subtotal: { amount: 100, currency: currency },
             discountRate
           }),
           priority: 2
@@ -281,11 +281,11 @@ export class CachedFinancialCalculations extends FinancialCalculations {
           serviceClass: 'FinancialCalculations',
           method: 'calculatePercentage',
           inputs: {
-            amount: { amount: 100, currencyCode: currency },
+            amount: { amount: 100, currency: currency },
             percentage
           },
           computeFn: () => this.calculatePercentage(
-            { amount: 100, currencyCode: currency },
+            { amount: 100, currency: currency },
             percentage
           ),
           priority: 1

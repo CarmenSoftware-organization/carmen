@@ -5,14 +5,10 @@
  * intelligent cache invalidation and dependency tracking.
  */
 
-import { 
+import {
   VendorMetrics,
   VendorPerformanceInput,
-  VendorPerformanceResult,
-  VendorComparisonInput,
-  VendorComparisonResult,
-  VendorRiskAssessmentInput,
-  VendorRiskAssessmentResult
+  VendorPerformanceResult
 } from '../calculations/vendor-metrics';
 import { CalculationResult } from '../calculations/base-calculator';
 import { EnhancedCacheLayer, CacheDependency } from './enhanced-cache-layer';
@@ -61,195 +57,6 @@ export class CachedVendorMetrics extends VendorMetrics {
     );
   }
 
-  /**
-   * Compare multiple vendors with caching
-   */
-  async compareVendors(input: VendorComparisonInput): Promise<CalculationResult<VendorComparisonResult>> {
-    const dependencies: CacheDependency[] = [
-      {
-        type: 'field',
-        identifier: 'vendor_comparison_criteria',
-        version: JSON.stringify(input.criteria)
-      },
-      {
-        type: 'field',
-        identifier: 'comparison_weights',
-        version: JSON.stringify(input.weights)
-      }
-    ];
-
-    // Add dependencies for each vendor being compared
-    input.vendorPerformances.forEach(performance => {
-      dependencies.push({
-        type: 'entity',
-        identifier: `vendor:${performance.vendorId}`,
-        version: performance.overallRating.toString()
-      });
-    });
-
-    return this.cacheLayer.getOrCompute(
-      'VendorMetrics',
-      'compareVendors',
-      input,
-      () => super.compareVendors(input),
-      dependencies
-    );
-  }
-
-  /**
-   * Assess vendor risk with caching
-   */
-  async assessVendorRisk(input: VendorRiskAssessmentInput): Promise<CalculationResult<VendorRiskAssessmentResult>> {
-    const dependencies: CacheDependency[] = [
-      {
-        type: 'entity',
-        identifier: `vendor:${input.vendorId}`,
-        version: input.financialData ? JSON.stringify(input.financialData) : 'no_financial'
-      },
-      {
-        type: 'entity',
-        identifier: `vendor_orders:${input.vendorId}`,
-        version: input.performanceHistory ? this.hashPerformanceHistory(input.performanceHistory) : 'no_history'
-      },
-      {
-        type: 'field',
-        identifier: 'risk_factors',
-        version: JSON.stringify(input.riskFactors || {})
-      }
-    ];
-
-    return this.cacheLayer.getOrCompute(
-      'VendorMetrics',
-      'assessVendorRisk',
-      input,
-      () => super.assessVendorRisk(input),
-      dependencies
-    );
-  }
-
-  /**
-   * Calculate vendor score with caching
-   */
-  async calculateVendorScore(
-    vendorId: string,
-    metrics: any,
-    weights?: any
-  ): Promise<CalculationResult<number>> {
-    const dependencies: CacheDependency[] = [
-      {
-        type: 'entity',
-        identifier: `vendor:${vendorId}`,
-        version: JSON.stringify(metrics)
-      },
-      {
-        type: 'field',
-        identifier: 'scoring_weights',
-        version: JSON.stringify(weights || {})
-      }
-    ];
-
-    return this.cacheLayer.getOrCompute(
-      'VendorMetrics',
-      'calculateVendorScore',
-      { vendorId, metrics, weights },
-      () => super.calculateVendorScore(vendorId, metrics, weights),
-      dependencies
-    );
-  }
-
-  /**
-   * Calculate vendor reliability score with caching
-   */
-  async calculateReliabilityScore(
-    deliveryPerformance: number,
-    qualityMetrics: any,
-    communicationScore: number
-  ): Promise<CalculationResult<number>> {
-    const dependencies: CacheDependency[] = [
-      {
-        type: 'field',
-        identifier: 'delivery_performance',
-        version: deliveryPerformance.toString()
-      },
-      {
-        type: 'field',
-        identifier: 'quality_metrics',
-        version: JSON.stringify(qualityMetrics)
-      },
-      {
-        type: 'field',
-        identifier: 'communication_score',
-        version: communicationScore.toString()
-      }
-    ];
-
-    return this.cacheLayer.getOrCompute(
-      'VendorMetrics',
-      'calculateReliabilityScore',
-      { deliveryPerformance, qualityMetrics, communicationScore },
-      () => super.calculateReliabilityScore(deliveryPerformance, qualityMetrics, communicationScore),
-      dependencies
-    );
-  }
-
-  /**
-   * Calculate cost competitiveness with caching
-   */
-  async calculateCostCompetitiveness(
-    vendorPrices: Array<{ itemId: string; price: number; currency: string }>,
-    marketPrices: Array<{ itemId: string; avgPrice: number; currency: string }>
-  ): Promise<CalculationResult<number>> {
-    const dependencies: CacheDependency[] = [
-      {
-        type: 'field',
-        identifier: 'vendor_prices',
-        version: JSON.stringify(vendorPrices)
-      },
-      {
-        type: 'field',
-        identifier: 'market_prices',
-        version: JSON.stringify(marketPrices)
-      }
-    ];
-
-    return this.cacheLayer.getOrCompute(
-      'VendorMetrics',
-      'calculateCostCompetitiveness',
-      { vendorPrices, marketPrices },
-      () => super.calculateCostCompetitiveness(vendorPrices, marketPrices),
-      dependencies
-    );
-  }
-
-  /**
-   * Generate vendor recommendations with caching
-   */
-  async generateVendorRecommendations(
-    vendorId: string,
-    performanceData: any,
-    industryBenchmarks: any
-  ): Promise<CalculationResult<string[]>> {
-    const dependencies: CacheDependency[] = [
-      {
-        type: 'entity',
-        identifier: `vendor:${vendorId}`,
-        version: JSON.stringify(performanceData)
-      },
-      {
-        type: 'field',
-        identifier: 'industry_benchmarks',
-        version: JSON.stringify(industryBenchmarks)
-      }
-    ];
-
-    return this.cacheLayer.getOrCompute(
-      'VendorMetrics',
-      'generateVendorRecommendations',
-      { vendorId, performanceData, industryBenchmarks },
-      () => super.generateVendorRecommendations(vendorId, performanceData, industryBenchmarks),
-      dependencies
-    );
-  }
 
   /**
    * Invalidate vendor metric caches
@@ -342,7 +149,7 @@ export class CachedVendorMetrics extends VendorMetrics {
                   priceCompetitiveness: 4.1,
                   paymentTermsScore: 4.0,
                   costStability: 4.2,
-                  totalSpend: { amount: 0, currencyCode: 'USD' }
+                  totalSpend: { amount: 0, currency: 'USD' }
                 },
                 overallRating: 4.3,
                 riskScore: 15.2,

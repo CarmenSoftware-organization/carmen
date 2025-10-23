@@ -4,8 +4,8 @@
  */
 
 import { PrismaClient } from '@prisma/client'
-import { Subject, Resource, Action, Environment } from '@/lib/types/permissions'
-import { User, Role, Department, Location } from '@/lib/types/user'
+import { SubjectAttributes, ResourceAttributes, EnvironmentAttributes } from '@/lib/types/permissions'
+import { User, Role, Department, Location } from '@/lib/types'
 
 const prisma = new PrismaClient()
 
@@ -99,10 +99,10 @@ export class AttributeResolver {
 
     try {
       // Fetch user from database
-      const user = await prisma.abac_users.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: subjectId },
         include: {
-          roles: {
+          roleAssignments: {
             include: {
               role: {
                 include: {
@@ -111,7 +111,7 @@ export class AttributeResolver {
                 }
               }
             },
-            where: { is_active: true }
+            where: { isActive: true }
           }
         }
       })
@@ -121,27 +121,27 @@ export class AttributeResolver {
       }
 
       // Get role hierarchy
-      const roleHierarchy = this.buildRoleHierarchy(user.roles.map(r => r.role))
+      const roleHierarchy = this.buildRoleHierarchy(user.roleAssignments.map((r: any) => r.role))
 
       // Build comprehensive subject attributes
       const attributes = {
         id: user.id,
         name: user.name,
         email: user.email,
-        userData: user.user_data,
-        isActive: user.is_active,
-        createdAt: user.created_at,
-        updatedAt: user.updated_at,
-        
+        userData: user.userData,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+
         // Role information
-        directRoles: user.roles.map(r => ({
+        directRoles: user.roleAssignments.map((r: any) => ({
           id: r.role.id,
           name: r.role.name,
-          displayName: r.role.display_name,
+          displayName: r.role.displayName,
           level: r.role.level,
           path: r.role.path,
           priority: r.role.priority,
-          assignedAt: r.assigned_at
+          assignedAt: r.assignedAt
         })),
         
         // Hierarchical role information
@@ -151,12 +151,12 @@ export class AttributeResolver {
         effectivePermissions: roleHierarchy.effectivePermissions,
         
         // Dynamic attributes from userData
-        ...this.extractDynamicAttributes(user.user_data),
-        
+        ...this.extractDynamicAttributes(user.userData),
+
         // Computed attributes
-        accountAge: user.created_at ? Math.floor((Date.now() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24)) : 0,
+        accountAge: user.createdAt ? Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0,
         hasHighPrivilege: roleHierarchy.maxLevel <= 2, // Assuming lower levels = higher privilege
-        roleCount: user.roles.length
+        roleCount: user.roleAssignments.length
       }
 
       // Cache the result
@@ -187,8 +187,8 @@ export class AttributeResolver {
 
     try {
       // Get resource definition
-      const resourceDefinition = await prisma.abac_resource_definitions.findUnique({
-        where: { resource_type: resourceType }
+      const resourceDefinition = await prisma.resourceDefinition.findUnique({
+        where: { resourceType: resourceType }
       })
 
       if (!resourceDefinition) {
@@ -199,11 +199,11 @@ export class AttributeResolver {
       const attributes = {
         type: resourceType,
         id: resourceId,
-        displayName: resourceDefinition.display_name,
+        displayName: resourceDefinition.displayName,
         description: resourceDefinition.description,
         category: resourceDefinition.category,
         definition: resourceDefinition.definition,
-        isActive: resourceDefinition.is_active,
+        isActive: resourceDefinition.isActive,
         version: resourceDefinition.version,
         
         // Dynamic attributes from definition
@@ -285,8 +285,8 @@ export class AttributeResolver {
 
     try {
       // Get environment definition if available
-      const environmentDefinitions = await prisma.abac_environment_definitions.findMany({
-        where: { is_active: true }
+      const environmentDefinitions = await prisma.environmentDefinition.findMany({
+        where: { isActive: true }
       })
 
       // Build environment attributes
@@ -297,21 +297,21 @@ export class AttributeResolver {
         isWeekend: now.getDay() === 0 || now.getDay() === 6,
         isBusinessHours: this.isBusinessHours(now),
         quarterOfYear: Math.floor(now.getMonth() / 3) + 1,
-        
+
         // Security context
         ipAddress: context?.ipAddress,
         userAgent: context?.userAgent,
         sessionId: context?.sessionId,
         requestId: context?.requestId,
-        
+
         // Application context
         applicationVersion: process.env.APP_VERSION,
         environment: process.env.NODE_ENV,
-        
+
         // Environment definitions
-        availableEnvironments: environmentDefinitions.map(env => ({
+        availableEnvironments: environmentDefinitions.map((env: any) => ({
           name: env.name,
-          displayName: env.display_name,
+          displayName: env.displayName,
           description: env.description,
           definition: env.definition
         })),
@@ -356,10 +356,10 @@ export class AttributeResolver {
       allRoles.add(role.id)
       roleNames.add(role.name)
       maxLevel = Math.min(maxLevel, role.level || 999)
-      
+
       // Add role-specific permissions from roleData
-      if (role.role_data?.permissions) {
-        role.role_data.permissions.forEach((perm: string) => effectivePermissions.add(perm))
+      if (role.roleData?.permissions) {
+        role.roleData.permissions.forEach((perm: string) => effectivePermissions.add(perm))
       }
       
       // Recursively add parent roles

@@ -4,10 +4,18 @@
  */
 
 import { policyEngine, PolicyEngineConfig } from './policy-engine'
-import { Policy, Subject, Resource, Action, Environment, PolicyDecision, Permission } from '@/lib/types/permissions'
+import {
+  Policy,
+  SubjectAttributes,
+  ResourceAttributes,
+  EnvironmentAttributes,
+  AccessDecision,
+  PermissionResult as PermissionType,
+  EffectType
+} from '@/lib/types/permissions'
 import { User, Role, Department, Location } from '@/lib/types/user'
-import { allMockPolicies } from '@/lib/mock-data/permissions'
-import { mockRoles, mockDepartments, mockLocations } from '@/lib/mock-data/users'
+import { allMockPolicies } from '@/lib/mock-data'
+import { mockRoles, mockDepartments, mockLocations } from '@/lib/mock-data'
 
 export interface PermissionCheckRequest {
   userId: string
@@ -26,7 +34,7 @@ export interface PermissionCheckRequest {
 export interface PermissionResult {
   allowed: boolean
   reason: string
-  decision: PolicyDecision
+  decision: AccessDecision
   executionTime: number
 }
 
@@ -81,9 +89,17 @@ export class PermissionService {
           allowed: false,
           reason: 'User not found',
           decision: {
-            decision: 'deny',
+            effect: EffectType.DENY,
             reason: 'User not found',
-            evaluatedPolicies: []
+            obligations: [],
+            advice: [],
+            requestId: `req-${Date.now()}`,
+            evaluatedPolicies: [],
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'permission-service',
+            auditRequired: false
           },
           executionTime: Date.now() - startTime
         }
@@ -107,7 +123,7 @@ export class PermissionService {
       )
 
       return {
-        allowed: decision.decision === 'permit',
+        allowed: decision.effect === 'permit',
         reason: decision.reason,
         decision,
         executionTime: Date.now() - startTime
@@ -117,9 +133,17 @@ export class PermissionService {
         allowed: false,
         reason: `Permission check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         decision: {
-          decision: 'deny',
+          effect: EffectType.DENY,
           reason: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          evaluatedPolicies: []
+          obligations: [],
+          advice: [],
+          requestId: `req-${Date.now()}`,
+          evaluatedPolicies: [],
+          evaluationTime: Date.now() - startTime,
+          cacheHit: false,
+          timestamp: new Date(),
+          evaluatedBy: 'permission-service',
+          auditRequired: false
         },
         executionTime: Date.now() - startTime
       }
@@ -276,13 +300,13 @@ export class PermissionService {
   async getEffectivePermissions(
     userId: string,
     context?: PermissionCheckRequest['context']
-  ): Promise<Permission[]> {
+  ): Promise<PermissionType[]> {
     const user = await this.getUser(userId)
     if (!user) {
       return []
     }
 
-    const effectivePermissions: Permission[] = []
+    const effectivePermissions: PermissionType[] = []
     const possibleResources = this.getPossibleResources()
     
     for (const resourceType of possibleResources) {
@@ -298,14 +322,9 @@ export class PermissionService {
         
         if (result.allowed) {
           effectivePermissions.push({
-            id: `${userId}-${resourceType}-${action}`,
-            subjectId: userId,
-            resourceType,
-            action,
-            effect: 'permit',
-            source: 'policy',
-            grantedAt: new Date(),
-            grantedBy: 'system'
+            allowed: true,
+            reason: 'Permission granted',
+            evaluationTime: result.executionTime
           })
         }
       }
@@ -317,60 +336,151 @@ export class PermissionService {
   /**
    * Build subject from user data
    */
-  private buildSubject(user: User, context?: PermissionCheckRequest['context']): Subject {
-    return {
-      id: user.id,
-      type: 'user',
-      roles: user.roles || [],
-      department: context?.department || user.department || user.context.currentDepartment.code,
-      location: context?.location || user.location || user.context.currentLocation.id,
-      permissions: user.specialPermissions || [],
-      attributes: {
-        primaryRole: user.primaryRole,
-        approvalLimit: user.approvalLimit,
-        clearanceLevel: user.clearanceLevel,
-        accountStatus: user.accountStatus || 'active',
-        lastLogin: user.lastLogin,
-        ...context?.additionalAttributes
+  private buildSubject(user: User, context?: PermissionCheckRequest['context']): SubjectAttributes {
+    // Map user clearance level to permission system clearance level
+    const mapClearanceLevel = (level?: 'basic' | 'confidential' | 'secret' | 'top-secret'): 'public' | 'internal' | 'confidential' | 'restricted' | 'top_secret' => {
+      switch (level) {
+        case 'basic': return 'internal';
+        case 'confidential': return 'confidential';
+        case 'secret': return 'restricted';
+        case 'top-secret': return 'top_secret';
+        default: return 'internal';
       }
+    };
+
+    // Convert Role objects to Permission Role format
+    const convertRoles = (roles: Role[]): import('@/lib/types/permissions').Role[] => {
+      return roles.map(r => ({
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        permissions: r.permissions,
+        hierarchy: r.hierarchy || 0,
+        isSystem: r.isSystem
+      }));
+    };
+
+    const permissionRoles = convertRoles(user.roles);
+    const permissionDepartments = user.departments?.map(d => ({
+      id: d.id,
+      name: d.name,
+      code: d.code,
+      description: d.description,
+      status: d.status,
+      parentDepartment: d.parentDepartment,
+      costCenter: d.costCenter,
+      manager: d.manager,
+      assignedUsers: d.assignedUsers
+    })) || [];
+    const permissionLocations = user.locations?.map(l => ({
+      id: l.id,
+      name: l.name,
+      type: l.type as any,
+      address: l.address,
+      coordinates: l.coordinates ? {
+        latitude: l.coordinates.latitude,
+        longitude: l.coordinates.longitude
+      } : undefined,
+      parentLocation: l.parentLocation
+    })) || [];
+
+    return {
+      userId: user.id,
+      username: user.name,
+      email: user.email,
+      role: {
+        id: user.context.currentRole.id,
+        name: user.context.currentRole.name,
+        description: user.context.currentRole.description,
+        permissions: user.context.currentRole.permissions,
+        hierarchy: user.context.currentRole.hierarchy || 0,
+        isSystem: user.context.currentRole.isSystem
+      },
+      roles: permissionRoles,
+      department: {
+        id: user.context.currentDepartment.id,
+        name: user.context.currentDepartment.name,
+        code: user.context.currentDepartment.code,
+        description: user.context.currentDepartment.description,
+        status: user.context.currentDepartment.status,
+        parentDepartment: user.context.currentDepartment.parentDepartment,
+        costCenter: user.context.currentDepartment.costCenter,
+        manager: user.context.currentDepartment.manager,
+        assignedUsers: user.context.currentDepartment.assignedUsers
+      },
+      departments: permissionDepartments,
+      location: {
+        id: user.context.currentLocation.id,
+        name: user.context.currentLocation.name,
+        type: user.context.currentLocation.type as any,
+        address: user.context.currentLocation.address,
+        coordinates: user.context.currentLocation.coordinates ? {
+          latitude: user.context.currentLocation.coordinates.latitude,
+          longitude: user.context.currentLocation.coordinates.longitude
+        } : undefined,
+        parentLocation: user.context.currentLocation.parentLocation
+      },
+      locations: permissionLocations,
+      employeeType: 'full-time',
+      seniority: 1,
+      clearanceLevel: mapClearanceLevel(user.clearanceLevel),
+      assignedWorkflowStages: user.assignedWorkflowStages || [],
+      delegatedAuthorities: user.delegatedAuthorities || [],
+      specialPermissions: user.specialPermissions || [],
+      accountStatus: user.accountStatus || 'active',
+      onDuty: true,
+      approvalLimit: user.approvalLimit
     }
   }
 
   /**
    * Build resource from resource type and ID
    */
-  private buildResource(resourceType: string, resourceId?: string): Resource {
+  private buildResource(resourceType: string, resourceId?: string): ResourceAttributes {
     return {
-      id: resourceId || resourceType,
-      type: resourceType,
-      category: this.getResourceCategory(resourceType),
-      attributes: resourceId ? { resourceId } : {}
+      resourceId: resourceId || resourceType,
+      resourceType: resourceType,
+      resourceName: resourceType,
+      dataClassification: 'internal',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      requiresAudit: false
     }
   }
 
   /**
    * Build action from action string
    */
-  private buildAction(actionName: string): Action {
-    return {
-      name: actionName,
-      type: this.getActionType(actionName),
-      attributes: {}
-    }
+  private buildAction(actionName: string): string {
+    return actionName
   }
 
   /**
    * Build environment from context
    */
-  private buildEnvironment(context?: PermissionCheckRequest['context']): Environment {
+  private buildEnvironment(context?: PermissionCheckRequest['context']): EnvironmentAttributes {
     const now = new Date()
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     return {
-      timestamp: now,
-      timeOfDay: now.getHours(),
-      dayOfWeek: now.getDay(),
-      ipAddress: context?.ipAddress,
-      userAgent: context?.userAgent,
-      attributes: {}
+      currentTime: now,
+      dayOfWeek: days[now.getDay()],
+      isBusinessHours: now.getHours() >= 8 && now.getHours() < 18,
+      isHoliday: false,
+      timeZone: 'UTC',
+      requestIP: context?.ipAddress || '0.0.0.0',
+      isInternalNetwork: true,
+      deviceType: 'desktop',
+      sessionId: `session-${Date.now()}`,
+      authenticationMethod: 'password',
+      sessionAge: 0,
+      systemLoad: 'normal',
+      maintenanceMode: false,
+      emergencyMode: false,
+      systemVersion: '1.0.0',
+      threatLevel: 'low',
+      auditMode: false,
+      requestSource: 'ui',
+      batchOperation: false
     }
   }
 
@@ -480,11 +590,13 @@ export class PermissionService {
       availableRoles: mockRoles,
       availableDepartments: mockDepartments,
       availableLocations: mockLocations,
-      roles: ['staff'],
-      primaryRole: 'staff',
-      role: 'staff',
-      department: 'kitchen',
-      location: 'main-location',
+      roles: mockRoles,
+      primaryRole: mockRoles[0],
+      departments: mockDepartments,
+      locations: mockLocations,
+      role: mockRoles[0].id,
+      department: mockDepartments[0].id,
+      location: mockLocations[0].id,
       context: {
         currentRole: mockRoles[0],
         currentDepartment: mockDepartments[0],
@@ -493,7 +605,7 @@ export class PermissionService {
       },
       accountStatus: 'active'
     }
-    
+
     return mockUser
   }
 

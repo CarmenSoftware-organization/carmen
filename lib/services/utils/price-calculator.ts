@@ -170,7 +170,7 @@ export class PriceCalculator extends BaseCalculator {
       // Calculate base subtotal
       const baseSubtotal = this.createMoney(
         basePrice.amount * quantity,
-        basePrice.currencyCode
+        basePrice.currency
       );
 
       // Apply bulk discounts
@@ -191,7 +191,7 @@ export class PriceCalculator extends BaseCalculator {
 
       // Combine all discounts
       const allDiscounts: AppliedDiscount[] = [];
-      let totalDiscountAmount = this.createMoney(0, basePrice.currencyCode);
+      let totalDiscountAmount = this.createMoney(0, basePrice.currency);
 
       if (bulkDiscountResult) {
         allDiscounts.push(...bulkDiscountResult.value.discountsApplied);
@@ -209,20 +209,20 @@ export class PriceCalculator extends BaseCalculator {
         );
         totalDiscountAmount = await this.addMoney([
           totalDiscountAmount,
-          this.createMoney(promoDiscount, basePrice.currencyCode)
+          this.createMoney(promoDiscount, basePrice.currency)
         ]);
       }
 
       // Calculate net amount after discounts
       const netAmount = this.createMoney(
         baseSubtotal.amount - totalDiscountAmount.amount,
-        basePrice.currencyCode
+        basePrice.currency
       );
 
       // Calculate effective unit price
       const effectiveUnitPrice = this.createMoney(
         netAmount.amount / quantity,
-        basePrice.currencyCode
+        basePrice.currency
       );
 
       // Calculate tax if applicable
@@ -234,7 +234,7 @@ export class PriceCalculator extends BaseCalculator {
           subtotal: netAmount,
           taxRate,
           taxIncluded: includesTax,
-          currencyCode: basePrice.currencyCode
+          currencyCode: basePrice.currency
         });
         taxAmount = taxResult.value.taxAmount;
         totalAmount = taxResult.value.totalAmount;
@@ -294,7 +294,7 @@ export class PriceCalculator extends BaseCalculator {
           discountsApplied.push({
             type: 'bulk',
             ruleName: `Bulk Discount - ${applicableTier.minQuantity}+ units`,
-            discountAmount: this.createMoney(discountAmount, basePrice.currencyCode),
+            discountAmount: this.createMoney(discountAmount, basePrice.currency),
             discountPercentage: applicableTier.discountPercentage,
             quantityAffected: quantity,
             description: applicableTier.description || `${applicableTier.discountPercentage}% off for ${applicableTier.minQuantity}+ units`
@@ -319,7 +319,7 @@ export class PriceCalculator extends BaseCalculator {
               discountsApplied.push({
                 type: 'bulk',
                 ruleName: `Bulk Tier - ${tier.minQuantity}+ units`,
-                discountAmount: this.createMoney(discountAmount, basePrice.currencyCode),
+                discountAmount: this.createMoney(discountAmount, basePrice.currency),
                 discountPercentage: tier.discountPercentage,
                 quantityAffected: quantityAtThisTier,
                 description: tier.description || `${tier.discountPercentage}% off for quantities ${tier.minQuantity}+`
@@ -333,12 +333,12 @@ export class PriceCalculator extends BaseCalculator {
 
       const effectivePrice = this.createMoney(
         basePrice.amount - (totalDiscountAmount / quantity),
-        basePrice.currencyCode
+        basePrice.currency
       );
 
       return {
         discountsApplied,
-        totalDiscountAmount: this.createMoney(totalDiscountAmount, basePrice.currencyCode),
+        totalDiscountAmount: this.createMoney(totalDiscountAmount, basePrice.currency),
         effectivePrice
       };
     });
@@ -462,7 +462,7 @@ export class PriceCalculator extends BaseCalculator {
       type: 'promotional',
       ruleId: rule.id,
       ruleName: rule.name,
-      discountAmount: this.createMoney(discountAmount, basePrice.currencyCode),
+      discountAmount: this.createMoney(discountAmount, basePrice.currency),
       discountPercentage: this.safeDivide(discountAmount * 100, basePrice.amount * quantity, 0),
       quantityAffected,
       description: `Promotional discount: ${rule.name}`
