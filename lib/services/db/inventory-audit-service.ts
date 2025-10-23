@@ -6,13 +6,13 @@
  */
 
 import { prisma, type PrismaClient } from '@/lib/db'
-import type { 
+import type {
   InventoryTransaction,
-  TransactionType,
   PhysicalCount,
   InventoryAdjustment,
   StockMovement
 } from '@/lib/types/inventory'
+import { TransactionType } from '@/lib/types/inventory'
 import type { Money } from '@/lib/types/common'
 
 /**
@@ -161,9 +161,9 @@ export interface PaginationOptions {
 }
 
 export class InventoryAuditService {
-  private db: PrismaClient
+  private db: any
 
-  constructor(prismaClient?: PrismaClient) {
+  constructor(prismaClient?: any) {
     this.db = prismaClient || prisma
   }
 
@@ -221,7 +221,7 @@ export class InventoryAuditService {
           timestamp: new Date('2024-01-15T10:30:00Z'),
           changes: {
             quantity: { oldValue: 0, newValue: 100 },
-            stockValue: { oldValue: { amount: 0, currencyCode: 'USD' }, newValue: { amount: 2500, currencyCode: 'USD' } }
+            stockValue: { oldValue: { amount: 0, currency: 'USD' }, newValue: { amount: 2500, currency: 'USD' } }
           },
           metadata: {
             itemId: 'item-001',
@@ -230,7 +230,7 @@ export class InventoryAuditService {
             locationName: 'Main Warehouse',
             transactionType: TransactionType.RECEIVE,
             quantity: 100,
-            value: { amount: 2500, currencyCode: 'USD' },
+            value: { amount: 2500, currency: 'USD' },
             referenceNo: 'PO-2024-001',
             ipAddress: '192.168.1.100'
           },
@@ -256,7 +256,7 @@ export class InventoryAuditService {
             locationName: 'Main Warehouse',
             transactionType: TransactionType.ADJUST_DOWN,
             quantity: 5,
-            value: { amount: 125, currencyCode: 'USD' },
+            value: { amount: 125, currency: 'USD' },
             referenceNo: 'ADJ-2024-001'
           },
           description: 'Stock adjustment due to physical count variance',
@@ -343,7 +343,7 @@ export class InventoryAuditService {
         generatedBy,
         summary: {
           totalTransactions: 1250,
-          totalValue: { amount: 875000.00, currencyCode: 'USD' },
+          totalValue: { amount: 875000.00, currency: 'USD' },
           itemsTracked: 450,
           locationsTracked: 15,
           discrepanciesFound: 8,
@@ -352,7 +352,7 @@ export class InventoryAuditService {
         },
         sections: {
           inventoryValuation: {
-            totalValue: { amount: 875000.00, currencyCode: 'USD' },
+            totalValue: { amount: 875000.00, currency: 'USD' },
             valuationMethod: 'WEIGHTED_AVERAGE',
             lastValuationDate: new Date(),
             discrepancies: []
@@ -367,7 +367,7 @@ export class InventoryAuditService {
           physicalCounts: {
             countsPerformed: 4,
             accuracyRate: 97.2,
-            varianceValue: { amount: 1250.00, currencyCode: 'USD' },
+            varianceValue: { amount: 1250.00, currency: 'USD' },
             pendingReconciliations: []
           },
           auditTrail: {

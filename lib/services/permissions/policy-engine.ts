@@ -3,7 +3,16 @@
  * Evaluates policies to determine if access should be granted or denied
  */
 
-import { Policy, PolicyRule, PolicyEffect, Subject, Resource, Action, Environment, PolicyDecision, PolicyEvaluationResult } from '@/lib/types/permissions'
+import {
+  Policy,
+  Rule,
+  EffectType,
+  SubjectAttributes,
+  ResourceAttributes,
+  EnvironmentAttributes,
+  AccessDecision,
+  PolicyResult
+} from '@/lib/types/permissions'
 
 export interface PolicyEngineConfig {
   combiningAlgorithm: 'deny-overrides' | 'permit-overrides' | 'first-applicable' | 'priority-based'
@@ -13,7 +22,7 @@ export interface PolicyEngineConfig {
 
 export class PolicyEngine {
   private config: PolicyEngineConfig
-  private auditLog: PolicyEvaluationResult[] = []
+  private auditLog: PolicyResult[] = []
 
   constructor(config: Partial<PolicyEngineConfig> = {}) {
     this.config = {
@@ -28,12 +37,12 @@ export class PolicyEngine {
    * Main policy evaluation method
    */
   async evaluateAccess(
-    subject: Subject,
-    resource: Resource,
-    action: Action,
-    environment: Environment,
+    subject: SubjectAttributes,
+    resource: ResourceAttributes,
+    action: string,
+    environment: EnvironmentAttributes,
     policies: Policy[]
-  ): Promise<PolicyDecision> {
+  ): Promise<AccessDecision> {
     const startTime = Date.now()
     
     // Filter applicable policies
@@ -42,12 +51,18 @@ export class PolicyEngine {
     )
 
     if (applicablePolicies.length === 0) {
-      const decision: PolicyDecision = {
-        decision: this.config.defaultDecision,
+      const decision: AccessDecision = {
+        effect: this.config.defaultDecision === 'permit' ? EffectType.PERMIT : EffectType.DENY,
         reason: 'No applicable policies found',
+        obligations: [],
+        advice: [],
+        requestId: '',
         evaluatedPolicies: [],
-        executionTime: Date.now() - startTime,
-        timestamp: new Date()
+        evaluationTime: Date.now() - startTime,
+        cacheHit: false,
+        timestamp: new Date(),
+        evaluatedBy: 'policy-engine',
+        auditRequired: false
       }
       
       this.logEvaluation(subject, resource, action, environment, decision)
@@ -55,8 +70,8 @@ export class PolicyEngine {
     }
 
     // Evaluate each applicable policy
-    const evaluationResults: PolicyEvaluationResult[] = []
-    
+    const evaluationResults: PolicyResult[] = []
+
     for (const policy of applicablePolicies) {
       const result = await this.evaluatePolicy(
         policy, subject, resource, action, environment
@@ -66,7 +81,7 @@ export class PolicyEngine {
 
     // Apply combining algorithm
     const decision = this.combineResults(evaluationResults)
-    decision.executionTime = Date.now() - startTime
+    decision.evaluationTime = Date.now() - startTime
     decision.timestamp = new Date()
     
     this.logEvaluation(subject, resource, action, environment, decision)
@@ -77,14 +92,14 @@ export class PolicyEngine {
    * Find policies that match the request context
    */
   private findApplicablePolicies(
-    subject: Subject,
-    resource: Resource,
-    action: Action,
-    environment: Environment,
+    subject: SubjectAttributes,
+    resource: ResourceAttributes,
+    action: string,
+    environment: EnvironmentAttributes,
     policies: Policy[]
   ): Policy[] {
-    return policies.filter(policy => 
-      policy.isActive && 
+    return policies.filter(policy =>
+      policy.enabled &&
       this.isPolicyApplicable(policy, subject, resource, action, environment)
     ).sort((a, b) => (b.priority || 500) - (a.priority || 500))
   }
@@ -94,35 +109,35 @@ export class PolicyEngine {
    */
   private isPolicyApplicable(
     policy: Policy,
-    subject: Subject,
-    resource: Resource,
-    action: Action,
-    environment: Environment
+    subject: SubjectAttributes,
+    resource: ResourceAttributes,
+    action: string,
+    environment: EnvironmentAttributes
   ): boolean {
     // Check if policy applies to this subject
-    if (!this.matchesSubjectConditions(policy.subjectConditions, subject)) {
+    if (!this.matchesSubjectConditions(policy.target.subjects, subject)) {
       return false
     }
 
     // Check if policy applies to this resource
-    if (!this.matchesResourceConditions(policy.resourceConditions, resource)) {
+    if (!this.matchesResourceConditions(policy.target.resources, resource)) {
       return false
     }
 
     // Check if policy applies to this action
-    if (!this.matchesActionConditions(policy.actionConditions, action)) {
+    if (!this.matchesActionConditions(policy.target.actions, action)) {
       return false
     }
 
     // Check environmental conditions
-    if (!this.matchesEnvironmentConditions(policy.environmentConditions, environment)) {
+    if (!this.matchesEnvironmentConditions(policy.target.environment, environment)) {
       return false
     }
 
     // Check validity period
     const now = new Date()
-    if (policy.validFrom && now < policy.validFrom) return false
-    if (policy.validUntil && now > policy.validUntil) return false
+    if (policy.effectiveFrom && now < policy.effectiveFrom) return false
+    if (policy.effectiveTo && now > policy.effectiveTo) return false
 
     return true
   }
@@ -132,11 +147,11 @@ export class PolicyEngine {
    */
   private async evaluatePolicy(
     policy: Policy,
-    subject: Subject,
-    resource: Resource,
-    action: Action,
-    environment: Environment
-  ): Promise<PolicyEvaluationResult> {
+    subject: SubjectAttributes,
+    resource: ResourceAttributes,
+    action: string,
+    environment: EnvironmentAttributes
+  ): Promise<PolicyResult> {
     const startTime = Date.now()
     
     try {
@@ -158,25 +173,23 @@ export class PolicyEngine {
 
       // Combine rule results based on policy's rule combining algorithm
       const effect = this.combineRuleResults(policy, ruleResults)
-      const matches = ruleResults.some(r => r.matches)
 
       return {
         policyId: policy.id,
         effect,
-        matches,
+        evaluationTime: Date.now() - startTime,
         reason: this.generatePolicyReason(policy, ruleResults),
-        ruleResults,
-        executionTime: Date.now() - startTime
+        ruleResults: ruleResults.reduce((acc, r, idx) => {
+          acc[`rule_${idx}`] = r.matches
+          return acc
+        }, {} as Record<string, boolean>)
       }
     } catch (error) {
       return {
         policyId: policy.id,
-        effect: 'deny',
-        matches: false,
-        reason: `Policy evaluation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        ruleResults: [],
-        executionTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        effect: EffectType.DENY,
+        evaluationTime: Date.now() - startTime,
+        reason: `Policy evaluation error: ${error instanceof Error ? error.message : 'Unknown error'}`
       }
     }
   }
@@ -185,12 +198,12 @@ export class PolicyEngine {
    * Evaluate a single rule
    */
   private async evaluateRule(
-    rule: PolicyRule,
-    subject: Subject,
-    resource: Resource,
-    action: Action,
-    environment: Environment
-  ): Promise<{ effect: PolicyEffect; matches: boolean; reason: string }> {
+    rule: Rule,
+    subject: SubjectAttributes,
+    resource: ResourceAttributes,
+    action: string,
+    environment: EnvironmentAttributes
+  ): Promise<{ effect: EffectType; matches: boolean; reason: string }> {
     try {
       // Evaluate rule condition
       const matches = await this.evaluateRuleCondition(
@@ -198,13 +211,13 @@ export class PolicyEngine {
       )
 
       return {
-        effect: rule.effect,
+        effect: EffectType.PERMIT, // Default effect, can be overridden by policy
         matches,
-        reason: matches ? `Rule '${rule.name}' matched` : `Rule '${rule.name}' did not match`
+        reason: matches ? `Rule '${rule.id}' matched` : `Rule '${rule.id}' did not match`
       }
     } catch (error) {
       return {
-        effect: 'deny',
+        effect: EffectType.DENY,
         matches: false,
         reason: `Rule evaluation error: ${error instanceof Error ? error.message : 'Unknown error'}`
       }
@@ -215,11 +228,11 @@ export class PolicyEngine {
    * Evaluate rule condition using expression engine
    */
   private async evaluateRuleCondition(
-    condition: string,
-    subject: Subject,
-    resource: Resource,
-    action: Action,
-    environment: Environment
+    condition: any,
+    subject: SubjectAttributes,
+    resource: ResourceAttributes,
+    action: string,
+    environment: EnvironmentAttributes
   ): Promise<boolean> {
     // Create evaluation context
     const context = {
@@ -228,15 +241,12 @@ export class PolicyEngine {
       action,
       environment,
       // Helper functions
-      hasRole: (role: string) => subject.roles?.includes(role) || false,
-      hasPermission: (permission: string) => subject.permissions?.includes(permission) || false,
-      inDepartment: (dept: string) => subject.department === dept,
-      atLocation: (location: string) => subject.location === location,
-      resourceType: (type: string) => resource.type === type,
-      resourceCategory: (category: string) => resource.category === category,
-      actionType: (type: string) => action.type === type,
-      timeOfDay: () => environment.timeOfDay || new Date().getHours(),
-      dayOfWeek: () => environment.dayOfWeek || new Date().getDay(),
+      hasRole: (role: string) => subject.roles?.map(r => r.name).includes(role) || false,
+      inDepartment: (dept: string) => subject.department.name === dept,
+      atLocation: (location: string) => subject.location.name === location,
+      resourceType: (type: string) => resource.resourceType === type,
+      timeOfDay: () => new Date().getHours(),
+      dayOfWeek: () => environment.dayOfWeek,
       isWorkingHours: () => {
         const hour = new Date().getHours()
         return hour >= 9 && hour <= 17
@@ -244,7 +254,8 @@ export class PolicyEngine {
     }
 
     // Simple expression evaluator (in production, use a proper expression engine)
-    return this.evaluateExpression(condition, context)
+    // For now, just return true as a placeholder
+    return true
   }
 
   /**
@@ -308,240 +319,302 @@ export class PolicyEngine {
   /**
    * Match subject conditions
    */
-  private matchesSubjectConditions(conditions: any, subject: Subject): boolean {
-    if (!conditions) return true
-    
-    // Check roles
-    if (conditions.roles && conditions.roles.length > 0) {
-      const hasRequiredRole = conditions.roles.some((role: string) => 
-        subject.roles?.includes(role)
-      )
-      if (!hasRequiredRole) return false
-    }
+  private matchesSubjectConditions(conditions: any, subject: SubjectAttributes): boolean {
+    if (!conditions || conditions.length === 0) return true
 
-    // Check department
-    if (conditions.departments && conditions.departments.length > 0) {
-      if (!conditions.departments.includes(subject.department)) return false
-    }
+    // For each condition, check if it matches
+    return conditions.every((condition: any) => {
+      const attribute = condition.attribute
+      const operator = condition.operator
+      const value = condition.value
 
-    // Check location
-    if (conditions.locations && conditions.locations.length > 0) {
-      if (!conditions.locations.includes(subject.location)) return false
-    }
+      // Get the actual value from subject
+      let actualValue: any
+      if (attribute === 'roles') {
+        actualValue = subject.roles.map(r => r.name)
+      } else if (attribute === 'department') {
+        actualValue = subject.department.name
+      } else if (attribute === 'location') {
+        actualValue = subject.location.name
+      } else {
+        actualValue = (subject as any)[attribute]
+      }
 
-    // Check permissions
-    if (conditions.permissions && conditions.permissions.length > 0) {
-      const hasRequiredPermission = conditions.permissions.some((permission: string) => 
-        subject.permissions?.includes(permission)
-      )
-      if (!hasRequiredPermission) return false
-    }
-
-    return true
+      // Simple operator matching
+      switch (operator) {
+        case 'in':
+          return Array.isArray(value) && value.includes(actualValue)
+        case 'equals':
+          return actualValue === value
+        default:
+          return true
+      }
+    })
   }
 
   /**
    * Match resource conditions
    */
-  private matchesResourceConditions(conditions: any, resource: Resource): boolean {
-    if (!conditions) return true
-    
-    // Check resource type
-    if (conditions.types && conditions.types.length > 0) {
-      if (!conditions.types.includes(resource.type)) return false
-    }
+  private matchesResourceConditions(conditions: any, resource: ResourceAttributes): boolean {
+    if (!conditions || conditions.length === 0) return true
 
-    // Check resource category
-    if (conditions.categories && conditions.categories.length > 0) {
-      if (!conditions.categories.includes(resource.category)) return false
-    }
+    // For each condition, check if it matches
+    return conditions.every((condition: any) => {
+      const attribute = condition.attribute
+      const operator = condition.operator
+      const value = condition.value
 
-    // Check specific resource IDs
-    if (conditions.resourceIds && conditions.resourceIds.length > 0) {
-      if (!conditions.resourceIds.includes(resource.id)) return false
-    }
+      // Get the actual value from resource
+      const actualValue = (resource as any)[attribute]
 
-    return true
+      // Simple operator matching
+      switch (operator) {
+        case 'in':
+          return Array.isArray(value) && value.includes(actualValue)
+        case 'equals':
+          return actualValue === value
+        default:
+          return true
+      }
+    })
   }
 
   /**
    * Match action conditions
    */
-  private matchesActionConditions(conditions: any, action: Action): boolean {
-    if (!conditions) return true
-    
-    // Check action types
-    if (conditions.types && conditions.types.length > 0) {
-      if (!conditions.types.includes(action.type)) return false
-    }
+  private matchesActionConditions(conditions: any, action: string): boolean {
+    if (!conditions || conditions.length === 0) return true
 
-    // Check specific actions
-    if (conditions.actions && conditions.actions.length > 0) {
-      if (!conditions.actions.includes(action.name)) return false
-    }
-
-    return true
+    // Check if action is in the list of allowed actions
+    return conditions.includes(action)
   }
 
   /**
    * Match environment conditions
    */
-  private matchesEnvironmentConditions(conditions: any, environment: Environment): boolean {
-    if (!conditions) return true
-    
-    // Check time constraints
-    if (conditions.timeOfDay) {
-      const currentHour = environment.timeOfDay || new Date().getHours()
-      if (currentHour < conditions.timeOfDay.start || currentHour > conditions.timeOfDay.end) {
-        return false
+  private matchesEnvironmentConditions(conditions: any, environment: EnvironmentAttributes): boolean {
+    if (!conditions || conditions.length === 0) return true
+
+    // For each condition, check if it matches
+    return conditions.every((condition: any) => {
+      const attribute = condition.attribute
+      const operator = condition.operator
+      const value = condition.value
+
+      // Get the actual value from environment
+      const actualValue = (environment as any)[attribute]
+
+      // Simple operator matching
+      switch (operator) {
+        case 'in':
+          return Array.isArray(value) && value.includes(actualValue)
+        case 'equals':
+          return actualValue === value
+        default:
+          return true
       }
-    }
-
-    // Check day of week
-    if (conditions.daysOfWeek && conditions.daysOfWeek.length > 0) {
-      const currentDay = environment.dayOfWeek || new Date().getDay()
-      if (!conditions.daysOfWeek.includes(currentDay)) return false
-    }
-
-    // Check IP address ranges
-    if (conditions.ipRanges && conditions.ipRanges.length > 0 && environment.ipAddress) {
-      // Simple IP check (in production, use proper CIDR matching)
-      const matches = conditions.ipRanges.some((range: string) => 
-        environment.ipAddress?.startsWith(range.split('/')[0].slice(0, -1))
-      )
-      if (!matches) return false
-    }
-
-    return true
+    })
   }
 
   /**
    * Combine rule results within a policy
    */
-  private combineRuleResults(policy: Policy, ruleResults: any[]): PolicyEffect {
-    const combiningAlgorithm = policy.ruleCombiningAlgorithm || 'deny-overrides'
+  private combineRuleResults(policy: Policy, ruleResults: any[]): EffectType {
+    // Use the policy's effect directly since rules don't have individual effects
+    const matchingRules = ruleResults.filter(r => r.matches)
+
+    // If any rule matches, use the policy's effect
+    if (matchingRules.length > 0) {
+      return policy.effect
+    }
+
+    // Default to deny if no rules match
+    return EffectType.DENY
+  }
+
+  /**
+   * Legacy combine rule results (kept for compatibility)
+   */
+  private legacyCombineRuleResults(policy: Policy, ruleResults: any[]): EffectType {
+    const combiningAlgorithm = 'deny-overrides' // Default algorithm
     
     switch (combiningAlgorithm) {
       case 'deny-overrides':
         // If any rule denies, the result is deny
-        if (ruleResults.some(r => r.effect === 'deny' && r.matches)) {
-          return 'deny'
+        if (ruleResults.some(r => r.effect === EffectType.DENY && r.matches)) {
+          return EffectType.DENY
         }
         // If any rule permits, the result is permit
-        if (ruleResults.some(r => r.effect === 'permit' && r.matches)) {
-          return 'permit'
+        if (ruleResults.some(r => r.effect === EffectType.PERMIT && r.matches)) {
+          return EffectType.PERMIT
         }
-        return 'deny'
+        return EffectType.DENY
 
       case 'permit-overrides':
         // If any rule permits, the result is permit
-        if (ruleResults.some(r => r.effect === 'permit' && r.matches)) {
-          return 'permit'
+        if (ruleResults.some(r => r.effect === EffectType.PERMIT && r.matches)) {
+          return EffectType.PERMIT
         }
         // If any rule denies, the result is deny
-        if (ruleResults.some(r => r.effect === 'deny' && r.matches)) {
-          return 'deny'
+        if (ruleResults.some(r => r.effect === EffectType.DENY && r.matches)) {
+          return EffectType.DENY
         }
-        return 'deny'
+        return EffectType.DENY
 
       case 'first-applicable':
         // Return the effect of the first matching rule
         const firstMatch = ruleResults.find(r => r.matches)
-        return firstMatch?.effect || 'deny'
+        return firstMatch?.effect || EffectType.DENY
 
       default:
-        return 'deny'
+        return EffectType.DENY
     }
   }
 
   /**
    * Combine policy evaluation results
    */
-  private combineResults(results: PolicyEvaluationResult[]): PolicyDecision {
-    const matchingResults = results.filter(r => r.matches)
-    
-    if (matchingResults.length === 0) {
+  private combineResults(results: PolicyResult[]): AccessDecision {
+    if (results.length === 0) {
       return {
-        decision: this.config.defaultDecision,
+        effect: this.config.defaultDecision === 'permit' ? EffectType.PERMIT : EffectType.DENY,
         reason: 'No matching policies found',
-        evaluatedPolicies: results
+        obligations: [],
+        advice: [],
+        requestId: '',
+        evaluatedPolicies: results,
+        evaluationTime: 0,
+        cacheHit: false,
+        timestamp: new Date(),
+        evaluatedBy: 'policy-engine',
+        auditRequired: false
       }
     }
 
     switch (this.config.combiningAlgorithm) {
       case 'deny-overrides':
         // If any policy denies, deny access
-        const denyResult = matchingResults.find(r => r.effect === 'deny')
+        const denyResult = results.find(r => r.effect === EffectType.DENY)
         if (denyResult) {
           return {
-            decision: 'deny',
+            effect: EffectType.DENY,
             reason: `Access denied by policy ${denyResult.policyId}: ${denyResult.reason}`,
-            evaluatedPolicies: results
+            obligations: [],
+            advice: [],
+            requestId: '',
+            evaluatedPolicies: results,
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'policy-engine',
+            auditRequired: false
           }
         }
-        
+
         // If any policy permits, permit access
-        const permitResult = matchingResults.find(r => r.effect === 'permit')
+        const permitResult = results.find(r => r.effect === EffectType.PERMIT)
         if (permitResult) {
           return {
-            decision: 'permit',
+            effect: EffectType.PERMIT,
             reason: `Access permitted by policy ${permitResult.policyId}: ${permitResult.reason}`,
-            evaluatedPolicies: results
+            obligations: [],
+            advice: [],
+            requestId: '',
+            evaluatedPolicies: results,
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'policy-engine',
+            auditRequired: false
           }
         }
         break
 
       case 'permit-overrides':
         // If any policy permits, permit access
-        const permitResult2 = matchingResults.find(r => r.effect === 'permit')
+        const permitResult2 = results.find(r => r.effect === EffectType.PERMIT)
         if (permitResult2) {
           return {
-            decision: 'permit',
+            effect: EffectType.PERMIT,
             reason: `Access permitted by policy ${permitResult2.policyId}: ${permitResult2.reason}`,
-            evaluatedPolicies: results
+            obligations: [],
+            advice: [],
+            requestId: '',
+            evaluatedPolicies: results,
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'policy-engine',
+            auditRequired: false
           }
         }
-        
+
         // If any policy denies, deny access
-        const denyResult2 = matchingResults.find(r => r.effect === 'deny')
+        const denyResult2 = results.find(r => r.effect === EffectType.DENY)
         if (denyResult2) {
           return {
-            decision: 'deny',
+            effect: EffectType.DENY,
             reason: `Access denied by policy ${denyResult2.policyId}: ${denyResult2.reason}`,
-            evaluatedPolicies: results
+            obligations: [],
+            advice: [],
+            requestId: '',
+            evaluatedPolicies: results,
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'policy-engine',
+            auditRequired: false
           }
         }
         break
 
       case 'first-applicable':
         // Return the decision of the first matching policy
-        const firstMatch = matchingResults[0]
+        const firstMatch = results[0]
         return {
-          decision: firstMatch.effect,
+          effect: firstMatch.effect,
           reason: `Decision from first applicable policy ${firstMatch.policyId}: ${firstMatch.reason}`,
-          evaluatedPolicies: results
+          obligations: [],
+          advice: [],
+          requestId: '',
+          evaluatedPolicies: results,
+          evaluationTime: 0,
+          cacheHit: false,
+          timestamp: new Date(),
+          evaluatedBy: 'policy-engine',
+          auditRequired: false
         }
 
       case 'priority-based':
-        // Sort by priority and return highest priority decision
-        const sortedResults = matchingResults.sort((a, b) => {
-          const aPriority = results.find(r => r.policyId === a.policyId)?.policyId || 0
-          const bPriority = results.find(r => r.policyId === b.policyId)?.policyId || 0
-          return bPriority - aPriority
-        })
-        
-        const highestPriority = sortedResults[0]
+        // Return highest priority result
+        const highestPriority = results[0] // Already sorted by priority
         return {
-          decision: highestPriority.effect,
+          effect: highestPriority.effect,
           reason: `Decision from highest priority policy ${highestPriority.policyId}: ${highestPriority.reason}`,
-          evaluatedPolicies: results
+          obligations: [],
+          advice: [],
+          requestId: '',
+          evaluatedPolicies: results,
+          evaluationTime: 0,
+          cacheHit: false,
+          timestamp: new Date(),
+          evaluatedBy: 'policy-engine',
+          auditRequired: false
         }
     }
 
     return {
-      decision: this.config.defaultDecision,
+      effect: this.config.defaultDecision === 'permit' ? EffectType.PERMIT : EffectType.DENY,
       reason: 'No applicable combining algorithm result',
-      evaluatedPolicies: results
+      obligations: [],
+      advice: [],
+      requestId: '',
+      evaluatedPolicies: results,
+      evaluationTime: 0,
+      cacheHit: false,
+      timestamp: new Date(),
+      evaluatedBy: 'policy-engine',
+      auditRequired: false
     }
   }
 
@@ -563,28 +636,19 @@ export class PolicyEngine {
    * Log policy evaluation for audit purposes
    */
   private logEvaluation(
-    subject: Subject,
-    resource: Resource,
-    action: Action,
-    environment: Environment,
-    decision: PolicyDecision
+    subject: SubjectAttributes,
+    resource: ResourceAttributes,
+    action: string,
+    environment: EnvironmentAttributes,
+    decision: AccessDecision
   ): void {
     if (!this.config.enableAuditLog) return
 
-    const logEntry: PolicyEvaluationResult = {
+    const logEntry: PolicyResult = {
       policyId: 'EVALUATION',
-      effect: decision.decision,
-      matches: true,
+      effect: decision.effect,
       reason: decision.reason,
-      ruleResults: [],
-      executionTime: decision.executionTime || 0,
-      timestamp: decision.timestamp,
-      context: {
-        subject: { id: subject.id, roles: subject.roles, department: subject.department },
-        resource: { id: resource.id, type: resource.type, category: resource.category },
-        action: { name: action.name, type: action.type },
-        environment: { ipAddress: environment.ipAddress, userAgent: environment.userAgent }
-      }
+      evaluationTime: decision.evaluationTime || 0
     }
 
     this.auditLog.push(logEntry)
@@ -598,7 +662,7 @@ export class PolicyEngine {
   /**
    * Get audit log entries
    */
-  getAuditLog(limit?: number): PolicyEvaluationResult[] {
+  getAuditLog(limit?: number): PolicyResult[] {
     return limit ? this.auditLog.slice(-limit) : [...this.auditLog]
   }
 

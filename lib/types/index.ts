@@ -1,68 +1,174 @@
 /**
  * Centralized Type Definitions - Main Barrel Export File
- * 
+ *
  * This file serves as the single source of truth for all TypeScript interfaces
  * and types used throughout the Carmen ERP application.
- * 
+ *
  * Import usage:
  * import { User, Vendor, PurchaseRequest, DocumentStatus } from '@/lib/types'
  */
 
-// Common shared types
+// =============================================================================
+// CORE TYPES (Primary Sources - Export First)
+// =============================================================================
+
+// Common shared types (PRIMARY SOURCE for: Money, FileAttachment, ApiResponse, SortConfig)
 export * from './common'
-// Explicit re-exports for commonly used enums and types to ensure proper resolution
-export { DocumentStatus, WorkflowStatus } from './common'
 
 // User and authentication types
-export * from './user'
+// NOTE: Exclude Money export from user.ts (already exported from common.ts)
+export type {
+  User,
+  Role,
+  Permission,
+  Department,
+  Location,
+  UserRole,
+  DepartmentType
+} from './user'
 
 // Inventory management types
-export * from './inventory'
+// NOTE: Exclude InventoryAlert (defined in fractional-inventory.ts)
+export type {
+  InventoryItem,
+  InventoryTransaction,
+  TransactionType
+} from './inventory'
 
 // Procurement types
-export * from './procurement'
-// Explicit re-exports for procurement enums and interfaces
-export { PRType, WorkflowStage } from './procurement'
-export type { Requestor } from './procurement'
+// NOTE: Exclude CostCenter (from finance), CreditNote/CreditNoteItem (from credit-note)
+export type {
+  PurchaseRequest,
+  PurchaseRequestItem,
+  PurchaseOrder,
+  PurchaseOrderItem,
+  PurchaseOrderTerms,
+  GoodsReceiveNote,
+  GRNItemStatus,
+  PRType,
+  WorkflowStage,
+  Requestor
+} from './procurement'
+
+// Vendor management types (PRIMARY SOURCE for VendorStatus)
+export type {
+  Vendor,
+  VendorContact,
+  VendorCertification,
+  VendorStatus,
+  VendorCategory
+} from './vendor'
+
+// Product management types (PRIMARY SOURCE for ProductCategory)
+export type {
+  Product,
+  ProductSpecification,
+  ProductCategory,
+  ProductStatus
+} from './product'
+
+// Recipe and operational planning types
+// NOTE: Exclude IngredientCostDetail (from enhanced-costing-engine)
+export type {
+  Recipe,
+  RecipeCategory,
+  RecipeStatus,
+  RecipeCostBreakdown
+} from './recipe'
+
+// Finance types (PRIMARY SOURCE for Currency, CostCenter)
+export type {
+  Currency,
+  Invoice,
+  Payment,
+  PaymentMethod,
+  PaymentStatus,
+  InvoiceStatus,
+  ExchangeRate,
+  CostCenter
+} from './finance'
+
+// Settings and preferences types (PRIMARY SOURCE for NotificationSettings)
+export type {
+  NotificationSettings,
+  ThemeMode
+} from './settings'
+
+// =============================================================================
+// SPECIALIZED MODULE TYPES
+// =============================================================================
 
 // Mock data type extensions (for development/prototyping)
 export * from './mock'
-export type { MockPurchaseRequest, MockPurchaseRequestItem, MockInventoryInfo, MockAdjustments } from './mock'
-
-// Vendor management types
-export * from './vendor'
-
-// Product management types
-export * from './product'
-
-// Recipe and operational planning types
-export * from './recipe'
 
 // Menu engineering types
 export * from './menu-engineering'
 
-// Finance types
-export * from './finance'
-
-// Settings and preferences types
-export * from './settings'
-
 // POS Integration types
-export * from './pos-integration'
-export { ErrorCategory } from './pos-integration'
+// NOTE: Exclude FileAttachment (already exported from common.ts)
+export type {
+  POSTransaction,
+  POSSyncStatus,
+  POSErrorLog,
+  ErrorCategory
+} from './pos-integration'
 
-// Existing specialized types (keep as is)
-export * from './fractional-inventory'
-export * from './enhanced-pr-types'
-export * from './enhanced-consumption-tracking'
-export * from './enhanced-costing-engine'
-export * from './count-allocation'
+// Credit note types (PRIMARY SOURCE for CreditNote, CreditNoteItem)
 export * from './credit-note'
+
+// Fractional inventory (PRIMARY SOURCE for InventoryAlert)
+export * from './fractional-inventory'
+
+// Enhanced PR types
+// NOTE: Exclude Currency (from finance), VendorComparison (from price-management)
+export type {
+  EnhancedPRItem,
+  EnhancedPRWorkflowStage
+} from './enhanced-pr-types'
+
+// Enhanced consumption tracking
+export * from './enhanced-consumption-tracking'
+
+// Enhanced costing engine (PRIMARY SOURCE for IngredientCostDetail)
+export * from './enhanced-costing-engine'
+
+// Count allocation
+export * from './count-allocation'
+
+// Hotel types
 export * from './hotel'
-export * from './price-management'
-export * from './campaign-management'
-export * from './vendor-price-management'
+
+// Campaign management types
+// NOTE: Exclude VendorFilters (from vendor-price-management)
+export type {
+  CampaignVendor,
+  CampaignMetrics
+} from './campaign-management'
+
+// Business rules types (PRIMARY SOURCE for BusinessRule, RuleAction, RuleCondition)
 export * from './business-rules'
+
+// Price management types
+// NOTE: Exclude BusinessRule, RuleAction, RuleCondition (from business-rules)
+// NOTE: Exclude Currency (from finance), ProductCategory (from product), VendorComparison (exported from enhanced-pr-types)
+export type {
+  PriceManagementDashboard,
+  VendorPriceHistory,
+  PriceAnalytics,
+  ContractPricing
+} from './price-management'
+
+// Vendor price management
+// NOTE: Exclude ApiResponse, SortConfig (from common), NotificationSettings (from settings), VendorStatus (from vendor)
+export type {
+  VendorPriceComparison,
+  PriceUpdateRequest,
+  VendorFilters
+} from './vendor-price-management'
+
+// =============================================================================
+// TYPE UTILITIES
+// =============================================================================
 
 // Type utilities and guards
 export * from './guards'

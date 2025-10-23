@@ -24,8 +24,10 @@ export type {
   UpdateVendorRequest,
   VendorListResponse,
   VendorStatsResponse,
-  VendorMetricsResponse,
-  
+  VendorMetricsResponse
+} from './vendors'
+
+export type {
   // Product types
   ProductFilters,
   CreateProductRequest,
@@ -35,8 +37,10 @@ export type {
   ProductInventoryResponse,
   ProductSpecification,
   ProductUnit,
-  ProductDimensions,
-  
+  ProductDimensions
+} from './products'
+
+export type {
   // Procurement types
   PurchaseRequestFilters,
   PurchaseOrderFilters,
@@ -49,7 +53,7 @@ export type {
   ProcurementStatsResponse,
   VendorComparisonResponse,
   PriceHistoryResponse
-} from './vendors'
+} from './procurement'
 
 export type {
   // POS Approvals types

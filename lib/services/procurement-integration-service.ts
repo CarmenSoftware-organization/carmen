@@ -13,16 +13,16 @@
  * - Price validation and market analysis
  */
 
-import { 
+import {
   PurchaseRequest,
   PurchaseOrder,
   PurchaseRequestItem,
   PurchaseOrderItem,
   Money,
-  ServiceResult,
-  BudgetAllocation,
-  VendorPerformanceMetrics
+  ServiceResult
 } from '@/lib/types'
+import { BudgetAllocation } from '@/lib/types/procurement'
+import { VendorPerformanceMetrics } from '@/lib/types/vendor'
 import { purchaseRequestService } from './db/purchase-request-service'
 import { purchaseOrderService } from './db/purchase-order-service'
 import { vendorService } from './db/vendor-service'
@@ -33,6 +33,7 @@ import { VendorMetrics } from './calculations/vendor-metrics'
 import { CachedFinancialCalculations } from './cache/cached-financial-calculations'
 import { CachedInventoryCalculations } from './cache/cached-inventory-calculations'
 import { CachedVendorMetrics } from './cache/cached-vendor-metrics'
+import { EnhancedCacheLayer, CacheLayerConfig } from './cache/enhanced-cache-layer'
 
 export interface ProcurementSummary {
   totalRequests: number
@@ -134,14 +135,42 @@ export class ProcurementIntegrationService {
   private cachedFinancial: CachedFinancialCalculations
   private cachedInventory: CachedInventoryCalculations
   private cachedVendorMetrics: CachedVendorMetrics
+  private cacheLayer: EnhancedCacheLayer
 
   constructor() {
+    const cacheConfig: CacheLayerConfig = {
+      redis: {
+        enabled: false,
+        fallbackToMemory: true,
+        connectionTimeout: 5000
+      },
+      memory: {
+        maxMemoryMB: 100,
+        maxEntries: 1000
+      },
+      ttl: {
+        financial: 300000,  // 5 minutes
+        inventory: 300000,  // 5 minutes
+        vendor: 300000,     // 5 minutes
+        default: 300000     // 5 minutes
+      },
+      invalidation: {
+        enabled: true,
+        batchSize: 100,
+        maxDependencies: 1000
+      },
+      monitoring: {
+        enabled: true,
+        metricsInterval: 60000  // 1 minute
+      }
+    }
+    this.cacheLayer = new EnhancedCacheLayer(cacheConfig)
     this.financialCalc = new FinancialCalculations()
     this.inventoryCalc = new InventoryCalculations()
     this.vendorMetrics = new VendorMetrics()
-    this.cachedFinancial = new CachedFinancialCalculations()
-    this.cachedInventory = new CachedInventoryCalculations()
-    this.cachedVendorMetrics = new CachedVendorMetrics()
+    this.cachedFinancial = new CachedFinancialCalculations(this.cacheLayer)
+    this.cachedInventory = new CachedInventoryCalculations(this.cacheLayer)
+    this.cachedVendorMetrics = new CachedVendorMetrics(this.cacheLayer)
   }
 
   /**
@@ -169,8 +198,8 @@ export class ProcurementIntegrationService {
       // Calculate budget utilization (placeholder - would integrate with budget service)
       const budgetUtilization = 75.5 // This would be calculated from actual budget data
 
-      // Get top vendors (simplified)
-      const topVendors = poStats.data!.topVendorsByValue?.slice(0, 5) || []
+      // Get top vendors (simplified) - would integrate with vendor service
+      const topVendors: { vendorId: string; vendorName: string; orderCount: number; totalValue: Money }[] = []
 
       // Calculate critical items (placeholder)
       const criticalItems = [
@@ -190,7 +219,7 @@ export class ProcurementIntegrationService {
         overdueDeliveries: poStats.data!.overdueDeliveries,
         budgetUtilization,
         avgProcessingTime: 5.2, // Would be calculated from actual data
-        topVendors: topVendors.map(v => ({
+        topVendors: topVendors.map((v: { vendorId: string; vendorName: string; orderCount: number; totalValue: Money }) => ({
           vendorId: v.vendorId,
           vendorName: v.vendorName,
           orderCount: v.orderCount,
@@ -228,11 +257,11 @@ export class ProcurementIntegrationService {
         budgetName: 'Department Operating Budget',
         fiscalYear: '2024',
         departmentId,
-        totalBudget: { amount: 100000, currencyCode: requestedAmount.currencyCode },
-        allocatedAmount: { amount: 100000, currencyCode: requestedAmount.currencyCode },
-        spentAmount: { amount: 45000, currencyCode: requestedAmount.currencyCode },
-        committedAmount: { amount: 20000, currencyCode: requestedAmount.currencyCode },
-        availableAmount: { amount: 35000, currencyCode: requestedAmount.currencyCode },
+        totalBudget: { amount: 100000, currency: requestedAmount.currency },
+        allocatedAmount: { amount: 100000, currency: requestedAmount.currency },
+        spentAmount: { amount: 45000, currency: requestedAmount.currency },
+        committedAmount: { amount: 20000, currency: requestedAmount.currency },
+        availableAmount: { amount: 35000, currency: requestedAmount.currency },
         utilizationRate: 65,
         lastUpdated: new Date()
       }
@@ -247,8 +276,8 @@ export class ProcurementIntegrationService {
         budgetCode,
         totalBudget: mockBudget.totalBudget,
         spentAmount: mockBudget.spentAmount,
-        committedAmount: { amount: newCommittedAmount, currencyCode: requestedAmount.currencyCode },
-        availableAmount: { amount: mockBudget.availableAmount.amount - requestedAmount.amount, currencyCode: requestedAmount.currencyCode },
+        committedAmount: { amount: newCommittedAmount, currency: requestedAmount.currency },
+        availableAmount: { amount: mockBudget.availableAmount.amount - requestedAmount.amount, currency: requestedAmount.currency },
         utilizationRate: newUtilizationRate,
         exceedsLimit,
         warningThreshold
@@ -311,9 +340,9 @@ export class ProcurementIntegrationService {
       }
 
       // Mock price comparison
-      const proposedPrice = { amount: 1500, currencyCode: 'USD' }
-      const marketAverage = { amount: 1750, currencyCode: 'USD' }
-      const savings = { amount: marketAverage.amount - proposedPrice.amount, currencyCode: 'USD' }
+      const proposedPrice: Money = { amount: 1500, currency: 'USD' }
+      const marketAverage: Money = { amount: 1750, currency: 'USD' }
+      const savings: Money = { amount: marketAverage.amount - proposedPrice.amount, currency: 'USD' }
 
       const recommendation: VendorSelectionRecommendation = {
         recommendedVendorId: recommendedVendor.id,
@@ -336,7 +365,7 @@ export class ProcurementIntegrationService {
           vendorId: v.id,
           vendorName: v.companyName,
           score: 80 - index * 5,
-          estimatedPrice: { amount: proposedPrice.amount + (index + 1) * 100, currencyCode: 'USD' }
+          estimatedPrice: { amount: proposedPrice.amount + (index + 1) * 100, currency: 'USD' }
         }))
       }
 
@@ -382,9 +411,9 @@ export class ProcurementIntegrationService {
         }
 
         // Calculate cost impact
-        const costImpact = {
+        const costImpact: Money = {
           amount: item.unitPrice.amount * item.orderedQuantity,
-          currencyCode: item.unitPrice.currencyCode
+          currency: item.unitPrice.currency
         }
 
         // Estimate storage requirements
@@ -630,7 +659,7 @@ export class ProcurementIntegrationService {
         averageProcessingTime: 4.5, // days
         onTimeDeliveryRate: poStats.data!.onTimeDeliveryRate,
         budgetCompliance: 92.5, // percentage
-        costSavings: { amount: 12500, currencyCode: 'USD' },
+        costSavings: { amount: 12500, currency: 'USD' },
         vendorPerformanceScore: 87.3,
         qualityMetrics: {
           defectRate: 2.1, // percentage

@@ -201,28 +201,28 @@ export class VendorMetrics extends BaseCalculator {
 
       // Calculate overall rating
       const overallRating = await this.calculateOverallRating({
-        deliveryMetrics,
-        qualityMetrics,
-        reliabilityMetrics,
-        financialMetrics,
+        deliveryMetrics: deliveryMetrics.value,
+        qualityMetrics: qualityMetrics.value,
+        reliabilityMetrics: reliabilityMetrics.value,
+        financialMetrics: financialMetrics.value,
         weights
       });
 
       // Calculate risk score
       const riskScore = await this.calculateRiskScore({
-        deliveryMetrics,
-        qualityMetrics,
-        reliabilityMetrics
+        deliveryMetrics: deliveryMetrics.value,
+        qualityMetrics: qualityMetrics.value,
+        reliabilityMetrics: reliabilityMetrics.value
       });
 
       // Generate recommendations
       const recommendations = await this.generateRecommendations({
-        deliveryMetrics,
-        qualityMetrics,
-        reliabilityMetrics,
-        financialMetrics,
-        overallRating,
-        riskScore
+        deliveryMetrics: deliveryMetrics.value,
+        qualityMetrics: qualityMetrics.value,
+        reliabilityMetrics: reliabilityMetrics.value,
+        financialMetrics: financialMetrics.value,
+        overallRating: overallRating.value,
+        riskScore: riskScore.value
       });
 
       return {
@@ -368,7 +368,7 @@ export class VendorMetrics extends BaseCalculator {
         };
       }
 
-      const currencyCode = orders[0].orderValue.currencyCode;
+      const currencyCode = orders[0].orderValue.currency;
       const totalValue = orders.reduce((sum, order) => sum + order.orderValue.amount, 0);
       const averageValue = totalValue / orders.length;
 
@@ -530,11 +530,11 @@ export class VendorMetrics extends BaseCalculator {
       }
 
       // Ensure all prices are in same currency
-      const baseCurrency = input.vendorPrices[0].price.currencyCode;
-      const invalidCurrency = input.vendorPrices.find(vp => vp.price.currencyCode !== baseCurrency);
+      const baseCurrency = input.vendorPrices[0].price.currency;
+      const invalidCurrency = input.vendorPrices.find(vp => vp.price.currency !== baseCurrency);
       if (invalidCurrency) {
         throw this.createError(
-          `All prices must be in same currency. Expected ${baseCurrency}, found ${invalidCurrency.price.currencyCode}`,
+          `All prices must be in same currency. Expected ${baseCurrency}, found ${invalidCurrency.price.currency}`,
           'CURRENCY_MISMATCH',
           context
         );
