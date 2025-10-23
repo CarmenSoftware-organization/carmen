@@ -29,29 +29,31 @@ export default function PurchaseOrdersPage() {
 
   const handleSelectPRs = (selectedPRs: PurchaseRequest[]) => {
     setShowCreateFromPRDialog(false)
-    
+
     if (selectedPRs.length > 0) {
       // Group PRs by vendor and currency - each group becomes a separate PO
+      // Note: vendor, currency, vendorId, totalAmount exist in mock data but not in PurchaseRequest interface
       const groupedPRs = selectedPRs.reduce((groups, pr) => {
-        const key = `${pr.vendor}-${pr.currency}`
+        const prAny = pr as any
+        const key = `${prAny.vendor}-${prAny.currency}`
         if (!groups[key]) {
           groups[key] = {
-            vendor: pr.vendor,
-            vendorId: pr.vendorId,
-            currency: pr.currency,
+            vendor: prAny.vendor,
+            vendorId: prAny.vendorId,
+            currency: prAny.currency,
             prs: [],
             totalAmount: 0
           }
         }
         groups[key].prs.push(pr)
-        groups[key].totalAmount += pr.totalAmount
+        groups[key].totalAmount += prAny.totalAmount || 0
         return groups
-      }, {} as Record<string, { 
+      }, {} as Record<string, {
         vendor: string
         vendorId: number
         currency: string
         prs: PurchaseRequest[]
-        totalAmount: number 
+        totalAmount: number
       }>)
 
       // Store grouped PRs for PO creation

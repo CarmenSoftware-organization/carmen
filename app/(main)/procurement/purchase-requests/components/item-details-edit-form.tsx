@@ -49,7 +49,32 @@ import VendorComparison from "./vendor-comparison";
 import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 import { PricingFormComponent } from "./pricing-form";
 import StatusBadge from "@/components/ui/custom-status-badge";
-import { PurchaseRequestItemStatus, PurchaseRequestItem, ConsolidatedButtonState } from "@/lib/types";
+import { PurchaseRequestItem, DocumentStatus, WorkflowStatus, PurchaseRequestPriority } from "@/lib/types";
+
+// Type for button state (not in central types)
+type ConsolidatedButtonState = {
+  show?: boolean;
+  disabled: boolean;
+  label: string;
+  action?: string;
+  color?: string;
+  requiresStepSelection?: boolean;
+};
+
+// Extended PurchaseRequestItem with mock-only fields for UI purposes
+type ExtendedPurchaseRequestItem = PurchaseRequestItem & {
+  location?: string;
+  jobCode?: string;
+  quantityApproved?: number;
+  foc?: number;
+  deliveryPoint?: string;
+  comment?: string;
+  vendor?: string;
+  pricelistNumber?: string;
+  event?: string;
+  project?: string;
+  marketSegment?: string;
+};
 import { useSimpleUser } from "@/lib/context/simple-user-context";
 
 // Delivery point options for dropdown
@@ -94,7 +119,7 @@ const getFieldPermissions = (userRole: string) => {
 };
 
 // Helper function to get approval button state for individual item
-const getItemApprovalButtonState = (status: PurchaseRequestItemStatus, userRole: string): ConsolidatedButtonState => {
+const getItemApprovalButtonState = (status: DocumentStatus, userRole: string): ConsolidatedButtonState => {
   const isApprover = ['Department Manager', 'Financial Manager', 'Purchasing Staff'].includes(userRole);
   
   if (!isApprover) {
@@ -107,32 +132,32 @@ const getItemApprovalButtonState = (status: PurchaseRequestItemStatus, userRole:
   }
 
   switch (status) {
-    case "Pending":
+    case DocumentStatus.Draft:
       return {
         action: "approve",
         label: "Approve",
         color: "green",
         disabled: false
       };
-    case "Approved":
+    case DocumentStatus.Approved:
       return {
-        action: "reject", 
+        action: "reject",
         label: "Reject",
         color: "red",
         disabled: false
       };
-    case "Rejected":
+    case DocumentStatus.Rejected:
       return {
         action: "approve",
-        label: "Approve", 
+        label: "Approve",
         color: "green",
         disabled: false
       };
-    case "Review":
+    case WorkflowStatus.Review as any:
       return {
         action: "return",
         label: "Return",
-        color: "orange", 
+        color: "orange",
         disabled: false,
         requiresStepSelection: true
       };
@@ -147,69 +172,35 @@ const getItemApprovalButtonState = (status: PurchaseRequestItemStatus, userRole:
 };
 
 type ItemDetailsFormProps = {
-  onSave: (formData: PurchaseRequestItem) => void;
+  onSave: (formData: ExtendedPurchaseRequestItem) => void;
   onCancel: () => void;
   onDelete?: () => void;
-  initialData?: Partial<PurchaseRequestItem>;
+  initialData?: Partial<ExtendedPurchaseRequestItem>;
   mode: "view" | "edit" | "add";
   onModeChange: (mode: "view" | "edit" | "add") => void;
 };
 
-const emptyItemData: PurchaseRequestItem = {
+const emptyItemData: ExtendedPurchaseRequestItem = {
   id: "",
-  status: "Pending" ,
-  location: "",
-  name: "",
+  requestId: "",
+  itemName: "",
   description: "",
   unit: "",
-  quantityRequested: 0,
+  requestedQuantity: 0,
+  requiredDate: new Date(),
+  deliveryLocationId: "",
+  priority: "normal" as PurchaseRequestPriority,
+  status: DocumentStatus.Draft,
+  convertedToPO: false,
+  // Extended fields with defaults
+  location: "",
+  jobCode: "",
   quantityApproved: 0,
-  deliveryDate: new Date(),
-  deliveryPoint: "",
-  currency: "",
-  currencyRate: 1,
-  price: 0,
   foc: 0,
-  netAmount: 0,
-  adjustments: {
-    discount: false,
-    tax: false,
-  },
-  taxIncluded: false,
-  discountRate: 0,
-  discountAmount: 0,
-  taxRate: 0,
-  taxAmount: 0,
-  totalAmount: 0,
+  deliveryPoint: "",
+  comment: "",
   vendor: "",
   pricelistNumber: "",
-  comment: "",
-  createdBy: "",
-  createdDate: new Date(),
-  updatedBy: "",
-  updatedDate: new Date(),
-  itemCategory: "",
-  itemSubcategory: "",
-  inventoryInfo: {
-    onHand: 0,
-    onOrdered: 0,
-    reorderLevel: 0,
-    restockLevel: 0,
-    averageMonthlyUsage: 0,
-    lastPrice: 0,
-    lastOrderDate: new Date(),
-    lastVendor: "",
-    inventoryUnit: "",
-  },
-  accountCode: "",
-  jobCode: "",
-  baseSubTotalPrice: 0,
-  subTotalPrice: 0,
-  baseNetAmount: 0,
-  baseDiscAmount: 0,
-  baseTaxAmount: 0,
-  baseTotalAmount: 0,
-  // Business Dimensions
   event: "",
   project: "",
   marketSegment: "",
@@ -226,10 +217,10 @@ export function ItemDetailsEditForm({
   const { user } = useSimpleUser();
   const userRole = user?.role || 'Requestor';
   const fieldPermissions = getFieldPermissions(userRole);
-  
-  
-  const [formData, setFormData] = useState<PurchaseRequestItem>(initialData ? { ...emptyItemData, ...initialData } : emptyItemData);
-  const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(formData.deliveryDate);
+
+
+  const [formData, setFormData] = useState<ExtendedPurchaseRequestItem>(initialData ? { ...emptyItemData, ...initialData } : emptyItemData);
+  const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(formData.requiredDate);
   const [isReturnStepSelectorOpen, setIsReturnStepSelectorOpen] = useState(false);
 
   // Update form data when initialData changes (e.g., when switching between items)
@@ -237,10 +228,10 @@ export function ItemDetailsEditForm({
     if (initialData) {
       const mergedData = { ...emptyItemData, ...initialData };
       setFormData(mergedData);
-      setDeliveryDate(initialData.deliveryDate);
+      setDeliveryDate(initialData.requiredDate);
     } else {
       setFormData(emptyItemData);
-      setDeliveryDate(emptyItemData.deliveryDate);
+      setDeliveryDate(emptyItemData.requiredDate);
     }
   }, [initialData]);
   const [isInventoryBreakdownOpen, setIsInventoryBreakdownOpen] = useState(false);
@@ -281,28 +272,28 @@ export function ItemDetailsEditForm({
   };
 
   const handleApproveItem = () => {
-    const updatedData = { ...formData, status: "Approved" as PurchaseRequestItemStatus };
+    const updatedData = { ...formData, status: DocumentStatus.Approved };
     setFormData(updatedData);
     onSave(updatedData);
-    console.log(`✓ Approving item: ${formData.name} (${formData.id})`);
-    console.log(`🎉 Successfully approved item: ${formData.name}`);
+    console.log(`✓ Approving item: ${formData.itemName} (${formData.id})`);
+    console.log(`🎉 Successfully approved item: ${formData.itemName}`);
   };
 
   const handleRejectItem = () => {
-    const updatedData = { ...formData, status: "Rejected" as PurchaseRequestItemStatus };
+    const updatedData = { ...formData, status: DocumentStatus.Rejected };
     setFormData(updatedData);
     onSave(updatedData);
-    console.log(`✓ Rejecting item: ${formData.name} (${formData.id})`);
-    console.log(`🎉 Successfully rejected item: ${formData.name}`);
+    console.log(`✓ Rejecting item: ${formData.itemName} (${formData.id})`);
+    console.log(`🎉 Successfully rejected item: ${formData.itemName}`);
   };
 
   const handleReturnItem = () => {
-    const updatedData = { ...formData, status: "Review" as PurchaseRequestItemStatus };
+    const updatedData = { ...formData, status: WorkflowStatus.Review as any };
     setFormData(updatedData);
     onSave(updatedData);
     setIsReturnStepSelectorOpen(false);
-    console.log(`✓ Returning item for review: ${formData.name} (${formData.id})`);
-    console.log(`🎉 Successfully returned item for review: ${formData.name}`);
+    console.log(`✓ Returning item for review: ${formData.itemName} (${formData.id})`);
+    console.log(`🎉 Successfully returned item for review: ${formData.itemName}`);
   };
 
   const FormField = ({
@@ -454,7 +445,7 @@ export function ItemDetailsEditForm({
                     <Input
                       id="location"
                       name="location"
-                      value={formData.location}
+                      value={formData.location || ""}
                       onChange={handleInputChange}
                       required
                       disabled={mode === "view"}
@@ -462,11 +453,11 @@ export function ItemDetailsEditForm({
                     />
                   </FormField>
                   <div className="sm:col-span-2">
-                  <FormField id="name" label="Product name" required fieldPermission={fieldPermissions.product}>
+                  <FormField id="itemName" label="Product name" required fieldPermission={fieldPermissions.product}>
                     <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
+                      id="itemName"
+                      name="itemName"
+                      value={formData.itemName}
                       onChange={handleInputChange}
                       required
                       disabled={mode === "view"}
@@ -487,11 +478,11 @@ export function ItemDetailsEditForm({
                     </FormField>
                   </div>
                   <div className="sm:col-span-1">
-                    <FormField id="jobcode" label="Job code">
+                    <FormField id="jobCode" label="Job code">
                       <Input
-                          id="jobcode"
-                        name="jobcode"
-                        value={formData.jobCode}
+                        id="jobCode"
+                        name="jobCode"
+                        value={formData.jobCode || ""}
                         onChange={handleInputChange}
                         required
                         disabled={mode === "view"}
@@ -521,19 +512,19 @@ export function ItemDetailsEditForm({
                     />
                   </FormField>
                   <FormField
-                    id="quantityRequested"
+                    id="requestedQuantity"
                     label="Request Qty"
                     required
                     smallText="5 Kg"
                     fieldPermission={fieldPermissions.requestQty}
                   >
                     <Input
-                      id="quantityRequested"
-                      name="quantityRequested"
+                      id="requestedQuantity"
+                      name="requestedQuantity"
                       type="number"
                       min="0"
                       step="1"
-                      value={formData.quantityRequested}
+                      value={formData.requestedQuantity}
                       onChange={handleInputChange}
                       required
                       disabled={mode === "view"}
@@ -552,7 +543,7 @@ export function ItemDetailsEditForm({
                       type="number"
                       min="0"
                       step="1"
-                      value={formData.quantityApproved}
+                      value={formData.quantityApproved || 0}
                       onChange={handleInputChange}
                       disabled={mode === "view"}
                       className="h-8 text-sm"
@@ -565,13 +556,13 @@ export function ItemDetailsEditForm({
                       type="number"
                       min="0"
                       step="1"
-                      value={formData.foc}
+                      value={formData.foc || 0}
                       onChange={handleInputChange}
                       disabled={mode === "view"}
                       className="h-8 text-sm"
                     />
                   </FormField>
-                  <FormField id="deliveryDate" label="Required Date" required fieldPermission={fieldPermissions.requiredDate}>
+                  <FormField id="requiredDate" label="Required Date" required fieldPermission={fieldPermissions.requiredDate}>
                     {mode === "view" ? (
                       <div>
                         {deliveryDate ? format(deliveryDate, "PPP") : "Not set"}
@@ -602,7 +593,7 @@ export function ItemDetailsEditForm({
                               setDeliveryDate(date);
                               setFormData((prevData) => ({
                                 ...prevData,
-                                deliveryDate: date ? date : new Date(),
+                                requiredDate: date ? date : new Date(),
                               }));
                             }}
                             initialFocus
@@ -614,11 +605,11 @@ export function ItemDetailsEditForm({
                   <FormField id="deliveryPoint" label="Delivery Point" fieldPermission={fieldPermissions.deliveryPoint}>
                     {mode === "view" || !fieldPermissions.deliveryPoint ? (
                       <div className="mt-1 text-sm">
-                        {deliveryPointOptions.find(option => option.value === formData.deliveryPoint)?.label || formData.deliveryPoint || "Not specified"}
+                        {deliveryPointOptions.find(option => option.value === (formData as any).deliveryPoint)?.label || (formData as any).deliveryPoint || "Not specified"}
                       </div>
                     ) : (
                       <Select 
-                        value={formData.deliveryPoint || ""} 
+                        value={(formData as any).deliveryPoint || ""} 
                         onValueChange={(value) => setFormData(prev => ({ ...prev, deliveryPoint: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -639,12 +630,12 @@ export function ItemDetailsEditForm({
                 <div className="w-full">
                     <FormField id="comment" label="Comment" fieldPermission={fieldPermissions.comment}>
                       {mode === "view" || !fieldPermissions.comment ? (
-                        <div className="mt-1 text-sm">{formData.comment}</div>
+                        <div className="mt-1 text-sm">{(formData as any).comment}</div>
                       ) : (
                         <Textarea
                           id="comment"
                           name="comment"
-                          value={formData.comment}
+                          value={(formData as any).comment}
                           onChange={handleInputChange}
                           placeholder="Add any additional notes here"
                           className="text-sm h-8"
@@ -678,7 +669,7 @@ export function ItemDetailsEditForm({
                       <Input
                         id="vendor"
                         name="vendor"
-                        value={formData.vendor}
+                        value={(formData as any).vendor}
                         onChange={handleInputChange}
                         placeholder="Vendor name"
                         disabled={mode === "view"}
@@ -689,7 +680,7 @@ export function ItemDetailsEditForm({
                       <Input
                         id="pricelistNumber"
                         name="pricelistNumber"
-                        value={formData.pricelistNumber}
+                        value={(formData as any).pricelistNumber}
                         onChange={handleInputChange}
                         placeholder="Pricelist #"
                         disabled={mode === "view"}
@@ -709,10 +700,10 @@ export function ItemDetailsEditForm({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField id="jobCode" label="Job Number" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{formData.jobCode || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{(formData as any).jobCode || "Not assigned"}</div>
                     ) : (
                       <Select 
-                        value={formData.jobCode || ""} 
+                        value={(formData as any).jobCode || ""} 
                         onValueChange={(value) => setFormData(prev => ({ ...prev, jobCode: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -732,10 +723,10 @@ export function ItemDetailsEditForm({
 
                   <FormField id="event" label="Event" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{formData.event || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{(formData as any).event || "Not assigned"}</div>
                     ) : (
                       <Select 
-                        value={formData.event || ""} 
+                        value={(formData as any).event || ""} 
                         onValueChange={(value) => setFormData(prev => ({ ...prev, event: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -754,10 +745,10 @@ export function ItemDetailsEditForm({
 
                   <FormField id="project" label="Project" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{formData.project || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{(formData as any).project || "Not assigned"}</div>
                     ) : (
                       <Select 
-                        value={formData.project || ""} 
+                        value={(formData as any).project || ""} 
                         onValueChange={(value) => setFormData(prev => ({ ...prev, project: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -776,10 +767,10 @@ export function ItemDetailsEditForm({
 
                   <FormField id="marketSegment" label="Market Segment" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{formData.marketSegment || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{(formData as any).marketSegment || "Not assigned"}</div>
                     ) : (
                       <Select 
-                        value={formData.marketSegment || ""} 
+                        value={(formData as any).marketSegment || ""} 
                         onValueChange={(value) => setFormData(prev => ({ ...prev, marketSegment: value }))}
                       >
                         <SelectTrigger className="h-8">
