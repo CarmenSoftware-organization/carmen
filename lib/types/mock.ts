@@ -19,7 +19,7 @@ import {
   PurchaseRequestPriority,
   PurchaseRequestType
 } from './procurement'
-import { DocumentStatus, Money } from './common'
+import { DocumentStatus, Money, Comment } from './common'
 
 /**
  * Extended Purchase Request for mock/sample data
@@ -67,6 +67,7 @@ export interface MockPurchaseRequest extends PurchaseRequest {
 
   // Items and activity
   items?: MockPurchaseRequestItem[];
+  comments?: Comment[];
   activityLog?: Array<{
     id: string;
     timestamp: Date;

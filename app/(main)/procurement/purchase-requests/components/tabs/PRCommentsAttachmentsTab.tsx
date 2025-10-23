@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Paperclip, Send } from 'lucide-react';
-import { PurchaseRequest, Comment } from '@/lib/types';
+import { PurchaseRequest, Comment, asMockPurchaseRequest } from '@/lib/types';
 import { useSimpleUser } from '@/lib/context/simple-user-context';
 
 interface PRCommentsAttachmentsTabProps {
@@ -40,10 +40,11 @@ const mockComments: Comment[] = [
 ];
 
 export default function PRCommentsAttachmentsTab({ prData }: PRCommentsAttachmentsTabProps) {
+  const mockPrData = asMockPurchaseRequest(prData);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(() => {
     // Use actual PR comments if available, otherwise use mock data
-    return prData.comments && prData.comments.length > 0 ? prData.comments : mockComments;
+    return mockPrData.comments && mockPrData.comments.length > 0 ? mockPrData.comments : mockComments;
   });
   const { user } = useSimpleUser();
 
@@ -80,7 +81,7 @@ export default function PRCommentsAttachmentsTab({ prData }: PRCommentsAttachmen
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={`/avatars/${comment.userId}.png`} alt={comment.userName} />
                   <AvatarFallback className="text-xs">
-                    {comment.userName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    {comment.userName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
@@ -130,7 +131,7 @@ export default function PRCommentsAttachmentsTab({ prData }: PRCommentsAttachmen
           <Avatar className="h-8 w-8">
             <AvatarImage src={user ? `/avatars/${user.id}.png` : undefined} alt={user?.name} />
             <AvatarFallback className="text-xs">
-              {user ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
+              {user ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-2">

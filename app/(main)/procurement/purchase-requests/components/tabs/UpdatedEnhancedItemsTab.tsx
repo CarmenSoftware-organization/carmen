@@ -26,7 +26,7 @@ import {
   Clock,
   AlertTriangle,
 } from "lucide-react";
-import { PurchaseRequestItem } from "@/lib/types";
+import { MockPurchaseRequestItem } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -55,18 +55,18 @@ export interface WorkflowStage {
   priceVerified?: boolean;
 }
 
-export interface EnhancedPRItem extends Omit<PurchaseRequestItem, 'status'> {
-  id: string;
+export interface EnhancedPRItem extends Omit<MockPurchaseRequestItem, 'status' | 'estimatedUnitPrice' | 'estimatedTotal'> {
+  // Override/add specific fields for the enhanced workflow
   location: string;
   productName: string;
   requestQuantity: number;
   requestUnit: string;
   requiredDate: Date;
   comment: string;
-  
+
   // Document-level status
   documentStatus: DocumentStatus;
-  
+
   // Workflow stages with individual statuses
   workflowStages: {
     request: WorkflowStage;
@@ -75,28 +75,28 @@ export interface EnhancedPRItem extends Omit<PurchaseRequestItem, 'status'> {
     financeManager: WorkflowStage;
     gmApproval: WorkflowStage;
   };
-  
+
   // Current active stage
   currentStage: WorkflowStageType | 'completed';
-  
-  // Financial fields (hidden from staff)
+
+  // Financial fields (hidden from staff) - using simple numbers for UI display
   estimatedUnitPrice?: number;
   estimatedTotalPrice?: number;
   estimatedVendorName?: string;
   priceEstimateSource?: string;
   priceEstimateAccuracy?: number;
-  
+
   // Purchase staff fields
   purchaserEstimatedPrice?: number;
   purchaserVendorId?: string;
   purchaserNotes?: string;
-  
+
   // Actual purchase data
   actualUnitPrice?: number;
   actualTotalPrice?: number;
   actualVendorId?: string;
   purchaseDate?: Date;
-  
+
   // Audit
   createdBy: string;
   lastModifiedBy: string;
@@ -115,6 +115,13 @@ interface UpdatedEnhancedItemsTabProps {
 const mockEnhancedItems: EnhancedPRItem[] = [
   {
     id: "item-001",
+    requestId: "PR-2024-001",
+    itemName: "Office Supplies - A4 Paper",
+    description: "High quality A4 paper for office use",
+    requestedQuantity: 50,
+    deliveryLocationId: "LOC-001",
+    priority: "normal",
+    convertedToPO: false,
     location: "Main Office",
     productName: "Office Supplies - A4 Paper",
     requestQuantity: 50,
@@ -155,7 +162,6 @@ const mockEnhancedItems: EnhancedPRItem[] = [
     version: 1,
     // Legacy fields for compatibility
     name: "Office Supplies - A4 Paper",
-    description: "High quality A4 paper for office use",
     unit: "boxes",
     quantityRequested: 50,
     quantityApproved: 0,
@@ -164,9 +170,9 @@ const mockEnhancedItems: EnhancedPRItem[] = [
     currency: "USD",
     currencyRate: 1,
     price: 25.50,
-    foc: 0,
+    foc: false,
     taxIncluded: false,
-    adjustments: { tax: true },
+    adjustments: { tax: true, discount: false },
     discountRate: 0,
     taxRate: 7,
     vendor: "ABC Supplies Inc.",
@@ -186,19 +192,16 @@ const mockEnhancedItems: EnhancedPRItem[] = [
     },
     accountCode: "ACC-001",
     jobCode: "JOB-001",
-    baseSubTotalPrice: 1275,
-    subTotalPrice: 1275,
-    baseNetAmount: 1275,
-    netAmount: 1275,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 89.25,
-    taxAmount: 89.25,
-    baseTotalAmount: 1364.25,
-    totalAmount: 1364.25,
   },
   {
     id: "item-002",
+    requestId: "PR-2024-002",
+    itemName: "Computer Equipment - Wireless Mouse",
+    description: "Ergonomic wireless mouse with USB receiver",
+    requestedQuantity: 10,
+    deliveryLocationId: "LOC-002",
+    priority: "normal",
+    convertedToPO: false,
     location: "IT Department",
     productName: "Computer Equipment - Wireless Mouse",
     requestQuantity: 10,
@@ -247,7 +250,6 @@ const mockEnhancedItems: EnhancedPRItem[] = [
     version: 3,
     // Legacy fields
     name: "Computer Equipment - Wireless Mouse",
-    description: "Ergonomic wireless mouse with USB receiver",
     unit: "pieces",
     quantityRequested: 10,
     quantityApproved: 8,
@@ -256,9 +258,9 @@ const mockEnhancedItems: EnhancedPRItem[] = [
     currency: "USD",
     currencyRate: 1,
     price: 45.00,
-    foc: 0,
+    foc: false,
     taxIncluded: false,
-    adjustments: { tax: true },
+    adjustments: { tax: true, discount: false },
     discountRate: 0,
     taxRate: 7,
     vendor: "Tech Solutions Ltd.",
@@ -278,16 +280,6 @@ const mockEnhancedItems: EnhancedPRItem[] = [
     },
     accountCode: "ACC-002",
     jobCode: "JOB-002",
-    baseSubTotalPrice: 450,
-    subTotalPrice: 450,
-    baseNetAmount: 450,
-    netAmount: 450,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 31.50,
-    taxAmount: 31.50,
-    baseTotalAmount: 481.50,
-    totalAmount: 481.50,
   }
 ];
 

@@ -321,6 +321,20 @@ export interface AutocompleteOption {
   disabled?: boolean;
 }
 
+// ====== COMMENTS AND ACTIVITY ======
+
+/**
+ * Comment interface for activity tracking
+ */
+export interface Comment {
+  id: string;
+  userId: string;
+  userName: string;
+  text: string;
+  content: string;
+  timestamp: Date;
+}
+
 // ====== PERFORMANCE AND METRICS ======
 
 /**
