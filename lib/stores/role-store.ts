@@ -1,7 +1,8 @@
 // Role Store for managing role data across components
 // This provides a simple state management solution for roles
 
-import { Role } from '@/lib/types/permissions';
+import React from 'react';
+import { Role } from '@/lib/types';
 import { mockRoles as initialMockRoles } from '@/lib/mock-data/permission-roles';
 
 // In-memory store for role data (in a real app, this would be managed by Zustand/Redux/etc.)
@@ -94,6 +95,3 @@ export function useRoleStore() {
     reset: roleStore.reset
   };
 }
-
-// Add React import for the hook
-import React from 'react';

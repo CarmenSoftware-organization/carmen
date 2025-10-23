@@ -50,10 +50,10 @@ export abstract class BaseModal extends BasePage {
       // Fallback: click at the edge of the modal
       const modalBounds = await this.page.locator(this.modalSelector).boundingBox();
       if (modalBounds) {
-        await this.page.click({
-          x: modalBounds.x - 10,
-          y: modalBounds.y + modalBounds.height / 2
-        });
+        await this.page.mouse.click(
+          modalBounds.x - 10,
+          modalBounds.y + modalBounds.height / 2
+        );
         await this.waitForModalClosed();
       }
     }
@@ -190,9 +190,9 @@ export abstract class BaseModal extends BasePage {
       const focusedElement = await this.page.evaluate(() => {
         const activeElement = document.activeElement;
         const modal = document.querySelector('[role="dialog"], [role="alertdialog"]');
-        return modal?.contains(activeElement);
+        return modal?.contains(activeElement) ?? false;
       });
-      
+
       return hasProperRole && hasAriaModal && hasAriaLabel && focusedElement;
     } catch (error) {
       console.error('Modal accessibility test failed:', error);

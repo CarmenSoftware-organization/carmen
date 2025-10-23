@@ -1,5 +1,17 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices, type ReporterDescription } from '@playwright/test';
 import { testConfig } from './config/test.config';
+
+// Build reporter configuration with proper typing
+const reporters: ReporterDescription[] = [
+  ['html', { outputFolder: 'reports/html' }],
+  ['json', { outputFile: 'reports/json/results.json' }],
+  ['junit', { outputFile: 'reports/junit.xml' }],
+  ['line']
+];
+
+if (process.env.CI) {
+  reporters.push(['github']);
+}
 
 export default defineConfig({
   testDir: './specs',
@@ -7,17 +19,13 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
   workers: testConfig.parallelWorkers,
-  reporter: [
-    ['html', { outputFolder: 'reports/html' }],
-    ['json', { outputFile: 'reports/json/results.json' }],
-    ['junit', { outputFile: 'reports/junit.xml' }],
-    ['line'],
-    ...(process.env.CI ? [['github']] : [])
-  ],
+  reporter: reporters,
   use: {
     baseURL: testConfig.baseUrl,
     trace: 'retain-on-failure',
-    screenshot: testConfig.screenshotMode,
+    // Map custom screenshot mode to Playwright's expected types
+    screenshot: testConfig.screenshotMode === 'always' ? 'on' :
+                testConfig.screenshotMode === 'failure' ? 'only-on-failure' : 'off',
     video: testConfig.videoMode,
     actionTimeout: 10000,
     navigationTimeout: 30000,

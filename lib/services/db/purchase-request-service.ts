@@ -13,19 +13,17 @@
  */
 
 import { PrismaClient } from '@prisma/client'
-import { 
-  PurchaseRequest, 
-  PurchaseRequestItem, 
-  PurchaseRequestPriority, 
+import {
+  PurchaseRequest,
+  PurchaseRequestItem,
+  PurchaseRequestPriority,
   PurchaseRequestType,
   DocumentStatus,
   ApprovalRecord,
   WorkflowStatus,
-  UserRole,
   Money,
   ServiceResult,
-  PaginationOptions,
-  BudgetAllocation
+  PaginationOptions
 } from '@/lib/types'
 import { FinancialCalculations } from '@/lib/services/calculations/financial-calculations'
 import { VendorService } from './vendor-service'

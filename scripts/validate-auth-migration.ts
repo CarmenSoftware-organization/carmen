@@ -293,4 +293,5 @@ if (require.main === module) {
     })
 }
 
-export { validateAuthMigration, ValidationResult, ValidationSummary }
+export { validateAuthMigration }
+export type { ValidationResult, ValidationSummary }

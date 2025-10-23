@@ -371,20 +371,20 @@ export interface ResourceActionMapping {
     view_analytics: 'View workflow analytics';
   };
 
-  [ResourceType.REPORT]: {
+  [ResourceType.OPERATIONAL_REPORT]: {
     view: 'View report';
     list: 'List available reports';
     search: 'Search reports';
-    
+
     generate: 'Generate report';
     schedule: 'Schedule report generation';
     export: 'Export report data';
     print: 'Print report';
-    
+
     share: 'Share report with others';
     save_template: 'Save report template';
     customize: 'Customize report parameters';
-    
+
     view_history: 'View report generation history';
     delete: 'Delete report';
   };
@@ -531,7 +531,7 @@ export interface ResourceMetadata {
   maxRetentionPeriod?: number; // days
 }
 
-export const RESOURCE_METADATA: Record<ResourceType, ResourceMetadata> = {
+export const RESOURCE_METADATA: Partial<Record<ResourceType, ResourceMetadata>> = {
   [ResourceType.PURCHASE_REQUEST]: {
     name: 'Purchase Request',
     description: 'Request for purchasing goods or services',

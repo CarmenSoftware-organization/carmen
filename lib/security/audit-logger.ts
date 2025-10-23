@@ -529,6 +529,3 @@ export async function logAuthorizationEvent(
     }
   })
 }
-
-// Export types and constants
-export type { SecurityAuditLogEntry, SecurityWebhookPayload }

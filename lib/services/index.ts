@@ -5,11 +5,40 @@
  * This is the main entry point for accessing calculation services throughout the application.
  */
 
-// Re-export all calculation services
+// Re-export calculation services
 export * from './calculations'
 
-// Re-export all utility services
-export * from './utils'
+// Re-export utility services - exclude types already exported from calculations
+export {
+  globalCacheManager,
+  type CacheStats,
+  type CacheConfig,
+  CacheManager,
+  Cacheable
+} from './utils/cache-manager'
+
+export {
+  exchangeRateConverter,
+  type ExchangeRateProvider,
+  type ExchangeRateData,
+  type ConversionRequest,
+  type ConversionResponse,
+  ExchangeRateConverter
+} from './utils/exchange-rate-converter'
+
+export {
+  PriceCalculator,
+  type PricingTier,
+  type BulkDiscountConfig,
+  type PromotionalRule,
+  type PromotionalConditions,
+  type PromotionalDiscount,
+  type PriceCalculationInput,
+  type PriceCalculationResult,
+  type AppliedDiscount,
+  type PriceComparisonInput as UtilPriceComparisonInput,
+  type PriceComparisonResult as UtilPriceComparisonResult
+} from './utils/price-calculator'
 
 // Re-export Menu Engineering module
 export * from './menu-engineering-index'
@@ -91,7 +120,7 @@ export class ServiceManager {
 
       // Test calculation services
       const { financialCalculations } = await import('./calculations')
-      const testMoney = { amount: 100, currencyCode: 'USD' }
+      const testMoney = { amount: 100, currency: 'USD' }
       const taxResult = await financialCalculations.calculateTax({
         subtotal: testMoney,
         taxRate: 10
