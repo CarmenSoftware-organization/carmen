@@ -532,21 +532,27 @@ export class PermissionManagementTestRunner {
         testFunction: async (page: Page) => {
           const permissionPage = new PermissionManagementPage(page);
           await permissionPage.navigateToPermissionManagement();
-          
-          const toggle = permissionPage.toggle;
-          const switchTimes = await toggle.testTogglePerformance(10); // 10 iterations
-          
+
+          // Perform multiple toggle operations to test performance
+          const switchTimes: number[] = [];
+          for (let i = 0; i < 10; i++) {
+            const startTime = await permissionPage.measureToggleResponseTime();
+            await permissionPage.toggleToABAC();
+            await permissionPage.toggleToRBAC();
+            switchTimes.push(startTime);
+          }
+
           const averageTime = switchTimes.reduce((a, b) => a + b, 0) / switchTimes.length;
           const maxTime = Math.max(...switchTimes);
-          
+
           if (averageTime > testConfig.performance.toggleResponseBenchmark) {
             throw new Error(`Average toggle time ${averageTime}ms exceeds benchmark`);
           }
-          
+
           if (maxTime > testConfig.performance.toggleResponseBenchmark * 2) {
             throw new Error(`Maximum toggle time ${maxTime}ms exceeds acceptable limit`);
           }
-          
+
           console.log(`Toggle performance: avg ${averageTime}ms, max ${maxTime}ms`);
         }
       },

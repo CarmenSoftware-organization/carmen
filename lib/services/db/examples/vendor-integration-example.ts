@@ -138,7 +138,7 @@ export async function vendorManagementExample() {
       console.log(`   Quality Rating: ${metrics.qualityRating}/5`)
       console.log(`   Service Rating: ${metrics.serviceRating}/5`)
       console.log(`   Overall Rating: ${metrics.overallRating}/5`)
-      console.log(`   Total Value: ${metrics.totalValue.currencyCode} ${metrics.totalValue.amount}`)
+      console.log(`   Total Value: ${metrics.totalValue.currency} ${metrics.totalValue.amount}`)
     }
     console.log('')
 

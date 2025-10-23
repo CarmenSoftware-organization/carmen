@@ -30,7 +30,7 @@ export class MockPrismaClient {
             upsert: async (data: any) => ({ id: 'mock-id', ...data.create || data.update }),
           }
         }
-        return target[prop as keyof MockPrismaClient]
+        return target[prop as unknown as keyof MockPrismaClient]
       }
     })
   }

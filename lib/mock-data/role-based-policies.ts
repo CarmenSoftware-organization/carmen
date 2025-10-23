@@ -3,7 +3,7 @@
  * Simplified approach replacing complex ABAC with direct role-to-permission mappings
  */
 
-import { Policy, EffectType } from '@/lib/types/permissions'
+import { Policy, EffectType, Operator } from '@/lib/types/permissions'
 
 // Role-based permission definitions
 export interface RolePermissions {
@@ -165,7 +165,7 @@ export const roleBasedPolicies: Policy[] = rolePermissionMappings.map(role => ({
   target: {
       subjects: [{
           attribute: 'user.role',
-          operator: 'EQUALS' as const,
+          operator: Operator.EQUALS,
           value: role.roleId
       }],
       actions: role.permissions,

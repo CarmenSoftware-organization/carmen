@@ -24,7 +24,10 @@ export {
   type ConversionResponse
 } from './exchange-rate-converter'
 
-// Price calculator
+// Price calculator - import for local use
+import { PriceCalculator } from './price-calculator'
+
+// Re-export all price calculator types and class
 export {
   PriceCalculator,
   type PricingTier,

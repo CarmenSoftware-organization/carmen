@@ -356,8 +356,7 @@ export class InventoryValuationService {
       }))
 
       const abcResult = await this.inventoryCalculations.performABCAnalysis({
-        items: analysisItems,
-        currencyCode: 'USD'
+        items: analysisItems
       })
 
       if (!abcResult.value) {

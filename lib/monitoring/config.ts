@@ -183,15 +183,17 @@ export const productionConfig: MonitoringConfig = {
 
 export function getMonitoringConfig(): MonitoringConfig {
   const env = process.env.NODE_ENV || 'development'
-  
-  switch (env) {
-    case 'production':
-      return productionConfig
-    case 'staging':
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV // Custom env for staging/production distinction
+
+  if (env === 'production') {
+    // Use APP_ENV to distinguish between staging and production
+    if (appEnv === 'staging') {
       return stagingConfig
-    default:
-      return developmentConfig
+    }
+    return productionConfig
   }
+
+  return developmentConfig
 }
 
 // Service-specific configurations
