@@ -9,6 +9,7 @@
 import { prisma, type PrismaClient } from '@/lib/db'
 import { InventoryCalculations } from '../calculations/inventory-calculations'
 import { CachedInventoryCalculations } from '../cache/cached-inventory-calculations'
+import { EnhancedCacheLayer } from '../cache/enhanced-cache-layer'
 import type {
   InventoryItem,
   StockBalance,
@@ -199,11 +200,38 @@ export class InventoryService {
   private db: any
   private inventoryCalculations: InventoryCalculations
   private cachedCalculations: CachedInventoryCalculations
+  private cacheLayer: EnhancedCacheLayer
 
   constructor(prismaClient?: any) {
     this.db = prismaClient || prisma
     this.inventoryCalculations = new InventoryCalculations()
-    this.cachedCalculations = new CachedInventoryCalculations()
+    this.cacheLayer = new EnhancedCacheLayer({
+      redis: {
+        enabled: false,
+        fallbackToMemory: true,
+        connectionTimeout: 5000
+      },
+      memory: {
+        maxMemoryMB: 50,
+        maxEntries: 1000
+      },
+      ttl: {
+        financial: 300,
+        inventory: 600,
+        vendor: 900,
+        default: 300
+      },
+      invalidation: {
+        enabled: true,
+        batchSize: 100,
+        maxDependencies: 50
+      },
+      monitoring: {
+        enabled: false,
+        metricsInterval: 60000
+      }
+    })
+    this.cachedCalculations = new CachedInventoryCalculations(this.cacheLayer)
   }
 
   /**

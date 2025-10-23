@@ -5,7 +5,7 @@
  * with calculation services for comprehensive product management.
  */
 
-import { prisma, type PrismaClient } from '@/lib/db'
+import { prisma, type PrismaClient } from '@/lib/db/prisma'
 import { InventoryCalculations, type StockValuationInput, type ReorderPointInput, type ABCAnalysisInput } from '../calculations/inventory-calculations'
 import type { 
   Product, 
@@ -22,6 +22,7 @@ import type {
   ProductMetrics 
 } from '@/lib/types/product'
 import type { Money } from '@/lib/types/common'
+import { CostingMethod } from '@/lib/types/inventory'
 
 /**
  * Database product representation (matching schema)
@@ -256,7 +257,7 @@ export interface ServiceResult<T> {
 }
 
 export class ProductService {
-  private db: PrismaClient
+  private db: any // Using any because Prisma generates model properties at runtime
   private inventoryCalculations: InventoryCalculations
 
   constructor(prismaClient?: PrismaClient) {
@@ -316,7 +317,7 @@ export class ProductService {
       }
 
       if (filters.search) {
-        const searchConditions = [
+        const searchConditions: any[] = [
           { product_name: { contains: filters.search, mode: 'insensitive' } },
           { product_code: { contains: filters.search, mode: 'insensitive' } },
           { description: { contains: filters.search, mode: 'insensitive' } },
@@ -329,7 +330,7 @@ export class ProductService {
             keywords: {
               has: filters.search
             }
-          })
+          } as any)
         }
 
         whereClause.OR = whereClause.OR ? [...whereClause.OR, ...searchConditions] : searchConditions
@@ -410,7 +411,7 @@ export class ProductService {
 
       // Transform to application format
       const transformedProducts = await Promise.all(
-        products.map(async (dbProduct) => await this.transformDbProductToProduct(dbProduct))
+        products.map(async (dbProduct: any) => await this.transformDbProductToProduct(dbProduct))
       )
 
       return {
@@ -540,7 +541,7 @@ export class ProductService {
           standard_order_quantity: input.standardOrderQuantity,
           lead_time_days: input.leadTimeDays,
           standard_cost_amount: input.standardCost?.amount,
-          standard_cost_currency: input.standardCost?.currencyCode,
+          standard_cost_currency: input.standardCost?.currency,
           weight: input.weight,
           weight_unit: input.weightUnit,
           length: input.dimensions?.length,
@@ -657,15 +658,15 @@ export class ProductService {
       if (input.leadTimeDays !== undefined) updateData.lead_time_days = input.leadTimeDays
       if (input.standardCost) {
         updateData.standard_cost_amount = input.standardCost.amount
-        updateData.standard_cost_currency = input.standardCost.currencyCode
+        updateData.standard_cost_currency = input.standardCost.currency
       }
       if (input.lastPurchaseCost) {
         updateData.last_purchase_cost_amount = input.lastPurchaseCost.amount
-        updateData.last_purchase_cost_currency = input.lastPurchaseCost.currencyCode
+        updateData.last_purchase_cost_currency = input.lastPurchaseCost.currency
       }
       if (input.averageCost) {
         updateData.average_cost_amount = input.averageCost.amount
-        updateData.average_cost_currency = input.averageCost.currencyCode
+        updateData.average_cost_currency = input.averageCost.currency
       }
       if (input.weight !== undefined) updateData.weight = input.weight
       if (input.weightUnit !== undefined) updateData.weight_unit = input.weightUnit
@@ -767,18 +768,18 @@ export class ProductService {
       // For demonstration, we'll create mock inventory data
       const mockInventoryData = {
         quantityOnHand: 150,
-        averageCost: { amount: 25.50, currencyCode: 'USD' },
+        averageCost: { amount: 25.50, currency: 'USD' },
         transactions: [
           {
             date: new Date('2024-01-15'),
             quantity: 100,
-            unitCost: { amount: 24.00, currencyCode: 'USD' },
+            unitCost: { amount: 24.00, currency: 'USD' },
             transactionType: 'purchase'
           },
           {
             date: new Date('2024-02-01'),
             quantity: 50,
-            unitCost: { amount: 27.00, currencyCode: 'USD' },
+            unitCost: { amount: 27.00, currency: 'USD' },
             transactionType: 'purchase'
           }
         ]
@@ -787,13 +788,13 @@ export class ProductService {
       const stockValuationInput: StockValuationInput = {
         itemId: productId,
         quantityOnHand: mockInventoryData.quantityOnHand,
-        costingMethod: 'weighted_average',
+        costingMethod: CostingMethod.WEIGHTED_AVERAGE,
         averageCost: mockInventoryData.averageCost
       }
 
       const valuationResult = await this.inventoryCalculations.calculateStockValuation(stockValuationInput)
-      
-      if (!valuationResult.success || !valuationResult.value) {
+
+      if (valuationResult.errors && valuationResult.errors.length > 0) {
         return {
           success: false,
           error: 'Failed to calculate stock valuation'
@@ -808,11 +809,11 @@ export class ProductService {
       }
 
       const reorderResult = await this.inventoryCalculations.calculateReorderPoint(reorderPointInput)
-      
+
       // Determine stock status
       let stockStatus: 'in_stock' | 'low_stock' | 'out_of_stock' | 'overstock' = 'in_stock'
       const currentStock = mockInventoryData.quantityOnHand
-      const reorderPoint = reorderResult.success ? reorderResult.value?.reorderPoint : 20
+      const reorderPoint = (!reorderResult.errors || reorderResult.errors.length === 0) ? reorderResult.value?.reorderPoint : 20
 
       if (currentStock === 0) {
         stockStatus = 'out_of_stock'
@@ -828,7 +829,7 @@ export class ProductService {
           currentStock,
           averageCost: valuationResult.value.unitCost,
           totalValue: valuationResult.value.totalValue,
-          reorderPoint: reorderResult.success ? reorderResult.value?.reorderPoint : undefined,
+          reorderPoint: (!reorderResult.errors || reorderResult.errors.length === 0) ? reorderResult.value?.reorderPoint : undefined,
           stockStatus
         }
       }
@@ -883,22 +884,22 @@ export class ProductService {
 
       const stats = {
         total,
-        active: statusCounts.find(s => s.status === 'active')?._count.status || 0,
-        inactive: statusCounts.find(s => s.status === 'inactive')?._count.status || 0,
-        discontinued: statusCounts.find(s => s.status === 'discontinued')?._count.status || 0,
-        byType: typeCounts.reduce((acc, item) => {
+        active: statusCounts.find((s: any) => s.status === 'active')?._count.status || 0,
+        inactive: statusCounts.find((s: any) => s.status === 'inactive')?._count.status || 0,
+        discontinued: statusCounts.find((s: any) => s.status === 'discontinued')?._count.status || 0,
+        byType: typeCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.product_type] = item._count.product_type
           return acc
         }, {} as Record<string, number>),
-        byCategory: categoryCounts.reduce((acc, item) => {
+        byCategory: categoryCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.category_id] = item._count.category_id
           return acc
         }, {} as Record<string, number>),
-        totalValue: valueAggregation._sum.standard_cost_amount 
-          ? { amount: valueAggregation._sum.standard_cost_amount, currencyCode: 'USD' }
+        totalValue: valueAggregation._sum.standard_cost_amount
+          ? { amount: valueAggregation._sum.standard_cost_amount, currency: 'USD' }
           : undefined,
         averageValue: valueAggregation._avg.standard_cost_amount
-          ? { amount: valueAggregation._avg.standard_cost_amount, currencyCode: 'USD' }
+          ? { amount: valueAggregation._avg.standard_cost_amount, currency: 'USD' }
           : undefined
       }
 
@@ -1038,14 +1039,14 @@ export class ProductService {
       maximumOrderQuantity: dbProduct.maximum_order_quantity || undefined,
       standardOrderQuantity: dbProduct.standard_order_quantity || undefined,
       leadTimeDays: dbProduct.lead_time_days || undefined,
-      standardCost: dbProduct.standard_cost_amount && dbProduct.standard_cost_currency 
-        ? { amount: dbProduct.standard_cost_amount, currencyCode: dbProduct.standard_cost_currency }
+      standardCost: dbProduct.standard_cost_amount && dbProduct.standard_cost_currency
+        ? { amount: dbProduct.standard_cost_amount, currency: dbProduct.standard_cost_currency }
         : undefined,
       lastPurchaseCost: dbProduct.last_purchase_cost_amount && dbProduct.last_purchase_cost_currency
-        ? { amount: dbProduct.last_purchase_cost_amount, currencyCode: dbProduct.last_purchase_cost_currency }
+        ? { amount: dbProduct.last_purchase_cost_amount, currency: dbProduct.last_purchase_cost_currency }
         : undefined,
       averageCost: dbProduct.average_cost_amount && dbProduct.average_cost_currency
-        ? { amount: dbProduct.average_cost_amount, currencyCode: dbProduct.average_cost_currency }
+        ? { amount: dbProduct.average_cost_amount, currency: dbProduct.average_cost_currency }
         : undefined,
       weight: dbProduct.weight || undefined,
       weightUnit: dbProduct.weight_unit || undefined,
@@ -1063,11 +1064,7 @@ export class ProductService {
       keywords: dbProduct.keywords || [],
       tags: dbProduct.tags || [],
       notes: dbProduct.notes || undefined,
-      isActive: dbProduct.is_active,
-      createdAt: dbProduct.created_at,
-      updatedAt: dbProduct.updated_at,
-      createdBy: dbProduct.created_by,
-      updatedBy: dbProduct.updated_by || undefined
+      isActive: dbProduct.is_active
     }
 
     return product

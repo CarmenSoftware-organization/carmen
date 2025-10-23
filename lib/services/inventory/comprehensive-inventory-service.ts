@@ -8,7 +8,6 @@
 
 import { prisma, type PrismaClient } from '@/lib/db'
 import { InventoryCalculations } from '../calculations/inventory-calculations'
-import { CachedInventoryCalculations } from '../cache/cached-inventory-calculations'
 import type {
   InventoryItem,
   StockBalance,
@@ -177,12 +176,14 @@ export interface EnhancedServiceResult<T> {
 export class ComprehensiveInventoryService {
   private db: any
   private inventoryCalculations: InventoryCalculations
-  private cachedCalculations: CachedInventoryCalculations
+  private cachedCalculations: InventoryCalculations
 
   constructor(prismaClient?: any) {
     this.db = prismaClient || prisma
-    this.inventoryCalculations = new InventoryCalculations(this.db)
-    this.cachedCalculations = new CachedInventoryCalculations(this.db)
+    this.inventoryCalculations = new InventoryCalculations()
+    // Note: CachedInventoryCalculations requires a cache layer, not a database client
+    // For now, we'll use the base InventoryCalculations class
+    this.cachedCalculations = new InventoryCalculations()
   }
 
   /**
@@ -842,7 +843,7 @@ export class ComprehensiveInventoryService {
     return 'minimal'
   }
 
-  private async calculateCostByMethod(item: any, method: CostingMethod, asOfDate?: Date): Money {
+  private async calculateCostByMethod(item: any, method: CostingMethod, asOfDate?: Date): Promise<Money> {
     // Implement different costing methods
     switch (method) {
       case CostingMethod.FIFO:

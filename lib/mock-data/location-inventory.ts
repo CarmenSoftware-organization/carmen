@@ -121,7 +121,7 @@ export const generateLocationStock = (locationId: string): LocationStockData => 
 export const generateRecentMovements = (locationId: string, count: number): StockMovement[] => {
   const movements: StockMovement[] = []
   const otherLocations = mockLocations.filter(l => l.id !== locationId)
-  const sampleItems = mockInventoryItems.slice(0, 10)
+  const sampleItems = mockProducts.slice(0, 10)
 
   for (let i = 0; i < count; i++) {
     const isIncoming = Math.random() > 0.5
@@ -130,8 +130,8 @@ export const generateRecentMovements = (locationId: string, count: number): Stoc
 
     movements.push({
       id: `mov-${locationId}-${i}`,
-      itemCode: item.code,
-      itemName: item.name,
+      itemCode: item.productCode,
+      itemName: item.productName,
       fromLocation: isIncoming ? otherLocation.name : mockLocations.find(l => l.id === locationId)!.name,
       toLocation: isIncoming ? mockLocations.find(l => l.id === locationId)!.name : otherLocation.name,
       quantity: Math.floor(Math.random() * 50) + 1,
@@ -307,7 +307,7 @@ export interface TransferSuggestion {
 
 export const generateTransferSuggestions = (): TransferSuggestion[] => {
   const suggestions: TransferSuggestion[] = []
-  const sampleItems = mockInventoryItems.slice(0, 8)
+  const sampleItems = mockProducts.slice(0, 8)
 
   for (let i = 0; i < 6; i++) {
     const item = sampleItems[Math.floor(Math.random() * sampleItems.length)]
@@ -315,8 +315,8 @@ export const generateTransferSuggestions = (): TransferSuggestion[] => {
     const toLoc = mockLocations.filter(l => l.id !== fromLoc.id)[Math.floor(Math.random() * (mockLocations.length - 1))]
 
     suggestions.push({
-      itemCode: item.code,
-      itemName: item.name,
+      itemCode: item.productCode,
+      itemName: item.productName,
       fromLocation: fromLoc.name,
       toLocation: toLoc.name,
       suggestedQuantity: Math.floor(Math.random() * 20) + 5,
@@ -371,10 +371,10 @@ export const generateSlowMovingData = (): SlowMovingGroup[] => {
       items.push({
         id: `slow-${location.id}-${i}`,
         productId: product.id,
-        productCode: product.sku,
-        productName: product.name,
-        category: product.category || 'Unknown',
-        unit: product.unit || 'pcs',
+        productCode: product.productCode,
+        productName: product.productName,
+        category: product.categoryId || 'Unknown',
+        unit: product.baseUnit || 'pcs',
         locationId: location.id,
         locationName: location.name,
         lastMovementDate,
@@ -448,10 +448,10 @@ export const generateSlowMovingItems = (): SlowMovingItem[] => {
       allItems.push({
         id: `slow-${location.id}-${product.id}-${i}`,
         productId: product.id,
-        productCode: product.sku,
-        productName: product.name,
-        category: product.category,
-        unit: product.unit,
+        productCode: product.productCode,
+        productName: product.productName,
+        category: product.categoryId,
+        unit: product.baseUnit,
         locationId: location.id,
         locationName: location.name,
         lastMovementDate,
@@ -461,7 +461,7 @@ export const generateSlowMovingItems = (): SlowMovingItem[] => {
         averageCost: unitCost,
         turnoverRate,
         suggestedAction,
-        riskLevel: Math.floor(Math.random() * 500) + 100 // $100-600 per month
+        riskLevel
       })
     }
   })
@@ -530,10 +530,10 @@ export const generateAgingData = (): LocationAgingGroup[] => {
       const agingItem: AgingItem = {
         id: `aging-${location.id}-${i}`,
         productId: product.id,
-        productCode: product.sku,
-        productName: product.name,
-        category: product.category || 'Unknown',
-        unit: product.unit || 'pcs',
+        productCode: product.productCode,
+        productName: product.productName,
+        category: product.categoryId || 'Unknown',
+        unit: product.baseUnit || 'pcs',
         locationId: location.id,
         locationName: location.name,
         lotNumber: Math.random() > 0.5 ? `LOT-${receivedDate.toISOString().slice(0, 10).replace(/-/g, '')}${i}` : undefined,
@@ -617,25 +617,20 @@ export const generateAgingItems = (): AgingItem[] => {
       receivedDate.setDate(receivedDate.getDate() - ageInDays)
 
       // Generate expiry date for some items (60-70% have expiry dates)
-      let expiryDate: string = ''
-      let daysToExpiry: number = 0
-      let expiryStatus: AgingItem['expiryStatus'] = 'no-expiry'
+      let expiryDate: Date | undefined
+      let daysToExpiry: number | undefined
+      let isExpired = false
 
       if (Math.random() > 0.3) {
-        const expiryDateObj = new Date(receivedDate)
+        expiryDate = new Date(receivedDate)
         const shelfLife = Math.floor(Math.random() * 90) + 30 // 30-120 days shelf life
-        expiryDateObj.setDate(expiryDateObj.getDate() + shelfLife)
-        expiryDate = expiryDateObj.toISOString().split('T')[0]
+        expiryDate.setDate(expiryDate.getDate() + shelfLife)
 
         const today = new Date()
-        daysToExpiry = Math.floor((expiryDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        daysToExpiry = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
         if (daysToExpiry < 0) {
-          expiryStatus = 'expired'
-        } else if (daysToExpiry <= 7) {
-          expiryStatus = 'near-expiry'
-        } else {
-          expiryStatus = 'fresh'
+          isExpired = true
         }
       }
 
@@ -651,25 +646,41 @@ export const generateAgingItems = (): AgingItem[] => {
         ageBucket = '90+'
       }
 
+      // Determine risk level
+      let riskLevel: 'low' | 'medium' | 'high' | 'critical'
+      if (isExpired || (daysToExpiry !== undefined && daysToExpiry < 7)) {
+        riskLevel = 'critical'
+      } else if (daysToExpiry !== undefined && daysToExpiry < 14) {
+        riskLevel = 'high'
+      } else if (ageInDays > 90) {
+        riskLevel = 'medium'
+      } else {
+        riskLevel = 'low'
+      }
+
+      const writeOffValue = (riskLevel === 'critical' && isExpired) ? value * 0.8 : undefined
+
       allItems.push({
         id: `aging-${location.id}-${product.id}-${i}`,
         productId: product.id,
-        productCode: product.sku,
-        productName: product.name,
-        category: product.category,
-        unit: product.unit,
+        productCode: product.productCode,
+        productName: product.productName,
+        category: product.categoryId,
+        unit: product.baseUnit,
         locationId: location.id,
         locationName: location.name,
-        batchNumber: `BATCH-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
-        receiptDate: receivedDate,
-        daysOld: ageInDays,
-        ageBucket,
-        currentStock: quantity,
-        value,
-        averageCost: unitCost,
+        lotNumber: `LOT-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+        receivedDate: receivedDate,
         expiryDate,
+        ageInDays,
+        ageBucket,
+        quantity,
+        value,
+        unitCost,
+        riskLevel,
         daysToExpiry,
-        expiryStatus
+        isExpired,
+        writeOffValue
       })
     }
   })
@@ -716,11 +727,11 @@ export const groupSlowMovingByLocation = (items: SlowMovingItem[]): LocationGrou
 export const groupAgingByLocation = (items: AgingItem[]): LocationGroup<AgingItem>[] => {
   return groupItemsByLocation(items, (locationItems) => ({
     totalItems: locationItems.length,
-    currentStock: locationItems.reduce((sum, item) => sum + item.currentStock, 0),
+    quantity: locationItems.reduce((sum, item) => sum + item.quantity, 0),
     value: locationItems.reduce((sum, item) => sum + item.value, 0),
-    averageAge: locationItems.reduce((sum, item) => sum + item.daysOld, 0) / locationItems.length,
-    expiredItems: locationItems.filter(item => item.expiryStatus === 'expired').length,
-    nearExpiryItems: locationItems.filter(item => item.expiryStatus === 'near-expiry').length
+    averageAge: locationItems.reduce((sum, item) => sum + item.ageInDays, 0) / locationItems.length,
+    expiredItems: locationItems.filter(item => item.isExpired).length,
+    nearExpiryItems: locationItems.filter(item => item.daysToExpiry !== undefined && item.daysToExpiry >= 0 && item.daysToExpiry <= 7).length
   }))
 }
 
@@ -743,11 +754,11 @@ export const groupAgingByAgeBucket = (items: AgingItem[]): LocationGroup<AgingIt
     items: bucketItems,
     subtotals: {
       totalItems: bucketItems.length,
-      currentStock: bucketItems.reduce((sum, item) => sum + item.currentStock, 0),
+      quantity: bucketItems.reduce((sum, item) => sum + item.quantity, 0),
       value: bucketItems.reduce((sum, item) => sum + item.value, 0),
-      averageAge: bucketItems.reduce((sum, item) => sum + item.daysOld, 0) / bucketItems.length,
-      expiredItems: bucketItems.filter(item => item.expiryStatus === 'expired').length,
-      nearExpiryItems: bucketItems.filter(item => item.expiryStatus === 'near-expiry').length
+      averageAge: bucketItems.reduce((sum, item) => sum + item.ageInDays, 0) / bucketItems.length,
+      expiredItems: bucketItems.filter(item => item.isExpired).length,
+      nearExpiryItems: bucketItems.filter(item => item.daysToExpiry !== undefined && item.daysToExpiry >= 0 && item.daysToExpiry <= 7).length
     },
     isExpanded: false
   }))

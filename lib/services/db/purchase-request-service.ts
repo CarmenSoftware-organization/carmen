@@ -756,7 +756,7 @@ export class PurchaseRequestService {
       await this.db.$transaction(async (tx) => {
         await (tx as any).purchase_request_items.updateMany({
           where: {
-            id: { in: itemsToConvert.map(item => item.id) }
+            id: { in: itemsToConvert.map((item: any) => item.id) }
           },
           data: {
             converted_to_po: true,
@@ -835,15 +835,15 @@ export class PurchaseRequestService {
 
       const stats = {
         total: valueStats._count.id,
-        byStatus: statusCounts.reduce((acc, item) => {
+        byStatus: statusCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.status] = item._count.status
           return acc
         }, {} as Record<string, number>),
-        byPriority: priorityCounts.reduce((acc, item) => {
+        byPriority: priorityCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.priority] = item._count.priority
           return acc
         }, {} as Record<string, number>),
-        byType: typeCounts.reduce((acc, item) => {
+        byType: typeCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.request_type] = item._count.request_type
           return acc
         }, {} as Record<string, number>),
@@ -1042,11 +1042,7 @@ export class PurchaseRequestService {
       attachments: [],
       workflowStages,
       currentStage: dbRequest.current_stage,
-      notes: dbRequest.notes,
-      createdAt: dbRequest.created_at,
-      updatedAt: dbRequest.updated_at,
-      createdBy: dbRequest.created_by,
-      updatedBy: dbRequest.updated_by
+      notes: dbRequest.notes
     }
   }
 }
