@@ -783,7 +783,7 @@ export function EnhancedPOItemRow({
                 {isEditMode ? (
                   <Input
                     type="number"
-                    value={editedItem.unitPrice || 0}
+                    value={typeof editedItem.unitPrice === 'object' && editedItem.unitPrice !== null ? ((editedItem.unitPrice as any).amount || 0) : (editedItem.unitPrice as any || 0)}
                     onChange={(e) => handleFieldChange('unitPrice', parseFloat(e.target.value) || 0)}
                     className="text-xs font-semibold text-right h-6 w-full max-w-18"
                     min="0"
@@ -791,9 +791,9 @@ export function EnhancedPOItemRow({
                   />
                 ) : (
                   <>
-                    <div className="font-semibold text-xs text-right">{currencyCode} {(item.unitPrice || 0).toFixed(2)}</div>
+                    <div className="font-semibold text-xs text-right">{currencyCode} {(typeof item.unitPrice === 'object' && item.unitPrice !== null ? ((item.unitPrice as any).amount || 0) : (item.unitPrice as any || 0)).toFixed(2)}</div>
                     {showBaseCurrency && (
-                      <div className="text-xs text-gray-400 text-right">{baseCurrencyCode} {((item.unitPrice || 0) * exchangeRate).toFixed(2)}</div>
+                      <div className="text-xs text-gray-400 text-right">{baseCurrencyCode} {((typeof item.unitPrice === 'object' && item.unitPrice !== null ? ((item.unitPrice as any).amount || 0) : (item.unitPrice as any || 0)) * exchangeRate).toFixed(2)}</div>
                     )}
                   </>
                 )}
