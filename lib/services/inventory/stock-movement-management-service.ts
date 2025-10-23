@@ -7,13 +7,14 @@
 
 import { prisma, type PrismaClient } from '@/lib/db'
 import { comprehensiveInventoryService } from './comprehensive-inventory-service'
+import { inventoryService } from '../db/inventory-service'
 import { InventoryCalculations } from '../calculations/inventory-calculations'
-import type {
-  StockMovement,
-  StockMovementItem,
-  InventoryTransaction,
+import {
+  type StockMovement,
+  type StockMovementItem,
+  type InventoryTransaction,
   TransactionType,
-  StockBalance
+  type StockBalance
 } from '@/lib/types/inventory'
 import type { Money, DocumentStatus } from '@/lib/types/common'
 
@@ -170,11 +171,11 @@ export interface StockOperationResult<T> {
 }
 
 export class StockMovementManagementService {
-  private db: PrismaClient
+  private db: typeof prisma
   private inventoryService = comprehensiveInventoryService
   private inventoryCalculations = new InventoryCalculations()
 
-  constructor(prismaClient?: PrismaClient) {
+  constructor(prismaClient?: typeof prisma) {
     this.db = prismaClient || prisma
   }
 
@@ -255,7 +256,7 @@ export class StockMovementManagementService {
       for (const item of items) {
         try {
           // Create outbound transaction (from location)
-          const outboundResult = await this.inventoryService.recordInventoryTransaction({
+          const outboundResult = await inventoryService.recordInventoryTransaction({
             itemId: item.itemId,
             locationId: fromLocationId,
             transactionType: TransactionType.TRANSFER_OUT,
@@ -273,7 +274,7 @@ export class StockMovementManagementService {
             transactionIds.push(outboundResult.data.transaction.id)
 
             // Create inbound transaction (to location)
-            const inboundResult = await this.inventoryService.recordInventoryTransaction({
+            const inboundResult = await inventoryService.recordInventoryTransaction({
               itemId: item.itemId,
               locationId: toLocationId,
               transactionType: TransactionType.TRANSFER_IN,
@@ -308,7 +309,7 @@ export class StockMovementManagementService {
       }
 
       // Update movement status
-      await this.updateMovementStatus(movement.id, transactions.length > 0 ? 'completed' : 'cancelled')
+      await this.updateMovementStatus(movement.id, transactions.length > 0 ? ('completed' as DocumentStatus) : ('cancelled' as DocumentStatus))
 
       // Create audit log
       await this.createTransferAuditLog(movement.id, requestedBy, 'completed', {
@@ -355,7 +356,7 @@ export class StockMovementManagementService {
   ): Promise<StockOperationResult<StockReservation>> {
     try {
       // Check stock availability
-      const stockResult = await this.inventoryService.getStockBalance(itemId, locationId)
+      const stockResult = await inventoryService.getStockBalance(itemId, locationId)
       
       if (!stockResult.success || !stockResult.data) {
         return {
@@ -399,7 +400,7 @@ export class StockMovementManagementService {
       await this.storeReservation(reservation)
 
       // Update stock balance to reflect reservation
-      const updatedBalanceResult = await this.inventoryService.upsertStockBalance({
+      const updatedBalanceResult = await inventoryService.upsertStockBalance({
         itemId,
         locationId,
         quantityOnHand: stockBalance.quantityOnHand,
@@ -478,15 +479,15 @@ export class StockMovementManagementService {
       }
 
       // Update stock balance
-      const stockResult = await this.inventoryService.getStockBalance(
-        reservation.itemId, 
+      const stockResult = await inventoryService.getStockBalance(
+        reservation.itemId,
         reservation.locationId
       )
 
       if (stockResult.success && stockResult.data) {
         const stockBalance = stockResult.data
-        
-        await this.inventoryService.upsertStockBalance({
+
+        await inventoryService.upsertStockBalance({
           itemId: reservation.itemId,
           locationId: reservation.locationId,
           quantityOnHand: stockBalance.quantityOnHand,
@@ -588,7 +589,7 @@ export class StockMovementManagementService {
               }
             } else {
               // Issue from location (e.g., production consumption)
-              const issueResult = await this.inventoryService.recordInventoryTransaction({
+              const issueResult = await inventoryService.recordInventoryTransaction({
                 itemId: item.itemId,
                 locationId: operation.fromLocationId,
                 transactionType: TransactionType.ISSUE,
@@ -675,7 +676,7 @@ export class StockMovementManagementService {
     const warnings: string[] = []
 
     for (const item of items) {
-      const stockResult = await this.inventoryService.getStockBalance(item.itemId, locationId)
+      const stockResult = await inventoryService.getStockBalance(item.itemId, locationId)
       
       if (!stockResult.success || !stockResult.data) {
         return {
@@ -720,28 +721,28 @@ export class StockMovementManagementService {
     items: { itemId: string; quantity: number; unitCost?: Money }[]
   ): Promise<Money> {
     let totalAmount = 0
-    let currencyCode = 'USD'
+    let currency = 'USD'
 
     for (const item of items) {
       const unitCost = item.unitCost || await this.getAverageCost(item.itemId)
       totalAmount += item.quantity * unitCost.amount
-      currencyCode = unitCost.currencyCode
+      currency = unitCost.currency
     }
 
-    return { amount: totalAmount, currencyCode }
+    return { amount: totalAmount, currency }
   }
 
   private async getAverageCost(itemId: string, locationId?: string): Promise<Money> {
     // Get average cost from stock balance or item master
     if (locationId) {
-      const stockResult = await this.inventoryService.getStockBalance(itemId, locationId)
+      const stockResult = await inventoryService.getStockBalance(itemId, locationId)
       if (stockResult.success && stockResult.data) {
         return stockResult.data.averageCost
       }
     }
 
     // Fallback to default cost
-    return { amount: 10.0, currencyCode: 'USD' }
+    return { amount: 10.0, currency: 'USD' }
   }
 
   private async createStockMovementRecord(data: any): Promise<StockMovement> {
@@ -753,15 +754,12 @@ export class StockMovementManagementService {
       movementType: 'transfer',
       fromLocationId: data.fromLocationId,
       toLocationId: data.toLocationId,
-      status: data.autoApprove ? 'completed' : 'pending',
+      status: (data.autoApprove ? 'completed' : 'pending') as DocumentStatus,
       requestedBy: data.requestedBy,
       totalItems: data.totalItems,
       totalValue: data.totalValue,
       priority: data.priority,
-      notes: data.notes,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      createdBy: data.requestedBy
+      notes: data.notes
     }
 
     // Store in database (placeholder)

@@ -668,11 +668,7 @@ export class VendorService {
       approvedBy: undefined,
       approvedAt: undefined,
       lastReviewDate: undefined,
-      nextReviewDate: undefined,
-      createdAt: dbVendor.created_at,
-      updatedAt: dbVendor.updated_at,
-      createdBy: dbVendor.created_by,
-      updatedBy: undefined
+      nextReviewDate: undefined
     }
 
     return vendor
@@ -719,10 +715,10 @@ export class VendorService {
 
       const stats = {
         total,
-        active: statusCounts.find(s => s.status === 'active')?._count.status || 0,
-        inactive: statusCounts.find(s => s.status === 'inactive')?._count.status || 0,
-        suspended: statusCounts.find(s => s.status === 'suspended')?._count.status || 0,
-        byBusinessType: businessTypeCounts.reduce((acc, item) => {
+        active: statusCounts.find((s: any) => s.status === 'active')?._count.status || 0,
+        inactive: statusCounts.find((s: any) => s.status === 'inactive')?._count.status || 0,
+        suspended: statusCounts.find((s: any) => s.status === 'suspended')?._count.status || 0,
+        byBusinessType: businessTypeCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.business_type || 'unknown'] = item._count.business_type
           return acc
         }, {} as Record<string, number>),

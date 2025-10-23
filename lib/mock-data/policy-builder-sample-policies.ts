@@ -32,28 +32,24 @@ export const samplePolicies: Policy[] = [
         {
           attribute: 'subject.role.name',
           operator: Operator.IN,
-          value: ['chef', 'kitchen-staff'],
-          logicalOperator: LogicalOperator.AND
+          value: ['chef', 'kitchen-staff']
         },
         {
           attribute: 'subject.department.name',
           operator: Operator.EQUALS,
-          value: 'kitchen',
-          logicalOperator: LogicalOperator.AND
+          value: 'kitchen'
         },
         {
           attribute: 'subject.accountStatus',
           operator: Operator.EQUALS,
-          value: 'active',
-          logicalOperator: LogicalOperator.AND
+          value: 'active'
         }
       ],
       resources: [
         {
           attribute: 'resource.resourceType',
           operator: Operator.EQUALS,
-          value: 'recipe',
-          logicalOperator: LogicalOperator.AND
+          value: 'recipe'
         }
       ],
       actions: ['view_recipe', 'modify_recipe'],
@@ -61,8 +57,7 @@ export const samplePolicies: Policy[] = [
         {
           attribute: 'environment.isBusinessHours',
           operator: Operator.EQUALS,
-          value: true,
-          logicalOperator: LogicalOperator.AND
+          value: true
         }
       ]
     },
@@ -75,14 +70,7 @@ export const samplePolicies: Policy[] = [
           type: 'simple'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'system-admin',
-      approvedAt: new Date('2024-01-15'),
-      comments: 'Standard kitchen operations policy'
-    }
+    ]
   },
 
   // 2. Purchase Request Approval Workflow
@@ -100,74 +88,24 @@ export const samplePolicies: Policy[] = [
     createdAt: new Date('2024-01-10'),
     updatedBy: 'financial-manager',
     updatedAt: new Date('2024-01-20'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       {
         id: 'rule-high-value-approval',
         description: 'Manager approval required for purchases over $1000',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.IN,
-              value: ['department-manager', 'financial-manager'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.approvalLimit.amount',
-              operator: Operator.GREATER_THAN_OR_EQUAL,
-              value: 1000,
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.EQUALS,
-              value: 'purchase_request',
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.totalValue.amount',
-              operator: Operator.GREATER_THAN,
-              value: 1000,
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.documentStatus.status',
-              operator: Operator.EQUALS,
-              value: 'pending_approval',
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['approve_purchase_request'],
-          environment: [
-            {
-              attribute: 'environment.isBusinessHours',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'system-admin',
-      approvedAt: new Date('2024-01-20'),
-      comments: 'Updated approval limits and added business hours restriction'
-    }
+    ]
   },
 
   // 3. Department Budget View
@@ -185,61 +123,24 @@ export const samplePolicies: Policy[] = [
     createdAt: new Date('2024-01-12'),
     updatedBy: 'financial-manager',
     updatedAt: new Date('2024-01-12'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       {
         id: 'rule-department-budget-access',
         description: 'Department budget visibility',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.accountStatus',
-              operator: Operator.EQUALS,
-              value: 'active',
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.IN,
-              value: ['budget', 'financial_report'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.ownerDepartment',
-              operator: Operator.EQUALS,
-              value: '{{subject.department.name}}',
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.dataClassification',
-              operator: Operator.IN,
-              value: ['internal', 'public'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['view', 'monitor_budget'],
-          environment: []
-        },
-        
         condition: {
           type: 'simple'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'financial-manager',
-      approvedAt: new Date('2024-01-12'),
-      comments: 'Standard department budget visibility policy'
-    }
+    ]
   },
 
   // 4. Admin System Access
@@ -257,68 +158,24 @@ export const samplePolicies: Policy[] = [
     createdAt: new Date('2024-01-08'),
     updatedBy: 'system-admin',
     updatedAt: new Date('2024-01-18'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       {
         id: 'rule-admin-maintenance',
         description: 'Admin access during maintenance',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.EQUALS,
-              value: 'admin',
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.clearanceLevel',
-              operator: Operator.IN,
-              value: ['restricted', 'confidential'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.IN,
-              value: ['system_config', 'backup', 'maintenance'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['configure_system', 'backup_system', 'monitor_system'],
-          environment: [
-            {
-              attribute: 'environment.maintenanceMode',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.OR
-            },
-            {
-              attribute: 'environment.isBusinessHours',
-              operator: Operator.EQUALS,
-              value: false,
-              logicalOperator: LogicalOperator.OR
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'system-admin',
-      approvedAt: new Date('2024-01-18'),
-      comments: 'Added business hours exception for maintenance access'
-    }
+    ]
   },
 
   // 5. Vendor Invoice Submission
@@ -336,74 +193,24 @@ export const samplePolicies: Policy[] = [
     createdAt: new Date('2024-01-14'),
     updatedBy: 'procurement-manager',
     updatedAt: new Date('2024-01-14'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       {
         id: 'rule-vendor-invoice-access',
         description: 'Vendor can submit invoices for their contracts',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.EQUALS,
-              value: 'vendor',
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.accountStatus',
-              operator: Operator.EQUALS,
-              value: 'active',
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.IN,
-              value: ['invoice', 'purchase_order'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.owner',
-              operator: Operator.EQUALS,
-              value: '{{subject.userId}}',
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['create_invoice', 'view', 'update'],
-          environment: [
-            {
-              attribute: 'environment.isInternalNetwork',
-              operator: Operator.EQUALS,
-              value: false,
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'environment.authenticationMethod',
-              operator: Operator.IN,
-              value: ['sso', 'mfa'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'procurement-manager',
-      approvedAt: new Date('2024-01-14'),
-      comments: 'Vendor portal access with enhanced security requirements'
-    }
+    ]
   },
 
   // 6. Emergency Override Policy
@@ -421,73 +228,24 @@ export const samplePolicies: Policy[] = [
     createdAt: new Date('2024-01-05'),
     updatedBy: 'system-admin',
     updatedAt: new Date('2024-01-16'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       {
         id: 'rule-emergency-override',
         description: 'Emergency access for experienced managers',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.IN,
-              value: ['department-manager', 'financial-manager', 'admin'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.seniority',
-              operator: Operator.GREATER_THAN,
-              value: 2,
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.clearanceLevel',
-              operator: Operator.IN,
-              value: ['confidential', 'restricted'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [],
-          actions: ['override', 'emergency_access', 'approve', 'escalate'],
-          environment: [
-            {
-              attribute: 'environment.emergencyMode',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.OR
-            },
-            {
-              attribute: 'environment.isHoliday',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.OR
-            },
-            {
-              attribute: 'environment.threatLevel',
-              operator: Operator.IN,
-              value: ['high', 'critical'],
-              logicalOperator: LogicalOperator.OR
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'system-admin',
-      approvedAt: new Date('2024-01-16'),
-      comments: 'Added threat level conditions for enhanced emergency response'
-    }
+    ]
   },
 
   // 7. Compliance Audit Trail Policy
@@ -505,56 +263,24 @@ export const samplePolicies: Policy[] = [
     createdAt: new Date('2024-01-11'),
     updatedBy: 'compliance-officer',
     updatedAt: new Date('2024-01-11'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       {
         id: 'rule-audit-trail-required',
         description: 'Enhanced logging for compliance-sensitive operations',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [],
-          resources: [
-            {
-              attribute: 'resource.requiresAudit',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.IN,
-              value: ['purchase_order', 'invoice', 'budget', 'payment'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['create', 'update', 'delete', 'approve', 'process_payment', 'transfer_funds'],
-          environment: [
-            {
-              attribute: 'environment.auditMode',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
-          type: 'simple',
-          expression: 'resource.requiresAudit == true AND environment.auditMode == true'
+          type: 'simple'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'compliance-officer',
-      approvedAt: new Date('2024-01-11'),
-      comments: 'Mandatory audit trail for SOX compliance requirements'
-    }
+    ]
   },
 
   // 8. Seasonal Menu Updates Policy
@@ -572,68 +298,24 @@ export const samplePolicies: Policy[] = [
     createdAt: new Date('2024-01-09'),
     updatedBy: 'head-chef',
     updatedAt: new Date('2024-01-09'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       {
         id: 'rule-seasonal-planning-window',
         description: 'Menu changes during planning periods only',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.IN,
-              value: ['chef', 'head-chef', 'menu-manager'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.department.name',
-              operator: Operator.EQUALS,
-              value: 'kitchen',
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.IN,
-              value: ['recipe', 'menu'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['modify_recipe', 'approve_menu_change', 'create'],
-          environment: [
-            {
-              attribute: 'environment.currentTime',
-              operator: Operator.GREATER_THAN_OR_EQUAL,
-              value: new Date('2024-02-01'),
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'environment.currentTime',
-              operator: Operator.LESS_THAN_OR_EQUAL,
-              value: new Date('2024-02-15'),
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'head-chef',
-      approvedAt: new Date('2024-01-09'),
-      comments: 'Spring menu planning window - February 1-15, 2024'
-    }
+    ]
   }
 ];
 
@@ -657,63 +339,20 @@ export const complexSamplePolicies: Policy[] = [
     createdAt: new Date('2024-01-13'),
     updatedBy: 'financial-manager',
     updatedAt: new Date('2024-01-19'),
-    
+
     effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [],
+      resources: [],
+      actions: []
+    },
 
     rules: [
       // Rule 1: High-value transactions from internal network
       {
         id: 'rule-internal-high-value',
         description: 'High-value transactions from internal network with manager approval',
-        effect: EffectType.PERMIT,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.IN,
-              value: ['financial-manager', 'department-manager'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.approvalLimit.amount',
-              operator: Operator.GREATER_THAN_OR_EQUAL,
-              value: 10000,
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.IN,
-              value: ['payment', 'transfer'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.totalValue.amount',
-              operator: Operator.GREATER_THAN,
-              value: 10000,
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['process_payment', 'transfer_funds'],
-          environment: [
-            {
-              attribute: 'environment.isInternalNetwork',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'environment.isBusinessHours',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
@@ -723,49 +362,6 @@ export const complexSamplePolicies: Policy[] = [
       {
         id: 'rule-medium-value-mfa',
         description: 'Medium-value transactions require MFA authentication',
-        effect: EffectType.PERMIT,
-        priority: 2,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.IN,
-              value: ['financial-manager', 'department-manager', 'purchasing-staff'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.approvalLimit.amount',
-              operator: Operator.GREATER_THAN_OR_EQUAL,
-              value: 1000,
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.totalValue.amount',
-              operator: Operator.GREATER_THAN,
-              value: 1000,
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'resource.totalValue.amount',
-              operator: Operator.LESS_THAN_OR_EQUAL,
-              value: 10000,
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['process_payment', 'approve'],
-          environment: [
-            {
-              attribute: 'environment.authenticationMethod',
-              operator: Operator.IN,
-              value: ['mfa', 'biometric'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
@@ -775,61 +371,11 @@ export const complexSamplePolicies: Policy[] = [
       {
         id: 'rule-emergency-financial-override',
         description: 'Emergency financial operations with enhanced audit requirements',
-        effect: EffectType.PERMIT,
-        priority: 3,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.IN,
-              value: ['admin', 'financial-manager'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.clearanceLevel',
-              operator: Operator.IN,
-              value: ['restricted', 'confidential'],
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.requiresAudit',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['override', 'emergency_payment', 'process_payment'],
-          environment: [
-            {
-              attribute: 'environment.emergencyMode',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'environment.auditMode',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
           type: 'composite'
         }
       }
-    ],
-    
-    documentStatus: {
-      status: 'approved' as DocumentStatus,
-      approvedBy: 'financial-manager',
-      approvedAt: new Date('2024-01-19'),
-      comments: 'Comprehensive financial controls with location and authentication requirements'
-    }
+    ]
   }
 ];
 

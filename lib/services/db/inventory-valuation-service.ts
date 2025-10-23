@@ -172,7 +172,32 @@ export class InventoryValuationService {
   constructor(prismaClient?: PrismaClient) {
     this.db = (prismaClient || prisma.raw) as PrismaClient
     this.inventoryCalculations = new InventoryCalculations()
-    const cacheLayer = new EnhancedCacheLayer()
+    const cacheLayer = new EnhancedCacheLayer({
+      redis: {
+        enabled: false,
+        fallbackToMemory: true,
+        connectionTimeout: 5000
+      },
+      memory: {
+        maxMemoryMB: 100,
+        maxEntries: 1000
+      },
+      ttl: {
+        financial: 300,
+        inventory: 300,
+        vendor: 300,
+        default: 300
+      },
+      invalidation: {
+        enabled: true,
+        batchSize: 100,
+        maxDependencies: 1000
+      },
+      monitoring: {
+        enabled: false,
+        metricsInterval: 60000
+      }
+    })
     this.cachedCalculations = new CachedInventoryCalculations(cacheLayer)
     this.financialCalculations = new FinancialCalculations()
   }
@@ -688,7 +713,7 @@ export class InventoryValuationService {
       whereClause.inventory_items = itemWhereClause
     }
 
-    return await this.db.stock_balances.findMany({
+    return await (this.db as any).stock_balances.findMany({
       where: whereClause,
       include: {
         inventory_items: {
@@ -721,10 +746,7 @@ export class InventoryValuationService {
           message: `Stock level (${balance.quantity_on_hand}) is below reorder point (${balance.inventory_items.reorder_point})`,
           currentQuantity: balance.quantity_on_hand,
           thresholdQuantity: balance.inventory_items.reorder_point,
-          isActive: true,
-          createdAt: currentDate,
-          updatedAt: currentDate,
-          createdBy: 'system'
+          isActive: true
         })
       }
 
@@ -738,10 +760,7 @@ export class InventoryValuationService {
           severity: 'critical',
           message: 'Item is out of stock',
           currentQuantity: 0,
-          isActive: true,
-          createdAt: currentDate,
-          updatedAt: currentDate,
-          createdBy: 'system'
+          isActive: true
         })
       }
 
@@ -757,10 +776,7 @@ export class InventoryValuationService {
           message: `Stock level (${balance.quantity_on_hand}) exceeds maximum (${balance.inventory_items.maximum_quantity})`,
           currentQuantity: balance.quantity_on_hand,
           thresholdQuantity: balance.inventory_items.maximum_quantity,
-          isActive: true,
-          createdAt: currentDate,
-          updatedAt: currentDate,
-          createdBy: 'system'
+          isActive: true
         })
       }
     }

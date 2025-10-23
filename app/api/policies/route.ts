@@ -19,20 +19,19 @@ import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 
 // Security imports
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
-import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
+import { authStrategies } from '@/lib/auth/api-protection'
+import { withAuthorization } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas, type ValidationResult } from '@/lib/security/input-validator'
 import { SecurityEventType } from '@/lib/security/audit-logger'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 
 // Type imports
-import { 
-  Policy, 
-  PolicyBuilderState, 
-  EffectType, 
-  CombiningAlgorithm,
-  PolicyStatus 
+import {
+  Policy,
+  EffectType,
+  CombiningAlgorithm
 } from '@/lib/types/permissions'
 
 const prisma = new PrismaClient()
@@ -52,8 +51,8 @@ const querySchema = z.object({
 })
 
 const createPolicySchema = z.object({
-  name: SecureSchemas.safeString(255).min(1).max(255),
-  description: SecureSchemas.safeString(1000).optional(),
+  name: z.string().min(1).max(255),
+  description: z.string().max(1000).optional(),
   priority: z.number().int().min(0).max(1000).default(500),
   effect: z.enum(['permit', 'deny']),
   status: z.enum(['draft', 'active', 'inactive', 'archived']).default('draft'),
@@ -120,7 +119,7 @@ const bulkOperationSchema = z.object({
  */
 const getPolicies = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('policies', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('policies', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const url = new URL(request.url)
         const rawParams = Object.fromEntries(url.searchParams.entries())
@@ -164,12 +163,12 @@ const getPolicies = withSecurity(
 
         // Build filters
         const where: any = {}
-        
-        if (query.effect !== 'all') {
+
+        if (query.effect && query.effect !== 'all') {
           where.effect = query.effect.toUpperCase()
         }
-        
-        if (query.status !== 'all') {
+
+        if (query.status && query.status !== 'all') {
           where.status = query.status.toUpperCase()
         }
         
@@ -194,13 +193,14 @@ const getPolicies = withSecurity(
         }
 
         // Additional role-based filtering
-        if (user.role === 'department-manager') {
+        const roleName = typeof user.role === 'string' ? user.role : user.role.name
+        if (roleName === 'department-manager') {
           // Department managers can only see policies they created or department-level policies
           where.OR = [
             { createdBy: user.id },
             { tags: { has: `department:${user.department}` } }
           ]
-        } else if (user.role === 'staff') {
+        } else if (roleName === 'staff') {
           // Staff can only see policies they created
           where.createdBy = user.id
         }
@@ -213,12 +213,14 @@ const getPolicies = withSecurity(
         else if (query.sort_by === 'updated_at') orderBy.updatedAt = query.sort_order
 
         // Execute query with pagination
+        const page = query.page ?? 1
+        const limit = query.limit ?? 20
         const [policies, totalCount] = await Promise.all([
           prisma.policy.findMany({
             where,
             orderBy,
-            skip: (query.page - 1) * query.limit,
-            take: query.limit,
+            skip: (page - 1) * limit,
+            take: limit,
             include: {
               _count: {
                 select: {
@@ -260,10 +262,10 @@ const getPolicies = withSecurity(
           data: {
             policies: transformedPolicies,
             pagination: {
-              page: query.page,
-              limit: query.limit,
+              page,
+              limit,
               total: totalCount,
-              totalPages: Math.ceil(totalCount / query.limit)
+              totalPages: Math.ceil(totalCount / limit)
             },
             filters: {
               effect: query.effect,
@@ -276,8 +278,8 @@ const getPolicies = withSecurity(
 
         // Add pagination headers
         response.headers.set('X-Total-Count', totalCount.toString())
-        response.headers.set('X-Page-Count', Math.ceil(totalCount / query.limit).toString())
-        response.headers.set('X-Current-Page', query.page.toString())
+        response.headers.set('X-Page-Count', Math.ceil(totalCount / limit).toString())
+        response.headers.set('X-Current-Page', page.toString())
 
         return response
 
@@ -320,7 +322,7 @@ export const GET = withRateLimit(RateLimitPresets.API)(getPolicies)
  */
 const createPolicy = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('policies', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('policies', 'create', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const body = await request.json()
         
@@ -353,8 +355,8 @@ const createPolicy = withSecurity(
 
         // Additional business logic validation
         if (validatedData.validTo && validatedData.validFrom) {
-          const fromDate = new Date(validatedData.validFrom)
-          const toDate = new Date(validatedData.validTo)
+          const fromDate = new Date(validatedData.validFrom as string)
+          const toDate = new Date(validatedData.validTo as string)
           if (fromDate >= toDate) {
             return createSecureResponse(
               {
@@ -367,7 +369,8 @@ const createPolicy = withSecurity(
         }
 
         // Role-based creation restrictions
-        if (validatedData.status === 'active' && !['admin', 'super-admin'].includes(user.role)) {
+        const roleName = typeof user.role === 'string' ? user.role : user.role.name
+        if (validatedData.status === 'active' && !['admin', 'super-admin'].includes(roleName)) {
           return createSecureResponse(
             {
               success: false,
@@ -379,7 +382,7 @@ const createPolicy = withSecurity(
 
         // Check for duplicate policy names
         const existingPolicy = await prisma.policy.findUnique({
-          where: { name: validatedData.name }
+          where: { name: validatedData.name as string }
         })
 
         if (existingPolicy) {
@@ -392,6 +395,14 @@ const createPolicy = withSecurity(
           )
         }
 
+        // Type the policyData properly
+        const policyData = validatedData.policyData as {
+          target: any
+          rules: Array<{ id: string; name: string; priority?: number; condition: any }>
+          obligations?: any[]
+          advice?: any[]
+        }
+
         // Log data modification
         await auditSecurityEvent(SecurityEventType.DATA_MODIFICATION, request, user.id, {
           resource: 'policies',
@@ -400,23 +411,23 @@ const createPolicy = withSecurity(
           effect: validatedData.effect,
           status: validatedData.status,
           priority: validatedData.priority,
-          rulesCount: validatedData.policyData.rules.length
+          rulesCount: policyData.rules.length
         })
 
         // Create the policy
         const policy = await prisma.policy.create({
           data: {
-            name: validatedData.name,
-            description: validatedData.description,
-            priority: validatedData.priority,
-            effect: validatedData.effect.toUpperCase() as any,
-            status: validatedData.status.toUpperCase() as any,
-            combiningAlgorithm: validatedData.combiningAlgorithm.toUpperCase() as any,
-            policyData: validatedData.policyData,
-            version: validatedData.version,
-            tags: validatedData.tags,
-            validFrom: validatedData.validFrom ? new Date(validatedData.validFrom) : null,
-            validTo: validatedData.validTo ? new Date(validatedData.validTo) : null,
+            name: validatedData.name as string,
+            description: validatedData.description as string | undefined,
+            priority: validatedData.priority as number,
+            effect: (validatedData.effect as string).toUpperCase() as any,
+            status: (validatedData.status as string).toUpperCase() as any,
+            combiningAlgorithm: (validatedData.combiningAlgorithm as string).toUpperCase() as any,
+            policyData: policyData as any,
+            version: validatedData.version as string,
+            tags: validatedData.tags as string[],
+            validFrom: validatedData.validFrom ? new Date(validatedData.validFrom as string) : null,
+            validTo: validatedData.validTo ? new Date(validatedData.validTo as string) : null,
             createdBy: user.id,
             updatedBy: user.id
           }
@@ -516,7 +527,7 @@ export const POST = withRateLimit({
  */
 const bulkPolicyOperations = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('policies', 'manage', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('policies', 'manage', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const body = await request.json()
 
@@ -561,7 +572,8 @@ const bulkPolicyOperations = withSecurity(
         }
 
         // Role-based operation restrictions
-        if (operation === 'activate' && !['admin', 'super-admin'].includes(user.role)) {
+        const roleName = typeof user.role === 'string' ? user.role : user.role.name
+        if (operation === 'activate' && !['admin', 'super-admin'].includes(roleName)) {
           return createSecureResponse(
             {
               success: false,
@@ -571,7 +583,7 @@ const bulkPolicyOperations = withSecurity(
           )
         }
 
-        if (operation === 'delete' && !['admin', 'super-admin'].includes(user.role)) {
+        if (operation === 'delete' && !['admin', 'super-admin'].includes(roleName)) {
           return createSecureResponse(
             {
               success: false,
