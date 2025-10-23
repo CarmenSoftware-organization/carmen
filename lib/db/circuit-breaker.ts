@@ -103,19 +103,19 @@ export class DatabaseCircuitBreaker {
     operation: () => Promise<T>,
     operationName: string
   ): Promise<T> {
-    let lastError: Error
-    
+    let lastError: Error | undefined
+
     for (let attempt = 1; attempt <= this.config.retry.attempts; attempt++) {
       try {
         return await this.executeWithTimeout(operation, operationName)
       } catch (error) {
         lastError = error as Error
-        
+
         // Don't retry on certain errors
         if (this.isNonRetryableError(error)) {
           throw error
         }
-        
+
         // Don't delay on last attempt
         if (attempt < this.config.retry.attempts) {
           const delay = this.calculateBackoffDelay(attempt)
@@ -123,7 +123,12 @@ export class DatabaseCircuitBreaker {
         }
       }
     }
-    
+
+    // lastError should always be defined here, but TypeScript needs the check
+    if (!lastError) {
+      throw new Error(`Operation ${operationName} failed with unknown error`)
+    }
+
     throw new DatabaseRetryError(
       `Operation ${operationName} failed after ${this.config.retry.attempts} attempts: ${lastError.message}`,
       this.config.retry.attempts,

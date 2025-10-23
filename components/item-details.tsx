@@ -115,12 +115,12 @@ export function ItemDetailsComponent({
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor="name" className="text-xs">Name</Label>
-                    <Input 
-                      id="name" 
-                      value={itemData.name || ''} 
-                      onChange={(e) => handleInputChange('name', e.target.value)} 
-                      readOnly={isReadOnly} 
-                      className="h-7 text-sm" 
+                    <Input
+                      id="name"
+                      value={itemData.itemName || ''}
+                      onChange={(e) => handleInputChange('itemName', e.target.value)}
+                      readOnly={isReadOnly}
+                      className="h-7 text-sm"
                     />
                   </div>
                   <div className="space-y-1">

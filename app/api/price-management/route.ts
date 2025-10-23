@@ -207,8 +207,7 @@ const getPriceManagementData = withSecurity(
             break;
           case 'sessions':
             // Only allow admin users to view portal sessions
-            const roleStr = typeof user.role === 'string' ? user.role : user.role.name;
-            if (!['admin', 'super-admin', 'purchasing-staff'].includes(roleStr)) {
+            if (!['admin', 'super-admin', 'purchasing-staff'].includes(user.role)) {
               return createSecureResponse(
                 {
                   success: false,
@@ -400,8 +399,7 @@ const createPriceManagementData = withSecurity(
 
         case 'create_portal_session': {
           // Check permissions - only admin and purchasing staff can create portal sessions
-          const roleStr = typeof user.role === 'string' ? user.role : user.role.name;
-          if (!['admin', 'super-admin', 'purchasing-staff'].includes(roleStr)) {
+          if (!['admin', 'super-admin', 'purchasing-staff'].includes(user.role)) {
             return createSecureResponse(
               {
                 success: false,

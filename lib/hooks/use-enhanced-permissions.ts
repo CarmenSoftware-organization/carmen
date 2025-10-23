@@ -20,6 +20,7 @@ import {
 } from '@/lib/services/permissions'
 import { useKeycloakUser } from '@/lib/context/simple-user-context'
 import type { User } from '@/lib/types/user'
+import { EffectType } from '@/lib/types/permissions'
 
 // Enhanced query keys for React Query
 export const enhancedPermissionKeys = {
@@ -74,9 +75,17 @@ export function useEnhancedPermission(options: EnhancedPermissionCheckOptions) {
           allowed: false,
           reason: 'User not authenticated',
           decision: {
-            decision: 'deny',
+            effect: EffectType.DENY,
             reason: 'User not authenticated',
-            evaluatedPolicies: []
+            obligations: [],
+            advice: [],
+            requestId: crypto.randomUUID(),
+            evaluatedPolicies: [],
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'enhanced-permission-hook',
+            auditRequired: false
           },
           executionTime: 0,
           matchedPolicies: []
@@ -165,9 +174,17 @@ export function useEnhancedBulkPermissions(
           allowed: false,
           reason: 'User not authenticated',
           decision: {
-            decision: 'deny',
+            effect: EffectType.DENY,
             reason: 'User not authenticated',
-            evaluatedPolicies: []
+            obligations: [],
+            advice: [],
+            requestId: crypto.randomUUID(),
+            evaluatedPolicies: [],
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'enhanced-permission-hook',
+            auditRequired: false
           },
           executionTime: 0,
           matchedPolicies: []

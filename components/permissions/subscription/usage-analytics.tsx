@@ -25,13 +25,13 @@ import {
   Maximize2
 } from 'lucide-react';
 
-import { 
-  UserSubscription, 
+import {
+  UserSubscription,
   SubscriptionUsage,
-  ResourceType,
   PackageFeatures,
   ModuleType
 } from '@/lib/types/permission-subscriptions';
+import { ResourceType } from '@/lib/types/permission-resources';
 import { mockCurrentSubscription } from '@/lib/mock-data/permission-subscriptions';
 
 // Extended mock usage data for analytics
@@ -141,15 +141,16 @@ export function UsageAnalytics({
     
     // Resource utilization trends
     const resourceTrends = Object.keys(currentUsage.resourceUsage).map(resource => {
+      const resourceKey = resource as ResourceType;
       const trend = usageHistory.map(usage => ({
         month: usage.period.start.toLocaleDateString('en', { month: 'short' }),
-        value: usage.resourceUsage[resource as ResourceType] || 0
+        value: usage.resourceUsage[resourceKey] ?? 0
       }));
-      
+
       const current = trend[trend.length - 1].value;
       const previous = trend[trend.length - 2]?.value || 0;
       const growth = previous > 0 ? ((current - previous) / previous) * 100 : 0;
-      
+
       return {
         resource: resource.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()),
         current,

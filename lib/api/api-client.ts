@@ -190,12 +190,10 @@ class EnhancedApiClient {
       const response = await this.executeWithRetries(url, config)
       const data = await this.parseResponse<T>(response)
 
-      // Update loading toast to success
+      // Dismiss loading toast and show success
       if (loadingToastId) {
-        enhancedToast.update(loadingToastId, {
-          type: 'success',
-          message: 'Request completed successfully',
-          persistent: false,
+        enhancedToast.dismiss(loadingToastId)
+        enhancedToast.success('Request completed successfully', {
           duration: 2000
         })
       }
@@ -579,7 +577,7 @@ class EnhancedApiClient {
       }
 
       // Set headers (auth headers will be added automatically)
-      const headers = { ...config?.headers }
+      const headers: Record<string, string> = { ...config?.headers as Record<string, string> }
       Object.keys(headers).forEach(key => {
         xhr.setRequestHeader(key, headers[key])
       })

@@ -82,7 +82,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 
 import { useRoleStore } from '@/lib/stores/role-store';
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 
 interface RoleListProps {
   onCreateRole?: () => void;
@@ -184,16 +184,19 @@ export function RoleList({
   const roleHierarchy = useMemo(() => {
     const buildHierarchy = (parentId?: string): RoleHierarchy[] => {
       return filteredAndSortedRoles
-        .filter(role => 
-          parentId 
+        .filter(role =>
+          parentId
             ? role.parentRoles?.includes(parentId)
             : !role.parentRoles || role.parentRoles.length === 0
         )
-        .map(role => ({
-          role,
-          children: buildHierarchy(role.id),
-          userCount: mockUserCounts[role.id] || 0
-        }));
+        .map(role => {
+          const hierarchy: RoleHierarchy = {
+            role,
+            children: buildHierarchy(role.id),
+            userCount: mockUserCounts[role.id] || 0
+          };
+          return hierarchy;
+        });
     };
 
     return buildHierarchy();
@@ -605,8 +608,11 @@ export function RoleList({
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Checkbox
-                  checked={selectedRoles.size > 0 && selectedRoles.size === filteredAndSortedRoles.length}
-                  indeterminate={selectedRoles.size > 0 && selectedRoles.size < filteredAndSortedRoles.length}
+                  checked={
+                    selectedRoles.size > 0 && selectedRoles.size < filteredAndSortedRoles.length
+                      ? 'indeterminate'
+                      : selectedRoles.size === filteredAndSortedRoles.length
+                  }
                   onCheckedChange={handleSelectAll}
                 />
                 <span>Select All</span>
