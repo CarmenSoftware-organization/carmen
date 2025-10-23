@@ -3,188 +3,141 @@
  * Centralized pricelist mock data for the Carmen ERP application
  */
 
-import { VendorPricelist, PricelistItem } from '@/lib/types'
+import type { VendorPriceList, VendorPriceListItem } from '@/lib/types'
 
-export const mockPricelists: VendorPricelist[] = [
+export const mockPricelists: VendorPriceList[] = [
   {
     id: 'pricelist-001',
-    pricelistNumber: 'PL-2024-001',
     vendorId: 'vendor-001',
-    campaignId: 'campaign-001',
-    templateId: 'template-001',
-    invitationId: 'invite-001',
+    priceListName: 'General Supplies Q2 2024',
+    priceListCode: 'PL-2024-001',
+    description: 'Comprehensive price list for general supplies',
     currency: 'USD',
+    effectiveDate: new Date('2024-04-01'),
+    expiryDate: new Date('2024-06-30'),
     status: 'active',
-    items: [],
-    validFrom: new Date('2024-04-01'),
-    validTo: new Date('2024-06-30'),
-    submittedAt: new Date('2024-04-15'),
-    approvedAt: new Date('2024-04-20'),
-    approvedBy: 'john.doe@carmen.com',
-    createdAt: new Date('2024-04-01'),
-    updatedAt: new Date('2024-05-15'),
-    completionPercentage: 100,
-    qualityScore: 95,
+    version: '1.0',
+    volumeDiscounts: [],
     totalItems: 245,
-    completedItems: 245,
-    lastAutoSave: new Date('2024-05-15'),
-    submissionNotes: 'All items submitted with competitive pricing',
-    version: 1
+    createdBy: 'john.doe@carmen.com',
+    approvedBy: 'john.doe@carmen.com',
+    approvedAt: new Date('2024-04-20'),
+    notes: 'All items submitted with competitive pricing'
   },
   {
     id: 'pricelist-002',
-    pricelistNumber: 'PL-2024-002',
     vendorId: 'vendor-002',
-    campaignId: 'campaign-002',
-    templateId: 'template-002',
-    invitationId: 'invite-002',
+    priceListName: 'Fresh Produce August 2024',
+    priceListCode: 'PL-2024-002',
+    description: 'Weekly fresh produce pricing',
     currency: 'USD',
+    effectiveDate: new Date('2024-08-01'),
+    expiryDate: new Date('2024-08-31'),
     status: 'active',
-    items: [],
-    validFrom: new Date('2024-08-01'),
-    validTo: new Date('2024-08-31'),
-    submittedAt: new Date('2024-08-05'),
-    approvedAt: new Date('2024-08-06'),
-    approvedBy: 'maria.garcia@carmen.com',
-    createdAt: new Date('2024-08-01'),
-    updatedAt: new Date('2024-08-22'),
-    completionPercentage: 100,
-    qualityScore: 98,
+    version: '3.0',
+    volumeDiscounts: [],
     totalItems: 156,
-    completedItems: 156,
-    lastAutoSave: new Date('2024-08-22'),
-    submissionNotes: 'Weekly fresh produce pricing submitted on time',
-    version: 3
+    createdBy: 'maria.garcia@carmen.com',
+    approvedBy: 'maria.garcia@carmen.com',
+    approvedAt: new Date('2024-08-06'),
+    notes: 'Weekly fresh produce pricing submitted on time'
   },
   {
     id: 'pricelist-003',
-    pricelistNumber: 'PL-2024-003',
     vendorId: 'vendor-003',
-    campaignId: 'campaign-003',
-    templateId: 'template-003',
-    invitationId: 'invite-003',
+    priceListName: 'Beverages September 2024',
+    priceListCode: 'PL-2024-003',
+    description: 'Monthly beverage pricing',
     currency: 'USD',
+    effectiveDate: new Date('2024-09-01'),
+    expiryDate: new Date('2024-09-30'),
     status: 'draft',
-    items: [],
-    validFrom: new Date('2024-09-01'),
-    validTo: new Date('2024-09-30'),
-    createdAt: new Date('2024-08-15'),
-    updatedAt: new Date('2024-08-22'),
-    completionPercentage: 0,
-    qualityScore: 0,
+    version: '1.0',
+    volumeDiscounts: [],
     totalItems: 0,
-    completedItems: 0,
-    lastAutoSave: new Date('2024-08-22'),
-    version: 1
+    createdBy: 'system'
   },
   {
     id: 'pricelist-004',
-    pricelistNumber: 'PL-2024-004',
     vendorId: 'vendor-001',
-    campaignId: 'campaign-004',
-    templateId: 'template-001',
-    invitationId: 'invite-004',
+    priceListName: 'Holiday Catering July 2024',
+    priceListCode: 'PL-2024-004',
+    description: 'Holiday catering items with seasonal pricing',
     currency: 'USD',
-    status: 'submitted',
-    items: [],
-    validFrom: new Date('2024-07-01'),
-    validTo: new Date('2024-07-31'),
-    submittedAt: new Date('2024-07-20'),
-    createdAt: new Date('2024-07-01'),
-    updatedAt: new Date('2024-07-31'),
-    completionPercentage: 100,
-    qualityScore: 92,
+    effectiveDate: new Date('2024-07-01'),
+    expiryDate: new Date('2024-07-31'),
+    status: 'active',
+    version: '1.0',
+    volumeDiscounts: [],
     totalItems: 89,
-    completedItems: 89,
-    lastAutoSave: new Date('2024-07-31'),
-    submissionNotes: 'Holiday catering items submitted with seasonal pricing',
-    version: 1
+    createdBy: 'john.doe@carmen.com',
+    notes: 'Holiday catering items submitted with seasonal pricing'
   }
 ]
 
-export const mockPricelistItems: PricelistItem[] = [
+export const mockPricelistItems: VendorPriceListItem[] = [
   {
     id: 'item-001',
-    productId: 'prod-001',
-    productCode: 'BE-001',
-    productName: 'Beach Umbrella - Large',
-    productDescription: 'Professional grade large beach umbrella with UV protection',
-    category: 'Beach Equipment',
-    subcategory: 'Shade',
-    pricing: [
+    priceListId: 'pricelist-001',
+    itemCode: 'BE-001',
+    itemName: 'Beach Umbrella - Large',
+    description: 'Professional grade large beach umbrella with UV protection',
+    unit: 'Each',
+    unitPrice: {
+      amount: 45.00,
+      currency: 'USD'
+    },
+    minimumOrderQuantity: 1,
+    leadTimeDays: 7,
+    itemDiscounts: [
       {
-        id: 'pricing-001',
-        moq: 1,
-        unit: 'Each',
-        unitPrice: 45.00,
-        leadTime: 7,
-        notes: 'Standard lead time'
+        id: 'discount-001',
+        minQuantity: 10,
+        discountType: 'percentage',
+        discountValue: 5,
+        description: '5% bulk discount for orders of 10+'
       },
       {
-        id: 'pricing-002', 
-        moq: 10,
-        unit: 'Each',
-        unitPrice: 42.50,
-        leadTime: 7,
-        notes: '5% bulk discount'
-      },
-      {
-        id: 'pricing-003',
-        moq: 25,
-        unit: 'Each', 
-        unitPrice: 40.00,
-        leadTime: 10,
-        notes: '10% bulk discount, extended lead time'
+        id: 'discount-002',
+        minQuantity: 25,
+        discountType: 'percentage',
+        discountValue: 10,
+        description: '10% bulk discount for orders of 25+'
       }
     ],
-    currency: 'USD',
-    leadTime: 7,
     notes: 'High quality UV resistant material',
-    status: 'approved',
-    qualityScore: 95,
-    lastModified: new Date('2024-05-15'),
-    certifications: ['UV Protection Certified']
+    isActive: true
   },
   {
     id: 'item-002',
-    productId: 'prod-002',
-    productCode: 'FU-012',
-    productName: 'Poolside Lounge Chair',
-    productDescription: 'Comfortable poolside lounge chair with adjustable back',
-    category: 'Furniture',
-    subcategory: 'Seating',
-    pricing: [
+    priceListId: 'pricelist-001',
+    itemCode: 'FU-012',
+    itemName: 'Poolside Lounge Chair',
+    description: 'Comfortable poolside lounge chair with adjustable back',
+    unit: 'Each',
+    unitPrice: {
+      amount: 180.00,
+      currency: 'USD'
+    },
+    minimumOrderQuantity: 1,
+    leadTimeDays: 14,
+    itemDiscounts: [
       {
-        id: 'pricing-004',
-        moq: 1,
-        unit: 'Each',
-        unitPrice: 180.00,
-        leadTime: 14,
-        notes: 'Individual order'
+        id: 'discount-003',
+        minQuantity: 5,
+        discountType: 'fixed_amount',
+        discountValue: 5,
+        description: '$5 discount for orders of 5+'
       },
       {
-        id: 'pricing-005',
-        moq: 5,
-        unit: 'Each',
-        unitPrice: 175.00,
-        leadTime: 14,
-        notes: 'Small bulk order'
-      },
-      {
-        id: 'pricing-006',
-        moq: 12,
-        unit: 'Each',
-        unitPrice: 170.00,
-        leadTime: 18,
-        notes: 'Large bulk order, extended lead time'
+        id: 'discount-004',
+        minQuantity: 12,
+        discountType: 'fixed_amount',
+        discountValue: 10,
+        description: '$10 discount for orders of 12+'
       }
     ],
-    currency: 'USD',
-    leadTime: 14,
     notes: 'Weather resistant aluminum frame',
-    status: 'approved',
-    qualityScore: 88,
-    lastModified: new Date('2024-05-14'),
-    certifications: ['Weather Resistant']
+    isActive: true
   }
 ]

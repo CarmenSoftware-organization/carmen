@@ -399,9 +399,9 @@ export class RBACAuthorization {
   /**
    * Get permissions for a role (including inherited permissions)
    */
-  private getRolePermissions(role: Role): string[] {
+  private getRolePermissions(role: string | Role): string[] {
     const permissions = new Set<string>()
-    const roleName = (role as unknown as string) as RoleName
+    const roleName = (typeof role === 'string' ? role : role.name) as RoleName
     const roleLevel = ROLE_HIERARCHY[roleName]
 
     if (roleLevel === undefined) {

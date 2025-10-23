@@ -26,10 +26,11 @@ import {
 } from '@/lib/services/permissions'
 import { useUser } from '@/lib/context/user-context'
 import type { User } from '@/lib/types/user'
-import type { PermissionString } from '@/lib/types/permissions'
+import type { PermissionString, PermissionResult as PermissionTypeImport } from '@/lib/types/permissions'
+import { EffectType } from '@/lib/types/permissions'
 
 // Define Permission type based on service implementation
-export interface Permission {
+export type Permission = {
   id: string
   subjectId: string
   resourceType: string
@@ -93,7 +94,19 @@ export function usePermission(options: PermissionCheckOptions) {
         return {
           allowed: false,
           reason: 'User not authenticated',
-          decision: { decision: 'deny', reason: 'User not authenticated', evaluatedPolicies: [] },
+          decision: {
+            effect: EffectType.DENY,
+            reason: 'User not authenticated',
+            evaluatedPolicies: [],
+            obligations: [],
+            advice: [],
+            requestId: crypto.randomUUID(),
+            evaluationTime: 0,
+            cacheHit: false,
+            timestamp: new Date(),
+            evaluatedBy: 'permission-service',
+            auditRequired: false
+          },
           executionTime: 0
         }
       }
@@ -158,7 +171,7 @@ export function useUserPermissions(options?: {
 
   return useQuery({
     queryKey: permissionKeys.user(user?.id || ''),
-    queryFn: async (): Promise<Permission[]> => {
+    queryFn: async (): Promise<PermissionTypeImport[]> => {
       if (!user?.id) return []
       return await getUserPermissions(user.id, context)
     },

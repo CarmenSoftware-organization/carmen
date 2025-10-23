@@ -27,7 +27,7 @@ const basicResources = [
   ResourceType.INVENTORY_ITEM, ResourceType.STOCK_COUNT,
   ResourceType.PURCHASE_REQUEST, ResourceType.VENDOR,
   ResourceType.RECIPE, ResourceType.MENU_ITEM,
-  ResourceType.REPORT, ResourceType.NOTIFICATION
+  ResourceType.OPERATIONAL_REPORT, ResourceType.NOTIFICATION
 ];
 
 const professionalResources = [

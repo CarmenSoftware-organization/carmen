@@ -831,7 +831,7 @@ export const mockNotificationLogs: NotificationLog[] = [
   {
     id: 'log-005',
     timestamp: new Date('2024-10-21T12:45:00'),
-    eventType: 'vendor-contract-expiring',
+    eventType: 'vendor-update',
     recipientId: 'user-008',
     recipientEmail: 'procurement@carmen.com',
     channel: 'sms',
@@ -899,7 +899,7 @@ export const mockNotificationLogs: NotificationLog[] = [
   {
     id: 'log-009',
     timestamp: new Date('2024-10-21T16:00:00'),
-    eventType: 'stock-count-due',
+    eventType: 'stock-count-required',
     recipientId: 'user-006',
     recipientEmail: 'warehouse@carmen.com',
     channel: 'in-app',

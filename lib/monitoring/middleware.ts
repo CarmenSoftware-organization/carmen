@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { useEffect } from 'react'
 import { performanceMonitor } from './performance'
 import { businessMetricsTracker } from './business-metrics'
 import { infrastructureMonitor } from './infrastructure-monitoring'
@@ -365,7 +366,7 @@ export function withDatabaseMonitoring<T extends any[], R>(
  * Component performance monitoring hook
  */
 export function useComponentMonitoring(componentName: string) {
-  React.useEffect(() => {
+  useEffect(() => {
     const startTime = performance.now()
     
     performanceMonitor.recordMetric({
@@ -433,12 +434,14 @@ export class WorkflowMonitor {
 
   complete(status: 'completed' | 'abandoned' | 'failed' = 'completed') {
     businessMetricsTracker.completeWorkflow(this.workflowId, status)
-    
+
     const duration = Date.now() - this.startTime
     logger.businessLog('workflow', 'execution', `workflow_${status}`, {
       duration,
-      workflowId: this.workflowId,
-      metadata: { completedAt: new Date().toISOString() }
+      metadata: {
+        workflowId: this.workflowId,
+        completedAt: new Date().toISOString()
+      }
     })
   }
 

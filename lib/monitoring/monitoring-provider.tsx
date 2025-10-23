@@ -62,7 +62,7 @@ export function MonitoringProvider({
   enableErrorTracking = true
 }: MonitoringProviderProps) {
   const [isEnabled, setIsEnabled] = useState(false)
-  const [config, setConfig] = useState(null)
+  const [config, setConfig] = useState<any>(null)
   const [currentUserId, setCurrentUserId] = useState(userId)
 
   useEffect(() => {
@@ -140,13 +140,14 @@ export function MonitoringProvider({
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        performanceMonitor.capturePerformanceMetrics()
+        // Performance metrics are automatically captured by the performanceMonitor
+        logger.info('Page visibility changed to hidden', { module })
       }
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
-  }, [enablePerformanceTracking])
+  }, [enablePerformanceTracking, module])
 
   const contextValue: MonitoringContextValue = {
     // Performance tracking

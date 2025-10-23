@@ -292,7 +292,7 @@ export interface SubscriptionUsage {
   reportsGenerated: number;
   
   // Resource Usage
-  resourceUsage: Record<ResourceType, number>;
+  resourceUsage: Partial<Record<ResourceType, number>>;
   
   // Feature Usage
   featuresUsed: string[];

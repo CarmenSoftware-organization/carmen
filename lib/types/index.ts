@@ -56,7 +56,11 @@ export type {
   VendorContact,
   VendorCertification,
   VendorStatus,
-  VendorCategory
+  VendorCategory,
+  VendorPriceList,
+  VendorPriceListItem,
+  VolumeDiscount,
+  PriceListStatus
 } from './vendor'
 
 // Product management types (PRIMARY SOURCE for ProductCategory)
@@ -149,8 +153,21 @@ export * from './hotel'
 // Campaign management types
 // NOTE: Exclude VendorFilters (from vendor-price-management)
 export type {
+  PriceCollectionCampaign,
+  CampaignTemplate,
+  RecurringPattern,
+  CampaignProgress,
+  CampaignSettings,
+  ReminderSchedule,
   CampaignVendorStatus,
-  CampaignAnalytics
+  CampaignAnalytics,
+  CreateCampaignRequest,
+  UpdateCampaignRequest,
+  CampaignDuplicationRequest,
+  CampaignValidationResult,
+  CampaignPreview,
+  CampaignManagementService,
+  CampaignFilters
 } from './campaign-management'
 
 // Business rules types (PRIMARY SOURCE for BusinessRule, RuleAction, RuleCondition)
