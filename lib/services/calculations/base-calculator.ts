@@ -155,7 +155,7 @@ export abstract class BaseCalculator {
         this.createContext('validateMoney', { money, fieldName }, false)
       );
     }
-    
+
     if (typeof money.amount !== 'number' || isNaN(money.amount)) {
       throw this.createError(
         `${fieldName}.amount must be a valid number`,
@@ -164,9 +164,9 @@ export abstract class BaseCalculator {
       );
     }
 
-    if (!money.currencyCode || typeof money.currencyCode !== 'string') {
+    if (!money.currency || typeof money.currency !== 'string') {
       throw this.createError(
-        `${fieldName}.currencyCode is required`,
+        `${fieldName}.currency is required`,
         'INVALID_CURRENCY_CODE',
         this.createContext('validateMoney', { money, fieldName }, false)
       );
@@ -179,7 +179,7 @@ export abstract class BaseCalculator {
   protected createMoney(amount: number, currencyCode: string, decimalPlaces: number = 2): Money {
     return {
       amount: this.roundMoney(amount, decimalPlaces),
-      currencyCode: currencyCode.toUpperCase()
+      currency: currencyCode.toUpperCase()
     };
   }
 

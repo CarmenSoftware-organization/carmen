@@ -110,7 +110,7 @@ export class FinancialCalculations extends BaseCalculator {
       this.validatePercentage(input.taxRate, 'taxRate');
 
       const { subtotal, taxRate, taxIncluded = false } = input;
-      const currencyCode = input.currencyCode || subtotal.currencyCode;
+      const currencyCode = input.currencyCode || subtotal.currency;
 
       let taxAmount: Money;
       let netSubtotal: Money;
@@ -152,7 +152,7 @@ export class FinancialCalculations extends BaseCalculator {
       this.validateMoney(input.subtotal, 'subtotal');
 
       const { subtotal } = input;
-      const currencyCode = input.currencyCode || subtotal.currencyCode;
+      const currencyCode = input.currencyCode || subtotal.currency;
 
       let discountAmount: Money;
       let discountRate: number;
@@ -204,9 +204,9 @@ export class FinancialCalculations extends BaseCalculator {
       }
 
       const { amount, toCurrency } = input;
-      
+
       // If same currency, no conversion needed
-      if (amount.currencyCode === toCurrency.toUpperCase()) {
+      if (amount.currency === toCurrency.toUpperCase()) {
         return {
           originalAmount: amount,
           convertedAmount: amount,
@@ -260,7 +260,7 @@ export class FinancialCalculations extends BaseCalculator {
         taxIncluded = false
       } = input;
 
-      const currencyCode = input.currencyCode || unitPrice.currencyCode;
+      const currencyCode = input.currencyCode || unitPrice.currency;
 
       // Calculate subtotal
       const subtotalValue = quantity * unitPrice.amount;
@@ -311,16 +311,16 @@ export class FinancialCalculations extends BaseCalculator {
         );
       }
 
-      const baseCurrency = amounts[0].currencyCode;
+      const baseCurrency = amounts[0].currency;
       let total = 0;
 
       for (let i = 0; i < amounts.length; i++) {
         const amount = amounts[i];
         this.validateMoney(amount, `amounts[${i}]`);
-        
-        if (amount.currencyCode !== baseCurrency) {
+
+        if (amount.currency !== baseCurrency) {
           throw this.createError(
-            `All amounts must be in the same currency. Expected ${baseCurrency}, got ${amount.currencyCode} at index ${i}`,
+            `All amounts must be in the same currency. Expected ${baseCurrency}, got ${amount.currency} at index ${i}`,
             'CURRENCY_MISMATCH',
             context
           );
@@ -342,7 +342,7 @@ export class FinancialCalculations extends BaseCalculator {
       this.validatePercentage(percentage, 'percentage');
 
       const result = amount.amount * (percentage / 100);
-      return this.createMoney(result, amount.currencyCode);
+      return this.createMoney(result, amount.currency);
     });
   }
 
@@ -354,9 +354,9 @@ export class FinancialCalculations extends BaseCalculator {
       this.validateMoney(amount1, 'amount1');
       this.validateMoney(amount2, 'amount2');
 
-      if (amount1.currencyCode !== amount2.currencyCode) {
+      if (amount1.currency !== amount2.currency) {
         throw this.createError(
-          `Cannot compare amounts in different currencies: ${amount1.currencyCode} vs ${amount2.currencyCode}`,
+          `Cannot compare amounts in different currencies: ${amount1.currency} vs ${amount2.currency}`,
           'CURRENCY_MISMATCH',
           context
         );

@@ -8,15 +8,14 @@
  */
 
 import { apiClient, type ApiResponse, type PaginationParams } from './client'
-import { 
-  type PurchaseRequest, 
-  type PurchaseOrder, 
-  type PurchaseRequestStatus, 
-  type PurchaseOrderStatus,
+import {
+  type PurchaseRequest,
+  type PurchaseOrder,
   type PurchaseRequestItem,
-  type PurchaseOrderItem
+  type PurchaseOrderItem,
+  PurchaseOrderStatus
 } from '@/lib/types/procurement'
-import { type Money } from '@/lib/types/common'
+import { type Money, type DocumentStatus } from '@/lib/types/common'
 
 // API response types
 export interface PurchaseRequestListResponse {
@@ -87,7 +86,7 @@ export interface PriceHistoryResponse {
 
 // Filter types
 export interface PurchaseRequestFilters {
-  status?: PurchaseRequestStatus[]
+  status?: DocumentStatus[]
   requesterId?: string[]
   departmentId?: string[]
   priority?: string[]
@@ -426,18 +425,3 @@ export class ProcurementApiService {
 
 // Create singleton instance
 export const procurementApi = new ProcurementApiService()
-
-// Export types for external use
-export type {
-  PurchaseRequestFilters,
-  PurchaseOrderFilters,
-  CreatePurchaseRequestRequest,
-  UpdatePurchaseRequestRequest,
-  CreatePurchaseOrderRequest,
-  UpdatePurchaseOrderRequest,
-  PurchaseRequestListResponse,
-  PurchaseOrderListResponse,
-  ProcurementStatsResponse,
-  VendorComparisonResponse,
-  PriceHistoryResponse
-}

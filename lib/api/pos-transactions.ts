@@ -9,16 +9,16 @@
  */
 
 import { apiClient, type ApiResponse, type PaginationParams } from './client'
-import {
-  type POSTransaction,
-  type TransactionStatus,
-  type TransactionError,
-  type TransactionAuditLog,
-  type TransactionStatistics,
-  type ManualResolutionRequest,
-  type RetryTransactionRequest,
-  type POSWebSocketEvent
-} from '@/lib/types'
+import type {
+  POSTransaction,
+  TransactionStatus,
+  TransactionError,
+  TransactionAuditLog,
+  TransactionStatistics,
+  ManualResolutionRequest,
+  RetryTransactionRequest,
+  POSWebSocketEvent
+} from '@/lib/types/pos-integration'
 
 // API response types
 export interface TransactionListResponse {
@@ -312,12 +312,3 @@ export class POSTransactionsApiService {
 
 // Create singleton instance
 export const posTransactionsApi = new POSTransactionsApiService()
-
-// Export types for external use
-export type {
-  TransactionListResponse,
-  TransactionDetailResponse,
-  FailedTransactionsListResponse,
-  TransactionFilters,
-  FailedTransactionFilters
-}

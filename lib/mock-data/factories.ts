@@ -10,15 +10,20 @@ import {
   Recipe,
   PurchaseRequest,
   POSTransaction,
+  DocumentStatus
+} from '@/lib/types'
+import type {
   PendingTransaction,
   POSMapping,
-  TransactionError,
+  TransactionError
+} from '@/lib/types/pos-integration'
+import { ErrorCategory } from '@/lib/types/pos-integration'
+import type {
   UserPreferences,
   CompanySettings,
   SecuritySettings,
   ApplicationSettings
-} from '@/lib/types'
-import { ErrorCategory } from '@/lib/types/pos-integration'
+} from '@/lib/types/settings'
 import {
   mockUserPreferences,
   mockCompanySettings,
@@ -32,17 +37,25 @@ import {
 export function createMockVendor(overrides: Partial<Vendor> = {}): Vendor {
   return {
     id: `vendor-${Date.now()}`,
+    vendorCode: `VEN-${Date.now()}`,
     companyName: 'Test Vendor Company',
-    contactName: 'Test Contact',
-    email: 'test@vendor.com',
-    phone: '+1-555-0000',
-    address: '123 Test Street, Test City, TC 12345',
-    isActive: true,
-    category: 'General',
+    businessRegistrationNumber: 'BRN000000',
     taxId: 'TAX000000',
-    paymentTerms: 'Net 30',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    establishmentDate: new Date().toISOString(),
+    businessType: 'distributor',
+    status: 'active',
+    rating: 4,
+    isActive: true,
+    addresses: [],
+    contacts: [],
+    certifications: [],
+    bankAccounts: [],
+    preferredCurrency: 'USD',
+    preferredPaymentTerms: 'Net 30',
+    creditLimit: {
+      amount: 100000,
+      currency: 'USD'
+    },
     ...overrides
   }
 }
@@ -51,17 +64,44 @@ export function createMockVendor(overrides: Partial<Vendor> = {}): Vendor {
  * Create a mock user with optional overrides
  */
 export function createMockUser(overrides: Partial<User> = {}): User {
+  const mockRole = {
+    id: 'role-staff',
+    name: 'Staff',
+    permissions: ['read'],
+    hierarchy: 1
+  }
+  const mockDepartment = {
+    id: 'dept-general',
+    name: 'General',
+    code: 'GEN',
+    status: 'active' as const
+  }
+  const mockLocation = {
+    id: 'loc-main',
+    name: 'Main Location',
+    type: 'office' as const
+  }
+
   return {
     id: `user-${Date.now()}`,
     name: 'Test User',
     email: 'test@example.com',
-    role: 'staff',
-    department: 'general',
-    location: 'main',
-    isActive: true,
-    permissions: ['read'],
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    role: 'role-staff',
+    department: 'dept-general',
+    location: 'loc-main',
+    availableRoles: [mockRole],
+    availableDepartments: [mockDepartment],
+    availableLocations: [mockLocation],
+    roles: [mockRole],
+    primaryRole: mockRole,
+    departments: [mockDepartment],
+    locations: [mockLocation],
+    accountStatus: 'active',
+    context: {
+      currentRole: mockRole,
+      currentDepartment: mockDepartment,
+      currentLocation: mockLocation
+    },
     ...overrides
   }
 }
@@ -72,20 +112,31 @@ export function createMockUser(overrides: Partial<User> = {}): User {
 export function createMockProduct(overrides: Partial<Product> = {}): Product {
   return {
     id: `product-${Date.now()}`,
-    name: 'Test Product',
-    sku: `SKU-${Date.now()}`,
+    productCode: `SKU-${Date.now()}`,
+    productName: 'Test Product',
     description: 'Test product description',
-    category: 'General',
-    unit: 'piece',
-    unitSize: '1pc',
+    productType: 'raw_material',
+    status: 'active',
+    categoryId: 'cat-general',
+    specifications: [],
+    baseUnit: 'piece',
+    alternativeUnits: [],
+    isInventoried: true,
+    isSerialTrackingRequired: false,
+    isBatchTrackingRequired: false,
+    isPurchasable: true,
+    isSellable: true,
+    regulatoryApprovals: [],
+    images: [],
+    documents: [],
+    relatedProducts: [],
+    substitutes: [],
+    accessories: [],
+    keywords: [],
+    tags: [],
+    minimumOrderQuantity: 1,
+    maximumOrderQuantity: 1000,
     isActive: true,
-    costPrice: 10.00,
-    sellingPrice: 15.00,
-    reorderLevel: 10,
-    maxStockLevel: 100,
-    supplier: 'Test Supplier',
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides
   }
 }
@@ -96,21 +147,47 @@ export function createMockProduct(overrides: Partial<Product> = {}): Product {
 export function createMockRecipe(overrides: Partial<Recipe> = {}): Recipe {
   return {
     id: `recipe-${Date.now()}`,
+    recipeCode: `RCP-${Date.now()}`,
     name: 'Test Recipe',
+    version: '1.0',
     description: 'Test recipe description',
-    category: 'Main Course',
-    cuisineType: 'International',
-    servingSize: 1,
-    preparationTime: 15,
-    cookingTime: 15,
-    difficulty: 'Easy',
+    categoryId: 'cat-main',
+    cuisineTypeId: 'cuisine-international',
+    status: 'draft',
+    complexity: 'simple',
+    yield: 1,
+    yieldUnit: 'serving',
+    basePortionSize: 1,
+    yieldVariants: [],
+    developedBy: 'system',
+    image: '',
     ingredients: [],
-    instructions: ['Test instruction'],
-    costPerServing: 5.00,
-    sellingPrice: 10.00,
+    preparationSteps: [],
+    prepTime: 15,
+    cookTime: 15,
+    totalTime: 30,
+    totalCost: {
+      amount: 5.00,
+      currency: 'USD'
+    },
+    costPerPortion: {
+      amount: 5.00,
+      currency: 'USD'
+    },
+    foodCostPercentage: 30,
+    requiredEquipment: [],
+    skillLevel: 'beginner',
+    keywords: [],
+    tags: [],
+    allergens: [],
+    dietaryRestrictions: [],
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    isHalal: false,
+    isKosher: false,
+    isMenuActive: true,
     isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides
   }
 }
@@ -121,17 +198,21 @@ export function createMockRecipe(overrides: Partial<Recipe> = {}): Recipe {
 export function createMockPurchaseRequest(overrides: Partial<PurchaseRequest> = {}): PurchaseRequest {
   return {
     id: `PR-${Date.now()}`,
-    description: 'Test Purchase Request',
-    requestedBy: 'test-user',
-    department: 'general',
+    requestDate: new Date(),
+    requiredDate: new Date(),
+    requestType: 'goods',
     priority: 'normal',
-    status: 'draft',
-    totalAmount: 100.00,
-    currency: 'USD',
+    status: DocumentStatus.Draft,
+    departmentId: 'dept-general',
+    locationId: 'loc-main',
+    requestedBy: 'test-user',
+    totalItems: 0,
+    estimatedTotal: {
+      amount: 100.00,
+      currency: 'USD'
+    },
+    workflowStages: [],
     items: [],
-    approvals: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides
   }
 }

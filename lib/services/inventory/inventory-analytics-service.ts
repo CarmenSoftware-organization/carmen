@@ -9,6 +9,7 @@
 import { prisma, type PrismaClient } from '@/lib/db'
 import { comprehensiveInventoryService } from './comprehensive-inventory-service'
 import { CachedInventoryCalculations } from '../cache/cached-inventory-calculations'
+import { createEnhancedCacheLayer } from '../cache/enhanced-cache-layer'
 import type {
   InventoryItem,
   InventoryTransaction,
@@ -224,10 +225,10 @@ export interface AnalyticsResult<T> {
 export class InventoryAnalyticsService {
   private db: PrismaClient
   private inventoryService = comprehensiveInventoryService
-  private cachedCalculations = new CachedInventoryCalculations()
+  private cachedCalculations = new CachedInventoryCalculations(createEnhancedCacheLayer())
 
   constructor(prismaClient?: PrismaClient) {
-    this.db = prismaClient || prisma
+    this.db = (prismaClient || prisma) as PrismaClient
   }
 
   /**
@@ -242,8 +243,8 @@ export class InventoryAnalyticsService {
 
     try {
       const whereClause = itemIds ? { id: { in: itemIds } } : { is_active: true }
-      
-      const items = await this.db.inventory_items.findMany({
+
+      const items = await (this.db as any).inventory_items.findMany({
         where: whereClause,
         include: {
           inventory_transactions: {
@@ -352,7 +353,7 @@ export class InventoryAnalyticsService {
 
       const whereClause = itemIds ? { id: { in: itemIds } } : { is_active: true }
 
-      const items = await this.db.inventory_items.findMany({
+      const items = await (this.db as any).inventory_items.findMany({
         where: whereClause,
         include: {
           categories: true,
@@ -388,7 +389,7 @@ export class InventoryAnalyticsService {
           itemId: item.id,
           itemName: item.item_name,
           category: (item as any).categories?.name || 'Uncategorized',
-          analysisP:  {
+          analysisPeriod: {
             startDate,
             endDate,
             periodDays
@@ -423,7 +424,7 @@ export class InventoryAnalyticsService {
     try {
       const whereClause = itemIds ? { id: { in: itemIds } } : { is_active: true }
 
-      const items = await this.db.inventory_items.findMany({
+      const items = await (this.db as any).inventory_items.findMany({
         where: whereClause,
         include: {
           inventory_transactions: {
@@ -477,7 +478,7 @@ export class InventoryAnalyticsService {
       const cutoffDate = new Date()
       cutoffDate.setDate(cutoffDate.getDate() - thresholdDays)
 
-      const items = await this.db.inventory_items.findMany({
+      const items = await (this.db as any).inventory_items.findMany({
         where: { is_active: true },
         include: {
           inventory_transactions: {
@@ -771,7 +772,7 @@ export class InventoryAnalyticsService {
   private analyzeCostTrend(transactions: any[]): any {
     // Implementation for cost trend analysis
     return {
-      averageCost: { amount: 10.0, currencyCode: 'USD' },
+      averageCost: { amount: 10.0, currency: 'USD' },
       costVariability: 0.15,
       inflationRate: 0.03
     }
@@ -811,7 +812,7 @@ export class InventoryAnalyticsService {
     return {
       averageStock: 50,
       turnoverRate: 6,
-      carryingCost: { amount: 100, currencyCode: 'USD' },
+      carryingCost: { amount: 100, currency: 'USD' },
       serviceLevel: 95
     }
   }
@@ -822,7 +823,7 @@ export class InventoryAnalyticsService {
       recommendedOrderQuantity: 100,
       recommendedSafetyStock: 15,
       expectedTurnoverRate: 8,
-      expectedCarryingCost: { amount: 80, currencyCode: 'USD' },
+      expectedCarryingCost: { amount: 80, currency: 'USD' },
       expectedServiceLevel: targetServiceLevel
     }
   }
@@ -830,13 +831,13 @@ export class InventoryAnalyticsService {
   private calculatePotentialSavings(currentMetrics: any, optimizedMetrics: any): any {
     const carryingCostSavings = {
       amount: currentMetrics.carryingCost.amount - optimizedMetrics.expectedCarryingCost.amount,
-      currencyCode: 'USD'
+      currency: 'USD'
     }
-    
+
     return {
       carryingCostSavings,
-      stockoutCostSavings: { amount: 50, currencyCode: 'USD' },
-      totalSavings: { amount: carryingCostSavings.amount + 50, currencyCode: 'USD' },
+      stockoutCostSavings: { amount: 50, currency: 'USD' },
+      totalSavings: { amount: carryingCostSavings.amount + 50, currency: 'USD' },
       paybackPeriod: 6
     }
   }
@@ -852,7 +853,7 @@ export class InventoryAnalyticsService {
   }
 
   private calculateCurrentValue(item: any, stock: number): Money {
-    return { amount: stock * 10, currencyCode: 'USD' }
+    return { amount: stock * 10, currency: 'USD' }
   }
 
   private calculateAverageMonthlyConsumption(transactions: any[]): number {
@@ -879,18 +880,18 @@ export class InventoryAnalyticsService {
 
   private calculatePotentialLoss(value: Money, risk: string): Money {
     const lossPercentage = risk === 'critical' ? 0.8 : risk === 'high' ? 0.6 : risk === 'medium' ? 0.3 : 0.1
-    return { amount: value.amount * lossPercentage, currencyCode: value.currencyCode }
+    return { amount: value.amount * lossPercentage, currency: value.currency }
   }
 
   private estimateLiquidationValue(value: Money, risk: string): Money {
     const recoveryPercentage = risk === 'critical' ? 0.1 : risk === 'high' ? 0.3 : risk === 'medium' ? 0.6 : 0.8
-    return { amount: value.amount * recoveryPercentage, currencyCode: value.currencyCode }
+    return { amount: value.amount * recoveryPercentage, currency: value.currency }
   }
 
   private async calculateOverallMetrics(startDate: Date, endDate: Date, locationIds?: string[]): Promise<any> {
     // Implementation for overall metrics calculation
     return {
-      totalInventoryValue: { amount: 500000, currencyCode: 'USD' },
+      totalInventoryValue: { amount: 500000, currency: 'USD' },
       inventoryTurnover: 6.5,
       daysOfInventory: 56,
       fillRate: 97.5,

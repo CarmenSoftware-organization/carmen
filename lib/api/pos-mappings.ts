@@ -9,15 +9,15 @@
  */
 
 import { apiClient, type ApiResponse, type PaginationParams } from './client'
-import {
-  type POSMapping,
-  type POSItem,
-  type RecipeSearchResult,
-  type MappingPreview
-} from '@/lib/types'
+import type {
+  POSMapping,
+  POSItem,
+  RecipeSearchResult,
+  MappingPreview
+} from '@/lib/types/pos-integration'
 
 // API response types
-export interface MappingListResponse {
+interface MappingListResponse {
   mappings: POSMapping[]
   total: number
   page: number
@@ -26,7 +26,7 @@ export interface MappingListResponse {
   pageCount: number
 }
 
-export interface UnmappedItemsListResponse {
+interface UnmappedItemsListResponse {
   items: POSItem[]
   total: number
   page: number
@@ -35,7 +35,7 @@ export interface UnmappedItemsListResponse {
   pageCount: number
 }
 
-export interface RecipeSearchResponse {
+interface RecipeSearchResponse {
   recipes: RecipeSearchResult[]
   total: number
   page: number
@@ -44,7 +44,7 @@ export interface RecipeSearchResponse {
   pageCount: number
 }
 
-export interface MappingStatsResponse {
+interface MappingStatsResponse {
   totalItems: number
   mappedItems: number
   unmappedItems: number
@@ -54,7 +54,7 @@ export interface MappingStatsResponse {
 }
 
 // Filter types
-export interface MappingFilters {
+interface MappingFilters {
   isActive?: boolean
   category?: string[]
   recipeCategory?: string[]
@@ -65,7 +65,7 @@ export interface MappingFilters {
   verifiedAfter?: string
 }
 
-export interface RecipeSearchFilters {
+interface RecipeSearchFilters {
   category?: string[]
   cuisineType?: string[]
   searchQuery?: string
@@ -74,7 +74,7 @@ export interface RecipeSearchFilters {
 }
 
 // Request types
-export interface CreateMappingRequest {
+interface CreateMappingRequest {
   posItemId: string
   posItemName: string
   posItemCategory: string
@@ -87,12 +87,12 @@ export interface CreateMappingRequest {
   notes?: string
 }
 
-export interface UpdateMappingRequest extends Partial<CreateMappingRequest> {
+interface UpdateMappingRequest extends Partial<CreateMappingRequest> {
   id: string
   isActive?: boolean
 }
 
-export interface BulkMappingRequest {
+interface BulkMappingRequest {
   mappings: Array<{
     posItemId: string
     recipeId: string
