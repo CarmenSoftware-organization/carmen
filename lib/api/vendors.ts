@@ -189,13 +189,3 @@ export class VendorApiService {
 
 // Create singleton instance
 export const vendorApi = new VendorApiService()
-
-// Export types for external use
-export type {
-  VendorFilters,
-  CreateVendorRequest,
-  UpdateVendorRequest,
-  VendorListResponse,
-  VendorStatsResponse,
-  VendorMetricsResponse
-}

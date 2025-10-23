@@ -129,7 +129,7 @@ export class CachedInventoryCalculations extends InventoryCalculations {
       {
         type: 'field',
         identifier: 'currency_rates',
-        version: input.currencyCode
+        version: input.items[0]?.annualValue.currency || 'USD'
       }
     ];
 

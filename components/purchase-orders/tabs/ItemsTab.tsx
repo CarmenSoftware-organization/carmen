@@ -7,14 +7,15 @@ import { PurchaseOrderItem, PurchaseOrder } from '@/lib/types';
 interface ItemsTabProps {
   onUpdateItem: (updatedItem: PurchaseOrderItem) => void;
   onDeleteItem: (itemId: string) => void;
-  onAddItem: (newItem: PurchaseOrderItem) => void;
+  onAddItem: (newItem: Partial<PurchaseOrderItem>) => void;
   poData: PurchaseOrder;
+  items?: PurchaseOrderItem[];
 }
 
-export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData }: ItemsTabProps) {
-   console.log("Items received in ItemsTab:", poData.items);
+export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData, items = [] }: ItemsTabProps) {
+   console.log("Items received in ItemsTab:", items);
 
-  if (!poData.items || poData.items.length === 0) {
+  if (!items || items.length === 0) {
     return <p>No items found for this purchase order.</p>
   }
 
@@ -31,7 +32,7 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Purchase Order Items</h2>
-        <Button onClick={() => onAddItem({ id: 'new', name: 'New Item' } as PurchaseOrderItem)}>
+        <Button onClick={() => onAddItem({ id: 'new', itemName: 'New Item' })}>
           Add Item
         </Button>
       </div>
@@ -49,14 +50,14 @@ export default function ItemsTab({ onUpdateItem, onDeleteItem, onAddItem, poData
           </TableRow>
         </TableHeader>
         <TableBody>
-          {poData.items.map((item) => (
+          {items.map((item: PurchaseOrderItem) => (
             <TableRow key={item.id}>
-              <TableCell>{item.name}</TableCell>
+              <TableCell>{item.itemName}</TableCell>
               <TableCell>{item.description}</TableCell>
-              <TableCell>{item.orderedQuantity} {item.orderUnit}</TableCell>
-              <TableCell>{item.receivedQuantity} {item.orderUnit}</TableCell>
-              <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
-              <TableCell>${item.subTotalPrice.toFixed(2)}</TableCell>
+              <TableCell>{item.orderedQuantity} {item.unit}</TableCell>
+              <TableCell>{item.receivedQuantity} {item.unit}</TableCell>
+              <TableCell>{item.unitPrice.currency} {item.unitPrice.amount.toFixed(2)}</TableCell>
+              <TableCell>{item.lineTotal.currency} {item.lineTotal.amount.toFixed(2)}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(item.status)}>
                   {item.status}

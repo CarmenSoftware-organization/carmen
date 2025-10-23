@@ -16,13 +16,19 @@ export function useApiAuth() {
 
   // Update API auth tokens when session changes
   useEffect(() => {
-    if (status === 'authenticated' && session?.accessToken) {
+    if (status === 'authenticated' && session) {
       // Set tokens in API client
-      AuthManager.setTokens(
-        session.accessToken as string,
-        session.refreshToken as string,
-        session.expiresAt ? Math.floor((session.expiresAt - Date.now()) / 1000) : undefined
-      )
+      const accessToken = (session as any).accessToken as string | undefined
+      const refreshToken = (session as any).refreshToken as string | undefined
+      const expiresAt = (session as any).expiresAt as number | undefined
+
+      if (accessToken) {
+        AuthManager.setTokens(
+          accessToken,
+          refreshToken || '',
+          expiresAt ? Math.floor((expiresAt - Date.now()) / 1000) : undefined
+        )
+      }
     } else if (status === 'unauthenticated') {
       // Clear tokens when unauthenticated
       AuthManager.clearTokens()
@@ -36,7 +42,8 @@ export function useApiAuth() {
     try {
       // This would typically call your token refresh endpoint
       // For now, we'll rely on NextAuth's built-in refresh
-      if (session?.refreshToken) {
+      const refreshToken = session ? (session as any).refreshToken : undefined
+      if (refreshToken) {
         // NextAuth will handle refresh automatically
         return true
       }

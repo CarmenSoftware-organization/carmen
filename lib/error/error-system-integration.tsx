@@ -59,21 +59,21 @@ export function ErrorSystemProvider({
   const queryClient = React.useRef(new QueryClient({
     defaultOptions: {
       queries: {
-        retry: (failureCount, error: any) => {
+        retry: (failureCount: number, error: any) => {
           // Custom retry logic based on error type
           if (error?.status === 401 || error?.status === 403) {
             return false // Don't retry auth errors
           }
           return failureCount < 3
         },
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000),
         staleTime: 5 * 60 * 1000, // 5 minutes
         gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
       },
       mutations: {
         retry: 1,
         retryDelay: 1000,
-        onError: (error: any, variables, context) => {
+        onError: (error: any, variables: any, context: any) => {
           // Global mutation error handling
           errorManager.handleError(error, {
             showToast: true,
@@ -141,7 +141,7 @@ export function ErrorSystemProvider({
   // Set up API client error interceptors
   React.useEffect(() => {
     const removeInterceptor = apiClient.addInterceptor({
-      onError: async (error) => {
+      onError: async (error: any) => {
         // Enhanced error context for API errors
         const enhancedError = {
           ...error,
@@ -270,7 +270,7 @@ export function withErrorHandling<P extends object>(
 
   const WrappedComponent = React.forwardRef<any, P>((props, ref) => {
     if (!enableBoundary) {
-      return <Component {...props} ref={ref} />
+      return <Component {...(props as any)} ref={ref} />
     }
 
     return (
@@ -278,15 +278,15 @@ export function withErrorHandling<P extends object>(
         config={{
           context: componentName,
           isolateFailure: true,
-          fallback: fallbackComponent
+          fallback: fallbackComponent as any
         }}
       >
         {enableAccessibility ? (
           <AccessibleErrorBoundary>
-            <Component {...props} ref={ref} />
+            <Component {...(props as any)} ref={ref} />
           </AccessibleErrorBoundary>
         ) : (
-          <Component {...props} ref={ref} />
+          <Component {...(props as any)} ref={ref} />
         )}
       </GlobalErrorBoundary>
     )
@@ -371,11 +371,11 @@ export function usePerformanceMonitoring() {
       if ('performance' in window) {
         const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
         const paint = performance.getEntriesByType('paint')
-        
+
         setMetrics({
           navigation: {
-            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.navigationStart,
-            loadComplete: navigation.loadEventEnd - navigation.navigationStart,
+            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+            loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
             firstByte: navigation.responseStart - navigation.requestStart
           },
           paint: paint.reduce((acc, entry) => {

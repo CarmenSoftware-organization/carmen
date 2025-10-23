@@ -100,7 +100,7 @@ export interface AlertRule {
 }
 
 class InfrastructureMonitor {
-  private healthChecks: Map<string, HealthCheckResult> = new Map()
+  private healthChecks: Map<string, () => Promise<HealthCheckResult>> = new Map()
   private systemMetrics: SystemMetrics[] = []
   private databaseMetrics: DatabaseMetrics[] = []
   private serviceHealth: Map<string, ServiceHealthStatus> = new Map()
@@ -110,6 +110,8 @@ class InfrastructureMonitor {
   private metricsInterval = 60000 // 1 minute
   private isMonitoring = false
   private timers: NodeJS.Timeout[] = []
+  private collectSystemMetricsFunc: () => Promise<SystemMetrics | null> = async () => null
+  private collectDatabaseMetricsFunc: () => Promise<DatabaseMetrics | null> = async () => null
 
   constructor() {
     if (this.config.enabledServices.infrastructureMonitoring) {
@@ -171,10 +173,13 @@ class InfrastructureMonitor {
         const startTime = Date.now()
         const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
         
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
+
         const response = await fetch(`${keycloakUrl}/auth/realms/carmen/protocol/openid_connect/.well-known`, {
           method: 'GET',
-          timeout: 5000
-        })
+          signal: controller.signal
+        }).finally(() => clearTimeout(timeoutId))
         
         const latency = Date.now() - startTime
         
@@ -236,9 +241,12 @@ class InfrastructureMonitor {
         // Example: Check currency exchange API
         if (process.env.EXCHANGE_RATE_API_URL) {
           const startTime = Date.now()
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 3000)
+
           const response = await fetch(process.env.EXCHANGE_RATE_API_URL, {
-            timeout: 3000
-          })
+            signal: controller.signal
+          }).finally(() => clearTimeout(timeoutId))
           checks.push({
             name: 'exchange-rate-api',
             status: response.ok,
@@ -491,21 +499,21 @@ class InfrastructureMonitor {
    * Register a health check
    */
   registerHealthCheck(name: string, checkFunction: () => Promise<HealthCheckResult>) {
-    this.healthChecks.set(name, checkFunction as any)
+    this.healthChecks.set(name, checkFunction)
   }
 
   /**
    * Register system metrics collector
    */
   registerSystemMetricsCollector(collector: () => Promise<SystemMetrics | null>) {
-    this.collectSystemMetrics = collector
+    this.collectSystemMetricsFunc = collector
   }
 
   /**
    * Register database metrics collector
    */
   registerDatabaseMetricsCollector(collector: () => Promise<DatabaseMetrics | null>) {
-    this.collectDatabaseMetrics = collector
+    this.collectDatabaseMetricsFunc = collector
   }
 
   /**
@@ -537,7 +545,7 @@ class InfrastructureMonitor {
 
     for (const [name, checkFn] of this.healthChecks) {
       try {
-        const result = await (checkFn as Function)()
+        const result = await checkFn()
         checks.push(result)
         
         if (result.status === 'healthy') healthyCount++
@@ -608,8 +616,8 @@ class InfrastructureMonitor {
   private async runAllHealthChecks() {
     for (const [name, checkFn] of this.healthChecks) {
       try {
-        const result = await (checkFn as Function)()
-        
+        const result = await checkFn()
+
         // Log degraded or unhealthy status
         if (result.status !== 'healthy') {
           logger.warn(`Health check failed: ${name}`, result)
@@ -621,11 +629,13 @@ class InfrastructureMonitor {
   }
 
   private async collectSystemMetrics() {
-    // Placeholder - would be implemented by registered collector
+    // Call registered collector
+    return await this.collectSystemMetricsFunc()
   }
 
   private async collectDatabaseMetrics() {
-    // Placeholder - would be implemented by registered collector
+    // Call registered collector
+    return await this.collectDatabaseMetricsFunc()
   }
 
   private updateServiceHealth() {

@@ -5,7 +5,8 @@
  * reorder points, costing methods, and availability calculations.
  */
 
-import { Money, CostingMethod, StockBalance, InventoryItem } from '@/lib/types'
+import { Money, InventoryItem } from '@/lib/types'
+import { CostingMethod, StockBalance } from '@/lib/types/inventory'
 import { BaseCalculator, CalculationResult } from './base-calculator'
 
 /**
@@ -84,7 +85,6 @@ export interface ABCAnalysisInput {
     annualValue: Money;
     annualUsage: number;
   }>;
-  currencyCode: string;
 }
 
 /**
@@ -174,7 +174,7 @@ export class InventoryCalculations extends BaseCalculator {
 
       const totalValue = this.createMoney(
         quantityOnHand * unitCost.amount,
-        unitCost.currencyCode
+        unitCost.currency
       );
 
       return {
@@ -370,8 +370,8 @@ export class InventoryCalculations extends BaseCalculator {
     }
 
     const avgCost = totalCost / totalQuantity;
-    const currencyCode = costLayers[0]?.unitCost?.currencyCode || 'USD';
-    
+    const currencyCode = costLayers[0]?.unitCost?.currency || 'USD';
+
     return this.createMoney(avgCost, currencyCode);
   }
 
@@ -417,7 +417,7 @@ export class InventoryCalculations extends BaseCalculator {
 
     const totalCost = receivingTransactions.reduce((sum, tx) => sum + tx.unitCost!.amount, 0);
     const avgCost = totalCost / receivingTransactions.length;
-    const currencyCode = receivingTransactions[0].unitCost!.currencyCode;
+    const currencyCode = receivingTransactions[0].unitCost!.currency;
 
     return this.createMoney(avgCost, currencyCode);
   }
@@ -449,7 +449,7 @@ export class InventoryCalculations extends BaseCalculator {
     }
 
     const weightedAvgCost = totalValue / totalQuantity;
-    const currencyCode = receivingTransactions[0].unitCost!.currencyCode;
+    const currencyCode = receivingTransactions[0].unitCost!.currency;
 
     return this.createMoney(weightedAvgCost, currencyCode);
   }
