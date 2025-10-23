@@ -242,7 +242,7 @@ async function handleOptimization(searchParams: URLSearchParams) {
     },
     totalPotentialSavings: {
       amount: result.data.reduce((sum, item) => sum + item.potentialSavings.totalSavings.amount, 0),
-      currencyCode: result.data[0]?.potentialSavings.totalSavings.currencyCode || 'USD'
+      currency: result.data[0]?.potentialSavings.totalSavings.currency || 'USD'
     },
     averagePaybackPeriod: result.data.reduce((sum, item) => sum + item.potentialSavings.paybackPeriod, 0) / result.data.length,
     riskDistribution: {
@@ -295,7 +295,7 @@ async function handleDeadStockAnalysis(searchParams: URLSearchParams) {
     totalDeadStockItems: result.data.length,
     totalDeadStockValue: {
       amount: result.data.reduce((sum, item) => sum + item.currentValue.amount, 0),
-      currencyCode: result.data[0]?.currentValue.currencyCode || 'USD'
+      currency: result.data[0]?.currentValue.currency || 'USD'
     },
     riskDistribution: {
       low: result.data.filter(item => item.obsolescenceRisk === 'low').length,
@@ -312,11 +312,11 @@ async function handleDeadStockAnalysis(searchParams: URLSearchParams) {
     },
     totalPotentialLoss: {
       amount: result.data.reduce((sum, item) => sum + item.potentialLoss.amount, 0),
-      currencyCode: result.data[0]?.potentialLoss.currencyCode || 'USD'
+      currency: result.data[0]?.potentialLoss.currency || 'USD'
     },
     totalLiquidationValue: {
       amount: result.data.reduce((sum, item) => sum + item.liquidationValue.amount, 0),
-      currencyCode: result.data[0]?.liquidationValue.currencyCode || 'USD'
+      currency: result.data[0]?.liquidationValue.currency || 'USD'
     }
   } : null
 

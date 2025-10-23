@@ -217,10 +217,10 @@ const getEntities = withSecurity(
 
         // Apply role-based filtering if needed
         let filteredEntities = mockEntities;
-        if (user.role.name === 'staff') {
+        if (user.role === 'staff') {
           // Staff can only see their own entities
           filteredEntities = mockEntities.filter((entity: any) => entity.createdBy === user.id);
-        } else if (user.role.name === 'department-manager') {
+        } else if (user.role === 'department-manager') {
           // Department managers can see their department's entities
           filteredEntities = mockEntities.filter((entity: any) => entity.department === user.department);
         }
@@ -325,7 +325,7 @@ const createEntity = withSecurity(
         // Add your specific validation rules here
         
         // Role-based creation restrictions
-        if (!ROLE_RESTRICTIONS[user.role.name]?.includes('create')) {
+        if (!ROLE_RESTRICTIONS[user.role]?.includes('create')) {
           return createSecureResponse(
             {
               success: false,
@@ -454,7 +454,7 @@ const updateEntity = withSecurity(
         // }
 
         // Role-based update restrictions
-        if (!ROLE_RESTRICTIONS[user.role.name]?.includes('update')) {
+        if (!ROLE_RESTRICTIONS[user.role]?.includes('update')) {
           return createSecureResponse(
             {
               success: false,
@@ -564,7 +564,7 @@ const deleteEntity = withSecurity(
         // }
 
         // Role-based deletion restrictions
-        if (!ROLE_RESTRICTIONS[user.role.name]?.includes('delete')) {
+        if (!ROLE_RESTRICTIONS[user.role]?.includes('delete')) {
           return createSecureResponse(
             {
               success: false,

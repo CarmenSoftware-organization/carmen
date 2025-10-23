@@ -100,11 +100,11 @@ export async function POST(request: NextRequest) {
       
       // Additional information if requested
       obligations: validatedRequest.options?.includeObligations ? result.decision.evaluatedPolicies
-        .flatMap(p => p.matches ? [] : []) // TODO: Extract obligations from policy results
+        .flatMap(p => p.obligations || [])
         : undefined,
-      
+
       advice: validatedRequest.options?.includeAdvice ? result.decision.evaluatedPolicies
-        .flatMap(p => p.matches ? [] : []) // TODO: Extract advice from policy results
+        .flatMap(p => p.advice || [])
         : undefined,
       
       evaluationTrace: validatedRequest.options?.includeTrace ? evaluationTrace : undefined,
@@ -227,13 +227,16 @@ export async function PUT(request: NextRequest) {
             successful: successful.length,
             failed: failed.length,
             totalTime: Date.now() - startTime,
-            averageTime: successful.length > 0 
-              ? successful.reduce((sum, r) => sum + (r.data.evaluationTime || 0), 0) / successful.length
+            averageTime: successful.length > 0
+              ? successful.reduce((sum, r) => {
+                  const evalTime = 'evaluationTime' in r.data ? r.data.evaluationTime : 0
+                  return sum + (evalTime || 0)
+                }, 0) / successful.length
               : 0
           },
           errors: failed.map(f => ({
             index: f.index,
-            error: f.error
+            error: 'error' in f ? f.error : 'Unknown error'
           }))
         }
       })

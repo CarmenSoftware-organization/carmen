@@ -20,8 +20,9 @@ interface SubtotalRowProps {
   columns: {
     key: string
     label: string
-    type: 'number' | 'currency' | 'text' | 'badge'
+    type: 'number' | 'currency' | 'text' | 'badge' | 'date' | 'actions'
     badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline'
+    badgeColor?: (value: any) => 'default' | 'secondary' | 'destructive' | 'outline'
   }[]
 }
 
@@ -76,7 +77,7 @@ interface GroupHeaderProps {
 export function GroupHeader({ locationName, itemCount, isExpanded, onToggle, keyMetrics }: GroupHeaderProps) {
   return (
     <TableRow className="bg-slate-50 hover:bg-slate-100 border-b-2 border-slate-200">
-      <TableCell colSpan="100%" className="py-3">
+      <TableCell colSpan={100} className="py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Button
@@ -199,7 +200,7 @@ export function GroupedTable<T>({
           {grandTotals && (
             <tbody>
               <TableRow className="border-t-2 border-primary bg-primary/5">
-                <TableCell colSpan="100%" className="py-1" />
+                <TableCell colSpan={100} className="py-1" />
               </TableRow>
               <SubtotalRow
                 label="Grand Total"

@@ -19,7 +19,7 @@ import {
   type SyncDailySalesInput
 } from '@/lib/services/pos-integration-service'
 import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
@@ -53,7 +53,7 @@ const SalesSummaryQuerySchema = z.object({
  */
 const getSalesSummary = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('menu_engineering', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('menu_engineering', 'read', async (request: NextRequest, { user }: { user: { id: string; role: string } }) => {
       try {
         const { searchParams } = new URL(request.url)
         
@@ -148,7 +148,32 @@ const getSalesSummary = withSecurity(
         })
 
         // Initialize cache and services
-        const cache = new EnhancedCacheLayer()
+        const cache = new EnhancedCacheLayer({
+          redis: {
+            enabled: false,
+            fallbackToMemory: true,
+            connectionTimeout: 5000
+          },
+          memory: {
+            maxMemoryMB: 100,
+            maxEntries: 1000
+          },
+          ttl: {
+            financial: 300,
+            inventory: 300,
+            vendor: 300,
+            default: 300
+          },
+          invalidation: {
+            enabled: false,
+            batchSize: 100,
+            maxDependencies: 1000
+          },
+          monitoring: {
+            enabled: false,
+            metricsInterval: 60000
+          }
+        })
 
         // Mock sales summary data (in real implementation, this would query the database)
         const salesSummary = {
@@ -232,7 +257,7 @@ const getSalesSummary = withSecurity(
         // Add caching headers
         response.headers.set('Cache-Control', 'public, max-age=300') // 5 minutes
         response.headers.set('X-Data-Source', 'menu-engineering-service')
-        response.headers.set('X-Query-Period', queryParams.period)
+        response.headers.set('X-Query-Period', queryParams.period || 'last_7_days')
 
         return response
 

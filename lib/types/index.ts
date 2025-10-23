@@ -115,7 +115,11 @@ export type {
   TransactionError,
   TransactionAuditLog,
   InventoryImpactPreview,
-  ErrorCategory
+  ErrorCategory,
+  POSMapping,
+  POSItem,
+  RecipeSearchResult,
+  MappingPreview
 } from './pos-integration'
 
 // Credit note types (PRIMARY SOURCE for CreditNote, CreditNoteItem)
