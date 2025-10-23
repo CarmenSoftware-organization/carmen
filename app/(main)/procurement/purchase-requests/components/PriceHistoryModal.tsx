@@ -155,7 +155,7 @@ export function PriceHistoryModal({
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `price-history-${prItem.name}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `price-history-${prItem.itemName}-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -171,7 +171,7 @@ export function PriceHistoryModal({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <BarChart3 className="w-5 h-5" />
-            <span>Price History - {prItem.name}</span>
+            <span>Price History - {prItem.itemName}</span>
           </DialogTitle>
         </DialogHeader>
 
