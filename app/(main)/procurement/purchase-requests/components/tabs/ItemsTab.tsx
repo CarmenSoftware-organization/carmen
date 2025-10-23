@@ -278,14 +278,14 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     setLocalItems(prevItems => 
       prevItems.map(item => 
         itemsToReturn.includes(item.id || '') 
-          ? ({ ...item, status: 'Review' as any, comment: returnComment } as any)
+          ? ({ ...item, status: DocumentStatus.InProgress, comment: returnComment })
           : item
       )
     );
     
     // Also call parent onOrderUpdate for each item
     itemsToReturn.forEach(itemId => {
-      onOrderUpdate(itemId, { status: 'Review' as any, comment: returnComment });
+      onOrderUpdate(itemId, { status: DocumentStatus.InProgress, comment: returnComment });
     });
     
     // Reset state
@@ -304,14 +304,14 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     setLocalItems(prevItems => 
       prevItems.map(item => 
         itemIds.includes(item.id || '') 
-          ? { ...item, status: 'Approved' as any } as any as any
+          ? { ...item, status: DocumentStatus.Approved }
           : item
       )
     );
     
     // Also call parent onOrderUpdate
     itemIds.forEach(itemId => {
-      onOrderUpdate(itemId, { status: 'Approved' as any });
+      onOrderUpdate(itemId, { status: DocumentStatus.Approved });
     });
     
     setSelectedItems([]); // Clear selection after action
@@ -325,14 +325,14 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     setLocalItems(prevItems => 
       prevItems.map(item => 
         itemIds.includes(item.id || '') 
-          ? { ...item, status: 'Rejected' as any } as any as any
+          ? { ...item, status: DocumentStatus.Rejected }
           : item
       )
     );
     
     // Also call parent onOrderUpdate
     itemIds.forEach(itemId => {
-      onOrderUpdate(itemId, { status: 'Rejected' as any });
+      onOrderUpdate(itemId, { status: DocumentStatus.Rejected });
     });
     
     setSelectedItems([]); // Clear selection after action
@@ -367,7 +367,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     
     // Also call parent onOrderUpdate for each selected item
     selectedItems.forEach(itemId => {
-      onOrderUpdate(itemId, { deliveryDate: bulkRequiredDate } as any);
+      onOrderUpdate(itemId, { deliveryDate: bulkRequiredDate });
     });
     
     setIsBulkDateModalOpen(false);
@@ -447,13 +447,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     setLocalItems(prevItems =>
       prevItems.map(item =>
         item.id === itemId
-          ? { ...item, status: 'Approved' as any }
+          ? { ...item, status: DocumentStatus.Approved }
           : item
       )
     );
 
     // Also call parent onOrderUpdate
-    onOrderUpdate(itemId, { status: 'Approved' as any });
+    onOrderUpdate(itemId, { status: DocumentStatus.Approved });
     console.log(`🎉 Successfully approved item: ${mockItem?.name}`);
   }
 
@@ -466,13 +466,13 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     setLocalItems(prevItems =>
       prevItems.map(item =>
         item.id === itemId
-          ? { ...item, status: 'Rejected' as any }
+          ? { ...item, status: DocumentStatus.Rejected }
           : item
       )
     );
 
     // Also call parent onOrderUpdate
-    onOrderUpdate(itemId, { status: 'Rejected' as any });
+    onOrderUpdate(itemId, { status: DocumentStatus.Rejected });
     console.log(`🎉 Successfully rejected item: ${mockItem?.name}`);
   }
 
