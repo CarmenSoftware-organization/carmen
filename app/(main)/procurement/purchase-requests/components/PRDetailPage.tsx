@@ -110,9 +110,9 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     if (isAddMode) return getEmptyPurchaseRequest();
     if (prId) {
       // Case-insensitive lookup for PR ID
-      const foundPR = mockPRListData.find(pr => 
-        pr.id.toLowerCase() === prId.toLowerCase() || 
-        pr.refNumber.toLowerCase() === prId.toLowerCase()
+      const foundPR = mockPRListData.find(pr =>
+        pr.id.toLowerCase() === prId.toLowerCase() ||
+        (pr as any).requestNumber?.toLowerCase() === prId.toLowerCase()
       );
       if (foundPR) return foundPR;
     }
@@ -120,10 +120,10 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   };
 
   const [formData, setFormData] = useState<PurchaseRequest>(getPRData());
-  
+
   // Items state management for proper form button updates
   const [currentItems, setCurrentItems] = useState<PurchaseRequestItem[]>(
-    formData.items && formData.items.length > 0 ? formData.items : samplePRItems
+    (formData as any).items && (formData as any).items.length > 0 ? (formData as any).items : samplePRItems
   );
   
   // RBAC state
@@ -149,13 +149,13 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   useEffect(() => {
     if (prId && !isAddMode) {
       // Case-insensitive lookup for PR ID
-      const foundPR = mockPRListData.find(pr => 
-        pr.id.toLowerCase() === prId.toLowerCase() || 
-        pr.refNumber.toLowerCase() === prId.toLowerCase()
+      const foundPR = mockPRListData.find(pr =>
+        pr.id.toLowerCase() === prId.toLowerCase() ||
+        (pr as any).requestNumber?.toLowerCase() === prId.toLowerCase()
       );
       if (foundPR) {
         setFormData(foundPR);
-        setCurrentItems(foundPR.items && foundPR.items.length > 0 ? foundPR.items : samplePRItems);
+        setCurrentItems((foundPR as any).items && (foundPR as any).items.length > 0 ? (foundPR as any).items : samplePRItems);
         setMode("view");
       }
     }
@@ -217,16 +217,16 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     }
 
     const nextStage = WorkflowDecisionEngine.getNextWorkflowStage(
-      formData.currentWorkflowStage, 
+      (formData as any).currentWorkflowStage || formData.currentStage,
       workflowDecision
     );
-    
+
     const updatedData = {
       ...formData,
       status: nextStage === 'completed' ? DocumentStatus.Completed : DocumentStatus.InProgress,
-      currentWorkflowStage: nextStage as any,
-      lastModified: new Date().toISOString(),
-    };
+      currentStage: nextStage,
+      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
+    } as any;
     setFormData(updatedData);
     console.log('PR Workflow Action:', workflowDecision.action, updatedData);
   };
@@ -238,16 +238,16 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     }
 
     const nextStage = WorkflowDecisionEngine.getNextWorkflowStage(
-      formData.currentWorkflowStage, 
+      (formData as any).currentWorkflowStage || formData.currentStage,
       workflowDecision
     );
-    
+
     const updatedData = {
       ...formData,
       status: DocumentStatus.Rejected,
-      currentWorkflowStage: nextStage as any,
-      lastModified: new Date().toISOString(),
-    };
+      currentStage: nextStage,
+      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
+    } as any;
     setFormData(updatedData);
     console.log('PR Workflow Action:', workflowDecision.action, updatedData);
   };
@@ -266,16 +266,16 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     const updatedData = {
       ...formData,
       status: DocumentStatus.InProgress,
-      currentWorkflowStage: step.targetStage as any,
-      lastModified: new Date().toISOString(),
-    };
+      currentStage: step.targetStage,
+      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
+    } as any;
     setFormData(updatedData);
-    
+
     // Reset state
     setIsReturnStepSelectorOpen(false);
     setReturnComment("");
     setSelectedReturnStep(null);
-    
+
     console.log('PR Returned to:', step.targetStage, 'with comment:', returnComment, updatedData);
   };
 
@@ -289,10 +289,10 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   const handleSubmitForApproval = () => {
     const updatedData = {
       ...formData,
-      status: DocumentStatus.Submitted,
-      workflowStage: WorkflowStage.departmentHeadApproval,
-      lastModified: new Date().toISOString(),
-    };
+      status: DocumentStatus.InProgress,
+      currentStage: WorkflowStage.departmentHeadApproval,
+      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
+    } as any;
     setFormData(updatedData);
     console.log('PR Submitted for Approval:', updatedData);
   };
@@ -383,13 +383,13 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                           <h1 className="text-2xl font-bold">
                             {mode === "add"
                               ? "Create New Purchase Request"
-                              : formData.refNumber || "Purchase Request Details"}
+                              : (formData as any).requestNumber || "Purchase Request Details"}
                           </h1>
                           {mode !== "add" && (
                             <p className="text-sm text-muted-foreground mt-1">Purchase Request</p>
                           )}
                         </div>
-                        {formData.refNumber && <StatusBadge status={formData.status} className="h-6" />}
+                        {(formData as any).requestNumber && <StatusBadge status={formData.status} className="h-6" />}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap justify-end">
@@ -469,20 +469,20 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
               {/* Main Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="date" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                  <Label htmlFor="requestDate" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
                     <CalendarIcon className="h-4 w-4" />
                     Date
                   </Label>
                   {mode === "view" ? (
                     <div className="text-gray-900 font-medium">
-                      {formData.date.toLocaleDateString('en-GB')}
+                      {formData.requestDate.toLocaleDateString('en-GB')}
                     </div>
                   ) : (
                     <Input
-                      id="date"
-                      name="date"
+                      id="requestDate"
+                      name="requestDate"
                       type="date"
-                      value={formData.date.toISOString().split("T")[0]}
+                      value={formData.requestDate.toISOString().split("T")[0]}
                       onChange={handleInputChange}
                       disabled={!canEditField("date", user?.context.currentRole.name || "")}
                       className={!canEditField("date", user?.context.currentRole.name || "") ? "bg-muted" : ""}
@@ -490,45 +490,45 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="type" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                  <Label htmlFor="requestType" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
                     <TagIcon className="h-4 w-4" />
                     PR Type
                   </Label>
                   {mode === "view" ? (
-                    <div className="text-gray-900 font-medium">{formData.type}</div>
+                    <div className="text-gray-900 font-medium">{formData.requestType}</div>
                   ) : (
                     <Select
-                      value={formData.type}
+                      value={formData.requestType}
                       onValueChange={(value) =>
-                        setFormData({ ...formData, type: value as PRType })
+                        setFormData({ ...formData, requestType: value as any })
                       }
                       disabled={!canEditField("type", user?.context.currentRole.name || "")}
                     >
-                      <SelectTrigger id="type" className={!canEditField("type", user?.context.currentRole.name || "") ? "bg-muted" : ""}>
+                      <SelectTrigger id="requestType" className={!canEditField("type", user?.context.currentRole.name || "") ? "bg-muted" : ""}>
                         <SelectValue placeholder="Select PR Type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.values(PRType).map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="goods">Goods</SelectItem>
+                        <SelectItem value="services">Services</SelectItem>
+                        <SelectItem value="capital">Capital</SelectItem>
+                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="emergency">Emergency</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="requestor.name" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                  <Label htmlFor="requestedBy" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
                     <UserIcon className="h-4 w-4" />
                     Requestor
                   </Label>
                   {mode === "view" ? (
-                    <div className="text-gray-900 font-medium">{formData.requestor.name}</div>
+                    <div className="text-gray-900 font-medium">{formData.requestedBy}</div>
                   ) : (
                     <Input
-                      id="requestor.name"
-                      name="requestor.name"
-                      value={formData.requestor.name}
+                      id="requestedBy"
+                      name="requestedBy"
+                      value={formData.requestedBy}
                       onChange={handleInputChange}
                       disabled={!canEditField("requestor", user?.context.currentRole.name || "")}
                       className={!canEditField("requestor", user?.context.currentRole.name || "") ? "bg-muted" : ""}
@@ -536,17 +536,17 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="department" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                  <Label htmlFor="departmentId" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
                     <BuildingIcon className="h-4 w-4" />
                     Department
                   </Label>
                   {mode === "view" ? (
-                    <div className="text-gray-900 font-medium">{formData.department || "Not specified"}</div>
+                    <div className="text-gray-900 font-medium">{formData.departmentId || "Not specified"}</div>
                   ) : (
                     <Input
-                      id="department"
-                      name="department"
-                      value={formData.department}
+                      id="departmentId"
+                      name="departmentId"
+                      value={formData.departmentId}
                       onChange={handleInputChange}
                       disabled={!canEditField("department", user?.context.currentRole.name || "")}
                       className={!canEditField("department", user?.context.currentRole.name || "") ? "bg-muted" : ""}
@@ -558,19 +558,19 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
               {/* Secondary Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
+                  <Label htmlFor="justification" className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
                     <FileIcon className="h-4 w-4" />
                     Description
                   </Label>
                   {mode === "view" ? (
                     <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
-                      {formData.description || "No description"}
+                      {formData.justification || formData.notes || "No description"}
                     </div>
                   ) : (
                     <Textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
+                      id="justification"
+                      name="justification"
+                      value={formData.justification || ''}
                       onChange={handleInputChange}
                       disabled={!canEditField("description", user?.context.currentRole.name || "")}
                       className={`min-h-[60px] ${!canEditField("description", user?.context.currentRole.name || "") ? "bg-muted" : ""}}`}
@@ -578,16 +578,16 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                     />
                   )}
                 </div>
-                
+
                 {/* Workflow Progress - Right Half */}
                 <div className="space-y-2">
                   <Label className="text-sm text-muted-foreground mb-2 block">
                     Workflow Progress
                   </Label>
-                  {formData.refNumber && formData.currentWorkflowStage ? (
+                  {(formData as any).requestNumber && formData.currentStage ? (
                     <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center">
-                      <CompactWorkflowIndicator 
-                        currentStage={formData.currentWorkflowStage}
+                      <CompactWorkflowIndicator
+                        currentStage={formData.currentStage as WorkflowStage}
                         prData={formData}
                         className="flex-shrink-0"
                       />
@@ -654,7 +654,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
           {user && workflowPermissions.canViewFinancialInfo && (
             <Card className="shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Transaction Summary ({formData.baseCurrencyCode || 'USD'})</CardTitle>
+                <CardTitle className="text-lg">Transaction Summary ({(formData as any).baseCurrencyCode || 'USD'})</CardTitle>
               </CardHeader>
               <CardContent className="pb-6">
                 <SummaryTotal prData={formData} />
@@ -679,7 +679,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
               <CardTitle className="text-base">Activity Log</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <ActivityTab activityLog={formData.activityLog} />
+              <ActivityTab activityLog={(formData as any).activityLog || []} />
             </CardContent>
           </Card>
         </div>
@@ -702,7 +702,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                       variant="destructive"
                       size="sm"
                       className="h-9"
-                      disabled={formData.status !== 'Draft'}
+                      disabled={formData.status !== DocumentStatus.Draft}
                     >
                       <X className="mr-2 h-4 w-4" />
                       Delete
@@ -712,7 +712,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                       variant="default"
                       size="sm"
                       className="h-9"
-                      disabled={!workflowDecision.canSubmit || formData.status !== 'Draft'}
+                      disabled={!workflowDecision.canSubmit || formData.status !== DocumentStatus.Draft}
                     >
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Submit
@@ -920,37 +920,21 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
 function getEmptyPurchaseRequest(): PurchaseRequest {
   return {
     id: "",
-    refNumber: "",
-    date: new Date(),
-    type: PRType.GeneralPurchase,
-    description: "",
-    requestorId: "",
-    requestor: {
-      name: "",
-      id: "",
-      department: "",
-    },
+    requestNumber: "",
+    requestDate: new Date(),
+    requiredDate: new Date(),
+    requestType: 'goods',
+    priority: 'normal',
     status: DocumentStatus.Draft,
-    workflowStatus: WorkflowStatus.pending,
-    currentWorkflowStage: WorkflowStage.requester,
-    location: "",
-    department: "",
-    jobCode: "",
-    estimatedTotal: 0,
-    currency:"THB",
-    baseCurrencyCode: "THB",
-    vendor: "",
-    vendorId: 0,
-    deliveryDate: new Date(),
-    baseSubTotalPrice : 0,
-    subTotalPrice: 0,
-    baseNetAmount: 0,
-    netAmount: 0,
-    baseDiscAmount: 0,
-    discountAmount: 0,
-    baseTaxAmount: 0,
-    taxAmount: 0,
-    baseTotalAmount: 0,
-    totalAmount: 0,
+    departmentId: "",
+    locationId: "",
+    requestedBy: "",
+    totalItems: 0,
+    estimatedTotal: {
+      amount: 0,
+      currency: 'THB'
+    },
+    workflowStages: [],
+    currentStage: WorkflowStage.requester,
   };
 }
