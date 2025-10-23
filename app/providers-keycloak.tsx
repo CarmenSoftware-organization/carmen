@@ -13,7 +13,7 @@ import { SessionProvider } from 'next-auth/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Toaster } from '@/components/ui/toaster'
-import { KeycloakUserProvider } from '@/lib/context/keycloak-user-context'
+import { UserProvider } from '@/lib/context/user-context'
 import { ThemeProvider } from 'next-themes'
 
 // Create a client for React Query
@@ -65,7 +65,7 @@ export function Providers({ children }: ProvidersProps) {
         // Refetch session when window gains focus
         refetchOnWindowFocus={true}
       >
-        <KeycloakUserProvider>
+        <UserProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -75,7 +75,7 @@ export function Providers({ children }: ProvidersProps) {
             {children}
             <Toaster />
           </ThemeProvider>
-        </KeycloakUserProvider>
+        </UserProvider>
       </SessionProvider>
     </QueryClientProvider>
   )
@@ -118,8 +118,8 @@ export function HybridProviders({ children }: ProvidersProps) {
         refetchInterval={5 * 60}
         refetchOnWindowFocus={true}
       >
-        {/* Use KeycloakUserProvider but maintain backward compatibility */}
-        <KeycloakUserProvider>
+        {/* Use UserProvider but maintain backward compatibility */}
+        <UserProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -129,7 +129,7 @@ export function HybridProviders({ children }: ProvidersProps) {
             {children}
             <Toaster />
           </ThemeProvider>
-        </KeycloakUserProvider>
+        </UserProvider>
       </SessionProvider>
     </QueryClientProvider>
   )

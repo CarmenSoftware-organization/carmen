@@ -10,6 +10,7 @@ import { inventoryValuationService } from '@/lib/services/db/inventory-valuation
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
+import { CostingMethod } from '@/lib/types/inventory'
 
 // Validation schemas
 const valuationFiltersSchema = z.object({
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
       locationIds: locationIds?.split(',').filter(Boolean),
       categoryIds: categoryIds?.split(',').filter(Boolean),
       itemIds: itemIds?.split(',').filter(Boolean),
-      costingMethod,
+      costingMethod: costingMethod as CostingMethod | undefined,
       valuationDate: valuationDate ? new Date(valuationDate) : undefined,
       includeInactive: includeInactive === 'true',
       includeZeroStock: includeZeroStock === 'true',

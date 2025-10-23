@@ -355,7 +355,7 @@ async function getComplianceMetrics(startTime: Date, policyIds?: string[]) {
   const auditLogs = await prisma.auditLog.findMany({
     where: {
       timestamp: { gte: startTime },
-      complianceFlags: { not: { isEmpty: true } }
+      complianceFlags: { isEmpty: false }
     },
     select: {
       eventType: true,

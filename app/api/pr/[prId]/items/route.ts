@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { EnhancedPRItem, DocumentStatus, WorkflowStageStatus, WorkflowStageType, UserRole, WorkflowStage } from '@/app/(main)/procurement/purchase-requests/components/tabs/UpdatedEnhancedItemsTab';
-import { PurchaseRequestItemStatus } from '@/lib/types';
 
 // Type alias for backward compatibility
 type EnhancedItemStatus = string;
@@ -61,7 +60,7 @@ let mockItems: any[] = [
     pricelistNumber: "PL-2024-001",
     itemCategory: "Office Supplies",
     itemSubcategory: "Paper Products",
-    status: "Pending" as PurchaseRequestItemStatus,
+    status: "Pending" as DocumentStatus,
     inventoryInfo: {
       onHand: 12,
       onOrdered: 25,
@@ -128,7 +127,7 @@ let mockItems: any[] = [
     pricelistNumber: "PL-2024-002",
     itemCategory: "Computer Equipment",
     itemSubcategory: "Peripherals",
-    status: "Approved" as PurchaseRequestItemStatus,
+    status: "Approved" as DocumentStatus,
     inventoryInfo: {
       onHand: 5,
       onOrdered: 0,
@@ -186,7 +185,7 @@ let mockItems: any[] = [
     pricelistNumber: "PL-2024-003",
     itemCategory: "Safety Equipment",
     itemSubcategory: "Personal Protective Equipment",
-    status: "Review" as PurchaseRequestItemStatus,
+    status: "Review" as DocumentStatus,
     inventoryInfo: {
       onHand: 8,
       onOrdered: 0,
@@ -255,7 +254,7 @@ let mockItems: any[] = [
     pricelistNumber: "PL-2024-004",
     itemCategory: "Marketing Materials",
     itemSubcategory: "Promotional Items",
-    status: "Approved" as PurchaseRequestItemStatus,
+    status: "Approved" as DocumentStatus,
     inventoryInfo: {
       onHand: 0,
       onOrdered: 5,

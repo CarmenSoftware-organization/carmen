@@ -27,20 +27,19 @@ const productParamsSchema = z.object({
   id: SecureSchemas.uuid
 })
 
-interface RouteParams {
-  params: { id: string }
-}
-
 /**
  * GET /api/products/[id]/inventory - Get product inventory metrics
  * Requires authentication and 'read:inventory' permission
  */
 const getProductInventoryMetrics = withSecurity(
   withAuth(
-    withAuthorization('inventory', 'read', async (request: NextRequest, { user, params }: { user: AuthenticatedUser } & RouteParams) => {
+    withAuthorization('inventory', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
+        // Extract ID from URL pathname
+        const id = new URL(request.url).pathname.split('/')[3] // /api/products/[id]/inventory
+
         // Validate product ID parameter
-        const paramsValidation = await validateInput(params, productParamsSchema)
+        const paramsValidation = await validateInput({ id }, productParamsSchema)
 
         if (!paramsValidation.success) {
           return createSecureResponse(
@@ -135,11 +134,14 @@ const getProductInventoryMetrics = withSecurity(
 
       } catch (error) {
         console.error('Error in GET /api/products/[id]/inventory:', error)
-        
+
+        // Extract ID for error logging
+        const id = new URL(request.url).pathname.split('/')[3]
+
         await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
           error: error instanceof Error ? error.message : 'Unknown error',
           operation: 'get_product_inventory_metrics',
-          productId: params?.id,
+          productId: id,
           stack: error instanceof Error ? error.stack : undefined
         })
 

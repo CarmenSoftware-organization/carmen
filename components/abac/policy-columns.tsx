@@ -44,7 +44,10 @@ export const getPolicyColumns = (onEdit: (policy: Policy) => void, onDelete: (po
     accessorKey: "enabled",
     header: "Status",
     cell: ({ row }) => (
-      <Badge variant={row.original.enabled ? 'outline_green' : 'outline_red'}>
+      <Badge
+        variant="outline"
+        className={row.original.enabled ? 'border-green-600 text-green-600' : 'border-red-600 text-red-600'}
+      >
         {row.original.enabled ? "Enabled" : "Disabled"}
       </Badge>
     ),

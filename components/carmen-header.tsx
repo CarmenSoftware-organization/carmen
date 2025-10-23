@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { useKeycloakUser } from "@/lib/context/keycloak-user-context"
+import { useKeycloakUser } from "@/lib/context/simple-user-context"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -17,7 +17,12 @@ import { Bell, Search, Menu as MenuIcon, X, Bookmark, Star, Clock, Settings, Use
 
 export function CarmenHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { user, signOut } = useKeycloakUser()
+  const { user } = useKeycloakUser()
+
+  const signOut = () => {
+    console.log('Sign out clicked')
+    // TODO: Implement sign out functionality
+  }
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)

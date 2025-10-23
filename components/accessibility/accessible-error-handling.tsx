@@ -279,12 +279,12 @@ export function AccessibleErrorBoundary({
   const [error, setError] = React.useState<Error | null>(null)
   const [errorId] = React.useState(() => `error-${Date.now()}`)
   const errorRef = React.useRef<HTMLDivElement>(null)
-  const { announceCriticalError } = useErrorAnnouncement()
+  const { announceError, announceCriticalError } = useErrorAnnouncement()
 
   const resetError = React.useCallback(() => {
     setError(null)
     announceError('Error cleared, returning to application', 'polite')
-  }, [])
+  }, [announceError])
 
   React.useEffect(() => {
     const handleError = (error: Error, errorInfo: React.ErrorInfo) => {

@@ -1,18 +1,21 @@
 // Policy Builder UI Types for Carmen ERP ABAC System
 
-import { 
-  Policy, 
-  Rule, 
-  Expression, 
-  AttributeCondition, 
-  Operator, 
-  LogicalOperator, 
+import {
+  Policy,
+  Rule,
+  Expression,
+  AttributeCondition,
+  Operator,
+  LogicalOperator,
   EffectType,
   SubjectAttributes,
   ResourceAttributes,
   EnvironmentAttributes,
-  PolicyTestScenario 
+  PolicyTestScenario
 } from './permissions';
+
+// Re-export types that are used by policy-builder consumers
+export type { PolicyTestScenario } from './permissions';
 
 // ============================================================================
 // Policy Builder State Types

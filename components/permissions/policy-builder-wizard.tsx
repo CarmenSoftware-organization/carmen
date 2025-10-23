@@ -191,8 +191,9 @@ export function PolicyBuilderWizard({ open, onOpenChange }: PolicyBuilderWizardP
               priority: policyData.step1?.priority || 100,
               subjectType: policyData.step1?.subjectType || 'role',
               selectedSubjects: policyData.step1?.selectedSubjects || [],
-              resourceTypes: policyData.step2?.resourceTypes || [],
-              actions: policyData.step3?.actions || []
+              selectedResourceType: policyData.step2?.resourceTypes?.[0] || '',
+              selectedActions: policyData.step3?.actions || [],
+              attributeConditions: policyData.step1?.attributeConditions || []
             }}
           />
         );
