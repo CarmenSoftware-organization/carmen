@@ -20,7 +20,7 @@ const getTemplateById = (id: string): PurchaseRequest => {
     id,
     refNumber: `TPL-${id}`,
     description: `Template ${id}`,
-  }
+  } as any
 }
 
 export default function PRTemplateDetailPage({
@@ -120,9 +120,9 @@ export default function PRTemplateDetailPage({
   const headerContent = (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold">{formData.description}</h1>
+        <h1 className="text-2xl font-bold">{(formData as any).description}</h1>
         <Badge variant="outline" className="h-6">
-          {formData.refNumber}
+          {(formData as any).refNumber}
         </Badge>
       </div>
       <div className="text-sm text-muted-foreground">
