@@ -399,7 +399,7 @@ export function ItemDetailsComponent({
                         <div className="grid grid-cols-2 gap-4 text-xs">
                           <div>
                             <span className="text-gray-600">Total Amount:</span>
-                            <span className="font-semibold ml-2">${itemData.totalAmount?.toFixed(2) || '0.00'}</span>
+                            <span className="font-semibold ml-2">${typeof itemData.lineTotal === 'object' && itemData.lineTotal !== null ? ((itemData.lineTotal as any).amount?.toFixed(2) || '0.00') : (itemData.lineTotal as any)?.toFixed(2) || '0.00'}</span>
                           </div>
                         </div>
                       </div>
@@ -447,7 +447,7 @@ export function ItemDetailsComponent({
           </DialogHeader>
           <div className="p-4">
             <div className="text-center text-gray-500">
-              <p>Inventory breakdown for {itemData.name || "this item"} will be displayed here.</p>
+              <p>Inventory breakdown for {itemData.itemName || "this item"} will be displayed here.</p>
             </div>
           </div>
         </DialogContent>
@@ -558,7 +558,7 @@ export function EnhancedPOItemRow({
 
   // Calculate totals (in display currency)
   const subtotal = (editedItem.orderedQuantity || 0) * (editedItem.unitPrice || 0);
-  const discountAmount = isDiscountOverride ? overrideDiscountAmount : subtotal * (editedItem.discountRate || 0);
+  const discountAmount = isDiscountOverride ? overrideDiscountAmount : subtotal * (editedItem.discount || 0);
   const netTotal = subtotal - discountAmount; // Net total after discount but before tax
   const taxAmount = isTaxOverride ? overrideTaxAmount : netTotal * (editedItem.taxRate || 0);
   const totalAmount = netTotal + taxAmount;
@@ -572,7 +572,7 @@ export function EnhancedPOItemRow({
   
   // Check if currencies and units are different to decide whether to show base values
   const showBaseCurrency = currencyCode !== baseCurrencyCode;
-  const showBaseUnit = item.orderUnit !== item.baseUnit;
+  const showBaseUnit = item.unit !== (item as any).baseUnit;
 
 
   // Status badge styling based on layout guide
@@ -604,7 +604,7 @@ export function EnhancedPOItemRow({
                 checked={isSelected}
                 onCheckedChange={() => onSelect(item.id)}
                 className="w-4 h-4 data-[state=checked]:bg-blue-600"
-                aria-label={`Select ${item.name}`}
+                aria-label={`Select ${item.itemName}`}
               />
             </div>
           )}
@@ -615,8 +615,8 @@ export function EnhancedPOItemRow({
               {isEditMode ? (
                 <div className="space-y-1">
                   <Input
-                    value={editedItem.name}
-                    onChange={(e) => handleFieldChange('name', e.target.value)}
+                    value={editedItem.itemName}
+                    onChange={(e) => handleFieldChange('itemName', e.target.value)}
                     className="text-sm font-semibold h-7"
                     placeholder="Product name"
                   />
@@ -630,7 +630,7 @@ export function EnhancedPOItemRow({
               ) : (
                 <>
                   <div className="flex items-start gap-2 mb-1">
-                    <div className="font-semibold text-base leading-tight">{item.name}</div>
+                    <div className="font-semibold text-base leading-tight">{item.itemName}</div>
                     <Badge className={`text-xs px-2 py-0 font-normal inline-flex items-center gap-1 ${getStatusBadgeClass(item.status || 'Ordered')}`}>
                       {item.status || 'Ordered'}
                     </Badge>
@@ -713,8 +713,8 @@ export function EnhancedPOItemRow({
                       placeholder="0"
                     />
                     <Select
-                      value={editedItem.orderUnit || 'Pcs'}
-                      onValueChange={(value) => handleFieldChange('orderUnit', value)}
+                      value={editedItem.unit || 'Pcs'}
+                      onValueChange={(value) => handleFieldChange('unit', value)}
                     >
                       <SelectTrigger className="h-5 text-sm w-full max-w-16">
                         <SelectValue />
@@ -732,9 +732,9 @@ export function EnhancedPOItemRow({
                 ) : (
                   <>
                     <div className="text-xs font-medium text-center">{(item.orderedQuantity || 0).toFixed(0)}</div>
-                    <div className="text-xs text-gray-500 text-center">{item.orderUnit || 'Pcs'}</div>
+                    <div className="text-xs text-gray-500 text-center">{item.unit || 'Pcs'}</div>
                     {showBaseUnit && (
-                      <div className="text-xs text-gray-400 text-center">{((item.orderedQuantity || 0) * (item.convRate || 1)).toFixed(2)} {item.baseUnit || 'kg'}</div>
+                      <div className="text-xs text-gray-400 text-center">{((item.orderedQuantity || 0) * ((item as any).convRate || 1)).toFixed(2)} {(item as any).baseUnit || 'kg'}</div>
                     )}
                   </>
                 )}
@@ -759,9 +759,9 @@ export function EnhancedPOItemRow({
                     {item.receivedQuantity ? (
                       <>
                         <div className="text-xs font-medium text-green-700 text-center">{item.receivedQuantity?.toFixed(0) || '0'}</div>
-                        <div className="text-xs text-gray-500 text-center">{item.orderUnit || 'Pcs'}</div>
+                        <div className="text-xs text-gray-500 text-center">{item.unit || 'Pcs'}</div>
                         {showBaseUnit && (
-                          <div className="text-xs text-gray-400 text-center">{((item.receivedQuantity || 0) * (item.convRate || 1)).toFixed(2)} {item.baseUnit || 'kg'}</div>
+                          <div className="text-xs text-gray-400 text-center">{((item.receivedQuantity || 0) * ((item as any).convRate || 1)).toFixed(2)} {(item as any).baseUnit || 'kg'}</div>
                         )}
                       </>
                     ) : (
@@ -816,8 +816,8 @@ export function EnhancedPOItemRow({
                     <div className="flex items-center space-x-1">
                       <Input
                         type="number"
-                        value={((editedItem.discountRate || 0) * 100).toFixed(1)}
-                        onChange={(e) => handleFieldChange('discountRate', (parseFloat(e.target.value) || 0) / 100)}
+                        value={((editedItem.discount || 0) * 100).toFixed(1)}
+                        onChange={(e) => handleFieldChange('discount', (parseFloat(e.target.value) || 0) / 100)}
                         className="h-6 text-xs text-center w-full max-w-12"
                         min="0"
                         max="100"
@@ -828,7 +828,7 @@ export function EnhancedPOItemRow({
                   </div>
                 ) : (
                   <>
-                    <div className="text-xs font-medium text-center">{((item.discountRate || 0) * 100).toFixed(1)}%</div>
+                    <div className="text-xs font-medium text-center">{((item.discount || 0) * 100).toFixed(1)}%</div>
                     <div className="text-xs text-orange-600 font-medium text-center">-{currencyCode} {discountAmount.toFixed(2)}</div>
                     {showBaseCurrency && (
                       <div className="text-xs text-gray-400 text-center">-{baseCurrencyCode} {baseDiscountAmount.toFixed(2)}</div>
@@ -921,7 +921,7 @@ export function EnhancedPOItemRow({
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">
-                Related Purchase Requests - {item.name}
+                Related Purchase Requests - {item.itemName}
               </DialogTitle>
               <DialogDescription>
                 Purchase requests that contributed to this purchase order item
@@ -938,7 +938,7 @@ export function EnhancedPOItemRow({
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">
-                Goods Receipt Notes - {item.name}
+                Goods Receipt Notes - {item.itemName}
               </DialogTitle>
               <DialogDescription>
                 Goods received notes for this purchase order item

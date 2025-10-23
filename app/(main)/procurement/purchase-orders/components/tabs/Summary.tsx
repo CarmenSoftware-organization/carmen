@@ -21,37 +21,43 @@ export default function SummaryTable({
   currencyCurrent,
   exchangeRate,
 }: ISummaryProps) {
+  // Extract Money type amounts or use mock data fields with proper type casting
+  const getAmount = (field: any): number => {
+    if (!field) return 0;
+    return typeof field === 'object' && field !== null ? ((field as any).amount ?? 0) : (field as any ?? 0);
+  };
+
   const data = [
     {
       Label: "Subtotal Amount",
       localCurrency: currencyBase,
-      localAmt: item.baseSubTotalPrice ?? 0,
+      localAmt: (item as any).baseSubTotalPrice ?? 0,
       currentCurrency: currencyCurrent,
-      currentAmt: item.subTotalPrice ?? 0,
+      currentAmt: (item as any).subTotalPrice ?? 0,
     },{
         Label: "Discount Amount",
         localCurrency: currencyBase,
-        localAmt: item.baseDiscAmount ?? 0,
+        localAmt: (item as any).baseDiscAmount ?? getAmount(item.discountAmount),
         currentCurrency: currencyCurrent,
-        currentAmt: item.discountAmount ?? 0,
+        currentAmt: getAmount(item.discountAmount),
       },{
         Label: "Net Amount",
         localCurrency: currencyBase,
-        localAmt: item.baseNetAmount ?? 0,
+        localAmt: (item as any).baseNetAmount ?? 0,
         currentCurrency: currencyCurrent,
-        currentAmt: item.netAmount ?? 0,
+        currentAmt: (item as any).netAmount ?? 0,
       },{
         Label: "Tax Amount",
         localCurrency: currencyBase,
-        localAmt: item.baseTaxAmount ?? 0,
+        localAmt: (item as any).baseTaxAmount ?? getAmount(item.taxAmount),
         currentCurrency: currencyCurrent,
-        currentAmt: item.taxAmount ?? 0,
+        currentAmt: getAmount(item.taxAmount),
       },{
         Label: "Total Amount",
         localCurrency: currencyBase,
-        localAmt: item.baseTotalAmount ?? 0,
+        localAmt: (item as any).baseTotalAmount ?? getAmount(item.lineTotal),
         currentCurrency: currencyCurrent,
-        currentAmt: item.totalAmount ?? 0,
+        currentAmt: getAmount(item.lineTotal),
       }
   ];
 
