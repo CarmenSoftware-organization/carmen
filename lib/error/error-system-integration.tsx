@@ -300,7 +300,7 @@ export function withErrorHandling<P extends object>(
 export function useAsyncError() {
   const { reportError, showSuccess } = useErrorSystem()
 
-  const handleAsyncOperation = React.useCallback(async <T>(
+  const handleAsyncOperation = React.useCallback(async <T,>(
     operation: () => Promise<T>,
     options: {
       loadingMessage?: string
