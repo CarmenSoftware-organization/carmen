@@ -73,7 +73,7 @@ export const PRForm: React.FC<PRFormProps> = ({ formData, setFormData, isDisable
         <Textarea
           id="description"
           name="description"
-          value={asMockPurchaseRequest(formData).description || formData.justification || ''}
+          value={formData.justification || ''}
           onChange={handleInputChange}
           disabled={isDisabled}
           className="h-20"

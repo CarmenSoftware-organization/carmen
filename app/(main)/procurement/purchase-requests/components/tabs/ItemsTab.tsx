@@ -53,7 +53,7 @@ import {
   MoreHorizontal,
   History,
 } from "lucide-react";
-import { PurchaseRequestItem, asMockPurchaseRequestItem } from "@/lib/types";
+import { PurchaseRequestItem, DocumentStatus, asMockPurchaseRequestItem } from "@/lib/types";
 import type { User } from "./types";
 import { ItemDetailsEditForm } from "../item-details-edit-form";
 import { samplePRItems } from "../sampleData";
