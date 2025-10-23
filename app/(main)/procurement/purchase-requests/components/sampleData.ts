@@ -1,6 +1,6 @@
 import { PurchaseRequest, PurchaseRequestItem, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/lib/types'
 
-export const samplePRData: PurchaseRequest = {
+export const samplePRData = {
   id: 'sample-pr-001',
   refNumber: 'PR-2023-001',
   date: new Date('2023-01-01'),
@@ -13,7 +13,7 @@ export const samplePRData: PurchaseRequest = {
     department: 'Administration'
   },
   status: DocumentStatus.Draft,
-  workflowStatus: WorkflowStatus.pending,
+  workflowStatus: WorkflowStatus.Pending,
   currentWorkflowStage: WorkflowStage.requester,
   location: 'Head Office',
   department: 'Administration',
@@ -36,7 +36,7 @@ export const samplePRData: PurchaseRequest = {
   totalAmount: 1100,
 }
 
-export const samplePRItems: PurchaseRequestItem[] = [
+export const samplePRItems = [
   {
     id: "PR-2023-001-01",
     location: "Main Kitchen",

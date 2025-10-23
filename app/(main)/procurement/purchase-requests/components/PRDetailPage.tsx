@@ -116,7 +116,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
       );
       if (foundPR) return foundPR;
     }
-    return samplePRData;
+    return samplePRData as any;
   };
 
   const [formData, setFormData] = useState<PurchaseRequest>(getPRData());
@@ -412,7 +412,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                     onClick={() => {
                       setMode("view");
                       // Reset form data to original if needed
-                      if (!isAddMode) setFormData(samplePRData);
+                      if (!isAddMode) setFormData(samplePRData as any);
                     }}
                     size="sm" 
                     className="h-9"

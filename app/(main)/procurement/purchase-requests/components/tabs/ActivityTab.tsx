@@ -2,8 +2,17 @@
 import React, { useState, useMemo } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-import { ActivityLogEntry } from '@/lib/types'
 import { Search } from 'lucide-react'
+
+interface ActivityLogEntry {
+  id: string;
+  timestamp: Date;
+  userId: string;
+  userName: string;
+  action: string;
+  description: string;
+  details?: string;
+}
 
 interface ActivityTabProps {
   activityLog?: ActivityLogEntry[]

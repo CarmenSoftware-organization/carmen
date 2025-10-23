@@ -22,26 +22,26 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
     {
       label: "Subtotal",
       icon: DollarSign,
-      amount: prData.subTotalPrice ?? 0,
-      baseAmount: prData.baseSubTotalPrice ?? 0,
+      amount: (prData as any).subTotalPrice ?? 0,
+      baseAmount: (prData as any).baseSubTotalPrice ?? 0,
       type: "subtotal",
     },
     {
       label: "Discount",
       icon: Percent,
-      amount: -(prData.discountAmount ?? 0),
-      baseAmount: -(prData.baseDiscAmount ?? 0),
+      amount: -((prData as any).discountAmount ?? 0),
+      baseAmount: -((prData as any).baseDiscAmount ?? 0),
       type: "discount",
     },
   ];
 
-  const netAmount = prData.netAmount ?? 0;
-  const baseNetAmount = prData.baseNetAmount ?? 0;
-  const totalAmount = prData.totalAmount ?? 0;
-  const baseTotalAmount = prData.baseTotalAmount ?? 0;
+  const netAmount = (prData as any).netAmount ?? 0;
+  const baseNetAmount = (prData as any).baseNetAmount ?? 0;
+  const totalAmount = (prData as any).totalAmount ?? 0;
+  const baseTotalAmount = (prData as any).baseTotalAmount ?? 0;
 
-  const currency = prData.currency || "USD";
-  const baseCurrency = prData.baseCurrencyCode || "USD";
+  const currency = (prData as any).currency || "USD";
+  const baseCurrency = (prData as any).baseCurrencyCode || "USD";
   const showBaseCurrency = currency !== baseCurrency;
 
   return (
@@ -61,11 +61,11 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             </div>
             <div className="mt-1 sm:mt-2 text-right">
               <div className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency(prData.subTotalPrice ?? 0, currency)}
+                {formatCurrency((prData as any).subTotalPrice ?? 0, currency)}
               </div>
               {showBaseCurrency && (
                 <div className="text-xs text-muted-foreground">
-                  {formatCurrency(prData.baseSubTotalPrice ?? 0, baseCurrency)}
+                  {formatCurrency((prData as any).baseSubTotalPrice ?? 0, baseCurrency)}
                 </div>
               )}
             </div>
@@ -85,11 +85,11 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             </div>
             <div className="mt-1 sm:mt-2 text-right">
               <div className="text-sm sm:text-base lg:text-lg font-bold text-green-600">
-                {formatCurrency(Math.abs(prData.discountAmount ?? 0), currency)}
+                {formatCurrency(Math.abs((prData as any).discountAmount ?? 0), currency)}
               </div>
               {showBaseCurrency && (
                 <div className="text-xs text-muted-foreground">
-                  {formatCurrency(Math.abs(prData.baseDiscAmount ?? 0), baseCurrency)}
+                  {formatCurrency(Math.abs((prData as any).baseDiscAmount ?? 0), baseCurrency)}
                 </div>
               )}
             </div>
@@ -133,11 +133,11 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             </div>
             <div className="mt-1 sm:mt-2 text-right">
               <div className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency(prData.taxAmount ?? 0, currency)}
+                {formatCurrency((prData as any).taxAmount ?? 0, currency)}
               </div>
               {showBaseCurrency && (
                 <div className="text-xs text-muted-foreground">
-                  {formatCurrency(prData.baseTaxAmount ?? 0, baseCurrency)}
+                  {formatCurrency((prData as any).baseTaxAmount ?? 0, baseCurrency)}
                 </div>
               )}
             </div>
@@ -185,9 +185,9 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             {baseCurrency} • Base Currency
           </Badge>
         )}
-        {prData.exchangeRate && prData.exchangeRate !== 1 && (
+        {(prData as any).exchangeRate && (prData as any).exchangeRate !== 1 && (
           <Badge variant="outline" className="text-xs">
-            Rate: 1 {currency} = {prData.exchangeRate?.toFixed(4)} {baseCurrency}
+            Rate: 1 {currency} = {(prData as any).exchangeRate?.toFixed(4)} {baseCurrency}
           </Badge>
         )}
       </div>

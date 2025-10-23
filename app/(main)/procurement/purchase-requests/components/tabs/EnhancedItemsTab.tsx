@@ -325,11 +325,11 @@ export function EnhancedItemsTab({
                 <TableRow key={item.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{item.name}</p>
+                      <p className="font-medium">{item.itemName}</p>
                       <p className="text-sm text-gray-500">{item.description}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{item.quantityRequested}</TableCell>
+                  <TableCell>{item.requestedQuantity}</TableCell>
                   <TableCell>
                     {item.priceAssignment ? (
                       <div>

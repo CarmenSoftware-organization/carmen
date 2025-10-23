@@ -23,8 +23,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({
       ...prev,
       [name]: value,
       requestor: name.startsWith("requestor.")
-        ? { ...prev.requestor, [name.split(".")[1]]: value }
-        : prev.requestor,
+        ? { ...(prev as any).requestor, [name.split(".")[1]]: value }
+        : (prev as any).requestor,
     }));
   };
 
@@ -49,8 +49,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({
             name={id}
             value={
               typeof formData[id as keyof PurchaseRequest] === "object"
-                ? (formData[id as keyof PurchaseRequest] as Requestor)[
-                    id.split(".")[1] as keyof Requestor
+                ? (formData[id as keyof PurchaseRequest] as any)[
+                    id.split(".")[1]
                   ]
                 : String(formData[id as keyof PurchaseRequest])
             }

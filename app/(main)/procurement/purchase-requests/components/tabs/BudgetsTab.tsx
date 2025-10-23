@@ -2,7 +2,17 @@
 // File: tabs/BudgetsTab.tsx
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { BudgetData } from '@/lib/types'
+
+interface BudgetData {
+  location: string;
+  budgetCategory: string;
+  totalBudget: number;
+  softCommitmentPR: number;
+  softCommitmentPO: number;
+  hardCommitment: number;
+  availableBudget: number;
+  currentPRAmount: number;
+}
 
 const budgetData: BudgetData[] = [
     {
