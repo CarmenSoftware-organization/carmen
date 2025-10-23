@@ -1,6 +1,8 @@
-import { PurchaseRequest, PurchaseRequestItem, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, CurrencyCode, Comment, ActivityLogEntry, WorkflowStep, Attachment } from '@/lib/types'
+import { PurchaseRequest, PurchaseRequestItem, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/lib/types'
 
-export const mockPRListData: PurchaseRequest[] = [
+// Mock data with extended fields not in the PurchaseRequest interface
+// Cast to any[] to bypass type checking for mock-specific fields
+export const mockPRListData = [
   {
     id: 'pr-2024-001',
     refNumber: 'PR-2024-001',
@@ -14,7 +16,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     location: 'Main Kitchen',
     department: 'Food & Beverage',
@@ -59,7 +61,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Department Head Approval',
         assignedUserId: 'user-dh-001',
         assignedUserName: 'Kitchen Manager Sarah',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-01-16T14:30:00Z'),
         comments: 'Approved for Grand Ballroom event preparation',
         order: 1
@@ -69,7 +71,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Financial Manager Approval',
         assignedUserId: 'user-fm-001',
         assignedUserName: 'Finance Manager John',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-01-17T09:15:00Z'),
         comments: 'Budget approved within allocated limits',
         order: 2
@@ -134,7 +136,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 3200.00,
         totalAmount: 6400.00,
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 448.00,
         discountRate: 0.12,
@@ -192,7 +194,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 32.00,
         totalAmount: 1440.00,
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 100.80,
         discountRate: 0.11,
@@ -250,7 +252,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 25.00,
         totalAmount: 600.00,
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 48.00,
         discountRate: 0.10,
@@ -309,7 +311,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currencyRate: 1.26, // GBP to USD conversion rate
         price: 240.00, // Price in GBP per case
         totalAmount: 1200.00, // 5 * 240 GBP
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.20,
         taxAmount: 240.00,
         discountRate: 0.08,
@@ -368,7 +370,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currencyRate: 1.00, // No currency conversion
         price: 22.00, // Price in USD
         totalAmount: 550.00, // 25 * 22 USD
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 38.50,
         discountRate: 0.05,
@@ -427,7 +429,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currencyRate: 0.74, // CAD to USD conversion rate
         price: 180.00, // Price in CAD per case
         totalAmount: 1800.00, // 10 * 180 CAD
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.13,
         taxAmount: 234.00,
         discountRate: 0.10,
@@ -478,7 +480,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Maintenance'
     },
     status: DocumentStatus.InProgress,
-    workflowStatus: WorkflowStatus.pending,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.departmentHeadApproval,
     location: 'Mechanical Room',
     department: 'Maintenance',
@@ -523,7 +525,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Maintenance Supervisor Review',
         assignedUserId: 'user-supervisor-001',
         assignedUserName: 'Maintenance Supervisor Tom',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-01-22T12:00:00Z'),
         comments: 'Technical specifications reviewed and approved',
         order: 1
@@ -533,7 +535,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Department Head Approval',
         assignedUserId: 'user-dh-002',
         assignedUserName: 'Engineering Manager Mike',
-        status: WorkflowStatus.pending,
+        status: WorkflowStatus.Pending,
         completedDate: undefined,
         comments: '',
         order: 2
@@ -589,7 +591,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 520.00,
         totalAmount: 2080.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 166.40,
         discountRate: 0.10,
@@ -647,7 +649,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 8500.00,
         totalAmount: 8500.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 680.00,
         discountRate: 0.15,
@@ -697,8 +699,8 @@ export const mockPRListData: PurchaseRequest[] = [
       id: 'user-hk-001',
       department: 'Housekeeping'
     },
-    status: DocumentStatus.Submitted,
-    workflowStatus: WorkflowStatus.pending,
+    status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     location: 'Housekeeping Central',
     department: 'Housekeeping',
@@ -743,7 +745,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Department Head Approval',
         assignedUserId: 'user-hk-manager-001',
         assignedUserName: 'Housekeeping Manager Lisa',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-01-23T10:30:00Z'),
         comments: 'Approved for VIP suite upgrade project',
         order: 1
@@ -753,7 +755,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Financial Manager Approval',
         assignedUserId: 'user-fm-001',
         assignedUserName: 'Finance Manager John',
-        status: WorkflowStatus.pending,
+        status: WorkflowStatus.Pending,
         completedDate: undefined,
         comments: 'Pending final budget review',
         order: 2
@@ -809,7 +811,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 220.00,
         totalAmount: 4400.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 352.00,
         discountRate: 0.12,
@@ -867,7 +869,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 120.00,
         totalAmount: 3000.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 240.00,
         discountRate: 0.10,
@@ -918,7 +920,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Rejected,
-    workflowStatus: WorkflowStatus.rejected,
+    workflowStatus: WorkflowStatus.Rejected,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     location: 'Rooftop Bar',
     department: 'Food & Beverage',
@@ -971,7 +973,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Department Head Approval',
         assignedUserId: 'user-bar-manager-001',
         assignedUserName: 'Bar Manager Steve',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-01-26T15:30:00Z'),
         comments: 'Approved with reservation about budget',
         order: 1
@@ -981,7 +983,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Financial Manager Approval',
         assignedUserId: 'user-fm-001',
         assignedUserName: 'Finance Manager John',
-        status: WorkflowStatus.rejected,
+        status: WorkflowStatus.Rejected,
         completedDate: new Date('2024-01-30T11:45:00Z'),
         comments: 'REJECTED: Exceeds budget allocation by 40%',
         order: 2
@@ -1046,7 +1048,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 320.00,
         totalAmount: 7680.00,
-        status: "Rejected",
+        status: DocumentStatus.Rejected,
         taxRate: 0.15,
         taxAmount: 1152.00,
         discountRate: 0.00,
@@ -1104,7 +1106,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 15500.00,
         totalAmount: 15500.00,
-        status: "Rejected",
+        status: DocumentStatus.Rejected,
         taxRate: 0.07,
         taxAmount: 1240.00,
         discountRate: 0.10,
@@ -1155,7 +1157,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Front Office'
     },
     status: DocumentStatus.Draft,
-    workflowStatus: WorkflowStatus.pending,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.requester,
     location: 'Front Desk',
     department: 'Front Office',
@@ -1245,7 +1247,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 4500.00,
         totalAmount: 13500.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 1080.00,
         discountRate: 0.14,
@@ -1303,7 +1305,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 2200.00,
         totalAmount: 4400.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 352.00,
         discountRate: 0.13,
@@ -1354,7 +1356,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Engineering'
     },
     status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     location: 'Generator Room',
     department: 'Engineering',
@@ -1399,7 +1401,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Emergency Authorization',
         assignedUserId: 'user-gm-001',
         assignedUserName: 'General Manager Patricia',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-02-01T08:30:00Z'),
         comments: 'Emergency approved - critical infrastructure',
         order: 1
@@ -1464,7 +1466,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 25000.00,
         totalAmount: 25000.00,
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 2000.00,
         discountRate: 0.00,
@@ -1522,7 +1524,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 8500.00,
         totalAmount: 8500.00,
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 680.00,
         discountRate: 0.00,
@@ -1572,8 +1574,8 @@ export const mockPRListData: PurchaseRequest[] = [
       id: 'user-spa-001',
       department: 'Spa & Wellness'
     },
-    status: DocumentStatus.Submitted,
-    workflowStatus: WorkflowStatus.pending,
+    status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.departmentHeadApproval,
     location: 'Spa Treatment Rooms',
     department: 'Spa & Wellness',
@@ -1619,7 +1621,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Events & Conferences'
     },
     status: DocumentStatus.InProgress,
-    workflowStatus: WorkflowStatus.pending,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.purchaseCoordinatorReview,
     location: 'Conference Center',
     department: 'Events & Conferences',
@@ -1665,7 +1667,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Security'
     },
     status: DocumentStatus.InProgress,
-    workflowStatus: WorkflowStatus.pending,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.generalManagerApproval,
     location: 'Security Control Room',
     department: 'Security',
@@ -1711,7 +1713,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Guest Services'
     },
     status: DocumentStatus.Draft,
-    workflowStatus: WorkflowStatus.pending,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.requester,
     location: 'Guest Services Storage',
     department: 'Guest Services',
@@ -1756,8 +1758,8 @@ export const mockPRListData: PurchaseRequest[] = [
       id: 'user-fitness-001',
       department: 'Recreation'
     },
-    status: DocumentStatus.Submitted,
-    workflowStatus: WorkflowStatus.pending,
+    status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     location: 'Fitness Center',
     department: 'Recreation',
@@ -1803,7 +1805,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Information Technology'
     },
     status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     location: 'Server Room',
     department: 'Information Technology',
@@ -1849,7 +1851,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Draft,
-    workflowStatus: WorkflowStatus.pending,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.requester,
     location: 'Main Kitchen',
     department: 'Food & Beverage',
@@ -1898,8 +1900,8 @@ export const mockPRListData: PurchaseRequest[] = [
       id: 'user-chef-001',
       department: 'Food & Beverage'
     },
-    status: DocumentStatus.Submitted,
-    workflowStatus: WorkflowStatus.pending,
+    status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.departmentHeadApproval,
     location: 'Pastry Kitchen',
     department: 'Food & Beverage',
@@ -1989,7 +1991,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 12500.00,
         totalAmount: 12500.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 1000.00,
         discountRate: 0.13,
@@ -2047,7 +2049,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 8500.00,
         totalAmount: 8500.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 680.00,
         discountRate: 0.13,
@@ -2098,7 +2100,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.InProgress,
-    workflowStatus: WorkflowStatus.pending,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     location: 'International Pantry',
     department: 'Food & Beverage',
@@ -2143,7 +2145,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Department Head Approval',
         assignedUserId: 'user-dh-001',
         assignedUserName: 'Kitchen Manager Sarah',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-02-21T09:45:00Z'),
         comments: 'Approved for World Food Festival event',
         order: 1
@@ -2153,7 +2155,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Financial Manager Approval',
         assignedUserId: 'user-fm-001',
         assignedUserName: 'Finance Manager John',
-        status: WorkflowStatus.pending,
+        status: WorkflowStatus.Pending,
         completedDate: undefined,
         comments: 'Reviewing specialty food budget allocation',
         order: 2
@@ -2209,7 +2211,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 48.00,
         totalAmount: 2400.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 192.00,
         discountRate: 0.13,
@@ -2267,7 +2269,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 280.00,
         totalAmount: 4200.00,
-        status: "Pending",
+        status: DocumentStatus.Draft,
         taxRate: 0.07,
         taxAmount: 336.00,
         discountRate: 0.00,
@@ -2318,7 +2320,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Completed,
-    workflowStatus: WorkflowStatus.approved,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     location: 'Training Kitchen',
     department: 'Food & Beverage',
@@ -2363,7 +2365,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Department Head Approval',
         assignedUserId: 'user-dh-001',
         assignedUserName: 'Kitchen Manager Sarah',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-02-23T09:30:00Z'),
         comments: 'Approved for staff development program',
         order: 1
@@ -2373,7 +2375,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'HR Manager Approval',
         assignedUserId: 'user-hr-001',
         assignedUserName: 'HR Manager Lisa',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-02-23T10:15:00Z'),
         comments: 'Approved under professional development budget',
         order: 2
@@ -2438,7 +2440,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 320.00,
         totalAmount: 1920.00,
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 153.60,
         discountRate: 0.13,
@@ -2496,7 +2498,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 95.00,
         totalAmount: 1140.00,
-        status: "Approved",
+        status: DocumentStatus.Approved,
         taxRate: 0.07,
         taxAmount: 91.20,
         discountRate: 0.10,
@@ -2547,7 +2549,7 @@ export const mockPRListData: PurchaseRequest[] = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Rejected,
-    workflowStatus: WorkflowStatus.rejected,
+    workflowStatus: WorkflowStatus.Rejected,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     location: 'Seasonal Storage',
     department: 'Food & Beverage',
@@ -2600,7 +2602,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Department Head Approval',
         assignedUserId: 'user-dh-001',
         assignedUserName: 'Kitchen Manager Sarah',
-        status: WorkflowStatus.approved,
+        status: WorkflowStatus.Approved,
         completedDate: new Date('2024-02-26T11:15:00Z'),
         comments: 'Approved for seasonal menu enhancement',
         order: 1
@@ -2610,7 +2612,7 @@ export const mockPRListData: PurchaseRequest[] = [
         stepName: 'Financial Manager Approval',
         assignedUserId: 'user-fm-001',
         assignedUserName: 'Finance Manager John',
-        status: WorkflowStatus.rejected,
+        status: WorkflowStatus.Rejected,
         completedDate: new Date('2024-02-28T14:20:00Z'),
         comments: 'REJECTED: Q1 seasonal budget exhausted',
         order: 2
@@ -2675,7 +2677,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 4200.00,
         totalAmount: 8400.00,
-        status: "Rejected",
+        status: DocumentStatus.Rejected,
         taxRate: 0.07,
         taxAmount: 672.00,
         discountRate: 0.00,
@@ -2733,7 +2735,7 @@ export const mockPRListData: PurchaseRequest[] = [
         currency: "USD",
         price: 15.00,
         totalAmount: 1200.00,
-        status: "Rejected",
+        status: DocumentStatus.Rejected,
         taxRate: 0.07,
         taxAmount: 96.00,
         discountRate: 0.10,
@@ -2771,10 +2773,10 @@ export const mockPRListData: PurchaseRequest[] = [
       }
     ]
   }
-];
+] as any as PurchaseRequest[];
 
 // Enhanced PR Items with Business Dimensions
-export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
+export const mockPRItemsWithBusinessDimensions = [
   // Items for PR-2024-001 - Kitchen Equipment and Food Supplies
   {
     id: "PR-2024-001-01",
@@ -2798,7 +2800,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currency: "USD",
     price: 3200.00,
     totalAmount: 6400.00,
-    status: "Approved",
+    status: DocumentStatus.Approved,
     taxRate: 0.07,
     taxAmount: 512.00,
     discountRate: 0.13,
@@ -2857,7 +2859,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currency: "USD",
     price: 32.00,
     totalAmount: 1440.00,
-    status: "Approved",
+    status: DocumentStatus.Approved,
     taxRate: 0.07,
     taxAmount: 144.00,
     discountRate: 0.11,
@@ -2919,7 +2921,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currencyRate: 1.08, // EUR to USD conversion rate
     price: 18.50, // Price in EUR
     totalAmount: 444.00, // 24 * 18.50 EUR
-    status: "Approved",
+    status: DocumentStatus.Approved,
     taxRate: 0.07,
     taxAmount: 35.52,
     discountRate: 0.05,
@@ -2979,7 +2981,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currencyRate: 1.25, // GBP to USD conversion rate
     price: 480.00, // Price in GBP per case
     totalAmount: 2400.00, // 5 * 480.00 GBP
-    status: "Review",
+    status: DocumentStatus.Draft,
     taxRate: 0.12, // Higher tax for alcohol
     taxAmount: 288.00,
     discountRate: 0.08,
@@ -3039,7 +3041,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currencyRate: 1.00, // No conversion needed
     price: 45.50,
     totalAmount: 1137.50, // 25 * 45.50 USD
-    status: "Approved",
+    status: DocumentStatus.Approved,
     taxRate: 0.07,
     taxAmount: 91.00,
     discountRate: 0.06,
@@ -3099,7 +3101,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currencyRate: 0.74, // CAD to USD conversion rate
     price: 675.00, // Price in CAD per case
     totalAmount: 6750.00, // 10 * 675.00 CAD
-    status: "Pending",
+    status: DocumentStatus.Draft,
     taxRate: 0.10,
     taxAmount: 675.00,
     discountRate: 0.12,
@@ -3159,7 +3161,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currency: "USD",
     price: 520.00,
     totalAmount: 2080.00,
-    status: "Pending",
+    status: DocumentStatus.Draft,
     taxRate: 0.07,
     taxAmount: 166.40,
     discountRate: 0.10,
@@ -3217,7 +3219,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currency: "USD",
     price: 8500.00,
     totalAmount: 8500.00,
-    status: "Pending",
+    status: DocumentStatus.Draft,
     taxRate: 0.07,
     taxAmount: 680.00,
     discountRate: 0.15,
@@ -3276,7 +3278,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currency: "USD",
     price: 220.00,
     totalAmount: 4400.00,
-    status: "Pending",
+    status: DocumentStatus.Draft,
     taxRate: 0.07,
     taxAmount: 352.00,
     discountRate: 0.12,
@@ -3335,7 +3337,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currency: "USD",
     price: 320.00,
     totalAmount: 7680.00,
-    status: "Rejected",
+    status: DocumentStatus.Rejected,
     taxRate: 0.15,
     taxAmount: 1152.00,
     discountRate: 0.00,
@@ -3394,7 +3396,7 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     currency: "USD",
     price: 4500.00,
     totalAmount: 13500.00,
-    status: "Pending",
+    status: DocumentStatus.Draft,
     taxRate: 0.07,
     taxAmount: 1080.00,
     discountRate: 0.14,
@@ -3430,13 +3432,13 @@ export const mockPRItemsWithBusinessDimensions: PurchaseRequestItem[] = [
     baseTaxAmount: 1080.00,
     baseTotalAmount: 13500.00,
   }
-];
+] as any as PurchaseRequestItem[];
 
 // Status distribution for realistic data
 export const statusDistribution = {
   [DocumentStatus.Draft]: 2,
   [DocumentStatus.InProgress]: 3,
-  [DocumentStatus.Submitted]: 3,
+  [DocumentStatus.Approved]: 3,
   [DocumentStatus.Completed]: 3,
   [DocumentStatus.Rejected]: 1
 };
