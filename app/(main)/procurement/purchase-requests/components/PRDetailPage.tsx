@@ -54,6 +54,8 @@ import {
   WorkflowStatus,
   WorkflowStage,
   Requestor,
+  asMockPurchaseRequest,
+  MockPurchaseRequest,
 } from "@/lib/types";
 import {
   getBadgeVariant,
@@ -110,21 +112,23 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     if (isAddMode) return getEmptyPurchaseRequest();
     if (prId) {
       // Case-insensitive lookup for PR ID
-      const foundPR = mockPRListData.find(pr =>
-        pr.id.toLowerCase() === prId.toLowerCase() ||
-        (pr as any).requestNumber?.toLowerCase() === prId.toLowerCase()
-      );
+      const foundPR = mockPRListData.find(pr => {
+        const mockPR = asMockPurchaseRequest(pr);
+        return pr.id.toLowerCase() === prId.toLowerCase() ||
+          mockPR.requestNumber?.toLowerCase() === prId.toLowerCase();
+      });
       if (foundPR) return foundPR;
     }
-    return samplePRData as any;
+    return asMockPurchaseRequest(samplePRData);
   };
 
-  const [formData, setFormData] = useState<PurchaseRequest>(getPRData());
+  const [formData, setFormData] = useState<PurchaseRequest | MockPurchaseRequest>(getPRData());
 
   // Items state management for proper form button updates
-  const [currentItems, setCurrentItems] = useState<PurchaseRequestItem[]>(
-    (formData as any).items && (formData as any).items.length > 0 ? (formData as any).items : samplePRItems
-  );
+  const [currentItems, setCurrentItems] = useState<PurchaseRequestItem[]>(() => {
+    const mockFormData = asMockPurchaseRequest(formData);
+    return mockFormData.items && mockFormData.items.length > 0 ? mockFormData.items : samplePRItems;
+  });
   
   // RBAC state
   const [availableActions, setAvailableActions] = useState<WorkflowAction[]>([]);
@@ -149,13 +153,15 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   useEffect(() => {
     if (prId && !isAddMode) {
       // Case-insensitive lookup for PR ID
-      const foundPR = mockPRListData.find(pr =>
-        pr.id.toLowerCase() === prId.toLowerCase() ||
-        (pr as any).requestNumber?.toLowerCase() === prId.toLowerCase()
-      );
+      const foundPR = mockPRListData.find(pr => {
+        const mockPR = asMockPurchaseRequest(pr);
+        return pr.id.toLowerCase() === prId.toLowerCase() ||
+          mockPR.requestNumber?.toLowerCase() === prId.toLowerCase();
+      });
       if (foundPR) {
+        const mockFoundPR = asMockPurchaseRequest(foundPR);
         setFormData(foundPR);
-        setCurrentItems((foundPR as any).items && (foundPR as any).items.length > 0 ? (foundPR as any).items : samplePRItems);
+        setCurrentItems(mockFoundPR.items && mockFoundPR.items.length > 0 ? mockFoundPR.items : samplePRItems);
         setMode("view");
       }
     }
@@ -216,17 +222,19 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
       return;
     }
 
+    const mockFormData = asMockPurchaseRequest(formData);
+    const currentStageValue = mockFormData.currentWorkflowStage || formData.currentStage;
     const nextStage = WorkflowDecisionEngine.getNextWorkflowStage(
-      (formData as any).currentWorkflowStage || formData.currentStage,
+      currentStageValue as string,
       workflowDecision
     );
 
-    const updatedData = {
+    const updatedData = asMockPurchaseRequest({
       ...formData,
       status: nextStage === 'completed' ? DocumentStatus.Completed : DocumentStatus.InProgress,
       currentStage: nextStage,
-      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
-    } as any;
+      ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
+    });
     setFormData(updatedData);
     console.log('PR Workflow Action:', workflowDecision.action, updatedData);
   };
@@ -237,17 +245,19 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
       return;
     }
 
+    const mockFormData = asMockPurchaseRequest(formData);
+    const currentStageValue = mockFormData.currentWorkflowStage || formData.currentStage;
     const nextStage = WorkflowDecisionEngine.getNextWorkflowStage(
-      (formData as any).currentWorkflowStage || formData.currentStage,
+      currentStageValue as string,
       workflowDecision
     );
 
-    const updatedData = {
+    const updatedData = asMockPurchaseRequest({
       ...formData,
       status: DocumentStatus.Rejected,
       currentStage: nextStage,
-      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
-    } as any;
+      ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
+    });
     setFormData(updatedData);
     console.log('PR Workflow Action:', workflowDecision.action, updatedData);
   };
@@ -263,12 +273,13 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   };
   
   const handleReturnWithStep = (step: any) => {
-    const updatedData = {
+    const mockFormData = asMockPurchaseRequest(formData);
+    const updatedData = asMockPurchaseRequest({
       ...formData,
       status: DocumentStatus.InProgress,
       currentStage: step.targetStage,
-      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
-    } as any;
+      ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
+    });
     setFormData(updatedData);
 
     // Reset state
@@ -287,12 +298,13 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
   };
 
   const handleSubmitForApproval = () => {
-    const updatedData = {
+    const mockFormData = asMockPurchaseRequest(formData);
+    const updatedData = asMockPurchaseRequest({
       ...formData,
       status: DocumentStatus.InProgress,
       currentStage: WorkflowStage.departmentHeadApproval,
-      ...(formData as any).lastModified && { lastModified: new Date().toISOString() },
-    } as any;
+      ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
+    });
     setFormData(updatedData);
     console.log('PR Submitted for Approval:', updatedData);
   };
@@ -383,13 +395,13 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                           <h1 className="text-2xl font-bold">
                             {mode === "add"
                               ? "Create New Purchase Request"
-                              : (formData as any).requestNumber || "Purchase Request Details"}
+                              : asMockPurchaseRequest(formData).requestNumber || "Purchase Request Details"}
                           </h1>
                           {mode !== "add" && (
                             <p className="text-sm text-muted-foreground mt-1">Purchase Request</p>
                           )}
                         </div>
-                        {(formData as any).requestNumber && <StatusBadge status={formData.status} className="h-6" />}
+                        {asMockPurchaseRequest(formData).requestNumber && <StatusBadge status={formData.status} className="h-6" />}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap justify-end">
@@ -407,14 +419,14 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Save
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       setMode("view");
                       // Reset form data to original if needed
-                      if (!isAddMode) setFormData(samplePRData as any);
+                      if (!isAddMode) setFormData(asMockPurchaseRequest(samplePRData));
                     }}
-                    size="sm" 
+                    size="sm"
                     className="h-9"
                   >
                     <X className="mr-2 h-4 w-4" />
@@ -500,7 +512,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                     <Select
                       value={formData.requestType}
                       onValueChange={(value) =>
-                        setFormData({ ...formData, requestType: value as any })
+                        setFormData({ ...formData, requestType: value as typeof formData.requestType })
                       }
                       disabled={!canEditField("type", user?.context.currentRole.name || "")}
                     >
@@ -584,11 +596,11 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                   <Label className="text-sm text-muted-foreground mb-2 block">
                     Workflow Progress
                   </Label>
-                  {(formData as any).requestNumber && formData.currentStage ? (
+                  {asMockPurchaseRequest(formData).requestNumber && formData.currentStage ? (
                     <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center">
                       <CompactWorkflowIndicator
                         currentStage={formData.currentStage as WorkflowStage}
-                        prData={formData}
+                        prData={formData as PurchaseRequest}
                         className="flex-shrink-0"
                       />
                     </div>
@@ -654,10 +666,10 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
           {user && workflowPermissions.canViewFinancialInfo && (
             <Card className="shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Transaction Summary ({(formData as any).baseCurrencyCode || 'USD'})</CardTitle>
+                <CardTitle className="text-lg">Transaction Summary ({asMockPurchaseRequest(formData).baseCurrencyCode || 'USD'})</CardTitle>
               </CardHeader>
               <CardContent className="pb-6">
-                <SummaryTotal prData={formData} />
+                <SummaryTotal prData={formData as PurchaseRequest} />
               </CardContent>
             </Card>
           )}
@@ -670,7 +682,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
               <CardTitle className="text-base">Comments & Attachments</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <PRCommentsAttachmentsTab prData={formData} />
+              <PRCommentsAttachmentsTab prData={formData as PurchaseRequest} />
             </CardContent>
           </Card>
 
@@ -679,7 +691,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
               <CardTitle className="text-base">Activity Log</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <ActivityTab activityLog={(formData as any).activityLog || []} />
+              <ActivityTab activityLog={asMockPurchaseRequest(formData).activityLog || []} />
             </CardContent>
           </Card>
         </div>
