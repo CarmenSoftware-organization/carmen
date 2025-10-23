@@ -18,7 +18,7 @@ const stockBalanceSchema = z.object({
   quantityReserved: z.number().min(0).optional().default(0),
   averageCost: z.object({
     amount: z.number().min(0, 'Average cost amount must be non-negative'),
-    currencyCode: z.string().length(3, 'Currency code must be 3 characters')
+    currency: z.string().length(3, 'Currency code must be 3 characters')
   }),
   lastMovementDate: z.string().optional(),
   lastCountDate: z.string().optional()

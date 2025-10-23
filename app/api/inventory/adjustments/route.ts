@@ -21,7 +21,7 @@ const createAdjustmentItemSchema = z.object({
   ),
   unitCost: z.object({
     amount: z.number().min(0, 'Unit cost amount must be non-negative'),
-    currencyCode: z.string().length(3, 'Currency code must be 3 characters')
+    currency: z.string().length(3, 'Currency code must be 3 characters')
   }),
   reason: z.string().optional(),
   batchNo: z.string().optional(),

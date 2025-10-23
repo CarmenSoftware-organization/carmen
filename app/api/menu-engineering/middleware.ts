@@ -10,7 +10,7 @@ import { z } from 'zod'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
 import { createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { SecurityEventType } from '@/lib/security/audit-logger'
-import type { UnifiedAuthenticatedUser } from '@/lib/auth/api-protection'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import type { ApiResponse, ApiMetadata } from './types'
 
 // ====== ENHANCED VALIDATION MIDDLEWARE ======
@@ -39,7 +39,7 @@ export function withMenuEngineeringValidation<T extends z.ZodSchema>(
 ) {
   return async function validateRequest(
     request: NextRequest,
-    user: UnifiedAuthenticatedUser,
+    user: AuthenticatedUser,
     rawData: any
   ): Promise<{ success: true; data: z.infer<T> } | { success: false; response: NextResponse }> {
     try {
@@ -167,7 +167,7 @@ export function withMenuEngineeringCache(config: CacheConfig) {
 export async function handleMenuEngineeringError(
   error: Error,
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   context: {
     endpoint: string
     operation: string
@@ -316,7 +316,7 @@ export function withPerformanceMonitoring() {
  */
 export async function logMenuEngineeringActivity(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   activity: {
     resource: string
     action: string
@@ -325,9 +325,9 @@ export async function logMenuEngineeringActivity(
     sensitive?: boolean
   }
 ): Promise<void> {
-  const eventType = activity.sensitive 
-    ? SecurityEventType.SENSITIVE_DATA_ACCESS 
-    : SecurityEventType.DATA_ACCESS
+  const eventType = activity.sensitive
+    ? SecurityEventType.SENSITIVE_DATA_ACCESS
+    : SecurityEventType.DATA_MODIFICATION
 
   await auditSecurityEvent(eventType, request, user.id, {
     resource: activity.resource,
@@ -398,7 +398,7 @@ export function extractClientInfo(request: NextRequest): {
  */
 export function generateRateLimitKey(
   request: NextRequest,
-  user?: UnifiedAuthenticatedUser,
+  user?: AuthenticatedUser,
   keyType: 'user' | 'ip' | 'endpoint' | 'combined' = 'combined'
 ): string {
   const endpoint = new URL(request.url).pathname

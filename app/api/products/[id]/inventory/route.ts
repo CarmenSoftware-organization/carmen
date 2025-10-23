@@ -36,10 +36,10 @@ const getProductInventoryMetrics = withSecurity(
     withAuthorization('inventory', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         // Extract ID from URL pathname
-        const id = new URL(request.url).pathname.split('/')[3] // /api/products/[id]/inventory
+        const rawId = new URL(request.url).pathname.split('/')[3] // /api/products/[id]/inventory
 
         // Validate product ID parameter
-        const paramsValidation = await validateInput({ id }, productParamsSchema)
+        const paramsValidation = await validateInput({ id: rawId }, productParamsSchema)
 
         if (!paramsValidation.success) {
           return createSecureResponse(

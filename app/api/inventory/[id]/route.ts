@@ -7,9 +7,11 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { inventoryService } from '@/lib/services/db/inventory-service'
+import type { UpdateInventoryItemInput } from '@/lib/services/db/inventory-service'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
+import { CostingMethod } from '@/lib/types/inventory'
 
 // Validation schemas
 const updateInventoryItemSchema = z.object({
@@ -17,7 +19,7 @@ const updateInventoryItemSchema = z.object({
   description: z.string().optional(),
   categoryId: z.string().min(1).optional(),
   baseUnitId: z.string().min(1).optional(),
-  costingMethod: z.enum(['FIFO', 'LIFO', 'MOVING_AVERAGE', 'WEIGHTED_AVERAGE', 'STANDARD_COST']).optional(),
+  costingMethod: z.nativeEnum(CostingMethod).optional(),
   isActive: z.boolean().optional(),
   isSerialized: z.boolean().optional(),
   minimumQuantity: z.number().min(0).optional(),
@@ -121,7 +123,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    const input = {
+    const input: UpdateInventoryItemInput = {
       ...validation.data,
       updatedBy: session.user.id
     }

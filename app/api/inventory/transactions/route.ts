@@ -22,7 +22,7 @@ const createTransactionSchema = z.object({
   quantity: z.number().positive('Quantity must be positive'),
   unitCost: z.object({
     amount: z.number().min(0, 'Unit cost amount must be non-negative'),
-    currencyCode: z.string().length(3, 'Currency code must be 3 characters')
+    currency: z.string().length(3, 'Currency code must be 3 characters')
   }),
   transactionDate: z.string().optional(),
   referenceNo: z.string().optional(),
@@ -107,8 +107,8 @@ export async function GET(request: NextRequest) {
         locationId: locationId || 'loc-001',
         transactionType: transactionType || 'RECEIVE',
         quantity: 100,
-        unitCost: { amount: 10.50, currencyCode: 'USD' },
-        totalCost: { amount: 1050.00, currencyCode: 'USD' },
+        unitCost: { amount: 10.50, currency: 'USD' },
+        totalCost: { amount: 1050.00, currency: 'USD' },
         balanceAfter: 100,
         transactionDate: new Date('2024-01-15'),
         referenceNo: 'PO-2024-001',

@@ -166,12 +166,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const input = {
+    const input: typeof validation.data & { createdBy: string } = {
       ...validation.data,
       createdBy: session.user.id
     }
 
-    const result = await inventoryService.createInventoryItem(input)
+    const result = await inventoryService.createInventoryItem(input as any)
     
     if (!result.success) {
       return NextResponse.json(
