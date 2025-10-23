@@ -331,7 +331,7 @@ export function ItemDetailsEditForm({
             isReadOnlyByRole && "bg-muted/30 p-2 rounded border opacity-75"
           )}>
             {(() => {
-              const value = formData[id as keyof PurchaseRequestItem];
+              const value = formData[id as keyof ExtendedPurchaseRequestItem];
               if (value instanceof Date) {
                 return value.toLocaleDateString();
               } else if (value === null || value === undefined) {
@@ -349,11 +349,11 @@ export function ItemDetailsEditForm({
         )}
         {baseValue && (
           <div className="text-xs text-muted-foreground mt-1">
-          Base: {baseValue}
-        </div>
-      )}
-    </div>
-  );
+            Base: {baseValue}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -605,11 +605,11 @@ export function ItemDetailsEditForm({
                   <FormField id="deliveryPoint" label="Delivery Point" fieldPermission={fieldPermissions.deliveryPoint}>
                     {mode === "view" || !fieldPermissions.deliveryPoint ? (
                       <div className="mt-1 text-sm">
-                        {deliveryPointOptions.find(option => option.value === (formData as any).deliveryPoint)?.label || (formData as any).deliveryPoint || "Not specified"}
+                        {deliveryPointOptions.find(option => option.value === formData.deliveryPoint)?.label || formData.deliveryPoint || "Not specified"}
                       </div>
                     ) : (
-                      <Select 
-                        value={(formData as any).deliveryPoint || ""} 
+                      <Select
+                        value={formData.deliveryPoint || ""}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, deliveryPoint: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -630,12 +630,12 @@ export function ItemDetailsEditForm({
                 <div className="w-full">
                     <FormField id="comment" label="Comment" fieldPermission={fieldPermissions.comment}>
                       {mode === "view" || !fieldPermissions.comment ? (
-                        <div className="mt-1 text-sm">{(formData as any).comment}</div>
+                        <div className="mt-1 text-sm">{formData.comment || ""}</div>
                       ) : (
                         <Textarea
                           id="comment"
                           name="comment"
-                          value={(formData as any).comment}
+                          value={formData.comment || ""}
                           onChange={handleInputChange}
                           placeholder="Add any additional notes here"
                           className="text-sm h-8"
@@ -669,7 +669,7 @@ export function ItemDetailsEditForm({
                       <Input
                         id="vendor"
                         name="vendor"
-                        value={(formData as any).vendor}
+                        value={formData.vendor || ""}
                         onChange={handleInputChange}
                         placeholder="Vendor name"
                         disabled={mode === "view"}
@@ -680,7 +680,7 @@ export function ItemDetailsEditForm({
                       <Input
                         id="pricelistNumber"
                         name="pricelistNumber"
-                        value={(formData as any).pricelistNumber}
+                        value={formData.pricelistNumber || ""}
                         onChange={handleInputChange}
                         placeholder="Pricelist #"
                         disabled={mode === "view"}
@@ -700,10 +700,10 @@ export function ItemDetailsEditForm({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField id="jobCode" label="Job Number" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{(formData as any).jobCode || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{formData.jobCode || "Not assigned"}</div>
                     ) : (
-                      <Select 
-                        value={(formData as any).jobCode || ""} 
+                      <Select
+                        value={formData.jobCode || ""}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, jobCode: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -723,10 +723,10 @@ export function ItemDetailsEditForm({
 
                   <FormField id="event" label="Event" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{(formData as any).event || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{formData.event || "Not assigned"}</div>
                     ) : (
-                      <Select 
-                        value={(formData as any).event || ""} 
+                      <Select
+                        value={formData.event || ""}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, event: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -745,10 +745,10 @@ export function ItemDetailsEditForm({
 
                   <FormField id="project" label="Project" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{(formData as any).project || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{formData.project || "Not assigned"}</div>
                     ) : (
-                      <Select 
-                        value={(formData as any).project || ""} 
+                      <Select
+                        value={formData.project || ""}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, project: value }))}
                       >
                         <SelectTrigger className="h-8">
@@ -767,10 +767,10 @@ export function ItemDetailsEditForm({
 
                   <FormField id="marketSegment" label="Market Segment" fieldPermission={true}>
                     {mode === "view" ? (
-                      <div className="mt-1 text-sm">{(formData as any).marketSegment || "Not assigned"}</div>
+                      <div className="mt-1 text-sm">{formData.marketSegment || "Not assigned"}</div>
                     ) : (
-                      <Select 
-                        value={(formData as any).marketSegment || ""} 
+                      <Select
+                        value={formData.marketSegment || ""}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, marketSegment: value }))}
                       >
                         <SelectTrigger className="h-8">
