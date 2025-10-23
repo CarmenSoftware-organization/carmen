@@ -27,16 +27,31 @@ import { PurchaseRequest } from "@/lib/types"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 
+// Extended PurchaseRequest with mock-only fields for display purposes
+type ExtendedPurchaseRequest = PurchaseRequest & {
+  refNumber?: string;
+  date?: Date;
+  type?: string;
+  description?: string;
+  requestor?: { name: string };
+  department?: string;
+  location?: string;
+  totalAmount?: number;
+  currency?: string;
+  currentWorkflowStage?: string;
+  requestorId?: string;
+};
+
 interface PurchaseRequestsCardViewProps {
-  data: PurchaseRequest[]
+  data: ExtendedPurchaseRequest[]
   selectedItems: string[]
   onSelectItem: (id: string) => void
   onSelectAll: () => void
-  onView?: (pr: PurchaseRequest) => void
-  onEdit?: (pr: PurchaseRequest) => void
-  onApprove?: (pr: PurchaseRequest) => void
-  onReject?: (pr: PurchaseRequest) => void
-  onDelete?: (pr: PurchaseRequest) => void
+  onView?: (pr: ExtendedPurchaseRequest) => void
+  onEdit?: (pr: ExtendedPurchaseRequest) => void
+  onApprove?: (pr: ExtendedPurchaseRequest) => void
+  onReject?: (pr: ExtendedPurchaseRequest) => void
+  onDelete?: (pr: ExtendedPurchaseRequest) => void
 }
 
 export function PurchaseRequestsCardView({
@@ -141,7 +156,7 @@ export function PurchaseRequestsCardView({
                     </h3>
                     <div className="flex items-center text-xs text-muted-foreground mt-1">
                       <Calendar className="mr-1 h-3 w-3" />
-                      {format(pr.date, "dd MMM yyyy")}
+                      {pr.date ? format(pr.date, "dd MMM yyyy") : 'N/A'}
                     </div>
                   </div>
                 </div>
@@ -162,11 +177,11 @@ export function PurchaseRequestsCardView({
                 <Badge variant="secondary" className="text-xs">
                   {pr.type}
                 </Badge>
-                <Badge 
-                  variant="outline" 
-                  className={cn("text-xs border", getWorkflowStageColor(pr.currentWorkflowStage))}
+                <Badge
+                  variant="outline"
+                  className={cn("text-xs border", getWorkflowStageColor(pr.currentWorkflowStage || ''))}
                 >
-                  {formatStageDisplay(pr.currentWorkflowStage)}
+                  {formatStageDisplay(pr.currentWorkflowStage || '')}
                 </Badge>
               </div>
 
@@ -178,7 +193,7 @@ export function PurchaseRequestsCardView({
                     <span className="text-xs">Requestor</span>
                   </div>
                   <div className="font-medium truncate text-xs">
-                    {pr.requestor.name}
+                    {pr.requestor?.name || 'N/A'}
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -202,7 +217,7 @@ export function PurchaseRequestsCardView({
                   {new Intl.NumberFormat("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }).format(pr.totalAmount)} {pr.currency}
+                  }).format(pr.totalAmount || 0)} {pr.currency || 'USD'}
                 </div>
               </div>
 
