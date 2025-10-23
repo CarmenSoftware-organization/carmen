@@ -557,7 +557,11 @@ export function EnhancedPOItemRow({
   };
 
   // Calculate totals (in display currency)
-  const subtotal = (editedItem.orderedQuantity || 0) * (editedItem.unitPrice || 0);
+  // Extract unitPrice from Money type if it's an object
+  const unitPriceValue = typeof editedItem.unitPrice === 'object' && editedItem.unitPrice !== null
+    ? ((editedItem.unitPrice as any).amount || 0)
+    : (editedItem.unitPrice as any || 0);
+  const subtotal = (editedItem.orderedQuantity || 0) * unitPriceValue;
   const discountAmount = isDiscountOverride ? overrideDiscountAmount : subtotal * (editedItem.discount || 0);
   const netTotal = subtotal - discountAmount; // Net total after discount but before tax
   const taxAmount = isTaxOverride ? overrideTaxAmount : netTotal * (editedItem.taxRate || 0);
