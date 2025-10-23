@@ -57,7 +57,17 @@ export default function CreatePOFromPRPage() {
       }>);
 
       // Convert Set to Array for serialization
-      const serializedGroups = Object.entries(groupedItems).reduce((acc, [key, group]) => {
+      type GroupType = {
+        vendor: string;
+        vendorId: number;
+        currency: string;
+        deliveryDate: Date;
+        items: any[];
+        totalAmount: number;
+        sourcePRs: Set<string>;
+      };
+
+      const serializedGroups = (Object.entries(groupedItems) as [string, GroupType][]).reduce((acc, [key, group]) => {
         // Explicitly extract object properties to avoid spread type error
         acc[key] = {
           vendor: group.vendor,
