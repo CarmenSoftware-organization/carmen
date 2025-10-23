@@ -804,11 +804,7 @@ export function VisualPolicyEditor({
       </div>
 
       {/* Validation on step change */}
-      {currentStep === 'review' && (
-        <div className="hidden">
-          {validatePolicy()}
-        </div>
-      )}
+      {currentStep === 'review' && validatePolicy() && null}
     </div>
   );
 }

@@ -276,7 +276,7 @@ export function PolicyAnalyticsDashboard({
         </div>
 
         <div className="flex items-center space-x-2">
-          <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+          <Select value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as '1h' | '24h' | '7d' | '30d' | '90d')}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

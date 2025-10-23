@@ -127,7 +127,7 @@ export function PolicyTestModal({ policy, isOpen, onClose }: PolicyTestModalProp
     // Mock evaluation logic based on policy rules
     const mockResult: TestResult = {
       scenario,
-      result: Math.random() > 0.3 ? 'permit' : 'deny',
+      result: Math.random() > 0.3 ? EffectType.PERMIT : EffectType.DENY,
       reason: generateMockReason(scenario, policy),
       evaluationTime: Math.floor(Math.random() * 50) + 10,
       ruleResults: policy.rules.reduce((acc, rule) => ({
@@ -176,9 +176,9 @@ export function PolicyTestModal({ policy, isOpen, onClose }: PolicyTestModalProp
 
   const getResultIcon = (result: EffectType | 'error') => {
     switch (result) {
-      case 'permit':
+      case EffectType.PERMIT:
         return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case 'deny':
+      case EffectType.DENY:
         return <XCircle className="w-5 h-5 text-red-600" />;
       case 'error':
         return <AlertCircle className="w-5 h-5 text-orange-600" />;
@@ -188,8 +188,8 @@ export function PolicyTestModal({ policy, isOpen, onClose }: PolicyTestModalProp
   };
 
   const getResultBadge = (result: EffectType | 'error') => (
-    <Badge variant={result === 'permit' ? 'default' : result === 'deny' ? 'destructive' : 'secondary'}>
-      {result.toUpperCase()}
+    <Badge variant={result === EffectType.PERMIT ? 'default' : result === EffectType.DENY ? 'destructive' : 'secondary'}>
+      {result.toString().toUpperCase()}
     </Badge>
   );
 

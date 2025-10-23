@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { 
-  DragDropContext, 
-  Droppable, 
-  Draggable, 
-  DropResult 
-} from '@hello-pangea/dnd';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult
+} from 'react-beautiful-dnd';
 import {
   Save,
   X,

@@ -290,7 +290,7 @@ export class ReliablePrismaClient {
   }
   
   // Wrapped transaction execution
-  async transaction<T>(transactionFn: (client: PrismaClient) => Promise<T>, options?: {
+  async transaction<T>(transactionFn: (tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>) => Promise<T>, options?: {
     operationName?: string
     timeout?: number
     useCircuitBreaker?: boolean
@@ -318,7 +318,7 @@ export class ReliablePrismaClient {
       } else {
         // Use $transaction with proper type handling
         return await this.client.$transaction(async (tx) => {
-          return transactionFn(tx as unknown as PrismaClient)
+          return transactionFn(tx)
         }) as T
       }
     }

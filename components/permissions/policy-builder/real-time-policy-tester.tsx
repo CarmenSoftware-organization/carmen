@@ -443,8 +443,7 @@ export function RealTimePolicyTester({
       description: builderState.description || '',
       effect: builderState.effect,
       priority: builderState.priority,
-      status: 'ACTIVE',
-      combiningAlgorithm: 'DENY_OVERRIDES',
+      enabled: true,
       target: {
         subjects: builderState.subjectConditions.map(cond => cond.value),
         resources: builderState.resourceConditions.map(cond => cond.value),

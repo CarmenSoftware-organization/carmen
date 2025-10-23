@@ -69,7 +69,7 @@ export function AttributeInspector({
   showFavorites = true
 }: AttributeInspectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTab, setSelectedTab] = useState(category || 'subject');
+  const [selectedTab, setSelectedTab] = useState<string>(category || 'subject');
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['core']));
   const [favoriteAttributes, setFavoriteAttributes] = useState<Set<string>>(new Set([
     'subject.userId',

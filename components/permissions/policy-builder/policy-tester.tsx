@@ -137,7 +137,7 @@ export function PolicyTester({
 
     const evaluationTraces: PolicyEvaluationTrace[] = policies.map(policy => {
       const policyStartTime = Date.now();
-      
+
       // Mock evaluation steps
       const steps: EvaluationStep[] = [
         {
@@ -164,14 +164,15 @@ export function PolicyTester({
       ];
 
       const totalTime = steps.reduce((sum, step) => sum + step.executionTime, 0);
-      
+      const lastStepResult = steps[steps.length - 1].result;
+
       return {
         policyId: policy.id,
         policyName: policy.name,
         effect: policy.effect,
         evaluationSteps: steps,
         executionTime: totalTime,
-        finalResult: steps[steps.length - 1].result
+        finalResult: typeof lastStepResult === 'boolean' ? lastStepResult : false
       };
     });
 

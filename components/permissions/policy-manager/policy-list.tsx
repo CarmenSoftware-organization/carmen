@@ -279,7 +279,7 @@ export function PolicyList({
                 className="pl-10"
               />
             </div>
-            <Tabs value={policyType} onValueChange={onPolicyTypeChange}>
+            <Tabs value={policyType} onValueChange={(value) => onPolicyTypeChange(value as 'rbac' | 'abac')}>
                 <TabsList className="grid w-full max-w-md grid-cols-2">
                 <TabsTrigger value="rbac">
                     Role-Based (RBAC)
