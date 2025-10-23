@@ -1,6 +1,6 @@
-import { PurchaseRequest, PurchaseRequestItem, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/lib/types'
+import { PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/lib/types'
 
-export const samplePRData = {
+export const samplePRData: any = {
   id: 'sample-pr-001',
   refNumber: 'PR-2023-001',
   date: new Date('2023-01-01'),
@@ -36,7 +36,7 @@ export const samplePRData = {
   totalAmount: 1100,
 }
 
-export const samplePRItems = [
+export const samplePRItems: any[] = [
   {
     id: "PR-2023-001-01",
     location: "Main Kitchen",
