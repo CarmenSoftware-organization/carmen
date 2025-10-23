@@ -1,4 +1,4 @@
-import { PurchaseRequest, PurchaseRequestItem, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/lib/types'
+import { PurchaseRequest, PurchaseRequestItem, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, MockPurchaseRequest, MockPurchaseRequestItem } from '@/lib/types'
 
 // Mock data with extended fields not in the PurchaseRequest interface
 // Cast to any[] to bypass type checking for mock-specific fields
@@ -2773,7 +2773,7 @@ export const mockPRListData = [
       }
     ]
   }
-] as any as PurchaseRequest[];
+] as MockPurchaseRequest[];
 
 // Enhanced PR Items with Business Dimensions
 export const mockPRItemsWithBusinessDimensions = [
@@ -3432,7 +3432,7 @@ export const mockPRItemsWithBusinessDimensions = [
     baseTaxAmount: 1080.00,
     baseTotalAmount: 13500.00,
   }
-] as any as PurchaseRequestItem[];
+] as MockPurchaseRequestItem[];
 
 // Status distribution for realistic data
 export const statusDistribution = {
