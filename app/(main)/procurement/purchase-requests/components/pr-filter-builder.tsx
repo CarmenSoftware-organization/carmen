@@ -364,7 +364,7 @@ export function PRAdvancedFilter({ onApplyFilters, onClearFilters, activeFilters
                             placeholder="Value"
                             value={filter.value}
                             onChange={(e) => handleValueChange(index, e.target.value)}
-                            type={filter.field === 'totalAmount' ? 'number' : filter.field === 'date' ? 'date' : 'text'}
+                            type={filter.field === 'estimatedTotal' ? 'number' : (filter.field === 'requestDate' || filter.field === 'requiredDate' || filter.field === 'approvedAt' || filter.field === 'rejectedAt') ? 'date' : 'text'}
                           />
                         </div>
                         

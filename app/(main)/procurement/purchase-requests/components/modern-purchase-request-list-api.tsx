@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { 
-  usePurchaseRequests, 
+import {
+  usePurchaseRequests,
   useCreatePurchaseRequest,
   useSubmitPurchaseRequest,
   useApprovePurchaseRequest,
@@ -11,7 +11,7 @@ import {
   useBulkApprovePurchaseRequests
 } from "@/lib/hooks/api"
 import { PurchaseRequestFilters } from "@/lib/api/procurement"
-import { PurchaseRequest, PurchaseRequestStatus } from "@/lib/types"
+import { PurchaseRequest, DocumentStatus } from "@/lib/types"
 import { ProcurementErrorBoundary } from "@/components/api/api-error-boundary"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,14 +62,13 @@ const PRIORITY_COLORS: Record<string, string> = {
   urgent: "bg-red-100 text-red-800"
 }
 
-const STATUS_COLORS: Record<PurchaseRequestStatus, string> = {
-  draft: "bg-gray-100 text-gray-800",
-  submitted: "bg-blue-100 text-blue-800",
-  approved: "bg-green-100 text-green-800",
-  rejected: "bg-red-100 text-red-800",
-  "partially-fulfilled": "bg-yellow-100 text-yellow-800",
-  fulfilled: "bg-emerald-100 text-emerald-800",
-  cancelled: "bg-gray-100 text-gray-600"
+const STATUS_COLORS: Record<DocumentStatus, string> = {
+  [DocumentStatus.Draft]: "bg-gray-100 text-gray-800",
+  [DocumentStatus.InProgress]: "bg-blue-100 text-blue-800",
+  [DocumentStatus.Approved]: "bg-green-100 text-green-800",
+  [DocumentStatus.Rejected]: "bg-red-100 text-red-800",
+  [DocumentStatus.Converted]: "bg-emerald-100 text-emerald-800",
+  [DocumentStatus.Void]: "bg-gray-100 text-gray-400"
 }
 
 export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseRequestListProps) {
@@ -78,7 +77,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
   
   // State for filters and pagination
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<PurchaseRequestStatus | "all">("all")
+  const [statusFilter, setStatusFilter] = useState<DocumentStatus | "all">("all")
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [page, setPage] = useState(1)
@@ -112,50 +111,15 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
     refetch 
   } = usePurchaseRequests(filters, { page, limit })
 
-  const createPRMutation = useCreatePurchaseRequest({
-    onSuccess: () => {
-      toast({ title: "Purchase request created successfully" })
-      refetch()
-    },
-    onError: (error: Error) => {
-      toast({ 
-        variant: "destructive",
-        title: "Failed to create purchase request",
-        description: error.message 
-      })
-    }
-  })
+  const createPRMutation = useCreatePurchaseRequest()
 
-  const submitPRMutation = useSubmitPurchaseRequest({
-    onSuccess: () => {
-      toast({ title: "Purchase request submitted successfully" })
-      refetch()
-    }
-  })
+  const submitPRMutation = useSubmitPurchaseRequest()
 
-  const approvePRMutation = useApprovePurchaseRequest({
-    onSuccess: () => {
-      toast({ title: "Purchase request approved successfully" })
-      refetch()
-    }
-  })
+  const approvePRMutation = useApprovePurchaseRequest()
 
-  const rejectPRMutation = useRejectPurchaseRequest({
-    onSuccess: () => {
-      toast({ title: "Purchase request rejected successfully" })
-      refetch()
-    }
-  })
+  const rejectPRMutation = useRejectPurchaseRequest()
 
-  const bulkApproveMutation = useBulkApprovePurchaseRequests({
-    onSuccess: (data) => {
-      toast({ 
-        title: `Successfully approved ${data.approved} purchase requests`
-      })
-      setSelectedItems([])
-      refetch()
-    }
-  })
+  const bulkApproveMutation = useBulkApprovePurchaseRequests()
 
   // Event handlers
   const handleCreatePR = () => {
@@ -171,23 +135,66 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
   }
 
   const handleSubmit = async (pr: PurchaseRequest) => {
-    await submitPRMutation.mutateAsync(pr.id)
+    try {
+      await submitPRMutation.mutateAsync(pr.id)
+      toast({ title: "Purchase request submitted successfully" })
+      refetch()
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Failed to submit purchase request",
+        description: error instanceof Error ? error.message : "Unknown error"
+      })
+    }
   }
 
   const handleApprove = async (pr: PurchaseRequest) => {
-    await approvePRMutation.mutateAsync({ id: pr.id })
+    try {
+      await approvePRMutation.mutateAsync({ id: pr.id })
+      toast({ title: "Purchase request approved successfully" })
+      refetch()
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Failed to approve purchase request",
+        description: error instanceof Error ? error.message : "Unknown error"
+      })
+    }
   }
 
   const handleReject = async (pr: PurchaseRequest) => {
     const reason = prompt("Please provide a reason for rejection:")
     if (reason) {
-      await rejectPRMutation.mutateAsync({ id: pr.id, reason })
+      try {
+        await rejectPRMutation.mutateAsync({ id: pr.id, reason })
+        toast({ title: "Purchase request rejected successfully" })
+        refetch()
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Failed to reject purchase request",
+          description: error instanceof Error ? error.message : "Unknown error"
+        })
+      }
     }
   }
 
   const handleBulkApprove = async () => {
     if (selectedItems.length === 0) return
-    await bulkApproveMutation.mutateAsync(selectedItems)
+    try {
+      const result = await bulkApproveMutation.mutateAsync({ requestIds: selectedItems })
+      toast({
+        title: `Successfully approved ${(result as any).approved || selectedItems.length} purchase requests`
+      })
+      setSelectedItems([])
+      refetch()
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Failed to approve purchase requests",
+        description: error instanceof Error ? error.message : "Unknown error"
+      })
+    }
   }
 
   const handleSelectItem = (id: string) => {
@@ -256,10 +263,10 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
   const groupedPRs = useMemo(() => {
     return {
       all: purchaseRequests,
-      draft: purchaseRequests.filter(pr => pr.status === 'draft'),
-      submitted: purchaseRequests.filter(pr => pr.status === 'submitted'),
-      approved: purchaseRequests.filter(pr => pr.status === 'approved'),
-      rejected: purchaseRequests.filter(pr => pr.status === 'rejected')
+      draft: purchaseRequests.filter(pr => pr.status === DocumentStatus.Draft),
+      submitted: purchaseRequests.filter(pr => pr.status === DocumentStatus.InProgress),
+      approved: purchaseRequests.filter(pr => pr.status === DocumentStatus.Approved),
+      rejected: purchaseRequests.filter(pr => pr.status === DocumentStatus.Rejected)
     }
   }, [purchaseRequests])
 
@@ -410,15 +417,15 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                                 className="rounded border-gray-300"
                               />
                               <CardTitle className="text-sm font-medium">
-                                {pr.title}
+                                {pr.notes || pr.requestNumber}
                               </CardTitle>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span>PR-{pr.id}</span>
+                              <span>PR-{pr.requestNumber}</span>
                               <span>•</span>
-                              <span>{pr.requester?.name || 'Unknown'}</span>
+                              <span>{pr.requestedBy || 'Unknown'}</span>
                               <span>•</span>
-                              <span>{pr.department?.name || 'Unknown'}</span>
+                              <span>{pr.departmentId || 'Unknown'}</span>
                             </div>
                           </div>
                           
@@ -440,10 +447,10 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                               Required: {new Date(pr.requiredDate).toLocaleDateString()}
                             </div>
                             <div className="text-xs font-medium">
-                              Total: {pr.totalAmount?.amount} {pr.totalAmount?.currency}
+                              Total: {pr.estimatedTotal?.amount} {pr.estimatedTotal?.currency}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {pr.items.length} item{pr.items.length !== 1 ? 's' : ''}
+                              {pr.totalItems} item{pr.totalItems !== 1 ? 's' : ''}
                             </div>
                           </div>
                           
@@ -455,8 +462,8 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                             >
                               View
                             </Button>
-                            
-                            {pr.status === 'draft' && (
+
+                            {pr.status === DocumentStatus.Draft && (
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -465,8 +472,8 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                                 Edit
                               </Button>
                             )}
-                            
-                            {pr.status === 'draft' && (
+
+                            {pr.status === DocumentStatus.Draft && (
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -476,8 +483,8 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                                 Submit
                               </Button>
                             )}
-                            
-                            {pr.status === 'submitted' && (
+
+                            {pr.status === DocumentStatus.InProgress && (
                               <>
                                 <Button
                                   variant="ghost"
