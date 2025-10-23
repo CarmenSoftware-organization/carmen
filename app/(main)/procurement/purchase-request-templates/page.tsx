@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { PRListTemplate } from "@/components/templates/PRListTemplate"
 import { Button } from "@/components/ui/button"
-import { PurchaseRequest } from "@/lib/types"
+import { PurchaseRequest, PRType, DocumentStatus } from "@/lib/types"
 import { samplePRData } from "../purchase-requests/components/sampleData"
 import { AdvancedFilter } from "@/components/ui/advanced-filter"
 import { FilterType } from "@/lib/utils/filter-storage"
@@ -43,11 +43,11 @@ import { Select } from "@/components/ui/select"
 
 // Create an array of sample templates based on the sample PR data
 const templateData: PurchaseRequest[] = [
-  { ...samplePRData, id: "template-001", refNumber: "TPL-2024-001", description: "Office Supplies Template" },
-  { ...samplePRData, id: "template-002", refNumber: "TPL-2024-002", description: "Kitchen Equipment Template" },
-  { ...samplePRData, id: "template-003", refNumber: "TPL-2024-003", description: "Housekeeping Supplies Template" },
-  { ...samplePRData, id: "template-004", refNumber: "TPL-2024-004", description: "Maintenance Materials Template" },
-  { ...samplePRData, id: "template-005", refNumber: "TPL-2024-005", description: "F&B Ingredients Template" },
+  { ...samplePRData, id: "template-001", refNumber: "TPL-2024-001", description: "Office Supplies Template" } as any,
+  { ...samplePRData, id: "template-002", refNumber: "TPL-2024-002", description: "Kitchen Equipment Template" } as any,
+  { ...samplePRData, id: "template-003", refNumber: "TPL-2024-003", description: "Housekeeping Supplies Template" } as any,
+  { ...samplePRData, id: "template-004", refNumber: "TPL-2024-004", description: "Maintenance Materials Template" } as any,
+  { ...samplePRData, id: "template-005", refNumber: "TPL-2024-005", description: "F&B Ingredients Template" } as any,
 ]
 
 export default function PRTemplatesPage() {
@@ -81,31 +81,31 @@ export default function PRTemplatesPage() {
     field: keyof PurchaseRequest | 'requestor.name'
     format?: (value: any) => string
   }> = [
-    { 
-      label: "Date", 
-      field: "date",
+    {
+      label: "Date",
+      field: "requestDate" as any,
       format: (value: Date) => value.toLocaleDateString()
     },
-    { 
-      label: "Type", 
-      field: "type" 
+    {
+      label: "Type",
+      field: "requestType" as any
     },
-    { 
-      label: "Requestor", 
-      field: "requestor.name" 
+    {
+      label: "Requestor",
+      field: "requestedBy" as any
     },
-    { 
-      label: "Department", 
-      field: "department" 
+    {
+      label: "Department",
+      field: "departmentId" as any
     },
-    { 
-      label: "Amount", 
-      field: "totalAmount",
-      format: (value: number) => `$${value.toFixed(2)}`
+    {
+      label: "Amount",
+      field: "estimatedTotal" as any,
+      format: (value: any) => `$${value?.amount || 0}`
     },
-    { 
-      label: "Workflow Stage", 
-      field: "currentWorkflowStage" 
+    {
+      label: "Workflow Stage",
+      field: "status" as any
     }
   ]
 
@@ -231,12 +231,12 @@ export default function PRTemplatesPage() {
   }
 
   const filterFields = [
-    { value: 'refNumber' as keyof PurchaseRequest, label: 'Template Number' },
-    { value: 'description' as keyof PurchaseRequest, label: 'Description' },
-    { value: 'type' as keyof PurchaseRequest, label: 'Type' },
+    { value: 'requestNumber' as keyof PurchaseRequest, label: 'Template Number' },
+    { value: 'notes' as keyof PurchaseRequest, label: 'Description' },
+    { value: 'requestType' as keyof PurchaseRequest, label: 'Type' },
     { value: 'status' as keyof PurchaseRequest, label: 'Status' },
-    { value: 'department' as keyof PurchaseRequest, label: 'Department' },
-    { value: 'totalAmount' as keyof PurchaseRequest, label: 'Total Amount' }
+    { value: 'departmentId' as keyof PurchaseRequest, label: 'Department' },
+    { value: 'estimatedTotal' as keyof PurchaseRequest, label: 'Total Amount' }
   ]
 
   const renderCardView = () => (
@@ -253,30 +253,30 @@ export default function PRTemplatesPage() {
                   className="h-4 w-4 rounded border-gray-300"
                 />
                 <div>
-                  <h3 className="text-lg font-semibold text-primary">{template.description}</h3>
-                  <p className="text-sm text-muted-foreground">{template.refNumber}</p>
+                  <h3 className="text-lg font-semibold text-primary">{(template as any).description}</h3>
+                  <p className="text-sm text-muted-foreground">{(template as any).refNumber}</p>
                 </div>
               </div>
-              <Badge variant="outline">{template.type}</Badge>
+              <Badge variant="outline">{(template as any).type}</Badge>
             </div>
           </CardHeader>
           <CardContent className="p-5">
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">Department</p>
-                <p className="text-sm font-medium">{template.department}</p>
+                <p className="text-sm font-medium">{(template as any).department}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">Requestor</p>
-                <p className="text-sm font-medium">{template.requestor.name}</p>
+                <p className="text-sm font-medium">{(template as any).requestor.name}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">Total Amount</p>
-                <p className="text-sm font-medium">${template.totalAmount.toFixed(2)}</p>
+                <p className="text-sm font-medium">${(template as any).totalAmount.toFixed(2)}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">Workflow Stage</p>
-                <p className="text-sm font-medium">{template.currentWorkflowStage}</p>
+                <p className="text-sm font-medium">{(template as any).currentWorkflowStage}</p>
               </div>
             </div>
             <div className="flex justify-end mt-4 pt-3 border-t border-border/50 space-x-1">
@@ -345,17 +345,17 @@ export default function PRTemplatesPage() {
               </TableCell>
               <TableCell>
                 <div>
-                  <p className="font-medium">{template.description}</p>
-                  <p className="text-sm text-muted-foreground">{template.refNumber}</p>
+                  <p className="font-medium">{(template as any).description}</p>
+                  <p className="text-sm text-muted-foreground">{(template as any).refNumber}</p>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{template.type}</Badge>
+                <Badge variant="outline">{(template as any).type}</Badge>
               </TableCell>
-              <TableCell>{template.department}</TableCell>
-              <TableCell>{template.requestor.name}</TableCell>
+              <TableCell>{(template as any).department}</TableCell>
+              <TableCell>{(template as any).requestor.name}</TableCell>
               <TableCell className="text-right font-medium">
-                ${template.totalAmount.toFixed(2)}
+                ${(template as any).totalAmount.toFixed(2)}
               </TableCell>
               <TableCell>
                 <Badge variant="outline">{template.status}</Badge>
