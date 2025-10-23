@@ -153,7 +153,7 @@ const getItemApprovalButtonState = (status: DocumentStatus, userRole: string): C
         color: "green",
         disabled: false
       };
-    case WorkflowStatus.Review as any:
+    case 'review' as DocumentStatus:
       return {
         action: "return",
         label: "Return",
@@ -288,7 +288,7 @@ export function ItemDetailsEditForm({
   };
 
   const handleReturnItem = () => {
-    const updatedData = { ...formData, status: WorkflowStatus.Review as any };
+    const updatedData = { ...formData, status: 'review' as DocumentStatus };
     setFormData(updatedData);
     onSave(updatedData);
     setIsReturnStepSelectorOpen(false);

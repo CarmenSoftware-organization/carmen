@@ -3,7 +3,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserIcon, HashIcon, BuildingIcon, MapPinIcon } from "lucide-react";
-import { PurchaseRequest } from "@/lib/types";
+import { PurchaseRequest, asMockPurchaseRequest } from "@/lib/types";
 import { Requestor } from "@/lib/types";
 
 interface DetailsTabProps {
@@ -19,13 +19,16 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({
 }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      requestor: name.startsWith("requestor.")
-        ? { ...(prev as any).requestor, [name.split(".")[1]]: value }
-        : (prev as any).requestor,
-    }));
+    setFormData((prev) => {
+      const mockPrev = asMockPurchaseRequest(prev);
+      return {
+        ...prev,
+        [name]: value,
+        requestor: name.startsWith("requestor.")
+          ? { ...mockPrev.requestor, [name.split(".")[1]]: value }
+          : mockPrev.requestor,
+      };
+    });
   };
 
   return (
@@ -49,9 +52,9 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({
             name={id}
             value={
               typeof formData[id as keyof PurchaseRequest] === "object"
-                ? (formData[id as keyof PurchaseRequest] as any)[
-                    id.split(".")[1]
-                  ]
+                ? asMockPurchaseRequest(formData)[
+                    id.split(".")[0] as keyof PurchaseRequest
+                  ]?.[id.split(".")[1]]
                 : String(formData[id as keyof PurchaseRequest])
             }
             onChange={handleInputChange}

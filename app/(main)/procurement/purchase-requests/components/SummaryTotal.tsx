@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { PurchaseRequest } from "@/lib/types";
+import { PurchaseRequest, asMockPurchaseRequest } from "@/lib/types";
 import { Calculator, TrendingUp, DollarSign, Percent } from "lucide-react";
 
 interface ISummaryTotalProps {
@@ -10,6 +10,8 @@ interface ISummaryTotalProps {
 }
 
 export default function SummaryTotal({ prData }: ISummaryTotalProps) {
+  const mockPrData = asMockPurchaseRequest(prData);
+
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat("en-US", {
       style: "decimal",
@@ -22,26 +24,26 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
     {
       label: "Subtotal",
       icon: DollarSign,
-      amount: (prData as any).subTotalPrice ?? 0,
-      baseAmount: (prData as any).baseSubTotalPrice ?? 0,
+      amount: mockPrData.subTotalPrice ?? 0,
+      baseAmount: mockPrData.baseSubTotalPrice ?? 0,
       type: "subtotal",
     },
     {
       label: "Discount",
       icon: Percent,
-      amount: -((prData as any).discountAmount ?? 0),
-      baseAmount: -((prData as any).baseDiscAmount ?? 0),
+      amount: -(mockPrData.discountAmount ?? 0),
+      baseAmount: -(mockPrData.baseDiscAmount ?? 0),
       type: "discount",
     },
   ];
 
-  const netAmount = (prData as any).netAmount ?? 0;
-  const baseNetAmount = (prData as any).baseNetAmount ?? 0;
-  const totalAmount = (prData as any).totalAmount ?? 0;
-  const baseTotalAmount = (prData as any).baseTotalAmount ?? 0;
+  const netAmount = mockPrData.netAmount ?? 0;
+  const baseNetAmount = mockPrData.baseNetAmount ?? 0;
+  const totalAmount = mockPrData.totalAmount ?? 0;
+  const baseTotalAmount = mockPrData.baseTotalAmount ?? 0;
 
-  const currency = (prData as any).currency || "USD";
-  const baseCurrency = (prData as any).baseCurrencyCode || "USD";
+  const currency = mockPrData.currency || "USD";
+  const baseCurrency = mockPrData.baseCurrencyCode || "USD";
   const showBaseCurrency = currency !== baseCurrency;
 
   return (
@@ -61,11 +63,11 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             </div>
             <div className="mt-1 sm:mt-2 text-right">
               <div className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency((prData as any).subTotalPrice ?? 0, currency)}
+                {formatCurrency(mockPrData.subTotalPrice ?? 0, currency)}
               </div>
               {showBaseCurrency && (
                 <div className="text-xs text-muted-foreground">
-                  {formatCurrency((prData as any).baseSubTotalPrice ?? 0, baseCurrency)}
+                  {formatCurrency(mockPrData.baseSubTotalPrice ?? 0, baseCurrency)}
                 </div>
               )}
             </div>
@@ -85,11 +87,11 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             </div>
             <div className="mt-1 sm:mt-2 text-right">
               <div className="text-sm sm:text-base lg:text-lg font-bold text-green-600">
-                {formatCurrency(Math.abs((prData as any).discountAmount ?? 0), currency)}
+                {formatCurrency(Math.abs(mockPrData.discountAmount ?? 0), currency)}
               </div>
               {showBaseCurrency && (
                 <div className="text-xs text-muted-foreground">
-                  {formatCurrency(Math.abs((prData as any).baseDiscAmount ?? 0), baseCurrency)}
+                  {formatCurrency(Math.abs(mockPrData.baseDiscAmount ?? 0), baseCurrency)}
                 </div>
               )}
             </div>
@@ -133,11 +135,11 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             </div>
             <div className="mt-1 sm:mt-2 text-right">
               <div className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency((prData as any).taxAmount ?? 0, currency)}
+                {formatCurrency(mockPrData.taxAmount ?? 0, currency)}
               </div>
               {showBaseCurrency && (
                 <div className="text-xs text-muted-foreground">
-                  {formatCurrency((prData as any).baseTaxAmount ?? 0, baseCurrency)}
+                  {formatCurrency(mockPrData.baseTaxAmount ?? 0, baseCurrency)}
                 </div>
               )}
             </div>
@@ -185,9 +187,9 @@ export default function SummaryTotal({ prData }: ISummaryTotalProps) {
             {baseCurrency} • Base Currency
           </Badge>
         )}
-        {(prData as any).exchangeRate && (prData as any).exchangeRate !== 1 && (
+        {mockPrData.exchangeRate && mockPrData.exchangeRate !== 1 && (
           <Badge variant="outline" className="text-xs">
-            Rate: 1 {currency} = {(prData as any).exchangeRate?.toFixed(4)} {baseCurrency}
+            Rate: 1 {currency} = {mockPrData.exchangeRate?.toFixed(4)} {baseCurrency}
           </Badge>
         )}
       </div>

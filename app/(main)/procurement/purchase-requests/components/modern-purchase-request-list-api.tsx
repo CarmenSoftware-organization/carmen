@@ -184,7 +184,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
     try {
       const result = await bulkApproveMutation.mutateAsync({ requestIds: selectedItems })
       toast({
-        title: `Successfully approved ${(result as any).approved || selectedItems.length} purchase requests`
+        title: `Successfully approved ${result.approved || selectedItems.length} purchase requests`
       })
       setSelectedItems([])
       refetch()
@@ -350,7 +350,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
           </div>
           
           <div className="flex gap-2">
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
+            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as DocumentStatus | "all")}>
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>

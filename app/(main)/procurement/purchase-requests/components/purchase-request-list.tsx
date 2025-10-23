@@ -54,7 +54,7 @@ import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import { AdvancedFilter } from '@/components/ui/advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
-import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage } from '@/lib/types'
+import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, MockPurchaseRequest } from '@/lib/types'
 import { mockPRListData } from './mockPRListData'
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -99,8 +99,8 @@ interface SortConfig {
   direction: "asc" | "desc"
 }
 
-// Use mockup data from our comprehensive PR list - cast to ExtendedPurchaseRequest
-const sampleData: ExtendedPurchaseRequest[] = mockPRListData as any;
+// Use mockup data from our comprehensive PR list - MockPurchaseRequest is compatible with ExtendedPurchaseRequest
+const sampleData: ExtendedPurchaseRequest[] = mockPRListData as MockPurchaseRequest[];
 
 const filterFields: { value: keyof ExtendedPurchaseRequest; label: string }[] = [
   { value: 'refNumber', label: 'PR Number' },
@@ -320,10 +320,10 @@ export function PurchaseRequestList() {
       }
       
       setAvailableWidgets(widgets);
-      
+
       // Set default toggle to first available widget
       if (widgets.length > 0 && !widgets.includes(toggleMode)) {
-        setToggleMode(widgets[0] as any);
+        setToggleMode(widgets[0] as 'myPending' | 'allDocument');
       }
     }
   }, [user, toggleMode]);
