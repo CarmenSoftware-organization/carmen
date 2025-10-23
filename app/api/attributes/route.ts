@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { AttributeDefinition, AttributeCategory } from '@/lib/types/policy-builder'
-import { SubjectAttributes, ResourceAttributes, EnvironmentAttributes } from '@/lib/types/permissions'
+import { SubjectAttributes, ResourceAttributes, EnvironmentAttributes, Operator } from '@/lib/types/permissions'
 
 const prisma = new PrismaClient()
 
@@ -234,7 +234,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'subject',
       examples: ['user123', 'emp001'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: true,
       isSystem: true
     },
@@ -246,7 +246,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'subject',
       examples: ['chef', 'manager', 'staff'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: true,
       isSystem: true
     },
@@ -258,7 +258,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'subject',
       examples: ['kitchen', 'procurement', 'finance'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: true,
       isSystem: true
     },
@@ -270,7 +270,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'subject',
       examples: ['public', 'internal', 'confidential', 'restricted'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: false,
       isSystem: true
     },
@@ -282,7 +282,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'number',
       category: 'subject',
       examples: [1000, 5000, 10000],
-      validOperators: ['==', '!=', '>', '<', '>=', '<='],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.GREATER_THAN, Operator.LESS_THAN, Operator.GREATER_THAN_OR_EQUAL, Operator.LESS_THAN_OR_EQUAL],
       isRequired: false,
       isSystem: true
     }
@@ -297,7 +297,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'resource',
       examples: ['purchase_request', 'inventory_item', 'vendor'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: true,
       isSystem: true
     },
@@ -309,7 +309,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'number',
       category: 'resource',
       examples: [100, 1000, 10000],
-      validOperators: ['==', '!=', '>', '<', '>=', '<='],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.GREATER_THAN, Operator.LESS_THAN, Operator.GREATER_THAN_OR_EQUAL, Operator.LESS_THAN_OR_EQUAL],
       isRequired: false,
       isSystem: true
     },
@@ -321,7 +321,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'resource',
       examples: ['public', 'internal', 'confidential', 'restricted'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: false,
       isSystem: true
     },
@@ -333,7 +333,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'resource',
       examples: ['draft', 'submitted', 'approved', 'rejected'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: false,
       isSystem: true
     }
@@ -348,7 +348,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'date',
       category: 'environment',
       examples: ['2024-01-15T10:00:00Z'],
-      validOperators: ['==', '!=', '>', '<', '>=', '<='],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.GREATER_THAN, Operator.LESS_THAN, Operator.GREATER_THAN_OR_EQUAL, Operator.LESS_THAN_OR_EQUAL],
       isRequired: true,
       isSystem: true
     },
@@ -360,7 +360,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'boolean',
       category: 'environment',
       examples: [true, false],
-      validOperators: ['==', '!='],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS],
       isRequired: false,
       isSystem: true
     },
@@ -372,7 +372,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'environment',
       examples: ['192.168.1.100', '10.0.0.50'],
-      validOperators: ['==', '!=', 'in', 'not_in', 'contains'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN, Operator.CONTAINS],
       isRequired: false,
       isSystem: true
     },
@@ -384,7 +384,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'environment',
       examples: ['low', 'medium', 'high', 'critical'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: false,
       isSystem: true
     }
@@ -399,7 +399,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'action',
       examples: ['view', 'create', 'update', 'delete', 'approve'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: true,
       isSystem: true
     },
@@ -411,7 +411,7 @@ async function getPredefinedAttributeDefinitions(category: string): Promise<Attr
       dataType: 'string',
       category: 'action',
       examples: ['low', 'medium', 'high', 'critical'],
-      validOperators: ['==', '!=', 'in', 'not_in'],
+      validOperators: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.IN, Operator.NOT_IN],
       isRequired: false,
       isSystem: true
     }
@@ -588,16 +588,16 @@ async function resolveActionAttributes(
 /**
  * Helper functions
  */
-function getValidOperatorsForType(dataType: string): string[] {
-  const operatorMap: Record<string, string[]> = {
-    string: ['==', '!=', 'contains', 'not_contains', 'starts_with', 'ends_with', 'in', 'not_in'],
-    number: ['==', '!=', '>', '<', '>=', '<=', 'in', 'not_in'],
-    boolean: ['==', '!='],
-    date: ['==', '!=', '>', '<', '>=', '<='],
-    array: ['contains', 'not_contains', 'in', 'not_in'],
-    object: ['exists', 'not_exists', 'contains', 'not_contains']
+function getValidOperatorsForType(dataType: string): Operator[] {
+  const operatorMap: Record<string, Operator[]> = {
+    string: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.CONTAINS, Operator.NOT_CONTAINS, Operator.STARTS_WITH, Operator.ENDS_WITH, Operator.IN, Operator.NOT_IN],
+    number: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.GREATER_THAN, Operator.LESS_THAN, Operator.GREATER_THAN_OR_EQUAL, Operator.LESS_THAN_OR_EQUAL, Operator.IN, Operator.NOT_IN],
+    boolean: [Operator.EQUALS, Operator.NOT_EQUALS],
+    date: [Operator.EQUALS, Operator.NOT_EQUALS, Operator.GREATER_THAN, Operator.LESS_THAN, Operator.GREATER_THAN_OR_EQUAL, Operator.LESS_THAN_OR_EQUAL],
+    array: [Operator.CONTAINS, Operator.NOT_CONTAINS, Operator.IN, Operator.NOT_IN],
+    object: [Operator.EXISTS, Operator.NOT_EXISTS, Operator.CONTAINS, Operator.NOT_CONTAINS]
   }
-  return operatorMap[dataType] || ['==', '!=']
+  return operatorMap[dataType] || [Operator.EQUALS, Operator.NOT_EQUALS]
 }
 
 function getCategoryDescription(category: string): string {

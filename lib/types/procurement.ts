@@ -83,6 +83,7 @@ export interface PurchaseRequest {
   workflowStages: ApprovalRecord[];
   currentStage?: string;
   notes?: string;
+  items?: PurchaseRequestItem[]; // Line items for the request
 }
 
 /**
@@ -186,6 +187,11 @@ export interface PurchaseOrder {
   pendingItems: number;
   notes?: string;
   attachments?: string[];
+  // Audit fields
+  createdAt?: Date;
+  updatedAt?: Date;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
 /**

@@ -130,6 +130,11 @@ export interface PhysicalCount {
   isFinalized: boolean;
   finalizedBy?: string;
   finalizedAt?: Date;
+  items?: PhysicalCountItem[];
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy?: string;
 }
 
 /**
@@ -175,6 +180,11 @@ export interface SpotCheck {
   itemsChecked: number;
   discrepancies: number;
   notes?: string;
+  items?: SpotCheckItem[];
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy?: string;
 }
 
 /**

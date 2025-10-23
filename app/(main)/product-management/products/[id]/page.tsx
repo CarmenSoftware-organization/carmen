@@ -498,7 +498,7 @@ const mockProductList = [
     energyEfficiencyRating: 'B',
     sustainableCertification: 'NONE'
   }
-] as Product[];
+] as any as Product[];
 
 export default function ProductDetail({ params, searchParams }: ProductDetailProps) {
   const router = useRouter()
@@ -518,45 +518,52 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         const emptyProduct: Product = {
           id: '',
           productCode: '',
-          name: '',
+          productName: '',
+          displayName: '',
           description: '',
-          localDescription: '',
+          shortDescription: '',
+          productType: 'raw_material',
+          status: 'draft',
           categoryId: '',
-          categoryName: '',
-          subCategoryId: '',
-          subCategoryName: '',
-          itemGroupId: '',
-          itemGroupName: '',
-          primaryInventoryUnitId: '',
-          primaryUnitName: '',
-          size: '',
-          color: '',
-          barcode: '',
-          isActive: true,
-          basePrice: 0,
-          currency: 'THB',
-          taxType: 'VAT',
-          taxRate: 0,
-          standardCost: 0,
-          lastCost: 0,
-          priceDeviationLimit: 0,
-          quantityDeviationLimit: 0,
-          minStockLevel: 0,
-          maxStockLevel: 0,
-          isForSale: false,
-          isIngredient: false,
+          subcategoryId: '',
+          brandId: '',
+          manufacturerId: '',
+          specifications: [],
+          baseUnit: '',
+          alternativeUnits: [],
+          isInventoried: true,
+          isSerialTrackingRequired: false,
+          isBatchTrackingRequired: false,
+          shelfLifeDays: undefined,
+          storageConditions: '',
+          handlingInstructions: '',
+          isPurchasable: true,
+          isSellable: false,
+          defaultVendorId: '',
+          minimumOrderQuantity: 0,
+          maximumOrderQuantity: undefined,
+          standardOrderQuantity: undefined,
+          leadTimeDays: undefined,
+          standardCost: { amount: 0, currency: 'THB' },
+          lastPurchaseCost: { amount: 0, currency: 'THB' },
+          averageCost: { amount: 0, currency: 'THB' },
           weight: 0,
-          shelfLife: 0,
-          storageInstructions: '',
-          imagesUrl: '',
-          unitConversions: [],
-          // Environmental Impact Fields
-          carbonFootprint: 0,
-          waterUsage: 0,
-          packagingRecyclability: 0,
-          biodegradabilityMonths: 0,
-          energyEfficiencyRating: 'A',
-          sustainableCertification: 'NONE'
+          weightUnit: 'kg',
+          dimensions: undefined,
+          color: '',
+          material: '',
+          hazardousClassification: '',
+          regulatoryApprovals: [],
+          safetyDataSheetUrl: '',
+          images: [],
+          documents: [],
+          relatedProducts: [],
+          substitutes: [],
+          accessories: [],
+          keywords: [],
+          tags: [],
+          notes: '',
+          isActive: true
         }
         setProduct(emptyProduct)
         setEditedProduct(emptyProduct)
@@ -684,7 +691,7 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         if (!prev) return null
         return {
           ...prev,
-          unitConversions: [...prev.unitConversions, newConversion],
+          unitConversions: [...(prev.unitConversions || []), newConversion],
         }
       })
     } catch (error) {
@@ -705,7 +712,7 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         if (!prev) return null
         return {
           ...prev,
-          unitConversions: prev.unitConversions.map(conv =>
+          unitConversions: (prev.unitConversions || []).map(conv =>
             conv.id === conversionId ? { ...conv, [field]: value } : conv
           ),
         }
@@ -726,7 +733,7 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         if (!prev) return null
         return {
           ...prev,
-          unitConversions: prev.unitConversions.filter(conv => conv.id !== conversionId),
+          unitConversions: (prev.unitConversions || []).filter(conv => conv.id !== conversionId),
         }
       });
     } catch (error) {

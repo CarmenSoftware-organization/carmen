@@ -40,6 +40,7 @@ export interface Product {
   // Units and measurements
   baseUnit: string;
   alternativeUnits: ProductUnit[];
+  unitConversions?: ProductUnit[]; // Alternative name for unit conversions
   // Inventory settings
   isInventoried: boolean;
   isSerialTrackingRequired: boolean;

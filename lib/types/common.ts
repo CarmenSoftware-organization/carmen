@@ -86,6 +86,16 @@ export interface PaginationParams {
 }
 
 /**
+ * Pagination options for queries with sorting
+ */
+export interface PaginationOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
  * Pagination response wrapper
  */
 export interface PaginatedResponse<T> {
@@ -114,6 +124,38 @@ export interface SortConfig<T = any> {
 export interface FilterConfig {
   [key: string]: any;
 }
+
+// ====== SERVICE RESULT TYPES ======
+
+/**
+ * Standard service result wrapper for successful operations
+ */
+export interface ServiceSuccess<T> {
+  success: true;
+  data: T;
+  metadata?: {
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    [key: string]: any;
+  };
+}
+
+/**
+ * Standard service result wrapper for failed operations
+ */
+export interface ServiceError {
+  success: false;
+  error: string;
+  code?: string;
+  details?: any;
+}
+
+/**
+ * Generic service result type for all service methods
+ */
+export type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
 // ====== CONTACT INFORMATION ======
 

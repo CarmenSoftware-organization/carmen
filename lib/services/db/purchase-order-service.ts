@@ -245,7 +245,7 @@ export class PurchaseOrderService {
         })
       ])
 
-      const transformedOrders = purchaseOrders.map(dbOrder => this.transformDbPurchaseOrder(dbOrder))
+      const transformedOrders = purchaseOrders.map((dbOrder: any) => this.transformDbPurchaseOrder(dbOrder))
 
       return {
         success: true,
@@ -461,12 +461,12 @@ export class PurchaseOrderService {
       let itemsToConvert = request.items || []
       
       if (itemSelections && itemSelections.length > 0) {
-        itemsToConvert = itemsToConvert.filter(item => 
+        itemsToConvert = itemsToConvert.filter((item: PurchaseRequestItem) =>
           itemSelections.some(sel => sel.requestItemId === item.id)
         )
       }
 
-      const orderItems: CreatePurchaseOrderItemInput[] = itemsToConvert.map(item => {
+      const orderItems: CreatePurchaseOrderItemInput[] = itemsToConvert.map((item: PurchaseRequestItem) => {
         const selection = itemSelections?.find(sel => sel.requestItemId === item.id)
         
         return {
@@ -477,7 +477,7 @@ export class PurchaseOrderService {
           specification: item.specification,
           orderedQuantity: selection?.quantity || item.approvedQuantity || item.requestedQuantity,
           unit: item.unit,
-          unitPrice: selection?.unitPrice || item.approvedUnitPrice || item.estimatedUnitPrice || { amount: 0, currencyCode: vendor.preferredCurrency || 'USD' },
+          unitPrice: selection?.unitPrice || item.approvedUnitPrice || item.estimatedUnitPrice || { amount: 0, currency: vendor.preferredCurrency || 'USD' },
           deliveryDate: item.requiredDate,
           notes: item.notes,
           sourceRequestItemId: item.id
@@ -686,7 +686,7 @@ export class PurchaseOrderService {
       await this.db.$transaction(async (tx) => {
         // Process each received item
         for (const receiveItem of receiveInput.items) {
-          const orderItem = order.items.find(item => item.id === receiveItem.itemId)
+          const orderItem = order.items.find((item: any) => item.id === receiveItem.itemId)
           if (!orderItem) continue
 
           const newReceivedQty = orderItem.received_quantity + receiveItem.receivedQuantity
@@ -929,21 +929,21 @@ export class PurchaseOrderService {
       
       const stats = {
         total: valueStats._count.id,
-        byStatus: statusCounts.reduce((acc, item) => {
+        byStatus: statusCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.status] = item._count.status
           return acc
         }, {} as Record<string, number>),
-        byCurrency: currencyCounts.reduce((acc, item) => {
+        byCurrency: currencyCounts.reduce((acc: Record<string, number>, item: any) => {
           acc[item.currency] = item._count.currency
           return acc
         }, {} as Record<string, number>),
         totalValue: {
           amount: valueStats._sum.total_amount || 0,
-          currencyCode: 'USD' // Would be configurable
+          currency: 'USD' // Would be configurable
         },
         averageValue: {
           amount: valueStats._avg.total_amount || 0,
-          currencyCode: 'USD'
+          currency: 'USD'
         },
         onTimeDeliveryRate: totalDelivered > 0 ? (onTimeDeliveries / totalDelivered) * 100 : 0,
         pendingDeliveries,
@@ -1002,10 +1002,10 @@ export class PurchaseOrderService {
     })
 
     return {
-      subtotal: { amount: subtotal, currencyCode: items[0]?.unitPrice.currencyCode || 'USD' },
-      discountAmount: { amount: totalDiscount, currencyCode: items[0]?.unitPrice.currencyCode || 'USD' },
-      taxAmount: { amount: totalTax, currencyCode: items[0]?.unitPrice.currencyCode || 'USD' },
-      totalAmount: { amount: subtotal - totalDiscount + totalTax, currencyCode: items[0]?.unitPrice.currencyCode || 'USD' }
+      subtotal: { amount: subtotal, currency: items[0]?.unitPrice.currency || 'USD' },
+      discountAmount: { amount: totalDiscount, currency: items[0]?.unitPrice.currency || 'USD' },
+      taxAmount: { amount: totalTax, currency: items[0]?.unitPrice.currency || 'USD' },
+      totalAmount: { amount: subtotal - totalDiscount + totalTax, currency: items[0]?.unitPrice.currency || 'USD' }
     }
   }
 
@@ -1026,10 +1026,10 @@ export class PurchaseOrderService {
     })
 
     return {
-      subtotal: { amount: subtotal, currencyCode: 'USD' },
-      discountAmount: { amount: totalDiscount, currencyCode: 'USD' },
-      taxAmount: { amount: totalTax, currencyCode: 'USD' },
-      totalAmount: { amount: subtotal - totalDiscount + totalTax, currencyCode: 'USD' }
+      subtotal: { amount: subtotal, currency: 'USD' },
+      discountAmount: { amount: totalDiscount, currency: 'USD' },
+      taxAmount: { amount: totalTax, currency: 'USD' },
+      totalAmount: { amount: subtotal - totalDiscount + totalTax, currency: 'USD' }
     }
   }
 
@@ -1118,21 +1118,21 @@ export class PurchaseOrderService {
       unit: item.unit,
       unitPrice: {
         amount: item.unit_price,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       discount: item.discount,
       discountAmount: {
         amount: item.discount_amount,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       lineTotal: {
         amount: item.line_total,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       taxRate: item.tax_rate,
       taxAmount: {
         amount: item.tax_amount,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       deliveryDate: item.delivery_date,
       status: item.status as 'pending' | 'partial_received' | 'fully_received' | 'cancelled',
@@ -1154,19 +1154,19 @@ export class PurchaseOrderService {
       exchangeRate: dbOrder.exchange_rate,
       subtotal: {
         amount: dbOrder.subtotal,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       taxAmount: {
         amount: dbOrder.tax_amount,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       discountAmount: {
         amount: dbOrder.discount_amount,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       totalAmount: {
         amount: dbOrder.total_amount,
-        currencyCode: dbOrder.currency
+        currency: dbOrder.currency
       },
       deliveryLocationId: dbOrder.delivery_location_id,
       expectedDeliveryDate: dbOrder.expected_delivery_date,

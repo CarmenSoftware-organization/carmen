@@ -3,6 +3,14 @@
  * Comprehensive monitoring, observability, and alerting system
  */
 
+// Import service instances for internal use
+import { performanceMonitor as perfMonitor } from './performance'
+import { businessMetricsTracker as bizTracker } from './business-metrics'
+import { logger as loggerInstance } from './logger'
+import { errorTracker as errTracker } from './error-tracking'
+import { infrastructureMonitor as infraMonitor } from './infrastructure-monitoring'
+import { alertManager as alertMgr, createAlert as createAlertFn } from './alert-manager'
+
 // Configuration
 export { 
   getMonitoringConfig,
@@ -119,7 +127,7 @@ export function initializeMonitoring(config: {
 
   // Set user context for error tracking
   if (enabledServices.errorTracking && userId) {
-    errorTracker.setUser({
+    errTracker.setUser({
       id: userId,
       email: userEmail,
       username: userEmail,
@@ -127,11 +135,11 @@ export function initializeMonitoring(config: {
     })
 
     // Set environment context
-    errorTracker.setTag('environment', environment)
+    errTracker.setTag('environment', environment)
   }
 
   // Log initialization
-  logger.info('Monitoring system initialized', {
+  loggerInstance.info('Monitoring system initialized', {
     userId,
     environment,
     enabledServices,
@@ -139,12 +147,12 @@ export function initializeMonitoring(config: {
   })
 
   return {
-    performanceMonitor,
-    businessMetricsTracker,
-    errorTracker,
-    infrastructureMonitor,
-    alertManager,
-    logger
+    performanceMonitor: perfMonitor,
+    businessMetricsTracker: bizTracker,
+    errorTracker: errTracker,
+    infrastructureMonitor: infraMonitor,
+    alertManager: alertMgr,
+    logger: loggerInstance
   }
 }
 
@@ -180,10 +188,10 @@ export function setupProductionMonitoring(config: {
 // Health check utilities
 export async function getSystemHealth() {
   try {
-    const healthStatus = await infrastructureMonitor.getHealthStatus()
-    const systemMetrics = infrastructureMonitor.getSystemMetrics(1)
-    const activeAlerts = infrastructureMonitor.getActiveAlerts()
-    
+    const healthStatus = await infraMonitor.getHealthStatus()
+    const systemMetrics = infraMonitor.getSystemMetrics(1)
+    const activeAlerts = infraMonitor.getActiveAlerts()
+
     return {
       status: healthStatus.overall,
       checks: healthStatus.checks,
@@ -192,7 +200,7 @@ export async function getSystemHealth() {
       timestamp: new Date().toISOString()
     }
   } catch (error) {
-    logger.error('Failed to get system health', { error })
+    loggerInstance.error('Failed to get system health', { error })
     return {
       status: 'error',
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -208,14 +216,14 @@ export function measurePerformance<T>(
   context?: Record<string, any>
 ): T | Promise<T> {
   if (fn.constructor.name === 'AsyncFunction') {
-    return performanceMonitor.measureAsync(name, fn as () => Promise<T>, context)
+    return perfMonitor.measureAsync(name, fn as () => Promise<T>, context)
   } else {
     const startTime = performance.now()
     try {
       const result = fn()
       const duration = performance.now() - startTime
-      
-      performanceMonitor.recordMetric({
+
+      perfMonitor.recordMetric({
         name: `sync_operation_${name}`,
         value: duration,
         unit: 'ms',
@@ -223,12 +231,12 @@ export function measurePerformance<T>(
         context,
         tags: ['sync', 'operation', 'success']
       })
-      
+
       return result
     } catch (error) {
       const duration = performance.now() - startTime
-      
-      performanceMonitor.recordMetric({
+
+      perfMonitor.recordMetric({
         name: `sync_operation_${name}`,
         value: duration,
         unit: 'ms',
@@ -236,7 +244,7 @@ export function measurePerformance<T>(
         context: { ...context, error: String(error) },
         tags: ['sync', 'operation', 'error']
       })
-      
+
       throw error
     }
   }
@@ -244,7 +252,7 @@ export function measurePerformance<T>(
 
 // Business metrics utilities
 export function trackUserJourney(journeyName: string, steps: string[], userId?: string) {
-  const workflowId = businessMetricsTracker.startWorkflow(journeyName, 'user-journey', {
+  const workflowId = bizTracker.startWorkflow(journeyName, 'user-journey', {
     userId,
     metadata: { plannedSteps: steps }
   })
@@ -254,23 +262,23 @@ export function trackUserJourney(journeyName: string, steps: string[], userId?: 
   return {
     nextStep: (data?: Record<string, any>) => {
       if (currentStepIndex > 0) {
-        businessMetricsTracker.completeWorkflowStep(
-          workflowId, 
-          steps[currentStepIndex - 1], 
+        bizTracker.completeWorkflowStep(
+          workflowId,
+          steps[currentStepIndex - 1],
           'completed'
         )
       }
-      
+
       if (currentStepIndex < steps.length) {
-        businessMetricsTracker.addWorkflowStep(workflowId, steps[currentStepIndex], data)
+        bizTracker.addWorkflowStep(workflowId, steps[currentStepIndex], data)
         currentStepIndex++
       }
     },
     skipStep: (reason?: string) => {
       if (currentStepIndex > 0) {
-        businessMetricsTracker.completeWorkflowStep(
-          workflowId, 
-          steps[currentStepIndex - 1], 
+        bizTracker.completeWorkflowStep(
+          workflowId,
+          steps[currentStepIndex - 1],
           'skipped'
         )
         currentStepIndex++
@@ -278,26 +286,26 @@ export function trackUserJourney(journeyName: string, steps: string[], userId?: 
     },
     failStep: (error: string) => {
       if (currentStepIndex > 0) {
-        businessMetricsTracker.completeWorkflowStep(
-          workflowId, 
-          steps[currentStepIndex - 1], 
+        bizTracker.completeWorkflowStep(
+          workflowId,
+          steps[currentStepIndex - 1],
           'failed'
         )
       }
-      businessMetricsTracker.completeWorkflow(workflowId, 'failed')
+      bizTracker.completeWorkflow(workflowId, 'failed')
     },
     complete: () => {
       if (currentStepIndex > 0) {
-        businessMetricsTracker.completeWorkflowStep(
-          workflowId, 
-          steps[currentStepIndex - 1], 
+        bizTracker.completeWorkflowStep(
+          workflowId,
+          steps[currentStepIndex - 1],
           'completed'
         )
       }
-      businessMetricsTracker.completeWorkflow(workflowId, 'completed')
+      bizTracker.completeWorkflow(workflowId, 'completed')
     },
     abandon: () => {
-      businessMetricsTracker.completeWorkflow(workflowId, 'abandoned')
+      bizTracker.completeWorkflow(workflowId, 'abandoned')
     }
   }
 }
@@ -309,7 +317,7 @@ export function createSystemAlert(
   threshold: number,
   severity: 'critical' | 'warning' | 'info' = 'warning'
 ) {
-  return createAlert(
+  return createAlertFn(
     `${metric} threshold exceeded`,
     `${metric} is ${currentValue}, which exceeds the threshold of ${threshold}`,
     severity,
@@ -319,31 +327,4 @@ export function createSystemAlert(
     threshold,
     { metric, source: 'automated' }
   )
-}
-
-// Export types for consumers
-export type {
-  MonitoringConfig,
-  BusinessEvent,
-  UserSession,
-  WorkflowExecution,
-  KPI,
-  FeatureUsage,
-  BusinessMetricsData,
-  LogLevel,
-  LogEntry,
-  LoggerConfig,
-  ErrorEvent,
-  UserContext,
-  PerformanceMetrics,
-  HealthCheckResult,
-  SystemMetrics,
-  DatabaseMetrics,
-  ServiceHealthStatus,
-  AlertRule,
-  Alert,
-  NotificationChannel,
-  EscalationPolicy,
-  Silence,
-  RequestContext
 }

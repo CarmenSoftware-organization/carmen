@@ -5,16 +5,17 @@
  * and variance analysis with comprehensive audit trails.
  */
 
-import { prisma, type PrismaClient } from '@/lib/db'
+import { prisma } from '@/lib/db'
+import type { PrismaClient } from '@prisma/client'
 import { inventoryService } from './inventory-service'
-import type { 
+import type {
   PhysicalCount,
   PhysicalCountItem,
   PhysicalCountStatus,
   SpotCheck,
-  SpotCheckItem,
-  TransactionType
+  SpotCheckItem
 } from '@/lib/types/inventory'
+import { TransactionType } from '@/lib/types/inventory'
 import type { Money } from '@/lib/types/common'
 
 /**
@@ -153,7 +154,7 @@ export interface PaginationOptions {
 }
 
 export class PhysicalCountService {
-  private db: PrismaClient
+  private db: any
 
   constructor(prismaClient?: PrismaClient) {
     this.db = prismaClient || prisma
@@ -171,20 +172,20 @@ export class PhysicalCountService {
       
       if (input.countType === 'full') {
         // Get all active items in the location
-        const itemBalances = await this.db.stock_balances.findMany({
+        const itemBalances = await (this.db as any).stock_balances.findMany({
           where: {
             location_id: input.locationId,
             quantity_on_hand: { gt: 0 }
           },
           select: { item_id: true }
         })
-        itemsToCount = itemBalances.map(b => b.item_id)
+        itemsToCount = itemBalances.map((b: any) => b.item_id)
       } else if (input.countType === 'cycle' && input.itemIds) {
         // Use specified items for cycle count
         itemsToCount = input.itemIds
       } else if (input.countType === 'spot') {
         // Random selection for spot count
-        const itemBalances = await this.db.stock_balances.findMany({
+        const itemBalances = await (this.db as any).stock_balances.findMany({
           where: {
             location_id: input.locationId,
             quantity_on_hand: { gt: 0 }
@@ -192,10 +193,10 @@ export class PhysicalCountService {
           select: { item_id: true },
           take: 20 // Random sample
         })
-        itemsToCount = itemBalances.map(b => b.item_id)
+        itemsToCount = itemBalances.map((b: any) => b.item_id)
       }
 
-      const dbCount = await this.db.physical_counts.create({
+      const dbCount = await (this.db as any).physical_counts.create({
         data: {
           count_number: countNumber,
           count_date: input.countDate,
@@ -225,7 +226,7 @@ export class PhysicalCountService {
           const balance = await inventoryService.getStockBalance(itemId, input.locationId)
           const expectedQuantity = balance.data?.quantityOnHand || 0
 
-          return this.db.physical_count_items.create({
+          return (this.db as any).physical_count_items.create({
             data: {
               id: `pci-${dbCount.id}-${index}`,
               count_id: dbCount.id,
@@ -263,7 +264,7 @@ export class PhysicalCountService {
    */
   async startPhysicalCount(countId: string, startedBy: string): Promise<ServiceResult<PhysicalCount>> {
     try {
-      const dbCount = await this.db.physical_counts.findUnique({
+      const dbCount = await (this.db as any).physical_counts.findUnique({
         where: { id: countId },
         include: { physical_count_items: true }
       })
@@ -282,7 +283,7 @@ export class PhysicalCountService {
         }
       }
 
-      const updatedCount = await this.db.physical_counts.update({
+      const updatedCount = await (this.db as any).physical_counts.update({
         where: { id: countId },
         data: {
           status: 'in_progress',
@@ -316,7 +317,7 @@ export class PhysicalCountService {
     input: UpdatePhysicalCountItemInput
   ): Promise<ServiceResult<PhysicalCountItem>> {
     try {
-      const countItem = await this.db.physical_count_items.findFirst({
+      const countItem = await (this.db as any).physical_count_items.findFirst({
         where: {
           count_id: countId,
           item_id: itemId
@@ -337,7 +338,7 @@ export class PhysicalCountService {
       // Determine status based on variance
       const status = variance === 0 ? 'counted' : 'variance'
 
-      const updatedItem = await this.db.physical_count_items.update({
+      const updatedItem = await (this.db as any).physical_count_items.update({
         where: { id: countItem.id },
         data: {
           counted_quantity: input.countedQuantity,
@@ -373,7 +374,7 @@ export class PhysicalCountService {
    */
   async completePhysicalCount(countId: string, completedBy: string): Promise<ServiceResult<PhysicalCount>> {
     try {
-      const dbCount = await this.db.physical_counts.findUnique({
+      const dbCount = await (this.db as any).physical_counts.findUnique({
         where: { id: countId },
         include: { physical_count_items: true }
       })
@@ -393,7 +394,7 @@ export class PhysicalCountService {
       }
 
       // Check if all items are counted
-      const pendingItems = dbCount.physical_count_items.filter(item => 
+      const pendingItems = dbCount.physical_count_items.filter((item: any) =>
         item.status === 'pending'
       )
 
@@ -404,7 +405,7 @@ export class PhysicalCountService {
         }
       }
 
-      const updatedCount = await this.db.physical_counts.update({
+      const updatedCount = await (this.db as any).physical_counts.update({
         where: { id: countId },
         data: {
           status: 'completed',
@@ -434,7 +435,7 @@ export class PhysicalCountService {
    */
   async finalizePhysicalCount(countId: string, finalizedBy: string): Promise<ServiceResult<PhysicalCount>> {
     try {
-      const dbCount = await this.db.physical_counts.findUnique({
+      const dbCount = await (this.db as any).physical_counts.findUnique({
         where: { id: countId },
         include: { physical_count_items: true }
       })
@@ -465,7 +466,7 @@ export class PhysicalCountService {
             locationId: dbCount.location_id,
             transactionType,
             quantity: Math.abs(item.variance),
-            unitCost: { amount: 10, currencyCode: 'USD' }, // Simplified - should use actual cost
+            unitCost: { amount: 10, currency: 'USD' }, // Simplified - should use actual cost
             referenceNo: dbCount.count_number,
             referenceType: 'PHYSICAL_COUNT',
             notes: `Physical count variance adjustment: ${item.comments || ''}`,
@@ -474,7 +475,7 @@ export class PhysicalCountService {
         }
       }
 
-      const updatedCount = await this.db.physical_counts.update({
+      const updatedCount = await (this.db as any).physical_counts.update({
         where: { id: countId },
         data: {
           status: 'finalized',
@@ -508,7 +509,7 @@ export class PhysicalCountService {
     try {
       const checkNumber = input.checkNumber || await this.generateSpotCheckNumber()
 
-      const dbSpotCheck = await this.db.spot_checks.create({
+      const dbSpotCheck = await (this.db as any).spot_checks.create({
         data: {
           check_number: checkNumber,
           check_date: input.checkDate,
@@ -534,7 +535,7 @@ export class PhysicalCountService {
           const balance = await inventoryService.getStockBalance(itemId, input.locationId)
           const expectedQuantity = balance.data?.quantityOnHand || 0
 
-          return this.db.spot_check_items.create({
+          return (this.db as any).spot_check_items.create({
             data: {
               id: `sci-${dbSpotCheck.id}-${index}`,
               spot_check_id: dbSpotCheck.id,
@@ -573,7 +574,7 @@ export class PhysicalCountService {
     input: UpdateSpotCheckItemInput
   ): Promise<ServiceResult<SpotCheckItem>> {
     try {
-      const spotCheckItem = await this.db.spot_check_items.findFirst({
+      const spotCheckItem = await (this.db as any).spot_check_items.findFirst({
         where: {
           spot_check_id: spotCheckId,
           item_id: itemId
@@ -590,7 +591,7 @@ export class PhysicalCountService {
       const variance = input.actualQuantity - spotCheckItem.expected_quantity
       const status = variance === 0 ? 'checked' : 'discrepancy'
 
-      const updatedItem = await this.db.spot_check_items.update({
+      const updatedItem = await (this.db as any).spot_check_items.update({
         where: { id: spotCheckItem.id },
         data: {
           actual_quantity: input.actualQuantity,
@@ -624,7 +625,7 @@ export class PhysicalCountService {
    */
   async generateVarianceAnalysis(countId: string): Promise<ServiceResult<VarianceAnalysis[]>> {
     try {
-      const count = await this.db.physical_counts.findUnique({
+      const count = await (this.db as any).physical_counts.findUnique({
         where: { id: countId },
         include: {
           physical_count_items: {
@@ -643,8 +644,8 @@ export class PhysicalCountService {
       }
 
       const analysis: VarianceAnalysis[] = count.physical_count_items
-        .filter(item => item.variance !== 0)
-        .map(item => {
+        .filter((item: any) => item.variance !== 0)
+        .map((item: any) => {
           const variancePercentage = item.expected_quantity === 0 
             ? 100 
             : Math.abs(item.variance / item.expected_quantity) * 100
@@ -680,14 +681,14 @@ export class PhysicalCountService {
             variancePercentage: Math.round(variancePercentage * 100) / 100,
             varianceValue: {
               amount: item.variance_value_amount,
-              currencyCode: item.variance_value_currency
+              currency: item.variance_value_currency
             },
             varianceType,
             possibleCauses,
             recommendations
           }
         })
-        .sort((a, b) => Math.abs(b.varianceValue.amount) - Math.abs(a.varianceValue.amount))
+        .sort((a: VarianceAnalysis, b: VarianceAnalysis) => Math.abs(b.varianceValue.amount) - Math.abs(a.varianceValue.amount))
 
       return {
         success: true,
@@ -714,21 +715,21 @@ export class PhysicalCountService {
       }
 
       const [counts, statusCounts, locationCounts, typeCounts] = await Promise.all([
-        this.db.physical_counts.findMany({
+        (this.db as any).physical_counts.findMany({
           where: whereClause,
           include: { physical_count_items: true }
         }),
-        this.db.physical_counts.groupBy({
+        (this.db as any).physical_counts.groupBy({
           by: ['status'],
           where: whereClause,
           _count: { status: true }
         }),
-        this.db.physical_counts.groupBy({
+        (this.db as any).physical_counts.groupBy({
           by: ['location_id'],
           where: whereClause,
           _count: { location_id: true }
         }),
-        this.db.physical_counts.groupBy({
+        (this.db as any).physical_counts.groupBy({
           by: ['count_type'],
           where: whereClause,
           _count: { count_type: true }
@@ -736,33 +737,33 @@ export class PhysicalCountService {
       ])
 
       const totalCounts = counts.length
-      const completedCounts = statusCounts.find(s => s.status === 'completed')?._count.status || 0
-      const pendingCounts = statusCounts.find(s => s.status === 'planning')?._count.status || 0
+      const completedCounts = statusCounts.find((s: any) => s.status === 'completed')?._count.status || 0
+      const pendingCounts = statusCounts.find((s: any) => s.status === 'planning')?._count.status || 0
 
-      const totalVarianceValue = counts.reduce((sum, count) => 
+      const totalVarianceValue = counts.reduce((sum: number, count: any) =>
         sum + count.total_variance_value_amount, 0
       )
 
-      const totalVariance = {
+      const totalVariance: Money = {
         amount: totalVarianceValue,
-        currencyCode: 'USD'
+        currency: 'USD'
       }
 
       // Calculate accuracy
-      const totalItemsExpected = counts.reduce((sum, count) => sum + count.total_items, 0)
-      const totalItemsAccurate = counts.reduce((sum, count) => 
+      const totalItemsExpected = counts.reduce((sum: number, count: any) => sum + count.total_items, 0)
+      const totalItemsAccurate = counts.reduce((sum: number, count: any) =>
         sum + (count.total_items - count.discrepancies_found), 0
       )
       const averageAccuracy = totalItemsExpected > 0 
         ? (totalItemsAccurate / totalItemsExpected) * 100 
         : 0
 
-      const countsByLocation = locationCounts.reduce((acc, item) => {
+      const countsByLocation = locationCounts.reduce((acc: Record<string, number>, item: any) => {
         acc[item.location_id] = item._count.location_id
         return acc
       }, {} as Record<string, number>)
 
-      const countsByType = typeCounts.reduce((acc, item) => {
+      const countsByType = typeCounts.reduce((acc: Record<string, number>, item: any) => {
         acc[item.count_type] = item._count.count_type
         return acc
       }, {} as Record<string, number>)
@@ -794,15 +795,15 @@ export class PhysicalCountService {
    * Update count statistics
    */
   private async updateCountStatistics(countId: string): Promise<void> {
-    const items = await this.db.physical_count_items.findMany({
+    const items = await (this.db as any).physical_count_items.findMany({
       where: { count_id: countId }
     })
 
-    const itemsCounted = items.filter(item => item.status !== 'pending').length
-    const discrepancies = items.filter(item => item.status === 'variance').length
-    const totalVariance = items.reduce((sum, item) => sum + Math.abs(item.variance_value_amount), 0)
+    const itemsCounted = items.filter((item: any) => item.status !== 'pending').length
+    const discrepancies = items.filter((item: any) => item.status === 'variance').length
+    const totalVariance = items.reduce((sum: number, item: any) => sum + Math.abs(item.variance_value_amount), 0)
 
-    await this.db.physical_counts.update({
+    await (this.db as any).physical_counts.update({
       where: { id: countId },
       data: {
         items_counted: itemsCounted,
@@ -817,14 +818,14 @@ export class PhysicalCountService {
    * Update spot check statistics
    */
   private async updateSpotCheckStatistics(spotCheckId: string): Promise<void> {
-    const items = await this.db.spot_check_items.findMany({
+    const items = await (this.db as any).spot_check_items.findMany({
       where: { spot_check_id: spotCheckId }
     })
 
-    const itemsChecked = items.filter(item => item.status !== 'pending').length
-    const discrepancies = items.filter(item => item.status === 'discrepancy').length
+    const itemsChecked = items.filter((item: any) => item.status !== 'pending').length
+    const discrepancies = items.filter((item: any) => item.status === 'discrepancy').length
 
-    await this.db.spot_checks.update({
+    await (this.db as any).spot_checks.update({
       where: { id: spotCheckId },
       data: {
         items_checked: itemsChecked,
@@ -881,7 +882,7 @@ export class PhysicalCountService {
       discrepanciesFound: dbCount.discrepancies_found,
       totalVarianceValue: {
         amount: dbCount.total_variance_value_amount,
-        currencyCode: dbCount.total_variance_value_currency
+        currency: dbCount.total_variance_value_currency
       },
       notes: dbCount.notes || undefined,
       isFinalized: dbCount.is_finalized,
@@ -908,7 +909,7 @@ export class PhysicalCountService {
       variance: dbItem.variance,
       varianceValue: {
         amount: dbItem.variance_value_amount,
-        currencyCode: dbItem.variance_value_currency
+        currency: dbItem.variance_value_currency
       },
       reasonCode: dbItem.reason_code || undefined,
       comments: dbItem.comments || undefined,
