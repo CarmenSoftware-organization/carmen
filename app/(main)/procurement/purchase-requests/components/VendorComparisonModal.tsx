@@ -117,7 +117,7 @@ export function VendorComparisonModal({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <DollarSign className="w-5 h-5" />
-            <span>Vendor Comparison - {prItem.name}</span>
+            <span>Vendor Comparison - {(prItem as any).name}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -236,7 +236,7 @@ export function VendorComparisonModal({
                               ${vendor.totalCost.toFixed(2)}
                             </span>
                             <p className="text-sm text-gray-500">
-                              Qty: {prItem.quantityRequested}
+                              Qty: {(prItem as any).quantityRequested}
                             </p>
                           </TableCell>
                           <TableCell>
