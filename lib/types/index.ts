@@ -20,11 +20,8 @@ export * from './common'
 export type {
   User,
   Role,
-  Permission,
   Department,
-  Location,
-  UserRole,
-  DepartmentType
+  Location
 } from './user'
 
 // Inventory management types
@@ -44,7 +41,6 @@ export type {
   PurchaseOrderItem,
   PurchaseOrderTerms,
   GoodsReceiveNote,
-  GRNItemStatus,
   PRType,
   WorkflowStage,
   Requestor
@@ -108,8 +104,6 @@ export * from './menu-engineering'
 // NOTE: Exclude FileAttachment (already exported from common.ts)
 export type {
   POSTransaction,
-  POSSyncStatus,
-  POSErrorLog,
   ErrorCategory
 } from './pos-integration'
 
@@ -122,8 +116,7 @@ export * from './fractional-inventory'
 // Enhanced PR types
 // NOTE: Exclude Currency (from finance), VendorComparison (from price-management)
 export type {
-  EnhancedPRItem,
-  EnhancedPRWorkflowStage
+  EnhancedPRItem
 } from './enhanced-pr-types'
 
 // Enhanced consumption tracking
@@ -141,8 +134,8 @@ export * from './hotel'
 // Campaign management types
 // NOTE: Exclude VendorFilters (from vendor-price-management)
 export type {
-  CampaignVendor,
-  CampaignMetrics
+  CampaignVendorStatus,
+  CampaignAnalytics
 } from './campaign-management'
 
 // Business rules types (PRIMARY SOURCE for BusinessRule, RuleAction, RuleCondition)
@@ -152,17 +145,17 @@ export * from './business-rules'
 // NOTE: Exclude BusinessRule, RuleAction, RuleCondition (from business-rules)
 // NOTE: Exclude Currency (from finance), ProductCategory (from product), VendorComparison (exported from enhanced-pr-types)
 export type {
-  PriceManagementDashboard,
-  VendorPriceHistory,
-  PriceAnalytics,
-  ContractPricing
+  VendorComparison,
+  ComparisonMetrics,
+  PriceAssignmentContext,
+  VendorPriceOption,
+  PriceAssignmentResult
 } from './price-management'
 
 // Vendor price management
 // NOTE: Exclude ApiResponse, SortConfig (from common), NotificationSettings (from settings), VendorStatus (from vendor)
 export type {
-  VendorPriceComparison,
-  PriceUpdateRequest,
+  VendorPriceManagement,
   VendorFilters
 } from './vendor-price-management'
 

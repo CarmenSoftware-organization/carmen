@@ -13,6 +13,17 @@ import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { createSecurityAuditLog, SecurityEventType } from '@/lib/security/audit-logger'
 import type { Role } from '@/lib/types/user'
 
+// Role name type - string union of all possible role names
+export type RoleName =
+  | 'super-admin'
+  | 'admin'
+  | 'financial-manager'
+  | 'department-manager'
+  | 'purchasing-staff'
+  | 'chef'
+  | 'counter'
+  | 'staff'
+
 // Permission Schema
 const permissionSchema = z.object({
   action: z.enum([
@@ -101,7 +112,7 @@ export interface AuthorizationResult {
 /**
  * Role Definitions with Hierarchical Structure
  */
-export const ROLE_HIERARCHY: Record<Role, number> = {
+export const ROLE_HIERARCHY: Record<RoleName, number> = {
   'super-admin': 100,
   'admin': 90,
   'financial-manager': 80,
@@ -116,7 +127,7 @@ export const ROLE_HIERARCHY: Record<Role, number> = {
  * Default Role Permissions
  * Each role inherits permissions from lower-level roles
  */
-export const DEFAULT_ROLE_PERMISSIONS: Record<Role, string[]> = {
+export const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
   'super-admin': [
     '*:*', // Full access to everything
   ],
@@ -265,7 +276,7 @@ export class RBACAuthorization {
       })
 
       // Super admin bypass
-      if (user.role === 'super-admin') {
+      if ((user.role as unknown as string) === 'super-admin') {
         return { allowed: true, reason: 'Super admin access' }
       }
 
@@ -390,13 +401,18 @@ export class RBACAuthorization {
    */
   private getRolePermissions(role: Role): string[] {
     const permissions = new Set<string>()
-    const roleLevel = ROLE_HIERARCHY[role]
+    const roleName = (role as unknown as string) as RoleName
+    const roleLevel = ROLE_HIERARCHY[roleName]
+
+    if (roleLevel === undefined) {
+      return []
+    }
 
     // Add permissions from current role and all lower roles
-    for (const [roleName, level] of Object.entries(ROLE_HIERARCHY)) {
+    for (const [name, level] of Object.entries(ROLE_HIERARCHY) as [RoleName, number][]) {
       if (level <= roleLevel) {
-        const rolePerms = DEFAULT_ROLE_PERMISSIONS[roleName as Role] || []
-        rolePerms.forEach(perm => permissions.add(perm))
+        const rolePerms = DEFAULT_ROLE_PERMISSIONS[name] || []
+        rolePerms.forEach((perm: string) => permissions.add(perm))
       }
     }
 
@@ -424,7 +440,7 @@ export class RBACAuthorization {
     resourceId?: string
   ): Promise<AuthorizationResult> {
     // Only allow read access hierarchically for user management
-    if (resource === 'users' && action === 'read' && user.role === 'department-manager') {
+    if (resource === 'users' && action === 'read' && (user.role as unknown as string) === 'department-manager') {
       return {
         allowed: true,
         reason: 'Department manager hierarchical access',
@@ -453,15 +469,15 @@ export class RBACAuthorization {
     // 5. Check financial limits
 
     // Example condition checks:
-    if (user.role === 'department-manager') {
+    if ((user.role as unknown as string) === 'department-manager') {
       // Department managers can only access their department's resources
       const conditions = ['department_only']
-      
+
       if (resource === 'purchase_requests' && action === 'approve') {
         // Additional condition: only approve requests under certain amount
         conditions.push('under_limit')
       }
-      
+
       return {
         allowed: true,
         conditions,
@@ -469,7 +485,7 @@ export class RBACAuthorization {
       }
     }
 
-    if (user.role === 'staff' && resource === 'purchase_requests') {
+    if ((user.role as unknown as string) === 'staff' && resource === 'purchase_requests') {
       // Staff can only see their own purchase requests
       return {
         allowed: true,
@@ -503,15 +519,19 @@ export class RBACAuthorization {
   /**
    * Get required role for action on resource
    */
-  getRequiredRole(action: string, resource: string): Role | null {
+  getRequiredRole(action: string, resource: string): RoleName | null {
     // Check which is the lowest role that has this permission
-    for (const [role, level] of Object.entries(ROLE_HIERARCHY).sort(([,a], [,b]) => a - b)) {
-      const permissions = this.getRolePermissions(role as Role)
+    const sortedRoles = Object.entries(ROLE_HIERARCHY).sort(
+      ([, a], [, b]) => (a as number) - (b as number)
+    ) as [RoleName, number][]
+
+    for (const [roleName] of sortedRoles) {
+      const permissions = this.getRolePermissions(roleName as unknown as Role)
       if (this.checkRolePermission(permissions, action, resource)) {
-        return role as Role
+        return roleName
       }
     }
-    
+
     return null
   }
 }

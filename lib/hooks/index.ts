@@ -58,28 +58,3 @@ export {
   useUserContext,
   usePriceManagementPermissions
 } from './use-price-management-permissions'
-
-// Default exports
-export default {
-  // Permission Management
-  usePermission,
-  useBulkPermissions,
-  useUserPermissions,
-  usePermissionCache,
-  useHasPermission,
-  useResourcePermissions,
-  
-  // Enhanced ABAC Permissions
-  useEnhancedPermission,
-  useUserAttributes,
-  useEnhancedBulkPermissions,
-  useHasEnhancedPermission,
-  useEnhancedResourcePermissions,
-  usePermissionAnalytics,
-  
-  // Price Management  
-  usePricePermission,
-  usePricePermissions,
-  usePriceUIPermissions,
-  useVendorPermissions,
-}

@@ -6,9 +6,9 @@
  */
 
 // Core inventory services
-export { 
+export {
   ComprehensiveInventoryService,
-  comprehensiveInventoryService 
+  comprehensiveInventoryService
 } from './comprehensive-inventory-service'
 
 export {
@@ -27,6 +27,32 @@ export {
 } from './physical-count-service'
 
 export {
+  InventoryIntegrationService,
+  inventoryIntegrationService
+} from './inventory-integration-service'
+
+// Import instances and classes for local use
+import {
+  ComprehensiveInventoryService,
+  comprehensiveInventoryService
+} from './comprehensive-inventory-service'
+
+import {
+  StockMovementManagementService,
+  stockMovementService
+} from './stock-movement-management-service'
+
+import {
+  InventoryAnalyticsService,
+  inventoryAnalyticsService
+} from './inventory-analytics-service'
+
+import {
+  PhysicalCountService,
+  physicalCountService
+} from './physical-count-service'
+
+import {
   InventoryIntegrationService,
   inventoryIntegrationService
 } from './inventory-integration-service'
@@ -76,6 +102,9 @@ export type {
   ProcurementIntegrationResult,
   VendorInventoryPerformance
 } from './inventory-integration-service'
+
+// Import type separately for use in function signature
+import type { InventoryIntegrationConfig } from './inventory-integration-service'
 
 // Service factory function for custom configurations
 export function createInventoryServices(config?: {
@@ -171,24 +200,30 @@ export async function checkInventoryServicesHealth(): Promise<{
     errors?: string[]
   }[]
 }> {
-  const services = []
+  const services: {
+    name: string
+    status: 'up' | 'down' | 'degraded'
+    responseTime?: number
+    lastCheck: Date
+    errors?: string[]
+  }[] = []
   let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
 
   // Check comprehensive inventory service
   try {
     const startTime = Date.now()
-    const statsResult = await comprehensiveInventoryService.getInventoryStatistics()
+    const kpisResult = await comprehensiveInventoryService.generateInventoryKPIs()
     const responseTime = Date.now() - startTime
-    
+
     services.push({
       name: 'comprehensive-inventory',
-      status: statsResult.success ? 'up' : 'degraded',
+      status: kpisResult.success ? 'up' : 'degraded',
       responseTime,
       lastCheck: new Date(),
-      errors: statsResult.success ? undefined : [statsResult.error || 'Unknown error']
+      errors: kpisResult.success ? undefined : [kpisResult.error || 'Unknown error']
     })
-    
-    if (!statsResult.success) {
+
+    if (!kpisResult.success) {
       overallStatus = 'degraded'
     }
   } catch (error) {
@@ -204,18 +239,18 @@ export async function checkInventoryServicesHealth(): Promise<{
   // Check analytics service
   try {
     const startTime = Date.now()
-    const kpisResult = await inventoryAnalyticsService.generateInventoryKPIs(30)
+    const dashboardResult = await inventoryAnalyticsService.generatePerformanceDashboard()
     const responseTime = Date.now() - startTime
-    
+
     services.push({
       name: 'inventory-analytics',
-      status: kpisResult.success ? 'up' : 'degraded',
+      status: dashboardResult.success ? 'up' : 'degraded',
       responseTime,
       lastCheck: new Date(),
-      errors: kpisResult.success ? undefined : [kpisResult.error || 'Unknown error']
+      errors: dashboardResult.success ? undefined : [dashboardResult.error || 'Unknown error']
     })
-    
-    if (!kpisResult.success && overallStatus === 'healthy') {
+
+    if (!dashboardResult.success && overallStatus === 'healthy') {
       overallStatus = 'degraded'
     }
   } catch (error) {
@@ -234,17 +269,17 @@ export async function checkInventoryServicesHealth(): Promise<{
   services.push(
     {
       name: 'stock-movement',
-      status: 'up',
+      status: 'up' as const,
       lastCheck: new Date()
     },
     {
       name: 'physical-count',
-      status: 'up',
+      status: 'up' as const,
       lastCheck: new Date()
     },
     {
       name: 'integration',
-      status: 'up',
+      status: 'up' as const,
       lastCheck: new Date()
     }
   )

@@ -6,7 +6,14 @@
 import { PrismaClient } from '@prisma/client'
 import { policyEngine, PolicyEngineConfig } from './policy-engine'
 import { attributeResolver, AttributeRequest } from './attribute-resolver'
-import { Policy, Subject, Resource, Action, Environment, PolicyDecision, Permission } from '@/lib/types/permissions'
+import {
+  Policy,
+  SubjectAttributes,
+  ResourceAttributes,
+  EnvironmentAttributes,
+  AccessDecision,
+  PermissionResult
+} from '@/lib/types/permissions'
 
 const prisma = new PrismaClient()
 
@@ -34,7 +41,7 @@ export interface EnhancedPermissionCheckRequest {
 export interface EnhancedPermissionResult {
   allowed: boolean
   reason: string
-  decision: PolicyDecision
+  decision: AccessDecision
   executionTime: number
   attributeResolutionTime?: number
   resolvedAttributes?: {
@@ -88,7 +95,7 @@ export class EnhancedPermissionService {
       // Step 2: Build ABAC components with resolved attributes
       const subject = await this.buildEnhancedSubject(request.userId, request.context, resolvedAttributes?.subject)
       const resource = await this.buildEnhancedResource(request.resourceType, request.resourceId, resolvedAttributes?.resource)
-      const action = this.buildEnhancedAction(request.action, resolvedAttributes?.action)
+      const action = request.action
       const environment = this.buildEnhancedEnvironment(request.context, resolvedAttributes?.environment)
 
       // Step 3: Get active policies
@@ -107,7 +114,7 @@ export class EnhancedPermissionService {
           resourceType: request.resourceType,
           resourceId: request.resourceId,
           action: request.action,
-          decision: decision.decision,
+          decision: decision.effect === 'permit' ? 'permit' : 'deny',
           reason: decision.reason,
           context: request.context,
           executionTime: Date.now() - startTime
@@ -116,13 +123,13 @@ export class EnhancedPermissionService {
 
       // Step 6: Prepare result
       const result: EnhancedPermissionResult = {
-        allowed: decision.decision === 'permit',
+        allowed: decision.effect === 'permit',
         reason: decision.reason,
         decision,
         executionTime: Date.now() - startTime,
         attributeResolutionTime: attributeResolutionTime > 0 ? attributeResolutionTime : undefined,
         resolvedAttributes: resolvedAttributes,
-        matchedPolicies: decision.evaluatedPolicies.filter(p => p.matches).map(p => p.policyId),
+        matchedPolicies: decision.evaluatedPolicies.filter(p => p.effect === 'permit' || p.effect === 'deny').map(p => p.policyId),
         auditLogId
       }
 
@@ -132,9 +139,17 @@ export class EnhancedPermissionService {
         allowed: false,
         reason: `Permission check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         decision: {
-          decision: 'deny',
+          effect: 'deny' as any,
           reason: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          evaluatedPolicies: []
+          obligations: [],
+          advice: [],
+          requestId: '',
+          evaluatedPolicies: [],
+          evaluationTime: Date.now() - startTime,
+          cacheHit: false,
+          timestamp: new Date(),
+          evaluatedBy: 'enhanced-permission-service',
+          auditRequired: false
         },
         executionTime: Date.now() - startTime,
         matchedPolicies: []
@@ -142,7 +157,7 @@ export class EnhancedPermissionService {
 
       // Log error for debugging
       console.error('Enhanced permission check failed:', error)
-      
+
       return errorResult
     }
   }
@@ -185,42 +200,38 @@ export class EnhancedPermissionService {
   async getEffectivePermissions(
     userId: string,
     context?: EnhancedPermissionCheckRequest['context']
-  ): Promise<Permission[]> {
-    const effectivePermissions: Permission[] = []
-    
+  ): Promise<PermissionResult[]> {
+    const effectivePermissions: PermissionResult[] = []
+
     // Get all resource definitions from database
-    const resourceDefinitions = await prisma.abac_resource_definitions.findMany({
-      where: { is_active: true }
+    const resourceDefinitions = await prisma.resourceDefinition.findMany({
+      where: { isActive: true }
     })
 
     // Check permissions for each resource type and action
     for (const resourceDef of resourceDefinitions) {
-      const possibleActions = this.getPossibleActionsForResource(resourceDef.resource_type)
-      
+      const possibleActions = this.getPossibleActionsForResource(resourceDef.resourceType)
+
       for (const action of possibleActions) {
         const result = await this.checkPermission({
           userId,
-          resourceType: resourceDef.resource_type,
+          resourceType: resourceDef.resourceType,
           action,
           context,
           options: { auditEnabled: false } // Skip audit for bulk operations
         })
-        
+
         if (result.allowed) {
           effectivePermissions.push({
-            id: `${userId}-${resourceDef.resource_type}-${action}`,
-            subjectId: userId,
-            resourceType: resourceDef.resource_type,
-            action,
-            effect: 'permit',
-            source: 'policy',
-            grantedAt: new Date(),
-            grantedBy: 'system'
+            allowed: true,
+            reason: 'Permission granted by policy',
+            evaluationTime: result.executionTime,
+            cacheHit: false
           })
         }
       }
     }
-    
+
     return effectivePermissions
   }
 
@@ -234,51 +245,41 @@ export class EnhancedPermissionService {
     }
 
     // Fetch from database
-    const dbPolicies = await prisma.abac_policies.findMany({
-      where: { 
-        status: 'ACTIVE',
-        OR: [
-          { valid_from: null },
-          { valid_from: { lte: new Date() } }
-        ],
-        AND: [
-          { OR: [
-              { valid_until: null },
-              { valid_until: { gte: new Date() } }
-            ]
-          }
-        ]
+    const dbPolicies = await prisma.policy.findMany({
+      where: {
+        status: 'ACTIVE'
       },
       orderBy: { priority: 'desc' }
     })
 
     // Convert to Policy objects
-    const policies: Policy[] = dbPolicies.map(dbPolicy => ({
-      id: dbPolicy.id,
-      name: dbPolicy.name,
-      description: dbPolicy.description,
-      effect: dbPolicy.effect as 'permit' | 'deny',
-      priority: dbPolicy.priority || 500,
-      isActive: dbPolicy.status === 'ACTIVE',
-      validFrom: dbPolicy.valid_from || undefined,
-      validUntil: dbPolicy.valid_until || undefined,
-      
-      // Extract policy structure from JSON
-      rules: dbPolicy.policy_data?.rules || [],
-      subjectConditions: dbPolicy.policy_data?.subject || {},
-      resourceConditions: dbPolicy.policy_data?.resource || {},
-      actionConditions: dbPolicy.policy_data?.action || {},
-      environmentConditions: dbPolicy.policy_data?.environment || {},
-      
-      ruleCombiningAlgorithm: dbPolicy.policy_data?.ruleCombiningAlgorithm || 'deny-overrides',
-      
-      // Metadata
-      version: dbPolicy.version || '1.0',
-      createdBy: dbPolicy.created_by || 'system',
-      updatedBy: dbPolicy.updated_by || 'system',
-      createdAt: dbPolicy.created_at,
-      updatedAt: dbPolicy.updated_at
-    }))
+    const policies: Policy[] = dbPolicies.map((dbPolicy: any) => {
+      const policyData = dbPolicy.policyData || {}
+      return {
+        id: dbPolicy.id,
+        name: dbPolicy.name,
+        description: dbPolicy.description || '',
+        effect: dbPolicy.effect as any,
+        priority: dbPolicy.priority || 500,
+        enabled: dbPolicy.status === 'ACTIVE',
+
+        // Extract policy structure from JSON
+        target: (policyData.target || {
+          subjects: [],
+          resources: [],
+          actions: [],
+          environment: []
+        }) as any,
+        rules: (policyData.rules || []) as any[],
+
+        // Metadata
+        version: dbPolicy.version || '1.0',
+        createdBy: dbPolicy.createdBy || 'system',
+        updatedBy: dbPolicy.updatedBy || 'system',
+        createdAt: dbPolicy.createdAt || new Date(),
+        updatedAt: dbPolicy.updatedAt || new Date()
+      }
+    })
 
     // Update cache
     this.policyCache = {
@@ -297,23 +298,27 @@ export class EnhancedPermissionService {
     userId: string,
     context?: EnhancedPermissionCheckRequest['context'],
     resolvedAttributes?: Record<string, any>
-  ): Promise<Subject> {
+  ): Promise<SubjectAttributes> {
     const baseAttributes = resolvedAttributes || await attributeResolver.resolveSubjectAttributes(userId)
-    
+
     return {
-      id: userId,
-      type: 'user',
-      roles: baseAttributes.roleNames || [],
-      department: context?.department || baseAttributes['userData.department'] || 'default',
-      location: context?.location || baseAttributes['userData.location'] || 'default',
-      permissions: baseAttributes.effectivePermissions || [],
-      attributes: {
-        ...baseAttributes,
-        ...context?.additionalAttributes,
-        // Override with context if provided
-        contextDepartment: context?.department,
-        contextLocation: context?.location
-      }
+      userId,
+      username: baseAttributes.username || userId,
+      email: baseAttributes.email || `${userId}@example.com`,
+      role: baseAttributes.role || { id: 'default', name: 'Default', permissions: [] } as any,
+      roles: baseAttributes.roles || [],
+      department: baseAttributes.department || { id: 'default', name: 'Default', code: 'DEF', status: 'active' } as any,
+      departments: baseAttributes.departments || [],
+      location: baseAttributes.location || { id: 'default', name: 'Default', type: 'office' } as any,
+      locations: baseAttributes.locations || [],
+      employeeType: baseAttributes.employeeType || 'full-time',
+      seniority: baseAttributes.seniority || 0,
+      clearanceLevel: baseAttributes.clearanceLevel || 'internal',
+      assignedWorkflowStages: baseAttributes.assignedWorkflowStages || [],
+      delegatedAuthorities: baseAttributes.delegatedAuthorities || [],
+      specialPermissions: baseAttributes.specialPermissions || [],
+      accountStatus: baseAttributes.accountStatus || 'active',
+      onDuty: baseAttributes.onDuty || true
     }
   }
 
@@ -324,35 +329,28 @@ export class EnhancedPermissionService {
     resourceType: string,
     resourceId?: string,
     resolvedAttributes?: Record<string, any>
-  ): Promise<Resource> {
+  ): Promise<ResourceAttributes> {
     const baseAttributes = resolvedAttributes || await attributeResolver.resolveResourceAttributes(resourceType, resourceId)
-    
-    return {
-      id: resourceId || resourceType,
-      type: resourceType,
-      category: baseAttributes.category || 'general',
-      attributes: {
-        ...baseAttributes,
-        hasSpecificId: !!resourceId
-      }
-    }
-  }
 
-  /**
-   * Build enhanced action with resolved attributes
-   */
-  private buildEnhancedAction(actionName: string, resolvedAttributes?: Record<string, any>): Action {
-    const baseAttributes = resolvedAttributes || {}
-    
     return {
-      name: actionName,
-      type: baseAttributes.category || this.getActionType(actionName),
-      attributes: {
-        ...baseAttributes,
-        riskLevel: baseAttributes.riskLevel || 'medium',
-        requiresApproval: baseAttributes.requiresApproval || false,
-        auditRequired: baseAttributes.auditRequired || false
-      }
+      resourceId: resourceId || resourceType,
+      resourceType,
+      resourceName: baseAttributes.resourceName || resourceType,
+      dataClassification: baseAttributes.dataClassification || 'internal',
+      createdAt: baseAttributes.createdAt || new Date(),
+      updatedAt: baseAttributes.updatedAt || new Date(),
+      requiresAudit: baseAttributes.requiresAudit || false,
+      owner: baseAttributes.owner,
+      ownerDepartment: baseAttributes.ownerDepartment,
+      ownerLocation: baseAttributes.ownerLocation,
+      documentStatus: baseAttributes.documentStatus,
+      workflowStage: baseAttributes.workflowStage,
+      approvalLevel: baseAttributes.approvalLevel,
+      priority: baseAttributes.priority,
+      totalValue: baseAttributes.totalValue,
+      budgetCategory: baseAttributes.budgetCategory,
+      costCenter: baseAttributes.costCenter,
+      customAttributes: baseAttributes.customAttributes
     }
   }
 
@@ -362,23 +360,39 @@ export class EnhancedPermissionService {
   private buildEnhancedEnvironment(
     context?: EnhancedPermissionCheckRequest['context'],
     resolvedAttributes?: Record<string, any>
-  ): Environment {
+  ): EnvironmentAttributes {
     const baseAttributes = resolvedAttributes || {}
-    
+    const now = new Date()
+
     return {
-      timestamp: new Date(),
-      timeOfDay: baseAttributes.timeOfDay || new Date().getHours(),
-      dayOfWeek: baseAttributes.dayOfWeek || new Date().getDay(),
-      ipAddress: context?.ipAddress,
+      currentTime: now,
+      dayOfWeek: now.toLocaleDateString('en-US', { weekday: 'long' }),
+      isBusinessHours: baseAttributes.isBusinessHours || false,
+      isHoliday: baseAttributes.isHoliday || false,
+      timeZone: baseAttributes.timeZone || 'UTC',
+      requestIP: context?.ipAddress || '127.0.0.1',
+      requestLocation: baseAttributes.requestLocation,
+      isInternalNetwork: baseAttributes.isInternalNetwork || true,
+      facility: baseAttributes.facility,
+      country: baseAttributes.country,
+      region: baseAttributes.region,
+      deviceType: baseAttributes.deviceType || 'desktop',
+      deviceId: baseAttributes.deviceId,
       userAgent: context?.userAgent,
-      attributes: {
-        ...baseAttributes,
-        sessionId: context?.sessionId,
-        requestId: context?.requestId,
-        isBusinessHours: baseAttributes.isBusinessHours || false,
-        riskScore: baseAttributes.riskScore || 0,
-        trustLevel: baseAttributes.trustLevel || 'medium'
-      }
+      sessionId: context?.sessionId || '',
+      authenticationMethod: baseAttributes.authenticationMethod || 'password',
+      sessionAge: baseAttributes.sessionAge || 0,
+      systemLoad: baseAttributes.systemLoad || 'normal',
+      maintenanceMode: baseAttributes.maintenanceMode || false,
+      emergencyMode: baseAttributes.emergencyMode || false,
+      systemVersion: baseAttributes.systemVersion || '1.0.0',
+      threatLevel: baseAttributes.threatLevel || 'low',
+      complianceMode: baseAttributes.complianceMode || [],
+      auditMode: baseAttributes.auditMode || false,
+      requestMethod: baseAttributes.requestMethod,
+      requestSource: baseAttributes.requestSource || 'ui',
+      batchOperation: baseAttributes.batchOperation || false,
+      customEnvironment: baseAttributes.customEnvironment
     }
   }
 
@@ -395,16 +409,26 @@ export class EnhancedPermissionService {
     context?: any
     executionTime: number
   }): Promise<string> {
-    const auditLog = await prisma.abac_audit_logs.create({
+    const auditLog = await prisma.auditLog.create({
       data: {
-        subject_id: data.userId,
-        resource_type: data.resourceType,
-        resource_id: data.resourceId,
-        action: data.action,
-        decision: data.decision,
-        reason: data.reason,
-        evaluation_context: data.context || {},
-        execution_time_ms: data.executionTime,
+        eventType: data.decision === 'permit' ? 'ACCESS_GRANTED' : 'ACCESS_DENIED',
+        eventCategory: 'ACCESS',
+        eventData: {
+          actor: {
+            userId: data.userId
+          },
+          action: {
+            actionType: data.action,
+            resource: data.resourceType,
+            resourceId: data.resourceId
+          },
+          decision: {
+            effect: data.decision,
+            reason: data.reason,
+            executionTime: data.executionTime
+          },
+          context: data.context || {}
+        },
         timestamp: new Date()
       }
     })
@@ -470,8 +494,8 @@ export class EnhancedPermissionService {
    */
   async getStats() {
     const [policyCount, auditLogCount] = await Promise.all([
-      prisma.abac_policies.count({ where: { status: 'ACTIVE' } }),
-      prisma.abac_audit_logs.count()
+      prisma.policy.count({ where: { status: 'ACTIVE' } }),
+      prisma.auditLog.count()
     ])
 
     return {

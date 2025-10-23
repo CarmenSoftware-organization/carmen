@@ -14,19 +14,31 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { 
-  permissionService, 
-  checkPermission, 
-  hasPermission, 
+import {
+  permissionService,
+  checkPermission,
+  hasPermission,
   getUserPermissions,
   type PermissionCheckRequest,
   type PermissionResult,
   type BulkPermissionRequest,
   type BulkPermissionResult
 } from '@/lib/services/permissions'
-import { useKeycloakUser } from '@/lib/context/keycloak-user-context'
+import { useUser } from '@/lib/context/user-context'
 import type { User } from '@/lib/types/user'
-import type { Permission } from '@/lib/types/permissions'
+import type { PermissionString } from '@/lib/types/permissions'
+
+// Define Permission type based on service implementation
+export interface Permission {
+  id: string
+  subjectId: string
+  resourceType: string
+  action: string
+  effect: 'permit' | 'deny'
+  source: 'policy' | 'role' | 'direct'
+  grantedAt: Date
+  grantedBy: string
+}
 
 // Query keys for React Query
 export const permissionKeys = {
@@ -66,14 +78,14 @@ export interface PermissionValidationRule {
  * Uses React Query for caching and automatic refetching
  */
 export function usePermission(options: PermissionCheckOptions) {
-  const { user } = useKeycloakUser()
+  const { user } = useUser()
   const { enabled = true, staleTime = 5 * 60 * 1000, cacheTime = 10 * 60 * 1000, ...checkOptions } = options
 
   return useQuery({
     queryKey: permissionKeys.single(
-      user?.id || '', 
-      checkOptions.resourceType, 
-      checkOptions.action, 
+      user?.id || '',
+      checkOptions.resourceType,
+      checkOptions.action,
       checkOptions.resourceId
     ),
     queryFn: async (): Promise<PermissionResult> => {
@@ -93,7 +105,7 @@ export function usePermission(options: PermissionCheckOptions) {
     },
     enabled: enabled && !!user?.id,
     staleTime,
-    cacheTime,
+    gcTime: cacheTime,
   })
 }
 
@@ -102,7 +114,7 @@ export function usePermission(options: PermissionCheckOptions) {
  * Optimizes performance by batching permission checks
  */
 export function useBulkPermissions(options: BulkPermissionOptions) {
-  const { user } = useKeycloakUser()
+  const { user } = useUser()
   const { enabled = true, staleTime = 5 * 60 * 1000, cacheTime = 10 * 60 * 1000, ...bulkOptions } = options
 
   return useQuery({
@@ -127,7 +139,7 @@ export function useBulkPermissions(options: BulkPermissionOptions) {
     },
     enabled: enabled && !!user?.id && bulkOptions.permissions.length > 0,
     staleTime,
-    cacheTime,
+    gcTime: cacheTime,
   })
 }
 
@@ -141,7 +153,7 @@ export function useUserPermissions(options?: {
   staleTime?: number
   cacheTime?: number
 }) {
-  const { user } = useKeycloakUser()
+  const { user } = useUser()
   const { enabled = true, staleTime = 10 * 60 * 1000, cacheTime = 30 * 60 * 1000, context } = options || {}
 
   return useQuery({
@@ -152,7 +164,7 @@ export function useUserPermissions(options?: {
     },
     enabled: enabled && !!user?.id,
     staleTime,
-    cacheTime,
+    gcTime: cacheTime,
   })
 }
 
@@ -170,7 +182,7 @@ export function useUserResourcePermissions(
     cacheTime?: number
   }
 ) {
-  const { user } = useKeycloakUser()
+  const { user } = useUser()
   const { enabled = true, staleTime = 5 * 60 * 1000, cacheTime = 10 * 60 * 1000, context } = options || {}
 
   return useQuery({
@@ -181,7 +193,7 @@ export function useUserResourcePermissions(
     },
     enabled: enabled && !!user?.id && !!resourceType,
     staleTime,
-    cacheTime,
+    gcTime: cacheTime,
   })
 }
 
@@ -190,7 +202,7 @@ export function useUserResourcePermissions(
  * Provides validation functions and error handling
  */
 export function usePermissionValidation(rules: PermissionValidationRule[]) {
-  const { user } = useKeycloakUser()
+  const { user } = useUser()
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [isValidating, setIsValidating] = useState(false)
 
@@ -330,7 +342,7 @@ export function usePermissionCache() {
 
   const getCacheStats = useCallback(() => {
     const queries = queryClient.getQueryCache().getAll()
-    const permissionQueries = queries.filter(query => 
+    const permissionQueries = queries.filter(query =>
       Array.isArray(query.queryKey) && query.queryKey[0] === 'permissions'
     )
 
@@ -338,7 +350,7 @@ export function usePermissionCache() {
       totalPermissionQueries: permissionQueries.length,
       cachedQueries: permissionQueries.filter(q => q.state.data).length,
       staleQueries: permissionQueries.filter(q => q.isStale()).length,
-      loadingQueries: permissionQueries.filter(q => q.state.status === 'loading').length,
+      loadingQueries: permissionQueries.filter(q => q.state.status === 'pending').length,
     }
   }, [queryClient])
 
@@ -375,11 +387,11 @@ export function useHasPermission(
   })
 
   return {
-    hasPermission: permissionQuery.data?.allowed ?? false,
+    hasPermission: (permissionQuery.data as PermissionResult | undefined)?.allowed ?? false,
     isLoading: permissionQuery.isLoading,
     error: permissionQuery.error,
-    reason: permissionQuery.data?.reason,
-    decision: permissionQuery.data?.decision,
+    reason: (permissionQuery.data as PermissionResult | undefined)?.reason,
+    decision: (permissionQuery.data as PermissionResult | undefined)?.decision,
     refetch: permissionQuery.refetch,
   }
 }
@@ -410,8 +422,11 @@ export function usePermissionLogic(
   const result = useMemo(() => {
     if (!bulkQuery.data) return false
 
-    const results = bulkQuery.data.results.map(r => r.allowed)
-    
+    const bulkData = bulkQuery.data as BulkPermissionResult | undefined
+    if (!bulkData) return false
+
+    const results = bulkData.results.map((r: { allowed: boolean }) => r.allowed)
+
     switch (operator) {
       case 'AND':
         return results.every(Boolean)
@@ -428,7 +443,7 @@ export function usePermissionLogic(
     hasPermission: result,
     isLoading: bulkQuery.isLoading,
     error: bulkQuery.error,
-    results: bulkQuery.data?.results ?? [],
+    results: (bulkQuery.data as BulkPermissionResult | undefined)?.results ?? [],
     refetch: bulkQuery.refetch,
   }
 }
@@ -503,7 +518,7 @@ export function useFormPermissionGuard(validationRules: PermissionValidationRule
  * Useful for admin dashboards and monitoring
  */
 export function usePermissionStats() {
-  const { user } = useKeycloakUser()
+  const { user } = useUser()
   const cacheStats = usePermissionCache().getCacheStats()
   const [runtimeStats, setRuntimeStats] = useState({
     totalChecks: 0,
@@ -520,8 +535,8 @@ export function usePermissionStats() {
     setRuntimeStats({
       totalChecks: stats.totalEvaluations || 0,
       averageResponseTime: stats.averageExecutionTime || 0,
-      cacheHitRate: stats.cacheHitRate || 0,
-      errorRate: stats.errorRate || 0
+      cacheHitRate: 0, // Not available in current stats
+      errorRate: 0 // Not available in current stats
     })
   }, [user?.id])
 
