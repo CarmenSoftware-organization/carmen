@@ -6,12 +6,12 @@
  */
 
 import { getCalculationCacheService } from '../calculation-cache-service';
-import { Money } from '@/lib/types';
+import { Money, CostingMethod } from '@/lib/types';
 
 /**
  * Demo: Financial calculations with caching
  */
-export async function demoFinancialCalculations() {
+async function demoFinancialCalculations() {
   console.log('🧮 Financial Calculations Demo');
   console.log('================================');
 
@@ -20,7 +20,7 @@ export async function demoFinancialCalculations() {
 
   // Demo: Tax calculation
   console.log('\n1. Tax Calculation');
-  const subtotal: Money = { amount: 100, currencyCode: 'USD' };
+  const subtotal: Money = { amount: 100, currency: 'USD' };
   const startTime = Date.now();
 
   const taxResult = await financial.calculateTax({
@@ -30,7 +30,7 @@ export async function demoFinancialCalculations() {
   });
 
   const duration = Date.now() - startTime;
-  console.log(`   Result: ${taxResult.value.totalAmount.amount} ${taxResult.value.totalAmount.currencyCode}`);
+  console.log(`   Result: ${taxResult.value.totalAmount.amount} ${taxResult.value.totalAmount.currency}`);
   console.log(`   Duration: ${duration}ms (first call - computed)`);
 
   // Second call should be cached
@@ -46,29 +46,29 @@ export async function demoFinancialCalculations() {
   // Demo: Currency conversion
   console.log('\n2. Currency Conversion');
   const conversionResult = await financial.convertCurrency({
-    amount: { amount: 100, currencyCode: 'USD' },
+    amount: { amount: 100, currency: 'USD' },
     toCurrency: 'EUR',
     exchangeRate: 0.85
   });
-  console.log(`   Converted: ${conversionResult.value.convertedAmount.amount} ${conversionResult.value.convertedAmount.currencyCode}`);
+  console.log(`   Converted: ${conversionResult.value.convertedAmount.amount} ${conversionResult.value.convertedAmount.currency}`);
 
   // Demo: Line item calculation (complex calculation)
   console.log('\n3. Line Item Total');
   const lineItemResult = await financial.calculateLineItemTotal({
     quantity: 5,
-    unitPrice: { amount: 20, currencyCode: 'USD' },
+    unitPrice: { amount: 20, currency: 'USD' },
     taxRate: 8.5,
     discountRate: 10,
     taxIncluded: false
   });
-  console.log(`   Line Total: ${lineItemResult.value.totalAmount.amount} ${lineItemResult.value.totalAmount.currencyCode}`);
+  console.log(`   Line Total: ${lineItemResult.value.totalAmount.amount} ${lineItemResult.value.totalAmount.currency}`);
   console.log(`   Breakdown: Subtotal ${lineItemResult.value.subtotal.amount}, Discount ${lineItemResult.value.discountAmount.amount}, Tax ${lineItemResult.value.taxAmount.amount}`);
 }
 
 /**
  * Demo: Inventory calculations with caching
  */
-export async function demoInventoryCalculations() {
+async function demoInventoryCalculations() {
   console.log('\n📦 Inventory Calculations Demo');
   console.log('==============================');
 
@@ -80,13 +80,13 @@ export async function demoInventoryCalculations() {
   const valuationResult = await inventory.calculateStockValuation({
     itemId: 'laptop-001',
     quantityOnHand: 50,
-    costingMethod: 'WEIGHTED_AVERAGE',
-    averageCost: { amount: 800, currencyCode: 'USD' }
+    costingMethod: CostingMethod.WEIGHTED_AVERAGE,
+    averageCost: { amount: 800, currency: 'USD' }
   });
   console.log(`   Item: ${valuationResult.value.itemId}`);
   console.log(`   Quantity: ${valuationResult.value.quantityOnHand} units`);
-  console.log(`   Unit Cost: ${valuationResult.value.unitCost.amount} ${valuationResult.value.unitCost.currencyCode}`);
-  console.log(`   Total Value: ${valuationResult.value.totalValue.amount} ${valuationResult.value.totalValue.currencyCode}`);
+  console.log(`   Unit Cost: ${valuationResult.value.unitCost.amount} ${valuationResult.value.unitCost.currency}`);
+  console.log(`   Total Value: ${valuationResult.value.totalValue.amount} ${valuationResult.value.totalValue.currency}`);
 
   // Demo: Available quantity calculation
   console.log('\n2. Available Quantity');
@@ -119,10 +119,10 @@ export async function demoInventoryCalculations() {
   console.log('\n4. ABC Analysis');
   const abcResult = await inventory.performABCAnalysis({
     items: [
-      { itemId: 'laptop-001', annualValue: { amount: 50000, currencyCode: 'USD' }, annualUsage: 60 },
-      { itemId: 'mouse-002', annualValue: { amount: 1000, currencyCode: 'USD' }, annualUsage: 200 },
-      { itemId: 'keyboard-003', annualValue: { amount: 5000, currencyCode: 'USD' }, annualUsage: 100 },
-      { itemId: 'monitor-004', annualValue: { amount: 15000, currencyCode: 'USD' }, annualUsage: 40 }
+      { itemId: 'laptop-001', annualValue: { amount: 50000, currency: 'USD' }, annualUsage: 60 },
+      { itemId: 'mouse-002', annualValue: { amount: 1000, currency: 'USD' }, annualUsage: 200 },
+      { itemId: 'keyboard-003', annualValue: { amount: 5000, currency: 'USD' }, annualUsage: 100 },
+      { itemId: 'monitor-004', annualValue: { amount: 15000, currency: 'USD' }, annualUsage: 40 }
     ],
     currencyCode: 'USD'
   });
@@ -135,7 +135,7 @@ export async function demoInventoryCalculations() {
 /**
  * Demo: Vendor metrics with caching
  */
-export async function demoVendorMetrics() {
+async function demoVendorMetrics() {
   console.log('\n🤝 Vendor Metrics Demo');
   console.log('======================');
 
@@ -152,7 +152,7 @@ export async function demoVendorMetrics() {
         orderDate: new Date('2024-01-15'),
         expectedDeliveryDate: new Date('2024-01-25'),
         actualDeliveryDate: new Date('2024-01-24'),
-        orderValue: { amount: 5000, currencyCode: 'USD' },
+        orderValue: { amount: 5000, currency: 'USD' },
         isDelivered: true,
         qualityScore: 4.5,
         isOnTime: true,
@@ -168,7 +168,7 @@ export async function demoVendorMetrics() {
         orderDate: new Date('2024-02-01'),
         expectedDeliveryDate: new Date('2024-02-10'),
         actualDeliveryDate: new Date('2024-02-12'),
-        orderValue: { amount: 3000, currencyCode: 'USD' },
+        orderValue: { amount: 3000, currency: 'USD' },
         isDelivered: true,
         qualityScore: 4.0,
         isOnTime: false,
@@ -223,7 +223,7 @@ export async function demoVendorMetrics() {
 /**
  * Demo: Cache management operations
  */
-export async function demoCacheManagement() {
+async function demoCacheManagement() {
   console.log('\n⚡ Cache Management Demo');
   console.log('========================');
 
@@ -300,7 +300,7 @@ export async function demoCacheManagement() {
 /**
  * Demo: Performance comparison
  */
-export async function demoPerformanceComparison() {
+async function demoPerformanceComparison() {
   console.log('\n🚀 Performance Comparison Demo');
   console.log('===============================');
 
@@ -308,10 +308,10 @@ export async function demoPerformanceComparison() {
 
   // Test calculation parameters
   const testInputs = [
-    { subtotal: { amount: 100, currencyCode: 'USD' }, taxRate: 8.5 },
-    { subtotal: { amount: 250, currencyCode: 'EUR' }, taxRate: 20 },
-    { subtotal: { amount: 500, currencyCode: 'USD' }, taxRate: 10 },
-    { subtotal: { amount: 75, currencyCode: 'GBP' }, taxRate: 15 }
+    { subtotal: { amount: 100, currency: 'USD' }, taxRate: 8.5 },
+    { subtotal: { amount: 250, currency: 'EUR' }, taxRate: 20 },
+    { subtotal: { amount: 500, currency: 'USD' }, taxRate: 10 },
+    { subtotal: { amount: 75, currency: 'GBP' }, taxRate: 15 }
   ];
 
   console.log('\n1. Cold Cache Performance (First Calls)');

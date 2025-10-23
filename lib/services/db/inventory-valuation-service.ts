@@ -5,11 +5,12 @@
  * ABC analysis, and comprehensive financial reporting.
  */
 
-import { prisma, type PrismaClient } from '@/lib/db'
+import { prisma } from '@/lib/db'
+import type { PrismaClient } from '@prisma/client'
 import { InventoryCalculations } from '../calculations/inventory-calculations'
 import { CachedInventoryCalculations } from '../cache/cached-inventory-calculations'
 import { FinancialCalculations } from '../calculations/financial-calculations'
-import type { 
+import {
   CostingMethod,
   InventoryAging,
   SlowMovingInventory,
@@ -18,6 +19,7 @@ import type {
 } from '@/lib/types/inventory'
 import type { Money } from '@/lib/types/common'
 import type { ABCAnalysisResult } from '../calculations/inventory-calculations'
+import { EnhancedCacheLayer } from '../cache/enhanced-cache-layer'
 
 /**
  * Inventory valuation summary
@@ -168,9 +170,10 @@ export class InventoryValuationService {
   private financialCalculations: FinancialCalculations
 
   constructor(prismaClient?: PrismaClient) {
-    this.db = prismaClient || prisma
+    this.db = (prismaClient || prisma.raw) as PrismaClient
     this.inventoryCalculations = new InventoryCalculations()
-    this.cachedCalculations = new CachedInventoryCalculations()
+    const cacheLayer = new EnhancedCacheLayer()
+    this.cachedCalculations = new CachedInventoryCalculations(cacheLayer)
     this.financialCalculations = new FinancialCalculations()
   }
 
@@ -190,9 +193,9 @@ export class InventoryValuationService {
         return {
           success: true,
           data: {
-            totalValue: { amount: 0, currencyCode: 'USD' },
+            totalValue: { amount: 0, currency: 'USD' },
             totalQuantity: 0,
-            averageCostPerUnit: { amount: 0, currencyCode: 'USD' },
+            averageCostPerUnit: { amount: 0, currency: 'USD' },
             valuationMethod: filters.costingMethod || CostingMethod.WEIGHTED_AVERAGE,
             valuationDate,
             byLocation: [],
@@ -226,7 +229,7 @@ export class InventoryValuationService {
           locationValuations.set(balance.location_id, {
             locationId: balance.location_id,
             locationName: balance.locations?.name || 'Unknown Location',
-            totalValue: { amount: 0, currencyCode: 'USD' },
+            totalValue: { amount: 0, currency: 'USD' },
             totalQuantity: 0,
             itemCount: 0,
             averageTurnover: 0
@@ -243,7 +246,7 @@ export class InventoryValuationService {
           categoryValuations.set(categoryId, {
             categoryId,
             categoryName: balance.inventory_items?.categories?.name || 'Uncategorized',
-            totalValue: { amount: 0, currencyCode: 'USD' },
+            totalValue: { amount: 0, currency: 'USD' },
             totalQuantity: 0,
             itemCount: 0,
             valuePercentage: 0
@@ -263,9 +266,9 @@ export class InventoryValuationService {
       })
 
       // Calculate average cost per unit
-      const averageCostPerUnit = {
+      const averageCostPerUnit: Money = {
         amount: totalQuantity > 0 ? totalValue / totalQuantity : 0,
-        currencyCode: 'USD'
+        currency: 'USD'
       }
 
       // Generate alerts
@@ -275,7 +278,7 @@ export class InventoryValuationService {
       const trends = await this.getValuationTrends(filters, 30)
 
       const valuation: InventoryValuationSummary = {
-        totalValue: { amount: totalValue, currencyCode: 'USD' },
+        totalValue: { amount: totalValue, currency: 'USD' },
         totalQuantity,
         averageCostPerUnit,
         valuationMethod: filters.costingMethod || CostingMethod.WEIGHTED_AVERAGE,
@@ -322,7 +325,7 @@ export class InventoryValuationService {
         itemId: balance.item_id,
         annualValue: {
           amount: balance.total_value_amount,
-          currencyCode: balance.total_value_currency
+          currency: balance.total_value_currency
         },
         annualUsage: balance.quantity_on_hand // Simplified - should use actual annual usage
       }))
@@ -332,7 +335,7 @@ export class InventoryValuationService {
         currencyCode: 'USD'
       })
 
-      if (!abcResult.success || !abcResult.value) {
+      if (!abcResult.value) {
         return {
           success: false,
           error: 'Failed to perform ABC analysis calculation'
@@ -386,7 +389,7 @@ export class InventoryValuationService {
 
       const summary: ABCAnalysisSummary = {
         analysisDate: new Date(),
-        totalValue: { amount: totalValue, currencyCode: 'USD' },
+        totalValue: { amount: totalValue, currency: 'USD' },
         totalItems,
         aItems: {
           count: aItems.length,
@@ -435,11 +438,11 @@ export class InventoryValuationService {
 
         // Define age ranges
         const ageRanges = [
-          { range: '0-30 days', quantity: 0, value: { amount: 0, currencyCode: 'USD' } },
-          { range: '31-60 days', quantity: 0, value: { amount: 0, currencyCode: 'USD' } },
-          { range: '61-90 days', quantity: 0, value: { amount: 0, currencyCode: 'USD' } },
-          { range: '91-180 days', quantity: 0, value: { amount: 0, currencyCode: 'USD' } },
-          { range: '180+ days', quantity: 0, value: { amount: 0, currencyCode: 'USD' } }
+          { range: '0-30 days', quantity: 0, value: { amount: 0, currency: 'USD' } },
+          { range: '31-60 days', quantity: 0, value: { amount: 0, currency: 'USD' } },
+          { range: '61-90 days', quantity: 0, value: { amount: 0, currency: 'USD' } },
+          { range: '91-180 days', quantity: 0, value: { amount: 0, currency: 'USD' } },
+          { range: '180+ days', quantity: 0, value: { amount: 0, currency: 'USD' } }
         ]
 
         // Assign to appropriate age range
@@ -458,7 +461,7 @@ export class InventoryValuationService {
           currentQuantity: balance.quantity_on_hand,
           value: {
             amount: balance.total_value_amount,
-            currencyCode: balance.total_value_currency
+            currency: balance.total_value_currency
           },
           ageRanges,
           averageAge: daysSinceMovement,
@@ -468,11 +471,11 @@ export class InventoryValuationService {
 
       // Aggregate age ranges
       const totalAgeRanges = [
-        { range: '0-30 days', value: { amount: 0, currencyCode: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
-        { range: '31-60 days', value: { amount: 0, currencyCode: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
-        { range: '61-90 days', value: { amount: 0, currencyCode: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
-        { range: '91-180 days', value: { amount: 0, currencyCode: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
-        { range: '180+ days', value: { amount: 0, currencyCode: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] }
+        { range: '0-30 days', value: { amount: 0, currency: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
+        { range: '31-60 days', value: { amount: 0, currency: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
+        { range: '61-90 days', value: { amount: 0, currency: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
+        { range: '91-180 days', value: { amount: 0, currency: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] },
+        { range: '180+ days', value: { amount: 0, currency: 'USD' }, quantity: 0, percentage: 0, items: [] as InventoryAging[] }
       ]
 
       let totalValue = 0
@@ -528,7 +531,7 @@ export class InventoryValuationService {
       }
 
       const analysis: AgingAnalysis = {
-        totalValue: { amount: totalValue, currencyCode: 'USD' },
+        totalValue: { amount: totalValue, currency: 'USD' },
         totalQuantity,
         ageRanges: totalAgeRanges,
         slowMovingItems,
@@ -557,29 +560,29 @@ export class InventoryValuationService {
       const analyses: CostAnalysis[] = []
 
       for (const balance of stockBalances) {
-        const currentCost = {
+        const currentCost: Money = {
           amount: balance.average_cost_amount,
-          currencyCode: balance.average_cost_currency
+          currency: balance.average_cost_currency
         }
 
-        const standardCost = balance.inventory_items?.last_purchase_price_amount ? {
+        const standardCost: Money | undefined = balance.inventory_items?.last_purchase_price_amount ? {
           amount: balance.inventory_items.last_purchase_price_amount,
-          currencyCode: balance.inventory_items.last_purchase_price_currency || 'USD'
+          currency: balance.inventory_items.last_purchase_price_currency || 'USD'
         } : undefined
 
         const lastPurchaseCost = standardCost // Using same data for now
 
         // Calculate variance
-        let costVariance = { amount: 0, currencyCode: 'USD' }
+        let costVariance: Money = { amount: 0, currency: 'USD' }
         let costVariancePercentage = 0
-        
+
         if (standardCost) {
           costVariance = {
             amount: currentCost.amount - standardCost.amount,
-            currencyCode: currentCost.currencyCode
+            currency: currentCost.currency
           }
-          costVariancePercentage = standardCost.amount !== 0 
-            ? (costVariance.amount / standardCost.amount) * 100 
+          costVariancePercentage = standardCost.amount !== 0
+            ? (costVariance.amount / standardCost.amount) * 100
             : 0
         }
 
@@ -607,7 +610,7 @@ export class InventoryValuationService {
           itemId: balance.item_id,
           itemName: balance.inventory_items?.item_name || 'Unknown',
           itemCode: balance.inventory_items?.item_code || 'Unknown',
-          costingMethod: balance.inventory_items?.costing_method as CostingMethod || CostingMethod.WEIGHTED_AVERAGE,
+          costingMethod: (balance.inventory_items?.costing_method as CostingMethod) || CostingMethod.WEIGHTED_AVERAGE,
           currentCost,
           standardCost,
           averageCost: currentCost, // Same as current for now
@@ -781,9 +784,9 @@ export class InventoryValuationService {
       // Mock data - in reality would query actual historical values
       trends.push({
         date,
-        totalValue: { amount: 100000 + Math.random() * 50000, currencyCode: 'USD' },
+        totalValue: { amount: 100000 + Math.random() * 50000, currency: 'USD' },
         totalQuantity: 1000 + Math.floor(Math.random() * 500),
-        averageCost: { amount: 100 + Math.random() * 50, currencyCode: 'USD' },
+        averageCost: { amount: 100 + Math.random() * 50, currency: 'USD' },
         movementCount: Math.floor(Math.random() * 50)
       })
     }

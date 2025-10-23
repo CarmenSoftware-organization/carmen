@@ -19,64 +19,60 @@ export const samplePolicies: Policy[] = [
     enabled: true,
     category: 'hospitality',
     tags: ['kitchen', 'recipe', 'business-hours'],
-    
+
     createdBy: 'admin',
     createdAt: new Date('2024-01-15'),
     updatedBy: 'admin',
     updatedAt: new Date('2024-01-15'),
-    
-    effect: EffectType.ALLOW,
-    
+
+    effect: EffectType.PERMIT,
+
+    target: {
+      subjects: [
+        {
+          attribute: 'subject.role.name',
+          operator: Operator.IN,
+          value: ['chef', 'kitchen-staff'],
+          logicalOperator: LogicalOperator.AND
+        },
+        {
+          attribute: 'subject.department.name',
+          operator: Operator.EQUALS,
+          value: 'kitchen',
+          logicalOperator: LogicalOperator.AND
+        },
+        {
+          attribute: 'subject.accountStatus',
+          operator: Operator.EQUALS,
+          value: 'active',
+          logicalOperator: LogicalOperator.AND
+        }
+      ],
+      resources: [
+        {
+          attribute: 'resource.resourceType',
+          operator: Operator.EQUALS,
+          value: 'recipe',
+          logicalOperator: LogicalOperator.AND
+        }
+      ],
+      actions: ['view_recipe', 'modify_recipe'],
+      environment: [
+        {
+          attribute: 'environment.isBusinessHours',
+          operator: Operator.EQUALS,
+          value: true,
+          logicalOperator: LogicalOperator.AND
+        }
+      ]
+    },
+
     rules: [
       {
         id: 'rule-kitchen-staff',
         description: 'Kitchen staff during business hours',
-        effect: EffectType.ALLOW,
-        priority: 1,
-        
-        target: {
-          subjects: [
-            {
-              attribute: 'subject.role.name',
-              operator: Operator.IN,
-              value: ['chef', 'kitchen-staff'],
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.department.name',
-              operator: Operator.EQUALS,
-              value: 'kitchen',
-              logicalOperator: LogicalOperator.AND
-            },
-            {
-              attribute: 'subject.accountStatus',
-              operator: Operator.EQUALS,
-              value: 'active',
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          resources: [
-            {
-              attribute: 'resource.resourceType',
-              operator: Operator.EQUALS,
-              value: 'recipe',
-              logicalOperator: LogicalOperator.AND
-            }
-          ],
-          actions: ['view_recipe', 'modify_recipe'],
-          environment: [
-            {
-              attribute: 'environment.isBusinessHours',
-              operator: Operator.EQUALS,
-              value: true,
-              logicalOperator: LogicalOperator.AND
-            }
-          ]
-        },
-        
         condition: {
-          type: 'simple',
-          expression: 'subject.role.name IN [chef, kitchen-staff] AND subject.department.name == kitchen AND resource.resourceType == recipe AND environment.isBusinessHours == true'
+          type: 'simple'
         }
       }
     ],
@@ -105,13 +101,13 @@ export const samplePolicies: Policy[] = [
     updatedBy: 'financial-manager',
     updatedAt: new Date('2024-01-20'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       {
         id: 'rule-high-value-approval',
         description: 'Manager approval required for purchases over $1000',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -161,8 +157,7 @@ export const samplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.role.name IN [department-manager, financial-manager]) AND (subject.approvalLimit.amount >= resource.totalValue.amount) AND (resource.totalValue.amount > 1000) AND (environment.isBusinessHours == true)'
+          type: 'composite'
         }
       }
     ],
@@ -191,13 +186,13 @@ export const samplePolicies: Policy[] = [
     updatedBy: 'financial-manager',
     updatedAt: new Date('2024-01-12'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       {
         id: 'rule-department-budget-access',
         description: 'Department budget visibility',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -234,8 +229,7 @@ export const samplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'simple',
-          expression: 'subject.accountStatus == active AND resource.ownerDepartment == subject.department.name AND resource.resourceType IN [budget, financial_report]'
+          type: 'simple'
         }
       }
     ],
@@ -264,13 +258,13 @@ export const samplePolicies: Policy[] = [
     updatedBy: 'system-admin',
     updatedAt: new Date('2024-01-18'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       {
         id: 'rule-admin-maintenance',
         description: 'Admin access during maintenance',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -314,8 +308,7 @@ export const samplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.role.name == admin) AND (subject.clearanceLevel IN [restricted, confidential]) AND (environment.maintenanceMode == true OR environment.isBusinessHours == false)'
+          type: 'composite'
         }
       }
     ],
@@ -344,13 +337,13 @@ export const samplePolicies: Policy[] = [
     updatedBy: 'procurement-manager',
     updatedAt: new Date('2024-01-14'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       {
         id: 'rule-vendor-invoice-access',
         description: 'Vendor can submit invoices for their contracts',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -400,8 +393,7 @@ export const samplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.role.name == vendor) AND (subject.accountStatus == active) AND (resource.owner == subject.userId) AND (environment.authenticationMethod IN [sso, mfa])'
+          type: 'composite'
         }
       }
     ],
@@ -430,13 +422,13 @@ export const samplePolicies: Policy[] = [
     updatedBy: 'system-admin',
     updatedAt: new Date('2024-01-16'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       {
         id: 'rule-emergency-override',
         description: 'Emergency access for experienced managers',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -485,8 +477,7 @@ export const samplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.role.name IN [department-manager, financial-manager, admin]) AND (subject.seniority > 2) AND (environment.emergencyMode == true OR environment.isHoliday == true OR environment.threatLevel IN [high, critical])'
+          type: 'composite'
         }
       }
     ],
@@ -515,13 +506,13 @@ export const samplePolicies: Policy[] = [
     updatedBy: 'compliance-officer',
     updatedAt: new Date('2024-01-11'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       {
         id: 'rule-audit-trail-required',
         description: 'Enhanced logging for compliance-sensitive operations',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -582,13 +573,13 @@ export const samplePolicies: Policy[] = [
     updatedBy: 'head-chef',
     updatedAt: new Date('2024-01-09'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       {
         id: 'rule-seasonal-planning-window',
         description: 'Menu changes during planning periods only',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -632,8 +623,7 @@ export const samplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.role.name IN [chef, head-chef, menu-manager]) AND (subject.department.name == kitchen) AND (environment.currentTime >= "2024-02-01" AND environment.currentTime <= "2024-02-15")'
+          type: 'composite'
         }
       }
     ],
@@ -668,14 +658,14 @@ export const complexSamplePolicies: Policy[] = [
     updatedBy: 'financial-manager',
     updatedAt: new Date('2024-01-19'),
     
-    effect: EffectType.ALLOW,
-    
+    effect: EffectType.PERMIT,
+
     rules: [
       // Rule 1: High-value transactions from internal network
       {
         id: 'rule-internal-high-value',
         description: 'High-value transactions from internal network with manager approval',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 1,
         
         target: {
@@ -725,16 +715,15 @@ export const complexSamplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.role.name IN [financial-manager, department-manager]) AND (subject.approvalLimit.amount >= 10000) AND (resource.totalValue.amount > 10000) AND (environment.isInternalNetwork == true) AND (environment.isBusinessHours == true)'
+          type: 'composite'
         }
       },
-      
+
       // Rule 2: Medium-value transactions with MFA
       {
         id: 'rule-medium-value-mfa',
         description: 'Medium-value transactions require MFA authentication',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 2,
         
         target: {
@@ -778,16 +767,15 @@ export const complexSamplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.approvalLimit.amount >= 1000) AND (resource.totalValue.amount > 1000 AND resource.totalValue.amount <= 10000) AND (environment.authenticationMethod IN [mfa, biometric])'
+          type: 'composite'
         }
       },
-      
+
       // Rule 3: Emergency override with enhanced logging
       {
         id: 'rule-emergency-financial-override',
         description: 'Emergency financial operations with enhanced audit requirements',
-        effect: EffectType.ALLOW,
+        effect: EffectType.PERMIT,
         priority: 3,
         
         target: {
@@ -831,8 +819,7 @@ export const complexSamplePolicies: Policy[] = [
         },
         
         condition: {
-          type: 'complex',
-          expression: '(subject.role.name IN [admin, financial-manager]) AND (subject.clearanceLevel IN [restricted, confidential]) AND (environment.emergencyMode == true) AND (environment.auditMode == true)'
+          type: 'composite'
         }
       }
     ],

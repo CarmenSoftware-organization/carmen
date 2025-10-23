@@ -7,14 +7,14 @@
 
 import { prisma, type PrismaClient } from '@/lib/db'
 import { inventoryService } from './inventory-service'
-import type { 
+import type {
   StockMovement,
   StockMovementItem,
   InventoryAdjustment,
   InventoryAdjustmentItem,
-  AdjustmentReason,
-  TransactionType
+  AdjustmentReason
 } from '@/lib/types/inventory'
+import { TransactionType } from '@/lib/types/inventory'
 import type { Money, DocumentStatus } from '@/lib/types/common'
 
 /**
@@ -130,7 +130,7 @@ export interface PaginationOptions {
 }
 
 export class StockMovementService {
-  private db: PrismaClient
+  private db: any
 
   constructor(prismaClient?: PrismaClient) {
     this.db = prismaClient || prisma
@@ -186,7 +186,7 @@ export class StockMovementService {
           requested_by: input.requestedBy,
           total_items: input.items.length,
           total_value_amount: totalValue,
-          total_value_currency: input.items[0]?.unitCost.currencyCode || 'USD',
+          total_value_currency: input.items[0]?.unitCost.currency || 'USD',
           priority: input.priority || 'normal',
           notes: input.notes,
           created_by: input.requestedBy
@@ -206,9 +206,9 @@ export class StockMovementService {
               item_id: item.itemId,
               requested_quantity: item.requestedQuantity,
               unit_cost_amount: item.unitCost.amount,
-              unit_cost_currency: item.unitCost.currencyCode,
+              unit_cost_currency: item.unitCost.currency,
               total_value_amount: item.requestedQuantity * item.unitCost.amount,
-              total_value_currency: item.unitCost.currencyCode,
+              total_value_currency: item.unitCost.currency,
               batch_no: item.batchNo,
               lot_no: item.lotNo,
               expiry_date: item.expiryDate,
@@ -271,7 +271,7 @@ export class StockMovementService {
           quantity: item.requested_quantity,
           unitCost: {
             amount: item.unit_cost_amount,
-            currencyCode: item.unit_cost_currency
+            currency: item.unit_cost_currency
           },
           referenceNo: dbMovement.movement_number,
           referenceType: 'STOCK_MOVEMENT',
@@ -290,7 +290,7 @@ export class StockMovementService {
           quantity: item.requested_quantity,
           unitCost: {
             amount: item.unit_cost_amount,
-            currencyCode: item.unit_cost_currency
+            currency: item.unit_cost_currency
           },
           referenceNo: dbMovement.movement_number,
           referenceType: 'STOCK_MOVEMENT',
@@ -362,7 +362,7 @@ export class StockMovementService {
           requested_by: input.requestedBy,
           total_items: input.items.length,
           total_value_amount: totalValue,
-          total_value_currency: input.items[0]?.unitCost.currencyCode || 'USD',
+          total_value_currency: input.items[0]?.unitCost.currency || 'USD',
           description: input.description,
           attachments: input.attachments,
           created_by: input.requestedBy
@@ -385,9 +385,9 @@ export class StockMovementService {
               adjustment_quantity: item.adjustmentQuantity,
               new_quantity: newQuantity,
               unit_cost_amount: item.unitCost.amount,
-              unit_cost_currency: item.unitCost.currencyCode,
+              unit_cost_currency: item.unitCost.currency,
               total_value_amount: Math.abs(item.adjustmentQuantity) * item.unitCost.amount,
-              total_value_currency: item.unitCost.currencyCode,
+              total_value_currency: item.unitCost.currency,
               reason: item.reason,
               batch_no: item.batchNo,
               lot_no: item.lotNo,
@@ -455,7 +455,7 @@ export class StockMovementService {
           quantity: Math.abs(item.adjustment_quantity),
           unitCost: {
             amount: item.unit_cost_amount,
-            currencyCode: item.unit_cost_currency
+            currency: item.unit_cost_currency
           },
           referenceNo: dbAdjustment.adjustment_number,
           referenceType: 'INVENTORY_ADJUSTMENT',
@@ -571,7 +571,7 @@ export class StockMovementService {
       ])
 
       const transformedMovements = await Promise.all(
-        movements.map(async (movement) => await this.transformDbMovementToStockMovement(movement))
+        movements.map(async (movement: any) => await this.transformDbMovementToStockMovement(movement))
       )
 
       return {
@@ -663,7 +663,7 @@ export class StockMovementService {
       ])
 
       const transformedAdjustments = await Promise.all(
-        adjustments.map(async (adjustment) => await this.transformDbAdjustmentToInventoryAdjustment(adjustment))
+        adjustments.map(async (adjustment: any) => await this.transformDbAdjustmentToInventoryAdjustment(adjustment))
       )
 
       return {
@@ -719,11 +719,11 @@ export class StockMovementService {
       receivedQuantity: item.received_quantity || undefined,
       unitCost: {
         amount: item.unit_cost_amount,
-        currencyCode: item.unit_cost_currency
+        currency: item.unit_cost_currency
       },
       totalValue: {
         amount: item.total_value_amount,
-        currencyCode: item.total_value_currency
+        currency: item.total_value_currency
       },
       batchNo: item.batch_no || undefined,
       lotNo: item.lot_no || undefined,
@@ -745,15 +745,10 @@ export class StockMovementService {
       totalItems: dbMovement.total_items,
       totalValue: {
         amount: dbMovement.total_value_amount,
-        currencyCode: dbMovement.total_value_currency
+        currency: dbMovement.total_value_currency
       },
       priority: dbMovement.priority,
-      notes: dbMovement.notes || undefined,
-      items,
-      createdAt: dbMovement.created_at,
-      updatedAt: dbMovement.updated_at,
-      createdBy: dbMovement.created_by,
-      updatedBy: dbMovement.updated_by || undefined
+      notes: dbMovement.notes || undefined
     }
   }
 
@@ -770,11 +765,11 @@ export class StockMovementService {
       newQuantity: item.new_quantity,
       unitCost: {
         amount: item.unit_cost_amount,
-        currencyCode: item.unit_cost_currency
+        currency: item.unit_cost_currency
       },
       totalValue: {
         amount: item.total_value_amount,
-        currencyCode: item.total_value_currency
+        currency: item.total_value_currency
       },
       reason: item.reason || undefined,
       batchNo: item.batch_no || undefined,
@@ -797,15 +792,10 @@ export class StockMovementService {
       totalItems: dbAdjustment.total_items,
       totalValue: {
         amount: dbAdjustment.total_value_amount,
-        currencyCode: dbAdjustment.total_value_currency
+        currency: dbAdjustment.total_value_currency
       },
       description: dbAdjustment.description || undefined,
-      attachments: dbAdjustment.attachments || [],
-      items,
-      createdAt: dbAdjustment.created_at,
-      updatedAt: dbAdjustment.updated_at,
-      createdBy: dbAdjustment.created_by,
-      updatedBy: dbAdjustment.updated_by || undefined
+      attachments: dbAdjustment.attachments || []
     }
   }
 }
