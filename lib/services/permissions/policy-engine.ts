@@ -436,8 +436,8 @@ export class PolicyEngine {
    * Legacy combine rule results (kept for compatibility)
    */
   private legacyCombineRuleResults(policy: Policy, ruleResults: any[]): EffectType {
-    const combiningAlgorithm = 'deny-overrides' // Default algorithm
-    
+    const combiningAlgorithm = 'deny-overrides' as 'deny-overrides' | 'permit-overrides' | 'first-applicable'
+
     switch (combiningAlgorithm) {
       case 'deny-overrides':
         // If any rule denies, the result is deny
@@ -571,8 +571,12 @@ export class PolicyEngine {
       case 'first-applicable':
         // Return the decision of the first matching policy
         const firstMatch = results[0]
+        // Convert 'not_applicable' and 'indeterminate' to DENY
+        const firstMatchEffect = firstMatch.effect === EffectType.PERMIT || firstMatch.effect === EffectType.DENY
+          ? firstMatch.effect
+          : EffectType.DENY
         return {
-          effect: firstMatch.effect,
+          effect: firstMatchEffect,
           reason: `Decision from first applicable policy ${firstMatch.policyId}: ${firstMatch.reason}`,
           obligations: [],
           advice: [],
@@ -588,8 +592,12 @@ export class PolicyEngine {
       case 'priority-based':
         // Return highest priority result
         const highestPriority = results[0] // Already sorted by priority
+        // Convert 'not_applicable' and 'indeterminate' to DENY
+        const highestPriorityEffect = highestPriority.effect === EffectType.PERMIT || highestPriority.effect === EffectType.DENY
+          ? highestPriority.effect
+          : EffectType.DENY
         return {
-          effect: highestPriority.effect,
+          effect: highestPriorityEffect,
           reason: `Decision from highest priority policy ${highestPriority.policyId}: ${highestPriority.reason}`,
           obligations: [],
           advice: [],
@@ -681,8 +689,8 @@ export class PolicyEngine {
       totalEvaluations: this.auditLog.length,
       permitDecisions: this.auditLog.filter(e => e.effect === 'permit').length,
       denyDecisions: this.auditLog.filter(e => e.effect === 'deny').length,
-      averageExecutionTime: this.auditLog.length > 0 
-        ? this.auditLog.reduce((sum, e) => sum + (e.executionTime || 0), 0) / this.auditLog.length
+      averageExecutionTime: this.auditLog.length > 0
+        ? this.auditLog.reduce((sum, e) => sum + (e.evaluationTime || 0), 0) / this.auditLog.length
         : 0,
       config: this.config
     }

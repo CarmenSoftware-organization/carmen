@@ -90,14 +90,10 @@ class Logger {
 
   private getDefaultLogLevel(): LogLevel {
     const env = process.env.NODE_ENV
-    switch (env) {
-      case 'production':
-        return 'info'
-      case 'staging':
-        return 'debug'
-      default:
-        return 'debug'
+    if (env === 'production') {
+      return 'info'
     }
+    return 'debug'
   }
 
   private setupPeriodicFlush() {
@@ -182,14 +178,22 @@ class Logger {
 
   private serializeError(error: any): LogEntry['error'] {
     if (error instanceof Error) {
-      return {
+      const serialized: LogEntry['error'] = {
         name: error.name,
         message: error.message,
         stack: error.stack,
-        ...(error.cause && { code: error.cause }),
       }
+
+      // Handle error.cause if it exists
+      if ('cause' in error && error.cause) {
+        if (typeof error.cause === 'string' || typeof error.cause === 'number') {
+          serialized.code = error.cause
+        }
+      }
+
+      return serialized
     }
-    
+
     if (typeof error === 'object' && error !== null) {
       return {
         name: error.name || 'UnknownError',
@@ -198,7 +202,7 @@ class Logger {
         ...(error.code && { code: error.code }),
       }
     }
-    
+
     return {
       name: 'UnknownError',
       message: String(error),
@@ -584,8 +588,10 @@ export function loggedFunction<T extends (...args: any[]) => any>(
 }
 
 // React hooks for component logging
+import React from 'react'
+
 export function useLogger(componentName: string) {
-  const componentLogger = React.useMemo(() => 
+  const componentLogger = React.useMemo(() =>
     createComponentLogger(componentName), [componentName]
   )
 

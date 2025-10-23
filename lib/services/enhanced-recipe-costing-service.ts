@@ -736,23 +736,47 @@ export class EnhancedRecipeCostingService extends BaseCalculator {
           unit: 'kg',
           notes: 'Main ingredient',
           type: 'product',
-          cost: { amount: 10, currency: 'USD' },
-          allergens: [],
+          costPerUnit: { amount: 5, currency: 'USD' },
+          totalCost: { amount: 10, currency: 'USD' },
+          wastage: 0,
+          yield: 100,
+          netQuantity: 2,
+          inventoryQty: 2,
+          inventoryUnit: 'kg',
           isOptional: false,
+          substitutes: [],
           preparation: 'chopped',
-          conversionFactor: 1
+          conversionFactor: 1,
+          displayOrder: 1
         }
       ],
       preparationSteps: [],
       prepTime: 30,
       cookTime: 45,
       totalTime: 75,
-      difficulty: 'medium',
       servingTemperature: 'hot',
       cuisine: 'international',
       dietaryInfo: [],
       allergenInfo: [],
-      nutritionalInfo: {},
+      nutritionalInfo: {
+        servingSize: '1 portion',
+        servingSizeGrams: 250,
+        calories: 350,
+        totalFat: 15,
+        saturatedFat: 5,
+        transFat: 0,
+        cholesterol: 30,
+        sodium: 500,
+        totalCarbohydrates: 40,
+        dietaryFiber: 5,
+        sugars: 5,
+        addedSugars: 0,
+        protein: 20,
+        caloriesFromFat: 135,
+        proteinPercentage: 23,
+        carbPercentage: 46,
+        fatPercentage: 39
+      },
       totalCost: { amount: 15, currency: 'USD' },
       costPerPortion: { amount: 3.75, currency: 'USD' },
       isActive: true,
@@ -778,7 +802,7 @@ export class EnhancedRecipeCostingService extends BaseCalculator {
     return ingredients.map(ingredient => ({
       ingredientId: ingredient.productId || ingredient.id,
       ingredientName: ingredient.name,
-      currentUnitCost: customPrices?.[ingredient.id] || ingredient.cost || { amount: 5, currency: 'USD' },
+      currentUnitCost: customPrices?.[ingredient.id] || ingredient.costPerUnit || { amount: 5, currency: 'USD' },
       supplierId: 'supplier-1',
       supplierName: 'Mock Supplier',
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
@@ -798,7 +822,7 @@ export class EnhancedRecipeCostingService extends BaseCalculator {
     
     return ingredients.map(ingredient => {
       const costSnapshot = costMap.get(ingredient.productId || ingredient.id);
-      const unitCost = costSnapshot?.currentUnitCost || ingredient.cost || { amount: 0, currency: 'USD' };
+      const unitCost = costSnapshot?.currentUnitCost || ingredient.costPerUnit || { amount: 0, currency: 'USD' };
       const totalCost = this.createMoney(unitCost.amount * ingredient.quantity, unitCost.currency);
       const costPerPortion = this.createMoney(totalCost.amount / recipeYield, totalCost.currency);
 
@@ -1142,8 +1166,8 @@ export class EnhancedRecipeCostingService extends BaseCalculator {
 
   private generateRecommendedActions(threshold: CostThreshold, variance: number): string[] {
     const actions: string[] = [];
-    
-    switch (threshold.severity) {
+
+    switch (threshold.alertSeverity) {
       case 'critical':
         actions.push('Immediate review required');
         actions.push('Consider temporary menu item removal');

@@ -3,6 +3,7 @@
  * Tracks Core Web Vitals, user journeys, and performance metrics
  */
 
+import React from 'react'
 import { getMonitoringConfig, businessMetricsConfig } from './config'
 import { logger } from './logger'
 
@@ -161,7 +162,8 @@ class PerformanceMonitor {
   private setupFID() {
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        const fid = entry.processingStart - entry.startTime
+        const eventEntry = entry as PerformanceEventTiming
+        const fid = eventEntry.processingStart - eventEntry.startTime
         this.webVitals.fid = fid
         this.recordMetric({
           name: 'web_vitals_fid',
@@ -236,8 +238,8 @@ class PerformanceMonitor {
       dns_lookup: entry.domainLookupEnd - entry.domainLookupStart,
       tcp_connect: entry.connectEnd - entry.connectStart,
       request_response: entry.responseEnd - entry.requestStart,
-      dom_processing: entry.domComplete - entry.domLoading,
-      load_complete: entry.loadEventEnd - entry.navigationStart,
+      dom_processing: entry.domComplete - entry.domInteractive,
+      load_complete: entry.loadEventEnd - entry.fetchStart,
     }
 
     Object.entries(metrics).forEach(([name, value]) => {

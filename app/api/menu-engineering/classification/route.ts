@@ -14,13 +14,14 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   createMenuEngineeringService,
   type MenuClassification
 } from '@/lib/services/menu-engineering-service'
-import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { EnhancedCacheLayer, type CacheLayerConfig } from '@/lib/services/cache/enhanced-cache-layer'
+import { withAuth, authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
@@ -47,8 +48,8 @@ const ClassificationQuerySchema = z.object({
   minRevenue: z.coerce.number().min(0).optional(),
   maxRevenue: z.coerce.number().min(0).optional(),
   // Output options
-  includeMetrics: z.string().transform(str => str !== 'false').optional().default(true),
-  includeTrends: z.string().transform(str => str === 'true').optional().default(false)
+  includeMetrics: z.coerce.boolean().optional().default(true),
+  includeTrends: z.coerce.boolean().optional().default(false)
 }).refine(data => {
   // Validate score ranges
   if (data.minPopularityScore && data.maxPopularityScore) {
@@ -81,7 +82,8 @@ const ClassificationQuerySchema = z.object({
  */
 const getClassifiedItems = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('menu_engineering', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('menu_engineering', 'read', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context
       try {
         const { searchParams } = new URL(request.url)
         
@@ -107,11 +109,15 @@ const getClassifiedItems = withSecurity(
         }
 
         // Enhanced security validation
-        const validationResult = await validateInput(rawQuery, ClassificationQuerySchema, {
-          maxLength: 500,
-          trimWhitespace: true,
-          removeSuspiciousPatterns: true
-        })
+        const validationResult = await validateInput(
+          rawQuery,
+          ClassificationQuerySchema as z.ZodType<z.infer<typeof ClassificationQuerySchema>>,
+          {
+            maxLength: 500,
+            trimWhitespace: true,
+            removeSuspiciousPatterns: true
+          }
+        )
 
         if (!validationResult.success) {
           await auditSecurityEvent(SecurityEventType.MALICIOUS_REQUEST, request, user.id, {
@@ -150,7 +156,33 @@ const getClassifiedItems = withSecurity(
         })
 
         // Initialize cache and services
-        const cache = new EnhancedCacheLayer()
+        const cacheConfig: CacheLayerConfig = {
+          redis: {
+            enabled: false,
+            fallbackToMemory: true,
+            connectionTimeout: 5000
+          },
+          memory: {
+            maxMemoryMB: 100,
+            maxEntries: 1000
+          },
+          ttl: {
+            financial: 300,
+            inventory: 600,
+            vendor: 600,
+            default: 300
+          },
+          invalidation: {
+            enabled: true,
+            batchSize: 100,
+            maxDependencies: 50
+          },
+          monitoring: {
+            enabled: false,
+            metricsInterval: 60000
+          }
+        }
+        const cache = new EnhancedCacheLayer(cacheConfig)
 
         // Mock classified items data (in real implementation, this would query the database)
         const mockItems = generateMockClassifiedItems(queryParams.classification, queryParams)

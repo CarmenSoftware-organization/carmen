@@ -18,16 +18,19 @@ import {
   isPositiveNumber,
   isValidDate,
   isMoney,
-  UserPreferences,
-  CompanySettings,
-  SecuritySettings,
-  ApplicationSettings,
   isValidTimezone,
   isValidCurrencyCode,
   isValidHexColor,
   isLanguage,
   isThemeMode
 } from './index'
+
+import type {
+  UserPreferences,
+  CompanySettings,
+  SecuritySettings,
+  ApplicationSettings
+} from './settings'
 
 // ====== VALIDATION RESULT TYPES ======
 

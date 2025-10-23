@@ -67,7 +67,7 @@ export interface AuthenticationResult {
 export interface AuthenticatedUser {
   id: string
   email: string
-  role: Role
+  role: 'staff' | 'department-manager' | 'financial-manager' | 'purchasing-staff' | 'counter' | 'chef' | 'admin' | 'super-admin'
   department?: string
   location?: string
   permissions: string[]
@@ -110,13 +110,25 @@ export class AuthenticationMiddleware {
     const sessionId = crypto.randomUUID()
 
     // Access Token Payload
+    // Map role name to JWT role enum value
+    const roleMapping: Record<string, 'staff' | 'department-manager' | 'financial-manager' | 'purchasing-staff' | 'counter' | 'chef' | 'admin' | 'super-admin'> = {
+      'staff': 'staff',
+      'department-manager': 'department-manager',
+      'financial-manager': 'financial-manager',
+      'purchasing-staff': 'purchasing-staff',
+      'counter': 'counter',
+      'chef': 'chef',
+      'admin': 'admin',
+      'super-admin': 'super-admin'
+    }
+
     const accessPayload: JWTPayload = {
       sub: user.id,
       email: user.email,
-      role: user.role,
-      department: user.department?.id,
-      location: user.location?.id,
-      permissions: user.permissions || [],
+      role: roleMapping[user.context.currentRole.name.toLowerCase()] || 'staff',
+      department: user.department, // Already a string (department ID)
+      location: user.location, // Already a string (location ID)
+      permissions: user.effectivePermissions || user.context.currentRole.permissions || [],
       iat: now,
       exp: now + this.parseExpiry(customExpiry || this.config.JWT_EXPIRES_IN),
       jti: sessionId,

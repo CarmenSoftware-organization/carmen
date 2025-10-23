@@ -1,15 +1,21 @@
 /**
  * Calculation Services - Main Export File
- * 
+ *
  * Centralized export for all calculation services and utilities.
  * Provides convenient access to financial, inventory, and vendor calculations.
  */
 
+// Import classes for instantiation
+import { FinancialCalculations } from './financial-calculations'
+import { InventoryCalculations } from './inventory-calculations'
+import { VendorMetrics } from './vendor-metrics'
+
 // Base calculator
-export { BaseCalculator, CalculationResult, CalculationContext, CalculationError } from './base-calculator'
+export { BaseCalculator, CalculationError } from './base-calculator'
+export type { CalculationResult, CalculationContext } from './base-calculator'
 
 // Financial calculations
-export { 
+export {
   FinancialCalculations,
   type TaxCalculationInput,
   type TaxCalculationResult,

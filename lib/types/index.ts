@@ -110,6 +110,11 @@ export * from './menu-engineering'
 // NOTE: Exclude FileAttachment (already exported from common.ts)
 export type {
   POSTransaction,
+  POSTransactionLineItem,
+  PendingTransaction,
+  TransactionError,
+  TransactionAuditLog,
+  InventoryImpactPreview,
   ErrorCategory
 } from './pos-integration'
 

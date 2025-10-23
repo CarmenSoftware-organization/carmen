@@ -14,18 +14,19 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   createPOSIntegrationService,
   type SyncDailySalesInput,
   type SyncDailySalesResult
 } from '@/lib/services/pos-integration-service'
-import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { EnhancedCacheLayer, type CacheLayerConfig } from '@/lib/services/cache/enhanced-cache-layer'
+import { withAuth, authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
 import { SecurityEventType } from '@/lib/security/audit-logger'
+import { type AuthenticatedUser } from '@/lib/middleware/auth'
 
 // Enhanced validation schema for POS sync
 const POSSyncSchema = z.object({
@@ -58,7 +59,8 @@ const POSSyncSchema = z.object({
  */
 const syncPOSData = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('menu_engineering', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('menu_engineering', 'create', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context
       try {
         const body = await request.json().catch(() => ({}))
 
@@ -119,7 +121,33 @@ const syncPOSData = withSecurity(
         })
 
         // Initialize cache and POS integration service
-        const cache = new EnhancedCacheLayer()
+        const cacheConfig: CacheLayerConfig = {
+          redis: {
+            enabled: false,
+            fallbackToMemory: true,
+            connectionTimeout: 5000
+          },
+          memory: {
+            maxMemoryMB: 100,
+            maxEntries: 1000
+          },
+          ttl: {
+            financial: 300,
+            inventory: 300,
+            vendor: 300,
+            default: 300
+          },
+          invalidation: {
+            enabled: true,
+            batchSize: 100,
+            maxDependencies: 50
+          },
+          monitoring: {
+            enabled: false,
+            metricsInterval: 60000
+          }
+        }
+        const cache = new EnhancedCacheLayer(cacheConfig)
         const posService = createPOSIntegrationService(cache)
 
         // Prepare sync input
@@ -132,26 +160,45 @@ const syncPOSData = withSecurity(
         }
 
         // Execute sync
-        const result = await posService.syncDailySales(syncInput)
+        let syncResult: SyncDailySalesResult
+        try {
+          const result = await posService.syncDailySales(syncInput)
 
-        if (!result.success) {
+          // Check for errors in the calculation result
+          if (result.errors && result.errors.length > 0) {
+            await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
+              component: 'pos-integration-service',
+              operation: 'sync_daily_sales',
+              errors: result.errors
+            })
+
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Failed to synchronize POS data',
+                details: result.errors
+              },
+              500
+            )
+          }
+
+          syncResult = result.value as SyncDailySalesResult
+        } catch (error) {
           await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
             component: 'pos-integration-service',
             operation: 'sync_daily_sales',
-            error: result.error
+            error: error instanceof Error ? error.message : 'Unknown error'
           })
 
           return createSecureResponse(
             {
               success: false,
               error: 'Failed to synchronize POS data',
-              details: result.error
+              details: error instanceof Error ? error.message : 'Unknown error'
             },
             500
           )
         }
-
-        const syncResult = result.value as SyncDailySalesResult
 
         // Log successful sync
         await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {

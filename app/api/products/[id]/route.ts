@@ -43,8 +43,8 @@ const moneySchema = z.object({
 })
 
 const updateProductSchema = z.object({
-  productName: SecureSchemas.safeString(255).min(1).optional(),
-  displayName: SecureSchemas.safeString(255).optional(),
+  productName: z.string().min(1).max(255).optional(),
+  displayName: z.string().max(255).optional(),
   description: SecureSchemas.safeString(2000).optional(),
   shortDescription: SecureSchemas.safeString(500).optional(),
   productType: z.enum(['raw_material', 'finished_good', 'semi_finished', 'service', 'asset', 'consumable']).optional(),
@@ -53,7 +53,7 @@ const updateProductSchema = z.object({
   subcategoryId: SecureSchemas.uuid.optional(),
   brandId: SecureSchemas.uuid.optional(),
   manufacturerId: SecureSchemas.uuid.optional(),
-  baseUnit: SecureSchemas.safeString(20).min(1).optional(),
+  baseUnit: z.string().min(1).max(20).optional(),
   isInventoried: z.boolean().optional(),
   isSerialTrackingRequired: z.boolean().optional(),
   isBatchTrackingRequired: z.boolean().optional(),
@@ -94,7 +94,13 @@ interface RouteParams {
  */
 const getProduct = withSecurity(
   withAuth(
-    withAuthorization('products', 'read', async (request: NextRequest, { user, params }: { user: AuthenticatedUser } & RouteParams) => {
+    withAuthorization('products', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
+      const url = new URL(request.url)
+      const pathParts = url.pathname.split('/')
+      const id = pathParts[pathParts.length - 1]
+      const params = { id }
+
+
       try {
         // Validate product ID parameter
         const paramsValidation = await validateInput(params, productParamsSchema)
@@ -196,7 +202,13 @@ export const GET = withRateLimit(RateLimitPresets.API)(getProduct)
  */
 const updateProduct = withSecurity(
   withAuth(
-    withAuthorization('products', 'update', async (request: NextRequest, { user, params }: { user: AuthenticatedUser } & RouteParams) => {
+    withAuthorization('products', 'update', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
+      const url = new URL(request.url)
+      const pathParts = url.pathname.split('/')
+      const id = pathParts[pathParts.length - 1]
+      const params = { id }
+
+
       try {
         // Validate product ID parameter
         const paramsValidation = await validateInput(params, productParamsSchema)
@@ -244,10 +256,11 @@ const updateProduct = withSecurity(
         }
 
         // Use sanitized data
-        const productData: UpdateProductInput = {
-          ...validationResult.sanitized || validationResult.data!,
+        const sanitizedData = validationResult.sanitized || validationResult.data!
+        const productData = {
+          ...sanitizedData,
           updatedBy: user.id // Override with authenticated user ID
-        }
+        } as UpdateProductInput
 
         // Additional permission checks for special statuses or high-value changes
         if (productData.status && !['active', 'inactive'].includes(productData.status)) {
@@ -390,7 +403,13 @@ export const PUT = withRateLimit({
  */
 const deleteProduct = withSecurity(
   withAuth(
-    withAuthorization('products', 'delete', async (request: NextRequest, { user, params }: { user: AuthenticatedUser } & RouteParams) => {
+    withAuthorization('products', 'delete', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
+      const url = new URL(request.url)
+      const pathParts = url.pathname.split('/')
+      const id = pathParts[pathParts.length - 1]
+      const params = { id }
+
+
       try {
         // Validate product ID parameter
         const paramsValidation = await validateInput(params, productParamsSchema)

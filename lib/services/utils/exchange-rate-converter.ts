@@ -108,7 +108,7 @@ class MockExchangeRateProvider implements ExchangeRateProvider {
       fromCurrency,
       toCurrency,
       rate: Math.round(adjustedRate * 10000) / 10000, // 4 decimal places
-      source: ExchangeRateSource.MOCK,
+      source: ExchangeRateSource.SYSTEM_DEFAULT,
       timestamp: new Date(),
       confidence: 0.95
     };
@@ -145,7 +145,7 @@ export class ExchangeRateConverter extends BaseCalculator {
       }
 
       const { amount, toCurrency } = request;
-      const fromCurrency = amount.currencyCode;
+      const fromCurrency = amount.currency;
 
       // Same currency, no conversion needed
       if (fromCurrency === toCurrency.toUpperCase()) {
@@ -153,7 +153,7 @@ export class ExchangeRateConverter extends BaseCalculator {
           originalAmount: amount,
           convertedAmount: amount,
           exchangeRate: 1.0,
-          source: ExchangeRateSource.SAME_CURRENCY,
+          source: ExchangeRateSource.SYSTEM_DEFAULT,
           timestamp: new Date(),
           confidence: 1.0,
           cacheHit: false
@@ -243,7 +243,7 @@ export class ExchangeRateConverter extends BaseCalculator {
         } catch (error) {
           // For bulk operations, we might want to continue with other conversions
           // and mark failed ones with zero values or skip them
-          console.error(`Failed to convert ${request.amount.currencyCode} to ${request.toCurrency}:`, error);
+          console.error(`Failed to convert ${request.amount.currency} to ${request.toCurrency}:`, error);
           
           // Add a failed conversion result
           results.push({
