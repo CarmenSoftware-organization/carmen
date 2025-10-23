@@ -13,33 +13,105 @@ class Redis {
     console.log('Mock Redis initialized:', config);
   }
 
-  async get(key: string) {
+  async get(key: string): Promise<string | null> {
     console.log('Mock Redis get:', key);
     return null;
   }
 
-  async set(key: string, value: string, ...args: any[]) {
+  async set(key: string, value: string, ...args: any[]): Promise<string> {
     console.log('Mock Redis set:', key, value, args);
     return 'OK';
   }
 
-  async del(key: string) {
-    console.log('Mock Redis del:', key);
-    return 1;
+  async setex(key: string, seconds: number, value: string): Promise<string> {
+    console.log('Mock Redis setex:', key, seconds, value);
+    return 'OK';
   }
 
-  async exists(key: string) {
-    console.log('Mock Redis exists:', key);
+  async del(...keys: string[]): Promise<number> {
+    console.log('Mock Redis del:', keys);
+    return keys.length;
+  }
+
+  async exists(...keys: string[]): Promise<number> {
+    console.log('Mock Redis exists:', keys);
     return 0;
   }
 
-  async disconnect() {
+  async keys(pattern: string): Promise<string[]> {
+    console.log('Mock Redis keys:', pattern);
+    return [];
+  }
+
+  async smembers(key: string): Promise<string[]> {
+    console.log('Mock Redis smembers:', key);
+    return [];
+  }
+
+  async ttl(key: string): Promise<number> {
+    console.log('Mock Redis ttl:', key);
+    return -1;
+  }
+
+  async ping(): Promise<string> {
+    console.log('Mock Redis ping');
+    return 'PONG';
+  }
+
+  async info(section?: string): Promise<string> {
+    console.log('Mock Redis info:', section);
+    return 'used_memory:1024\r\n';
+  }
+
+  async dbsize(): Promise<number> {
+    console.log('Mock Redis dbsize');
+    return 0;
+  }
+
+  async flushdb(): Promise<string> {
+    console.log('Mock Redis flushdb');
+    return 'OK';
+  }
+
+  async quit(): Promise<string> {
+    console.log('Mock Redis quit');
+    return 'OK';
+  }
+
+  disconnect(): void {
     console.log('Mock Redis disconnect');
   }
 
-  on(event: string, handler: Function) {
+  pipeline(): RedisPipeline {
+    console.log('Mock Redis pipeline');
+    return new RedisPipeline();
+  }
+
+  on(event: string, handler: (arg?: any) => void): this {
     console.log('Mock Redis event listener:', event);
     return this;
+  }
+}
+
+// Mock Redis Pipeline for batch operations
+class RedisPipeline {
+  private commands: Array<() => any> = [];
+
+  sadd(key: string, ...members: string[]): this {
+    console.log('Mock Pipeline sadd:', key, members);
+    this.commands.push(() => members.length);
+    return this;
+  }
+
+  expire(key: string, seconds: number): this {
+    console.log('Mock Pipeline expire:', key, seconds);
+    this.commands.push(() => 1);
+    return this;
+  }
+
+  async exec(): Promise<Array<[Error | null, any]>> {
+    console.log('Mock Pipeline exec');
+    return this.commands.map(cmd => [null, cmd()]);
   }
 }
 
@@ -134,7 +206,7 @@ export class RedisCacheProvider implements CacheProvider {
       console.log('[RedisCacheProvider] Connected to Redis');
     });
 
-    this.client.on('error', (error) => {
+    this.client.on('error', (error: Error) => {
       this.isConnected = false;
       this.lastError = error.message;
       this.errorCount++;
@@ -146,7 +218,7 @@ export class RedisCacheProvider implements CacheProvider {
       console.log('[RedisCacheProvider] Redis connection closed');
     });
 
-    this.client.on('reconnecting', (delay) => {
+    this.client.on('reconnecting', (delay: number) => {
       this.connectionAttempts++;
       console.log(`[RedisCacheProvider] Reconnecting to Redis (attempt ${this.connectionAttempts}, delay: ${delay}ms)`);
     });
@@ -308,7 +380,7 @@ export class RedisCacheProvider implements CacheProvider {
         hitCount: this.hitCount,
         missCount: this.missCount,
         errorCount: this.errorCount,
-        lastError: this.lastError,
+        lastError: this.lastError ?? undefined,
         uptime: Date.now() - this.startTime
       };
     } catch (error) {
@@ -318,7 +390,7 @@ export class RedisCacheProvider implements CacheProvider {
         hitCount: this.hitCount,
         missCount: this.missCount,
         errorCount: this.errorCount,
-        lastError: this.lastError,
+        lastError: this.lastError ?? undefined,
         uptime: Date.now() - this.startTime
       };
     }

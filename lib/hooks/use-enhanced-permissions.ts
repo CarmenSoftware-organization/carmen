@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { 
+import {
   enhancedPermissionService,
   checkEnhancedPermission,
   hasEnhancedPermission,
@@ -18,9 +18,8 @@ import {
   type EnhancedPermissionResult,
   type AttributeRequest
 } from '@/lib/services/permissions'
-import { useKeycloakUser } from '@/lib/context/keycloak-user-context'
+import { useKeycloakUser } from '@/lib/context/simple-user-context'
 import type { User } from '@/lib/types/user'
-import type { Permission } from '@/lib/types/permissions'
 
 // Enhanced query keys for React Query
 export const enhancedPermissionKeys = {
@@ -39,14 +38,10 @@ export const enhancedPermissionKeys = {
 export interface EnhancedPermissionCheckOptions extends Omit<EnhancedPermissionCheckRequest, 'userId'> {
   enabled?: boolean
   staleTime?: number
-  cacheTime?: number
-  onSuccess?: (data: EnhancedPermissionResult) => void
-  onError?: (error: any) => void
 }
 
 export interface AttributeResolutionOptions {
   enabled?: boolean
-  cacheTime?: number
   staleTime?: number
   includeSubject?: boolean
   includeResource?: boolean
@@ -59,20 +54,17 @@ export interface AttributeResolutionOptions {
  */
 export function useEnhancedPermission(options: EnhancedPermissionCheckOptions) {
   const { user } = useKeycloakUser()
-  const { 
-    enabled = true, 
-    staleTime = 5 * 60 * 1000, 
-    cacheTime = 10 * 60 * 1000,
-    onSuccess,
-    onError,
-    ...checkOptions 
+  const {
+    enabled = true,
+    staleTime = 5 * 60 * 1000,
+    ...checkOptions
   } = options
 
   return useQuery({
     queryKey: enhancedPermissionKeys.single(
-      user?.id || '', 
-      checkOptions.resourceType, 
-      checkOptions.action, 
+      user?.id || '',
+      checkOptions.resourceType,
+      checkOptions.action,
       checkOptions.resourceId,
       checkOptions.context
     ),
@@ -81,10 +73,10 @@ export function useEnhancedPermission(options: EnhancedPermissionCheckOptions) {
         return {
           allowed: false,
           reason: 'User not authenticated',
-          decision: { 
-            decision: 'deny', 
-            reason: 'User not authenticated', 
-            evaluatedPolicies: [] 
+          decision: {
+            decision: 'deny',
+            reason: 'User not authenticated',
+            evaluatedPolicies: []
           },
           executionTime: 0,
           matchedPolicies: []
@@ -104,9 +96,6 @@ export function useEnhancedPermission(options: EnhancedPermissionCheckOptions) {
     },
     enabled: enabled && !!user?.id,
     staleTime,
-    cacheTime,
-    onSuccess,
-    onError,
   })
 }
 
@@ -115,9 +104,8 @@ export function useEnhancedPermission(options: EnhancedPermissionCheckOptions) {
  */
 export function useUserAttributes(options: AttributeResolutionOptions = {}) {
   const { user } = useKeycloakUser()
-  const { 
-    enabled = true, 
-    cacheTime = 10 * 60 * 1000, 
+  const {
+    enabled = true,
     staleTime = 5 * 60 * 1000,
     includeSubject = true,
     includeResource = false,
@@ -140,7 +128,6 @@ export function useUserAttributes(options: AttributeResolutionOptions = {}) {
     },
     enabled: enabled && !!user?.id,
     staleTime,
-    cacheTime,
   })
 }
 
@@ -157,16 +144,14 @@ export function useEnhancedBulkPermissions(
     context?: EnhancedPermissionCheckRequest['context']
     enabled?: boolean
     staleTime?: number
-    cacheTime?: number
     resolveAttributes?: boolean
     auditEnabled?: boolean
   } = {}
 ) {
   const { user } = useKeycloakUser()
-  const { 
-    enabled = true, 
-    staleTime = 5 * 60 * 1000, 
-    cacheTime = 10 * 60 * 1000,
+  const {
+    enabled = true,
+    staleTime = 5 * 60 * 1000,
     context,
     resolveAttributes = true,
     auditEnabled = false // Disable audit for bulk to avoid spam
@@ -179,10 +164,10 @@ export function useEnhancedBulkPermissions(
         return permissions.map(p => ({
           allowed: false,
           reason: 'User not authenticated',
-          decision: { 
-            decision: 'deny', 
-            reason: 'User not authenticated', 
-            evaluatedPolicies: [] 
+          decision: {
+            decision: 'deny',
+            reason: 'User not authenticated',
+            evaluatedPolicies: []
           },
           executionTime: 0,
           matchedPolicies: []
@@ -201,7 +186,6 @@ export function useEnhancedBulkPermissions(
     },
     enabled: enabled && !!user?.id && permissions.length > 0,
     staleTime,
-    cacheTime,
   })
 }
 
@@ -324,7 +308,7 @@ export function usePermissionFeatureFlags(
   )
 
   const featureFlags = useMemo(() => {
-    if (!bulkQuery.data) {
+    if (!bulkQuery.data || !Array.isArray(bulkQuery.data)) {
       return featureKeys.reduce((acc, key) => ({ ...acc, [key]: fallbackEnabled }), {})
     }
 
@@ -465,14 +449,13 @@ export function usePermissionAnalytics() {
           totalQueries: permissionQueries.length,
           successfulQueries: permissionQueries.filter(q => q.state.status === 'success').length,
           errorQueries: permissionQueries.filter(q => q.state.status === 'error').length,
-          loadingQueries: permissionQueries.filter(q => q.state.status === 'loading').length,
+          loadingQueries: permissionQueries.filter(q => q.state.status === 'pending').length,
           staleQueries: permissionQueries.filter(q => q.isStale()).length
         },
         user: user?.id
       }
     },
     staleTime: 30000, // 30 seconds
-    cacheTime: 60000, // 1 minute
     enabled: !!user?.id
   })
 
@@ -548,16 +531,18 @@ export function useHasEnhancedPermission(
     enabled: options?.enabled
   })
 
+  const data = permissionQuery.data as EnhancedPermissionResult | undefined
+
   return {
-    hasPermission: permissionQuery.data?.allowed ?? false,
+    hasPermission: data?.allowed ?? false,
     isLoading: permissionQuery.isLoading,
     error: permissionQuery.error,
-    reason: permissionQuery.data?.reason,
-    decision: permissionQuery.data?.decision,
-    executionTime: permissionQuery.data?.executionTime,
-    resolvedAttributes: permissionQuery.data?.resolvedAttributes,
-    matchedPolicies: permissionQuery.data?.matchedPolicies || [],
-    auditLogId: permissionQuery.data?.auditLogId,
+    reason: data?.reason,
+    decision: data?.decision,
+    executionTime: data?.executionTime,
+    resolvedAttributes: data?.resolvedAttributes,
+    matchedPolicies: data?.matchedPolicies || [],
+    auditLogId: data?.auditLogId,
     refetch: permissionQuery.refetch,
   }
 }
@@ -588,10 +573,12 @@ export function useEnhancedResourcePermissions(
   )
 
   const permissions = useMemo(() => {
-    if (!bulkQuery.data) return {}
+    if (!bulkQuery.data || !Array.isArray(bulkQuery.data)) return {}
+
+    const data = bulkQuery.data as EnhancedPermissionResult[]
 
     return actions.reduce((acc, action, index) => {
-      const result = bulkQuery.data[index]
+      const result = data[index]
       return {
         ...acc,
         [action]: {
@@ -601,7 +588,9 @@ export function useEnhancedResourcePermissions(
         }
       }
     }, {} as Record<string, any>)
-  }, [bulkQuery.data])
+  }, [bulkQuery.data, actions])
+
+  const data = bulkQuery.data as EnhancedPermissionResult[] | undefined
 
   return {
     permissions,
@@ -617,7 +606,7 @@ export function useEnhancedResourcePermissions(
     isLoading: bulkQuery.isLoading,
     error: bulkQuery.error,
     refetch: bulkQuery.refetch,
-    resolvedAttributes: bulkQuery.data?.[0]?.resolvedAttributes
+    resolvedAttributes: data?.[0]?.resolvedAttributes
   }
 }
 

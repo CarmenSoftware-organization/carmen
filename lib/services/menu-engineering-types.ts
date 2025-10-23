@@ -8,6 +8,18 @@
 import { Money } from '@/lib/types/common';
 import { Recipe, Ingredient } from '@/lib/types/recipe';
 
+// Import types that will be used in this file
+import type {
+  MenuClassification,
+  MenuItemPerformance,
+  MenuRecommendation,
+  AnalysisInsight
+} from './menu-engineering-service';
+
+import type {
+  CostVariance
+} from './enhanced-recipe-costing-service';
+
 // Re-export service types for centralized access
 export type {
   // POS Integration Service Types

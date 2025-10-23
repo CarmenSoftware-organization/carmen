@@ -19,12 +19,18 @@ import {
   WorkflowStatus,
   Money,
   Currency,
-  POSTransaction,
+  POSTransaction
+} from './index'
+
+// Import types not re-exported from index
+import type {
   PendingTransaction,
   TransactionStatus,
   TransactionError,
-  ErrorCategory,
-  POSMapping,
+  POSMapping
+} from './pos-integration'
+
+import type {
   UserPreferences,
   CompanySettings,
   SecuritySettings,
@@ -34,7 +40,9 @@ import {
   NotificationSettings,
   ThemeMode,
   Language
-} from './index'
+} from './settings'
+
+import { ErrorCategory } from './pos-integration'
 
 // ====== CORE TYPE GUARDS ======
 
@@ -69,7 +77,14 @@ export const isCurrency = (value: any): value is Currency => {
  * Check if status is a valid DocumentStatus
  */
 export const isDocumentStatus = (value: any): value is DocumentStatus => {
-  const validStatuses: DocumentStatus[] = ['draft', 'inprogress', 'approved', 'converted', 'rejected', 'void'];
+  const validStatuses: DocumentStatus[] = [
+    DocumentStatus.Draft,
+    DocumentStatus.InProgress,
+    DocumentStatus.Approved,
+    DocumentStatus.Converted,
+    DocumentStatus.Rejected,
+    DocumentStatus.Void
+  ];
   return typeof value === 'string' && validStatuses.includes(value as DocumentStatus);
 };
 
@@ -77,7 +92,13 @@ export const isDocumentStatus = (value: any): value is DocumentStatus => {
  * Check if status is a valid WorkflowStatus
  */
 export const isWorkflowStatus = (value: any): value is WorkflowStatus => {
-  const validStatuses: WorkflowStatus[] = ['draft', 'pending', 'approved', 'review', 'rejected'];
+  const validStatuses: WorkflowStatus[] = [
+    WorkflowStatus.Draft,
+    WorkflowStatus.Pending,
+    WorkflowStatus.Approved,
+    WorkflowStatus.Review,
+    WorkflowStatus.Rejected
+  ];
   return typeof value === 'string' && validStatuses.includes(value as WorkflowStatus);
 };
 
@@ -420,9 +441,20 @@ export const isPOSTransaction = (value: any): value is POSTransaction => {
  */
 export const isPendingTransaction = (value: any): value is PendingTransaction => {
   return (
-    isPOSTransaction(value) &&
+    typeof value === 'object' &&
+    value !== null &&
+    typeof value.id === 'string' &&
+    typeof value.transactionId === 'string' &&
+    typeof value.externalId === 'string' &&
     value.status === 'pending_approval' &&
+    typeof value.locationId === 'string' &&
+    isMoney(value.totalAmount) &&
+    typeof value.itemCount === 'number' &&
     typeof value.requester === 'object' &&
+    value.requester !== null &&
+    typeof value.requester.id === 'string' &&
+    typeof value.requester.name === 'string' &&
+    typeof value.requester.email === 'string' &&
     Array.isArray(value.lineItems)
   );
 };

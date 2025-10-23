@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import { 
+import {
   usePermission,
   useBulkPermissions,
   useUserPermissions,
@@ -16,6 +16,7 @@ import {
   useFormPermissionGuard,
   usePermissionLogic
 } from './use-permissions'
+import type { BulkPermissionResult } from '@/lib/services/permissions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -63,10 +64,12 @@ export function PurchaseRequestActions({ purchaseRequestId }: { purchaseRequestI
     return <div>Loading permissions...</div>
   }
 
-  const canRead = permissions?.results.find(r => r.action === 'read')?.allowed ?? false
-  const canUpdate = permissions?.results.find(r => r.action === 'update')?.allowed ?? false
-  const canApprove = permissions?.results.find(r => r.action === 'approve')?.allowed ?? false
-  const canDelete = permissions?.results.find(r => r.action === 'delete')?.allowed ?? false
+  const bulkResult = permissions as BulkPermissionResult | undefined
+  const results = bulkResult?.results ?? []
+  const canRead = results.find((r: { action: string; allowed: boolean }) => r.action === 'read')?.allowed ?? false
+  const canUpdate = results.find((r: { action: string; allowed: boolean }) => r.action === 'update')?.allowed ?? false
+  const canApprove = results.find((r: { action: string; allowed: boolean }) => r.action === 'approve')?.allowed ?? false
+  const canDelete = results.find((r: { action: string; allowed: boolean }) => r.action === 'delete')?.allowed ?? false
 
   if (!canRead) {
     return <Alert><AlertDescription>You don't have permission to view this purchase request.</AlertDescription></Alert>
@@ -106,8 +109,8 @@ export function ProductManagementPanel({ productId }: { productId?: string }) {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div>Read Access: <Badge variant={canRead ? 'success' : 'secondary'}>{canRead ? 'Yes' : 'No'}</Badge></div>
-          <div>Write Access: <Badge variant={canWrite ? 'success' : 'secondary'}>{canWrite ? 'Yes' : 'No'}</Badge></div>
+          <div>Read Access: <Badge variant={canRead ? 'default' : 'secondary'}>{canRead ? 'Yes' : 'No'}</Badge></div>
+          <div>Write Access: <Badge variant={canWrite ? 'default' : 'secondary'}>{canWrite ? 'Yes' : 'No'}</Badge></div>
           
           <div className="flex gap-2 mt-4">
             {canCreate && <Button>Create Product</Button>}
@@ -225,7 +228,7 @@ export function FinancialReportsAccess() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <p>Access Level: <Badge variant={hasFullAccess ? 'success' : 'secondary'}>
+            <p>Access Level: <Badge variant={hasFullAccess ? 'default' : 'secondary'}>
               {hasFullAccess ? 'Full Access' : 'Limited Access'}
             </Badge></p>
             
@@ -260,41 +263,45 @@ export function UserPermissionsDashboard() {
     return <Alert><AlertDescription>Error loading permissions: {error.message}</AlertDescription></Alert>
   }
 
-  if (!permissions || permissions.length === 0) {
+  if (!permissions || (Array.isArray(permissions) && permissions.length === 0)) {
     return <Alert><AlertDescription>No permissions found for current user.</AlertDescription></Alert>
   }
 
   // Group permissions by resource type
-  const groupedPermissions = permissions.reduce((acc, perm) => {
+  const permissionsArray = Array.isArray(permissions) ? permissions : []
+  const groupedPermissions = permissionsArray.reduce((acc: Record<string, any[]>, perm: any) => {
     if (!acc[perm.resourceType]) {
       acc[perm.resourceType] = []
     }
     acc[perm.resourceType].push(perm)
     return acc
-  }, {} as Record<string, typeof permissions>)
+  }, {} as Record<string, any[]>)
 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Your Permissions</h3>
       
-      {Object.entries(groupedPermissions).map(([resourceType, perms]) => (
-        <Card key={resourceType}>
-          <CardHeader>
-            <CardTitle className="text-base capitalize">
-              {resourceType.replace('-', ' ')} ({perms.length} permissions)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {perms.map((perm) => (
-                <Badge key={`${perm.resourceType}-${perm.action}`} variant="outline">
-                  {perm.action}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+      {Object.entries(groupedPermissions).map(([resourceType, perms]) => {
+        const permsArray = Array.isArray(perms) ? perms : []
+        return (
+          <Card key={resourceType}>
+            <CardHeader>
+              <CardTitle className="text-base capitalize">
+                {resourceType.replace('-', ' ')} ({permsArray.length} permissions)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {permsArray.map((perm: any) => (
+                  <Badge key={`${perm.resourceType}-${perm.action}`} variant="outline">
+                    {perm.action}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )
+      })}
     </div>
   )
 }
@@ -363,7 +370,7 @@ export function RealtimePermissionMonitor() {
       <CardContent>
         <div className="space-y-2">
           <p>Last Updated: {lastUpdate.toLocaleTimeString()}</p>
-          <p>Total Permissions: {permissions?.length ?? 0}</p>
+          <p>Total Permissions: {Array.isArray(permissions) ? permissions.length : 0}</p>
           <Button size="sm" onClick={() => refetch()}>
             Refresh Now
           </Button>

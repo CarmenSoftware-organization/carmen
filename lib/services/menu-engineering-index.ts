@@ -99,32 +99,36 @@ export type {
 
 // ====== VALIDATION SCHEMAS ======
 
+// POS Integration Schemas
 export {
   SalesTransactionSchema,
   POSItemMappingSchema,
-  SalesDataImportBatchSchema,
+  SalesDataImportBatchSchema
+} from './pos-integration-service';
+
+// Menu Engineering Schemas
+export {
   MenuAnalysisInputSchema,
   PopularityCalculationInputSchema,
   ProfitabilityCalculationInputSchema,
-  RealTimeCostCalculationSchema,
-  CostThresholdSchema,
-  InventoryChangeEventSchema,
-  MenuEngineeringModuleConfigSchema
-} from './pos-integration-service';
-
-export {
   MenuAnalysisInputSchema as AnalysisInputSchema,
   PopularityCalculationInputSchema as PopularityInputSchema,
   ProfitabilityCalculationInputSchema as ProfitabilityInputSchema
 } from './menu-engineering-service';
 
+// Enhanced Recipe Costing Schemas
 export {
+  RealTimeCostCalculationSchema,
+  CostThresholdSchema,
+  InventoryChangeEventSchema,
   RealTimeCostCalculationSchema as CostCalculationSchema,
   CostThresholdSchema as ThresholdSchema,
   InventoryChangeEventSchema as InventoryEventSchema
 } from './enhanced-recipe-costing-service';
 
+// Integration Schemas
 export {
+  MenuEngineeringModuleConfigSchema,
   MenuEngineeringModuleConfigSchema as ModuleConfigSchema
 } from './menu-engineering-integration';
 
@@ -136,18 +140,13 @@ export {
 export function createMenuEngineeringSystem(
   config?: Partial<MenuEngineeringModuleConfig>
 ) {
-  const integrationService = createMenuEngineeringIntegrationService(config);
-  
+  const integrationService = createIntegrationService(config);
+
+  // Note: Individual services are not exposed as they are managed internally by the integration service
+  // Access all functionality through the integration service methods
   return {
     // Main integration service
     integration: integrationService,
-    
-    // Individual services (accessible if needed)
-    services: {
-      pos: createPOSIntegrationService(integrationService['cache']),
-      analytics: createMenuEngineeringService(integrationService['cache']),
-      costing: createEnhancedRecipeCostingService(integrationService['cache'])
-    },
     
     // Convenience methods
     async generateFullAnalysis(periodStart: Date, periodEnd: Date, locationIds?: string[]) {
@@ -205,7 +204,29 @@ export const defaultMenuEngineeringConfig: MenuEngineeringModuleConfig = {
     enabled: true,
     costVarianceThreshold: 10,
     profitMarginThreshold: 20,
-    notificationChannels: ['email', 'dashboard']
+    notificationChannels: ['email', 'dashboard'],
+    escalationLevels: [
+      {
+        severity: 'low',
+        responseTime: 48,
+        recipients: ['manager@example.com']
+      },
+      {
+        severity: 'medium',
+        responseTime: 24,
+        recipients: ['manager@example.com', 'supervisor@example.com']
+      },
+      {
+        severity: 'high',
+        responseTime: 8,
+        recipients: ['manager@example.com', 'supervisor@example.com', 'director@example.com']
+      },
+      {
+        severity: 'critical',
+        responseTime: 2,
+        recipients: ['manager@example.com', 'supervisor@example.com', 'director@example.com', 'executive@example.com']
+      }
+    ]
   },
   integration: {
     posSystemId: 'default_pos',
@@ -226,7 +247,27 @@ export const defaultMenuEngineeringConfig: MenuEngineeringModuleConfig = {
       puzzles: '#3b82f6',    // blue
       dogs: '#ef4444'        // red
     },
-    exportFormats: ['pdf', 'excel', 'csv']
+    exportFormats: ['pdf', 'excel', 'csv'],
+    scheduledReports: [
+      {
+        name: 'Daily Menu Performance',
+        frequency: 'daily',
+        recipients: ['manager@example.com'],
+        format: 'pdf'
+      },
+      {
+        name: 'Weekly Menu Analysis',
+        frequency: 'weekly',
+        recipients: ['manager@example.com', 'director@example.com'],
+        format: 'excel'
+      },
+      {
+        name: 'Monthly Strategic Review',
+        frequency: 'monthly',
+        recipients: ['director@example.com', 'executive@example.com'],
+        format: 'pdf'
+      }
+    ]
   }
 };
 
@@ -316,7 +357,7 @@ export const validation = {
   /**
    * Validate module configuration
    */
-  validateModuleConfig(data: any): { valid: boolean; errors: string[]; config?: MenuEngineeringModuleConfig } {
+  validateModuleConfig(data: any): { valid: boolean; errors: string[]; config?: z.infer<typeof MenuEngineeringModuleConfigSchema> } {
     try {
       const config = MenuEngineeringModuleConfigSchema.parse(data);
       return { valid: true, errors: [], config };
@@ -407,9 +448,17 @@ export const monitoring = {
   }
 };
 
-// Import required dependencies for type checking
+// Import required dependencies for type checking and implementation
 import { z } from 'zod';
 import type {
   MenuClassification,
   MenuEngineeringModuleConfig
 } from './menu-engineering-types';
+
+// Import schemas for validation functions
+import { SalesTransactionSchema } from './pos-integration-service';
+import { CostThresholdSchema } from './enhanced-recipe-costing-service';
+import { MenuEngineeringModuleConfigSchema } from './menu-engineering-integration';
+
+// Import service factory for system creation
+import { createMenuEngineeringIntegrationService as createIntegrationService } from './menu-engineering-integration';
