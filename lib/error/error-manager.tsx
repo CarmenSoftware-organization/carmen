@@ -187,7 +187,7 @@ class ErrorManager {
     } = config
 
     if (showToast) {
-      this.showToastError(error, { autoHide, hideAfter, showRetry, recoveryActions })
+      this.showToastError(error, { autoHide, hideAfter, showRetry: showRetry ?? false, recoveryActions })
     }
 
     if (showModal) {

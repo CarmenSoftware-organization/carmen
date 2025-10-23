@@ -188,7 +188,8 @@ export class DatabaseTestSuite {
         throw new Error('Expected operation to be blocked')
       } catch (error) {
         if (!(error instanceof DatabaseCircuitBreakerError)) {
-          throw new Error(`Expected DatabaseCircuitBreakerError, got ${error.constructor.name}`)
+          const errorName = error instanceof Error ? error.constructor.name : String(error)
+          throw new Error(`Expected DatabaseCircuitBreakerError, got ${errorName}`)
         }
       }
       

@@ -165,10 +165,10 @@ export class DatabaseConnectionMonitor {
       try {
         const poolMetrics = await this.getPoolMetrics()
         this.updateMetrics(poolMetrics)
-        
-        if (poolMetrics.poolUtilization < this.alertConfig.thresholds.poolUtilization) {
+
+        if (poolMetrics.poolUtilization !== undefined && poolMetrics.poolUtilization < this.alertConfig.thresholds.poolUtilization) {
           checks.poolHealth = true
-        } else {
+        } else if (poolMetrics.poolUtilization !== undefined) {
           warnings.push(`High pool utilization: ${poolMetrics.poolUtilization}%`)
         }
       } catch (error) {

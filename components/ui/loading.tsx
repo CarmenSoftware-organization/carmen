@@ -129,7 +129,7 @@ export function ProgressBar({
 
 // Loading states for different contexts
 interface LoadingStateProps {
-  type: 'inline' | 'overlay' | 'page' | 'card' | 'button' | 'table'
+  type: 'inline' | 'overlay' | 'page' | 'card' | 'button' | 'table' | 'skeleton'
   message?: string
   submessage?: string
   progress?: number
@@ -239,6 +239,9 @@ export function LoadingState({
           </div>
         </div>
       )
+
+    case 'skeleton':
+      return <CardSkeleton className={className} />
 
     default:
       return (

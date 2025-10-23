@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GoodsReceiveNote, GoodsReceiveNoteStatus } from '@/lib/types';
+import { GoodsReceiveNote, GRNStatus } from '@/lib/types';
 import StatusBadge from '@/components/ui/custom-status-badge';
 
 interface GoodsReceiveNoteTabProps {
@@ -10,7 +10,7 @@ interface GoodsReceiveNoteTabProps {
     id: string;
     ref: string;
     date: Date;
-    status: GoodsReceiveNoteStatus;
+    status: GRNStatus;
     orderedQuantity: number;
     receivedQuantity: number;
     remarks: string;
@@ -22,7 +22,7 @@ interface GoodsReceiveNoteItem {
   id: string;
   ref: string;
   date: Date;
-  status: GoodsReceiveNoteStatus;
+  status: GRNStatus;
   receivedQuantity: number;
   remarks: string;
   unit: string;
@@ -30,30 +30,30 @@ interface GoodsReceiveNoteItem {
 
 // Mock items received
 const mockItemsReceived: GoodsReceiveNoteItem[] = [
-  { 
-    id: "GRN001", 
+  {
+    id: "GRN001",
     ref: "GRN-2023-001",
-    date: new Date("2023-05-15"), 
-    status: "Received", 
-    receivedQuantity: 50, 
+    date: new Date("2023-05-15"),
+    status: GRNStatus.RECEIVED,
+    receivedQuantity: 50,
     remarks: "All items in good condition",
     unit: "unit"
   },
-  { 
-    id: "GRN002", 
+  {
+    id: "GRN002",
     ref: "GRN-2023-002",
-    date: new Date("2023-05-20"), 
-    status: "Committed", 
-    receivedQuantity: 30, 
+    date: new Date("2023-05-20"),
+    status: GRNStatus.COMMITTED,
+    receivedQuantity: 30,
     remarks: "Some items backordered",
     unit: "unit"
   },
-  { 
-    id: "GRN003", 
+  {
+    id: "GRN003",
     ref: "GRN-2023-003",
-    date: new Date("2023-05-25"), 
-    status: "Committed", 
-    receivedQuantity: 0, 
+    date: new Date("2023-05-25"),
+    status: GRNStatus.COMMITTED,
+    receivedQuantity: 0,
     remarks: "Awaiting delivery",
     unit: "unit"
   },

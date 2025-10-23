@@ -73,5 +73,17 @@ export {
   type RoleAssignment
 } from './permission-roles'
 
-export * from './permission-policies'
+// Export permission-policies with explicit exports to avoid PolicyTemplate conflict
+// Note: allMockPolicies is exported from permission-index instead
+export {
+  procurementPolicies,
+  inventoryPolicies,
+  vendorPolicies,
+  policyTemplates,
+  searchPolicies,
+  getPoliciesByCategory,
+  getPoliciesByResource,
+  getActivePolicies
+} from './permission-policies'
+
 export * from './permission-subscriptions'

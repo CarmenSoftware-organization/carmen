@@ -20,7 +20,7 @@ export { mockPRListData as mockPurchaseRequests } from '../../app/(main)/procure
 export const getPurchaseOrderById = (id: string): PurchaseOrder | undefined => {
   // Import here to avoid circular dependencies
   const { Mock_purchaseOrders } = require('../mock/mock_purchaseOrder')
-  return Mock_purchaseOrders.find((po: PurchaseOrder) => po.poId === id)
+  return Mock_purchaseOrders.find((po: PurchaseOrder) => po.id === id)
 }
 
 export const getPurchaseOrdersByStatus = (status: string): PurchaseOrder[] => {

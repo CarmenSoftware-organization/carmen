@@ -158,7 +158,7 @@ export class DatabaseTimeoutHandler {
    */
   async executeTransaction<T>(
     prisma: PrismaClient,
-    transactionFn: (tx: PrismaClient) => Promise<T>,
+    transactionFn: (tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>) => Promise<T>,
     context: Omit<OperationContext, 'operationType'>,
     customTimeout?: number
   ): Promise<TimeoutResult<T>> {
@@ -166,19 +166,19 @@ export class DatabaseTimeoutHandler {
       ...context,
       operationType: 'transaction'
     }
-    
+
     return this.executeWithTimeout(
       async (signal) => {
         if (signal?.aborted) {
           throw new DatabaseTimeoutError('Transaction cancelled before execution')
         }
-        
+
         return prisma.$transaction(async (tx) => {
           // Check for cancellation during transaction
           if (signal?.aborted) {
             throw new DatabaseTimeoutError('Transaction cancelled during execution')
           }
-          
+
           return transactionFn(tx)
         })
       },

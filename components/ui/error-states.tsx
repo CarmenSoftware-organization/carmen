@@ -23,7 +23,7 @@ interface ErrorStateProps {
   error?: Error | string
   onRetry?: () => void
   showRetry?: boolean
-  variant?: "default" | "destructive" | "warning"
+  variant?: "default" | "destructive"
 }
 
 export function NetworkErrorState({ 

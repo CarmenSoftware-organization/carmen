@@ -19,6 +19,11 @@ const createMockUser = (): User => {
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
+    // Permission-related fields (required by UserProfile)
+    roles: mockRoles, // User has access to all roles for testing
+    primaryRole: defaultRole, // Primary role object
+    departments: mockDepartments, // Departments user has access to
+    locations: mockLocations, // Locations user has access to
     // Current active selections
     role: defaultRole.name,
     department: defaultDepartment.name,
