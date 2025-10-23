@@ -21,8 +21,9 @@ import {
   MenuAnalysisInputSchema
 } from '@/lib/services/menu-engineering-service'
 import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
@@ -36,15 +37,15 @@ const MenuAnalysisQuerySchema = z.object({
   recipeIds: z.string().transform(str => str.split(',')).pipe(z.array(SecureSchemas.uuid)).optional(),
   category: SecureSchemas.safeString(100).optional(),
   classification: z.enum(['stars', 'plowhorses', 'puzzles', 'dogs', 'all']).optional().default('all'),
-  includeInactive: z.string().transform(str => str === 'true').optional().default(false),
+  includeInactive: z.string().optional().transform(str => str === 'true').default('false'),
   // Configuration options
   popularityThreshold: z.coerce.number().min(50).max(95).optional(),
   profitabilityThreshold: z.coerce.number().min(50).max(95).optional(),
   minimumSampleSize: z.coerce.number().positive().optional(),
   dataQualityThreshold: z.coerce.number().min(0.1).max(1).optional(),
   // Output options
-  includeRecommendations: z.string().transform(str => str !== 'false').optional().default(true),
-  includeInsights: z.string().transform(str => str !== 'false').optional().default(true),
+  includeRecommendations: z.string().optional().transform(str => str !== 'false').default('true'),
+  includeInsights: z.string().optional().transform(str => str !== 'false').default('true'),
   maxRecommendations: z.coerce.number().int().min(1).max(50).optional().default(20)
 }).refine(data => {
   // Period validation
@@ -66,7 +67,7 @@ const MenuAnalysisQuerySchema = z.object({
  */
 const getMenuAnalysis = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('menu_engineering', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('menu_engineering', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const { searchParams } = new URL(request.url)
         
@@ -89,7 +90,7 @@ const getMenuAnalysis = withSecurity(
         }
 
         // Enhanced security validation
-        const validationResult = await validateInput(rawQuery, MenuAnalysisQuerySchema, {
+        const validationResult = await validateInput(rawQuery, MenuAnalysisQuerySchema as any, {
           maxLength: 1000,
           trimWhitespace: true,
           removeSuspiciousPatterns: true
@@ -112,7 +113,7 @@ const getMenuAnalysis = withSecurity(
           )
         }
 
-        const queryParams = validationResult.sanitized || validationResult.data!
+        const queryParams = (validationResult.sanitized || validationResult.data!) as z.infer<typeof MenuAnalysisQuerySchema>
 
         // Log analytics access
         await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {
@@ -128,7 +129,13 @@ const getMenuAnalysis = withSecurity(
         })
 
         // Initialize cache and menu engineering service
-        const cache = new EnhancedCacheLayer()
+        const cache = new EnhancedCacheLayer({
+          redis: { enabled: false, fallbackToMemory: true, connectionTimeout: 5000 },
+          memory: { maxMemoryMB: 128, maxEntries: 1000 },
+          ttl: { financial: 300, inventory: 300, vendor: 300, default: 300 },
+          invalidation: { enabled: true, batchSize: 100, maxDependencies: 1000 },
+          monitoring: { enabled: false, metricsInterval: 60000 }
+        })
         const menuService = createMenuEngineeringService(cache)
 
         // Prepare analysis input
@@ -149,24 +156,23 @@ const getMenuAnalysis = withSecurity(
         // Execute menu analysis
         const result = await menuService.analyzeMenuPerformance(analysisInput)
 
-        if (!result.success) {
+        if (!result.value) {
           await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
             component: 'menu-engineering-service',
             operation: 'analyze_menu_performance',
-            error: result.error
+            error: 'Analysis failed to return value'
           })
 
           return createSecureResponse(
             {
               success: false,
-              error: 'Failed to analyze menu performance',
-              details: result.error
+              error: 'Failed to analyze menu performance'
             },
             500
           )
         }
 
-        const analysisResult = result.value as MenuAnalysisResult
+        const analysisResult = result.value
 
         // Filter results by classification if specified
         let filteredResult = analysisResult

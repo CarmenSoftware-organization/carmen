@@ -17,7 +17,8 @@ import {
   type UpdatePurchaseRequestInput,
   type ApprovalInput
 } from '@/lib/services/db/purchase-request-service'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
@@ -41,7 +42,7 @@ const approvalSchema = z.object({
   approvedQuantity: z.number().min(0).optional(),
   approvedUnitPrice: z.object({
     amount: z.number().min(0),
-    currencyCode: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
+    currency: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
   }).optional(),
   approvedVendor: SecureSchemas.safeString(255).optional()
 })
@@ -57,11 +58,14 @@ const convertToPOSchema = z.object({
 const getPurchaseRequest = withSecurity(
   authStrategies.hybrid(
     withAuthorization('purchase_requests', 'read', async (
-      request: NextRequest, 
-      { user, params }: { user: UnifiedAuthenticatedUser; params: { id: string } }
+      request: NextRequest,
+      { user }: { user: AuthenticatedUser }
     ) => {
       try {
-        const { id } = params
+        // Extract ID from URL
+        const url = new URL(request.url)
+        const pathSegments = url.pathname.split('/')
+        const id = pathSegments[pathSegments.length - 1]
 
         // Validate ID format
         const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
@@ -109,8 +113,8 @@ const getPurchaseRequest = withSecurity(
 
         // Check department access
         const canViewAllDepartments = await checkPermission(user, 'view_all_departments', 'purchase_requests')
-        if (!canViewAllDepartments && purchaseRequest.departmentId !== user.departmentId) {
-          await auditSecurityEvent(SecurityEventType.UNAUTHORIZED_ACCESS, request, user.id, {
+        if (!canViewAllDepartments && purchaseRequest.departmentId !== user.department) {
+          await auditSecurityEvent(SecurityEventType.AUTHORIZATION_DENIED, request, user.id, {
             resource: 'purchase_requests',
             resourceId: id,
             reason: 'Attempted to access request from different department'
@@ -167,10 +171,13 @@ const updatePurchaseRequest = withSecurity(
   authStrategies.hybrid(
     withAuthorization('purchase_requests', 'update', async (
       request: NextRequest,
-      { user, params }: { user: UnifiedAuthenticatedUser; params: { id: string } }
+      { user }: { user: AuthenticatedUser }
     ) => {
       try {
-        const { id } = params
+        // Extract ID from URL
+        const url = new URL(request.url)
+        const pathSegments = url.pathname.split('/')
+        const id = pathSegments[pathSegments.length - 1]
         const body = await request.json()
 
         // Validate ID and body
@@ -224,7 +231,7 @@ const updatePurchaseRequest = withSecurity(
         const canUpdateOthers = await checkPermission(user, 'update_all_requests', 'purchase_requests')
         
         if (existingRequest.requestedBy !== user.id && !canUpdateOthers) {
-          await auditSecurityEvent(SecurityEventType.UNAUTHORIZED_ACCESS, request, user.id, {
+          await auditSecurityEvent(SecurityEventType.AUTHORIZATION_DENIED, request, user.id, {
             resource: 'purchase_requests',
             resourceId: id,
             reason: 'Attempted to update request owned by another user'
@@ -304,10 +311,13 @@ const cancelPurchaseRequest = withSecurity(
   authStrategies.hybrid(
     withAuthorization('purchase_requests', 'delete', async (
       request: NextRequest,
-      { user, params }: { user: UnifiedAuthenticatedUser; params: { id: string } }
+      { user }: { user: AuthenticatedUser }
     ) => {
       try {
-        const { id } = params
+        // Extract ID from URL
+        const url = new URL(request.url)
+        const pathSegments = url.pathname.split('/')
+        const id = pathSegments[pathSegments.length - 1]
 
         // Validate ID
         const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
@@ -398,71 +408,70 @@ export const DELETE = withRateLimit(RateLimitPresets.API)(cancelPurchaseRequest)
 /**
  * POST /api/purchase-requests/[id]/submit - Submit for approval
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  return withSecurity(
-    authStrategies.hybrid(
-      withAuthorization('purchase_requests', 'update', async (
-        req: NextRequest,
-        { user }: { user: UnifiedAuthenticatedUser }
-      ) => {
-        try {
-          const { id } = params
-          const url = new URL(req.url)
-          const action = url.pathname.split('/').pop()
+const handlePostAction = withSecurity(
+  authStrategies.hybrid(
+    withAuthorization('purchase_requests', 'update', async (
+      req: NextRequest,
+      { user }: { user: AuthenticatedUser }
+    ) => {
+      try {
+        // Extract ID from URL
+        const url = new URL(req.url)
+        const pathSegments = url.pathname.split('/')
+        const action = pathSegments[pathSegments.length - 1]
+        const id = pathSegments[pathSegments.length - 2]
 
-          // Validate ID
-          const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
-          if (!idValidation.success) {
-            return createSecureResponse(
-              {
-                success: false,
-                error: 'Invalid purchase request ID'
-              },
-              400
-            )
-          }
-
-          switch (action) {
-            case 'submit':
-              return await handleSubmit(req, user, id)
-            case 'approve':
-            case 'reject':
-              return await handleApproval(req, user, id)
-            case 'convert':
-              return await handleConvert(req, user, id)
-            default:
-              return createSecureResponse(
-                {
-                  success: false,
-                  error: 'Invalid action'
-                },
-                400
-              )
-          }
-        } catch (error) {
-          console.error('Error in POST /api/purchase-requests/[id]/[action]:', error)
-          
+        // Validate ID
+        const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
+        if (!idValidation.success) {
           return createSecureResponse(
             {
               success: false,
-              error: 'Internal server error'
+              error: 'Invalid purchase request ID'
             },
-            500
+            400
           )
         }
-      })
-    )
-  )(request, { params })
-}
+
+        switch (action) {
+          case 'submit':
+            return await handleSubmit(req, user, id)
+          case 'approve':
+          case 'reject':
+            return await handleApproval(req, user, id)
+          case 'convert':
+            return await handleConvert(req, user, id)
+          default:
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid action'
+              },
+              400
+            )
+        }
+      } catch (error) {
+        console.error('Error in POST /api/purchase-requests/[id]/[action]:', error)
+
+        return createSecureResponse(
+          {
+            success: false,
+            error: 'Internal server error'
+          },
+          500
+        )
+      }
+    })
+  )
+)
+
+export const POST = withRateLimit(RateLimitPresets.API)(handlePostAction)
 
 async function handleSubmit(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   // Check ownership or permission
   const existingResult = await purchaseRequestService.getPurchaseRequestById(id)
   if (!existingResult.success) {
@@ -517,9 +526,9 @@ async function handleSubmit(
 
 async function handleApproval(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   const body = await request.json()
   const action = new URL(request.url).pathname.split('/').pop() as 'approve' | 'reject'
 
@@ -536,9 +545,14 @@ async function handleApproval(
     )
   }
 
+  const validatedData = bodyValidation.data!
   const approvalData: ApprovalInput = {
-    ...bodyValidation.data!,
-    userId: user.id
+    userId: user.id,
+    action: validatedData.action,
+    comments: validatedData.comments,
+    approvedQuantity: validatedData.approvedQuantity,
+    approvedUnitPrice: validatedData.approvedUnitPrice,
+    approvedVendor: validatedData.approvedVendor
   }
 
   // Log action
@@ -569,9 +583,9 @@ async function handleApproval(
 
 async function handleConvert(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   const body = await request.json()
 
   // Validate body

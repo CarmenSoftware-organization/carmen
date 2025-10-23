@@ -19,7 +19,8 @@ import {
   type MenuClassification
 } from '@/lib/services/menu-engineering-service'
 import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { withAuthorization } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
@@ -37,7 +38,7 @@ const PerformanceMetricsQuerySchema = z.object({
   departmentId: SecureSchemas.uuid.optional(),
   // Comparison options
   compareWith: z.enum(['previous_period', 'same_period_last_year', 'category_average', 'none']).optional().default('previous_period'),
-  includeBenchmarks: z.string().transform(str => str === 'true').optional().default(false),
+  includeBenchmarks: z.string().optional().default('false').transform(str => str === 'true'),
   // Metrics selection
   metrics: z.string().transform(str => str.split(',')).pipe(
     z.array(z.enum([
@@ -48,9 +49,9 @@ const PerformanceMetricsQuerySchema = z.object({
   // Granularity
   groupBy: z.enum(['hour', 'day', 'week', 'month', 'day_of_week', 'meal_period']).optional().default('day'),
   // Output options
-  includeForecasting: z.string().transform(str => str === 'true').optional().default(false),
-  includeRecommendations: z.string().transform(str => str === 'true').optional().default(false),
-  includeAlerts: z.string().transform(str => str !== 'false').optional().default(true),
+  includeForecasting: z.string().optional().default('false').transform(str => str === 'true'),
+  includeRecommendations: z.string().optional().default('false').transform(str => str === 'true'),
+  includeAlerts: z.string().optional().default('true').transform(str => str !== 'false'),
   // Analysis depth
   analysisDepth: z.enum(['basic', 'detailed', 'comprehensive']).optional().default('detailed')
 }).refine(data => {
@@ -75,9 +76,13 @@ const PathParamsSchema = z.object({
 const getPerformanceMetrics = withSecurity(
   authStrategies.hybrid(
     withAuthorization('recipes', 'read', async (
-      request: NextRequest, 
-      { user, params }: { user: UnifiedAuthenticatedUser, params: { id: string } }
+      request: NextRequest,
+      { user }: { user: AuthenticatedUser }
     ) => {
+      // Extract params from URL
+      const { pathname } = new URL(request.url)
+      const id = pathname.split('/')[3] as string
+      const params = { id }
       try {
         // Validate path parameters
         const pathValidation = await validateInput({ id: params.id }, PathParamsSchema)
@@ -112,7 +117,7 @@ const getPerformanceMetrics = withSecurity(
         }
 
         // Enhanced security validation
-        const validationResult = await validateInput(rawQuery, PerformanceMetricsQuerySchema, {
+        const validationResult = await validateInput(rawQuery, PerformanceMetricsQuerySchema as any, {
           maxLength: 1000,
           trimWhitespace: true,
           removeSuspiciousPatterns: true
@@ -135,7 +140,21 @@ const getPerformanceMetrics = withSecurity(
           )
         }
 
-        const queryParams = validationResult.sanitized || validationResult.data!
+        const queryParams = (validationResult.sanitized || validationResult.data!) as {
+          timeframe: 'today' | 'yesterday' | 'last_7_days' | 'last_30_days' | 'last_90_days' | 'this_month' | 'last_month' | 'this_year' | 'custom'
+          dateFrom?: Date
+          dateTo?: Date
+          locationId?: string
+          departmentId?: string
+          compareWith: 'previous_period' | 'same_period_last_year' | 'category_average' | 'none'
+          includeBenchmarks: boolean
+          metrics?: Array<'sales_volume' | 'revenue' | 'profitability' | 'popularity' | 'customer_satisfaction' | 'preparation_time' | 'waste_percentage' | 'return_rate' | 'seasonal_trends' | 'cost_trends'>
+          groupBy: 'hour' | 'day' | 'week' | 'month' | 'day_of_week' | 'meal_period'
+          includeForecasting: boolean
+          includeRecommendations: boolean
+          includeAlerts: boolean
+          analysisDepth: 'basic' | 'detailed' | 'comprehensive'
+        }
         const recipeId = pathValidation.data!.id
 
         // Calculate date range based on timeframe
@@ -190,7 +209,32 @@ const getPerformanceMetrics = withSecurity(
         })
 
         // Initialize cache and services
-        const cache = new EnhancedCacheLayer()
+        const cache = new EnhancedCacheLayer({
+          redis: {
+            enabled: false,
+            fallbackToMemory: true,
+            connectionTimeout: 5000
+          },
+          memory: {
+            maxMemoryMB: 128,
+            maxEntries: 1000
+          },
+          ttl: {
+            financial: 900,
+            inventory: 900,
+            vendor: 900,
+            default: 900
+          },
+          invalidation: {
+            enabled: true,
+            batchSize: 100,
+            maxDependencies: 50
+          },
+          monitoring: {
+            enabled: false,
+            metricsInterval: 60000
+          }
+        })
 
         // Mock performance metrics data (in real implementation, this would aggregate from sales data)
         const performanceMetrics = {

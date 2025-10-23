@@ -14,12 +14,13 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   createMenuEngineeringService
 } from '@/lib/services/menu-engineering-service'
 import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
@@ -40,9 +41,18 @@ const CostAlertsQuerySchema = z.object({
   maxVariancePercent: z.coerce.number().optional(),
   minImpactAmount: z.coerce.number().min(0).optional(),
   // Output options
-  includeHistorical: z.string().transform(str => str === 'true').optional().default(false),
-  includeRecommendations: z.string().transform(str => str === 'true').optional().default(false),
-  includeIngredientDetails: z.string().transform(str => str !== 'false').optional().default(true),
+  includeHistorical: z.preprocess(
+    (val) => val === 'true',
+    z.boolean().optional().default(false)
+  ),
+  includeRecommendations: z.preprocess(
+    (val) => val === 'true',
+    z.boolean().optional().default(false)
+  ),
+  includeIngredientDetails: z.preprocess(
+    (val) => val !== 'false',
+    z.boolean().optional().default(true)
+  ),
   // Sorting and pagination
   sortBy: z.enum(['severity', 'timestamp', 'impact', 'variance']).optional().default('timestamp'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
@@ -69,12 +79,18 @@ const PathParamsSchema = z.object({
 const getCostAlerts = withSecurity(
   authStrategies.hybrid(
     withAuthorization('recipes', 'read', async (
-      request: NextRequest, 
-      { user, params }: { user: UnifiedAuthenticatedUser, params: { id: string } }
+      request: NextRequest,
+      { user }: { user: AuthenticatedUser }
     ) => {
+      // Extract recipe ID from URL path (outside try block for error handling access)
+      const url = new URL(request.url)
+      const pathSegments = url.pathname.split('/')
+      const recipeIdIndex = pathSegments.findIndex(segment => segment === 'recipes') + 1
+      const recipeIdFromPath = pathSegments[recipeIdIndex]
+
       try {
         // Validate path parameters
-        const pathValidation = await validateInput({ id: params.id }, PathParamsSchema)
+        const pathValidation = await validateInput({ id: recipeIdFromPath }, PathParamsSchema)
         if (!pathValidation.success) {
           return createSecureResponse(
             {
@@ -108,7 +124,7 @@ const getCostAlerts = withSecurity(
         }
 
         // Enhanced security validation
-        const validationResult = await validateInput(rawQuery, CostAlertsQuerySchema, {
+        const validationResult = await validateInput(rawQuery, CostAlertsQuerySchema as any, {
           maxLength: 500,
           trimWhitespace: true,
           removeSuspiciousPatterns: true
@@ -131,14 +147,14 @@ const getCostAlerts = withSecurity(
           )
         }
 
-        const queryParams = validationResult.sanitized || validationResult.data!
+        const queryParams = (validationResult.sanitized || validationResult.data!) as z.infer<typeof CostAlertsQuerySchema>
         const recipeId = pathValidation.data!.id
 
         // Calculate date range based on period
         const now = new Date()
         let since: Date
         let until: Date = new Date(now)
-        
+
         switch (queryParams.period) {
           case 'today':
             since = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -174,10 +190,16 @@ const getCostAlerts = withSecurity(
         })
 
         // Initialize cache and services
-        const cache = new EnhancedCacheLayer()
+        const cache = new EnhancedCacheLayer({
+          redis: { enabled: false, fallbackToMemory: true, connectionTimeout: 5000 },
+          memory: { maxMemoryMB: 100, maxEntries: 1000 },
+          ttl: { financial: 300, inventory: 300, vendor: 300, default: 300 },
+          invalidation: { enabled: true, batchSize: 100, maxDependencies: 50 },
+          monitoring: { enabled: false, metricsInterval: 60000 }
+        })
 
         // Mock cost alerts data (in real implementation, this would query alert database)
-        const mockAlerts = generateMockCostAlerts(recipeId, queryParams, since, until)
+        const mockAlerts = generateMockCostAlerts(recipeId, queryParams, since, until, user)
 
         // Apply filters
         let filteredAlerts = mockAlerts.filter(alert => {
@@ -338,7 +360,7 @@ const getCostAlerts = withSecurity(
         
         await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
           error: error instanceof Error ? error.message : 'Unknown error',
-          recipeId: params.id,
+          recipeId: recipeIdFromPath,
           stack: error instanceof Error ? error.stack : undefined
         })
 
@@ -365,20 +387,20 @@ const getCostAlerts = withSecurity(
 )
 
 // Helper function to generate mock cost alerts
-function generateMockCostAlerts(recipeId: string, params: any, since: Date, until: Date) {
+function generateMockCostAlerts(recipeId: string, params: any, since: Date, until: Date, user: AuthenticatedUser) {
   const alertTypes = ['price_increase', 'price_decrease', 'threshold_breach', 'variance', 'availability', 'quality'] as const
   const severities = ['critical', 'high', 'medium', 'low'] as const
   const statuses = ['active', 'acknowledged', 'resolved'] as const
-  
+
   const alerts = []
-  
+
   // Generate 25 mock alerts
   for (let i = 0; i < 25; i++) {
     const timestamp = new Date(since.getTime() + Math.random() * (until.getTime() - since.getTime()))
     const type = alertTypes[Math.floor(Math.random() * alertTypes.length)]
     const severity = severities[Math.floor(Math.random() * severities.length)]
     const status = statuses[Math.floor(Math.random() * statuses.length)]
-    
+
     alerts.push({
       id: `alert_${i + 1}_${Math.random().toString(36).substr(2, 9)}`,
       recipeId,
@@ -409,7 +431,7 @@ function generateMockCostAlerts(recipeId: string, params: any, since: Date, unti
       ].slice(0, Math.floor(Math.random() * 3) + 1)
     })
   }
-  
+
   return alerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 }
 

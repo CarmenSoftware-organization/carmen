@@ -15,34 +15,35 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   createPOSIntegrationService,
   type ImportSalesDataInput,
   type ImportSalesDataResult,
   SalesTransactionSchema
 } from '@/lib/services/pos-integration-service'
 import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { withAuth, authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
 import { SecurityEventType } from '@/lib/security/audit-logger'
+import { type AuthenticatedUser } from '@/lib/middleware/auth'
 
 // Enhanced validation schema for sales data import
 const ImportSalesDataSchema = z.object({
-  source: SecureSchemas.safeString(100).min(1, 'Source is required'),
+  source: z.string().min(1, 'Source is required').max(100),
   transactions: z.array(SalesTransactionSchema).min(1, 'At least one transaction is required').max(10000, 'Maximum 10,000 transactions per batch'),
   batchSize: z.number().int().min(100).max(5000).optional().default(1000),
   validateOnly: z.boolean().optional().default(false),
   skipDuplicates: z.boolean().optional().default(true),
   metadata: z.object({
-    posSystemName: SecureSchemas.safeString(100).optional(),
-    posVersion: SecureSchemas.safeString(50).optional(),
+    posSystemName: z.string().max(100).optional(),
+    posVersion: z.string().max(50).optional(),
     exportedAt: z.coerce.date().optional(),
     fileSize: z.number().positive().optional(),
-    checksum: SecureSchemas.safeString(256).optional(),
-    notes: SecureSchemas.safeString(1000).optional()
+    checksum: z.string().max(256).optional(),
+    notes: z.string().max(1000).optional()
   }).optional()
 })
 
@@ -52,7 +53,7 @@ const ImportSalesDataSchema = z.object({
  */
 const importSalesData = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('menu_engineering', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('menu_engineering', 'create', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const body = await request.json()
 
@@ -84,8 +85,14 @@ const importSalesData = withSecurity(
         }
 
         // Use sanitized data
+        const validatedData = validationResult.sanitized || validationResult.data!
         const importData: ImportSalesDataInput = {
-          ...validationResult.sanitized || validationResult.data!,
+          source: validatedData.source,
+          transactions: validatedData.transactions,
+          batchSize: validatedData.batchSize,
+          validateOnly: validatedData.validateOnly,
+          skipDuplicates: validatedData.skipDuplicates,
+          metadata: validatedData.metadata,
           importedBy: user.id // Override with authenticated user ID
         }
 
@@ -100,30 +107,56 @@ const importSalesData = withSecurity(
         })
 
         // Initialize cache and POS integration service
-        const cache = new EnhancedCacheLayer()
+        const cache = new EnhancedCacheLayer({
+          redis: {
+            enabled: false,
+            fallbackToMemory: true,
+            connectionTimeout: 5000
+          },
+          memory: {
+            maxMemoryMB: 100,
+            maxEntries: 1000
+          },
+          ttl: {
+            financial: 3600,
+            inventory: 3600,
+            vendor: 3600,
+            default: 3600
+          },
+          invalidation: {
+            enabled: true,
+            batchSize: 100,
+            maxDependencies: 50
+          },
+          monitoring: {
+            enabled: false,
+            metricsInterval: 60000
+          }
+        })
         const posService = createPOSIntegrationService(cache)
 
         // Import sales data
         const result = await posService.importSalesData(importData)
 
-        if (!result.success) {
+        // Check if there are errors in the calculation result
+        if (result.errors && result.errors.length > 0) {
           await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
             component: 'pos-integration-service',
             operation: 'import_sales_data',
-            error: result.error
+            error: result.errors[0]
           })
 
           return createSecureResponse(
             {
               success: false,
               error: 'Failed to import sales data',
-              details: result.error
+              details: result.errors[0]
             },
             500
           )
         }
 
-        const importResult = result.value as ImportSalesDataResult
+        const importResult = result.value
 
         // Log successful import
         await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {
@@ -149,7 +182,7 @@ const importSalesData = withSecurity(
               validationErrors: importResult.validationErrors.slice(0, 100), // Limit error details
               hasMore: importResult.validationErrors.length > 100
             },
-            message: importResult.validateOnly 
+            message: importData.validateOnly
               ? 'Sales data validation completed'
               : 'Sales data import completed'
           },

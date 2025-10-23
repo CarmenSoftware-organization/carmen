@@ -22,12 +22,13 @@ import { z } from 'zod';
 import businessRulesData from '@/lib/mock/price-management/business-rules.json';
 
 // Security imports
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection';
+import { withAuth, authStrategies } from '@/lib/auth/api-protection';
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac';
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security';
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter';
 import { validateInput, SecureSchemas, type ValidationResult } from '@/lib/security/input-validator';
 import { SecurityEventType } from '@/lib/security/audit-logger';
+import type { AuthenticatedUser } from '@/lib/middleware/auth';
 
 // Security-enhanced validation schemas
 const businessRuleFiltersSchema = z.object({
@@ -38,12 +39,12 @@ const businessRuleFiltersSchema = z.object({
 });
 
 const createBusinessRuleSchema = z.object({
-  name: SecureSchemas.safeString(255).min(1).max(255),
+  name: SecureSchemas.safeString(255),
   description: SecureSchemas.safeString(1000).optional(),
   category: z.enum(['price_assignment', 'approval_workflow', 'validation', 'notification']),
   priority: z.enum(['low', 'medium', 'high', 'critical']).optional().default('medium'),
   conditions: z.array(z.object({
-    field: SecureSchemas.safeString(100).min(1),
+    field: SecureSchemas.safeString(100),
     operator: z.enum(['equals', 'not_equals', 'contains', 'not_contains', 'greater_than', 'less_than', 'greater_equal', 'less_equal', 'in', 'not_in']),
     value: SecureSchemas.safeString(500),
     logicalOperator: z.enum(['AND', 'OR']).optional().default('AND')
@@ -66,12 +67,12 @@ const createBusinessRuleSchema = z.object({
 
 const updateBusinessRuleSchema = z.object({
   id: SecureSchemas.uuid,
-  name: SecureSchemas.safeString(255).min(1).max(255).optional(),
+  name: SecureSchemas.safeString(255).optional(),
   description: SecureSchemas.safeString(1000).optional(),
   category: z.enum(['price_assignment', 'approval_workflow', 'validation', 'notification']).optional(),
   priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
   conditions: z.array(z.object({
-    field: SecureSchemas.safeString(100).min(1),
+    field: SecureSchemas.safeString(100),
     operator: z.enum(['equals', 'not_equals', 'contains', 'not_contains', 'greater_than', 'less_than', 'greater_equal', 'less_equal', 'in', 'not_in']),
     value: SecureSchemas.safeString(500),
     logicalOperator: z.enum(['AND', 'OR']).optional().default('AND')
@@ -102,7 +103,8 @@ const deleteBusinessRuleSchema = z.object({
  */
 const getBusinessRules = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('business_rules', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('business_rules', 'read', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context;
       try {
         const { searchParams } = new URL(request.url);
         
@@ -163,7 +165,7 @@ const getBusinessRules = withSecurity(
         }
 
         if (filters.priority) {
-          filteredRules = filteredRules.filter(rule => rule.priority === filters.priority);
+          filteredRules = filteredRules.filter(rule => String(rule.priority) === filters.priority);
         }
 
         if (filters.search) {
@@ -236,7 +238,8 @@ export const GET = withRateLimit(RateLimitPresets.API)(getBusinessRules);
  */
 const createBusinessRule = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('business_rules', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('business_rules', 'create', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context;
       try {
         const body = await request.json();
 
@@ -267,8 +270,8 @@ const createBusinessRule = withSecurity(
           );
         }
 
-        // Use sanitized data
-        const ruleData = validationResult.sanitized || validationResult.data!;
+        // Use sanitized data with proper type assertion
+        const ruleData = (validationResult.sanitized || validationResult.data!) as z.infer<typeof createBusinessRuleSchema>;
 
         // Additional business logic validation
         if (ruleData.effectiveTo && ruleData.effectiveFrom && ruleData.effectiveFrom >= ruleData.effectiveTo) {
@@ -387,7 +390,8 @@ export const POST = withRateLimit({
  */
 const updateBusinessRule = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('business_rules', 'update', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('business_rules', 'update', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context;
       try {
         const body = await request.json();
 
@@ -511,7 +515,8 @@ export const PUT = withRateLimit({
  */
 const deleteBusinessRule = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('business_rules', 'delete', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('business_rules', 'delete', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context;
       try {
         const { searchParams } = new URL(request.url);
         const ruleId = searchParams.get('id');
