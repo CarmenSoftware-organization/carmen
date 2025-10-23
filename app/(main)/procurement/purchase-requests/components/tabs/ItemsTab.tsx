@@ -53,7 +53,7 @@ import {
   MoreHorizontal,
   History,
 } from "lucide-react";
-import { PurchaseRequestItem } from "@/lib/types";
+import { PurchaseRequestItem, asMockPurchaseRequestItem } from "@/lib/types";
 import type { User } from "./types";
 import { ItemDetailsEditForm } from "../item-details-edit-form";
 import { samplePRItems } from "../sampleData";
@@ -78,7 +78,7 @@ interface ItemsTabProps {
   formMode?: "view" | "edit" | "add";
 }
 
-export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpdate, formMode = "view" }: ItemsTabProps) {
+export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, formMode = "view" }: ItemsTabProps) {
   // Get user context for price visibility setting
   const { user } = useSimpleUser();
   
@@ -174,9 +174,10 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
 
   const filteredItems = useMemo(() => {
     return localItems.filter((item) => {
-      const matchesSearch = (item as any).name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      const mockItem = asMockPurchaseRequestItem(item);
+      const matchesSearch = mockItem.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item as any).location.toLowerCase().includes(searchTerm.toLowerCase());
+        mockItem.location.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
     });
   }, [localItems, searchTerm]);
@@ -248,11 +249,11 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
   // Execute the actual bulk action
   const executeBulkAction = (action: 'approve' | 'reject' | 'return', scope: 'pending-only' | 'all') => {
     const analysis = analyzeSelectedItemsStatus();
-    
+
     // Determine which items to apply action to
     let targetItems = selectedItems;
     if (scope === 'pending-only') {
-      const pendingItems = (analysis as any).items.filter(item => (item as any).status === 'Pending');
+      const pendingItems = analysis.items.filter(item => item.status === 'Pending');
       targetItems = pendingItems.map(item => item.id || '');
     }
     
@@ -439,38 +440,40 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
   // Action handlers for status changes
   function handleApproveItem(itemId: string) {
     const item = filteredItems.find(i => i.id === itemId);
-    console.log(`✓ Approving item: ${(item as any)?.name} (${itemId})`);
-    
+    const mockItem = item ? asMockPurchaseRequestItem(item) : null;
+    console.log(`✓ Approving item: ${mockItem?.name} (${itemId})`);
+
     // Update local state immediately
-    setLocalItems(prevItems => 
-      prevItems.map(item => 
-        item.id === itemId 
-          ? { ...item, status: 'Approved' as any } as any as any
+    setLocalItems(prevItems =>
+      prevItems.map(item =>
+        item.id === itemId
+          ? { ...item, status: 'Approved' as any }
           : item
       )
     );
-    
+
     // Also call parent onOrderUpdate
     onOrderUpdate(itemId, { status: 'Approved' as any });
-    console.log(`🎉 Successfully approved item: ${(item as any)?.name}`);
+    console.log(`🎉 Successfully approved item: ${mockItem?.name}`);
   }
 
   function handleRejectItem(itemId: string) {
     const item = filteredItems.find(i => i.id === itemId);
-    console.log(`✓ Rejecting item: ${(item as any)?.name} (${itemId})`);
-    
+    const mockItem = item ? asMockPurchaseRequestItem(item) : null;
+    console.log(`✓ Rejecting item: ${mockItem?.name} (${itemId})`);
+
     // Update local state immediately
-    setLocalItems(prevItems => 
-      prevItems.map(item => 
-        item.id === itemId 
-          ? { ...item, status: 'Rejected' as any } as any as any
+    setLocalItems(prevItems =>
+      prevItems.map(item =>
+        item.id === itemId
+          ? { ...item, status: 'Rejected' as any }
           : item
       )
     );
-    
+
     // Also call parent onOrderUpdate
     onOrderUpdate(itemId, { status: 'Rejected' as any });
-    console.log(`🎉 Successfully rejected item: ${(item as any)?.name}`);
+    console.log(`🎉 Successfully rejected item: ${mockItem?.name}`);
   }
 
   // handleReviewItem function removed - 'Send for Review' option no longer available
@@ -519,8 +522,8 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
     console.log(`Updated ${field} for item ${itemId}:`, newAdjustments);
   };
 
-  const mockLocations = useMemo(() => [...new Set(localItems.map(i => (i as any).location))], [localItems]);
-  const mockProducts = useMemo(() => [...new Set(localItems.map(i => (i as any).name))], [localItems]);
+  const mockLocations = useMemo(() => [...new Set(localItems.map(i => asMockPurchaseRequestItem(i).location))], [localItems]);
+  const mockProducts = useMemo(() => [...new Set(localItems.map(i => asMockPurchaseRequestItem(i).name))], [localItems]);
   const mockUnits = ["pieces", "kg", "g", "bags", "boxes", "units", "liters", "ml", "meters", "cm", "pairs", "sets"];
 
   // Mock data for on-hand by location
@@ -672,18 +675,19 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
         </Card>
       )}
       {filteredItems.map((item) => {
+        const mockItem = asMockPurchaseRequestItem(item);
         const itemIsRequestor = currentUser.role === 'Staff' || currentUser.role === 'Requestor';
-        const itemIsApprover = currentUser.role === 'Department Manager' || 
+        const itemIsApprover = currentUser.role === 'Department Manager' ||
                               currentUser.role === 'Financial Manager' ||
                               currentUser.role === 'Approver';
-        const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
+        const itemIsPurchaser = currentUser.role === 'Purchasing Staff' ||
                                currentUser.role === 'Purchaser';
         // Price visibility: Requestors use user settings, Approvers/Purchasers always see prices
-        const canSeePrices = isRequestor ? 
+        const canSeePrices = isRequestor ?
           (user?.context.showPrices !== false) :
           true; // Approvers and Purchasers always see prices
         const isItemEditable = formMode === "edit";
-        
+
         return (
           <Card key={item.id} className={`relative transition-all duration-200 ${formMode === "edit" ? 'ring-2 ring-amber-300 bg-amber-50/20 shadow-md' : 'hover:shadow-md'}`}>
             <CardContent className="p-4">
@@ -694,7 +698,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                     onCheckedChange={() => handleSelectItem(item.id || "")}
                   />
                   <div className="flex flex-col">
-                    <span className="font-semibold text-xs">{(item as any).name}</span>
+                    <span className="font-semibold text-xs">{mockItem.name}</span>
                     <span className="text-xs text-muted-foreground">{item.description}</span>
                   </div>
                 </div>
@@ -702,22 +706,22 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                   {item.status}
                 </Badge>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <div>
                   <p className="text-xs text-muted-foreground">Location</p>
-                  <p className="font-medium text-sm">{(item as any).location}</p>
+                  <p className="font-medium text-sm">{mockItem.location}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Quantity</p>
-                  <p className="font-medium text-sm">{(item as any).quantityRequested} {item.unit}</p>
-                  {(item as any).quantityApproved && (
-                    <p className="text-xs text-green-600">Approved: {(item as any).quantityApproved}</p>
+                  <p className="font-medium text-sm">{mockItem.quantityRequested} {item.unit}</p>
+                  {mockItem.quantityApproved && (
+                    <p className="text-xs text-green-600">Approved: {mockItem.quantityApproved}</p>
                   )}
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Delivery</p>
-                  <p className="font-medium text-sm">{(item as any).deliveryDate ? format((item as any).deliveryDate, "dd/MM") : "TBD"}</p>
+                  <p className="font-medium text-sm">{mockItem.deliveryDate ? format(mockItem.deliveryDate, "dd/MM") : "TBD"}</p>
                 </div>
               </div>
 
@@ -725,7 +729,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
               <div className="flex items-center justify-end">
                 {!itemIsRequestor && (
                   <div className="flex-1 text-xs text-muted-foreground">
-                    Vendor: {(item as any).vendor || "Not assigned"}
+                    Vendor: {mockItem.vendor || "Not assigned"}
                   </div>
                 )}
               </div>
@@ -788,17 +792,18 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
               />
             )}
             {filteredItems.map((item, index) => {
+              const mockItem = asMockPurchaseRequestItem(item);
               const isManuallyExpanded = expandedTableRows.has(item.id || "");
               const isAutoExpanded = autoExpandedRow === item.id;
               const isExpanded = isManuallyExpanded || isAutoExpanded;
               const itemIsRequestor = currentUser.role === 'Staff' || currentUser.role === 'Requestor';
-              const itemIsApprover = currentUser.role === 'Department Manager' || 
+              const itemIsApprover = currentUser.role === 'Department Manager' ||
                                     currentUser.role === 'Financial Manager' ||
                                     currentUser.role === 'Approver';
-              const itemIsPurchaser = currentUser.role === 'Purchasing Staff' || 
+              const itemIsPurchaser = currentUser.role === 'Purchasing Staff' ||
                                      currentUser.role === 'Purchaser';
               // Price visibility: Requestors use user settings, Approvers/Purchasers always see prices
-              const canSeePrices = isRequestor ? 
+              const canSeePrices = isRequestor ?
           (user?.context.showPrices !== false) :
           true; // Approvers and Purchasers always see prices
               const isRowEditing = editingRows.has(item.id || "");
@@ -851,7 +856,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                     </TableCell>
                     <TableCell className="py-2 align-top" onClick={(e) => e.stopPropagation()}>
                       {isItemEditable && itemIsRequestor ? (
-                        <Select value={(item as any).location || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'location', value)}>
+                        <Select value={mockItem.location || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'location', value)}>
                           <SelectTrigger className="w-full"><SelectValue placeholder="Select location" /></SelectTrigger>
                           <SelectContent>
                             {mockLocations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
@@ -861,33 +866,33 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                         <div className="space-y-2">
                           <div className="flex items-center gap-3">
                             <MapPin className="h-4 w-4 text-blue-500/70 flex-shrink-0" />
-                            <div className="font-medium text-sm">{(item as any).location}</div>
+                            <div className="font-medium text-sm">{mockItem.location}</div>
                           </div>
                           <div>
-                            <Badge 
-                              variant="secondary" 
+                            <Badge
+                              variant="secondary"
                               className={cn(
                                 "text-xs px-1.5 py-0.5 font-normal inline-flex items-center gap-1",
-                                (item as any).status === 'Approved' && "bg-green-100 text-green-700 border-green-200",
-                                (item as any).status === 'Review' && "bg-yellow-100 text-yellow-700 border-yellow-200",
-                                (item as any).status === 'Rejected' && "bg-red-100 text-red-700 border-red-200",
-                                (item as any).status === 'Pending' && "bg-gray-100 text-gray-600 border-gray-200"
+                                item.status === 'Approved' && "bg-green-100 text-green-700 border-green-200",
+                                item.status === 'Review' && "bg-yellow-100 text-yellow-700 border-yellow-200",
+                                item.status === 'Rejected' && "bg-red-100 text-red-700 border-red-200",
+                                item.status === 'Pending' && "bg-gray-100 text-gray-600 border-gray-200"
                               )}
                             >
-                              {(item as any).status === 'Approved' && <CheckCircle className="h-3 w-3" />}
-                              {(item as any).status === 'Review' && <RotateCcw className="h-3 w-3" />}
-                              {(item as any).status === 'Rejected' && <XCircle className="h-3 w-3" />}
-                              {(item as any).status === 'Pending' && <Clock className="h-3 w-3" />}
+                              {item.status === 'Approved' && <CheckCircle className="h-3 w-3" />}
+                              {item.status === 'Review' && <RotateCcw className="h-3 w-3" />}
+                              {item.status === 'Rejected' && <XCircle className="h-3 w-3" />}
+                              {item.status === 'Pending' && <Clock className="h-3 w-3" />}
                               {item.status}
                             </Badge>
                           </div>
-                          
+
                           {/* Comment section - Compact row spanning panel */}
-                          {((item as any).comment || isItemEditable) && (
+                          {(mockItem.comment || isItemEditable) && (
                             <div className="mt-2 relative">
                               <div className={cn(
                                 "absolute left-0 z-10 grid grid-cols-12 gap-2",
-                                canSeePrices 
+                                canSeePrices
                                   ? "right-[-800px]" // Span much wider to cover full expanded panel
                                   : "right-[-700px]" // Span much wider when pricing not visible
                               )}>
@@ -895,14 +900,14 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                                 <div className="col-span-12">
                                   {isItemEditable ? (
                                     <Textarea
-                                      value={(item as any).comment || ""}
+                                      value={mockItem.comment || ""}
                                       onChange={(e) => item.id && handleItemChange(item.id, 'comment', e.target.value)}
                                       placeholder="Add a comment..."
                                       className="min-h-[32px] text-xs resize-none border-gray-200 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 w-full bg-white shadow-sm"
                                     />
                                   ) : (
                                     <div className="bg-gray-50 p-2 rounded border border-gray-200 shadow-sm min-h-[32px]">
-                                      <p className="text-xs text-gray-700 leading-tight">{(item as any).comment || ""}</p>
+                                      <p className="text-xs text-gray-700 leading-tight">{mockItem.comment || ""}</p>
                                     </div>
                                   )}
                                 </div>
@@ -916,7 +921,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                     </TableCell>
                     <TableCell className="py-2 align-top" onClick={(e) => e.stopPropagation()}>
                       {isItemEditable && itemIsRequestor ? (
-                        <Select value={(item as any).name || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'name', value)}>
+                        <Select value={mockItem.name || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'name', value)}>
                           <SelectTrigger className="w-full"><SelectValue placeholder="Select product" /></SelectTrigger>
                           <SelectContent>
                             {mockProducts.map(prod => <SelectItem key={prod} value={prod}>{prod}</SelectItem>)}
@@ -924,7 +929,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                         </Select>
                       ) : (
                         <div className="min-w-0">
-                          <div className="font-semibold text-xs leading-tight">{(item as any).name}</div>
+                          <div className="font-semibold text-xs leading-tight">{mockItem.name}</div>
                           <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.description}</div>
                         </div>
                       )}
@@ -934,7 +939,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                       <div className="flex flex-col items-center justify-center space-y-1 w-full">
                         {isItemEditable && itemIsRequestor ? (
                           <div className="flex items-center gap-1 justify-center">
-                            <Input type="number" step="0.00001" value={(item as any).quantityRequested?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityRequested', parseFloat(e.target.value))} className="h-8 w-20 text-center" />
+                            <Input type="number" step="0.00001" value={mockItem.quantityRequested?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityRequested', parseFloat(e.target.value))} className="h-8 w-20 text-center" />
                             <Select value={item.unit || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'unit', value)}>
                               <SelectTrigger className="h-8 w-20"><SelectValue placeholder="Unit" /></SelectTrigger>
                               <SelectContent>
@@ -944,39 +949,39 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                           </div>
                         ) : (
                           <div className="flex flex-col items-center justify-center">
-                            <div className="text-xs font-medium text-center">{(item as any).quantityRequested?.toFixed(5) || '0.00000'}</div>
+                            <div className="text-xs font-medium text-center">{mockItem.quantityRequested?.toFixed(5) || '0.00000'}</div>
                             <div className="text-xs text-gray-500 text-center">{item.unit}</div>
                             {/* Show unit conversion if different from inventory unit */}
-                            {(item as any).quantityRequested && item.unit && (item as any).inventoryInfo?.inventoryUnit &&
-                             shouldShowUnitConversion(item.unit, (item as any).inventoryInfo.inventoryUnit) && (
+                            {mockItem.quantityRequested && item.unit && mockItem.inventoryInfo?.inventoryUnit &&
+                             shouldShowUnitConversion(item.unit, mockItem.inventoryInfo.inventoryUnit) && (
                               <div className="text-xs text-muted-foreground text-center">
-                                {getUnitConversionDisplay((item as any).quantityRequested, item.unit, (item as any).inventoryInfo.inventoryUnit)}
+                                {getUnitConversionDisplay(mockItem.quantityRequested, item.unit, mockItem.inventoryInfo.inventoryUnit)}
                               </div>
                             )}
                           </div>
                         )}
                       </div>
                     </TableCell>
-                    
+
                     {/* Approved Quantity Column */}
                     <TableCell className="py-2 align-top !text-center" onClick={(e) => e.stopPropagation()}>
                       <div className="flex flex-col items-center justify-center space-y-1 w-full">
                         {isItemEditable && (itemIsApprover || itemIsPurchaser) ? (
                           <div className="flex items-center gap-1 justify-center">
-                            <Input type="number" step="0.00001" value={(item as any).quantityApproved?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityApproved', parseFloat(e.target.value))} className="h-8 w-24 text-center" placeholder="0.00000" />
+                            <Input type="number" step="0.00001" value={mockItem.quantityApproved?.toFixed(5) || ""} onChange={(e) => item.id && handleItemChange(item.id, 'quantityApproved', parseFloat(e.target.value))} className="h-8 w-24 text-center" placeholder="0.00000" />
                             <span className="text-xs text-gray-600">{item.unit}</span>
                           </div>
                         ) : (
                           <div className="flex flex-col items-center justify-center">
-                            {(item as any).quantityApproved ? (
+                            {mockItem.quantityApproved ? (
                               <>
-                                <div className="text-xs font-medium text-green-700 text-center">{(item as any).quantityApproved?.toFixed(5) || '0.00000'}</div>
+                                <div className="text-xs font-medium text-green-700 text-center">{mockItem.quantityApproved?.toFixed(5) || '0.00000'}</div>
                                 <div className="text-xs text-gray-500 text-center">{item.unit}</div>
                                 {/* Show unit conversion if different from inventory unit */}
-                                {(item as any).quantityApproved && item.unit && (item as any).inventoryInfo?.inventoryUnit &&
-                                 shouldShowUnitConversion(item.unit, (item as any).inventoryInfo.inventoryUnit) && (
+                                {mockItem.quantityApproved && item.unit && mockItem.inventoryInfo?.inventoryUnit &&
+                                 shouldShowUnitConversion(item.unit, mockItem.inventoryInfo.inventoryUnit) && (
                                   <div className="text-xs text-muted-foreground text-center">
-                                    {getUnitConversionDisplay((item as any).quantityApproved, item.unit, (item as any).inventoryInfo.inventoryUnit)}
+                                    {getUnitConversionDisplay(mockItem.quantityApproved, item.unit, mockItem.inventoryInfo.inventoryUnit)}
                                   </div>
                                 )}
                               </>
@@ -993,7 +998,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                               <span className="text-xs text-gray-500">FOC:</span>
                               <Input
                                 type="number"
-                                value={(item as any).foc?.toFixed(5) || ""}
+                                value={mockItem.foc?.toFixed(5) || ""}
                                 onChange={(e) => item.id && handleItemChange(item.id, 'foc', parseFloat(e.target.value))}
                                 className="h-6 w-20 text-center text-xs"
                                 step="0.00001"
@@ -1007,7 +1012,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                               </Select>
                             </div>
                           ) : (
-                            <div className="text-xs font-medium text-green-700 text-center">FOC: {(item as any).foc?.toFixed(3) || '0.000'} {item.unit}</div>
+                            <div className="text-xs font-medium text-green-700 text-center">FOC: {mockItem.foc?.toFixed(3) || '0.000'} {item.unit}</div>
                           )}
                           </div>
                         )}
@@ -1018,21 +1023,21 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                     <TableCell className="py-2 align-top text-center" onClick={(e) => e.stopPropagation()}>
                       {isItemEditable && itemIsRequestor ? (
                         <DatePickerField
-                          value={(item as any).deliveryDate}
+                          value={mockItem.deliveryDate}
                           onChange={(date) => item.id && handleItemChange(item.id, 'deliveryDate', date)}
                           placeholder="Select date"
                         />
                       ) : (
                         <div className="text-xs text-gray-700 font-medium text-center">
-                          {(item as any).deliveryDate ? format((item as any).deliveryDate, "dd/MM/yyyy") : "Not specified"}
+                          {mockItem.deliveryDate ? format(mockItem.deliveryDate, "dd/MM/yyyy") : "Not specified"}
                         </div>
                       )}
                     </TableCell>
-                    
+
                     {/* Delivery Point Column */}
                     <TableCell className="py-2 align-top text-center" onClick={(e) => e.stopPropagation()}>
                       {isItemEditable && (itemIsRequestor || itemIsPurchaser) ? (
-                        <Select value={(item as any).deliveryPoint || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'deliveryPoint', value)}>
+                        <Select value={mockItem.deliveryPoint || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'deliveryPoint', value)}>
                           <SelectTrigger className="h-8 text-xs">
                             <SelectValue placeholder="Select point" />
                           </SelectTrigger>
@@ -1046,21 +1051,21 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                         </Select>
                       ) : (
                         <div className="text-xs text-gray-700 font-medium text-center">
-                          {(item as any).deliveryPoint || "Not specified"}
+                          {mockItem.deliveryPoint || "Not specified"}
                         </div>
                       )}
                     </TableCell>
-                    
+
                     {canSeePrices && (
                       <TableCell className="py-2 text-right align-top">
                         <div className="space-y-1">
-                          <div className="font-semibold text-sm text-right">{((item as any).totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                          <div className="text-xs text-gray-500 text-right">{(item as any).currency}</div>
+                          <div className="font-semibold text-sm text-right">{(mockItem.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          <div className="text-xs text-gray-500 text-right">{mockItem.currency}</div>
                           {/* Show currency conversion if different from base currency */}
-                          {(item as any).totalAmount && (item as any).currency && (item as any).baseCurrency &&
-                           shouldShowCurrencyConversion((item as any).currency, (item as any).baseCurrency) && (
+                          {mockItem.totalAmount && mockItem.currency && mockItem.baseCurrency &&
+                           shouldShowCurrencyConversion(mockItem.currency, mockItem.baseCurrency) && (
                             <div className="text-xs text-green-700 mt-1 text-right">
-                              {getCurrencyConversionDisplay((item as any).totalAmount, (item as any).currency, (item as any).baseCurrency, (item as any).currencyRate)}
+                              {getCurrencyConversionDisplay(mockItem.totalAmount, mockItem.currency, mockItem.baseCurrency, mockItem.currencyRate)}
                             </div>
                           )}
                         </div>
@@ -1096,17 +1101,17 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                                 <ConsolidatedItemDetailsCard
                                   // Vendor & Pricing props
                                   vendor={item.vendor || "Premium Food Suppliers Inc."}
-                                  pricelistNumber={(item as any).pricelistNumber || "PL-2024-01-KITCHEN"}
+                                  pricelistNumber={mockItem.pricelistNumber || "PL-2024-01-KITCHEN"}
                                   currency={item.currency || "USD"}
-                                  baseCurrency={(item as any).baseCurrency}
-                                  unitPrice={(item as any).price || 3200}
+                                  baseCurrency={mockItem.baseCurrency}
+                                  unitPrice={mockItem.price || 3200}
                                   quantity={item.quantityApproved || item.quantityRequested || 2}
                                   unit={item.unit || "piece"}
-                                  discountRate={(item as any).discountRate || 0.12}
-                                  discountAmount={(item as any).discountAmount || 0}
-                                  taxType={(item as any).taxType || "VAT"}
-                                  taxRate={(item as any).taxRate || 0.07}
-                                  taxAmount={(item as any).taxAmount || 0}
+                                  discountRate={mockItem.discountRate || 0.12}
+                                  discountAmount={mockItem.discountAmount || 0}
+                                  taxType={mockItem.taxType || "VAT"}
+                                  taxRate={mockItem.taxRate || 0.07}
+                                  taxAmount={mockItem.taxAmount || 0}
                                   isDiscountApplied={getItemAdjustments(item.id || '').discount}
                                   isTaxApplied={getItemAdjustments(item.id || '').tax}
                                   onDiscountToggle={(checked) => item.id && updateItemAdjustments(item.id, 'discount', checked)}
@@ -1115,9 +1120,9 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                                     setSelectedItemForComparison(item);
                                     setIsVendorComparisonOpen(true);
                                   }}
-                                  currencyRate={(item as any).currencyRate}
-                                  showCurrencyConversion={!!(item.currency && (item as any).baseCurrency && shouldShowCurrencyConversion(item.currency, (item as any).baseCurrency))}
-                                  
+                                  currencyRate={mockItem.currencyRate}
+                                  showCurrencyConversion={!!(item.currency && mockItem.baseCurrency && shouldShowCurrencyConversion(item.currency, mockItem.baseCurrency))}
+
                                   // Inventory props
                                   onHand={item.inventoryInfo?.onHand || 1}
                                   onOrder={item.inventoryInfo?.onOrdered || 0}
@@ -1129,7 +1134,7 @@ export function ItemsTab({ items = samplePRItems as any, currentUser, onOrderUpd
                                   deliveryPointOptions={[]}
                                   onHandClick={() => handleOnHandClick(item)}
                                   onOrderClick={() => handleOnOrderClick(item)}
-                                  
+
                                   // Business Dimensions props
                                   jobNumber={item.jobCode || null}
                                   event={item.event || null}
