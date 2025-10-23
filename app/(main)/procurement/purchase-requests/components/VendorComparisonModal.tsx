@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 
 import { VendorComparisonModalProps, VendorComparison } from '@/lib/types/enhanced-pr-types';
+import { asMockPurchaseRequestItem } from '@/lib/types';
 import { prPriceAssignmentService } from '@/lib/services/pr-price-assignment-service';
 
 export function VendorComparisonModal({ 
@@ -117,7 +118,7 @@ export function VendorComparisonModal({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <DollarSign className="w-5 h-5" />
-            <span>Vendor Comparison - {(prItem as any).name}</span>
+            <span>Vendor Comparison - {asMockPurchaseRequestItem(prItem).name}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -236,7 +237,7 @@ export function VendorComparisonModal({
                               ${vendor.totalCost.toFixed(2)}
                             </span>
                             <p className="text-sm text-gray-500">
-                              Qty: {(prItem as any).quantityRequested}
+                              Qty: {asMockPurchaseRequestItem(prItem).quantityRequested}
                             </p>
                           </TableCell>
                           <TableCell>
