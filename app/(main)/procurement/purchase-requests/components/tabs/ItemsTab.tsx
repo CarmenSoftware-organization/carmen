@@ -253,7 +253,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     // Determine which items to apply action to
     let targetItems = selectedItems;
     if (scope === 'pending-only') {
-      const pendingItems = analysis.items.filter(item => item.status === 'Pending');
+      const pendingItems = analysis.items.filter(item => item.status === DocumentStatus.Draft);
       targetItems = pendingItems.map(item => item.id || '');
     }
     
@@ -873,16 +873,16 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                               variant="secondary"
                               className={cn(
                                 "text-xs px-1.5 py-0.5 font-normal inline-flex items-center gap-1",
-                                item.status === 'Approved' && "bg-green-100 text-green-700 border-green-200",
-                                item.status === 'Review' && "bg-yellow-100 text-yellow-700 border-yellow-200",
-                                item.status === 'Rejected' && "bg-red-100 text-red-700 border-red-200",
-                                item.status === 'Pending' && "bg-gray-100 text-gray-600 border-gray-200"
+                                item.status === DocumentStatus.Approved && "bg-green-100 text-green-700 border-green-200",
+                                item.status === DocumentStatus.InProgress && "bg-yellow-100 text-yellow-700 border-yellow-200",
+                                item.status === DocumentStatus.Rejected && "bg-red-100 text-red-700 border-red-200",
+                                item.status === DocumentStatus.Draft && "bg-gray-100 text-gray-600 border-gray-200"
                               )}
                             >
-                              {item.status === 'Approved' && <CheckCircle className="h-3 w-3" />}
-                              {item.status === 'Review' && <RotateCcw className="h-3 w-3" />}
-                              {item.status === 'Rejected' && <XCircle className="h-3 w-3" />}
-                              {item.status === 'Pending' && <Clock className="h-3 w-3" />}
+                              {item.status === DocumentStatus.Approved && <CheckCircle className="h-3 w-3" />}
+                              {item.status === DocumentStatus.InProgress && <RotateCcw className="h-3 w-3" />}
+                              {item.status === DocumentStatus.Rejected && <XCircle className="h-3 w-3" />}
+                              {item.status === DocumentStatus.Draft && <Clock className="h-3 w-3" />}
                               {item.status}
                             </Badge>
                           </div>
@@ -991,31 +991,37 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           </div>
                         )}
                         {/* FOC field below approved quantity - Hidden for requestors and approvers, only visible for purchasers */}
-                        {itemIsPurchaser && (
-                          <div className="pt-1 border-t border-gray-200 mt-2 flex flex-col items-center">
-                            {isItemEditable ? (
-                            <div className="flex items-center gap-1 justify-center">
-                              <span className="text-xs text-gray-500">FOC:</span>
-                              <Input
-                                type="number"
-                                value={mockItem.foc?.toFixed(5) || ""}
-                                onChange={(e) => item.id && handleItemChange(item.id, 'foc', parseFloat(e.target.value))}
-                                className="h-6 w-20 text-center text-xs"
-                                step="0.00001"
-                                placeholder="0"
-                              />
-                              <Select value={item.unit || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'unit', value)}>
-                                <SelectTrigger className="h-6 w-20 text-xs"><SelectValue placeholder="Unit" /></SelectTrigger>
-                                <SelectContent>
-                                  {mockUnits.map(unit => <SelectItem key={unit} value={unit}>{unit}</SelectItem>)}
-                                </SelectContent>
-                              </Select>
+                        {itemIsPurchaser && (() => {
+                          const focValue = mockItem.foc as number | undefined;
+                          const focDisplay = focValue !== undefined ? focValue.toFixed(5) : "";
+                          const focDisplayShort = focValue !== undefined ? focValue.toFixed(3) : '0.000';
+
+                          return (
+                            <div className="pt-1 border-t border-gray-200 mt-2 flex flex-col items-center">
+                              {isItemEditable ? (
+                              <div className="flex items-center gap-1 justify-center">
+                                <span className="text-xs text-gray-500">FOC:</span>
+                                <Input
+                                  type="number"
+                                  value={focDisplay}
+                                  onChange={(e) => item.id && handleItemChange(item.id, 'foc', parseFloat(e.target.value))}
+                                  className="h-6 w-20 text-center text-xs"
+                                  step="0.00001"
+                                  placeholder="0"
+                                />
+                                <Select value={item.unit || ""} onValueChange={(value) => item.id && handleItemChange(item.id, 'unit', value)}>
+                                  <SelectTrigger className="h-6 w-20 text-xs"><SelectValue placeholder="Unit" /></SelectTrigger>
+                                  <SelectContent>
+                                    {mockUnits.map(unit => <SelectItem key={unit} value={unit}>{unit}</SelectItem>)}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            ) : (
+                              <div className="text-xs font-medium text-green-700 text-center">FOC: {focDisplayShort} {item.unit}</div>
+                            )}
                             </div>
-                          ) : (
-                            <div className="text-xs font-medium text-green-700 text-center">FOC: {mockItem.foc?.toFixed(3) || '0.000'} {item.unit}</div>
-                          )}
-                          </div>
-                        )}
+                          );
+                        })()}
                       </div>
                     </TableCell>
                     
@@ -1098,134 +1104,142 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
 
                               {/* Consolidated Item Details Card */}
                               <div>
-                                <ConsolidatedItemDetailsCard
-                                  // Vendor & Pricing props
-                                  vendor={item.vendor || "Premium Food Suppliers Inc."}
-                                  pricelistNumber={mockItem.pricelistNumber || "PL-2024-01-KITCHEN"}
-                                  currency={item.currency || "USD"}
-                                  baseCurrency={mockItem.baseCurrency}
-                                  unitPrice={mockItem.price || 3200}
-                                  quantity={item.quantityApproved || item.quantityRequested || 2}
-                                  unit={item.unit || "piece"}
-                                  discountRate={mockItem.discountRate || 0.12}
-                                  discountAmount={mockItem.discountAmount || 0}
-                                  taxType={mockItem.taxType || "VAT"}
-                                  taxRate={mockItem.taxRate || 0.07}
-                                  taxAmount={mockItem.taxAmount || 0}
-                                  isDiscountApplied={getItemAdjustments(item.id || '').discount}
-                                  isTaxApplied={getItemAdjustments(item.id || '').tax}
-                                  onDiscountToggle={(checked) => item.id && updateItemAdjustments(item.id, 'discount', checked)}
-                                  onTaxToggle={(checked) => item.id && updateItemAdjustments(item.id, 'tax', checked)}
-                                  onCompareClick={() => {
-                                    setSelectedItemForComparison(item);
-                                    setIsVendorComparisonOpen(true);
-                                  }}
-                                  currencyRate={mockItem.currencyRate}
-                                  showCurrencyConversion={!!(item.currency && mockItem.baseCurrency && shouldShowCurrencyConversion(item.currency, mockItem.baseCurrency))}
+                                {(() => {
+                                  const detailMockItem = asMockPurchaseRequestItem(item);
+                                  return (
+                                    <ConsolidatedItemDetailsCard
+                                      // Vendor & Pricing props
+                                      vendor={detailMockItem.vendor || "Premium Food Suppliers Inc."}
+                                      pricelistNumber={detailMockItem.pricelistNumber || "PL-2024-01-KITCHEN"}
+                                      currency={detailMockItem.currency || "USD"}
+                                      baseCurrency={detailMockItem.baseCurrency}
+                                      unitPrice={detailMockItem.price || 3200}
+                                      quantity={detailMockItem.quantityApproved || detailMockItem.quantityRequested || 2}
+                                      unit={item.unit || "piece"}
+                                      discountRate={detailMockItem.discountRate || 0.12}
+                                      discountAmount={detailMockItem.discountAmount || 0}
+                                      taxType={detailMockItem.taxType || "VAT"}
+                                      taxRate={detailMockItem.taxRate || 0.07}
+                                      taxAmount={detailMockItem.taxAmount || 0}
+                                      isDiscountApplied={getItemAdjustments(item.id || '').discount}
+                                      isTaxApplied={getItemAdjustments(item.id || '').tax}
+                                      onDiscountToggle={(checked) => item.id && updateItemAdjustments(item.id, 'discount', checked)}
+                                      onTaxToggle={(checked) => item.id && updateItemAdjustments(item.id, 'tax', checked)}
+                                      onCompareClick={() => {
+                                        setSelectedItemForComparison(item);
+                                        setIsVendorComparisonOpen(true);
+                                      }}
+                                      currencyRate={detailMockItem.currencyRate}
+                                      showCurrencyConversion={!!(detailMockItem.currency && detailMockItem.baseCurrency && shouldShowCurrencyConversion(detailMockItem.currency, detailMockItem.baseCurrency))}
 
-                                  // Inventory props
-                                  onHand={item.inventoryInfo?.onHand || 1}
-                                  onOrder={item.inventoryInfo?.onOrdered || 0}
-                                  reorderLevel={item.inventoryInfo?.reorderLevel || 1}
-                                  restockLevel={item.inventoryInfo?.restockLevel || 3}
-                                  dateRequired={null}
-                                  deliveryPoint={null}
-                                  isEditable={formMode === "edit"}
-                                  deliveryPointOptions={[]}
-                                  onHandClick={() => handleOnHandClick(item)}
-                                  onOrderClick={() => handleOnOrderClick(item)}
+                                      // Inventory props
+                                      onHand={detailMockItem.inventoryInfo?.onHand || 1}
+                                      onOrder={detailMockItem.inventoryInfo?.onOrdered || 0}
+                                      reorderLevel={detailMockItem.inventoryInfo?.reorderLevel || 1}
+                                      restockLevel={detailMockItem.inventoryInfo?.restockLevel || 3}
+                                      dateRequired={null}
+                                      deliveryPoint={null}
+                                      isEditable={formMode === "edit"}
+                                      deliveryPointOptions={[]}
+                                      onHandClick={() => handleOnHandClick(item)}
+                                      onOrderClick={() => handleOnOrderClick(item)}
 
-                                  // Business Dimensions props
-                                  jobNumber={item.jobCode || null}
-                                  event={item.event || null}
-                                  project={item.project || null}
-                                  marketSegment={item.marketSegment || null}
-                                  onJobNumberChange={(value) => item.id && handleItemChange(item.id, 'jobCode', value)}
-                                  onEventChange={(value) => item.id && handleItemChange(item.id, 'event', value)}
-                                  onProjectChange={(value) => item.id && handleItemChange(item.id, 'project', value)}
-                                  onMarketSegmentChange={(value) => item.id && handleItemChange(item.id, 'marketSegment', value)}
-                                  jobOptions={[
-                                    { value: "FB-2024-Q1-001", label: "FB-2024-Q1-001 - Office Renovation" },
-                                    { value: "JOB001", label: "JOB001 - Office Renovation" },
-                                    { value: "JOB002", label: "JOB002 - Kitchen Upgrade" },
-                                    { value: "JOB003", label: "JOB003 - IT Infrastructure" }
-                                  ]}
-                                  eventOptions={[
-                                    { value: "CONF2024", label: "Annual Conference 2024" },
-                                    { value: "LAUNCH", label: "Product Launch Event" },
-                                    { value: "WORKSHOP", label: "Training Workshop" }
-                                  ]}
-                                  projectOptions={[
-                                    { value: "PROJ001", label: "Digital Transformation" },
-                                    { value: "PROJ002", label: "Sustainability Initiative" },
-                                    { value: "PROJ003", label: "Market Expansion" }
-                                  ]}
-                                  marketSegmentOptions={[
-                                    { value: "ENTERPRISE", label: "Enterprise" },
-                                    { value: "RETAIL", label: "Retail" },
-                                    { value: "WHOLESALE", label: "Wholesale" },
-                                    { value: "GOVERNMENT", label: "Government" }
-                                  ]}
-                                  
-                                  // Section visibility props
-                                  showVendorPricing={canSeePrices && (itemIsApprover || itemIsPurchaser)}
-                                  showInventoryInfo={true}
-                                  showBusinessDimensions={true}
-                                  
-                                  // Action handlers
-                                  onEditClick={() => {
-                                    console.log('Edit item:', item.id);
-                                    // Add edit logic here
-                                  }}
-                                  onDuplicateClick={() => {
-                                    console.log('Duplicate item:', item.id);
-                                    // Add duplicate logic here
-                                  }}
-                                  onArchiveClick={() => {
-                                    console.log('Archive item:', item.id);
-                                    // Add archive logic here
-                                  }}
-                                  onDeleteClick={() => {
-                                    console.log('Delete item:', item.id);
-                                    // Add delete logic here
-                                  }}
-                                  onMoreActions={() => {
-                                    console.log('More actions for item:', item.id);
-                                    // Add more actions logic here
-                                  }}
-                                  showActions={formMode === "edit"}
-                                />
+                                      // Business Dimensions props
+                                      jobNumber={detailMockItem.jobCode || null}
+                                      event={detailMockItem.event || null}
+                                      project={detailMockItem.project || null}
+                                      marketSegment={detailMockItem.marketSegment || null}
+                                      onJobNumberChange={(value) => item.id && handleItemChange(item.id, 'jobCode', value)}
+                                      onEventChange={(value) => item.id && handleItemChange(item.id, 'event', value)}
+                                      onProjectChange={(value) => item.id && handleItemChange(item.id, 'project', value)}
+                                      onMarketSegmentChange={(value) => item.id && handleItemChange(item.id, 'marketSegment', value)}
+                                      jobOptions={[
+                                        { value: "FB-2024-Q1-001", label: "FB-2024-Q1-001 - Office Renovation" },
+                                        { value: "JOB001", label: "JOB001 - Office Renovation" },
+                                        { value: "JOB002", label: "JOB002 - Kitchen Upgrade" },
+                                        { value: "JOB003", label: "JOB003 - IT Infrastructure" }
+                                      ]}
+                                      eventOptions={[
+                                        { value: "CONF2024", label: "Annual Conference 2024" },
+                                        { value: "LAUNCH", label: "Product Launch Event" },
+                                        { value: "WORKSHOP", label: "Training Workshop" }
+                                      ]}
+                                      projectOptions={[
+                                        { value: "PROJ001", label: "Digital Transformation" },
+                                        { value: "PROJ002", label: "Sustainability Initiative" },
+                                        { value: "PROJ003", label: "Market Expansion" }
+                                      ]}
+                                      marketSegmentOptions={[
+                                        { value: "ENTERPRISE", label: "Enterprise" },
+                                        { value: "RETAIL", label: "Retail" },
+                                        { value: "WHOLESALE", label: "Wholesale" },
+                                        { value: "GOVERNMENT", label: "Government" }
+                                      ]}
+
+                                      // Section visibility props
+                                      showVendorPricing={canSeePrices && (itemIsApprover || itemIsPurchaser)}
+                                      showInventoryInfo={true}
+                                      showBusinessDimensions={true}
+
+                                      // Action handlers
+                                      onEditClick={() => {
+                                        console.log('Edit item:', item.id);
+                                        // Add edit logic here
+                                      }}
+                                      onDuplicateClick={() => {
+                                        console.log('Duplicate item:', item.id);
+                                        // Add duplicate logic here
+                                      }}
+                                      onArchiveClick={() => {
+                                        console.log('Archive item:', item.id);
+                                        // Add archive logic here
+                                      }}
+                                      onDeleteClick={() => {
+                                        console.log('Delete item:', item.id);
+                                        // Add delete logic here
+                                      }}
+                                      onMoreActions={() => {
+                                        console.log('More actions for item:', item.id);
+                                        // Add more actions logic here
+                                      }}
+                                      showActions={formMode === "edit"}
+                                    />
+                                  );
+                                })()}
                               </div>
                                 
                               {/* Vendor Comparison Dialog - Moved outside of card */}
-                                {canSeePrices && (itemIsApprover || itemIsPurchaser) && (
-                                  <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
-                                    <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-                                      <DialogHeader>
-                                        <DialogTitle>Vendor Comparison</DialogTitle>
-                                      </DialogHeader>
-                                      <VendorComparison 
-                                        currentPricelistNumber={selectedItemForComparison?.pricelistNumber} 
-                                        selectedVendor={itemIsPurchaser ? undefined : selectedItemForComparison?.vendor}
-                                        itemName={selectedItemForComparison?.name}
-                                        itemDescription={selectedItemForComparison?.description}
-                                        itemUnit={selectedItemForComparison?.unit}
-                                        itemStatus={selectedItemForComparison?.status}
-                                        requestedQuantity={selectedItemForComparison?.quantityRequested}
-                                        approvedQuantity={selectedItemForComparison?.quantityApproved}
-                                        userRole={currentUser.role}
-                                        onPricelistSelect={itemIsPurchaser ? (vendor, pricelistNumber, unitPrice) => {
-                                          if (selectedItemForComparison?.id) {
-                                            handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
-                                            handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
-                                            handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
-                                          }
-                                          setIsVendorComparisonOpen(false);
-                                        } : undefined}
-                                      />
-                                    </DialogContent>
-                                  </Dialog>
-                                )}
+                                {canSeePrices && (itemIsApprover || itemIsPurchaser) && selectedItemForComparison && (() => {
+                                  const comparisonMockItem = asMockPurchaseRequestItem(selectedItemForComparison);
+                                  return (
+                                    <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
+                                      <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+                                        <DialogHeader>
+                                          <DialogTitle>Vendor Comparison</DialogTitle>
+                                        </DialogHeader>
+                                        <VendorComparison
+                                          currentPricelistNumber={comparisonMockItem.pricelistNumber}
+                                          selectedVendor={itemIsPurchaser ? undefined : comparisonMockItem.vendor}
+                                          itemName={comparisonMockItem.name}
+                                          itemDescription={selectedItemForComparison.description}
+                                          itemUnit={selectedItemForComparison.unit}
+                                          itemStatus={selectedItemForComparison.status}
+                                          requestedQuantity={comparisonMockItem.quantityRequested}
+                                          approvedQuantity={comparisonMockItem.quantityApproved}
+                                          userRole={currentUser.role}
+                                          onPricelistSelect={itemIsPurchaser ? (vendor, pricelistNumber, unitPrice) => {
+                                            if (selectedItemForComparison?.id) {
+                                              handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
+                                              handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
+                                              handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
+                                            }
+                                            setIsVendorComparisonOpen(false);
+                                          } : undefined}
+                                        />
+                                      </DialogContent>
+                                    </Dialog>
+                                  );
+                                })()}
                             </div>
                           )}
                         </div>
@@ -1352,7 +1366,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
       <Dialog open={isOnHandPopupOpen} onOpenChange={setIsOnHandPopupOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>On Hand by Location - {selectedItemForPopup?.name}</DialogTitle>
+            <DialogTitle>On Hand by Location - {selectedItemForPopup && asMockPurchaseRequestItem(selectedItemForPopup).name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-sm text-gray-600 mb-4">
@@ -1398,7 +1412,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
       <Dialog open={isOnOrderPopupOpen} onOpenChange={setIsOnOrderPopupOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Purchase Orders - {selectedItemForPopup?.name}</DialogTitle>
+            <DialogTitle>Purchase Orders - {selectedItemForPopup && asMockPurchaseRequestItem(selectedItemForPopup).name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-sm text-gray-600 mb-4">
