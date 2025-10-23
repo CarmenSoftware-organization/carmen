@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { PurchaseRequestItem } from "@/lib/types";
+import { PurchaseRequestItem, MockPurchaseRequestItem, DocumentStatus } from "@/lib/types";
 import { Check, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -18,14 +18,14 @@ interface NewItemRowProps {
 }
 
 export function NewItemRow({ onSave, onCancel, locations, products, units, showPricing = true }: NewItemRowProps) {
-  const [newItem, setNewItem] = useState<Partial<PurchaseRequestItem>>({
+  const [newItem, setNewItem] = useState<Partial<MockPurchaseRequestItem>>({
     location: "",
     name: "",
     quantityRequested: 0,
     unit: "",
     price: 0,
     currency: "USD",
-    status: "Pending",
+    status: DocumentStatus.Draft,
     comment: "",
     deliveryDate: undefined,
     deliveryPoint: "",
@@ -54,7 +54,7 @@ export function NewItemRow({ onSave, onCancel, locations, products, units, showP
     onSave(newItem as PurchaseRequestItem);
   };
 
-  const handleInputChange = (field: keyof PurchaseRequestItem, value: any) => {
+  const handleInputChange = (field: keyof MockPurchaseRequestItem, value: any) => {
     setNewItem((prev) => ({ ...prev, [field]: value }));
   };
 
