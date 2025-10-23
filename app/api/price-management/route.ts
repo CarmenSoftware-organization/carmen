@@ -25,7 +25,8 @@ import portalSessionsData from '@/lib/mock/price-management/portal-sessions.json
 import analyticsData from '@/lib/mock/price-management/analytics.json';
 
 // Security imports
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection';
+import { authStrategies } from '@/lib/auth/api-protection';
+import { type AuthenticatedUser } from '@/lib/middleware/auth';
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac';
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security';
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter';
@@ -38,7 +39,10 @@ const priceManagementQuerySchema = z.object({
 });
 
 const createVendorSchema = z.object({
-  name: SecureSchemas.safeString(255).min(1),
+  name: z.string().min(1).max(255).refine(
+    val => !/<script|javascript:|vbscript:|onload=/i.test(val),
+    { message: 'String contains potentially malicious content' }
+  ),
   contactEmail: z.string().email().max(255),
   status: z.enum(['active', 'inactive', 'suspended']).optional().default('active'),
   settings: z.object({
@@ -54,7 +58,10 @@ const createPortalSessionSchema = z.object({
 });
 
 const createBusinessRuleSchema = z.object({
-  name: SecureSchemas.safeString(255).min(1),
+  name: z.string().min(1).max(255).refine(
+    val => !/<script|javascript:|vbscript:|onload=/i.test(val),
+    { message: 'String contains potentially malicious content' }
+  ),
   description: SecureSchemas.safeString(1000).optional(),
   conditions: z.array(z.object({
     field: SecureSchemas.safeString(100),
@@ -88,7 +95,7 @@ const priceManagementActionSchema = z.object({
  */
 const getPriceManagementData = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('price_management', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('price_management', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const { searchParams } = new URL(request.url);
         
@@ -200,7 +207,8 @@ const getPriceManagementData = withSecurity(
             break;
           case 'sessions':
             // Only allow admin users to view portal sessions
-            if (!['admin', 'super-admin', 'purchasing-staff'].includes(user.role)) {
+            const roleStr = typeof user.role === 'string' ? user.role : user.role.name;
+            if (!['admin', 'super-admin', 'purchasing-staff'].includes(roleStr)) {
               return createSecureResponse(
                 {
                   success: false,
@@ -267,7 +275,7 @@ export const GET = withRateLimit(RateLimitPresets.API)(getPriceManagementData);
  * Requires authentication and appropriate permissions based on action
  */
 const createPriceManagementData = withSecurity(
-  authStrategies.hybrid(async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+  authStrategies.hybrid(async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
     try {
       const body = await request.json();
 
@@ -392,7 +400,8 @@ const createPriceManagementData = withSecurity(
 
         case 'create_portal_session': {
           // Check permissions - only admin and purchasing staff can create portal sessions
-          if (!['admin', 'super-admin', 'purchasing-staff'].includes(user.role)) {
+          const roleStr = typeof user.role === 'string' ? user.role : user.role.name;
+          if (!['admin', 'super-admin', 'purchasing-staff'].includes(roleStr)) {
             return createSecureResponse(
               {
                 success: false,
@@ -425,7 +434,8 @@ const createPriceManagementData = withSecurity(
           // Generate secure tokens
           const sessionId = crypto.randomUUID();
           const sessionToken = crypto.randomUUID() + '-' + Date.now().toString(36);
-          const expiresAt = new Date(Date.now() + sessionData.expiryDays * 24 * 60 * 60 * 1000);
+          const expiryDays = sessionData.expiryDays ?? 7; // Default to 7 days
+          const expiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
 
           // Log sensitive operation
           await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {
@@ -495,8 +505,8 @@ const createPriceManagementData = withSecurity(
             resource: 'business_rules',
             action: 'create',
             ruleName: ruleData.name,
-            conditionsCount: ruleData.conditions.length,
-            actionsCount: ruleData.actions.length,
+            conditionsCount: Array.isArray(ruleData.conditions) ? ruleData.conditions.length : 0,
+            actionsCount: Array.isArray(ruleData.actions) ? ruleData.actions.length : 0,
             isActive: ruleData.isActive
           });
 

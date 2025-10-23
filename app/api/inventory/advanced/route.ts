@@ -11,6 +11,19 @@ import { stockMovementService } from '@/lib/services/inventory/stock-movement-ma
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
+import type { Money } from '@/lib/types/common'
+
+// Extend NextAuth session type to include user ID
+declare module 'next-auth' {
+  interface Session {
+    user?: {
+      id?: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+    }
+  }
+}
 
 // Validation schemas
 const abcAnalysisSchema = z.object({
@@ -46,7 +59,7 @@ const stockTransferSchema = z.object({
     quantity: z.number().min(0.01),
     unitCost: z.object({
       amount: z.number().min(0),
-      currencyCode: z.string().length(3)
+      currency: z.string().length(3)
     }).optional()
   })).min(1),
   priority: z.enum(['normal', 'urgent', 'emergency']).optional(),
@@ -78,7 +91,7 @@ const batchTransferSchema = z.object({
     plannedQuantity: z.number().min(0.01),
     unitCost: z.object({
       amount: z.number().min(0),
-      currencyCode: z.string().length(3)
+      currency: z.string().length(3)
     }),
     notes: z.string().optional()
   })).min(1),
@@ -478,34 +491,42 @@ async function handleBatchTransfer(body: any, userId: string) {
   }
 
   const validatedData = validation.data
+  const now = new Date()
+  const operationNumber = `BO-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Date.now()}`
 
   const batchOperation = {
+    id: `batch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    operationNumber,
     operationType: validatedData.operationType,
     fromLocationId: validatedData.fromLocationId,
     toLocationId: validatedData.toLocationId,
     requestedBy: userId,
-    requestDate: new Date(),
+    requestDate: now,
     scheduledDate: validatedData.scheduledDate ? new Date(validatedData.scheduledDate) : undefined,
     status: 'planned' as const,
     totalItems: validatedData.items.length,
     totalValue: {
       amount: validatedData.items.reduce((sum, item) => sum + (item.plannedQuantity * item.unitCost.amount), 0),
-      currencyCode: validatedData.items[0]?.unitCost.currencyCode || 'USD'
+      currency: validatedData.items[0]?.unitCost.currency || 'USD'
     },
+    completionPercentage: 0,
     items: validatedData.items.map((item, index) => ({
       id: `item-${index}-${Date.now()}`,
-      batchTransferId: '', // Will be set by service
+      batchTransferId: `batch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       itemId: item.itemId,
       plannedQuantity: item.plannedQuantity,
       unitCost: item.unitCost,
       totalCost: {
         amount: item.plannedQuantity * item.unitCost.amount,
-        currencyCode: item.unitCost.currencyCode
+        currency: item.unitCost.currency
       },
       status: 'pending' as const,
       notes: item.notes
     })),
-    notes: validatedData.notes
+    notes: validatedData.notes,
+    createdAt: now,
+    updatedAt: now,
+    createdBy: userId
   }
 
   const result = await stockMovementService.executeBatchTransfer(batchOperation, userId)

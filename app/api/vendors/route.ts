@@ -17,7 +17,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { vendorService, type VendorFilters, type PaginationOptions } from '@/lib/services/db/vendor-service'
 import { type VendorBusinessType, type VendorStatus } from '@/lib/types/vendor'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
+import { type AuthenticatedUser } from '@/lib/middleware/auth'
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
@@ -43,7 +44,7 @@ const paginationSchema = z.object({
 })
 
 const createVendorSchema = z.object({
-  name: SecureSchemas.safeString(255).min(1),
+  name: SecureSchemas.safeString(255),
   contactEmail: z.string().email().max(255),
   contactPhone: SecureSchemas.phoneNumber.optional(),
   address: z.object({
@@ -72,7 +73,7 @@ const createVendorSchema = z.object({
  */
 const getVendors = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('vendors', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('vendors', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const { searchParams } = new URL(request.url)
         
@@ -173,9 +174,15 @@ const getVendors = withSecurity(
 
         // Add pagination headers
         if (result.metadata) {
-          response.headers.set('X-Total-Count', result.metadata.total.toString())
-          response.headers.set('X-Page-Count', result.metadata.pageCount.toString())
-          response.headers.set('X-Current-Page', result.metadata.page.toString())
+          if (result.metadata.total !== undefined) {
+            response.headers.set('X-Total-Count', result.metadata.total.toString())
+          }
+          if (result.metadata.totalPages !== undefined) {
+            response.headers.set('X-Page-Count', result.metadata.totalPages.toString())
+          }
+          if (result.metadata.page !== undefined) {
+            response.headers.set('X-Current-Page', result.metadata.page.toString())
+          }
         }
 
         return response
@@ -219,7 +226,7 @@ export const GET = withRateLimit(RateLimitPresets.API)(getVendors)
  */
 const createVendor = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('vendors', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('vendors', 'create', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const body = await request.json()
 
@@ -251,14 +258,15 @@ const createVendor = withSecurity(
         }
 
         // Use sanitized data
-        const vendorData = {
-          ...validationResult.sanitized || validationResult.data!,
+        const validatedData = validationResult.sanitized || validationResult.data!
+        const vendorData: any = {
+          ...validatedData,
           createdBy: user.id // Override with authenticated user ID
         }
 
         // Additional permission check for vendor status
         if (vendorData.status && !['active', 'inactive'].includes(vendorData.status)) {
-          const canSetSpecialStatus = await checkPermission(user, 'manage_vendors', 'vendors')
+          const canSetSpecialStatus = await checkPermission(user, 'manage', 'vendors')
           if (!canSetSpecialStatus) {
             return createSecureResponse(
               {

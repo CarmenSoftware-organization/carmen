@@ -12,18 +12,20 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   purchaseOrderService,
   type UpdatePurchaseOrderInput,
   type ReceiveOrderInput,
   type VendorAcknowledgment
 } from '@/lib/services/db/purchase-order-service'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
+import { type AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
 import { SecurityEventType } from '@/lib/security/audit-logger'
+import type { Money } from '@/lib/types'
 
 // Validation schemas
 const updatePurchaseOrderSchema = z.object({
@@ -88,32 +90,72 @@ const cancelOrderSchema = z.object({
 /**
  * GET /api/purchase-orders/[id] - Get purchase order by ID
  */
-const getPurchaseOrder = withSecurity(
-  authStrategies.hybrid(
-    withAuthorization('purchase_orders', 'read', async (
-      request: NextRequest, 
-      { user, params }: { user: UnifiedAuthenticatedUser; params: { id: string } }
-    ) => {
-      try {
-        const { id } = params
+async function getPurchaseOrderHandler(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  return withSecurity(
+    authStrategies.hybrid(
+      withAuthorization('purchase_orders', 'read', async (
+        req: NextRequest,
+        { user }: { user: AuthenticatedUser }
+      ) => {
+        const { id } = context.params
 
-        // Validate ID format
-        const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
-        if (!idValidation.success) {
-          return createSecureResponse(
-            {
-              success: false,
-              error: 'Invalid purchase order ID'
-            },
-            400
-          )
-        }
+        try {
+          // Validate ID format
+          const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
+          if (!idValidation.success) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid purchase order ID'
+              },
+              400
+            )
+          }
 
-        // Fetch purchase order
-        const result = await purchaseOrderService.getPurchaseOrderById(id)
+          // Fetch purchase order
+          const result = await purchaseOrderService.getPurchaseOrderById(id)
 
-        if (!result.success) {
-          if (result.error?.includes('not found')) {
+          if (!result.success) {
+            if (result.error?.includes('not found')) {
+              return createSecureResponse(
+                {
+                  success: false,
+                  error: 'Purchase order not found'
+                },
+                404
+              )
+            }
+
+            await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, req, user.id, {
+              component: 'purchase-order-service',
+              operation: 'get',
+              error: result.error,
+              orderId: id
+            })
+
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Failed to fetch purchase order'
+              },
+              500
+            )
+          }
+
+          const purchaseOrder = result.data!
+
+          // Check location access
+          const canViewAllLocations = await checkPermission(user, 'view_all_locations', 'purchase_orders')
+          if (!canViewAllLocations && purchaseOrder.deliveryLocationId !== user.location) {
+            await auditSecurityEvent(SecurityEventType.AUTHORIZATION_DENIED, req, user.id, {
+              resource: 'purchase_orders',
+              resourceId: id,
+              reason: 'Attempted to access order for different location'
+            })
+
             return createSecureResponse(
               {
                 success: false,
@@ -123,191 +165,162 @@ const getPurchaseOrder = withSecurity(
             )
           }
 
-          await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
-            component: 'purchase-order-service',
-            operation: 'get',
-            error: result.error,
-            orderId: id
+          // Log sensitive data access
+          await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, req, user.id, {
+            resource: 'purchase_orders',
+            resourceId: id,
+            action: 'view',
+            orderNumber: purchaseOrder.orderNumber
+          })
+
+          return createSecureResponse({
+            success: true,
+            data: purchaseOrder
+          })
+
+        } catch (error) {
+          console.error('Error in GET /api/purchase-orders/[id]:', error)
+
+          await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, req, user.id, {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
           })
 
           return createSecureResponse(
             {
               success: false,
-              error: 'Failed to fetch purchase order'
+              error: 'Internal server error'
             },
             500
           )
         }
+      })
+    )
+  )(request, context)
+}
 
-        const purchaseOrder = result.data!
-
-        // Check location access
-        const canViewAllLocations = await checkPermission(user, 'view_all_locations', 'purchase_orders')
-        if (!canViewAllLocations && purchaseOrder.deliveryLocationId !== user.locationId) {
-          await auditSecurityEvent(SecurityEventType.UNAUTHORIZED_ACCESS, request, user.id, {
-            resource: 'purchase_orders',
-            resourceId: id,
-            reason: 'Attempted to access order for different location'
-          })
-
-          return createSecureResponse(
-            {
-              success: false,
-              error: 'Purchase order not found'
-            },
-            404
-          )
-        }
-
-        // Log sensitive data access
-        await auditSecurityEvent(SecurityEventType.SENSITIVE_DATA_ACCESS, request, user.id, {
-          resource: 'purchase_orders',
-          resourceId: id,
-          action: 'view',
-          orderNumber: purchaseOrder.orderNumber
-        })
-
-        return createSecureResponse({
-          success: true,
-          data: purchaseOrder
-        })
-
-      } catch (error) {
-        console.error('Error in GET /api/purchase-orders/[id]:', error)
-        
-        await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          stack: error instanceof Error ? error.stack : undefined
-        })
-
-        return createSecureResponse(
-          {
-            success: false,
-            error: 'Internal server error'
-          },
-          500
-        )
-      }
-    })
-  )
-)
-
-export const GET = withRateLimit(RateLimitPresets.API)(getPurchaseOrder)
+export const GET = withRateLimit(RateLimitPresets.API)(getPurchaseOrderHandler)
 
 /**
  * PUT /api/purchase-orders/[id] - Update purchase order
  */
-const updatePurchaseOrder = withSecurity(
-  authStrategies.hybrid(
-    withAuthorization('purchase_orders', 'update', async (
-      request: NextRequest,
-      { user, params }: { user: UnifiedAuthenticatedUser; params: { id: string } }
-    ) => {
-      try {
-        const { id } = params
-        const body = await request.json()
+async function updatePurchaseOrderHandler(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  return withSecurity(
+    authStrategies.hybrid(
+      withAuthorization('purchase_orders', 'update', async (
+        req: NextRequest,
+        { user }: { user: AuthenticatedUser }
+      ) => {
+        const { id } = context.params
 
-        // Validate ID and body
-        const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
-        if (!idValidation.success) {
-          return createSecureResponse(
-            {
-              success: false,
-              error: 'Invalid purchase order ID'
-            },
-            400
-          )
-        }
+        try {
+          const body = await req.json()
 
-        const bodyValidation = await validateInput(body, updatePurchaseOrderSchema, {
-          maxLength: 10000,
-          trimWhitespace: true,
-          removeSuspiciousPatterns: true
-        })
+          // Validate ID and body
+          const idValidation = await validateInput({ id }, z.object({ id: SecureSchemas.uuid }))
+          if (!idValidation.success) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid purchase order ID'
+              },
+              400
+            )
+          }
 
-        if (!bodyValidation.success) {
-          await auditSecurityEvent(SecurityEventType.MALICIOUS_REQUEST, request, user.id, {
-            reason: 'Invalid update data',
-            threats: bodyValidation.threats,
-            riskLevel: bodyValidation.riskLevel
+          const bodyValidation = await validateInput(body, updatePurchaseOrderSchema, {
+            maxLength: 10000,
+            trimWhitespace: true,
+            removeSuspiciousPatterns: true
+          })
+
+          if (!bodyValidation.success) {
+            await auditSecurityEvent(SecurityEventType.MALICIOUS_REQUEST, req, user.id, {
+              reason: 'Invalid update data',
+              threats: bodyValidation.threats,
+              riskLevel: bodyValidation.riskLevel
+            })
+
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Invalid update data',
+                details: bodyValidation.errors
+              },
+              400
+            )
+          }
+
+          // Check if user can update purchase orders
+          const canUpdate = await checkPermission(user, 'update_purchase_orders', 'purchase_orders')
+          if (!canUpdate) {
+            return createSecureResponse(
+              {
+                success: false,
+                error: 'Insufficient permissions to update purchase orders'
+              },
+              403
+            )
+          }
+
+          const updateData: UpdatePurchaseOrderInput = bodyValidation.sanitized || bodyValidation.data!
+
+          // Log data modification
+          await auditSecurityEvent(SecurityEventType.DATA_MODIFICATION, req, user.id, {
+            resource: 'purchase_orders',
+            resourceId: id,
+            action: 'update',
+            changes: Object.keys(updateData)
+          })
+
+          // For now, return success - actual update would be implemented in service
+          return createSecureResponse({
+            success: true,
+            message: 'Purchase order update functionality coming soon'
+          })
+
+        } catch (error) {
+          console.error('Error in PUT /api/purchase-orders/[id]:', error)
+
+          await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, req, user.id, {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            operation: 'update_purchase_order',
+            stack: error instanceof Error ? error.stack : undefined
           })
 
           return createSecureResponse(
             {
               success: false,
-              error: 'Invalid update data',
-              details: bodyValidation.errors
+              error: 'Internal server error'
             },
-            400
+            500
           )
         }
+      })
+    )
+  )(request, context)
+}
 
-        // Check if user can update purchase orders
-        const canUpdate = await checkPermission(user, 'update_purchase_orders', 'purchase_orders')
-        if (!canUpdate) {
-          return createSecureResponse(
-            {
-              success: false,
-              error: 'Insufficient permissions to update purchase orders'
-            },
-            403
-          )
-        }
-
-        const updateData: UpdatePurchaseOrderInput = bodyValidation.sanitized || bodyValidation.data!
-
-        // Log data modification
-        await auditSecurityEvent(SecurityEventType.DATA_MODIFICATION, request, user.id, {
-          resource: 'purchase_orders',
-          resourceId: id,
-          action: 'update',
-          changes: Object.keys(updateData)
-        })
-
-        // For now, return success - actual update would be implemented in service
-        return createSecureResponse({
-          success: true,
-          message: 'Purchase order update functionality coming soon'
-        })
-
-      } catch (error) {
-        console.error('Error in PUT /api/purchase-orders/[id]:', error)
-        
-        await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          operation: 'update_purchase_order',
-          stack: error instanceof Error ? error.stack : undefined
-        })
-
-        return createSecureResponse(
-          {
-            success: false,
-            error: 'Internal server error'
-          },
-          500
-        )
-      }
-    })
-  )
-)
-
-export const PUT = withRateLimit(RateLimitPresets.API)(updatePurchaseOrder)
+export const PUT = withRateLimit(RateLimitPresets.API)(updatePurchaseOrderHandler)
 
 /**
  * POST /api/purchase-orders/[id]/[action] - Handle various order actions
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   return withSecurity(
     authStrategies.hybrid(
       withAuthorization('purchase_orders', 'update', async (
         req: NextRequest,
-        { user }: { user: UnifiedAuthenticatedUser }
+        { user }: { user: AuthenticatedUser }
       ) => {
         try {
-          const { id } = params
+          const { id } = context.params
           const url = new URL(req.url)
           const action = url.pathname.split('/').pop()
 
@@ -356,14 +369,14 @@ export async function POST(
         }
       })
     )
-  )(request, { params })
+  )(request, context)
 }
 
 async function handleSendOrder(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   // Check permission to send orders
   const canSend = await checkPermission(user, 'send_purchase_orders', 'purchase_orders')
   if (!canSend) {
@@ -404,9 +417,9 @@ async function handleSendOrder(
 
 async function handleAcknowledgeOrder(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   const body = await request.json()
 
   // Validate body
@@ -434,9 +447,18 @@ async function handleAcknowledgeOrder(
     )
   }
 
+  // Transform itemAdjustments to match Money type if present
+  const transformedData = bodyValidation.data!
   const acknowledgmentData: VendorAcknowledgment = {
-    ...bodyValidation.data!,
-    acknowledgedBy: user.id
+    ...transformedData,
+    acknowledgedBy: user.id,
+    itemAdjustments: transformedData.itemAdjustments?.map(item => ({
+      ...item,
+      confirmedPrice: item.confirmedPrice ? {
+        amount: item.confirmedPrice.amount,
+        currency: item.confirmedPrice.currencyCode
+      } : undefined
+    }))
   }
 
   // Log action
@@ -467,9 +489,9 @@ async function handleAcknowledgeOrder(
 
 async function handleReceiveOrder(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   const body = await request.json()
 
   // Validate body
@@ -531,9 +553,9 @@ async function handleReceiveOrder(
 
 async function handleCloseOrder(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   const body = await request.json()
 
   // Validate body
@@ -591,9 +613,9 @@ async function handleCloseOrder(
 
 async function handleCancelOrder(
   request: NextRequest,
-  user: UnifiedAuthenticatedUser,
+  user: AuthenticatedUser,
   id: string
-): Promise<Response> {
+): Promise<NextResponse> {
   const body = await request.json()
 
   // Validate body

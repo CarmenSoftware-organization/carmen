@@ -10,7 +10,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { vendorService } from '@/lib/services/db/vendor-service'
 import { type VendorBusinessType, type VendorStatus } from '@/lib/types/vendor'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
@@ -19,7 +20,7 @@ import { SecurityEventType } from '@/lib/security/audit-logger'
 
 // Validation schemas
 const updateVendorSchema = z.object({
-  name: SecureSchemas.safeString(255).min(1).optional(),
+  name: z.string().min(1).max(255).optional(),
   contactEmail: z.string().email().max(255).optional(),
   contactPhone: SecureSchemas.phoneNumber.optional(),
   address: z.object({
@@ -55,8 +56,7 @@ const getVendorWithAuth = withSecurity(
   authStrategies.hybrid(
     withAuthorization('vendors', 'read', async (
       request: NextRequest,
-      { user }: { user: UnifiedAuthenticatedUser },
-      { params }: RouteParams
+      { user }: { user: AuthenticatedUser }
     ) => {
       try {
         // Extract ID from injected params or URL
@@ -177,8 +177,7 @@ const updateVendorWithAuth = withSecurity(
   authStrategies.hybrid(
     withAuthorization('vendors', 'update', async (
       request: NextRequest,
-      { user }: { user: UnifiedAuthenticatedUser },
-      { params }: RouteParams
+      { user }: { user: AuthenticatedUser }
     ) => {
       try {
         // Extract ID from injected params or URL
@@ -230,11 +229,11 @@ const updateVendorWithAuth = withSecurity(
           )
         }
 
-        const vendorData = bodyValidation.sanitized || bodyValidation.data!
+        const vendorData = (bodyValidation.sanitized || bodyValidation.data!) as z.infer<typeof updateVendorSchema>
 
         // Additional permission check for vendor status
         if (vendorData.status && !['active', 'inactive'].includes(vendorData.status)) {
-          const canSetSpecialStatus = await checkPermission(user, 'manage_vendors', 'vendors')
+          const canSetSpecialStatus = await checkPermission(user, 'vendors', 'manage_vendors')
           if (!canSetSpecialStatus) {
             return createSecureResponse(
               {
@@ -255,7 +254,7 @@ const updateVendorWithAuth = withSecurity(
         })
 
         // Update vendor
-        const result = await vendorService.updateVendor(id, vendorData)
+        const result = await vendorService.updateVendor(id, vendorData as any)
 
         if (!result.success) {
           let statusCode = 500
@@ -352,8 +351,7 @@ const deleteVendorWithAuth = withSecurity(
   authStrategies.hybrid(
     withAuthorization('vendors', 'delete', async (
       request: NextRequest,
-      { user }: { user: UnifiedAuthenticatedUser },
-      { params }: RouteParams
+      { user }: { user: AuthenticatedUser }
     ) => {
       try {
         // Extract ID from injected params or URL

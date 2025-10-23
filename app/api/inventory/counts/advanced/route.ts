@@ -25,7 +25,7 @@ const createCountSchema = z.object({
     abcClassification: z.array(z.enum(['A', 'B', 'C'])).optional(),
     valueThreshold: z.object({
       amount: z.number().min(0),
-      currencyCode: z.string().length(3)
+      currency: z.string().length(3)
     }).optional(),
     velocityThreshold: z.number().optional(),
     lastCountDaysThreshold: z.number().optional()
@@ -70,7 +70,7 @@ const generateScheduleSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -128,22 +128,22 @@ export async function POST(request: NextRequest) {
 
     switch (operation) {
       case 'create-count':
-        return await handleCreateCount(body, session.user.id)
-      
+        return await handleCreateCount(body, (session.user as any).id)
+
       case 'update-count-item':
-        return await handleUpdateCountItem(body, session.user.id)
-      
+        return await handleUpdateCountItem(body, (session.user as any).id)
+
       case 'finalize-count':
-        return await handleFinalizeCount(body, session.user.id)
-      
+        return await handleFinalizeCount(body, (session.user as any).id)
+
       case 'create-spot-check':
-        return await handleCreateSpotCheck(body, session.user.id)
-      
+        return await handleCreateSpotCheck(body, (session.user as any).id)
+
       case 'generate-schedule':
-        return await handleGenerateSchedule(body, session.user.id)
-      
+        return await handleGenerateSchedule(body, (session.user as any).id)
+
       case 'recount-items':
-        return await handleRecountItems(body, session.user.id)
+        return await handleRecountItems(body, (session.user as any).id)
       
       default:
         return NextResponse.json(
@@ -255,7 +255,7 @@ async function handleCountPerformance(searchParams: URLSearchParams) {
   const locationId = searchParams.get('locationId')
   const periodDays = parseInt(searchParams.get('periodDays') || '30')
 
-  const performance = await calculateCountPerformanceMetrics(locationId, periodDays)
+  const performance = await calculateCountPerformanceMetrics(locationId ?? undefined, periodDays)
 
   return NextResponse.json({
     success: true,
@@ -575,10 +575,10 @@ async function getVarianceAnalysisForCount(countId: string): Promise<any> {
     totalItemsCounted: 85,
     itemsWithVariance: 8,
     varianceRate: 9.4,
-    totalVarianceValue: { amount: 245.50, currencyCode: 'USD' },
+    totalVarianceValue: { amount: 245.50, currency: 'USD' },
     varianceBreakdown: {
-      positive: { items: 3, value: { amount: 125.00, currencyCode: 'USD' } },
-      negative: { items: 5, value: { amount: 120.50, currencyCode: 'USD' } }
+      positive: { items: 3, value: { amount: 125.00, currency: 'USD' } },
+      negative: { items: 5, value: { amount: 120.50, currency: 'USD' } }
     },
     significantVariances: [
       {
@@ -588,7 +588,7 @@ async function getVarianceAnalysisForCount(countId: string): Promise<any> {
         countedQuantity: 40,
         variance: -5,
         variancePercentage: -11.1,
-        varianceValue: { amount: 225.00, currencyCode: 'USD' },
+        varianceValue: { amount: 225.00, currency: 'USD' },
         investigationRequired: true
       }
     ],
