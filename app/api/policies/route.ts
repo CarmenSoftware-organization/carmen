@@ -193,14 +193,13 @@ const getPolicies = withSecurity(
         }
 
         // Additional role-based filtering
-        const roleName = typeof user.role === 'string' ? user.role : user.role.name
-        if (roleName === 'department-manager') {
+        if (user.role === 'department-manager') {
           // Department managers can only see policies they created or department-level policies
           where.OR = [
             { createdBy: user.id },
             { tags: { has: `department:${user.department}` } }
           ]
-        } else if (roleName === 'staff') {
+        } else if (user.role === 'staff') {
           // Staff can only see policies they created
           where.createdBy = user.id
         }
@@ -369,8 +368,7 @@ const createPolicy = withSecurity(
         }
 
         // Role-based creation restrictions
-        const roleName = typeof user.role === 'string' ? user.role : user.role.name
-        if (validatedData.status === 'active' && !['admin', 'super-admin'].includes(roleName)) {
+        if (validatedData.status === 'active' && !['admin', 'super-admin'].includes(user.role)) {
           return createSecureResponse(
             {
               success: false,
@@ -572,8 +570,7 @@ const bulkPolicyOperations = withSecurity(
         }
 
         // Role-based operation restrictions
-        const roleName = typeof user.role === 'string' ? user.role : user.role.name
-        if (operation === 'activate' && !['admin', 'super-admin'].includes(roleName)) {
+        if (operation === 'activate' && !['admin', 'super-admin'].includes(user.role)) {
           return createSecureResponse(
             {
               success: false,
@@ -583,7 +580,7 @@ const bulkPolicyOperations = withSecurity(
           )
         }
 
-        if (operation === 'delete' && !['admin', 'super-admin'].includes(roleName)) {
+        if (operation === 'delete' && !['admin', 'super-admin'].includes(user.role)) {
           return createSecureResponse(
             {
               success: false,

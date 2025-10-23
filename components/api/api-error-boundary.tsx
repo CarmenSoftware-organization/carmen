@@ -248,13 +248,13 @@ export function ApiErrorBoundary({
         <ErrorBoundary
           FallbackComponent={fallback}
           onReset={reset}
-          onError={(error, errorInfo) => {
+          onError={(error: Error, errorInfo: React.ErrorInfo) => {
             // Log error for monitoring
             console.error('API Error Boundary:', error, errorInfo)
-            
+
             // Call custom error handler if provided
             onError?.(error, errorInfo)
-            
+
             // Report to error tracking service
             // reportError(error, errorInfo)
           }}

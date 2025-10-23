@@ -34,7 +34,8 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
-  Minimize2
+  Minimize2,
+  XCircle
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -77,12 +78,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu';
 
 import { 
   ConditionNode, 
@@ -586,77 +581,81 @@ export function AdvancedRuleBuilder({
   // Render visual node
   const renderVisualNode = (node: VisualRuleNode) => {
     return (
-      <ContextMenu key={node.id}>
-        <ContextMenuTrigger>
-          <div
-            className={`absolute border-2 rounded-lg shadow-md cursor-pointer transition-all hover:shadow-lg ${
-              node.data.color || 'bg-white border-gray-300'
-            } ${node.isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-            style={{
-              left: node.position.x,
-              top: node.position.y,
-              width: node.size.width,
-              height: node.size.height,
-              transform: `scale(${canvasState.zoom})`
-            }}
-            onClick={(e) => handleNodeSelect(node.id, e.ctrlKey || e.metaKey)}
-            onMouseDown={(e) => {
-              if (visualMode === 'select') {
-                dragState.current.isDragging = true;
-                dragState.current.startPos = { x: e.clientX, y: e.clientY };
-              }
+      <div
+        key={node.id}
+        className={`absolute border-2 rounded-lg shadow-md cursor-pointer transition-all hover:shadow-lg ${
+          node.data.color || 'bg-white border-gray-300'
+        } ${node.isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+        style={{
+          left: node.position.x,
+          top: node.position.y,
+          width: node.size.width,
+          height: node.size.height,
+          transform: `scale(${canvasState.zoom})`
+        }}
+        onClick={(e) => handleNodeSelect(node.id, e.ctrlKey || e.metaKey)}
+        onMouseDown={(e) => {
+          if (visualMode === 'select') {
+            dragState.current.isDragging = true;
+            dragState.current.startPos = { x: e.clientX, y: e.clientY };
+          }
+        }}
+      >
+        <div className="p-3 h-full flex flex-col justify-center">
+          <div className="flex items-center space-x-2 mb-1">
+            {node.type === 'condition' && <Target className="h-4 w-4" />}
+            {node.type === 'group' && <GitBranch className="h-4 w-4" />}
+            <span className="font-medium text-sm truncate">{node.data.label}</span>
+            {!node.data.isValid && <AlertCircle className="h-4 w-4 text-red-500" />}
+            {node.data.isValid && <CheckCircle className="h-4 w-4 text-green-500" />}
+          </div>
+
+          {node.type === 'condition' && (
+            <div className="text-xs text-muted-foreground">
+              {node.data.attribute || 'No attribute selected'}
+            </div>
+          )}
+
+          {node.type === 'group' && (
+            <Badge variant="secondary" className="text-xs w-fit">
+              {node.data.logicalOperator} Group
+            </Badge>
+          )}
+        </div>
+
+        {/* Connection points */}
+        {visualMode === 'connect' && (
+          <>
+            <div className="absolute -left-2 top-1/2 w-4 h-4 bg-white border-2 border-blue-400 rounded-full transform -translate-y-1/2 hover:bg-blue-100 cursor-crosshair" />
+            <div className="absolute -right-2 top-1/2 w-4 h-4 bg-white border-2 border-blue-400 rounded-full transform -translate-y-1/2 hover:bg-blue-100 cursor-crosshair" />
+          </>
+        )}
+
+        {/* Action buttons on hover */}
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              const clonedCondition = { ...conditions.find(c => c.id === node.id)!, id: generateId() };
+              setConditions(prev => [...prev, clonedCondition]);
             }}
           >
-            <div className="p-3 h-full flex flex-col justify-center">
-              <div className="flex items-center space-x-2 mb-1">
-                {node.type === 'condition' && <Target className="h-4 w-4" />}
-                {node.type === 'group' && <GitBranch className="h-4 w-4" />}
-                <span className="font-medium text-sm truncate">{node.data.label}</span>
-                {!node.data.isValid && <AlertCircle className="h-4 w-4 text-red-500" />}
-                {node.data.isValid && <CheckCircle className="h-4 w-4 text-green-500" />}
-              </div>
-              
-              {node.type === 'condition' && (
-                <div className="text-xs text-muted-foreground">
-                  {node.data.attribute || 'No attribute selected'}
-                </div>
-              )}
-              
-              {node.type === 'group' && (
-                <Badge variant="secondary" className="text-xs w-fit">
-                  {node.data.logicalOperator} Group
-                </Badge>
-              )}
-            </div>
-            
-            {/* Connection points */}
-            {visualMode === 'connect' && (
-              <>
-                <div className="absolute -left-2 top-1/2 w-4 h-4 bg-white border-2 border-blue-400 rounded-full transform -translate-y-1/2 hover:bg-blue-100 cursor-crosshair" />
-                <div className="absolute -right-2 top-1/2 w-4 h-4 bg-white border-2 border-blue-400 rounded-full transform -translate-y-1/2 hover:bg-blue-100 cursor-crosshair" />
-              </>
-            )}
-          </div>
-        </ContextMenuTrigger>
-        
-        <ContextMenuContent>
-          <ContextMenuItem onClick={() => handleNodeSelect(node.id)}>
-            Select Node
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => {
-            // Clone node logic
-            const clonedCondition = { ...conditions.find(c => c.id === node.id)!, id: generateId() };
-            setConditions(prev => [...prev, clonedCondition]);
-          }}>
-            <Copy className="h-4 w-4 mr-2" />
-            Duplicate
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => deleteCondition(node.id)} className="text-red-600">
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+            <Copy className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteCondition(node.id);
+            }}
+          >
+            <Trash2 className="h-3 w-3 text-red-500" />
+          </Button>
+        </div>
+      </div>
     );
   };
 
@@ -1081,7 +1080,7 @@ export function AdvancedRuleBuilder({
                     </div>
                     
                     <div className="flex flex-wrap gap-1 mb-3">
-                      {template.tags.map(tag => (
+                      {template.tags?.map(tag => (
                         <Badge key={tag} variant="secondary" className="text-xs">
                           {tag}
                         </Badge>

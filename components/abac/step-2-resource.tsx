@@ -54,7 +54,12 @@ export function Step2Resource({ policy, setPolicy }: Step2ResourceProps) {
             subtitle={`Make the rule more specific by adding conditions about the ${selectedResourceType}.`}
             conditions={policy.target.resources?.slice(1) || []}
             onChange={newConditions => setPolicy({ ...policy, target: { ...policy.target, resources: [policy.target.resources![0], ...newConditions] } })}
-            attributeSource={MOCK_ABAC_DATA.resourceTypes[selectedResourceType]?.attributes.reduce((acc, attr) => ({ ...acc, [attr]: [] }), {}) || {}}
+            attributeSource={
+              (MOCK_ABAC_DATA.resourceTypes as Record<string, { actions: string[]; attributes: string[] }>)[selectedResourceType]?.attributes.reduce(
+                (acc: Record<string, string[]>, attr: string) => ({ ...acc, [attr]: [] }),
+                {} as Record<string, string[]>
+              ) || {}
+            }
           />
         )}
       </div>

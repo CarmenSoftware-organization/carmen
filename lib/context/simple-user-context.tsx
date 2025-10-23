@@ -10,7 +10,8 @@
  */
 
 import { createContext, useContext, useState, useCallback } from 'react'
-import type { User, UserContextType, UserContext, Role } from '../types/user'
+import type { User, UserContextType, UserContext } from '../types/user'
+import type { Role } from '../types/user'
 import { mockDepartments, mockLocations, mockUsers } from '../mock-data'
 
 // Use the first mock user as default (can be changed for testing)
@@ -20,7 +21,7 @@ interface SimpleUserContextType extends UserContextType {
   user: User | null
   setUser: (user: User | null) => void
   switchUser: (userId: string) => void
-  switchRole: (role: Role) => void
+  switchRole: (roleName: string) => void
   switchDepartment: (departmentName: string) => void
   switchLocation: (locationName: string) => void
   isLoading: false // Always false for prototype
@@ -39,7 +40,7 @@ export function SimpleUserProvider({ children }: { children: React.ReactNode }) 
     // Update role if provided
     if (contextUpdates.currentRole) {
       updatedUser.context.currentRole = contextUpdates.currentRole
-      updatedUser.role = contextUpdates.currentRole.name as Role
+      updatedUser.role = contextUpdates.currentRole.id
     }
 
     // Update department if provided
@@ -71,10 +72,10 @@ export function SimpleUserProvider({ children }: { children: React.ReactNode }) 
     }
   }, [])
 
-  const switchRole = useCallback((role: Role) => {
+  const switchRole = useCallback((roleName: string) => {
     if (!user) return
 
-    const availableRole = user.availableRoles.find(r => r.name === role)
+    const availableRole = user.availableRoles.find(r => r.name === roleName)
     if (availableRole) {
       updateUserContext({ currentRole: availableRole })
     }

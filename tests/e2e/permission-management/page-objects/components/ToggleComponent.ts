@@ -4,6 +4,7 @@ import { testSelectors } from '../../config/test.config';
 
 export class ToggleComponent extends BasePage {
   private readonly selectors = {
+    rbacAbacToggle: testSelectors.rbacAbacToggle,
     rbacButton: testSelectors.rbacButton,
     abacButton: testSelectors.abacButton,
     migrationDialog: testSelectors.migrationDialog,
@@ -227,41 +228,59 @@ export class ToggleComponent extends BasePage {
    * Validate the toggle has proper accessibility attributes
    */
   async validateToggleAccessibility(): Promise<boolean> {
-    const toggle = this.page.locator(this.selectors.toggle);
-    
+    const tabList = this.page.locator(this.selectors.rbacAbacToggle);
+
     try {
-      // Check ARIA attributes
-      const role = await toggle.getAttribute('role');
-      const ariaLabel = await toggle.getAttribute('aria-label');
-      const ariaChecked = await toggle.getAttribute('aria-checked');
-      
-      console.log('Toggle accessibility attributes:', { role, ariaLabel, ariaChecked });
-      
-      // Test keyboard focus
-      await toggle.focus();
-      const isFocused = await toggle.evaluate(el => document.activeElement === el);
-      
+      // Check ARIA attributes on the tablist
+      const role = await tabList.getAttribute('role');
+      const ariaLabel = await tabList.getAttribute('aria-label');
+
+      // Check individual tabs
+      const rbacTab = this.page.locator(this.selectors.rbacButton);
+      const abacTab = this.page.locator(this.selectors.abacButton);
+
+      const rbacRole = await rbacTab.getAttribute('role');
+      const rbacAriaSelected = await rbacTab.getAttribute('aria-selected');
+      const abacRole = await abacTab.getAttribute('role');
+      const abacAriaSelected = await abacTab.getAttribute('aria-selected');
+
+      console.log('Toggle accessibility attributes:', {
+        tabListRole: role,
+        tabListLabel: ariaLabel,
+        rbacRole,
+        rbacAriaSelected,
+        abacRole,
+        abacAriaSelected
+      });
+
+      // Test keyboard focus on active tab
+      const currentMode = await this.getCurrentMode();
+      const activeTab = currentMode === 'rbac' ? rbacTab : abacTab;
+
+      await activeTab.focus();
+      const isFocused = await activeTab.evaluate(el => document.activeElement === el);
+
       // Test keyboard interaction
       await this.page.keyboard.press('Space');
       await this.waitForTimeout(100);
-      
-      const hasValidRole = role === 'switch' || role === 'checkbox' || role === 'button';
-      const hasValidLabel = ariaLabel !== null && ariaLabel.length > 0;
-      const hasValidState = ariaChecked !== null;
-      
-      const isAccessible = hasValidRole && hasValidLabel && hasValidState && isFocused;
-      
+
+      const hasValidTabListRole = role === 'tablist';
+      const hasValidTabRoles = rbacRole === 'tab' && abacRole === 'tab';
+      const hasValidState = rbacAriaSelected !== null && abacAriaSelected !== null;
+
+      const isAccessible = hasValidTabListRole && hasValidTabRoles && hasValidState && isFocused;
+
       if (!isAccessible) {
         console.warn('Toggle accessibility issues:', {
-          hasValidRole,
-          hasValidLabel,
+          hasValidTabListRole,
+          hasValidTabRoles,
           hasValidState,
           isFocused
         });
       }
-      
+
       return isAccessible;
-      
+
     } catch (error) {
       console.error('Toggle accessibility validation failed:', error);
       return false;
@@ -314,31 +333,32 @@ export class ToggleComponent extends BasePage {
   }> {
     const initialMode = await this.getCurrentMode();
     const startTime = Date.now();
-    
-    // Start toggle
-    await this.clickElement(this.selectors.toggle);
-    
+
+    // Start toggle - click the opposite mode button
+    const targetMode = initialMode === 'rbac' ? 'abac' : 'rbac';
+    const buttonSelector = targetMode === 'abac' ? this.selectors.abacButton : this.selectors.rbacButton;
+    await this.clickElement(buttonSelector);
+
     // Measure visual update time (when toggle visually changes)
     const visualUpdateStartTime = Date.now();
-    const targetMode = initialMode === 'rbac' ? 'abac' : 'rbac';
-    
+
     let visualUpdateTime = 0;
     let migrationTime = 0;
-    
+
     // Wait for visual change
     let currentMode = await this.getCurrentMode();
     while (currentMode === initialMode) {
       await this.waitForTimeout(50);
       currentMode = await this.getCurrentMode();
-      
+
       // Timeout check
       if (Date.now() - visualUpdateStartTime > 5000) {
         throw new Error('Toggle did not update visually within 5 seconds');
       }
     }
-    
+
     visualUpdateTime = Date.now() - visualUpdateStartTime;
-    
+
     // Handle migration if needed
     try {
       if (await this.isElementVisible(this.selectors.migrationDialog)) {
@@ -350,9 +370,9 @@ export class ToggleComponent extends BasePage {
     } catch (error) {
       // No migration needed
     }
-    
+
     const totalTime = Date.now() - startTime;
-    
+
     return {
       totalTime,
       visualUpdateTime,
@@ -440,15 +460,20 @@ export class ToggleComponent extends BasePage {
     migrationProgress?: number;
   }> {
     const currentMode = await this.getCurrentMode();
-    const isEnabled = await this.isElementEnabled(this.selectors.toggle);
+
+    // Check if the tablist is enabled by checking if either button is enabled
+    const rbacButton = this.page.locator(this.selectors.rbacButton);
+    const isEnabled = await this.isElementEnabled(this.selectors.rbacButton) ||
+                     await this.isElementEnabled(this.selectors.abacButton);
+
     const isMigrating = await this.isElementVisible(this.selectors.migrationDialog) ||
                        await this.isElementVisible(this.selectors.migrationProgress);
-    
+
     let migrationProgress: number | undefined;
     if (isMigrating) {
       migrationProgress = await this.getMigrationProgress();
     }
-    
+
     return {
       currentMode,
       isEnabled,
