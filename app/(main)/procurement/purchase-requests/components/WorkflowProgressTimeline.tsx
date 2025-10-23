@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { WorkflowStage, WorkflowStatus, PurchaseRequest, DocumentStatus } from "@/lib/types";
+import { WorkflowStage, WorkflowStatus, PurchaseRequest, DocumentStatus, asMockPurchaseRequest } from "@/lib/types";
 
 import { CheckCircle, Clock, XCircle, User, Building, CreditCard, UserCheck, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -66,16 +66,18 @@ export function WorkflowProgressTimeline({ prData, className }: WorkflowProgress
     return steps.map((step) => {
       let status: WorkflowStep['status'] = 'pending';
 
-      if (prData.status === DocumentStatus.Rejected && step.stage === (prData as any).currentWorkflowStage) {
+      const mockPrData = asMockPurchaseRequest(prData);
+
+      if (prData.status === DocumentStatus.Rejected && step.stage === mockPrData.currentWorkflowStage) {
         status = 'rejected';
-      } else if (step.stage === (prData as any).currentWorkflowStage) {
+      } else if (step.stage === mockPrData.currentWorkflowStage) {
         status = 'current';
       } else {
         // Check if this step is before the current stage (completed)
-        const currentStageIndex = steps.findIndex(s => s.stage === (prData as any).currentWorkflowStage);
+        const currentStageIndex = steps.findIndex(s => s.stage === mockPrData.currentWorkflowStage);
         const stepIndex = steps.findIndex(s => s.stage === step.stage);
 
-        if (stepIndex < currentStageIndex || (prData as any).currentWorkflowStage === WorkflowStage.completed) {
+        if (stepIndex < currentStageIndex || mockPrData.currentWorkflowStage === WorkflowStage.completed) {
           status = 'completed';
         }
       }
