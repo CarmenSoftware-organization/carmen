@@ -37,6 +37,8 @@ export type {
 export type {
   PurchaseRequest,
   PurchaseRequestItem,
+  PurchaseRequestPriority,
+  PurchaseRequestType,
   PurchaseOrder,
   PurchaseOrderItem,
   PurchaseOrderTerms,

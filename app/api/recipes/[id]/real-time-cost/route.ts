@@ -14,12 +14,13 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   createMenuEngineeringService
 } from '@/lib/services/menu-engineering-service'
 import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
+import type { AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
@@ -30,24 +31,24 @@ const RealTimeCostQuerySchema = z.object({
   // Yield options
   yieldVariantId: SecureSchemas.uuid.optional(),
   portionSize: z.coerce.number().positive().optional(),
-  quantity: z.coerce.number().positive().optional().default(1),
+  quantity: z.coerce.number().positive().default(1),
   // Pricing options
-  includeLabor: z.string().transform(str => str !== 'false').optional().default(true),
-  includeOverhead: z.string().transform(str => str !== 'false').optional().default(true),
-  useLatestPrices: z.string().transform(str => str !== 'false').optional().default(true),
+  includeLabor: z.string().transform(str => str !== 'false').default('true'),
+  includeOverhead: z.string().transform(str => str !== 'false').default('true'),
+  useLatestPrices: z.string().transform(str => str !== 'false').default('true'),
   // Vendor options
   preferredVendorId: SecureSchemas.uuid.optional(),
-  useContractPrices: z.string().transform(str => str === 'true').optional().default(false),
+  useContractPrices: z.string().transform(str => str === 'true').default('false'),
   // Currency and location
-  currency: z.string().regex(/^[A-Z]{3}$/, 'Invalid currency code').optional().default('USD'),
+  currency: z.string().regex(/^[A-Z]{3}$/, 'Invalid currency code').default('USD'),
   locationId: SecureSchemas.uuid.optional(),
   // Output options
-  includeIngredientBreakdown: z.string().transform(str => str !== 'false').optional().default(true),
-  includePriceHistory: z.string().transform(str => str === 'true').optional().default(false),
-  includeAlternatives: z.string().transform(str => str === 'true').optional().default(false),
+  includeIngredientBreakdown: z.string().transform(str => str !== 'false').default('true'),
+  includePriceHistory: z.string().transform(str => str === 'true').default('false'),
+  includeAlternatives: z.string().transform(str => str === 'true').default('false'),
   // Analysis options
-  compareToTarget: z.string().transform(str => str === 'true').optional().default(false),
-  showVariance: z.string().transform(str => str === 'true').optional().default(false)
+  compareToTarget: z.string().transform(str => str === 'true').default('false'),
+  showVariance: z.string().transform(str => str === 'true').default('false')
 })
 
 // Path parameter validation
@@ -62,9 +63,13 @@ const PathParamsSchema = z.object({
 const getRealTimeCost = withSecurity(
   authStrategies.hybrid(
     withAuthorization('recipes', 'read', async (
-      request: NextRequest, 
-      { user, params }: { user: UnifiedAuthenticatedUser, params: { id: string } }
+      request: NextRequest,
+      { user }: { user: AuthenticatedUser }
     ) => {
+      // Extract params from URL
+      const url = new URL(request.url)
+      const pathSegments = url.pathname.split('/')
+      const params = { id: pathSegments[pathSegments.length - 2] }
       try {
         // Validate path parameters
         const pathValidation = await validateInput({ id: params.id }, PathParamsSchema)
@@ -101,7 +106,7 @@ const getRealTimeCost = withSecurity(
         }
 
         // Enhanced security validation
-        const validationResult = await validateInput(rawQuery, RealTimeCostQuerySchema, {
+        const validationResult = await validateInput(rawQuery, RealTimeCostQuerySchema as any, {
           maxLength: 500,
           trimWhitespace: true,
           removeSuspiciousPatterns: true
@@ -124,7 +129,7 @@ const getRealTimeCost = withSecurity(
           )
         }
 
-        const queryParams = validationResult.sanitized || validationResult.data!
+        const queryParams = (validationResult.sanitized || validationResult.data!) as z.infer<typeof RealTimeCostQuerySchema>
         const recipeId = pathValidation.data!.id
 
         // Log costing access
@@ -142,7 +147,32 @@ const getRealTimeCost = withSecurity(
         })
 
         // Initialize cache and services
-        const cache = new EnhancedCacheLayer()
+        const cache = new EnhancedCacheLayer({
+          redis: {
+            enabled: false,
+            fallbackToMemory: true,
+            connectionTimeout: 5000
+          },
+          memory: {
+            maxMemoryMB: 100,
+            maxEntries: 1000
+          },
+          ttl: {
+            default: 300,
+            financial: 600,
+            inventory: 300,
+            vendor: 3600
+          },
+          invalidation: {
+            enabled: true,
+            batchSize: 100,
+            maxDependencies: 1000
+          },
+          monitoring: {
+            enabled: false,
+            metricsInterval: 60000
+          }
+        })
 
         // Mock real-time cost calculation (in real implementation, this would calculate from current prices)
         const realTimeCostData = {

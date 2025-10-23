@@ -15,19 +15,20 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
-  purchaseRequestService, 
-  type PurchaseRequestFilters, 
-  type CreatePurchaseRequestInput,
-  type PaginationOptions 
+import {
+  purchaseRequestService,
+  type PurchaseRequestFilters,
+  type CreatePurchaseRequestInput
 } from '@/lib/services/db/purchase-request-service'
-import { 
-  type PurchaseRequestPriority, 
+import {
+  type PurchaseRequestPriority,
   type PurchaseRequestType,
-  type DocumentStatus 
+  type DocumentStatus,
+  type PaginationOptions
 } from '@/lib/types'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
+import { type AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas, type ValidationResult } from '@/lib/security/input-validator'
@@ -35,7 +36,7 @@ import { SecurityEventType } from '@/lib/security/audit-logger'
 
 // Security-enhanced validation schemas
 const purchaseRequestFiltersSchema = z.object({
-  status: z.array(z.enum(['draft', 'pending_approval', 'approved', 'rejected', 'closed', 'cancelled'])).optional(),
+  status: z.array(z.enum(['draft', 'inprogress', 'approved', 'rejected', 'void', 'converted'])).optional(),
   priority: z.array(z.enum(['low', 'normal', 'high', 'urgent', 'emergency'])).optional(),
   requestType: z.array(z.enum(['goods', 'services', 'capital', 'maintenance', 'emergency'])).optional(),
   departmentId: SecureSchemas.uuid.optional(),
@@ -59,14 +60,14 @@ const paginationSchema = z.object({
 const createPurchaseRequestItemSchema = z.object({
   itemId: SecureSchemas.uuid.optional(),
   itemCode: SecureSchemas.safeString(50).optional(),
-  itemName: SecureSchemas.safeString(255).min(1),
-  description: SecureSchemas.safeString(500).min(1),
+  itemName: z.string().min(1).max(255),
+  description: z.string().min(1).max(500),
   specification: SecureSchemas.safeString(1000).optional(),
   requestedQuantity: z.number().min(0.001).max(999999),
-  unit: SecureSchemas.safeString(20).min(1),
+  unit: z.string().min(1).max(20),
   estimatedUnitPrice: z.object({
     amount: z.number().min(0),
-    currencyCode: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
+    currency: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
   }).optional(),
   budgetCode: SecureSchemas.safeString(50).optional(),
   accountCode: SecureSchemas.safeString(50).optional(),
@@ -101,7 +102,7 @@ const createPurchaseRequestSchema = z.object({
  */
 const getPurchaseRequests = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('purchase_requests', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('purchase_requests', 'read', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const { searchParams } = new URL(request.url)
         
@@ -165,14 +166,14 @@ const getPurchaseRequests = withSecurity(
           )
         }
 
-        const filters: PurchaseRequestFilters = filtersValidation.sanitized || filtersValidation.data!
-        const pagination: PaginationOptions = paginationValidation.sanitized || paginationValidation.data!
+        const filters: PurchaseRequestFilters = (filtersValidation.sanitized || filtersValidation.data!) as PurchaseRequestFilters
+        const pagination: PaginationOptions = (paginationValidation.sanitized || paginationValidation.data!) as PaginationOptions
 
         // Department-based access control - users can only see their department's requests unless they have elevated permissions
         const canViewAllDepartments = await checkPermission(user, 'view_all_departments', 'purchase_requests')
         if (!canViewAllDepartments && !filters.departmentId) {
           // Apply department filter based on user's department
-          filters.departmentId = user.departmentId
+          filters.departmentId = user.department
         }
 
         // Log data access for sensitive operations
@@ -214,9 +215,15 @@ const getPurchaseRequests = withSecurity(
 
         // Add pagination headers
         if (result.metadata) {
-          response.headers.set('X-Total-Count', result.metadata.total.toString())
-          response.headers.set('X-Page-Count', result.metadata.totalPages.toString())
-          response.headers.set('X-Current-Page', result.metadata.page.toString())
+          if (result.metadata.total !== undefined) {
+            response.headers.set('X-Total-Count', result.metadata.total.toString())
+          }
+          if (result.metadata.totalPages !== undefined) {
+            response.headers.set('X-Page-Count', result.metadata.totalPages.toString())
+          }
+          if (result.metadata.page !== undefined) {
+            response.headers.set('X-Current-Page', result.metadata.page.toString())
+          }
         }
 
         return response
@@ -260,7 +267,7 @@ export const GET = withRateLimit(RateLimitPresets.API)(getPurchaseRequests)
  */
 const createPurchaseRequest = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('purchase_requests', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('purchase_requests', 'create', async (request: NextRequest, { user }: { user: AuthenticatedUser }) => {
       try {
         const body = await request.json()
 
@@ -293,12 +300,12 @@ const createPurchaseRequest = withSecurity(
 
         // Use sanitized data
         const requestData: CreatePurchaseRequestInput = {
-          ...validationResult.sanitized || validationResult.data!,
+          ...(validationResult.sanitized || validationResult.data!),
           requestedBy: user.id // Override with authenticated user ID
-        }
+        } as CreatePurchaseRequestInput
 
         // Additional validation - check if user can create requests for the specified department
-        const canCreateForDepartment = user.departmentId === requestData.departmentId || 
+        const canCreateForDepartment = user.department === requestData.departmentId ||
                                       await checkPermission(user, 'create_for_other_departments', 'purchase_requests')
         
         if (!canCreateForDepartment) {

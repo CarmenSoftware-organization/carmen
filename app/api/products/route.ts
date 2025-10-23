@@ -17,7 +17,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { productService, type ProductFilters, type PaginationOptions } from '@/lib/services/db/product-service'
 import { type ProductType, type ProductStatus } from '@/lib/types/product'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
@@ -64,16 +64,18 @@ const productDimensionsSchema = z.object({
 })
 
 const productSpecificationSchema = z.object({
-  name: SecureSchemas.safeString(100).min(1),
-  value: SecureSchemas.safeString(500).min(1),
+  name: SecureSchemas.safeString(100),
+  value: SecureSchemas.safeString(500),
   unit: SecureSchemas.safeString(20).optional(),
   category: SecureSchemas.safeString(50).optional(),
   isRequired: z.boolean().default(false),
   displayOrder: z.number().min(0).default(0)
+}).refine(data => data.name.length >= 1 && data.value.length >= 1, {
+  message: 'Name and value are required'
 })
 
 const productUnitSchema = z.object({
-  unit: SecureSchemas.safeString(20).min(1),
+  unit: SecureSchemas.safeString(20),
   conversionFactor: z.number().min(0.0001),
   isActive: z.boolean().default(true),
   isPurchaseUnit: z.boolean().default(false),
@@ -81,16 +83,18 @@ const productUnitSchema = z.object({
   isInventoryUnit: z.boolean().default(false),
   barcode: SecureSchemas.safeString(50).optional(),
   notes: SecureSchemas.safeString(500).optional()
+}).refine(data => data.unit.length >= 1, {
+  message: 'Unit is required'
 })
 
 const moneySchema = z.object({
   amount: z.number().min(0),
-  currencyCode: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
+  currency: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
 })
 
 const createProductSchema = z.object({
   productCode: SecureSchemas.safeString(50).optional(),
-  productName: SecureSchemas.safeString(255).min(1),
+  productName: SecureSchemas.safeString(255),
   displayName: SecureSchemas.safeString(255).optional(),
   description: SecureSchemas.safeString(2000).optional(),
   shortDescription: SecureSchemas.safeString(500).optional(),
@@ -101,7 +105,7 @@ const createProductSchema = z.object({
   brandId: SecureSchemas.uuid.optional(),
   manufacturerId: SecureSchemas.uuid.optional(),
   specifications: z.array(productSpecificationSchema).max(50).optional(),
-  baseUnit: SecureSchemas.safeString(20).min(1),
+  baseUnit: SecureSchemas.safeString(20),
   alternativeUnits: z.array(productUnitSchema).max(20).optional(),
   isInventoried: z.boolean().optional(),
   isSerialTrackingRequired: z.boolean().optional(),
@@ -129,6 +133,8 @@ const createProductSchema = z.object({
   tags: z.array(SecureSchemas.safeString(30)).max(20).optional(),
   notes: SecureSchemas.safeString(2000).optional(),
   createdBy: SecureSchemas.uuid
+}).refine(data => data.productName.length >= 1 && data.baseUnit.length >= 1, {
+  message: 'Product name and base unit are required'
 })
 
 /**
@@ -137,12 +143,18 @@ const createProductSchema = z.object({
  */
 const getProducts = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('products', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('products', 'read', async (request: NextRequest, { user }: { user: any }) => {
       try {
         const { searchParams } = new URL(request.url)
         
         // Parse query parameters
-        const rawFilters = {
+        const priceRange = {
+          min: searchParams.get('priceMin') ? parseFloat(searchParams.get('priceMin')!) : undefined,
+          max: searchParams.get('priceMax') ? parseFloat(searchParams.get('priceMax')!) : undefined,
+          currency: searchParams.get('priceCurrency') || undefined
+        }
+
+        const rawFilters: any = {
           status: searchParams.getAll('status') as ProductStatus[] | undefined,
           productType: searchParams.getAll('productType') as ProductType[] | undefined,
           categoryId: searchParams.getAll('categoryId') || undefined,
@@ -155,20 +167,15 @@ const getProducts = withSecurity(
           isActive: searchParams.get('isActive') === 'true' ? true : searchParams.get('isActive') === 'false' ? false : undefined,
           hasStock: searchParams.get('hasStock') === 'true' ? true : undefined,
           hasImages: searchParams.get('hasImages') === 'true' ? true : undefined,
-          priceRange: {
-            min: searchParams.get('priceMin') ? parseFloat(searchParams.get('priceMin')!) : undefined,
-            max: searchParams.get('priceMax') ? parseFloat(searchParams.get('priceMax')!) : undefined,
-            currency: searchParams.get('priceCurrency') || undefined
-          },
           createdAfter: searchParams.get('createdAfter') || undefined,
           createdBefore: searchParams.get('createdBefore') || undefined,
           updatedAfter: searchParams.get('updatedAfter') || undefined,
           updatedBefore: searchParams.get('updatedBefore') || undefined
         }
 
-        // Clean up priceRange if all values are undefined
-        if (!rawFilters.priceRange?.min && !rawFilters.priceRange?.max && !rawFilters.priceRange?.currency) {
-          delete rawFilters.priceRange
+        // Add priceRange only if at least one value exists
+        if (priceRange.min !== undefined || priceRange.max !== undefined || priceRange.currency !== undefined) {
+          rawFilters.priceRange = priceRange
         }
 
         const rawPagination = {
@@ -305,7 +312,7 @@ export const GET = withRateLimit(RateLimitPresets.API)(getProducts)
  */
 const createProduct = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('products', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('products', 'create', async (request: NextRequest, { user }: { user: any }) => {
       try {
         const body = await request.json()
 
@@ -336,14 +343,15 @@ const createProduct = withSecurity(
           )
         }
 
-        // Use sanitized data
-        const productData = {
-          ...validationResult.sanitized || validationResult.data!,
+        // Use sanitized data and cast to CreateProductInput
+        const validatedData = validationResult.sanitized || validationResult.data!
+        const productData: any = {
+          ...validatedData,
           createdBy: user.id // Override with authenticated user ID
         }
 
         // Additional permission checks for special statuses or high-value products
-        if (productData.status && !['active', 'draft'].includes(productData.status)) {
+        if (productData.status && !['active', 'draft'].includes(productData.status as string)) {
           const canSetSpecialStatus = await checkPermission(user, 'manage_products', 'products')
           if (!canSetSpecialStatus) {
             return createSecureResponse(
@@ -357,7 +365,7 @@ const createProduct = withSecurity(
         }
 
         // Check for high-value product creation permissions
-        if (productData.standardCost && productData.standardCost.amount > 10000) {
+        if (productData.standardCost && typeof productData.standardCost === 'object' && 'amount' in productData.standardCost && productData.standardCost.amount > 10000) {
           const canCreateHighValue = await checkPermission(user, 'create_high_value_products', 'products')
           if (!canCreateHighValue) {
             return createSecureResponse(
@@ -378,7 +386,7 @@ const createProduct = withSecurity(
           productType: productData.productType,
           categoryId: productData.categoryId,
           status: productData.status,
-          standardCost: productData.standardCost?.amount
+          standardCost: productData.standardCost && typeof productData.standardCost === 'object' && 'amount' in productData.standardCost ? productData.standardCost.amount : undefined
         })
 
         // Create product

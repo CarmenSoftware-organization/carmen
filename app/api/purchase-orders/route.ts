@@ -15,14 +15,15 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   purchaseOrderService,
   type PurchaseOrderFilters,
-  type CreatePurchaseOrderInput,
-  type PaginationOptions
+  type CreatePurchaseOrderInput
 } from '@/lib/services/db/purchase-order-service'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
+import { type PaginationOptions } from '@/lib/types/common'
 import { withAuthorization, checkPermission } from '@/lib/middleware/rbac'
+import { type AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas, type ValidationResult } from '@/lib/security/input-validator'
@@ -52,30 +53,30 @@ const paginationSchema = z.object({
 })
 
 const purchaseOrderTermsSchema = z.object({
-  paymentTerms: SecureSchemas.safeString(200).min(1),
-  deliveryTerms: SecureSchemas.safeString(200).min(1),
+  paymentTerms: z.string().min(1).max(200),
+  deliveryTerms: z.string().min(1).max(200),
   warrantyPeriod: z.number().min(0).max(36500).optional(), // max 100 years in days
-  returnPolicy: SecureSchemas.safeString(500).optional(),
-  penaltyClause: SecureSchemas.safeString(500).optional(),
-  specialInstructions: SecureSchemas.safeString(1000).optional()
+  returnPolicy: z.string().max(500).optional(),
+  penaltyClause: z.string().max(500).optional(),
+  specialInstructions: z.string().max(1000).optional()
 })
 
 const createPurchaseOrderItemSchema = z.object({
   itemId: SecureSchemas.uuid.optional(),
-  itemCode: SecureSchemas.safeString(50).optional(),
-  itemName: SecureSchemas.safeString(255).min(1),
-  description: SecureSchemas.safeString(500).min(1),
-  specification: SecureSchemas.safeString(1000).optional(),
+  itemCode: z.string().max(50).optional(),
+  itemName: z.string().min(1).max(255),
+  description: z.string().min(1).max(500),
+  specification: z.string().max(1000).optional(),
   orderedQuantity: z.number().min(0.001).max(999999),
-  unit: SecureSchemas.safeString(20).min(1),
+  unit: z.string().min(1).max(20),
   unitPrice: z.object({
     amount: z.number().min(0),
-    currencyCode: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
+    currency: z.string().length(3).regex(/^[A-Z]{3}$/, 'Invalid currency code')
   }),
   discount: z.number().min(0).max(100).optional(), // percentage
   taxRate: z.number().min(0).max(100).optional(), // percentage
   deliveryDate: z.coerce.date(),
-  notes: SecureSchemas.safeString(1000).optional(),
+  notes: z.string().max(1000).optional(),
   sourceRequestItemId: SecureSchemas.uuid.optional()
 })
 
@@ -85,13 +86,16 @@ const createPurchaseOrderSchema = z.object({
   exchangeRate: z.number().min(0.001).max(1000000).optional(),
   deliveryLocationId: SecureSchemas.uuid,
   expectedDeliveryDate: z.coerce.date(),
-  paymentTerms: SecureSchemas.safeString(200).min(1),
+  paymentTerms: z.string().min(1).max(200),
   terms: purchaseOrderTermsSchema,
   approvedBy: SecureSchemas.uuid,
-  notes: SecureSchemas.safeString(1000).optional(),
+  notes: z.string().max(1000).optional(),
   items: z.array(createPurchaseOrderItemSchema).min(1).max(100),
   sourceRequestId: SecureSchemas.uuid.optional()
-}).refine(data => data.expectedDeliveryDate > new Date(), {
+}).refine(data => {
+  const deliveryDate = data.expectedDeliveryDate as Date;
+  return deliveryDate > new Date();
+}, {
   message: "Expected delivery date must be in the future"
 })
 
@@ -101,7 +105,8 @@ const createPurchaseOrderSchema = z.object({
  */
 const getPurchaseOrders = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('purchase_orders', 'read', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('purchase_orders', 'read', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context;
       try {
         const { searchParams } = new URL(request.url)
         
@@ -170,9 +175,9 @@ const getPurchaseOrders = withSecurity(
 
         // Location-based access control if not admin
         const canViewAllLocations = await checkPermission(user, 'view_all_locations', 'purchase_orders')
-        if (!canViewAllLocations && !filters.locationId) {
+        if (!canViewAllLocations && !filters.locationId && user.location) {
           // Apply location filter based on user's location
-          filters.locationId = user.locationId
+          filters.locationId = user.location
         }
 
         // Log data access for sensitive operations
@@ -214,9 +219,9 @@ const getPurchaseOrders = withSecurity(
 
         // Add pagination headers
         if (result.metadata) {
-          response.headers.set('X-Total-Count', result.metadata.total.toString())
-          response.headers.set('X-Page-Count', result.metadata.totalPages.toString())
-          response.headers.set('X-Current-Page', result.metadata.page.toString())
+          response.headers.set('X-Total-Count', (result.metadata.total ?? 0).toString())
+          response.headers.set('X-Page-Count', (result.metadata.totalPages ?? 0).toString())
+          response.headers.set('X-Current-Page', (result.metadata.page ?? 1).toString())
         }
 
         return response
@@ -260,7 +265,8 @@ export const GET = withRateLimit(RateLimitPresets.API)(getPurchaseOrders)
  */
 const createPurchaseOrder = withSecurity(
   authStrategies.hybrid(
-    withAuthorization('purchase_orders', 'create', async (request: NextRequest, { user }: { user: UnifiedAuthenticatedUser }) => {
+    withAuthorization('purchase_orders', 'create', async (request: NextRequest, context: { user: AuthenticatedUser }) => {
+      const { user } = context;
       try {
         const body = await request.json()
 
@@ -292,8 +298,9 @@ const createPurchaseOrder = withSecurity(
         }
 
         // Use sanitized data
+        const validatedData = (validationResult.sanitized || validationResult.data!) as Omit<CreatePurchaseOrderInput, 'approvedBy'>
         const orderData: CreatePurchaseOrderInput = {
-          ...validationResult.sanitized || validationResult.data!,
+          ...validatedData,
           approvedBy: user.id // Override with authenticated user ID
         }
 

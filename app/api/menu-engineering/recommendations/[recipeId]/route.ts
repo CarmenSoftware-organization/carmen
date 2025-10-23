@@ -14,15 +14,16 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { 
+import {
   createMenuEngineeringService,
   type GenerateRecommendationsInput,
   type MenuRecommendation,
   type MenuAnalysisResult
 } from '@/lib/services/menu-engineering-service'
 import { EnhancedCacheLayer } from '@/lib/services/cache/enhanced-cache-layer'
-import { withUnifiedAuth, type UnifiedAuthenticatedUser, authStrategies } from '@/lib/auth/api-protection'
+import { authStrategies } from '@/lib/auth/api-protection'
 import { withAuthorization } from '@/lib/middleware/rbac'
+import { type AuthenticatedUser } from '@/lib/middleware/auth'
 import { withSecurity, createSecureResponse, auditSecurityEvent } from '@/lib/middleware/security'
 import { withRateLimit, RateLimitPresets } from '@/lib/security/rate-limiter'
 import { validateInput, SecureSchemas } from '@/lib/security/input-validator'
@@ -46,13 +47,13 @@ const RecommendationQuerySchema = z.object({
   ).optional(),
   maxRecommendations: z.coerce.number().int().min(1).max(20).optional().default(10),
   // Context data flags
-  includeSeasonality: z.string().transform(str => str === 'true').optional().default(false),
-  includeCompetitor: z.string().transform(str => str === 'true').optional().default(false),
-  includeMarketTrends: z.string().transform(str => str === 'true').optional().default(false),
+  includeSeasonality: z.string().optional().transform(str => str === 'true').default('false'),
+  includeCompetitor: z.string().optional().transform(str => str === 'true').default('false'),
+  includeMarketTrends: z.string().optional().transform(str => str === 'true').default('false'),
   // Output options
-  includeActionSteps: z.string().transform(str => str !== 'false').optional().default(true),
-  includeMetrics: z.string().transform(str => str !== 'false').optional().default(true),
-  includeImpactEstimates: z.string().transform(str => str === 'true').optional().default(false)
+  includeActionSteps: z.string().optional().transform(str => str !== 'false').default('true'),
+  includeMetrics: z.string().optional().transform(str => str !== 'false').default('true'),
+  includeImpactEstimates: z.string().optional().transform(str => str === 'true').default('false')
 })
 
 // Path parameter validation
@@ -67,9 +68,11 @@ const PathParamsSchema = z.object({
 const getRecipeRecommendations = withSecurity(
   authStrategies.hybrid(
     withAuthorization('menu_engineering', 'read', async (
-      request: NextRequest, 
-      { user, params }: { user: UnifiedAuthenticatedUser, params: { recipeId: string } }
+      request: NextRequest,
+      { user }: { user: AuthenticatedUser }
     ) => {
+      // Extract params from Next.js 14 App Router context
+      const params = { recipeId: request.url.split('/').pop()?.split('?')[0] || '' };
       try {
         // Validate path parameters
         const pathValidation = await validateInput({ recipeId: params.recipeId }, PathParamsSchema)
@@ -105,11 +108,15 @@ const getRecipeRecommendations = withSecurity(
         }
 
         // Enhanced security validation
-        const validationResult = await validateInput(rawQuery, RecommendationQuerySchema, {
-          maxLength: 500,
-          trimWhitespace: true,
-          removeSuspiciousPatterns: true
-        })
+        const validationResult = await validateInput(
+          rawQuery,
+          RecommendationQuerySchema as any, // Type compatibility for complex Zod schemas
+          {
+            maxLength: 500,
+            trimWhitespace: true,
+            removeSuspiciousPatterns: true
+          }
+        )
 
         if (!validationResult.success) {
           await auditSecurityEvent(SecurityEventType.MALICIOUS_REQUEST, request, user.id, {
@@ -128,7 +135,7 @@ const getRecipeRecommendations = withSecurity(
           )
         }
 
-        const queryParams = validationResult.sanitized || validationResult.data!
+        const queryParams = (validationResult.sanitized || validationResult.data!) as z.infer<typeof RecommendationQuerySchema>
         const recipeId = pathValidation.data!.recipeId
 
         // Log recommendation access
@@ -146,7 +153,32 @@ const getRecipeRecommendations = withSecurity(
         })
 
         // Initialize cache and menu engineering service
-        const cache = new EnhancedCacheLayer()
+        const cache = new EnhancedCacheLayer({
+          redis: {
+            enabled: false,
+            fallbackToMemory: true,
+            connectionTimeout: 5000
+          },
+          memory: {
+            maxMemoryMB: 100,
+            maxEntries: 5000
+          },
+          ttl: {
+            financial: 3600,
+            inventory: 300,
+            vendor: 600,
+            default: 300
+          },
+          invalidation: {
+            enabled: true,
+            batchSize: 100,
+            maxDependencies: 50
+          },
+          monitoring: {
+            enabled: false,
+            metricsInterval: 60000
+          }
+        })
         const menuService = createMenuEngineeringService(cache)
 
         // First, we need to get or create a menu analysis for the recipe
@@ -163,19 +195,13 @@ const getRecipeRecommendations = withSecurity(
           },
           contextData: {
             seasonality: queryParams.includeSeasonality ? {
-              currentSeason: 'winter',
-              seasonalFactor: 0.85,
-              peakMonths: ['December', 'January', 'February']
+              seasonalFactor: 0.85
             } : undefined,
             competitorData: queryParams.includeCompetitor ? {
-              avgCompetitorPrice: 24.99,
-              competitorRating: 4.2,
-              marketPosition: 'premium'
+              avgCompetitorPrice: 24.99
             } : undefined,
             marketTrends: queryParams.includeMarketTrends ? {
-              trendingIngredients: ['truffle', 'plant-based', 'fermented'],
-              dietaryTrends: ['keto', 'gluten-free', 'sustainable'],
-              priceTrend: 'increasing'
+              priceTrend: 1.05
             } : undefined
           }
         }
@@ -183,19 +209,20 @@ const getRecipeRecommendations = withSecurity(
         // Generate recommendations
         const result = await menuService.generateRecommendations(recommendationInput)
 
-        if (!result.success) {
+        // Check if result has errors
+        if (result.errors && result.errors.length > 0) {
           await auditSecurityEvent(SecurityEventType.SYSTEM_ERROR, request, user.id, {
             component: 'menu-engineering-service',
             operation: 'generate_recommendations',
             recipeId,
-            error: result.error
+            errors: result.errors
           })
 
           return createSecureResponse(
             {
               success: false,
               error: 'Failed to generate recommendations',
-              details: result.error
+              details: result.errors
             },
             500
           )
@@ -348,8 +375,8 @@ function createMockAnalysisForRecipe(recipeId: string): MenuAnalysisResult {
     periodEnd: new Date(),
     totalItems: 1,
     totalSales: 245,
-    totalRevenue: { amount: 12250.50, currency: 'USD' },
-    totalGrossProfit: { amount: 7350.30, currency: 'USD' },
+    totalRevenue: { amount: 12250.50, currency: 'USD' as const },
+    totalGrossProfit: { amount: 7350.30, currency: 'USD' as const },
     overallProfitMargin: 60.0,
     stars: [{
       recipeId,
@@ -357,22 +384,22 @@ function createMockAnalysisForRecipe(recipeId: string): MenuAnalysisResult {
       recipeCode: 'SIG-001',
       category: 'Main Courses',
       totalSales: 245,
-      totalRevenue: { amount: 12250.50, currency: 'USD' },
+      totalRevenue: { amount: 12250.50, currency: 'USD' as const },
       totalQuantitySold: 245,
-      averagePrice: { amount: 50.00, currency: 'USD' },
-      totalFoodCost: { amount: 4900.20, currency: 'USD' },
-      averageFoodCost: { amount: 20.00, currency: 'USD' },
-      totalGrossProfit: { amount: 7350.30, currency: 'USD' },
+      averagePrice: { amount: 50.00, currency: 'USD' as const },
+      totalFoodCost: { amount: 4900.20, currency: 'USD' as const },
+      averageFoodCost: { amount: 20.00, currency: 'USD' as const },
+      totalGrossProfit: { amount: 7350.30, currency: 'USD' as const },
       averageProfitMargin: 60.0,
       popularityScore: 85.5,
       profitabilityScore: 88.2,
       popularityRank: 3,
       profitabilityRank: 2,
-      classification: 'STAR',
+      classification: 'STAR' as const,
       dataQuality: 0.92,
       sampleSize: 245,
-      salesTrend: 'increasing',
-      profitabilityTrend: 'stable'
+      salesTrend: 'increasing' as const,
+      profitabilityTrend: 'stable' as const
     }],
     plowhorses: [],
     puzzles: [],
