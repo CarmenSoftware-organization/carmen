@@ -14,16 +14,17 @@ export default function CreatePOFromPRPage() {
   const handleSelectPRs = (selectedPRs: PurchaseRequest[]) => {
     if (selectedPRs.length > 0) {
       // Extract all items from selected PRs
-      const allItems = selectedPRs.flatMap(pr => 
-        pr.items?.map(item => ({
+      // Note: items array exists in mock data but not in PurchaseRequest interface
+      const allItems = selectedPRs.flatMap(pr =>
+        (pr as any).items?.map((item: any) => ({
           ...item,
           sourcePR: pr,
           prId: pr.id,
-          prNumber: pr.refNumber,
-          vendor: pr.vendor,
-          vendorId: pr.vendorId,
-          currency: pr.currency,
-          deliveryDate: pr.deliveryDate
+          prNumber: (pr as any).refNumber,
+          vendor: (pr as any).vendor,
+          vendorId: (pr as any).vendorId,
+          currency: (pr as any).currency,
+          deliveryDate: (pr as any).deliveryDate
         })) || []
       );
       
