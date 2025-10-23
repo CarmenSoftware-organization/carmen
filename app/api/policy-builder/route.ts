@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
-import { 
-  PolicyBuilderState, 
-  PolicyBuilderValidation, 
-  ValidationError, 
+import {
+  PolicyBuilderState,
+  PolicyBuilderValidation,
+  ValidationError,
   ValidationWarning,
   ConditionTemplate,
   PolicyDashboardStats
 } from '@/lib/types/policy-builder'
+import { Operator } from '@/lib/types/permissions'
 
 const prisma = new PrismaClient()
 
@@ -361,7 +362,7 @@ async function getDashboardStats(): Promise<NextResponse> {
       userId: (activity.eventData as any)?.actor?.userId || 'system',
       userName: 'System User', // TODO: Resolve user names
       timestamp: activity.timestamp,
-      details: activity.eventData
+      details: activity.eventData ? (activity.eventData as Record<string, any>) : undefined
     })),
     performanceMetrics
   }
@@ -390,13 +391,13 @@ async function getConditionTemplates(request: NextRequest): Promise<NextResponse
       conditions: [
         {
           attribute: 'subject.role.name',
-          operator: '==',
+          operator: Operator.EQUALS,
           value: 'department_manager',
           description: 'User must be a department manager'
         },
         {
           attribute: 'subject.department.id',
-          operator: '==',
+          operator: Operator.EQUALS,
           value: 'resource.ownerDepartment',
           description: 'Same department as resource'
         }
@@ -412,7 +413,7 @@ async function getConditionTemplates(request: NextRequest): Promise<NextResponse
       conditions: [
         {
           attribute: 'environment.isBusinessHours',
-          operator: '==',
+          operator: Operator.EQUALS,
           value: true,
           description: 'Must be during business hours'
         }
@@ -428,7 +429,7 @@ async function getConditionTemplates(request: NextRequest): Promise<NextResponse
       conditions: [
         {
           attribute: 'resource.totalValue.amount',
-          operator: '<=',
+          operator: Operator.LESS_THAN_OR_EQUAL,
           value: 'subject.approvalLimit.amount',
           description: 'Resource value must be within approval limit'
         }
@@ -444,13 +445,13 @@ async function getConditionTemplates(request: NextRequest): Promise<NextResponse
       conditions: [
         {
           attribute: 'environment.isInternalNetwork',
-          operator: '==',
+          operator: Operator.EQUALS,
           value: true,
           description: 'Must be from internal network'
         },
         {
           attribute: 'subject.clearanceLevel',
-          operator: 'in',
+          operator: Operator.IN,
           value: ['confidential', 'restricted'],
           description: 'Must have appropriate clearance'
         }

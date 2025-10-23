@@ -129,7 +129,7 @@ export function ResourceActivation({
   onLimitUpdate,
   showAnalytics = true 
 }: ResourceActivationProps) {
-  const [resourceConfigs, setResourceConfigs] = useState<Record<ResourceType, ResourceConfig>>({});
+  const [resourceConfigs, setResourceConfigs] = useState<Record<string, ResourceConfig>>({});
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -192,7 +192,7 @@ export function ResourceActivation({
 
   // Initialize resource configurations
   useEffect(() => {
-    const initialConfigs: Record<ResourceType, ResourceConfig> = {} as any;
+    const initialConfigs: Record<string, ResourceConfig> = {};
     
     Object.values(ResourceType).forEach(resource => {
       const currentUsage = subscription.currentUsage.resourceUsage[resource] || 0;
@@ -222,12 +222,12 @@ export function ResourceActivation({
       case ResourceType.INVENTORY_ITEM: return <Package className="h-4 w-4" />;
       case ResourceType.RECIPE: return <ChefHat className="h-4 w-4" />;
       case ResourceType.VENDOR: return <Users className="h-4 w-4" />;
-      case ResourceType.REPORT: return <BarChart3 className="h-4 w-4" />;
+      case ResourceType.OPERATIONAL_REPORT: return <BarChart3 className="h-4 w-4" />;
       case ResourceType.INVOICE: return <Calculator className="h-4 w-4" />;
       case ResourceType.LOCATION: return <Building className="h-4 w-4" />;
       case ResourceType.DEPARTMENT: return <Building className="h-4 w-4" />;
       case ResourceType.ROLE: return <Shield className="h-4 w-4" />;
-      case ResourceType.CONFIGURATION: return <Settings className="h-4 w-4" />;
+      case ResourceType.SYSTEM_CONFIGURATION: return <Settings className="h-4 w-4" />;
       default: return <Settings className="h-4 w-4" />;
     }
   };
@@ -370,7 +370,7 @@ export function ResourceActivation({
   };
 
   const handleReset = () => {
-    const initialConfigs: Record<ResourceType, ResourceConfig> = {} as any;
+    const initialConfigs: Record<string, ResourceConfig> = {};
     
     Object.values(ResourceType).forEach(resource => {
       const currentUsage = subscription.currentUsage.resourceUsage[resource] || 0;
@@ -401,7 +401,7 @@ export function ResourceActivation({
     'Inventory': [ResourceType.INVENTORY_ITEM, ResourceType.PRODUCT, ResourceType.GOODS_RECEIPT_NOTE],
     'Operations': [ResourceType.RECIPE, ResourceType.STORE_REQUISITION, ResourceType.PRODUCTION_ORDER],
     'Finance': [ResourceType.INVOICE, ResourceType.PAYMENT, ResourceType.BUDGET],
-    'System': [ResourceType.LOCATION, ResourceType.CONFIGURATION, ResourceType.REPORT]
+    'System': [ResourceType.LOCATION, ResourceType.SYSTEM_CONFIGURATION, ResourceType.OPERATIONAL_REPORT]
   };
 
   const getEnabledCount = (resources: ResourceType[]) => {
@@ -558,7 +558,7 @@ export function ResourceActivation({
                       <CardContent className="pt-0">
                         <div className="space-y-4">
                           {availableResources.map((resource) => {
-                            const config = resourceConfigs[resource];
+                            const config = resourceConfigs[resource as string];
                             const stats = usageStats.find(s => s.resourceType === resource);
                             if (!config) return null;
 
@@ -647,10 +647,10 @@ export function ResourceActivation({
                                           <div className="flex items-center gap-2">
                                             <Input
                                               type="number"
-                                              value={value}
+                                              value={value as number}
                                               onChange={(e) => handleLimitChange(
-                                                resource, 
-                                                limitKey, 
+                                                resource,
+                                                limitKey,
                                                 parseInt(e.target.value) || 0
                                               )}
                                               className="w-24"
@@ -658,10 +658,10 @@ export function ResourceActivation({
                                             />
                                             <div className="flex-1">
                                               <Slider
-                                                value={[value]}
+                                                value={[value as number]}
                                                 onValueChange={(values) => handleLimitChange(
-                                                  resource, 
-                                                  limitKey, 
+                                                  resource,
+                                                  limitKey,
                                                   values[0]
                                                 )}
                                                 max={limitKey.includes('Value') ? 100000 : 10000}

@@ -27,7 +27,7 @@ import {
   MapPin
 } from 'lucide-react';
 
-import { ResourceType, getResourcesByCategory, getResourceActions } from '@/lib/types/permission-resources';
+import { ResourceType, ResourceCategory, getResourcesByCategory, getResourceActions } from '@/lib/types/permission-resources';
 import { mockDepartments, mockLocations } from '@/lib/mock-data/permission-index';
 
 // Form schema for Step 2
@@ -54,54 +54,54 @@ interface PolicyBuilderStep2Props {
 
 // Resource category mapping with icons
 const resourceCategories = [
-  { 
-    key: 'procurement', 
-    label: 'Procurement', 
-    icon: ShoppingCart, 
+  {
+    key: 'procurement',
+    label: 'Procurement',
+    icon: ShoppingCart,
     description: 'Purchase requests, orders, receipts, and vendor management',
-    resources: getResourcesByCategory('procurement')
+    resources: getResourcesByCategory(ResourceCategory.PROCUREMENT)
   },
-  { 
-    key: 'inventory', 
-    label: 'Inventory Management', 
-    icon: Warehouse, 
+  {
+    key: 'inventory',
+    label: 'Inventory Management',
+    icon: Warehouse,
     description: 'Stock management, adjustments, counts, and transfers',
-    resources: getResourcesByCategory('inventory')
+    resources: getResourcesByCategory(ResourceCategory.INVENTORY)
   },
-  { 
-    key: 'vendor', 
-    label: 'Vendor Management', 
-    icon: Users, 
+  {
+    key: 'vendor',
+    label: 'Vendor Management',
+    icon: Users,
     description: 'Vendor profiles, contracts, and performance management',
-    resources: getResourcesByCategory('vendor')
+    resources: getResourcesByCategory(ResourceCategory.VENDOR)
   },
-  { 
-    key: 'product', 
-    label: 'Product Management', 
-    icon: Package, 
+  {
+    key: 'product',
+    label: 'Product Management',
+    icon: Package,
     description: 'Product catalog, categories, and specifications',
-    resources: getResourcesByCategory('product')
+    resources: getResourcesByCategory(ResourceCategory.PRODUCT)
   },
-  { 
-    key: 'recipe', 
-    label: 'Recipe & Menu', 
-    icon: ChefHat, 
+  {
+    key: 'recipe',
+    label: 'Recipe & Menu',
+    icon: ChefHat,
     description: 'Recipes, menu items, and culinary management',
-    resources: getResourcesByCategory('recipe')
+    resources: getResourcesByCategory(ResourceCategory.RECIPE)
   },
-  { 
-    key: 'financial', 
-    label: 'Financial Management', 
-    icon: DollarSign, 
+  {
+    key: 'financial',
+    label: 'Financial Management',
+    icon: DollarSign,
     description: 'Invoices, payments, budgets, and accounting',
-    resources: getResourcesByCategory('financial')
+    resources: getResourcesByCategory(ResourceCategory.FINANCIAL)
   },
-  { 
-    key: 'system', 
-    label: 'System Administration', 
-    icon: Settings, 
+  {
+    key: 'system',
+    label: 'System Administration',
+    icon: Settings,
     description: 'Users, roles, configurations, and system settings',
-    resources: getResourcesByCategory('system')
+    resources: getResourcesByCategory(ResourceCategory.SYSTEM)
   }
 ];
 

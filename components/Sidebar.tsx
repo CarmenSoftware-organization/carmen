@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import * as LucideIcons from "lucide-react";
-import { ChevronDown, ChevronRight, Collapsible } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { Collapsible as CollapsibleRoot, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface MenuItem {
@@ -279,8 +279,13 @@ const menuItems: MenuItem[] = [
 function MenuItemComponent({ item, level = 0 }: { item: MenuItem | SubMenuItem; level?: number }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
-  
-  const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
+
+  // Helper to get the label (title for MenuItem, name for SubMenuItem)
+  const getLabel = (item: MenuItem | SubMenuItem): string => {
+    return 'title' in item ? item.title : item.name;
+  };
+
+  const IconComponent = item.icon ? (LucideIcons as any)[item.icon] || LucideIcons.Circle : LucideIcons.Circle;
   const isActive = pathname === item.path;
   const hasSubItems = 'subItems' in item && item.subItems && item.subItems.length > 0;
 
@@ -300,10 +305,10 @@ function MenuItemComponent({ item, level = 0 }: { item: MenuItem | SubMenuItem; 
     // Simple menu item without sub-items
     return (
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive} tooltip={item.title || item.name}>
+        <SidebarMenuButton asChild isActive={isActive} tooltip={getLabel(item)}>
           <Link href={item.path} className="flex items-center gap-2">
             {level === 0 && <IconComponent className="w-4 h-4" />}
-            <span>{item.title || item.name}</span>
+            <span>{getLabel(item)}</span>
             {'description' in item && item.description && (
               <span className="text-xs text-muted-foreground ml-auto max-w-[100px] truncate">
                 {item.description}
@@ -323,7 +328,7 @@ function MenuItemComponent({ item, level = 0 }: { item: MenuItem | SubMenuItem; 
           <SidebarMenuButton isActive={isActive} className="w-full justify-between">
             <div className="flex items-center gap-2">
               {level === 0 && <IconComponent className="w-4 h-4" />}
-              <span>{item.title || item.name}</span>
+              <span>{getLabel(item)}</span>
             </div>
             {isOpen ? (
               <ChevronDown className="w-4 h-4" />

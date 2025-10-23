@@ -34,7 +34,8 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import StatusBadge from "@/components/ui/custom-status-badge"
-import { PurchaseRequest, PRType, Requestor } from "@/lib/types"
+import { PurchaseRequest, Requestor } from "@/lib/types"
+import { PRType } from "@/lib/types/procurement"
 
 interface SummaryTotalProps {
   prData: PurchaseRequest
@@ -42,16 +43,22 @@ interface SummaryTotalProps {
 
 // Temporary SummaryTotal component until we create the actual one
 function SummaryTotal({ prData }: SummaryTotalProps) {
+  const formatMoney = (money: { amount: number; currency: string }) => {
+    return `${money.currency} ${money.amount.toFixed(2)}`
+  }
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <p className="text-sm font-medium">Sub Total</p>
-        <p className="text-2xl font-bold">{prData.subTotalPrice.toFixed(2)}</p>
+        <p className="text-sm font-medium">Estimated Total</p>
+        <p className="text-2xl font-bold">{formatMoney(prData.estimatedTotal)}</p>
       </div>
-      <div>
-        <p className="text-sm font-medium">Total Amount</p>
-        <p className="text-2xl font-bold">{prData.totalAmount.toFixed(2)}</p>
-      </div>
+      {prData.actualTotal && (
+        <div>
+          <p className="text-sm font-medium">Actual Total</p>
+          <p className="text-2xl font-bold">{formatMoney(prData.actualTotal)}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -144,97 +151,93 @@ export function PRDetailTemplate({
             <CardContent className="p-4">
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div>
-                  <Label htmlFor="refNumber">Requisition</Label>
+                  <Label htmlFor="requestNumber">Requisition</Label>
                   <Input
-                    id="refNumber"
-                    name="refNumber"
-                    value={formData.refNumber}
+                    id="requestNumber"
+                    name="requestNumber"
+                    value={formData.requestNumber || ""}
                     onChange={onInputChange}
                     disabled={mode === "view"}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="requestDate">Date</Label>
                   <Input
-                    id="date"
-                    name="date"
+                    id="requestDate"
+                    name="requestDate"
                     type="date"
-                    value={formData.date.toISOString().split("T")[0]}
+                    value={formData.requestDate.toISOString().split("T")[0]}
                     onChange={(e) =>
                       onFormDataChange({
-                        date: new Date(e.target.value),
+                        requestDate: new Date(e.target.value),
                       })
                     }
                     disabled={mode === "view"}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="type">PR Type</Label>
+                  <Label htmlFor="requestType">PR Type</Label>
                   <Select
-                    value={formData.type}
+                    value={formData.requestType}
                     onValueChange={(value) =>
-                      onFormDataChange({ type: value as PRType })
+                      onFormDataChange({ requestType: value as PurchaseRequest['requestType'] })
                     }
                     disabled={mode === "view"}
                   >
-                    <SelectTrigger id="type">
+                    <SelectTrigger id="requestType">
                       <SelectValue placeholder="Select PR Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.values(PRType).map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="goods">Goods</SelectItem>
+                      <SelectItem value="services">Services</SelectItem>
+                      <SelectItem value="capital">Capital</SelectItem>
+                      <SelectItem value="maintenance">Maintenance</SelectItem>
+                      <SelectItem value="emergency">Emergency</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="col-span-2">
                   <div className="grid grid-cols-2 w-full">
-                    {[
-                      {
-                        id: "requestor.name",
-                        label: "Requestor",
-                        icon: UserIcon,
-                      },
-                      {
-                        id: "department",
-                        label: "Department",
-                        icon: Building2Icon,
-                      },
-                    ].map(({ id, label, icon: Icon }) => (
-                      <div key={id} className="space-y-1">
-                        <Label
-                          htmlFor={id}
-                          className="text-[0.7rem] text-gray-500 flex items-center gap-2"
-                        >
-                          <Icon className="h-3 w-3" /> {label}
-                        </Label>
-                        <Input
-                          id={id}
-                          name={id}
-                          value={
-                            id.includes(".")
-                              ? (formData[
-                                  id.split(".")[0] as keyof PurchaseRequest
-                                ] as Requestor)[id.split(".")[1] as keyof Requestor]
-                              : String(formData[id as keyof PurchaseRequest])
-                          }
-                          onChange={onInputChange}
-                          disabled={mode === "view"}
-                        />
-                      </div>
-                    ))}
+                    <div className="space-y-1">
+                      <Label
+                        htmlFor="requestedBy"
+                        className="text-[0.7rem] text-gray-500 flex items-center gap-2"
+                      >
+                        <UserIcon className="h-3 w-3" /> Requestor
+                      </Label>
+                      <Input
+                        id="requestedBy"
+                        name="requestedBy"
+                        value={formData.requestedBy}
+                        onChange={onInputChange}
+                        disabled={mode === "view"}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label
+                        htmlFor="departmentId"
+                        className="text-[0.7rem] text-gray-500 flex items-center gap-2"
+                      >
+                        <Building2Icon className="h-3 w-3" /> Department
+                      </Label>
+                      <Input
+                        id="departmentId"
+                        name="departmentId"
+                        value={formData.departmentId}
+                        onChange={onInputChange}
+                        disabled={mode === "view"}
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="col-span-2 md:col-span-3">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="justification">Justification</Label>
                   <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
+                    id="justification"
+                    name="justification"
+                    value={formData.justification || ""}
                     onChange={(e) =>
-                      onFormDataChange({ description: e.target.value })
+                      onFormDataChange({ justification: e.target.value })
                     }
                     disabled={mode === "view"}
                   />

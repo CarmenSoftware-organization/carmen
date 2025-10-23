@@ -19,38 +19,43 @@ interface ItemFormProps {
   initialData?: PurchaseOrderItem
 }
 
+// Extended form data type that includes UI-specific fields
+interface ExtendedFormData extends PurchaseOrderItem {
+  comment: string;
+  attachedFile: File | null;
+}
+
 export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, initialData }: ItemFormProps) {
   const [mode, setMode] = useState<FormMode>(initialMode)
-  const [formData, setFormData] = useState(initialData || {
-    name: 'Laptop Computer',
+
+  // Create default form data with proper typing
+  const defaultFormData: ExtendedFormData = initialData ? {
+    ...initialData,
+    comment: initialData.notes || '',
+    attachedFile: null
+  } : {
+    id: '',
+    orderId: '',
+    lineNumber: 0,
+    itemName: 'Laptop Computer',
     description: 'High-performance laptop with 16GB RAM, 512GB SSD, and 15" display',
-    itemOrderUnit: 'Unit',
-    baseUnit: 'Piece',
-    convRate: 1.2,
-    approvedQty: 10.000,
-    baseApprovedQty: 10.000,
-    receivedQty: 8.000,
-    baseReceivedQty: 8.000,
-    foc: 1.000,
-    baseFocQty: 1.000,
-    cancelQty: 1.000,
-    baseCancelQty: 1.000,
-    pricePerUnit: 1200.00,
-    basePricePerUnit: 1200.00,
-    totalAmount: 12000.00,
-    baseTotalAmount: 12000.00,
-    netAmount: 11400.00,
-    baseNetAmount: 11400.00,
-    baseQty: 10.000,
-    discountRate: 5,
-    discountAmount: 600.00,
-    baseDiscAmount: 600.00,
+    orderedQuantity: 10,
+    receivedQuantity: 8,
+    pendingQuantity: 2,
+    unit: 'Unit',
+    unitPrice: { amount: 1200.00, currency: 'USD' },
+    discount: 5,
+    discountAmount: { amount: 600.00, currency: 'USD' },
+    lineTotal: { amount: 12000.00, currency: 'USD' },
     taxRate: 7,
-    taxAmount: 798.00,
-    baseTaxAmount: 798.00,
+    taxAmount: { amount: 798.00, currency: 'USD' },
+    deliveryDate: new Date(),
+    status: 'pending' as const,
     comment: '',
     attachedFile: null
-  })
+  }
+
+  const [formData, setFormData] = useState<ExtendedFormData>(defaultFormData)
 
   const [adjustments, setAdjustments] = useState({
     discount: true,
@@ -95,10 +100,9 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
     setShowGRNTable(true)
   }
 
-  const renderField = (label: string, name: keyof typeof formData, type: string = 'text', baseField?: keyof typeof formData, convRate?: boolean, suffix?: string, decimals?: number) => {
+  const renderField = (label: string, name: keyof ExtendedFormData, type: string = 'text', baseField?: keyof ExtendedFormData, convRate?: boolean, suffix?: string, decimals?: number) => {
     const value = formData[name]
     const baseValue = baseField ? formData[baseField] : null
-    const convRateValue = convRate ? formData.convRate : null
     const formattedValue = typeof value === 'number' && decimals !== undefined ? formatNumber(value, decimals) : value
     const formattedBaseValue = typeof baseValue === 'number' && decimals !== undefined ? formatNumber(baseValue, decimals) : baseValue
 
@@ -110,7 +114,6 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
           {baseValue && (
             <div className="text-xs text-gray-500">
               {/* {formattedBaseValue} */}
-              {convRateValue && ` (Conv: ${convRateValue})`}
             </div>
           )}
         </div>
@@ -143,7 +146,6 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
         {baseValue && (
           <div className="text-xs text-gray-500 mt-0.5">
             {/* {formattedBaseValue} */}
-            {convRateValue && ` (Conv: ${convRateValue})`}
           </div>
         )}
       </div>
@@ -173,7 +175,7 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
         </div>
 
         <div className="col-span-1">
-          {renderField('Name', 'name')}
+          {renderField('Name', 'itemName')}
         </div>
         <div className="col-span-5">
           {renderField('Description', 'description', 'textarea')}
@@ -202,8 +204,19 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
         <div className="col-span-3 flex justify-end">
           <div className="w-full grid grid-cols-3 gap-4">
             <div className="col-span-2">Net Amount</div>
-            <div className="col-span-1 text-right">{renderField('', 'netAmount', 'number', 'baseNetAmount', false, '', 2)}</div>
-            
+            <div className="col-span-1 text-right">
+              {mode === 'view' ? (
+                <div className="mt-0.5">{typeof formData.lineTotal === 'object' ? formData.lineTotal.amount.toFixed(2) : formData.lineTotal}</div>
+              ) : (
+                <Input
+                  type="number"
+                  value={typeof formData.lineTotal === 'object' ? formData.lineTotal.amount : formData.lineTotal}
+                  readOnly
+                  className="text-right"
+                />
+              )}
+            </div>
+
             <div className="col-span-1">
               <div className="flex items-center">
                 <Checkbox
@@ -214,9 +227,20 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
                 <label htmlFor="adjDiscount" className="ml-2 text-sm">Discount</label>
               </div>
             </div>
-            <div className="col-span-1">{renderField('', 'discountRate', 'number', undefined, undefined, '%')}</div>
-            <div className="col-span-1 text-right">{renderField('', 'discountAmount', 'number', 'baseDiscAmount', false, '', 2)}</div>
-            
+            <div className="col-span-1">{renderField('', 'discount', 'number', undefined, undefined, '%')}</div>
+            <div className="col-span-1 text-right">
+              {mode === 'view' ? (
+                <div className="mt-0.5">{typeof formData.discountAmount === 'object' ? formData.discountAmount.amount.toFixed(2) : formData.discountAmount}</div>
+              ) : (
+                <Input
+                  type="number"
+                  value={typeof formData.discountAmount === 'object' ? formData.discountAmount.amount : formData.discountAmount}
+                  readOnly
+                  className="text-right"
+                />
+              )}
+            </div>
+
             <div className="col-span-1">
               <div className="flex items-center">
                 <Checkbox
@@ -228,10 +252,32 @@ export function PurchaseOrderItemFormComponent({ initialMode = 'view', onClose, 
               </div>
             </div>
             <div className="col-span-1">{renderField('', 'taxRate', 'number', undefined, undefined, '%')}</div>
-            <div className="col-span-1 text-right">{renderField('', 'taxAmount', 'number', 'baseTaxAmount', false, '', 2)}</div>
-            
+            <div className="col-span-1 text-right">
+              {mode === 'view' ? (
+                <div className="mt-0.5">{typeof formData.taxAmount === 'object' ? formData.taxAmount.amount.toFixed(2) : formData.taxAmount}</div>
+              ) : (
+                <Input
+                  type="number"
+                  value={typeof formData.taxAmount === 'object' ? formData.taxAmount.amount : formData.taxAmount}
+                  readOnly
+                  className="text-right"
+                />
+              )}
+            </div>
+
             <div className="col-span-2">Total Amount</div>
-            <div className="col-span-1 text-right">{renderField('', 'totalAmount', 'number', 'baseTotalAmount', false, '', 2)}</div>
+            <div className="col-span-1 text-right">
+              {mode === 'view' ? (
+                <div className="mt-0.5">{typeof formData.lineTotal === 'object' ? formData.lineTotal.amount.toFixed(2) : formData.lineTotal}</div>
+              ) : (
+                <Input
+                  type="number"
+                  value={typeof formData.lineTotal === 'object' ? formData.lineTotal.amount : formData.lineTotal}
+                  readOnly
+                  className="text-right"
+                />
+              )}
+            </div>
           </div>
         </div>
 
