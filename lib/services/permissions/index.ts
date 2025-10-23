@@ -49,13 +49,11 @@ export {
 // Re-export types for convenience
 export type {
   Policy,
-  PolicyRule,
-  PolicyEffect,
-  PolicyDecision,
-  PolicyEvaluationResult,
-  Subject,
-  Resource,
-  Action,
-  Environment,
-  Permission
+  PolicyResult,
+  EffectType,
+  AccessDecision,
+  SubjectAttributes,
+  ResourceAttributes,
+  EnvironmentAttributes,
+  AccessRequest
 } from '@/lib/types/permissions'

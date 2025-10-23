@@ -1,13 +1,13 @@
-import { GoodsReceiveNote, GoodsReceiveNoteItem, StockMovement, Department, AccountCode, Comment, Attachment, ActivityLogEntry } from './types'
+import { GoodsReceiveNote, Department } from './types'
 
  const sampleDepartments: Department[] = [
-  { id: "DEPT-001", name: "Food & Beverage" },
-  { id: "DEPT-002", name: "Housekeeping" },
-  { id: "DEPT-003", name: "Administration" },
-  { id: "DEPT-004", name: "Maintenance" },
+  { id: "DEPT-001", name: "Food & Beverage", code: "FB", status: "active" },
+  { id: "DEPT-002", name: "Housekeeping", code: "HK", status: "active" },
+  { id: "DEPT-003", name: "Administration", code: "ADMIN", status: "active" },
+  { id: "DEPT-004", name: "Maintenance", code: "MAINT", status: "active" },
 ];
 
- const sampleAccountCodes: AccountCode[] = [
+const sampleAccountCodes = [
   { id: "ACC-001", code: "1000", name: "Inventory" },
   { id: "ACC-002", code: "2000", name: "Accounts Payable" },
   { id: "ACC-003", code: "2200", name: "Tax Payable" },

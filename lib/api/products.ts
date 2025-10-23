@@ -349,16 +349,3 @@ export class ProductApiService {
 
 // Create singleton instance
 export const productApi = new ProductApiService()
-
-// Export types for external use
-export type {
-  ProductFilters,
-  CreateProductRequest,
-  UpdateProductRequest,
-  ProductListResponse,
-  ProductStatsResponse,
-  ProductInventoryResponse,
-  ProductSpecification,
-  ProductUnit,
-  ProductDimensions
-}

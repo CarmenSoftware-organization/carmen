@@ -58,11 +58,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'dept-003')!,
       currentLocation: mockLocations.find(l => l.id === 'loc-002')!,
       showPrices: true,
-    },
-    createdAt: new Date('2023-01-15'),
-    createdBy: 'system',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   },
   {
     id: 'user-manager-001',
@@ -100,11 +96,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'dept-001')!,
       currentLocation: mockLocations.find(l => l.id === 'loc-001')!,
       showPrices: true,
-    },
-    createdAt: new Date('2022-06-01'),
-    createdBy: 'system',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   },
   {
     id: 'user-purchasing-001',
@@ -142,11 +134,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'dept-002')!,
       currentLocation: mockLocations.find(l => l.id === 'loc-001')!,
       showPrices: true,
-    },
-    createdAt: new Date('2023-03-10'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   },
   {
     id: 'user-finance-001',
@@ -184,11 +172,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'dept-005')!,
       currentLocation: mockLocations.find(l => l.id === 'loc-006')!,
       showPrices: true,
-    },
-    createdAt: new Date('2022-01-20'),
-    createdBy: 'system',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   },
   {
     id: 'user-warehouse-001',
@@ -198,6 +182,25 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'warehouse-manager')!],
+    primaryRole: mockRoles.find(r => r.id === 'warehouse-manager')!,
+    departments: [mockDepartments.find(d => d.id === 'procurement')!],
+    locations: [mockLocations.find(l => l.id === 'central-warehouse')!],
+    approvalLimit: { amount: 5000, currency: 'USD' } as Money,
+    clearanceLevel: 'basic',
+    effectiveFrom: new Date('2023-07-05'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: false,
+    businessUnit: 'operations',
+    specialPermissions: [],
+    delegatedAuthorities: ['goods-receipt-management'],
+    effectivePermissions: [
+      'goods_receipt_note:*', 'inventory:view', 'inventory:update',
+      'stock_transaction:create', 'warehouse:manage'
+    ],
+    // Legacy compatibility fields
     role: 'Warehouse Manager',
     department: 'Procurement',
     location: 'Central Warehouse',
@@ -207,11 +210,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'procurement')!,
       currentLocation: mockLocations.find(l => l.id === 'central-warehouse')!,
       showPrices: true,
-    },
-    createdAt: new Date('2023-07-05'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   },
   {
     id: 'user-staff-001',
@@ -221,6 +220,23 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'staff')!],
+    primaryRole: mockRoles.find(r => r.id === 'staff')!,
+    departments: [mockDepartments.find(d => d.id === 'housekeeping')!],
+    locations: [mockLocations.find(l => l.id === 'main-hotel')!],
+    clearanceLevel: 'basic',
+    effectiveFrom: new Date('2023-09-12'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: false,
+    businessUnit: 'operations',
+    specialPermissions: [],
+    delegatedAuthorities: [],
+    effectivePermissions: [
+      'store_requisition:create', 'inventory:view'
+    ],
+    // Legacy compatibility fields
     role: 'Staff',
     department: 'Housekeeping',
     location: 'Grand Hotel Main',
@@ -230,11 +246,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'housekeeping')!,
       currentLocation: mockLocations.find(l => l.id === 'main-hotel')!,
       showPrices: false,
-    },
-    createdAt: new Date('2023-09-12'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   },
   {
     id: 'user-counter-001',
@@ -244,6 +256,23 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'counter')!],
+    primaryRole: mockRoles.find(r => r.id === 'counter')!,
+    departments: [mockDepartments.find(d => d.id === 'fb')!],
+    locations: [mockLocations.find(l => l.id === 'pool-bar')!],
+    clearanceLevel: 'basic',
+    effectiveFrom: new Date('2024-02-14'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: false,
+    businessUnit: 'operations',
+    specialPermissions: [],
+    delegatedAuthorities: [],
+    effectivePermissions: [
+      'menu_item:view', 'recipe:view', 'production_order:create'
+    ],
+    // Legacy compatibility fields
     role: 'Counter Staff',
     department: 'Food & Beverage',
     location: 'Pool Bar & Grill',
@@ -253,11 +282,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'fb')!,
       currentLocation: mockLocations.find(l => l.id === 'pool-bar')!,
       showPrices: false,
-    },
-    createdAt: new Date('2024-02-14'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   },
   {
     id: 'user-admin-001',
@@ -267,6 +292,22 @@ export const mockUsers: User[] = [
     availableRoles: mockRoles,
     availableDepartments: mockDepartments,
     availableLocations: mockLocations,
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'admin')!],
+    primaryRole: mockRoles.find(r => r.id === 'admin')!,
+    departments: mockDepartments,
+    locations: mockLocations,
+    approvalLimit: { amount: 100000, currency: 'USD' } as Money,
+    clearanceLevel: 'top-secret',
+    effectiveFrom: new Date('2021-12-01'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: true,
+    businessUnit: 'management',
+    specialPermissions: ['system-admin', 'emergency-access-override', 'cross-department-access'],
+    delegatedAuthorities: ['system-configuration', 'user-management', 'workflow-configuration'],
+    effectivePermissions: ['*:*'],
+    // Legacy compatibility fields
     role: 'System Administrator',
     department: 'Administration',
     location: 'Administrative Office',
@@ -276,11 +317,7 @@ export const mockUsers: User[] = [
       currentDepartment: mockDepartments.find(d => d.id === 'administration')!,
       currentLocation: mockLocations.find(l => l.id === 'admin-office')!,
       showPrices: true,
-    },
-    createdAt: new Date('2021-12-01'),
-    createdBy: 'system',
-    updatedAt: new Date('2024-08-20'),
-    updatedBy: 'admin'
+    }
   }
 ];
 

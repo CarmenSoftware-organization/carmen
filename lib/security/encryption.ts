@@ -96,7 +96,7 @@ export class EncryptionService {
         key = Buffer.from(this.config.ENCRYPTION_KEY, 'utf8')
       }
 
-      const cipher = crypto.createCipher(this.encryptionConfig.algorithm, key)
+      const cipher = crypto.createCipheriv(this.encryptionConfig.algorithm, key, iv) as crypto.CipherGCM
       cipher.setAAD(Buffer.from('carmen-erp', 'utf8')) // Additional authenticated data
 
       let encrypted = cipher.update(plaintext, 'utf8', 'base64')
@@ -141,7 +141,8 @@ export class EncryptionService {
         key = Buffer.from(this.config.ENCRYPTION_KEY, 'utf8')
       }
 
-      const decipher = crypto.createDecipher(this.encryptionConfig.algorithm, key)
+      const ivBuffer = Buffer.from(iv, 'base64')
+      const decipher = crypto.createDecipheriv(this.encryptionConfig.algorithm, key, ivBuffer) as crypto.DecipherGCM
       decipher.setAAD(Buffer.from('carmen-erp', 'utf8')) // Must match AAD from encryption
       decipher.setAuthTag(Buffer.from(tag, 'base64'))
 
@@ -512,10 +513,4 @@ export function decryptDatabaseField(encryptedValue: string): string | null {
   return encryptionService.decryptField(encryptedValue)
 }
 
-// Export types
-export type {
-  EncryptionResult,
-  DecryptionResult,
-  HashResult,
-  HashVerificationResult
-}
+// Types are already exported above with 'export interface'
