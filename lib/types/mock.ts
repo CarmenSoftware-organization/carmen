@@ -28,6 +28,7 @@ import { DocumentStatus, Money } from './common'
 export interface MockPurchaseRequest extends PurchaseRequest {
   // Legacy fields from old data structure
   refNumber?: string;
+  requestNumber?: string;
 
   // UI-specific mock fields
   requestor?: {
@@ -55,9 +56,26 @@ export interface MockPurchaseRequest extends PurchaseRequest {
   department?: string;
   location?: string;
   jobCode?: string;
+  vendor?: string;
+  vendorId?: number;
+  deliveryDate?: Date;
+  deliveryPoint?: string;
 
   // Workflow fields
   currentWorkflowStage?: string;
+  lastModified?: string;
+
+  // Items and activity
+  items?: MockPurchaseRequestItem[];
+  activityLog?: Array<{
+    id: string;
+    timestamp: Date;
+    userId: string;
+    userName: string;
+    action: string;
+    description: string;
+    details?: string;
+  }>;
 }
 
 /**
@@ -156,7 +174,7 @@ export function isMockPurchaseRequestItem(item: PurchaseRequestItem | MockPurcha
 /**
  * Helper to safely cast PurchaseRequest to MockPurchaseRequest
  */
-export function asMockPurchaseRequest(pr: PurchaseRequest): MockPurchaseRequest {
+export function asMockPurchaseRequest(pr: PurchaseRequest | MockPurchaseRequest): MockPurchaseRequest {
   return pr as MockPurchaseRequest;
 }
 

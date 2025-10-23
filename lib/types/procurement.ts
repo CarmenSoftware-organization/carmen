@@ -58,7 +58,7 @@ export interface Requestor {
  */
 export interface PurchaseRequest {
   id: string;
-  requestNumber: string;
+  requestNumber?: string;
   requestDate: Date;
   requiredDate: Date;
   requestType: PurchaseRequestType;

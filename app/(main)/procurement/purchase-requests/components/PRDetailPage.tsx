@@ -56,6 +56,7 @@ import {
   Requestor,
   asMockPurchaseRequest,
   MockPurchaseRequest,
+  MockPurchaseRequestItem,
 } from "@/lib/types";
 import {
   getBadgeVariant,
@@ -326,13 +327,13 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   };
 
-  const handleOrderUpdate = (orderId: string, updates: any) => {
+  const handleOrderUpdate = (orderId: string, updates: Partial<PurchaseRequestItem | MockPurchaseRequestItem>) => {
     console.log("Updating order:", orderId, updates);
-    
+
     // Update the items state to trigger form button updates
-    setCurrentItems(prevItems => 
-      prevItems.map(item => 
-        item.id === orderId 
+    setCurrentItems(prevItems =>
+      prevItems.map(item =>
+        item.id === orderId
           ? { ...item, ...updates }
           : item
       )

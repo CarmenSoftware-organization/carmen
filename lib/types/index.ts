@@ -25,6 +25,10 @@ export * from './procurement'
 export { PRType, WorkflowStage } from './procurement'
 export type { Requestor } from './procurement'
 
+// Mock data type extensions (for development/prototyping)
+export * from './mock'
+export type { MockPurchaseRequest, MockPurchaseRequestItem, MockInventoryInfo, MockAdjustments } from './mock'
+
 // Vendor management types
 export * from './vendor'
 

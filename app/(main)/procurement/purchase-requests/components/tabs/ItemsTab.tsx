@@ -53,7 +53,7 @@ import {
   MoreHorizontal,
   History,
 } from "lucide-react";
-import { PurchaseRequestItem, DocumentStatus, asMockPurchaseRequestItem } from "@/lib/types";
+import { PurchaseRequestItem, DocumentStatus, asMockPurchaseRequestItem, MockPurchaseRequestItem } from "@/lib/types";
 import type { User } from "./types";
 import { ItemDetailsEditForm } from "../item-details-edit-form";
 import { samplePRItems } from "../sampleData";
@@ -74,7 +74,7 @@ import {
 interface ItemsTabProps {
   items: PurchaseRequestItem[];
   currentUser: User;
-  onOrderUpdate: (orderId: string, updates: Partial<PurchaseRequestItem>) => void;
+  onOrderUpdate: (orderId: string, updates: Partial<PurchaseRequestItem | MockPurchaseRequestItem>) => void;
   formMode?: "view" | "edit" | "add";
 }
 
@@ -177,7 +177,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
       const mockItem = asMockPurchaseRequestItem(item);
       const matchesSearch = mockItem.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        mockItem.location.toLowerCase().includes(searchTerm.toLowerCase());
+        mockItem.location?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
     });
   }, [localItems, searchTerm]);
@@ -522,8 +522,8 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
     console.log(`Updated ${field} for item ${itemId}:`, newAdjustments);
   };
 
-  const mockLocations = useMemo(() => [...new Set(localItems.map(i => asMockPurchaseRequestItem(i).location))], [localItems]);
-  const mockProducts = useMemo(() => [...new Set(localItems.map(i => asMockPurchaseRequestItem(i).name))], [localItems]);
+  const mockLocations = useMemo(() => [...new Set(localItems.map(i => asMockPurchaseRequestItem(i).location).filter((loc): loc is string => loc !== undefined))], [localItems]);
+  const mockProducts = useMemo(() => [...new Set(localItems.map(i => asMockPurchaseRequestItem(i).name).filter((name): name is string => name !== undefined))], [localItems]);
   const mockUnits = ["pieces", "kg", "g", "bags", "boxes", "units", "liters", "ml", "meters", "cm", "pairs", "sets"];
 
   // Mock data for on-hand by location

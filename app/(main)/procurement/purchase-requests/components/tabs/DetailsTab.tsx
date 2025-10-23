@@ -50,13 +50,23 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({
           <Input
             id={id}
             name={id}
-            value={
-              typeof formData[id as keyof PurchaseRequest] === "object"
-                ? asMockPurchaseRequest(formData)[
-                    id.split(".")[0] as keyof PurchaseRequest
-                  ]?.[id.split(".")[1]]
-                : String(formData[id as keyof PurchaseRequest])
-            }
+            value={(() => {
+              const fieldValue = formData[id as keyof PurchaseRequest];
+              if (typeof fieldValue === "object" && fieldValue !== null) {
+                const keys = id.split(".");
+                if (keys.length > 1) {
+                  const mockData = asMockPurchaseRequest(formData);
+                  const parentKey = keys[0] as keyof typeof mockData;
+                  const childKey = keys[1];
+                  const parent = mockData[parentKey];
+                  if (parent && typeof parent === 'object' && childKey in parent) {
+                    return String((parent as Record<string, unknown>)[childKey] ?? '');
+                  }
+                }
+                return '';
+              }
+              return String(fieldValue ?? '');
+            })()}
             onChange={handleInputChange}
             disabled={isDisabled}
           />

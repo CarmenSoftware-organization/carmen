@@ -34,7 +34,7 @@ export function ModernPurchaseRequestList() {
   }, []);
 
   // Use the existing mock data instead of fetched data for now
-  const displayData = useMemo(() => mockPRListData, [])
+  const displayData = useMemo(() => mockPRListData as PurchaseRequest[], [])
 
   const handleSelectItem = (id: string) => {
     setSelectedItems(prev =>

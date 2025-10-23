@@ -18,6 +18,7 @@ export const mockPRListData = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Completed,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     locationId: 'loc-main-kitchen',
     location: 'Main Kitchen',
@@ -486,6 +487,7 @@ export const mockPRListData = [
       department: 'Maintenance'
     },
     status: DocumentStatus.InProgress,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.departmentHeadApproval,
     locationId: 'loc-mechanical-room',
     location: 'Mechanical Room',
@@ -710,6 +712,7 @@ export const mockPRListData = [
       department: 'Housekeeping'
     },
     status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     locationId: 'loc-housekeeping-central',
     location: 'Housekeeping Central',
@@ -934,6 +937,7 @@ export const mockPRListData = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Rejected,
+    workflowStatus: WorkflowStatus.Rejected,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     locationId: 'loc-rooftop-bar',
     location: 'Rooftop Bar',
@@ -1175,6 +1179,7 @@ export const mockPRListData = [
       department: 'Front Office'
     },
     status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.requester,
     locationId: 'loc-front-desk',
     location: 'Front Desk',
@@ -1378,6 +1383,7 @@ export const mockPRListData = [
       department: 'Engineering'
     },
     status: DocumentStatus.Completed,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     locationId: 'loc-generator-room',
     location: 'Generator Room',
@@ -1601,6 +1607,7 @@ export const mockPRListData = [
       department: 'Spa & Wellness'
     },
     status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.departmentHeadApproval,
     locationId: 'loc-spa-treatment-rooms',
     location: 'Spa Treatment Rooms',
@@ -1651,6 +1658,7 @@ export const mockPRListData = [
       department: 'Events & Conferences'
     },
     status: DocumentStatus.InProgress,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.purchaseCoordinatorReview,
     locationId: 'loc-conference-center',
     location: 'Conference Center',
@@ -1701,6 +1709,7 @@ export const mockPRListData = [
       department: 'Security'
     },
     status: DocumentStatus.InProgress,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.generalManagerApproval,
     locationId: 'loc-security-control-room',
     location: 'Security Control Room',
@@ -1751,6 +1760,7 @@ export const mockPRListData = [
       department: 'Guest Services'
     },
     status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.requester,
     locationId: 'loc-guest-services-storage',
     location: 'Guest Services Storage',
@@ -1801,6 +1811,7 @@ export const mockPRListData = [
       department: 'Recreation'
     },
     status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     locationId: 'loc-fitness-center',
     location: 'Fitness Center',
@@ -1851,6 +1862,7 @@ export const mockPRListData = [
       department: 'Information Technology'
     },
     status: DocumentStatus.Completed,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     locationId: 'loc-server-room',
     location: 'Server Room',
@@ -1901,6 +1913,7 @@ export const mockPRListData = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.requester,
     locationId: 'loc-main-kitchen',
     location: 'Main Kitchen',
@@ -1955,6 +1968,7 @@ export const mockPRListData = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Draft,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.departmentHeadApproval,
     locationId: 'loc-pastry-kitchen',
     location: 'Pastry Kitchen',
@@ -2158,6 +2172,7 @@ export const mockPRListData = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.InProgress,
+    workflowStatus: WorkflowStatus.Pending,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     locationId: 'loc-international-pantry',
     location: 'International Pantry',
@@ -2382,6 +2397,7 @@ export const mockPRListData = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Completed,
+    workflowStatus: WorkflowStatus.Approved,
     currentWorkflowStage: WorkflowStage.completed,
     locationId: 'loc-training-kitchen',
     location: 'Training Kitchen',
@@ -2615,6 +2631,7 @@ export const mockPRListData = [
       department: 'Food & Beverage'
     },
     status: DocumentStatus.Rejected,
+    workflowStatus: WorkflowStatus.Rejected,
     currentWorkflowStage: WorkflowStage.financeManagerApproval,
     locationId: 'loc-seasonal-storage',
     location: 'Seasonal Storage',

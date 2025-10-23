@@ -99,8 +99,8 @@ interface SortConfig {
   direction: "asc" | "desc"
 }
 
-// Use mockup data from our comprehensive PR list - MockPurchaseRequest is compatible with ExtendedPurchaseRequest
-const sampleData: ExtendedPurchaseRequest[] = mockPRListData as MockPurchaseRequest[];
+// Use mockup data from our comprehensive PR list - Cast to ExtendedPurchaseRequest for compatibility
+const sampleData: ExtendedPurchaseRequest[] = mockPRListData as ExtendedPurchaseRequest[];
 
 const filterFields: { value: keyof ExtendedPurchaseRequest; label: string }[] = [
   { value: 'refNumber', label: 'PR Number' },
