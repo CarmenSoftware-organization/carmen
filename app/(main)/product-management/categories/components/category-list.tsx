@@ -209,8 +209,8 @@ const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, o
 
   return (
     <TouchFeedback onTouch={() => triggerHapticFeedback('light')}>
-      <div 
-        ref={dragPreview}
+      <div
+        ref={dragPreview as any}
         className={cn(
           "relative group",
           isDragging && "opacity-50 scale-95",

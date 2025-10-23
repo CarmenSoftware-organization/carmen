@@ -12,7 +12,7 @@ import { Edit, TrashIcon, PlusIcon, XIcon, ImageIcon, ChevronLeft } from 'lucide
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Product, UnitConversion } from '@/lib/types';
+import { Product } from '@/lib/types';
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
