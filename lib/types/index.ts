@@ -46,6 +46,8 @@ export type {
   Requestor
 } from './procurement'
 
+export { GRNStatus } from './procurement'
+
 // Vendor management types (PRIMARY SOURCE for VendorStatus)
 export type {
   Vendor,

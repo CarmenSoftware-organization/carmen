@@ -48,12 +48,12 @@ const queryParamsSchema = z.object({
  * Customize based on your entity structure
  */
 const createEntitySchema = z.object({
-  name: SecureSchemas.safeString(255).min(1).max(255),
+  name: SecureSchemas.safeString(255),
   description: SecureSchemas.safeString(1000).optional(),
   status: z.enum(['active', 'inactive']).optional().default('active'),
   tags: z.array(SecureSchemas.safeString(50)).max(10).optional(),
   metadata: z.record(SecureSchemas.safeString(500)).optional(),
-  
+
   // Add entity-specific fields here
   // category: z.enum(['type1', 'type2', 'type3']),
   // priority: z.number().min(1).max(10).optional().default(5),
@@ -66,12 +66,12 @@ const createEntitySchema = z.object({
  */
 const updateEntitySchema = z.object({
   id: SecureSchemas.uuid,
-  name: SecureSchemas.safeString(255).min(1).max(255).optional(),
+  name: SecureSchemas.safeString(255).optional(),
   description: SecureSchemas.safeString(1000).optional(),
   status: z.enum(['active', 'inactive']).optional(),
   tags: z.array(SecureSchemas.safeString(50)).max(10).optional(),
   metadata: z.record(SecureSchemas.safeString(500)).optional(),
-  
+
   // Add entity-specific fields here (all optional)
 });
 
@@ -112,7 +112,7 @@ const PERMISSIONS = {
  * Role-based operation restrictions
  * Define which roles can perform which operations
  */
-const ROLE_RESTRICTIONS = {
+const ROLE_RESTRICTIONS: Record<string, readonly string[]> = {
   'staff': ['read'],
   'counter': ['read', 'create'],
   'chef': ['read', 'create', 'update'],
@@ -121,7 +121,7 @@ const ROLE_RESTRICTIONS = {
   'financial-manager': ['read', 'create', 'update'],
   'admin': ['read', 'create', 'update', 'delete', 'manage'],
   'super-admin': ['read', 'create', 'update', 'delete', 'manage']
-} as const;
+};
 
 // =============================================================================
 // RATE LIMITING CONFIGURATIONS
@@ -212,15 +212,15 @@ const getEntities = withSecurity(
 
         // TODO: Replace with actual database query
         // const result = await entityService.getEntities(queryParams, user);
-        const mockEntities = []; // Replace with actual data
+        const mockEntities: any[] = []; // Replace with actual data
         const totalCount = 0; // Replace with actual count
 
         // Apply role-based filtering if needed
         let filteredEntities = mockEntities;
-        if (user.role === 'staff') {
+        if (user.role.name === 'staff') {
           // Staff can only see their own entities
           filteredEntities = mockEntities.filter((entity: any) => entity.createdBy === user.id);
-        } else if (user.role === 'department-manager') {
+        } else if (user.role.name === 'department-manager') {
           // Department managers can see their department's entities
           filteredEntities = mockEntities.filter((entity: any) => entity.department === user.department);
         }
@@ -230,18 +230,18 @@ const getEntities = withSecurity(
           data: {
             entities: filteredEntities,
             pagination: {
-              page: queryParams.page,
-              limit: queryParams.limit,
+              page: queryParams.page!,
+              limit: queryParams.limit!,
               total: totalCount,
-              pages: Math.ceil(totalCount / queryParams.limit)
+              pages: Math.ceil(totalCount / queryParams.limit!)
             }
           }
         });
 
         // Add pagination headers
         response.headers.set('X-Total-Count', totalCount.toString());
-        response.headers.set('X-Page-Count', Math.ceil(totalCount / queryParams.limit).toString());
-        response.headers.set('X-Current-Page', queryParams.page.toString());
+        response.headers.set('X-Page-Count', Math.ceil(totalCount / queryParams.limit!).toString());
+        response.headers.set('X-Current-Page', queryParams.page!.toString());
 
         return response;
 
@@ -325,7 +325,7 @@ const createEntity = withSecurity(
         // Add your specific validation rules here
         
         // Role-based creation restrictions
-        if (!ROLE_RESTRICTIONS[user.role]?.includes('create')) {
+        if (!ROLE_RESTRICTIONS[user.role.name]?.includes('create')) {
           return createSecureResponse(
             {
               success: false,
@@ -454,7 +454,7 @@ const updateEntity = withSecurity(
         // }
 
         // Role-based update restrictions
-        if (!ROLE_RESTRICTIONS[user.role]?.includes('update')) {
+        if (!ROLE_RESTRICTIONS[user.role.name]?.includes('update')) {
           return createSecureResponse(
             {
               success: false,
@@ -564,7 +564,7 @@ const deleteEntity = withSecurity(
         // }
 
         // Role-based deletion restrictions
-        if (!ROLE_RESTRICTIONS[user.role]?.includes('delete')) {
+        if (!ROLE_RESTRICTIONS[user.role.name]?.includes('delete')) {
           return createSecureResponse(
             {
               success: false,

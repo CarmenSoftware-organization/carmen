@@ -3,9 +3,24 @@
  * Helper functions for permission management and validation
  */
 
-import { Policy, PolicyRule, Subject, Resource, Action, Environment } from '@/lib/types/permissions'
+import {
+  Policy,
+  Rule,
+  SubjectAttributes,
+  ResourceAttributes,
+  EnvironmentAttributes,
+  EffectType,
+  PolicyResult
+} from '@/lib/types/permissions'
 import { User, Role } from '@/lib/types/user'
 import { permissionService } from './permission-service'
+
+// Helper interface for permission analysis
+interface PermissionSummary {
+  resourceType: string
+  action: string
+  effect: EffectType
+}
 
 /**
  * Permission validation utilities
@@ -46,9 +61,9 @@ export class PermissionValidator {
     }
 
     // Validate date ranges
-    if (policy.validFrom && policy.validUntil) {
-      if (policy.validFrom >= policy.validUntil) {
-        errors.push('Valid from date must be before valid until date')
+    if (policy.effectiveFrom && policy.effectiveTo) {
+      if (policy.effectiveFrom >= policy.effectiveTo) {
+        errors.push('Effective from date must be before effective to date')
       }
     }
 
@@ -61,27 +76,27 @@ export class PermissionValidator {
   /**
    * Validate policy rule structure
    */
-  static validateRule(rule: PolicyRule): { isValid: boolean; errors: string[] } {
+  static validateRule(rule: Rule): { isValid: boolean; errors: string[] } {
     const errors: string[] = []
 
-    if (!rule.name || rule.name.trim() === '') {
-      errors.push('Rule name is required')
+    if (!rule.id || rule.id.trim() === '') {
+      errors.push('Rule ID is required')
     }
 
-    if (!rule.condition || rule.condition.trim() === '') {
+    if (!rule.description || rule.description.trim() === '') {
+      errors.push('Rule description is required')
+    }
+
+    if (!rule.condition) {
       errors.push('Rule condition is required')
     }
 
-    if (!['permit', 'deny'].includes(rule.effect)) {
-      errors.push('Rule effect must be either "permit" or "deny"')
-    }
-
-    // Validate condition syntax (basic validation)
+    // Validate condition structure
     if (rule.condition) {
       try {
-        this.validateConditionSyntax(rule.condition)
+        this.validateConditionStructure(rule.condition)
       } catch (error) {
-        errors.push(`Invalid condition syntax: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        errors.push(`Invalid condition structure: ${error instanceof Error ? error.message : 'Unknown error'}`)
       }
     }
 
@@ -92,41 +107,40 @@ export class PermissionValidator {
   }
 
   /**
-   * Basic condition syntax validation
+   * Validate condition structure (Expression type)
    */
-  static validateConditionSyntax(condition: string): void {
-    // Check for balanced parentheses
-    let parenthesesCount = 0
-    for (const char of condition) {
-      if (char === '(') parenthesesCount++
-      if (char === ')') parenthesesCount--
-      if (parenthesesCount < 0) {
-        throw new Error('Unmatched closing parenthesis')
-      }
-    }
-    if (parenthesesCount !== 0) {
-      throw new Error('Unmatched opening parenthesis')
+  static validateConditionStructure(expression: any): void {
+    if (!expression || typeof expression !== 'object') {
+      throw new Error('Condition must be an object')
     }
 
-    // Check for valid function calls
-    const functionPattern = /(hasRole|hasPermission|inDepartment|resourceType|actionType|isWorkingHours)\s*\(/g
-    const matches = condition.match(functionPattern)
-    
-    if (matches) {
-      for (const match of matches) {
-        const functionName = match.replace(/\s*\(/, '')
-        const validFunctions = ['hasRole', 'hasPermission', 'inDepartment', 'resourceType', 'actionType', 'isWorkingHours']
-        if (!validFunctions.includes(functionName)) {
-          throw new Error(`Unknown function: ${functionName}`)
-        }
+    if (!expression.type || !['simple', 'composite'].includes(expression.type)) {
+      throw new Error('Condition type must be either "simple" or "composite"')
+    }
+
+    if (expression.type === 'simple') {
+      if (!expression.attribute || typeof expression.attribute !== 'string') {
+        throw new Error('Simple condition must have an attribute')
+      }
+      if (!expression.operator) {
+        throw new Error('Simple condition must have an operator')
+      }
+      if (expression.value === undefined) {
+        throw new Error('Simple condition must have a value')
       }
     }
 
-    // Check for valid operators
-    const invalidOperators = /[^a-zA-Z0-9\s()'".,=!<>&|+-]/g
-    const invalidChars = condition.match(invalidOperators)
-    if (invalidChars) {
-      throw new Error(`Invalid characters in condition: ${invalidChars.join(', ')}`)
+    if (expression.type === 'composite') {
+      if (!Array.isArray(expression.expressions) || expression.expressions.length === 0) {
+        throw new Error('Composite condition must have at least one expression')
+      }
+      if (!expression.logicalOperator || !['AND', 'OR', 'NOT'].includes(expression.logicalOperator)) {
+        throw new Error('Composite condition must have a valid logical operator (AND, OR, NOT)')
+      }
+      // Recursively validate nested expressions
+      for (const expr of expression.expressions) {
+        this.validateConditionStructure(expr)
+      }
     }
   }
 }
@@ -227,20 +241,51 @@ export class PermissionFormatter {
   }
 
   /**
-   * Format condition for display
+   * Format condition for display (Expression type)
    */
-  static formatCondition(condition: string): string {
-    return condition
-      .replace(/hasRole\('([^']+)'\)/g, 'has role "$1"')
-      .replace(/hasPermission\('([^']+)'\)/g, 'has permission "$1"')
-      .replace(/inDepartment\('([^']+)'\)/g, 'in department "$1"')
-      .replace(/resourceType\('([^']+)'\)/g, 'resource type is "$1"')
-      .replace(/actionType\('([^']+)'\)/g, 'action type is "$1"')
-      .replace(/isWorkingHours\(\)/g, 'during working hours')
-      .replace(/&&/g, ' and ')
-      .replace(/\|\|/g, ' or ')
-      .replace(/==/g, ' equals ')
-      .replace(/!=/g, ' does not equal ')
+  static formatCondition(expression: any): string {
+    if (!expression || typeof expression !== 'object') {
+      return 'Invalid condition'
+    }
+
+    if (expression.type === 'simple') {
+      const { attribute, operator, value } = expression
+      const operatorMap: Record<string, string> = {
+        '==': 'equals',
+        '!=': 'does not equal',
+        '>': 'is greater than',
+        '<': 'is less than',
+        '>=': 'is at least',
+        '<=': 'is at most',
+        'in': 'is in',
+        'not_in': 'is not in',
+        'contains': 'contains',
+        'not_contains': 'does not contain',
+        'matches': 'matches',
+        'exists': 'exists',
+        'not_exists': 'does not exist',
+        'starts_with': 'starts with',
+        'ends_with': 'ends with'
+      }
+
+      const operatorText = operatorMap[operator] || operator
+      const valueText = Array.isArray(value) ? value.join(', ') : String(value)
+
+      return `${attribute} ${operatorText} ${valueText}`
+    }
+
+    if (expression.type === 'composite') {
+      const { expressions, logicalOperator } = expression
+      const operatorText = logicalOperator === 'AND' ? ' and ' : logicalOperator === 'OR' ? ' or ' : ' not '
+
+      if (logicalOperator === 'NOT' && expressions.length > 0) {
+        return `not (${this.formatCondition(expressions[0])})`
+      }
+
+      return expressions.map((expr: any) => this.formatCondition(expr)).join(operatorText)
+    }
+
+    return 'Unknown condition type'
   }
 }
 
@@ -277,12 +322,8 @@ export class PermissionAnalyzer {
     // Find conflicts
     for (const [key, policiesForKey] of policyMap) {
       if (policiesForKey.length > 1) {
-        const permitPolicies = policiesForKey.filter(p => 
-          p.rules.some(r => r.effect === 'permit')
-        )
-        const denyPolicies = policiesForKey.filter(p => 
-          p.rules.some(r => r.effect === 'deny')
-        )
+        const permitPolicies = policiesForKey.filter(p => p.effect === 'permit')
+        const denyPolicies = policiesForKey.filter(p => p.effect === 'deny')
 
         if (permitPolicies.length > 0 && denyPolicies.length > 0) {
           for (const permitPolicy of permitPolicies) {
@@ -290,7 +331,7 @@ export class PermissionAnalyzer {
               conflicts.push({
                 policy1: permitPolicy.id,
                 policy2: denyPolicy.id,
-                conflictType: 'permission',
+                conflictType: 'permission' as const,
                 description: `Policy "${permitPolicy.name}" permits while policy "${denyPolicy.name}" denies the same resource-action combination`
               })
             }
@@ -324,7 +365,9 @@ export class PermissionAnalyzer {
   private static getPolicyResourceActionKey(policy: Policy): string {
     // This is a simplified implementation
     // In a real system, you'd analyze the policy conditions to determine resource-action combinations
-    return `${policy.resourceConditions || 'any'}-${policy.actionConditions || 'any'}`
+    const resources = policy.target?.resources?.map(r => r.value).join(',') || 'any'
+    const actions = policy.target?.actions?.join(',') || 'any'
+    return `${resources}-${actions}`
   }
 
   /**
@@ -337,27 +380,30 @@ export class PermissionAnalyzer {
     coverageByCategory: Record<string, { allowed: number; total: number }>
   }> {
     const allPermissions = await permissionService.getEffectivePermissions(userId)
-    
+
     const coverageByCategory: Record<string, { allowed: number; total: number }> = {}
-    
+
     // Group permissions by category
     for (const permission of allPermissions) {
       const category = this.getResourceCategory(permission.resourceType)
-      
+
       if (!coverageByCategory[category]) {
         coverageByCategory[category] = { allowed: 0, total: 0 }
       }
-      
+
       coverageByCategory[category].total++
       if (permission.effect === 'permit') {
         coverageByCategory[category].allowed++
       }
     }
 
+    // Count denied permissions (not returned by getEffectivePermissions but can be inferred)
+    const deniedCount = 0 // getEffectivePermissions only returns allowed permissions
+
     return {
       totalPermissions: allPermissions.length,
       allowedPermissions: allPermissions.filter(p => p.effect === 'permit').length,
-      deniedPermissions: allPermissions.filter(p => p.effect === 'deny').length,
+      deniedPermissions: deniedCount,
       coverageByCategory
     }
   }

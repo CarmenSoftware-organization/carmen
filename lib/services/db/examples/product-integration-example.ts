@@ -88,7 +88,7 @@ export class ProductManagementExample {
       leadTimeDays: 14,
       standardCost: {
         amount: 85.50,
-        currencyCode: 'USD'
+        currency: 'USD'
       },
       weight: 15.7, // kg per sqm
       weightUnit: 'kg',
@@ -165,7 +165,7 @@ export class ProductManagementExample {
         result.data?.forEach((product, index) => {
           console.log(`   ${index + 1}. ${product.productCode} - ${product.productName}`)
           console.log(`      Status: ${product.status}, Type: ${product.productType}`)
-          console.log(`      Standard Cost: ${product.standardCost?.amount} ${product.standardCost?.currencyCode}`)
+          console.log(`      Standard Cost: ${product.standardCost?.amount} ${product.standardCost?.currency}`)
         })
         
         return result.data
@@ -188,15 +188,15 @@ export class ProductManagementExample {
     const updateData: UpdateProductInput = {
       standardCost: {
         amount: 92.75, // Price increase
-        currencyCode: 'USD'
+        currency: 'USD'
       },
       lastPurchaseCost: {
         amount: 88.50,
-        currencyCode: 'USD'
+        currency: 'USD'
       },
       averageCost: {
         amount: 90.25,
-        currencyCode: 'USD'
+        currency: 'USD'
       },
       leadTimeDays: 10, // Improved lead time
       notes: 'Updated pricing as of Q1 2024. Supplier improved lead times.',
@@ -234,8 +234,8 @@ export class ProductManagementExample {
         const metrics = result.data!
         console.log('✅ Inventory metrics calculated:')
         console.log(`   Current Stock: ${metrics.currentStock} units`)
-        console.log(`   Average Cost: ${metrics.averageCost?.amount} ${metrics.averageCost?.currencyCode}`)
-        console.log(`   Total Value: ${metrics.totalValue?.amount} ${metrics.totalValue?.currencyCode}`)
+        console.log(`   Average Cost: ${metrics.averageCost?.amount} ${metrics.averageCost?.currency}`)
+        console.log(`   Total Value: ${metrics.totalValue?.amount} ${metrics.totalValue?.currency}`)
         console.log(`   Reorder Point: ${metrics.reorderPoint} units`)
         console.log(`   Stock Status: ${metrics.stockStatus}`)
         
@@ -294,10 +294,10 @@ export class ProductManagementExample {
         })
         
         if (stats.totalValue) {
-          console.log(`\n   Total Inventory Value: ${stats.totalValue.amount} ${stats.totalValue.currencyCode}`)
+          console.log(`\n   Total Inventory Value: ${stats.totalValue.amount} ${stats.totalValue.currency}`)
         }
         if (stats.averageValue) {
-          console.log(`   Average Product Value: ${stats.averageValue.amount} ${stats.averageValue.currencyCode}`)
+          console.log(`   Average Product Value: ${stats.averageValue.amount} ${stats.averageValue.currency}`)
         }
         
         return stats
@@ -388,15 +388,15 @@ export class ProductManagementExample {
         productType: 'raw_material',
         categoryId: 'cat-metals-001',
         baseUnit: 'sqm',
-        standardCost: { amount: 65.00, currencyCode: 'USD' },
+        standardCost: { amount: 65.00, currency: 'USD' },
         createdBy: 'bulk-import-system'
       },
       {
         productName: 'Copper Wire',
-        productType: 'raw_material', 
+        productType: 'raw_material',
         categoryId: 'cat-metals-001',
         baseUnit: 'meters',
-        standardCost: { amount: 12.50, currencyCode: 'USD' },
+        standardCost: { amount: 12.50, currency: 'USD' },
         createdBy: 'bulk-import-system'
       },
       {
@@ -487,9 +487,6 @@ export async function runProductServiceExamples() {
   const examples = new ProductManagementExample()
   await examples.runAllExamples()
 }
-
-// Export individual example functions for selective use
-export { ProductManagementExample }
 
 /**
  * Quick start example - minimal product creation

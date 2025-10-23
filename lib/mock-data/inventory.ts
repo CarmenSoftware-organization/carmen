@@ -4,16 +4,19 @@
  * Centralized mock data for inventory items, stock levels, counts, and adjustments.
  */
 
-import { 
-  InventoryItem, 
-  StockBalance, 
-  PhysicalCount, 
+import {
+  InventoryItem,
+  InventoryTransaction
+} from '../types'
+
+import {
+  StockBalance,
+  PhysicalCount,
   PhysicalCountItem,
   CountItem,
-  InventoryTransaction,
   CostingMethod,
   TransactionType
-} from '../types'
+} from '../types/inventory'
 
 // ====== INVENTORY ITEMS ======
 
@@ -34,11 +37,7 @@ export const mockInventoryItems: InventoryItem[] = [
     reorderQuantity: 30,
     leadTime: 5,
     lastPurchaseDate: new Date('2024-08-15'),
-    lastPurchasePrice: { amount: 45.00, currency: 'USD' },
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-15'),
-    updatedBy: 'purchasing-staff'
+    lastPurchasePrice: { amount: 45.00, currency: 'USD' }
   },
   {
     id: "item-002",
@@ -56,11 +55,7 @@ export const mockInventoryItems: InventoryItem[] = [
     reorderQuantity: 20,
     leadTime: 7,
     lastPurchaseDate: new Date('2024-08-10'),
-    lastPurchasePrice: { amount: 28.50, currency: 'USD' },
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-10'),
-    updatedBy: 'purchasing-staff'
+    lastPurchasePrice: { amount: 28.50, currency: 'USD' }
   },
   {
     id: "item-003",
@@ -78,11 +73,7 @@ export const mockInventoryItems: InventoryItem[] = [
     reorderQuantity: 15,
     leadTime: 3,
     lastPurchaseDate: new Date('2024-08-12'),
-    lastPurchasePrice: { amount: 15.75, currency: 'USD' },
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-12'),
-    updatedBy: 'purchasing-staff'
+    lastPurchasePrice: { amount: 15.75, currency: 'USD' }
   },
   {
     id: "item-004",
@@ -100,11 +91,7 @@ export const mockInventoryItems: InventoryItem[] = [
     reorderQuantity: 10,
     leadTime: 4,
     lastPurchaseDate: new Date('2024-08-08'),
-    lastPurchasePrice: { amount: 22.40, currency: 'USD' },
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-08'),
-    updatedBy: 'purchasing-staff'
+    lastPurchasePrice: { amount: 22.40, currency: 'USD' }
   },
   {
     id: "item-005",
@@ -122,11 +109,7 @@ export const mockInventoryItems: InventoryItem[] = [
     reorderQuantity: 25,
     leadTime: 6,
     lastPurchaseDate: new Date('2024-08-14'),
-    lastPurchasePrice: { amount: 18.90, currency: 'USD' },
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'admin',
-    updatedAt: new Date('2024-08-14'),
-    updatedBy: 'purchasing-staff'
+    lastPurchasePrice: { amount: 18.90, currency: 'USD' }
   }
 ];
 
@@ -143,11 +126,7 @@ export const mockStockBalances: StockBalance[] = [
     averageCost: { amount: 44.50, currency: 'USD' },
     totalValue: { amount: 2002.50, currency: 'USD' },
     lastMovementDate: new Date('2024-08-15'),
-    lastCountDate: new Date('2024-08-01'),
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'system',
-    updatedAt: new Date('2024-08-15'),
-    updatedBy: 'system'
+    lastCountDate: new Date('2024-08-01')
   },
   {
     id: "stock-002",
@@ -159,11 +138,7 @@ export const mockStockBalances: StockBalance[] = [
     averageCost: { amount: 28.25, currency: 'USD' },
     totalValue: { amount: 791.00, currency: 'USD' },
     lastMovementDate: new Date('2024-08-14'),
-    lastCountDate: new Date('2024-08-01'),
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'system',
-    updatedAt: new Date('2024-08-14'),
-    updatedBy: 'system'
+    lastCountDate: new Date('2024-08-01')
   },
   {
     id: "stock-003",
@@ -175,11 +150,7 @@ export const mockStockBalances: StockBalance[] = [
     averageCost: { amount: 15.60, currency: 'USD' },
     totalValue: { amount: 343.20, currency: 'USD' },
     lastMovementDate: new Date('2024-08-13'),
-    lastCountDate: new Date('2024-08-01'),
-    createdAt: new Date('2024-01-01'),
-    createdBy: 'system',
-    updatedAt: new Date('2024-08-13'),
-    updatedBy: 'system'
+    lastCountDate: new Date('2024-08-01')
   }
 ];
 
@@ -200,11 +171,7 @@ export const mockInventoryTransactions: InventoryTransaction[] = [
     referenceNo: "PO-2024-125",
     referenceType: "Purchase Order",
     userId: "user-warehouse-001",
-    notes: "Received from ABC Suppliers",
-    createdAt: new Date('2024-08-15'),
-    createdBy: "user-warehouse-001",
-    updatedAt: new Date('2024-08-15'),
-    updatedBy: "user-warehouse-001"
+    notes: "Received from ABC Suppliers"
   },
   {
     id: "txn-002",
@@ -220,11 +187,7 @@ export const mockInventoryTransactions: InventoryTransaction[] = [
     referenceNo: "REQ-2024-089",
     referenceType: "Kitchen Requisition",
     userId: "user-chef-001",
-    notes: "Issued to Main Kitchen",
-    createdAt: new Date('2024-08-16'),
-    createdBy: "user-warehouse-001",
-    updatedAt: new Date('2024-08-16'),
-    updatedBy: "user-warehouse-001"
+    notes: "Issued to Main Kitchen"
   }
 ];
 
