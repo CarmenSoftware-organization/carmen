@@ -290,6 +290,44 @@ export default function UserManagementPage() {
     setUsers([...users, newUser]);
   }
 
+  const handleExport = () => {
+    // Convert users data to CSV
+    const headers = ['Name', 'Email', 'Business Unit', 'Department', 'Roles', 'Status'];
+    const csvData = users.map(user => [
+      user.name,
+      user.email,
+      user.businessUnitName || user.businessUnit,
+      user.department,
+      user.roles.join('; '),
+      user.accountStatus
+    ]);
+
+    const csv = [headers, ...csvData].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `users-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  const handlePrint = () => {
+    window.print();
+  }
+
+  const handleInviteUser = () => {
+    alert('Invite User dialog - To be implemented');
+  }
+
+  const handleImportCSV = () => {
+    alert('Import CSV dialog - To be implemented');
+  }
+
+  const handleBulkSetup = () => {
+    alert('Bulk User Setup wizard - To be implemented');
+  }
+
   const columns = createUserColumns({
     onView: handleView,
     onEdit: handleEdit,
@@ -343,18 +381,18 @@ export default function UserManagementPage() {
               />
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
-              <DropdownMenuItem>Invite User</DropdownMenuItem>
-              <DropdownMenuItem>Import from CSV</DropdownMenuItem>
-              <DropdownMenuItem>Bulk User Setup</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleInviteUser}>Invite User</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleImportCSV}>Import from CSV</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleBulkSetup}>Bulk User Setup</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          
-          <Button variant="outline" size="sm">
+
+          <Button variant="outline" size="sm" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>

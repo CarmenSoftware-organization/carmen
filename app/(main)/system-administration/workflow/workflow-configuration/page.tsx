@@ -59,6 +59,14 @@ function WorkflowConfigurationContent() {
     // TODO: Implement duplicate functionality
   }
 
+  const handleNewWorkflow = () => {
+    router.push('/system-administration/workflow/workflow-configuration/new')
+  }
+
+  const handleSettings = () => {
+    alert('Workflow Settings - To be implemented')
+  }
+
   const columns = createWorkflowColumns({
     onView: handleView,
     onEdit: handleEdit,
@@ -76,11 +84,11 @@ function WorkflowConfigurationContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleSettings}>
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={handleNewWorkflow}>
             <Plus className="mr-2 h-4 w-4" />
             New Workflow
           </Button>
