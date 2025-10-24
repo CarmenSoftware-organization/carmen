@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 import { fetchCertificationById } from '@/app/lib/data';
 import { updateCertification } from '@/actions/certification-actions';
 import { Button } from '@/components/ui/button';
