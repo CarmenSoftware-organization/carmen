@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -487,9 +488,9 @@ export function AccountCodeMapping() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => handleCloseView(false)}>
-              Close
-            </Button>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -655,9 +656,9 @@ export function AccountCodeMapping() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => handleCloseCreate(false)}>
-              Cancel
-            </Button>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
             <Button onClick={handleSaveCreate}>Create</Button>
           </DialogFooter>
         </DialogContent>
@@ -824,9 +825,9 @@ export function AccountCodeMapping() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => handleCloseEdit(false)}>
-              Cancel
-            </Button>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
             <Button onClick={handleSaveEdit}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
