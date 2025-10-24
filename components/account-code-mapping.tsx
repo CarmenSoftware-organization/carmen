@@ -142,20 +142,26 @@ export function AccountCodeMapping() {
     setSelectedMapping(null)
   }
 
-  const handleCloseView = () => {
-    setIsViewDialogOpen(false)
-    setSelectedMapping(null)
+  const handleCloseView = (open: boolean) => {
+    setIsViewDialogOpen(open)
+    if (!open) {
+      setSelectedMapping(null)
+    }
   }
 
-  const handleCloseCreate = () => {
-    setIsCreateDialogOpen(false)
-    setFormData({})
+  const handleCloseCreate = (open: boolean) => {
+    setIsCreateDialogOpen(open)
+    if (!open) {
+      setFormData({})
+    }
   }
 
-  const handleCloseEdit = () => {
-    setIsEditDialogOpen(false)
-    setFormData({})
-    setSelectedMapping(null)
+  const handleCloseEdit = (open: boolean) => {
+    setIsEditDialogOpen(open)
+    if (!open) {
+      setFormData({})
+      setSelectedMapping(null)
+    }
   }
 
   const handleScan = () => {
@@ -481,7 +487,7 @@ export function AccountCodeMapping() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseView}>
+            <Button variant="outline" onClick={() => handleCloseView(false)}>
               Close
             </Button>
           </DialogFooter>
@@ -649,7 +655,7 @@ export function AccountCodeMapping() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseCreate}>
+            <Button variant="outline" onClick={() => handleCloseCreate(false)}>
               Cancel
             </Button>
             <Button onClick={handleSaveCreate}>Create</Button>
@@ -818,7 +824,7 @@ export function AccountCodeMapping() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseEdit}>
+            <Button variant="outline" onClick={() => handleCloseEdit(false)}>
               Cancel
             </Button>
             <Button onClick={handleSaveEdit}>Save Changes</Button>
