@@ -238,7 +238,7 @@ export function ModernProductList({
             <div className="flex items-center gap-2 mb-2">
               {product.images && product.images.length > 0 ? (
                 <Image
-                  src={product.images[0].url}
+                  src={product.images[0].imageUrl}
                   alt={product.productName}
                   width={40}
                   height={40}
@@ -304,8 +304,8 @@ export function ModernProductList({
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Price:</span>
             <span className="font-semibold">
-              {product.standardCost 
-                ? formatCurrency(product.standardCost.amount, product.standardCost.currencyCode)
+              {product.standardCost
+                ? formatCurrency(product.standardCost.amount)
                 : 'N/A'
               }
             </span>
@@ -336,7 +336,7 @@ export function ModernProductList({
         <div className="flex items-center gap-3">
           {product.images && product.images.length > 0 ? (
             <Image
-              src={product.images[0].url}
+              src={product.images[0].imageUrl}
               alt={product.productName}
               width={32}
               height={32}
@@ -361,16 +361,13 @@ export function ModernProductList({
       </TableCell>
       <TableCell>
         <div className="text-sm">
-          {product.category?.name || 'Uncategorized'}
-          {product.subcategory && (
-            <div className="text-muted-foreground">{product.subcategory.name}</div>
-          )}
+          <div>Category</div>
         </div>
       </TableCell>
       <TableCell>
         <div className="font-medium">
-          {product.standardCost 
-            ? formatCurrency(product.standardCost.amount, product.standardCost.currencyCode)
+          {product.standardCost
+            ? formatCurrency(product.standardCost.amount)
             : 'N/A'
           }
         </div>
@@ -380,7 +377,7 @@ export function ModernProductList({
       </TableCell>
       <TableCell>
         <div className="text-sm text-muted-foreground">
-          {product.createdAt && new Date(product.createdAt).toLocaleDateString()}
+          N/A
         </div>
       </TableCell>
       <TableCell>
@@ -543,7 +540,7 @@ export function ModernProductList({
           <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
           <h3 className="text-lg font-semibold mb-2">Error Loading Products</h3>
           <p className="text-muted-foreground mb-4">
-            {error || 'Failed to load product data'}
+            {String(error) || 'Failed to load product data'}
           </p>
           <Button onClick={() => refetch()}>
             Try Again
@@ -574,51 +571,38 @@ export function ModernProductList({
       )
     }
 
-    if (viewMode === 'card') {
-      return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.map(renderProductCard)}
-        </div>
-      )
-    }
-
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-12">
-              <input
-                type="checkbox"
-                checked={selectedProducts.size === products.length && products.length > 0}
-                onChange={(e) => handleSelectAll(e.target.checked)}
-                className="rounded border-gray-300"
-              />
-            </TableHead>
-            <TableHead>Product</TableHead>
-            <TableHead>Status & Type</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead className="w-12">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {products.map(renderProductRow)}
-        </TableBody>
-      </Table>
-    )
-  }
+      <>
+        {viewMode === 'card' ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map(renderProductCard)}
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">
+                  <input
+                    type="checkbox"
+                    checked={selectedProducts.size === products.length && products.length > 0}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                </TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>Status & Type</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="w-12">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.map(renderProductRow)}
+            </TableBody>
+          </Table>
+        )}
 
-  return (
-    <>
-      <ListPageTemplate
-        title="Products"
-        subtitle={`${totalCount} products`}
-        actions={actions}
-        compact={compact}
-      >
-        {content()}
-        
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
@@ -648,7 +632,17 @@ export function ModernProductList({
             </div>
           </div>
         )}
-      </ListPageTemplate>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <ListPageTemplate
+        title="Products"
+        actionButtons={actions}
+        content={content()}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

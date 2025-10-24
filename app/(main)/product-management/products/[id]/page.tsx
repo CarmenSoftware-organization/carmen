@@ -322,14 +322,7 @@ const mockProductList = [
         conversionFactor: 0.2,
         unitType: "ORDER" as const
       }
-    ],
-    // Environmental Impact Fields
-    carbonFootprint: 2.5,
-    waterUsage: 2500,
-    packagingRecyclability: 85,
-    biodegradabilityMonths: 6,
-    energyEfficiencyRating: 'A',
-    sustainableCertification: 'ORGANIC'
+    ]
   },
   {
     id: 'PRD002',
@@ -384,14 +377,7 @@ const mockProductList = [
         conversionFactor: 0.1,
         unitType: "ORDER" as const
       }
-    ],
-    // Environmental Impact Fields
-    carbonFootprint: 1.8,
-    waterUsage: 1200,
-    packagingRecyclability: 70,
-    biodegradabilityMonths: 4,
-    energyEfficiencyRating: 'B',
-    sustainableCertification: 'FAIRTRADE'
+    ]
   },
   {
     id: 'PRD003',
@@ -446,14 +432,7 @@ const mockProductList = [
         conversionFactor: 1,
         unitType: "ORDER" as const
       }
-    ],
-    // Environmental Impact Fields
-    carbonFootprint: 3.2,
-    waterUsage: 1800,
-    packagingRecyclability: 90,
-    biodegradabilityMonths: 8,
-    energyEfficiencyRating: 'A',
-    sustainableCertification: 'MSC'
+    ]
   },
   {
     id: 'PRD004',
@@ -489,14 +468,7 @@ const mockProductList = [
     shelfLife: 0,
     storageInstructions: 'Store in dry area, avoid direct sunlight',
     imagesUrl: '/images/products/monitor.jpg',
-    unitConversions: [],
-    // Environmental Impact Fields
-    carbonFootprint: 85.5,
-    waterUsage: 3500,
-    packagingRecyclability: 80,
-    biodegradabilityMonths: 0,
-    energyEfficiencyRating: 'B',
-    sustainableCertification: 'NONE'
+    unitConversions: []
   }
 ] as any as Product[];
 
@@ -824,7 +796,6 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
           <TabsTrigger value="order-units">Order Units</TabsTrigger>
           <TabsTrigger value="ingredient-units">Ingredient Units</TabsTrigger>
           <TabsTrigger value="locations">Location Assignment</TabsTrigger>
-          <TabsTrigger value="environmental-impact">Environmental Impact</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -942,16 +913,7 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
                       onChange={(e) => handleInputChange('storageConditions', e.target.value)}
                     />
                   </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Size</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="Enter size"
-                      defaultValue={product?.size || ''}
-                      disabled={!isEditing}
-                      onChange={(e) => handleInputChange('size', e.target.value)}
-                    />
-                  </div>
+                  {/* Size property not available in Product interface - needs to be added as ProductSpecification */}
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label>Color</Label>
                     <Input 
@@ -990,129 +952,6 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
           />
         </TabsContent>
 
-        <TabsContent value="environmental-impact">
-          <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                <CardTitle>Environmental Impact Metrics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label>Carbon Footprint (kg CO2e)</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="Enter CO2 equivalent"
-                      defaultValue={product.carbonFootprint}
-                        disabled={!isEditing}
-                      />
-                    <p className="text-sm text-muted-foreground">
-                      Carbon emissions per unit produced
-                    </p>
-                    </div>
-                  <div className="space-y-2">
-                    <Label>Water Usage (Liters)</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="Enter water usage"
-                      defaultValue={product.waterUsage}
-                        disabled={!isEditing}
-                      />
-                    <p className="text-sm text-muted-foreground">
-                      Water consumption per unit
-                    </p>
-                    </div>
-                  <div className="space-y-2">
-                    <Label>Packaging Recyclability (%)</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="Enter recyclability percentage"
-                      min={0}
-                      max={100}
-                      defaultValue={product.packagingRecyclability}
-                        disabled={!isEditing}
-                      />
-                    <p className="text-sm text-muted-foreground">
-                      Percentage of packaging that can be recycled
-                    </p>
-                    </div>
-                  <div className="space-y-2">
-                    <Label>Biodegradability (Months)</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="Enter months to biodegrade"
-                      defaultValue={product.biodegradabilityMonths}
-                      disabled={!isEditing}
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Time taken for natural decomposition
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Energy Efficiency Rating</Label>
-                    <Select 
-                      defaultValue={product.energyEfficiencyRating}
-                      disabled={!isEditing}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select rating" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="A">A (Most Efficient)</SelectItem>
-                        <SelectItem value="B">B</SelectItem>
-                        <SelectItem value="C">C</SelectItem>
-                        <SelectItem value="D">D</SelectItem>
-                        <SelectItem value="E">E</SelectItem>
-                        <SelectItem value="F">F (Least Efficient)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground">
-                      Product energy efficiency classification
-                    </p>
-            </div>
-                  <div className="space-y-2">
-                    <Label>Sustainable Certification</Label>
-                    <Select 
-                      defaultValue={product.sustainableCertification}
-                      disabled={!isEditing}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select certification" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="NONE">None</SelectItem>
-                        <SelectItem value="ORGANIC">Organic Certified</SelectItem>
-                        <SelectItem value="FAIRTRADE">Fair Trade</SelectItem>
-                        <SelectItem value="RAINFOREST">Rainforest Alliance</SelectItem>
-                        <SelectItem value="MSC">Marine Stewardship Council</SelectItem>
-                        <SelectItem value="FSC">Forest Stewardship Council</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground">
-                      Environmental or sustainability certifications
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Environmental Notes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Label>Additional Environmental Information</Label>
-                  <Textarea 
-                    placeholder="Enter any additional environmental impact information"
-                    className="min-h-[100px]"
-                    disabled={!isEditing}
-                  />
-                            </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
       <div className="mt-4 space-x-2">
       </div>
@@ -1126,26 +965,26 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         <p className="mt-1">{product?.description}</p>
       </div>
       <div>
-        <label className="text-muted-foreground">Local Description</label>
-        <p className="mt-1">{product?.localDescription}</p>
+        <label className="text-muted-foreground">Short Description</label>
+        <p className="mt-1">{product?.shortDescription}</p>
       </div>
       <div>
-        <label className="text-muted-foreground">Category</label>
-        <p className="mt-1">{product?.categoryName} / {product?.subCategoryName}</p>
+        <label className="text-muted-foreground">Category ID</label>
+        <p className="mt-1">{product?.categoryId} {product?.subcategoryId ? `/ ${product.subcategoryId}` : ''}</p>
       </div>
       <div>
-        <label className="text-muted-foreground">Item Group</label>
-        <p className="mt-1">{product?.itemGroupName}</p>
-      </div>
-      <div>
-        <label className="text-muted-foreground">Primary Inventory Unit</label>
+        <label className="text-muted-foreground">Base Unit</label>
         <span className="text-sm font-medium bg-blue-50 text-blue-700 px-2 py-1 rounded mt-1 inline-block">
-          {inventoryUnits.find(unit => unit.id === product?.primaryInventoryUnitId)?.code || product?.primaryInventoryUnitId}
+          {product?.baseUnit}
         </span>
       </div>
       <div className="flex items-center space-x-2">
-        <label className="text-muted-foreground">Use for Ingredients</label>
-        <Checkbox checked={product?.isIngredient} disabled />
+        <label className="text-muted-foreground">Purchasable</label>
+        <Checkbox checked={product?.isPurchasable} disabled />
+      </div>
+      <div className="flex items-center space-x-2">
+        <label className="text-muted-foreground">Sellable</label>
+        <Checkbox checked={product?.isSellable} disabled />
       </div>
     </>
   );
@@ -1156,64 +995,54 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         <label className="text-muted-foreground">Description</label>
         <Textarea
           className="mt-1"
-          value={editedProduct.description}
+          value={editedProduct.description || ''}
           onChange={(e) => handleInputChange('description', e.target.value)}
         />
       </div>
       <div>
-        <label className="text-muted-foreground">Local Description</label>
+        <label className="text-muted-foreground">Short Description</label>
         <Textarea
           className="mt-1"
-          value={editedProduct.localDescription}
-          onChange={(e) => handleInputChange('localDescription', e.target.value)}
+          value={editedProduct.shortDescription || ''}
+          onChange={(e) => handleInputChange('shortDescription', e.target.value)}
         />
       </div>
       <div>
-        <label className="text-muted-foreground">Category</label>
-        <div className="grid grid-cols-2 gap-2 mt-1">
-          <Input
-            value={editedProduct.categoryName}
-            onChange={(e) => handleInputChange('categoryName', e.target.value)}
-          />
-          <Input
-            value={editedProduct.subCategoryName}
-            onChange={(e) => handleInputChange('subCategoryName', e.target.value)}
-          />
-        </div>
-      </div>
-      <div>
-        <label className="text-muted-foreground">Item Group</label>
+        <label className="text-muted-foreground">Category ID</label>
         <Input
           className="mt-1"
-          value={editedProduct.itemGroupName}
-          onChange={(e) => handleInputChange('itemGroupName', e.target.value)}
+          value={editedProduct.categoryId}
+          onChange={(e) => handleInputChange('categoryId', e.target.value)}
         />
       </div>
       <div>
-        <label className="text-muted-foreground">Primary Inventory Unit</label>
-        <Select
-          value={editedProduct.primaryInventoryUnitId}
-          onValueChange={(value) => handleInputChange('primaryInventoryUnitId', value)}
-        >
-          <SelectTrigger className="mt-1">
-            <SelectValue placeholder="Select unit">
-              {inventoryUnits.find(unit => unit.id === editedProduct.primaryInventoryUnitId)?.code}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {inventoryUnits.map((unit) => (
-              <SelectItem key={unit.id} value={unit.id}>
-                {unit.name} ({unit.code})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <label className="text-muted-foreground">Subcategory ID</label>
+        <Input
+          className="mt-1"
+          value={editedProduct.subcategoryId || ''}
+          onChange={(e) => handleInputChange('subcategoryId', e.target.value)}
+        />
+      </div>
+      <div>
+        <label className="text-muted-foreground">Base Unit</label>
+        <Input
+          className="mt-1"
+          value={editedProduct.baseUnit}
+          onChange={(e) => handleInputChange('baseUnit', e.target.value)}
+        />
       </div>
       <div className="flex items-center space-x-2">
-        <label className="text-muted-foreground">Use for Ingredients</label>
-        <Checkbox 
-          checked={editedProduct.isIngredient}
-          onCheckedChange={(checked) => handleInputChange('isIngredient', checked)}
+        <label className="text-muted-foreground">Purchasable</label>
+        <Checkbox
+          checked={editedProduct.isPurchasable}
+          onCheckedChange={(checked) => handleInputChange('isPurchasable', checked)}
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <label className="text-muted-foreground">Sellable</label>
+        <Checkbox
+          checked={editedProduct.isSellable}
+          onCheckedChange={(checked) => handleInputChange('isSellable', checked)}
         />
       </div>
     </>
@@ -1235,11 +1064,11 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
                   <ChevronLeft className="h-4 w-4" />
                   <span className="sr-only">Back</span>
                 </Button>
-                <EditableTitle 
-                  value={editedProduct?.name || ''} 
+                <EditableTitle
+                  value={editedProduct?.productName || ''}
                   code={editedProduct?.productCode || ''}
-                  onNameChange={(value) => handleInputChange('name', value)}
-                  onCodeChange={(value) => handleInputChange('productCode', value)} 
+                  onNameChange={(value) => handleInputChange('productName', value)}
+                  onCodeChange={(value) => handleInputChange('productCode', value)}
                 />
               </div>
             </>
@@ -1261,7 +1090,7 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
                 </div>
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Product Name</div>
-                  <div className="text-lg font-semibold">{product?.name}</div>
+                  <div className="text-lg font-semibold">{product?.productName}</div>
                 </div>
               </div>
             </div>

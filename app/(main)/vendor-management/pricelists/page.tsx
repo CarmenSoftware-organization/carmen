@@ -114,21 +114,21 @@ const mockPricelistsLegacy = [
 // Transform centralized data to legacy format for display
 const transformedPricelists = mockPricelists.map(pricelist => ({
   id: pricelist.id,
-  pricelistNumber: pricelist.pricelistNumber,
+  pricelistNumber: pricelist.priceListCode,
   vendorName: getVendorName(pricelist.vendorId),
   vendorId: pricelist.vendorId,
-  campaignId: pricelist.campaignId,
-  campaignName: getCampaignName(pricelist.campaignId),
-  name: `${getCampaignName(pricelist.campaignId)} - ${getVendorName(pricelist.vendorId)}`,
+  campaignId: undefined,
+  campaignName: undefined,
+  name: `${pricelist.priceListName}`,
   status: pricelist.status,
   currency: pricelist.currency,
-  itemCount: pricelist.totalItems,
-  totalValue: pricelist.totalItems * 100, // Mock calculation
+  itemCount: pricelist.totalItems || 0,
+  totalValue: (pricelist.totalItems || 0) * 100, // Mock calculation
   taxProfile: 'VAT',
   taxRate: 7,
-  validFrom: formatDate(pricelist.validFrom),
-  validTo: formatDate(pricelist.validTo),
-  lastUpdated: formatDate(pricelist.updatedAt),
+  validFrom: formatDate(pricelist.effectiveDate),
+  validTo: pricelist.expiryDate ? formatDate(pricelist.expiryDate) : 'N/A',
+  lastUpdated: pricelist.approvedAt ? formatDate(pricelist.approvedAt) : 'N/A',
   categories: ['Equipment', 'Supplies'] // Mock categories
 }))
 

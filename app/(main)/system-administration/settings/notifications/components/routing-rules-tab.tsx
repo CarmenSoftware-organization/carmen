@@ -140,14 +140,15 @@ export function RoutingRulesTab() {
                       {selectedRule.actions.map((action, idx) => (
                         <div key={idx} className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                           <Badge variant="outline">{action.type}</Badge>
-                          {action.type === 'route-to-role' && action.roleId && (
-                            <span className="text-sm">Role: {action.roleId}</span>
+                          <Badge variant="secondary">{action.recipientType}</Badge>
+                          <span className="text-sm">Recipient: {action.recipient}</span>
+                          {action.delay && (
+                            <span className="text-sm text-muted-foreground">Delay: {action.delay}m</span>
                           )}
-                          {action.type === 'route-to-user' && action.userId && (
-                            <span className="text-sm">User: {action.userId}</span>
-                          )}
-                          {action.type === 'set-priority' && action.priority && (
-                            <span className="text-sm">Priority: {action.priority}</span>
+                          {action.channels && action.channels.length > 0 && (
+                            <span className="text-sm text-muted-foreground">
+                              Channels: {action.channels.join(', ')}
+                            </span>
                           )}
                         </div>
                       ))}

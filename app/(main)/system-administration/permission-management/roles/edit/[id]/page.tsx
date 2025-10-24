@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/form';
 
 import { useRoleStore } from '@/lib/stores/role-store';
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 
 const roleSchema = z.object({
   name: z.string().min(2, {
@@ -39,7 +39,6 @@ const roleSchema = z.object({
   }),
   description: z.string().optional(),
   hierarchy: z.number().min(1).max(1000).default(100),
-  isActive: z.boolean().default(true),
   parentRoles: z.array(z.string()).optional(),
 });
 
@@ -62,7 +61,6 @@ export default function EditRolePage() {
       name: '',
       description: '',
       hierarchy: 100,
-      isActive: true,
       parentRoles: [],
     },
   });
@@ -74,7 +72,6 @@ export default function EditRolePage() {
         name: role.name,
         description: role.description || '',
         hierarchy: role.hierarchy || 100,
-        isActive: role.isActive !== false,
         parentRoles: role.parentRoles || [],
       });
     }
@@ -83,13 +80,13 @@ export default function EditRolePage() {
   // Set available parent roles (excluding self and children)
   useEffect(() => {
     if (role && allRoles) {
-      const available = allRoles.filter(r => 
-        r.id !== role.id && 
+      const available = allRoles.filter(r =>
+        r.id !== role.id &&
         !role.parentRoles?.includes(r.id) &&
-        r.hierarchy !== undefined && 
+        r.hierarchy !== undefined &&
         role.hierarchy !== undefined &&
         r.hierarchy < role.hierarchy // Parent must have lower hierarchy number
-      );
+      ) as Role[];
       setAvailableParentRoles(available);
     }
   }, [role, allRoles]);
@@ -116,15 +113,16 @@ export default function EditRolePage() {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const updatedRole: Role = {
-        ...role,
-        ...data,
-        updatedAt: new Date().toISOString(),
+
+      const updatedRole: Partial<Role> = {
+        name: data.name,
+        description: data.description,
+        hierarchy: data.hierarchy,
+        parentRoles: data.parentRoles,
       };
 
       updateRole(roleId, updatedRole);
-      
+
       // Navigate back to role detail page
       router.push(`/system-administration/permission-management/roles/${roleId}`);
     } catch (error) {
@@ -323,28 +321,22 @@ export default function EditRolePage() {
                 />
               )}
 
-              {/* Status Information */}
+              {/* Role Metadata */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Status Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <h3 className="text-lg font-medium">Role Metadata</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Current Status</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">Role ID</Label>
+                    <div className="mt-1 text-sm font-mono">
+                      {role.id}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">System Role</Label>
                     <div className="mt-1">
-                      <Badge variant={role.isActive !== false ? "default" : "secondary"}>
-                        {role.isActive !== false ? "Active" : "Inactive"}
+                      <Badge variant={role.isSystem ? "secondary" : "outline"}>
+                        {role.isSystem ? "System Role" : "Custom Role"}
                       </Badge>
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Created</Label>
-                    <div className="mt-1 text-sm">
-                      {role.createdAt ? new Date(role.createdAt).toLocaleDateString() : 'Unknown'}
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Last Modified</Label>
-                    <div className="mt-1 text-sm">
-                      {role.updatedAt ? new Date(role.updatedAt).toLocaleDateString() : 'Never'}
                     </div>
                   </div>
                 </div>

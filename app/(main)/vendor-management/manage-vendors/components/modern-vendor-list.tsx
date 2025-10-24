@@ -210,7 +210,7 @@ export function ModernVendorList({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg font-semibold line-clamp-1">
-              {vendor.name}
+              {vendor.companyName}
             </CardTitle>
             <CardDescription className="flex items-center gap-2 mt-1">
               <Building className="h-4 w-4" />
@@ -253,23 +253,23 @@ export function ModernVendorList({
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-2 text-sm text-muted-foreground">
-          {vendor.contactEmail && (
+          {vendor.contacts?.[0]?.email && (
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
-              <span className="truncate">{vendor.contactEmail}</span>
+              <span className="truncate">{vendor.contacts[0].email}</span>
             </div>
           )}
-          {vendor.contactPhone && (
+          {vendor.contacts?.[0]?.phone && (
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              <span>{vendor.contactPhone}</span>
+              <span>{vendor.contacts[0].phone}</span>
             </div>
           )}
-          {vendor.address && (
+          {vendor.addresses?.[0] && (
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span className="truncate">
-                {vendor.address.city}, {vendor.address.country}
+                {vendor.addresses[0].city}, {vendor.addresses[0].country}
               </span>
             </div>
           )}
@@ -290,32 +290,32 @@ export function ModernVendorList({
         />
       </TableCell>
       <TableCell>
-        <div className="font-medium">{vendor.name}</div>
+        <div className="font-medium">{vendor.companyName}</div>
         <div className="text-sm text-muted-foreground">
           {vendor.businessType || 'Not specified'}
         </div>
       </TableCell>
       <TableCell>
         <div className="text-sm">
-          {vendor.contactEmail && (
+          {vendor.contacts?.[0]?.email && (
             <div className="flex items-center gap-1">
               <Mail className="h-3 w-3" />
-              <span className="truncate max-w-[200px]">{vendor.contactEmail}</span>
+              <span className="truncate max-w-[200px]">{vendor.contacts[0].email}</span>
             </div>
           )}
-          {vendor.contactPhone && (
+          {vendor.contacts?.[0]?.phone && (
             <div className="flex items-center gap-1 mt-1">
               <Phone className="h-3 w-3" />
-              <span>{vendor.contactPhone}</span>
+              <span>{vendor.contacts[0].phone}</span>
             </div>
           )}
         </div>
       </TableCell>
       <TableCell>
-        {vendor.address && (
+        {vendor.addresses?.[0] && (
           <div className="text-sm">
-            <div>{vendor.address.city}</div>
-            <div className="text-muted-foreground">{vendor.address.country}</div>
+            <div>{vendor.addresses[0].city}</div>
+            <div className="text-muted-foreground">{vendor.addresses[0].country}</div>
           </div>
         )}
       </TableCell>
@@ -324,7 +324,7 @@ export function ModernVendorList({
       </TableCell>
       <TableCell>
         <div className="text-sm text-muted-foreground">
-          {vendor.createdAt && new Date(vendor.createdAt).toLocaleDateString()}
+          {vendor.establishmentDate && new Date(vendor.establishmentDate).toLocaleDateString()}
         </div>
       </TableCell>
       <TableCell>
@@ -479,7 +479,7 @@ export function ModernVendorList({
           <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
           <h3 className="text-lg font-semibold mb-2">Error Loading Vendors</h3>
           <p className="text-muted-foreground mb-4">
-            {error || 'Failed to load vendor data'}
+            {error instanceof Error ? error.message : 'Failed to load vendor data'}
           </p>
           <Button onClick={() => refetch()}>
             Try Again
@@ -549,42 +549,43 @@ export function ModernVendorList({
     <>
       <ListPageTemplate
         title="Vendors"
-        subtitle={`${totalCount} vendors`}
-        actions={actions}
-        compact={compact}
-      >
-        {content()}
-        
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} vendors
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage <= 1}
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              >
-                Previous
-              </Button>
-              <span className="text-sm">
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage >= totalPages}
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
-      </ListPageTemplate>
+        actionButtons={actions}
+        content={
+          <>
+            {content()}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6">
+                <div className="text-sm text-muted-foreground">
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} vendors
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        }
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

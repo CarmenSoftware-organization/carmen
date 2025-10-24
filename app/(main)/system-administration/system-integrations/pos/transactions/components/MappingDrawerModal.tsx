@@ -95,13 +95,8 @@ export function MappingDrawerModal({
   const mappingPreview = useMemo(() => {
     if (!selectedRecipe || !posItem) return null
 
-    // Try to get from mock data
-    const preview = getMappingPreview(
-      posItem.posItemId,
-      selectedRecipe.id,
-      portionSize,
-      unit
-    )
+    // Try to get from mock data (getMappingPreview only takes posItemId)
+    const preview = getMappingPreview(posItem.posItemId)
 
     return preview
   }, [selectedRecipe, posItem, portionSize, unit])
@@ -297,8 +292,8 @@ export function MappingDrawerModal({
                     <span className="font-medium">Total Cost per Sale</span>
                     <span className="text-lg font-bold">
                       {formatCurrency(
-                        mappingPreview.totalCost.amount,
-                        mappingPreview.totalCost.currency
+                        mappingPreview.totalEstimatedCost.amount,
+                        mappingPreview.totalEstimatedCost.currency
                       )}
                     </span>
                   </div>
@@ -313,16 +308,13 @@ export function MappingDrawerModal({
                         <div key={idx} className="p-2 flex justify-between items-center">
                           <div>
                             <p className="text-sm font-medium">{ing.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {ing.location}
-                            </p>
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-medium">
-                              {ing.quantity} {ing.unit}
+                              {ing.quantityPerPortion} {ing.unit}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {formatCurrency(ing.cost.amount, ing.cost.currency)}
+                              {formatCurrency(ing.estimatedCost.amount, ing.estimatedCost.currency)}
                             </p>
                           </div>
                         </div>
@@ -330,10 +322,10 @@ export function MappingDrawerModal({
                     </div>
                   </div>
 
-                  {/* Warnings */}
+                  {/* Warnings - commented out until warnings are added to MappingPreview type
                   {mappingPreview.warnings && mappingPreview.warnings.length > 0 && (
                     <div className="space-y-2">
-                      {mappingPreview.warnings.map((warning, idx) => (
+                      {mappingPreview.warnings.map((warning: string, idx: number) => (
                         <div key={idx} className="flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
                           <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
                           <p className="text-sm text-yellow-900">{warning}</p>
@@ -341,6 +333,7 @@ export function MappingDrawerModal({
                       ))}
                     </div>
                   )}
+                  */}
                 </div>
               </CardContent>
             </Card>

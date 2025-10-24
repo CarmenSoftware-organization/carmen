@@ -29,7 +29,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { Checkbox } from "@/components/ui/checkbox"
-import { PurchaseRequest, DocumentStatus } from "@/lib/types"
+import { DocumentStatus, MockPurchaseRequest } from "@/lib/types"
 import { mockPurchaseRequests } from "@/lib/mock-data"
 
 // Quick date filter options
@@ -50,11 +50,11 @@ const PR_TYPES = [
 
 // Status filter options
 const STATUS_OPTIONS: DocumentStatus[] = [
-  "draft",
-  "pending_approval",
-  "approved",
-  "rejected",
-  "cancelled",
+  DocumentStatus.Draft,
+  DocumentStatus.InProgress,
+  DocumentStatus.Approved,
+  DocumentStatus.Rejected,
+  DocumentStatus.Void,
 ]
 
 interface Filters {
@@ -116,7 +116,7 @@ export function PurchaseRequestListReport() {
   const summary = useMemo(() => {
     return {
       totalPRs: filteredData.length,
-      totalAmount: filteredData.reduce((sum, pr) => sum + pr.totalAmount, 0),
+      totalAmount: filteredData.reduce((sum, pr) => sum + (pr.totalAmount || 0), 0),
       byStatus: filteredData.reduce((acc, pr) => {
         acc[pr.status] = (acc[pr.status] || 0) + 1
         return acc
@@ -156,26 +156,24 @@ export function PurchaseRequestListReport() {
 
   const getStatusBadgeVariant = (status: DocumentStatus) => {
     const variants: Record<DocumentStatus, string> = {
-      draft: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
-      pending_approval: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-      approved: "bg-green-100 text-green-800 hover:bg-green-100",
-      rejected: "bg-red-100 text-red-800 hover:bg-red-100",
-      cancelled: "bg-gray-100 text-gray-800 hover:bg-gray-100",
-      completed: "bg-blue-100 text-blue-800 hover:bg-blue-100",
-      in_progress: "bg-purple-100 text-purple-800 hover:bg-purple-100",
+      [DocumentStatus.Draft]: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
+      [DocumentStatus.InProgress]: "bg-orange-100 text-orange-800 hover:bg-orange-100",
+      [DocumentStatus.Approved]: "bg-green-100 text-green-800 hover:bg-green-100",
+      [DocumentStatus.Rejected]: "bg-red-100 text-red-800 hover:bg-red-100",
+      [DocumentStatus.Void]: "bg-gray-100 text-gray-800 hover:bg-gray-100",
+      [DocumentStatus.Converted]: "bg-blue-100 text-blue-800 hover:bg-blue-100",
     }
     return variants[status] || "bg-gray-100 text-gray-800"
   }
 
   const getStatusLabel = (status: DocumentStatus) => {
     const labels: Record<DocumentStatus, string> = {
-      draft: "Draft",
-      pending_approval: "Pending Approval",
-      approved: "Approved",
-      rejected: "Rejected",
-      cancelled: "Cancelled",
-      completed: "Completed",
-      in_progress: "In Progress",
+      [DocumentStatus.Draft]: "Draft",
+      [DocumentStatus.InProgress]: "In Progress",
+      [DocumentStatus.Approved]: "Approved",
+      [DocumentStatus.Rejected]: "Rejected",
+      [DocumentStatus.Void]: "Void",
+      [DocumentStatus.Converted]: "Converted",
     }
     return labels[status] || status
   }
@@ -219,14 +217,14 @@ export function PurchaseRequestListReport() {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Pending Approval</CardDescription>
-            <CardTitle className="text-2xl">{summary.byStatus.pending_approval || 0}</CardTitle>
+            <CardDescription>In Progress</CardDescription>
+            <CardTitle className="text-2xl">{summary.byStatus[DocumentStatus.InProgress] || 0}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Approved</CardDescription>
-            <CardTitle className="text-2xl">{summary.byStatus.approved || 0}</CardTitle>
+            <CardTitle className="text-2xl">{summary.byStatus[DocumentStatus.Approved] || 0}</CardTitle>
           </CardHeader>
         </Card>
       </div>
@@ -469,10 +467,10 @@ export function PurchaseRequestListReport() {
                           href={`/procurement/purchase-requests/${pr.id}`}
                           className="text-primary hover:underline font-medium"
                         >
-                          {pr.prNumber}
+                          {pr.refNumber || pr.requestNumber}
                         </a>
                       </TableCell>
-                      <TableCell>{pr.description || "-"}</TableCell>
+                      <TableCell>{pr.justification || "-"}</TableCell>
                       <TableCell>{pr.requestedBy}</TableCell>
                       <TableCell className="text-center">
                         {pr.deliveryDate ? format(new Date(pr.deliveryDate), "dd/MM/yyyy") : "-"}
@@ -486,7 +484,7 @@ export function PurchaseRequestListReport() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        ฿{pr.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ฿{(pr.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </TableCell>
                     </TableRow>
                   ))
