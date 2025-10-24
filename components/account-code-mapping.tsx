@@ -384,7 +384,7 @@ export function AccountCodeMapping() {
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={handleCloseView}>
-        <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>View Mapping Details</DialogTitle>
             <DialogDescription>
@@ -490,7 +490,7 @@ export function AccountCodeMapping() {
 
       {/* Create Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={handleCloseCreate}>
-        <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Create New Mapping</DialogTitle>
             <DialogDescription>
@@ -659,7 +659,7 @@ export function AccountCodeMapping() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={handleCloseEdit}>
-        <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Edit Mapping</DialogTitle>
             <DialogDescription>
