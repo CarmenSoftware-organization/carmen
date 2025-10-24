@@ -305,7 +305,7 @@ const createPurchaseOrder = withSecurity(
         }
 
         // Validate high-value orders require additional permissions
-        const totalValue = orderData.items.reduce((sum, item) => {
+        const totalValue = orderData.items.reduce((sum: number, item: any) => {
           return sum + (item.unitPrice.amount * item.orderedQuantity * (1 - (item.discount || 0) / 100))
         }, 0)
 
