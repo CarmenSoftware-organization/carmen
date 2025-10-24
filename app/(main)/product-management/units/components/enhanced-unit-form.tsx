@@ -81,6 +81,7 @@ const unitSchema = z.object({
 })
 
 type UnitFormValues = z.infer<typeof unitSchema>
+type UnitFormData = UnitFormValues
 
 interface UnitFormProps {
   unit?: Unit
@@ -249,7 +250,7 @@ export function EnhancedUnitForm({
   }
   
   // Field validation on blur
-  const handleFieldBlur = (fieldName: string) => {
+  const handleFieldBlur = (fieldName: keyof UnitFormData) => {
     setValidationTouched(prev => ({ ...prev, [fieldName]: true }))
     form.trigger(fieldName)
   }

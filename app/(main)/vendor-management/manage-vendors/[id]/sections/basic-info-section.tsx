@@ -54,10 +54,10 @@ export function BasicInfoSection({ vendor, isEditing, onFieldChange }: BasicInfo
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="businessTypeId">Business Type</Label>
+          <Label htmlFor="businessType">Business Type</Label>
           <Select
-            value={vendor.businessTypeId}
-            onValueChange={(value) => onFieldChange('businessTypeId', value)}
+            value={vendor.businessType}
+            onValueChange={(value) => onFieldChange('businessType', value)}
             disabled={!isEditing}
           >
             <SelectTrigger className="w-full">

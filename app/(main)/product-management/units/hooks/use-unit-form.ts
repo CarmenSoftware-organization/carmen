@@ -52,7 +52,7 @@ export interface UseUnitFormReturn {
   handleCancel: () => void
   handleFieldBlur: (fieldName: string) => void
   resetForm: () => void
-  validateField: (fieldName: keyof UnitFormData) => boolean
+  validateField: (fieldName: keyof UnitFormData) => Promise<boolean>
   getFieldState: (fieldName: keyof UnitFormData) => {
     hasError: boolean
     isValid: boolean
@@ -200,19 +200,19 @@ export function useUnitForm(options: UseUnitFormOptions): UseUnitFormReturn {
   }, [form, unit])
 
   // Validate specific field
-  const validateField = useCallback((fieldName: keyof UnitFormData): boolean => {
-    return form.trigger(fieldName)
+  const validateField = useCallback(async (fieldName: keyof UnitFormData): Promise<boolean> => {
+    return await form.trigger(fieldName)
   }, [form])
 
   // Get field state information
   const getFieldState = useCallback((fieldName: keyof UnitFormData) => {
     const error = form.formState.errors[fieldName]
     const isTouched = validationTouched[fieldName] || form.formState.touchedFields[fieldName]
-    
+
     return {
       hasError: !!error,
-      isValid: !error && isTouched,
-      isTouched,
+      isValid: !error && !!isTouched,
+      isTouched: !!isTouched,
       errorMessage: error?.message,
     }
   }, [form.formState.errors, form.formState.touchedFields, validationTouched])

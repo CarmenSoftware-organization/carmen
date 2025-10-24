@@ -275,11 +275,17 @@ export default function UserManagementPage() {
     }
   }
 
-  const handleUserSubmit = async (userData: Omit<User, "id">) => {
+  const handleUserSubmit = async (userData: Omit<User, "id"> | any) => {
     // In a real application, this would be an API call
     const newUser: User = {
       ...userData,
       id: Math.random().toString(36).substr(2, 9),
+      // Ensure all required User properties are present
+      businessUnit: userData.businessUnit || '',
+      department: userData.department || '',
+      roles: userData.roles || [],
+      hodStatus: userData.hodStatus || false,
+      accountStatus: userData.accountStatus || 'active',
     };
     setUsers([...users, newUser]);
   }

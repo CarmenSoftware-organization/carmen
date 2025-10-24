@@ -259,7 +259,7 @@ export default function RequestForPricingDetailPage() {
                         <TableCell>
                           <div>
                             <div className="font-medium">{vendor?.companyName}</div>
-                            <div className="text-sm text-muted-foreground">{vendor?.email}</div>
+                            <div className="text-sm text-muted-foreground">{vendor?.contacts?.[0]?.email || 'N/A'}</div>
                           </div>
                         </TableCell>
                         <TableCell>

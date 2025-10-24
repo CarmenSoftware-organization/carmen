@@ -1,6 +1,6 @@
 "use client"
 
-import { forwardRef } from 'react'
+import React, { forwardRef } from 'react'
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -305,7 +305,7 @@ export const FieldSuccess = ({ message, className = "" }: FieldSuccessProps) => 
 // Copy to clipboard button
 export interface CopyButtonProps {
   value: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'lg' | 'default' | 'icon'
   variant?: 'ghost' | 'outline' | 'default'
 }
 

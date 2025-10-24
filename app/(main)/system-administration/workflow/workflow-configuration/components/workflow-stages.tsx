@@ -137,7 +137,8 @@ export function WorkflowStages({
         pricePerUnit: false,
         totalPrice: false
       },
-      assignedUsers: []
+      assignedUsers: [],
+      roleType: 'requester'
     }
     setStages([...stages, newStage])
     setSelectedStageId(newStage.id)

@@ -55,7 +55,7 @@ export function LocationEditForm({ location, onSave, onCancel }: LocationEditFor
       code: location?.code || '',
       name: location?.name || '',
       type: location?.type || 'Inventory',
-      eop: location?.eop || 'false',
+      eop: (location?.eop ? 'true' : 'false') as 'true' | 'false',
       deliveryPoint: location?.deliveryPoint || '',
       isActive: location?.isActive ?? true,
     },
@@ -68,6 +68,7 @@ export function LocationEditForm({ location, onSave, onCancel }: LocationEditFor
   const onSubmit = (data: LocationFormData) => {
     const updatedLocation: Partial<Location> = {
       ...data,
+      eop: data.eop,
       assignedUsers: assignedUserIds,
     }
 

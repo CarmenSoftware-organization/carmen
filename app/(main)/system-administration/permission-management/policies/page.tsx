@@ -18,8 +18,10 @@ export default function PolicyManagementPage() {
     search: '',
     effect: 'all',
     status: 'all',
+    categories: [],
     resourceTypes: [],
-    priorityRange: { min: 0, max: 1000 }
+    priorityRange: { min: 0, max: 1000 },
+    createdDateRange: { from: '', to: '' }
   });
 
   // Sample saved filter presets
@@ -30,8 +32,10 @@ export default function PolicyManagementPage() {
         search: '',
         effect: 'permit' as EffectType,
         status: 'enabled' as const,
+        categories: [],
         resourceTypes: [],
-        priorityRange: { min: 800, max: 1000 }
+        priorityRange: { min: 800, max: 1000 },
+        createdDateRange: { from: '', to: '' }
       }
     },
     {
@@ -40,8 +44,10 @@ export default function PolicyManagementPage() {
         search: '',
         effect: 'all' as const,
         status: 'all' as const,
+        categories: [],
         resourceTypes: [ResourceType.PURCHASE_REQUEST, ResourceType.PURCHASE_ORDER],
-        priorityRange: { min: 0, max: 1000 }
+        priorityRange: { min: 0, max: 1000 },
+        createdDateRange: { from: '', to: '' }
       }
     }
   ]);

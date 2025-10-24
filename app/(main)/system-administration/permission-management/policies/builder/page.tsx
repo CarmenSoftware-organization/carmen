@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { 
+import {
   VisualPolicyEditor,
   PolicyTester,
   AttributeInspector
 } from '@/components/permissions/policy-builder';
+import { LogicalOperator } from '@/lib/types/permissions';
 import { 
   PolicyBuilderState,
   PolicyTestResult 
@@ -40,7 +41,7 @@ export default function PolicyBuilderPage() {
         priority: policy.priority,
         enabled: policy.enabled,
         effect: policy.effect,
-        logicalOperator: 'AND' as const,
+        logicalOperator: LogicalOperator.AND,
         subjectConditions: policy.target.subjects || [],
         resourceConditions: policy.target.resources || [],
         actionConditions: policy.target.actions || [],

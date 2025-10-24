@@ -42,6 +42,7 @@ import { mockSubscriptionPackages, mockCurrentSubscription } from '@/lib/mock-da
 // Placeholder components for each view
 function PolicyManagementView() {
   const [isPolicyWizardOpen, setIsPolicyWizardOpen] = useState(false);
+  const [policyType, setPolicyType] = useState<'rbac' | 'abac'>('rbac');
   const [filters, setFilters] = useState<PolicyFilters>({
     search: '',
     effect: 'all',
@@ -75,6 +76,8 @@ function PolicyManagementView() {
 
       {/* Policy List */}
       <PolicyList
+        policyType={policyType}
+        onPolicyTypeChange={setPolicyType}
         onCreatePolicy={() => setIsPolicyWizardOpen(true)}
         onEditPolicy={(policyId) => {
           console.log('Edit policy:', policyId);
