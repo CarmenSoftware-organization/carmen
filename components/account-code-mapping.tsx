@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/select"
 
 export function AccountCodeMapping() {
+  const [selectedView, setSelectedView] = useState("posting-to-ap")
   const mappingData = [
     { store: "Mini Bar", category: "Beverage", subCategory: "Beers", itemGroup: "Beer", department: "35", accountCode: "5000020" },
     { store: "MIN1", category: "2", subCategory: "21", itemGroup: "2100", department: "35", accountCode: "5000020" },
@@ -49,7 +51,7 @@ export function AccountCodeMapping() {
         <Input className="max-w-xs" placeholder="Search..." />
         <div className="flex items-center space-x-2">
           <span>View Name:</span>
-          <Select defaultValue="posting-to-ap">
+          <Select value={selectedView} onValueChange={setSelectedView}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select a view" />
             </SelectTrigger>
