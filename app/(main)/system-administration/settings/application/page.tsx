@@ -172,8 +172,14 @@ export default function ApplicationSettingsPage() {
                       <Label htmlFor="smtp-host">SMTP Host</Label>
                       <Input
                         id="smtp-host"
-                        value={settings.email.smtpHost}
-                        onChange={(e) => handleEmailChange("smtpHost", e.target.value)}
+                        value={settings.email.smtp.host}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          email: {
+                            ...settings.email,
+                            smtp: { ...settings.email.smtp, host: e.target.value }
+                          }
+                        })}
                         placeholder="smtp.example.com"
                       />
                     </div>
@@ -182,8 +188,14 @@ export default function ApplicationSettingsPage() {
                       <Input
                         id="smtp-port"
                         type="number"
-                        value={settings.email.smtpPort}
-                        onChange={(e) => handleEmailChange("smtpPort", parseInt(e.target.value))}
+                        value={settings.email.smtp.port}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          email: {
+                            ...settings.email,
+                            smtp: { ...settings.email.smtp, port: parseInt(e.target.value) }
+                          }
+                        })}
                       />
                     </div>
                   </div>
@@ -193,8 +205,14 @@ export default function ApplicationSettingsPage() {
                       <Label htmlFor="smtp-user">SMTP Username</Label>
                       <Input
                         id="smtp-user"
-                        value={settings.email.smtpUser}
-                        onChange={(e) => handleEmailChange("smtpUser", e.target.value)}
+                        value={settings.email.smtp.username}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          email: {
+                            ...settings.email,
+                            smtp: { ...settings.email.smtp, username: e.target.value }
+                          }
+                        })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -202,8 +220,14 @@ export default function ApplicationSettingsPage() {
                       <Input
                         id="smtp-pass"
                         type="password"
-                        value={settings.email.smtpPassword}
-                        onChange={(e) => handleEmailChange("smtpPassword", e.target.value)}
+                        value={settings.email.smtp.password}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          email: {
+                            ...settings.email,
+                            smtp: { ...settings.email.smtp, password: e.target.value }
+                          }
+                        })}
                       />
                     </div>
                   </div>
@@ -217,8 +241,14 @@ export default function ApplicationSettingsPage() {
                     </div>
                     <Switch
                       id="smtp-secure"
-                      checked={settings.email.smtpSecure}
-                      onCheckedChange={(checked) => handleEmailChange("smtpSecure", checked)}
+                      checked={settings.email.smtp.secure}
+                      onCheckedChange={(checked) => setSettings({
+                        ...settings,
+                        email: {
+                          ...settings.email,
+                          smtp: { ...settings.email.smtp, secure: checked }
+                        }
+                      })}
                     />
                   </div>
                 </>
@@ -251,8 +281,8 @@ export default function ApplicationSettingsPage() {
                 <Input
                   id="reply-to"
                   type="email"
-                  value={settings.email.replyTo || ""}
-                  onChange={(e) => handleEmailChange("replyTo", e.target.value)}
+                  value={settings.email.replyToEmail}
+                  onChange={(e) => handleEmailChange("replyToEmail", e.target.value)}
                   placeholder="support@example.com"
                 />
               </div>
@@ -313,8 +343,14 @@ export default function ApplicationSettingsPage() {
                     <div className="space-y-2">
                       <Label htmlFor="backup-frequency">Backup Frequency</Label>
                       <Select
-                        value={settings.backup.frequency}
-                        onValueChange={(value) => handleBackupChange("frequency", value)}
+                        value={settings.backup.schedule.frequency}
+                        onValueChange={(value) => setSettings({
+                          ...settings,
+                          backup: {
+                            ...settings.backup,
+                            schedule: { ...settings.backup.schedule, frequency: value as 'hourly' | 'daily' | 'weekly' | 'monthly' }
+                          }
+                        })}
                       >
                         <SelectTrigger id="backup-frequency">
                           <SelectValue />
@@ -328,14 +364,18 @@ export default function ApplicationSettingsPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="backup-retention">Retention Period (Days)</Label>
+                      <Label htmlFor="backup-retention">Daily Retention (Days)</Label>
                       <Input
                         id="backup-retention"
                         type="number"
-                        value={settings.backup.retentionDays}
-                        onChange={(e) =>
-                          handleBackupChange("retentionDays", parseInt(e.target.value))
-                        }
+                        value={settings.backup.retention.keepDaily}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          backup: {
+                            ...settings.backup,
+                            retention: { ...settings.backup.retention, keepDaily: parseInt(e.target.value) }
+                          }
+                        })}
                       />
                     </div>
                   </div>
@@ -343,8 +383,14 @@ export default function ApplicationSettingsPage() {
                   <div className="space-y-2">
                     <Label htmlFor="backup-location">Backup Location</Label>
                     <Select
-                      value={settings.backup.location}
-                      onValueChange={(value) => handleBackupChange("location", value)}
+                      value={settings.backup.storage.type}
+                      onValueChange={(value) => setSettings({
+                        ...settings,
+                        backup: {
+                          ...settings.backup,
+                          storage: { ...settings.backup.storage, type: value as 'local' | 's3' | 'azure' | 'gcp' }
+                        }
+                      })}
                     >
                       <SelectTrigger id="backup-location">
                         <SelectValue />
@@ -353,7 +399,7 @@ export default function ApplicationSettingsPage() {
                         <SelectItem value="local">Local Storage</SelectItem>
                         <SelectItem value="s3">Amazon S3</SelectItem>
                         <SelectItem value="azure">Azure Blob Storage</SelectItem>
-                        <SelectItem value="gcs">Google Cloud Storage</SelectItem>
+                        <SelectItem value="gcp">Google Cloud Storage</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -367,8 +413,8 @@ export default function ApplicationSettingsPage() {
                     </div>
                     <Switch
                       id="backup-compress"
-                      checked={settings.backup.compress}
-                      onCheckedChange={(checked) => handleBackupChange("compress", checked)}
+                      checked={settings.backup.compressionEnabled}
+                      onCheckedChange={(checked) => handleBackupChange("compressionEnabled", checked)}
                     />
                   </div>
                 </>
@@ -394,55 +440,134 @@ export default function ApplicationSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="transactions-retention">Transaction Data (Days)</Label>
-                  <Input
-                    id="transactions-retention"
-                    type="number"
-                    value={settings.dataRetention.transactionData}
-                    onChange={(e) =>
-                      handleDataRetentionChange("transactionData", parseInt(e.target.value))
-                    }
-                  />
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Documents</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="purchase-requests-retention">Purchase Requests (Days)</Label>
+                      <Input
+                        id="purchase-requests-retention"
+                        type="number"
+                        value={settings.dataRetention.documents.purchaseRequests}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          dataRetention: {
+                            ...settings.dataRetention,
+                            documents: {
+                              ...settings.dataRetention.documents,
+                              purchaseRequests: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="purchase-orders-retention">Purchase Orders (Days)</Label>
+                      <Input
+                        id="purchase-orders-retention"
+                        type="number"
+                        value={settings.dataRetention.documents.purchaseOrders}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          dataRetention: {
+                            ...settings.dataRetention,
+                            documents: {
+                              ...settings.dataRetention.documents,
+                              purchaseOrders: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="audit-retention">Audit Logs (Days)</Label>
-                  <Input
-                    id="audit-retention"
-                    type="number"
-                    value={settings.dataRetention.auditLogs}
-                    onChange={(e) =>
-                      handleDataRetentionChange("auditLogs", parseInt(e.target.value))
-                    }
-                  />
-                </div>
-              </div>
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Logs</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="audit-retention">Audit Logs (Days)</Label>
+                      <Input
+                        id="audit-retention"
+                        type="number"
+                        value={settings.dataRetention.logs.auditLogs}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          dataRetention: {
+                            ...settings.dataRetention,
+                            logs: {
+                              ...settings.dataRetention.logs,
+                              auditLogs: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                      />
+                    </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="archive-retention">Archived Data (Days)</Label>
-                  <Input
-                    id="archive-retention"
-                    type="number"
-                    value={settings.dataRetention.archivedData}
-                    onChange={(e) =>
-                      handleDataRetentionChange("archivedData", parseInt(e.target.value))
-                    }
-                  />
+                    <div className="space-y-2">
+                      <Label htmlFor="system-logs-retention">System Logs (Days)</Label>
+                      <Input
+                        id="system-logs-retention"
+                        type="number"
+                        value={settings.dataRetention.logs.systemLogs}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          dataRetention: {
+                            ...settings.dataRetention,
+                            logs: {
+                              ...settings.dataRetention.logs,
+                              systemLogs: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="deleted-retention">Deleted Records (Days)</Label>
-                  <Input
-                    id="deleted-retention"
-                    type="number"
-                    value={settings.dataRetention.deletedRecords}
-                    onChange={(e) =>
-                      handleDataRetentionChange("deletedRecords", parseInt(e.target.value))
-                    }
-                  />
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Archived Data</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="auto-archive">Auto-Archive After (Days)</Label>
+                      <Input
+                        id="auto-archive"
+                        type="number"
+                        value={settings.dataRetention.archived.autoArchiveAfter}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          dataRetention: {
+                            ...settings.dataRetention,
+                            archived: {
+                              ...settings.dataRetention.archived,
+                              autoArchiveAfter: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="delete-archived">Delete Archived After (Days)</Label>
+                      <Input
+                        id="delete-archived"
+                        type="number"
+                        value={settings.dataRetention.archived.deleteArchivedAfter}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          dataRetention: {
+                            ...settings.dataRetention,
+                            archived: {
+                              ...settings.dataRetention.archived,
+                              deleteArchivedAfter: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -460,32 +585,84 @@ export default function ApplicationSettingsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="pos-system">POS System</Label>
-                <Input
-                  id="pos-system"
-                  value={settings.integrations.posSystem || ""}
-                  onChange={(e) => handleIntegrationsChange("posSystem", e.target.value)}
-                  placeholder="Oracle Micros, Toast, Square, etc."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="erp-system">ERP System</Label>
-                <Input
-                  id="erp-system"
-                  value={settings.integrations.erpSystem || ""}
-                  onChange={(e) => handleIntegrationsChange("erpSystem", e.target.value)}
-                  placeholder="SAP, Oracle, NetSuite, etc."
-                />
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={settings.integrations.thirdParty.posSystem.enabled}
+                    onCheckedChange={(checked) => setSettings({
+                      ...settings,
+                      integrations: {
+                        ...settings.integrations,
+                        thirdParty: {
+                          ...settings.integrations.thirdParty,
+                          posSystem: {
+                            ...settings.integrations.thirdParty.posSystem,
+                            enabled: checked
+                          }
+                        }
+                      }
+                    })}
+                  />
+                  <Input
+                    id="pos-system"
+                    value={settings.integrations.thirdParty.posSystem.provider}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      integrations: {
+                        ...settings.integrations,
+                        thirdParty: {
+                          ...settings.integrations.thirdParty,
+                          posSystem: {
+                            ...settings.integrations.thirdParty.posSystem,
+                            provider: e.target.value
+                          }
+                        }
+                      }
+                    })}
+                    placeholder="Oracle Micros, Toast, Square, etc."
+                    disabled={!settings.integrations.thirdParty.posSystem.enabled}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="accounting-system">Accounting System</Label>
-                <Input
-                  id="accounting-system"
-                  value={settings.integrations.accountingSystem || ""}
-                  onChange={(e) => handleIntegrationsChange("accountingSystem", e.target.value)}
-                  placeholder="QuickBooks, Xero, etc."
-                />
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={settings.integrations.thirdParty.accounting.enabled}
+                    onCheckedChange={(checked) => setSettings({
+                      ...settings,
+                      integrations: {
+                        ...settings.integrations,
+                        thirdParty: {
+                          ...settings.integrations.thirdParty,
+                          accounting: {
+                            ...settings.integrations.thirdParty.accounting,
+                            enabled: checked
+                          }
+                        }
+                      }
+                    })}
+                  />
+                  <Input
+                    id="accounting-system"
+                    value={settings.integrations.thirdParty.accounting.provider}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      integrations: {
+                        ...settings.integrations,
+                        thirdParty: {
+                          ...settings.integrations.thirdParty,
+                          accounting: {
+                            ...settings.integrations.thirdParty.accounting,
+                            provider: e.target.value
+                          }
+                        }
+                      }
+                    })}
+                    placeholder="QuickBooks, Xero, etc."
+                    disabled={!settings.integrations.thirdParty.accounting.enabled}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -520,29 +697,43 @@ export default function ApplicationSettingsPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="advanced-analytics">Advanced Analytics</Label>
+                  <Label htmlFor="maintenance-mode">Maintenance Mode</Label>
                   <p className="text-sm text-muted-foreground">
-                    Enable advanced reporting and analytics features
+                    Enable system maintenance mode
                   </p>
                 </div>
                 <Switch
-                  id="advanced-analytics"
-                  checked={settings.features.advancedAnalytics}
-                  onCheckedChange={(checked) => handleFeaturesChange("advancedAnalytics", checked)}
+                  id="maintenance-mode"
+                  checked={settings.features.maintenanceMode}
+                  onCheckedChange={(checked) => handleFeaturesChange("maintenanceMode", checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="mobile-app">Mobile Application</Label>
+                  <Label htmlFor="registration-enabled">User Registration</Label>
                   <p className="text-sm text-muted-foreground">
-                    Enable mobile app access and features
+                    Allow new user registration
                   </p>
                 </div>
                 <Switch
-                  id="mobile-app"
-                  checked={settings.features.mobileApp}
-                  onCheckedChange={(checked) => handleFeaturesChange("mobileApp", checked)}
+                  id="registration-enabled"
+                  checked={settings.features.registrationEnabled}
+                  onCheckedChange={(checked) => handleFeaturesChange("registrationEnabled", checked)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="guest-access">Guest Access</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Allow guest access to the system
+                  </p>
+                </div>
+                <Switch
+                  id="guest-access"
+                  checked={settings.features.guestAccessEnabled}
+                  onCheckedChange={(checked) => handleFeaturesChange("guestAccessEnabled", checked)}
                 />
               </div>
 
@@ -555,22 +746,8 @@ export default function ApplicationSettingsPage() {
                 </div>
                 <Switch
                   id="api-access"
-                  checked={settings.features.apiAccess}
-                  onCheckedChange={(checked) => handleFeaturesChange("apiAccess", checked)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="vendor-portal">Vendor Portal</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Enable vendor self-service portal
-                  </p>
-                </div>
-                <Switch
-                  id="vendor-portal"
-                  checked={settings.features.vendorPortal}
-                  onCheckedChange={(checked) => handleFeaturesChange("vendorPortal", checked)}
+                  checked={settings.features.apiAccessEnabled}
+                  onCheckedChange={(checked) => handleFeaturesChange("apiAccessEnabled", checked)}
                 />
               </div>
             </CardContent>
@@ -593,12 +770,12 @@ export default function ApplicationSettingsPage() {
                 </div>
                 <Switch
                   id="enable-caching"
-                  checked={settings.performance.enableCaching}
-                  onCheckedChange={(checked) => handlePerformanceChange("enableCaching", checked)}
+                  checked={settings.performance.cacheEnabled}
+                  onCheckedChange={(checked) => handlePerformanceChange("cacheEnabled", checked)}
                 />
               </div>
 
-              {settings.performance.enableCaching && (
+              {settings.performance.cacheEnabled && (
                 <div className="space-y-2">
                   <Label htmlFor="cache-ttl">Cache TTL (Seconds)</Label>
                   <Input
@@ -613,14 +790,33 @@ export default function ApplicationSettingsPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="api-rate-limit">API Rate Limit (Requests/Minute)</Label>
-                <Input
-                  id="api-rate-limit"
-                  type="number"
-                  value={settings.performance.apiRateLimit}
-                  onChange={(e) =>
-                    handlePerformanceChange("apiRateLimit", parseInt(e.target.value))
-                  }
+                <Label htmlFor="session-storage">Session Storage</Label>
+                <Select
+                  value={settings.performance.sessionStorage}
+                  onValueChange={(value) => handlePerformanceChange("sessionStorage", value)}
+                >
+                  <SelectTrigger id="session-storage">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="memory">Memory</SelectItem>
+                    <SelectItem value="redis">Redis</SelectItem>
+                    <SelectItem value="database">Database</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="compression">Enable Compression</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Compress responses for better performance
+                  </p>
+                </div>
+                <Switch
+                  id="compression"
+                  checked={settings.performance.compressionEnabled}
+                  onCheckedChange={(checked) => handlePerformanceChange("compressionEnabled", checked)}
                 />
               </div>
             </CardContent>
