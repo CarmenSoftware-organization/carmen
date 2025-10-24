@@ -312,6 +312,7 @@ export const mockSecuritySettings: SecuritySettings = {
     requireNumbers: true,
     requireSpecialChars: true,
     preventReuse: 5,
+    historyCount: 5,
     expiryDays: 90,
     complexityScore: 3
   },
@@ -320,18 +321,17 @@ export const mockSecuritySettings: SecuritySettings = {
     timeout: 30, // 30 minutes
     maxConcurrentSessions: 3,
     rememberMeEnabled: true,
-    rememberMeDuration: 30 // 30 days
+    rememberMe: true,
+    rememberMeDuration: 30, // 30 days
+    absoluteTimeout: false
   },
 
   twoFactor: {
     enabled: true,
     required: false,
     requiredForRoles: ['system-admin', 'financial-manager'],
-    methods: {
-      authenticatorApp: true,
-      sms: true,
-      email: true
-    }
+    methods: ['authenticator', 'sms', 'email'],
+    gracePeriodDays: 7
   },
 
   ipAccessControl: {
@@ -344,35 +344,26 @@ export const mockSecuritySettings: SecuritySettings = {
   loginAttempts: {
     maxAttempts: 5,
     lockoutDuration: 15, // 15 minutes
-    resetAfter: 60 // 60 minutes
+    resetAfter: 60, // 60 minutes
+    notifyAdmin: true
   },
 
   securityQuestions: {
     enabled: true,
     required: false,
-    minQuestions: 3
+    minRequired: 3
   },
 
   auditLogging: {
     enabled: true,
-    events: [
-      'user-login',
-      'user-logout',
-      'password-change',
-      'role-change',
-      'permission-change',
-      'sensitive-data-access',
-      'settings-change',
-      'financial-transaction',
-      'document-approval',
-      'security-alert'
-    ],
+    events: ['login', 'logout', 'dataAccess', 'dataModification', 'settingsChange'],
     retentionDays: 365 // 1 year
   },
 
   dataEncryption: {
     atRest: true,
-    inTransit: true
+    inTransit: true,
+    algorithm: 'AES-256'
   },
 
   updatedAt: new Date(),

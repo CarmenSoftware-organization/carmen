@@ -116,7 +116,7 @@ export default function CampaignsPage() {
   }
 
   const getTemplateName = (templateId: string) => {
-    const template = mockTemplates.find(t => t.id === templateId)
+    const template = mockCampaignTemplates.find((t: any) => t.id === templateId)
     return template?.name || 'Unknown Template'
   }
 

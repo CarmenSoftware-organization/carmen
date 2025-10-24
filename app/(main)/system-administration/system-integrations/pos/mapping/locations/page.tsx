@@ -95,29 +95,32 @@ export default function LocationMappingPage() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
         if (
-          !location.locationCode.toLowerCase().includes(query) &&
+          !location.posLocationCode?.toLowerCase().includes(query) &&
           !location.posLocationName.toLowerCase().includes(query) &&
-          !location.mappedName.toLowerCase().includes(query)
+          !location.carmenLocationName.toLowerCase().includes(query)
         ) {
           return false
         }
       }
 
-      // Apply status filters
+      // Apply status filters - using isActive instead of status
       const statusFilters = appliedFilters
         .filter(f => f.groupId === "status")
         .map(f => f.value)
-      
-      if (statusFilters.length > 0 && !statusFilters.includes(location.status)) {
-        return false
+
+      if (statusFilters.length > 0) {
+        const statusValue = location.isActive ? "active" : "inactive"
+        if (!statusFilters.includes(statusValue)) {
+          return false
+        }
       }
 
-      // Apply POS type filters
+      // Apply POS type filters - using carmenLocationType
       const posTypeFilters = appliedFilters
         .filter(f => f.groupId === "posType")
         .map(f => f.value)
-      
-      if (posTypeFilters.length > 0 && !posTypeFilters.includes(location.posType)) {
+
+      if (posTypeFilters.length > 0 && !posTypeFilters.includes(location.carmenLocationType)) {
         return false
       }
 
@@ -128,10 +131,10 @@ export default function LocationMappingPage() {
   // Define columns
   const columns: ColumnDef<LocationMapping>[] = [
     {
-      accessorKey: "locationCode",
+      accessorKey: "posLocationCode",
       header: "Location Code",
       cell: ({ row }) => (
-        <div className="font-medium">{row.original.locationCode}</div>
+        <div className="font-medium">{row.original.posLocationCode || row.original.posLocationId}</div>
       ),
     },
     {
@@ -140,20 +143,20 @@ export default function LocationMappingPage() {
       cell: ({ row }) => <div>{row.original.posLocationName}</div>,
     },
     {
-      accessorKey: "mappedName",
+      accessorKey: "carmenLocationName",
       header: "Mapped Name",
-      cell: ({ row }) => <div>{row.original.mappedName}</div>,
+      cell: ({ row }) => <div>{row.original.carmenLocationName}</div>,
     },
     {
-      accessorKey: "posType",
+      accessorKey: "carmenLocationType",
       header: "POS Type",
-      cell: ({ row }) => <div>{row.original.posType}</div>,
+      cell: ({ row }) => <div>{row.original.carmenLocationType}</div>,
     },
     {
-      accessorKey: "status",
+      accessorKey: "isActive",
       header: "Status",
       cell: ({ row }) => (
-        <StatusBadge status={row.original.status} />
+        <StatusBadge status={row.original.isActive ? "active" : "inactive"} />
       ),
     },
     {
@@ -187,7 +190,7 @@ export default function LocationMappingPage() {
 
   // Get row class based on status
   const getRowClassName = (location: LocationMapping) => {
-    if (location.status === "error") {
+    if (!location.isActive || !location.syncEnabled) {
       return "bg-red-50 dark:bg-red-900/10"
     }
     return ""

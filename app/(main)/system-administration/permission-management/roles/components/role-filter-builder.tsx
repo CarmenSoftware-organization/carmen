@@ -22,7 +22,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Filter, Plus, X, Settings2 } from 'lucide-react'
 import { FilterType, FilterOperator } from '@/lib/utils/filter-storage'
-import { Role } from '@/lib/types/permissions'
+import { Role } from '@/lib/types'
 
 type RoleFilter = FilterType<Role> & { id: string }
 

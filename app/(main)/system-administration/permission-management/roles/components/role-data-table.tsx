@@ -48,7 +48,7 @@ import { Badge } from '@/components/ui/badge'
 import { RoleAdvancedFilter } from './role-filter-builder'
 import { FilterType } from '@/lib/utils/filter-storage'
 import { RoleQuickFilters, QuickFilterOption } from './role-quick-filters'
-import { Role } from '@/lib/types/permissions'
+import { Role } from '@/lib/types'
 
 type RoleFilter = FilterType<Role> & { id: string }
 

@@ -21,6 +21,31 @@ import { UnitEditDrawer } from "../components/unit-edit-drawer"
 import { DeleteConfirmationDialog } from "../components/delete-confirmation-dialog"
 import { MappingHistoryDrawer } from "../components/mapping-history-drawer"
 
+// Type adapter for UnitEditDrawer compatibility
+type DrawerUnitMapping = {
+  id: string
+  posUnitId: string
+  posUnitName: string
+  carmenUnitId: string
+  carmenUnitName: string
+  conversionRate: number
+  unitType: string
+  baseUnit: string
+  isActive: boolean
+  mappedBy: {
+    id: string
+    name: string
+  }
+  mappedAt: string
+}
+
+// Type adapter for DeleteConfirmationDialog compatibility
+type BaseMapping = {
+  id: string
+  posUnitName?: string
+  isActive: boolean
+}
+
 export default function UnitMappingPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([])
@@ -28,6 +53,37 @@ export default function UnitMappingPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<UnitMapping | null>(null)
+
+  // Convert UnitMapping to DrawerUnitMapping for the drawer component
+  const toDrawerMapping = (unit: UnitMapping | null): DrawerUnitMapping | null => {
+    if (!unit) return null
+    return {
+      id: unit.id,
+      posUnitId: unit.unitCode,
+      posUnitName: unit.unitName,
+      carmenUnitId: unit.id,
+      carmenUnitName: unit.unitName,
+      conversionRate: unit.conversionRate,
+      unitType: unit.unitType,
+      baseUnit: unit.baseUnit,
+      isActive: unit.status === "active",
+      mappedBy: {
+        id: "current-user",
+        name: "Current User"
+      },
+      mappedAt: unit.updatedAt.toISOString()
+    }
+  }
+
+  // Convert UnitMapping to BaseMapping for the delete dialog component
+  const toBaseMapping = (unit: UnitMapping | null): BaseMapping | null => {
+    if (!unit) return null
+    return {
+      id: unit.id,
+      posUnitName: unit.unitName,
+      isActive: unit.status === "active"
+    }
+  }
   
   // Setup filter groups
   const filterGroups: FilterGroup[] = [
@@ -86,9 +142,10 @@ export default function UnitMappingPage() {
   }
 
   // Handle save mapping
-  const handleSaveMapping = (updatedMapping: Partial<UnitMapping>) => {
+  const handleSaveMapping = (updatedMapping: Partial<DrawerUnitMapping>) => {
     console.log("Saving updated mapping:", updatedMapping)
     // TODO: Implement actual save logic with API call
+    // Convert back from DrawerUnitMapping to UnitMapping if needed
   }
 
   // Handle delete mapping
@@ -251,14 +308,14 @@ export default function UnitMappingPage() {
       <UnitEditDrawer
         open={editDrawerOpen}
         onOpenChange={setEditDrawerOpen}
-        mapping={selectedUnit}
+        mapping={toDrawerMapping(selectedUnit)}
         onSave={handleSaveMapping}
       />
 
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        mapping={selectedUnit}
+        mapping={toBaseMapping(selectedUnit)}
         mappingType="unit"
         onConfirm={handleDeleteMapping}
       />

@@ -269,7 +269,7 @@ export function ModernVendorList({
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span className="truncate">
-                {vendor.addresses[0].city}, {vendor.addresses[0].country}
+                {vendor.addresses[0].addressLine}
               </span>
             </div>
           )}
@@ -313,9 +313,8 @@ export function ModernVendorList({
       </TableCell>
       <TableCell>
         {vendor.addresses?.[0] && (
-          <div className="text-sm">
-            <div>{vendor.addresses[0].city}</div>
-            <div className="text-muted-foreground">{vendor.addresses[0].country}</div>
+          <div className="text-sm truncate max-w-[200px]">
+            {vendor.addresses[0].addressLine}
           </div>
         )}
       </TableCell>

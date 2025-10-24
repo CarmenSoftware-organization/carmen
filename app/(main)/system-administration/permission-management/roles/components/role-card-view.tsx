@@ -28,7 +28,7 @@ import {
   UserPlus,
   Lock
 } from "lucide-react"
-import { Role } from '@/lib/types/permissions'
+import { Role } from '@/lib/types'
 
 interface RoleCardViewProps {
   data: Role[]

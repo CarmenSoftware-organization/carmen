@@ -350,12 +350,12 @@ export function TransactionDetailDrawer({
                     <div key={idx} className="border-l-2 border-blue-500 pl-3 py-2">
                       <div className="flex items-center gap-2 mb-1">
                         <User className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm font-medium">{note.author.name}</span>
+                        <span className="text-sm font-medium">{note.user}</span>
                         <span className="text-xs text-muted-foreground">
-                          {formatDate(note.createdAt)}
+                          {formatDate(note.timestamp)}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">{note.note}</p>
+                      <p className="text-sm text-muted-foreground">{note.comment}</p>
                     </div>
                   ))}
                 </div>

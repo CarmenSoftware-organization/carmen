@@ -14,14 +14,20 @@ const statusIcons = {
   sent: CheckCircle,
   failed: XCircle,
   pending: Clock,
-  retrying: AlertCircle
+  retrying: AlertCircle,
+  bounced: XCircle,
+  opened: CheckCircle,
+  clicked: CheckCircle
 };
 
 const statusColors = {
   sent: "default",
   failed: "destructive",
   pending: "secondary",
-  retrying: "outline"
+  retrying: "outline",
+  bounced: "destructive",
+  opened: "default",
+  clicked: "default"
 } as const;
 
 export function NotificationHistoryTab() {

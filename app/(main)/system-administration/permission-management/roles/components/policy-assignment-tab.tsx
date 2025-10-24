@@ -511,7 +511,7 @@ export function PolicyAssignmentTab({ role }: PolicyAssignmentTabProps) {
                     {getPolicyTypeIcon(policy.name)}
                     <div className="flex-1">
                       <span className="text-sm font-medium">{policy.name}</span>
-                      <div className="text-xs text-muted-foreground">{policy.permissions?.length || 0} permissions</div>
+                      <div className="text-xs text-muted-foreground">{policy.rules?.length || 0} rules</div>
                     </div>
                   </div>
                 ) : null;
@@ -556,7 +556,7 @@ export function PolicyAssignmentTab({ role }: PolicyAssignmentTabProps) {
                     {getPolicyTypeIcon(policy.name)}
                     <div className="flex-1">
                       <span className="text-sm font-medium">{policy.name}</span>
-                      <div className="text-xs text-muted-foreground">{policy.permissions?.length || 0} permissions</div>
+                      <div className="text-xs text-muted-foreground">{policy.rules?.length || 0} rules</div>
                     </div>
                   </div>
                 ) : null;
@@ -564,8 +564,8 @@ export function PolicyAssignmentTab({ role }: PolicyAssignmentTabProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setIsAddDialogOpen(false)}
               disabled={isProcessing}
             >

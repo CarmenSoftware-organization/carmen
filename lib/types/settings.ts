@@ -189,35 +189,39 @@ export interface PasswordPolicy {
   requireLowercase: boolean;
   requireNumbers: boolean;
   requireSpecialChars: boolean;
-  preventReuse: number; // Number of previous passwords to check
+  preventReuse?: number; // Number of previous passwords to check
+  historyCount?: number; // Number of previous passwords to prevent reuse
   expiryDays: number; // 0 = never expires
-  complexityScore: number; // Minimum password strength score (0-4)
+  complexityScore?: number; // Minimum password strength score (0-4)
 }
 
 export interface SessionSettings {
   timeout: number; // Minutes of inactivity before logout
   maxConcurrentSessions: number; // Max simultaneous sessions per user
-  rememberMeEnabled: boolean;
-  rememberMeDuration: number; // Days
+  rememberMeEnabled?: boolean; // Legacy field
+  rememberMe?: boolean; // Allow "Remember Me" option
+  rememberMeDuration?: number; // Days
+  absoluteTimeout?: boolean; // Force logout after maximum session duration
 }
+
+export type TwoFactorMethod = 'authenticator' | 'sms' | 'email';
 
 export interface TwoFactorSettings {
   enabled: boolean;
   required: boolean; // Mandatory for all users
-  requiredForRoles: string[]; // Role IDs that require 2FA
-  methods: {
-    authenticatorApp: boolean;
-    sms: boolean;
-    email: boolean;
-  };
+  requiredForRoles?: string[]; // Role IDs that require 2FA
+  methods: TwoFactorMethod[];
+  gracePeriodDays?: number; // Grace period before 2FA becomes mandatory
 }
 
 export interface IPAccessControl {
   enabled: boolean;
   whitelist: string[]; // IP addresses or CIDR ranges
-  blacklist: string[]; // IP addresses or CIDR ranges
-  allowVPN: boolean;
+  blacklist?: string[]; // IP addresses or CIDR ranges
+  allowVPN?: boolean;
 }
+
+export type AuditEventType = 'login' | 'logout' | 'dataAccess' | 'dataModification' | 'settingsChange';
 
 export interface SecuritySettings {
   id: string;
@@ -231,25 +235,27 @@ export interface SecuritySettings {
   loginAttempts: {
     maxAttempts: number;
     lockoutDuration: number; // Minutes
-    resetAfter: number; // Minutes
+    resetAfter?: number; // Minutes
+    notifyAdmin?: boolean; // Notify admin on lockout
   };
 
   securityQuestions: {
     enabled: boolean;
-    required: boolean;
-    minQuestions: number;
+    required?: boolean;
+    minRequired?: number; // Minimum questions required
   };
 
   // Audit & Compliance
   auditLogging: {
     enabled: boolean;
-    events: string[]; // Event types to log
+    events: AuditEventType[]; // Event types to log
     retentionDays: number;
   };
 
   dataEncryption: {
     atRest: boolean;
     inTransit: boolean;
+    algorithm?: string; // Encryption algorithm
   };
 
   updatedAt: Date;

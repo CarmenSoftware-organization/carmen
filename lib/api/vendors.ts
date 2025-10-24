@@ -77,7 +77,7 @@ export interface CreateVendorRequest {
   createdBy: string
 }
 
-export interface UpdateVendorRequest extends Partial<CreateVendorRequest> {
+export interface UpdateVendorRequest extends Partial<Omit<Vendor, 'id' | 'addresses' | 'contacts' | 'certifications' | 'bankAccounts'>> {
   id: string
 }
 

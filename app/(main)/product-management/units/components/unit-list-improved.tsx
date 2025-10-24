@@ -38,19 +38,9 @@ import {
   Grid,
 } from "lucide-react"
 
-// Import mock data
+// Import mock data and types
 import { mockUnits } from "../data/mock-units"
-
-interface Unit {
-  id: string
-  code: string
-  name: string
-  description?: string
-  type: 'inventory' | 'order' | 'recipe'
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { Unit } from "./unit-list"
 
 export function UnitListImproved() {
   const router = useRouter()
@@ -126,9 +116,9 @@ export function UnitListImproved() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="inventory">Inventory</SelectItem>
-              <SelectItem value="order">Order</SelectItem>
-              <SelectItem value="recipe">Recipe</SelectItem>
+              <SelectItem value="INVENTORY">Inventory</SelectItem>
+              <SelectItem value="ORDER">Order</SelectItem>
+              <SelectItem value="RECIPE">Recipe</SelectItem>
             </SelectContent>
           </Select>
           

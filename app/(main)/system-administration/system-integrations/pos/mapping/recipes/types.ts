@@ -20,6 +20,22 @@ export interface RecipeMapping {
   lastSyncStatus?: StatusType
   createdAt: Date
   updatedAt: Date
+  // Additional properties for component compatibility
+  posItemName?: string
+  posItemId?: string
+  posItemCategory?: string
+  posUnitName?: string
+  posLocationName?: string
+  isActive: boolean
+  portionSize?: number
+  unit?: string
+  recipeId?: string
+  recipeCategory?: string
+  mappedBy?: {
+    id: string
+    name: string
+  }
+  mappedAt?: string
 }
 
 export interface RecipeMappingFormData {

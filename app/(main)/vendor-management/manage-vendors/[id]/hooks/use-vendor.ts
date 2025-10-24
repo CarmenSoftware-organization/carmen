@@ -41,11 +41,13 @@ export function useVendor(id: string) {
     if (!vendorData || !vendor) return
 
     try {
+      // Extract id from vendorData and pass the rest
+      const { id, ...vendorUpdates } = vendorData
       await updateVendorMutation.mutateAsync({
         id: vendor.id,
-        ...vendorData
+        ...vendorUpdates
       })
-      
+
       setIsEditing(false)
       // Refresh data to get latest from server
       refetch()
@@ -86,7 +88,7 @@ export function useVendor(id: string) {
     isLoading: isLoading || isLoadingMutation,
     error: error?.message,
     isEditing,
-    isDeleting,
+    isDeleting: isDeleting || deleteVendorMutation.isPending,
     handleEdit,
     handleCancel,
     handleSave,
@@ -95,7 +97,6 @@ export function useVendor(id: string) {
     setIsDeleting,
     refetch,
     // Additional state for mutations
-    isSaving: updateVendorMutation.isPending,
-    isDeleting: isDeleting || deleteVendorMutation.isPending
+    isSaving: updateVendorMutation.isPending
   }
 } 

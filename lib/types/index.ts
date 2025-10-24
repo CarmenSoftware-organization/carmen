@@ -111,7 +111,20 @@ export type {
   DateFormat,
   TimeFormat,
   NumberFormat,
-  FirstDayOfWeek
+  FirstDayOfWeek,
+  SecuritySettings,
+  PasswordPolicy,
+  SessionSettings,
+  TwoFactorSettings,
+  TwoFactorMethod,
+  IPAccessControl,
+  AuditEventType,
+  CompanySettings,
+  EmailConfiguration,
+  BackupSettings,
+  DataRetentionSettings,
+  IntegrationSettings,
+  ApplicationSettings
 } from './settings'
 
 // =============================================================================

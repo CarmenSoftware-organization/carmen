@@ -16,6 +16,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:00:00"),
     updatedAt: new Date("2023-11-20T15:45:00"),
+    isActive: true,
   },
   {
     id: "recipe-002",
@@ -32,6 +33,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:05:00"),
     updatedAt: new Date("2023-11-20T15:50:00"),
+    isActive: true,
   },
   {
     id: "recipe-003",
@@ -48,6 +50,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:10:00"),
     updatedAt: new Date("2023-11-20T15:55:00"),
+    isActive: true,
   },
   {
     id: "recipe-004",
@@ -64,6 +67,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:15:00"),
     updatedAt: new Date("2023-11-20T16:00:00"),
+    isActive: true,
   },
   // Enhanced fractional sales mappings - Chocolate Pound Cake variants
   {
@@ -85,6 +89,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:20:00"),
     updatedAt: new Date("2023-11-20T16:05:00"),
+    isActive: true,
   },
   {
     id: "recipe-005-quarter",
@@ -105,6 +110,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:22:00"),
     updatedAt: new Date("2023-11-20T16:07:00"),
+    isActive: true,
   },
   {
     id: "recipe-005-half",
@@ -125,6 +131,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:24:00"),
     updatedAt: new Date("2023-11-20T16:09:00"),
+    isActive: true,
   },
   {
     id: "recipe-005-whole",
@@ -145,6 +152,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:26:00"),
     updatedAt: new Date("2023-11-20T16:11:00"),
+    isActive: true,
   },
   {
     id: "recipe-006",
@@ -159,6 +167,7 @@ export const recipeMappings: RecipeMapping[] = [
     status: "unmapped",
     createdAt: new Date("2023-01-15T10:25:00"),
     updatedAt: new Date("2023-01-15T10:25:00"),
+    isActive: true,
   },
   {
     id: "recipe-007",
@@ -175,6 +184,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "error",
     createdAt: new Date("2023-01-15T10:30:00"),
     updatedAt: new Date("2023-11-15T09:35:00"),
+    isActive: false,
   },
   {
     id: "recipe-008",
@@ -191,6 +201,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:35:00"),
     updatedAt: new Date("2023-11-20T16:10:00"),
+    isActive: true,
   },
   // Enhanced fractional sales mappings - Margherita Pizza variants
   {
@@ -212,6 +223,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:40:00"),
     updatedAt: new Date("2023-11-20T16:15:00"),
+    isActive: true,
   },
   {
     id: "recipe-009-half",
@@ -232,6 +244,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:42:00"),
     updatedAt: new Date("2023-11-20T16:17:00"),
+    isActive: true,
   },
   {
     id: "recipe-009-whole",
@@ -252,6 +265,7 @@ export const recipeMappings: RecipeMapping[] = [
     lastSyncStatus: "active",
     createdAt: new Date("2023-01-15T10:44:00"),
     updatedAt: new Date("2023-11-20T16:19:00"),
+    isActive: true,
   },
 ]
 

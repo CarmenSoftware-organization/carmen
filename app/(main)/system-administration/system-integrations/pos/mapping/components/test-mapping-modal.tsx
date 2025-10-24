@@ -25,18 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-interface RecipeMapping {
-  id: string
-  posItemCode: string
-  posDescription: string
-  recipeCode: string
-  recipeName: string
-  portionSize: number
-  unit: string
-  conversionRate: number
-  isActive: boolean
-}
+import { RecipeMapping } from "../recipes/types"
 
 interface TestResult {
   status: "success" | "warning" | "error"

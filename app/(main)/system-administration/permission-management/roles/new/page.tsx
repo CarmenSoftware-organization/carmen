@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/form';
 
 import { useRoleStore } from '@/lib/stores/role-store';
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 
 const roleSchema = z.object({
   name: z.string().min(2, {
@@ -67,6 +67,7 @@ export default function NewRolePage() {
       
       const newRole = {
         ...data,
+        permissions: [],
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

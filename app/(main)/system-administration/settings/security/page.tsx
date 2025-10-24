@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SecuritySettings } from "@/lib/types";
+import { SecuritySettings, TwoFactorMethod, AuditEventType } from "@/lib/types";
 import { mockSecuritySettings } from "@/lib/mock-data";
 import { Shield, Lock, Key, AlertTriangle, ArrowLeft, Save, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -350,7 +350,7 @@ export default function SecuritySettingsPage() {
                             onChange={(e) => {
                               const methods = e.target.checked
                                 ? [...settings.twoFactor.methods, method]
-                                : settings.twoFactor.methods.filter((m) => m !== method);
+                                : settings.twoFactor.methods.filter((m: TwoFactorMethod) => m !== method);
                               handleTwoFactorChange("methods", methods);
                             }}
                             className="rounded"
@@ -621,7 +621,7 @@ export default function SecuritySettingsPage() {
                               onChange={(e) => {
                                 const events = e.target.checked
                                   ? [...settings.auditLogging.events, event]
-                                  : settings.auditLogging.events.filter((ev) => ev !== event);
+                                  : settings.auditLogging.events.filter((ev: AuditEventType) => ev !== event);
                                 handleAuditLoggingChange("events", events);
                               }}
                               className="rounded"

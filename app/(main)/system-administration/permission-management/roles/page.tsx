@@ -12,7 +12,7 @@ import { createRoleColumns } from './components/role-columns';
 import { RoleForm } from '@/components/permissions/role-manager/role-form';
 import { mockRoles } from '@/lib/mock-data/permission-index';
 import { useRoleStore } from '@/lib/stores/role-store';
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 
 type ViewMode = 'list' | 'create' | 'edit' | 'view';
 
@@ -30,7 +30,7 @@ export default function RoleManagementPage() {
   };
 
   const handleEditRole = (roleOrId: string | Role) => {
-    let role: Role | null = null;
+    let role: Role | undefined = undefined;
     if (typeof roleOrId === 'string') {
       role = getRole(roleOrId);
     } else {
@@ -99,7 +99,7 @@ export default function RoleManagementPage() {
     onDelete: (role: Role) => console.log('Delete role:', role),
     onDuplicate: handleDuplicateRole,
     onAssignUsers: handleAssignUsers,
-  });
+  }) as any;
 
   const getPageTitle = () => {
     switch (currentView) {

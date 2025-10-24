@@ -14,7 +14,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Role } from '@/lib/types/permissions'
+import { Role } from '@/lib/types'
 import { Crown, Shield, Briefcase, User } from "lucide-react"
 
 interface RoleColumnsProps {

@@ -42,7 +42,7 @@ import {
 
 import { useRoleStore } from '@/lib/stores/role-store';
 import { mockDepartments, mockLocations } from '@/lib/mock-data/permission-roles';
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 
 // Form schema for role creation/editing
 const roleFormSchema = z.object({

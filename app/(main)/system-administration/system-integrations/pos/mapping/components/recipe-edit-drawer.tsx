@@ -21,24 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-
-interface RecipeMapping {
-  id: string
-  posItemId: string
-  posItemName: string
-  posItemCategory: string
-  recipeId: string
-  recipeName: string
-  recipeCategory: string
-  portionSize: number
-  unit: string
-  isActive: boolean
-  mappedBy: {
-    id: string
-    name: string
-  }
-  mappedAt: string
-}
+import { RecipeMapping } from "../recipes/types"
 
 interface Recipe {
   id: string
@@ -98,8 +81,8 @@ export function RecipeEditDrawer({
     if (mapping) {
       const recipe = mockRecipes.find(r => r.id === mapping.recipeId)
       setSelectedRecipe(recipe || null)
-      setPortionSize(mapping.portionSize.toString())
-      setUnit(mapping.unit)
+      setPortionSize(mapping.portionSize?.toString() || "1")
+      setUnit(mapping.unit || mapping.posUnit || "")
       setIsActive(mapping.isActive)
     }
   }, [mapping])

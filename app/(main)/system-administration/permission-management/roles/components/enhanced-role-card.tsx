@@ -35,7 +35,7 @@ import {
   AlertCircle,
   CheckCircle2
 } from "lucide-react"
-import { Role } from '@/lib/types/permissions'
+import { Role } from '@/lib/types'
 
 interface EnhancedRoleCardProps {
   role: Role
