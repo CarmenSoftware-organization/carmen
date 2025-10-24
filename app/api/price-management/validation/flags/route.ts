@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { automatedQualityService } from '@/lib/services/automated-quality-service';
 
+// Mark this route as dynamic since it uses searchParams
+export const dynamic = 'force-dynamic';
+
 // GET /api/price-management/validation/flags - Get quality flags
 export async function GET(request: NextRequest) {
   try {

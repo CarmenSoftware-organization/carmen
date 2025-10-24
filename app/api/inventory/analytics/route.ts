@@ -1,6 +1,6 @@
 /**
  * Inventory Analytics API
- * 
+ *
  * API endpoints for inventory analytics, forecasting, trend analysis,
  * and performance reporting with comprehensive business intelligence features.
  */
@@ -10,6 +10,9 @@ import { inventoryAnalyticsService } from '@/lib/services/inventory/inventory-an
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
+
+// Mark this route as dynamic since it uses authentication
+export const dynamic = 'force-dynamic'
 
 // Validation schemas
 const forecastSchema = z.object({
