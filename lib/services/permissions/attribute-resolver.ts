@@ -3,11 +3,9 @@
  * Responsible for retrieving and resolving attributes for subjects, resources, actions, and environments
  */
 
-import { PrismaClient } from '@prisma/client'
 import { SubjectAttributes, ResourceAttributes, EnvironmentAttributes } from '@/lib/types/permissions'
 import { User, Role, Department, Location } from '@/lib/types'
-
-const prisma = new PrismaClient()
+import { mockUsers, mockDepartments, mockLocations } from '@/lib/mock-data'
 
 export interface AttributeRequest {
   subjectId?: string
@@ -98,49 +96,41 @@ export class AttributeResolver {
     }
 
     try {
-      // Fetch user from database
-      const user = await prisma.user.findUnique({
-        where: { id: subjectId },
-        include: {
-          roleAssignments: {
-            include: {
-              role: {
-                include: {
-                  parent: true,
-                  children: true
-                }
-              }
-            },
-            where: { isActive: true }
-          }
-        }
-      })
+      // Fetch user from mock data
+      const user = mockUsers.find(u => u.id === subjectId)
 
       if (!user) {
         throw new Error(`Subject ${subjectId} not found`)
       }
 
+      // Mock role assignments - using user's role property
+      const roleAssignments = user.role ? [{
+        role: user.role,
+        assignedAt: new Date(),
+        isActive: true
+      }] : []
+
       // Get role hierarchy
-      const roleHierarchy = this.buildRoleHierarchy(user.roleAssignments.map((r: any) => r.role))
+      const roleHierarchy = this.buildRoleHierarchy(roleAssignments.map((r: any) => r.role))
 
       // Build comprehensive subject attributes
       const attributes = {
         id: user.id,
         name: user.name,
         email: user.email,
-        userData: user.userData,
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        userData: {},
+        isActive: true, // Mock users are always active
+        createdAt: new Date(),
+        updatedAt: new Date(),
 
         // Role information
-        directRoles: user.roleAssignments.map((r: any) => ({
+        directRoles: roleAssignments.map((r: any) => ({
           id: r.role.id,
           name: r.role.name,
-          displayName: r.role.displayName,
-          level: r.role.level,
-          path: r.role.path,
-          priority: r.role.priority,
+          displayName: r.role.name,
+          level: 1,
+          path: r.role.name,
+          priority: 500,
           assignedAt: r.assignedAt
         })),
         
@@ -150,13 +140,13 @@ export class AttributeResolver {
         maxRoleLevel: roleHierarchy.maxLevel,
         effectivePermissions: roleHierarchy.effectivePermissions,
         
-        // Dynamic attributes from userData
-        ...this.extractDynamicAttributes(user.userData),
+        // Dynamic attributes from userData (mock - none for now)
+        ...this.extractDynamicAttributes({}),
 
         // Computed attributes
-        accountAge: user.createdAt ? Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0,
+        accountAge: 0,
         hasHighPrivilege: roleHierarchy.maxLevel <= 2, // Assuming lower levels = higher privilege
-        roleCount: user.roleAssignments.length
+        roleCount: roleAssignments.length
       }
 
       // Cache the result
@@ -186,13 +176,15 @@ export class AttributeResolver {
     }
 
     try {
-      // Get resource definition
-      const resourceDefinition = await prisma.resourceDefinition.findUnique({
-        where: { resourceType: resourceType }
-      })
-
-      if (!resourceDefinition) {
-        throw new Error(`Resource type ${resourceType} not found`)
+      // Mock resource definition - no database query needed
+      const resourceDefinition = {
+        resourceType,
+        displayName: resourceType.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        description: `Resource type for ${resourceType}`,
+        category: 'general',
+        definition: {},
+        isActive: true,
+        version: '1.0'
       }
 
       // Base resource attributes
@@ -205,10 +197,10 @@ export class AttributeResolver {
         definition: resourceDefinition.definition,
         isActive: resourceDefinition.isActive,
         version: resourceDefinition.version,
-        
+
         // Dynamic attributes from definition
         ...this.extractDynamicAttributes(resourceDefinition.definition),
-        
+
         // Resource-specific attributes based on type
         ...await this.getResourceSpecificAttributes(resourceType, resourceId)
       }
@@ -284,10 +276,8 @@ export class AttributeResolver {
     }
 
     try {
-      // Get environment definition if available
-      const environmentDefinitions = await prisma.environmentDefinition.findMany({
-        where: { isActive: true }
-      })
+      // Mock environment definitions - no database query needed
+      const environmentDefinitions: any[] = []
 
       // Build environment attributes
       const attributes = {
@@ -315,10 +305,10 @@ export class AttributeResolver {
           description: env.description,
           definition: env.definition
         })),
-        
+
         // Dynamic environment attributes
         ...context,
-        
+
         // Computed environment attributes
         riskScore: this.calculateEnvironmentRiskScore(context),
         trustLevel: this.calculateEnvironmentTrustLevel(context)

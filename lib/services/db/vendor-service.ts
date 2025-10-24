@@ -6,7 +6,7 @@
  */
 
 import { prisma } from '@/lib/db'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@/lib/db/prisma'
 import { VendorMetrics, type VendorPerformanceInput, type VendorOrderData } from '../calculations/vendor-metrics'
 import type { Vendor, VendorAddress, VendorContact, VendorPerformanceMetrics, VendorBusinessType, VendorStatus } from '@/lib/types/vendor'
 import type { Money, AuditTimestamp } from '@/lib/types/common'

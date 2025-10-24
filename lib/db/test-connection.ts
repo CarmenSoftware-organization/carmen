@@ -51,52 +51,39 @@ async function testConnection() {
       console.error('❌ Transaction test failed:', error instanceof Error ? error.message : error)
     }
     
-    // Test 4: Circuit breaker status
+    // Test 4: Circuit breaker status (mock)
     console.log('\n4. Testing circuit breaker status...')
     const cbMetrics = databaseCircuitBreaker.getMetrics()
-    console.log('✅ Circuit breaker status:', {
-      state: cbMetrics.state,
-      failures: cbMetrics.failures,
-      successes: cbMetrics.successes,
-      requests: cbMetrics.requests
-    })
-    
+    console.log('✅ Circuit breaker status:', cbMetrics || 'N/A (using JSON storage)')
+
     // Test 5: Health check
     console.log('\n5. Testing health monitoring...')
     const isHealthy = await reliablePrisma.healthCheck()
     console.log('✅ Health check result:', isHealthy ? 'HEALTHY' : 'UNHEALTHY')
-    
+
     // Test 6: Connection metrics
     console.log('\n6. Testing connection metrics...')
     const metrics = reliablePrisma.getMetrics()
     console.log('✅ Connection metrics:', {
-      circuitBreakerState: metrics.circuitBreaker.state,
+      mode: 'JSON Storage',
+      circuitBreaker: metrics.circuitBreaker || 'N/A',
       activeOperations: metrics.activeOperations,
-      config: {
-        circuitBreakerEnabled: metrics.config.enableCircuitBreaker,
-        monitoringEnabled: metrics.config.enableMonitoring,
-        timeoutsEnabled: metrics.config.enableTimeouts
-      }
+      config: metrics.config
     })
     
     // Test 7: Monitoring system
     console.log('\n7. Testing monitoring system...')
     const monitor = getDatabaseMonitor()
     if (monitor) {
-      const healthStatus = await monitor.getHealthStatus()
-      console.log('✅ Monitoring system active:', {
-        status: healthStatus.status,
-        healthy: healthStatus.healthy,
-        timestamp: healthStatus.timestamp
-      })
+      console.log('✅ Monitoring system active')
     } else {
-      console.log('ℹ️  Monitoring system not active (this is normal in some configurations)')
+      console.log('ℹ️  Monitoring system not active (using JSON storage)')
     }
-    
+
     console.log('\n' + '='.repeat(80))
     console.log('🎉 All enhanced database tests completed successfully!')
     console.log('\n📊 Final Status Summary:')
-    console.log(`   • Circuit Breaker: ${cbMetrics.state}`)
+    console.log(`   • Storage Mode: JSON-based (no database required)`)
     console.log(`   • Health Status: ${isHealthy ? 'HEALTHY' : 'UNHEALTHY'}`)
     console.log(`   • Active Operations: ${metrics.activeOperations}`)
     console.log(`   • Monitoring: ${monitor ? 'ACTIVE' : 'INACTIVE'}`)

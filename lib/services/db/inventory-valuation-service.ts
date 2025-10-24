@@ -6,7 +6,7 @@
  */
 
 import { prisma } from '@/lib/db'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@/lib/db/prisma'
 import { InventoryCalculations } from '../calculations/inventory-calculations'
 import { CachedInventoryCalculations } from '../cache/cached-inventory-calculations'
 import { FinancialCalculations } from '../calculations/financial-calculations'

@@ -12,7 +12,7 @@
  * - Status transitions and audit logging
  */
 
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@/lib/db/prisma'
 import {
   PurchaseRequest,
   PurchaseRequestItem,

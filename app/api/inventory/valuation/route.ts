@@ -1,6 +1,6 @@
 /**
  * Inventory Valuation API Routes
- * 
+ *
  * API endpoints for inventory valuation, ABC analysis, aging reports,
  * and comprehensive financial reporting.
  */
@@ -11,6 +11,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 import { CostingMethod } from '@/lib/types/inventory'
+
+// Mark this route as dynamic since it uses authentication
+export const dynamic = 'force-dynamic'
 
 // Validation schemas
 const valuationFiltersSchema = z.object({

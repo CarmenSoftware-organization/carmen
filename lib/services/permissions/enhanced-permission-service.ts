@@ -3,7 +3,6 @@
  * Integrates PolicyEngine, AttributeResolver, and PostgreSQL database for complete ABAC functionality
  */
 
-import { PrismaClient } from '@prisma/client'
 import { policyEngine, PolicyEngineConfig } from './policy-engine'
 import { attributeResolver, AttributeRequest } from './attribute-resolver'
 import {
@@ -14,8 +13,7 @@ import {
   AccessDecision,
   PermissionResult
 } from '@/lib/types/permissions'
-
-const prisma = new PrismaClient()
+import { mockUsers } from '@/lib/mock-data'
 
 export interface EnhancedPermissionCheckRequest {
   userId: string
@@ -203,19 +201,32 @@ export class EnhancedPermissionService {
   ): Promise<PermissionResult[]> {
     const effectivePermissions: PermissionResult[] = []
 
-    // Get all resource definitions from database
-    const resourceDefinitions = await prisma.resourceDefinition.findMany({
-      where: { isActive: true }
-    })
+    // Mock resource definitions - no database query needed
+    const resourceTypes = [
+      'purchase_request',
+      'purchase_order',
+      'goods_received_note',
+      'vendor',
+      'product',
+      'recipe',
+      'inventory_item',
+      'stock_adjustment',
+      'user',
+      'role',
+      'policy',
+      'report',
+      'dashboard',
+      'workflow'
+    ]
 
     // Check permissions for each resource type and action
-    for (const resourceDef of resourceDefinitions) {
-      const possibleActions = this.getPossibleActionsForResource(resourceDef.resourceType)
+    for (const resourceType of resourceTypes) {
+      const possibleActions = this.getPossibleActionsForResource(resourceType)
 
       for (const action of possibleActions) {
         const result = await this.checkPermission({
           userId,
-          resourceType: resourceDef.resourceType,
+          resourceType,
           action,
           context,
           options: { auditEnabled: false } // Skip audit for bulk operations
@@ -236,7 +247,7 @@ export class EnhancedPermissionService {
   }
 
   /**
-   * Get active policies from database with caching
+   * Get active policies from mock data with caching
    */
   private async getActivePolicies(): Promise<Policy[]> {
     // Check cache first
@@ -244,42 +255,8 @@ export class EnhancedPermissionService {
       return this.policyCache.policies
     }
 
-    // Fetch from database
-    const dbPolicies = await prisma.policy.findMany({
-      where: {
-        status: 'ACTIVE'
-      },
-      orderBy: { priority: 'desc' }
-    })
-
-    // Convert to Policy objects
-    const policies: Policy[] = dbPolicies.map((dbPolicy: any) => {
-      const policyData = dbPolicy.policyData || {}
-      return {
-        id: dbPolicy.id,
-        name: dbPolicy.name,
-        description: dbPolicy.description || '',
-        effect: dbPolicy.effect as any,
-        priority: dbPolicy.priority || 500,
-        enabled: dbPolicy.status === 'ACTIVE',
-
-        // Extract policy structure from JSON
-        target: (policyData.target || {
-          subjects: [],
-          resources: [],
-          actions: [],
-          environment: []
-        }) as any,
-        rules: (policyData.rules || []) as any[],
-
-        // Metadata
-        version: dbPolicy.version || '1.0',
-        createdBy: dbPolicy.createdBy || 'system',
-        updatedBy: dbPolicy.updatedBy || 'system',
-        createdAt: dbPolicy.createdAt || new Date(),
-        updatedAt: dbPolicy.updatedAt || new Date()
-      }
-    })
+    // Return empty array - policies will be managed through mock data if needed
+    const policies: Policy[] = []
 
     // Update cache
     this.policyCache = {
@@ -397,7 +374,7 @@ export class EnhancedPermissionService {
   }
 
   /**
-   * Create audit log entry
+   * Create audit log entry (mock implementation)
    */
   private async createAuditLog(data: {
     userId: string
@@ -409,31 +386,23 @@ export class EnhancedPermissionService {
     context?: any
     executionTime: number
   }): Promise<string> {
-    const auditLog = await prisma.auditLog.create({
-      data: {
-        eventType: data.decision === 'permit' ? 'ACCESS_GRANTED' : 'ACCESS_DENIED',
-        eventCategory: 'ACCESS',
-        eventData: {
-          actor: {
-            userId: data.userId
-          },
-          action: {
-            actionType: data.action,
-            resource: data.resourceType,
-            resourceId: data.resourceId
-          },
-          decision: {
-            effect: data.decision,
-            reason: data.reason,
-            executionTime: data.executionTime
-          },
-          context: data.context || {}
-        },
-        timestamp: new Date()
-      }
-    })
+    // Mock audit log - just generate a random ID
+    const auditLogId = `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-    return auditLog.id
+    // In a real implementation, this would store to database
+    // For now, just log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Audit Log:', {
+        id: auditLogId,
+        eventType: data.decision === 'permit' ? 'ACCESS_GRANTED' : 'ACCESS_DENIED',
+        userId: data.userId,
+        resource: data.resourceType,
+        action: data.action,
+        decision: data.decision
+      })
+    }
+
+    return auditLogId
   }
 
   /**
@@ -493,14 +462,10 @@ export class EnhancedPermissionService {
    * Get service statistics
    */
   async getStats() {
-    const [policyCount, auditLogCount] = await Promise.all([
-      prisma.policy.count({ where: { status: 'ACTIVE' } }),
-      prisma.auditLog.count()
-    ])
-
+    // Mock statistics - no database queries
     return {
-      activePolicies: policyCount,
-      auditLogEntries: auditLogCount,
+      activePolicies: 0,
+      auditLogEntries: 0,
       policyCached: !!this.policyCache,
       policyEngine: policyEngine.getStats(),
       attributeResolver: attributeResolver.getCacheStats()
@@ -518,14 +483,8 @@ export class EnhancedPermissionService {
     const checks: Record<string, boolean> = {}
     const details: Record<string, any> = {}
 
-    try {
-      // Test database connection
-      await prisma.$queryRaw`SELECT 1`
-      checks.database = true
-    } catch (error) {
-      checks.database = false
-      details.databaseError = error instanceof Error ? error.message : 'Unknown error'
-    }
+    // Mock database check - always healthy in mock mode
+    checks.database = true
 
     try {
       // Test policy loading

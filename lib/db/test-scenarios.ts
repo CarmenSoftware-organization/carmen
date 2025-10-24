@@ -3,7 +3,7 @@
  * Tests various failure scenarios, recovery patterns, and performance benchmarks
  */
 
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@/lib/db/prisma'
 import { 
   databaseCircuitBreaker, 
   DatabaseCircuitBreakerError, 

@@ -1,0 +1,150 @@
+[
+  {
+    "id": "product-001",
+    "productCode": "OIL-OLIVE-001",
+    "productName": "Premium Olive Oil",
+    "description": "Extra virgin olive oil from Italy",
+    "productType": "raw_material",
+    "status": "active",
+    "categoryId": "cat-oils",
+    "specifications": [],
+    "baseUnit": "bottle",
+    "alternativeUnits": [],
+    "isInventoried": true,
+    "isSerialTrackingRequired": false,
+    "isBatchTrackingRequired": false,
+    "isPurchasable": true,
+    "isSellable": true,
+    "standardCost": {
+      "amount": 8.5,
+      "currency": "USD"
+    },
+    "images": [],
+    "documents": [],
+    "relatedProducts": [],
+    "substitutes": [],
+    "accessories": [],
+    "keywords": [
+      "olive",
+      "oil",
+      "premium"
+    ],
+    "tags": [
+      "oils",
+      "cooking"
+    ],
+    "regulatoryApprovals": [],
+    "isActive": true
+  },
+  {
+    "id": "product-002",
+    "productCode": "VEG-TOM-002",
+    "productName": "Organic Tomatoes",
+    "description": "Fresh organic roma tomatoes",
+    "productType": "raw_material",
+    "status": "active",
+    "categoryId": "cat-vegetables",
+    "specifications": [],
+    "baseUnit": "kg",
+    "alternativeUnits": [],
+    "isInventoried": true,
+    "isSerialTrackingRequired": false,
+    "isBatchTrackingRequired": false,
+    "isPurchasable": true,
+    "isSellable": true,
+    "standardCost": {
+      "amount": 3.25,
+      "currency": "USD"
+    },
+    "images": [],
+    "documents": [],
+    "relatedProducts": [],
+    "substitutes": [],
+    "accessories": [],
+    "keywords": [
+      "tomatoes",
+      "organic",
+      "vegetables"
+    ],
+    "tags": [
+      "vegetables",
+      "fresh"
+    ],
+    "regulatoryApprovals": [],
+    "isActive": true
+  },
+  {
+    "id": "product-003",
+    "productCode": "DRY-FLR-003",
+    "productName": "All-Purpose Flour",
+    "description": "High-quality all-purpose flour",
+    "productType": "raw_material",
+    "status": "active",
+    "categoryId": "cat-dry-goods",
+    "specifications": [],
+    "baseUnit": "kg",
+    "alternativeUnits": [],
+    "isInventoried": true,
+    "isSerialTrackingRequired": false,
+    "isBatchTrackingRequired": false,
+    "isPurchasable": true,
+    "isSellable": true,
+    "standardCost": {
+      "amount": 2.1,
+      "currency": "USD"
+    },
+    "images": [],
+    "documents": [],
+    "relatedProducts": [],
+    "substitutes": [],
+    "accessories": [],
+    "keywords": [
+      "flour",
+      "baking",
+      "dry goods"
+    ],
+    "tags": [
+      "dry-goods",
+      "baking"
+    ],
+    "regulatoryApprovals": [],
+    "isActive": true
+  },
+  {
+    "id": "product-004",
+    "productCode": "HRB-BAS-004",
+    "productName": "Fresh Basil",
+    "description": "Fresh organic basil leaves",
+    "productType": "raw_material",
+    "status": "active",
+    "categoryId": "cat-herbs",
+    "specifications": [],
+    "baseUnit": "bunch",
+    "alternativeUnits": [],
+    "isInventoried": true,
+    "isSerialTrackingRequired": false,
+    "isBatchTrackingRequired": false,
+    "isPurchasable": true,
+    "isSellable": true,
+    "standardCost": {
+      "amount": 1.8,
+      "currency": "USD"
+    },
+    "images": [],
+    "documents": [],
+    "relatedProducts": [],
+    "substitutes": [],
+    "accessories": [],
+    "keywords": [
+      "basil",
+      "herbs",
+      "fresh"
+    ],
+    "tags": [
+      "herbs",
+      "fresh"
+    ],
+    "regulatoryApprovals": [],
+    "isActive": true
+  }
+]

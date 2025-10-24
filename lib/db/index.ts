@@ -2,19 +2,19 @@
  * Database utilities and connections
  *
  * This module provides:
- * - Prisma client singleton with connection pooling
- * - Database connection testing utilities
- * - Proper error handling and graceful shutdown
+ * - Mock Prisma client using JSON storage (no database required)
+ * - JSON-based storage layer for prototype/development
+ * - Prisma-compatible interface
  */
 
-export { default as prisma } from './prisma'
-export { testConnection } from './test-connection'
+export { default as prisma, prisma as default } from './prisma'
+export { jsonDb } from './json-storage'
 
-// Re-export commonly used Prisma types for convenience
-export type {
-  Prisma,
-  PrismaPromise,
-} from '@prisma/client'
+// Re-export from mock Prisma client
+export type { PrismaClient } from './prisma'
 
-// Export PrismaClient class from generated client
-export { PrismaClient } from '@prisma/client'
+// Mock test connection function
+export async function testConnection() {
+  console.log('📦 Using JSON-based storage (no database connection test needed)')
+  return { success: true, message: 'JSON storage ready' }
+}

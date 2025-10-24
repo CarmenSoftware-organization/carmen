@@ -1,0 +1,107 @@
+[
+  {
+    "id": "item-001",
+    "itemCode": "GR-BSM-001",
+    "itemName": "Basmati Rice",
+    "description": "Premium Long Grain Basmati Rice - 25kg bag",
+    "categoryId": "cat-grains",
+    "baseUnitId": "unit-bags",
+    "costingMethod": "FIFO",
+    "isActive": true,
+    "isSerialized": false,
+    "minimumQuantity": 10,
+    "maximumQuantity": 100,
+    "reorderPoint": 15,
+    "reorderQuantity": 30,
+    "leadTime": 5,
+    "lastPurchaseDate": "2024-08-15T00:00:00.000Z",
+    "lastPurchasePrice": {
+      "amount": 45,
+      "currency": "USD"
+    }
+  },
+  {
+    "id": "item-002",
+    "itemCode": "OIL-EV-002",
+    "itemName": "Olive Oil Extra Virgin",
+    "description": "Extra Virgin Olive Oil - 5L container",
+    "categoryId": "cat-oils",
+    "baseUnitId": "unit-bottles",
+    "costingMethod": "MOVING_AVERAGE",
+    "isActive": true,
+    "isSerialized": false,
+    "minimumQuantity": 5,
+    "maximumQuantity": 50,
+    "reorderPoint": 10,
+    "reorderQuantity": 20,
+    "leadTime": 7,
+    "lastPurchaseDate": "2024-08-10T00:00:00.000Z",
+    "lastPurchasePrice": {
+      "amount": 28.5,
+      "currency": "USD"
+    }
+  },
+  {
+    "id": "item-003",
+    "itemCode": "SP-BP-003",
+    "itemName": "Black Pepper Ground",
+    "description": "Ground Black Pepper - 1kg pack",
+    "categoryId": "cat-spices",
+    "baseUnitId": "unit-packs",
+    "costingMethod": "FIFO",
+    "isActive": true,
+    "isSerialized": false,
+    "minimumQuantity": 3,
+    "maximumQuantity": 30,
+    "reorderPoint": 8,
+    "reorderQuantity": 15,
+    "leadTime": 3,
+    "lastPurchaseDate": "2024-08-12T00:00:00.000Z",
+    "lastPurchasePrice": {
+      "amount": 15.75,
+      "currency": "USD"
+    }
+  },
+  {
+    "id": "item-004",
+    "itemCode": "ST-CH-004",
+    "itemName": "Chicken Stock Powder",
+    "description": "Professional Kitchen Chicken Stock Powder - 2.5kg tin",
+    "categoryId": "cat-stocks",
+    "baseUnitId": "unit-tins",
+    "costingMethod": "WEIGHTED_AVERAGE",
+    "isActive": true,
+    "isSerialized": false,
+    "minimumQuantity": 2,
+    "maximumQuantity": 20,
+    "reorderPoint": 5,
+    "reorderQuantity": 10,
+    "leadTime": 4,
+    "lastPurchaseDate": "2024-08-08T00:00:00.000Z",
+    "lastPurchasePrice": {
+      "amount": 22.4,
+      "currency": "USD"
+    }
+  },
+  {
+    "id": "item-005",
+    "itemCode": "PA-PEN-005",
+    "itemName": "Pasta Penne",
+    "description": "Durum Wheat Penne Pasta - 5kg bag",
+    "categoryId": "cat-pasta",
+    "baseUnitId": "unit-bags",
+    "costingMethod": "FIFO",
+    "isActive": true,
+    "isSerialized": false,
+    "minimumQuantity": 8,
+    "maximumQuantity": 50,
+    "reorderPoint": 12,
+    "reorderQuantity": 25,
+    "leadTime": 6,
+    "lastPurchaseDate": "2024-08-14T00:00:00.000Z",
+    "lastPurchasePrice": {
+      "amount": 18.9,
+      "currency": "USD"
+    }
+  }
+]

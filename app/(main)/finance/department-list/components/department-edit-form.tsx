@@ -82,9 +82,11 @@ export function DepartmentEditForm({ department, onSave, onCancel }: DepartmentE
   const availableManagers = useMemo(() => {
     return mockUsers.filter(user =>
       user.roles && user.roles.some(role =>
-        role.name.toLowerCase().includes('manager') ||
-        role.name.toLowerCase().includes('director') ||
-        role.name.toLowerCase().includes('head')
+        role && role.name && (
+          role.name.toLowerCase().includes('manager') ||
+          role.name.toLowerCase().includes('director') ||
+          role.name.toLowerCase().includes('head')
+        )
       )
     )
   }, [])

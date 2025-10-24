@@ -9,7 +9,7 @@ import jsonDb from './json-storage'
 import { mockUsers, mockVendors, mockInventoryItems, mockProducts } from '@/lib/mock-data'
 
 // Mock Prisma Client
-class MockPrismaClient {
+export class MockPrismaClient {
   // Initialize collections with mock data
   constructor() {
     // Initialize with mock data if collections don't exist
@@ -39,15 +39,15 @@ class MockPrismaClient {
     return Promise.resolve()
   }
 
-  // Mock $queryRaw method (accepts template literals with args)
-  async $queryRaw(query: any, ...args: any[]): Promise<any[]> {
-    console.log('Mock query executed')
+  // Mock $queryRaw method
+  async $queryRaw(query: any): Promise<any[]> {
+    console.log('Mock query executed:', query)
     return Promise.resolve([{ health_check: 1 }])
   }
 
-  // Mock $executeRaw method (accepts template literals with args)
-  async $executeRaw(query: any, ...args: any[]): Promise<number> {
-    console.log('Mock execute')
+  // Mock $executeRaw method
+  async $executeRaw(query: any): Promise<number> {
+    console.log('Mock execute:', query)
     return Promise.resolve(1)
   }
 
@@ -158,11 +158,8 @@ export enum CircuitState {
   HALF_OPEN = 'HALF_OPEN'
 }
 
-// Export MockPrismaClient as PrismaClient for compatibility (both type and value)
-export { MockPrismaClient as PrismaClient }
-export type { MockPrismaClient }
-
 // Type exports for compatibility
+export type PrismaClient = MockPrismaClient
 export type CircuitBreakerMetrics = any
 export type ConnectionPoolMetrics = any
 export type HealthCheckResult = any

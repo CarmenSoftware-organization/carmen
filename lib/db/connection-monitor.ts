@@ -3,7 +3,7 @@
  * Provides real-time monitoring, alerting, and health status
  */
 
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@/lib/db/prisma'
 import { databaseCircuitBreaker, CircuitState } from './circuit-breaker'
 
 export interface ConnectionPoolMetrics {

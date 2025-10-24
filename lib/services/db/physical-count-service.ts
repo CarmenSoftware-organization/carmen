@@ -6,7 +6,7 @@
  */
 
 import { prisma } from '@/lib/db'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@/lib/db/prisma'
 import { inventoryService } from './inventory-service'
 import type {
   PhysicalCount,
