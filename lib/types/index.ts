@@ -44,12 +44,10 @@ export type {
   PurchaseOrderTerms,
   GoodsReceiveNote,
   GoodsReceiveNoteItem,
-  PRType,
-  WorkflowStage,
   Requestor
 } from './procurement'
 
-export { GRNStatus, PurchaseOrderStatus } from './procurement'
+export { GRNStatus, PurchaseOrderStatus, PRType, WorkflowStage } from './procurement'
 
 // Vendor management types (PRIMARY SOURCE for VendorStatus)
 export type {
