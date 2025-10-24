@@ -43,8 +43,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { Role } from '@/lib/types/permissions';
-import { User } from '@/lib/types/user';
+import { Role, User } from '@/lib/types';
 import { mockUsers } from '@/lib/mock-data/users';
 
 interface UserAssignmentTabProps {

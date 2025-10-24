@@ -86,7 +86,12 @@ function LocationList() {
     return filtered.sort((a, b) => {
       const aValue = a[sortConfig.field]
       const bValue = b[sortConfig.field]
-      
+
+      // Handle undefined values
+      if (aValue === undefined && bValue === undefined) return 0
+      if (aValue === undefined) return sortConfig.direction === 'asc' ? 1 : -1
+      if (bValue === undefined) return sortConfig.direction === 'asc' ? -1 : 1
+
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
       return 0

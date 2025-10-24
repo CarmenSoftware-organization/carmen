@@ -37,7 +37,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 import { ResourceType, StandardAction } from '@/lib/types/permission-resources';
 import { allMockPolicies } from '@/lib/mock-data/permission-policies';
 

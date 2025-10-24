@@ -100,7 +100,18 @@ export { ExchangeRateSource } from './finance'
 // Settings and preferences types (PRIMARY SOURCE for NotificationSettings)
 export type {
   NotificationSettings,
-  ThemeMode
+  NotificationPreference,
+  NotificationEventType,
+  ThemeMode,
+  DisplaySettings,
+  RegionalSettings,
+  Language,
+  AccessibilitySettings,
+  UserPreferences,
+  DateFormat,
+  TimeFormat,
+  NumberFormat,
+  FirstDayOfWeek
 } from './settings'
 
 // =============================================================================

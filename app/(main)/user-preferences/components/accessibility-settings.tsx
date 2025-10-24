@@ -25,11 +25,11 @@ interface AccessibilityState {
 export function AccessibilitySettings({ userId }: AccessibilitySettingsProps) {
   const [settings, setSettings] = useState<AccessibilityState>({
     screenReader: mockUserPreferences.accessibility?.screenReaderOptimized || false,
-    keyboardNavigation: mockUserPreferences.accessibility?.keyboardShortcuts || true,
-    reducedMotion: mockUserPreferences.accessibility?.reducedMotion || false,
-    highContrastText: mockUserPreferences.accessibility?.highContrastText || false,
-    largerClickTargets: mockUserPreferences.accessibility?.largerClickTargets || false,
-    focusIndicators: mockUserPreferences.accessibility?.focusIndicators || true,
+    keyboardNavigation: mockUserPreferences.accessibility?.keyboardNavigationHints || true,
+    reducedMotion: mockUserPreferences.accessibility?.reduceMotion || false,
+    highContrastText: false, // Not in AccessibilitySettings type, using local state only
+    largerClickTargets: false, // Not in AccessibilitySettings type, using local state only
+    focusIndicators: mockUserPreferences.accessibility?.focusIndicatorEnhanced || true,
     textToSpeech: false,
     voiceCommands: false,
   });

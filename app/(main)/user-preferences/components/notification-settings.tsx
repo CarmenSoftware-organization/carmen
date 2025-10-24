@@ -33,19 +33,19 @@ const EVENT_LABELS: Record<NotificationEventType, { label: string; category: str
   "purchase-request-approved": { label: "Purchase Request Approved", category: "Procurement" },
   "purchase-request-rejected": { label: "Purchase Request Rejected", category: "Procurement" },
   "purchase-order-created": { label: "Purchase Order Created", category: "Procurement" },
-  "purchase-order-sent": { label: "Purchase Order Sent", category: "Procurement" },
-  "purchase-order-confirmed": { label: "Purchase Order Confirmed", category: "Procurement" },
-  "goods-receipt-created": { label: "Goods Receipt Created", category: "Inventory" },
-  "stock-low": { label: "Stock Level Low", category: "Inventory" },
-  "stock-adjustment-required": { label: "Stock Adjustment Required", category: "Inventory" },
-  "physical-count-scheduled": { label: "Physical Count Scheduled", category: "Inventory" },
+  "purchase-order-approved": { label: "Purchase Order Approved", category: "Procurement" },
+  "goods-received": { label: "Goods Received", category: "Inventory" },
+  "low-stock-alert": { label: "Low Stock Alert", category: "Inventory" },
+  "stock-count-required": { label: "Stock Count Required", category: "Inventory" },
   "invoice-received": { label: "Invoice Received", category: "Finance" },
   "payment-due": { label: "Payment Due", category: "Finance" },
-  "payment-processed": { label: "Payment Processed", category: "Finance" },
-  "vendor-rating-low": { label: "Vendor Rating Low", category: "Vendor" },
-  "workflow-assigned": { label: "Workflow Task Assigned", category: "System" },
-  "workflow-escalated": { label: "Workflow Escalated", category: "System" },
-  "system-maintenance": { label: "System Maintenance Scheduled", category: "System" },
+  "vendor-update": { label: "Vendor Update", category: "Vendor" },
+  "price-update": { label: "Price Update", category: "Product" },
+  "workflow-assignment": { label: "Workflow Task Assigned", category: "System" },
+  "comment-mention": { label: "Comment Mention", category: "Collaboration" },
+  "document-shared": { label: "Document Shared", category: "Collaboration" },
+  "system-maintenance": { label: "System Maintenance", category: "System" },
+  "security-alert": { label: "Security Alert", category: "Security" },
 };
 
 export function NotificationSettings({ userId }: NotificationSettingsProps) {
@@ -90,7 +90,10 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
   const handleEmailDigestChange = (value: string) => {
     setSettings({
       ...settings,
-      emailDigest: value as NotificationSettingsType["emailDigest"],
+      emailDigest: {
+        ...settings.emailDigest,
+        frequency: value as "daily" | "weekly" | "monthly",
+      },
     });
     // TODO: Save to backend
   };
@@ -158,14 +161,14 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
 
           <div className="space-y-2">
             <Label htmlFor="email-digest">Email Digest</Label>
-            <Select value={settings.emailDigest} onValueChange={handleEmailDigestChange}>
+            <Select value={settings.emailDigest.frequency} onValueChange={handleEmailDigestChange}>
               <SelectTrigger id="email-digest">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">No digest</SelectItem>
                 <SelectItem value="daily">Daily digest</SelectItem>
                 <SelectItem value="weekly">Weekly digest</SelectItem>
+                <SelectItem value="monthly">Monthly digest</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">

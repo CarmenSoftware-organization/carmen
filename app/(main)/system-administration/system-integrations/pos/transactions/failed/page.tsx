@@ -59,6 +59,8 @@ import {
 } from "@/lib/mock-data/pos-transactions"
 import type {
   POSTransaction,
+} from "@/lib/types/pos-integration"
+import {
   ErrorCategory,
 } from "@/lib/types/pos-integration"
 
@@ -69,15 +71,15 @@ import { TransactionDetailDrawer } from "../components/TransactionDetailDrawer"
 function ErrorCategoryBadge({ category }: { category: ErrorCategory }) {
   const getCategoryColor = (category: ErrorCategory) => {
     switch (category) {
-      case "MAPPING_ERROR":
+      case ErrorCategory.MAPPING_ERROR:
         return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "STOCK_INSUFFICIENT":
+      case ErrorCategory.STOCK_INSUFFICIENT:
         return "bg-red-100 text-red-800 border-red-200"
-      case "VALIDATION_ERROR":
+      case ErrorCategory.VALIDATION_ERROR:
         return "bg-orange-100 text-orange-800 border-orange-200"
-      case "SYSTEM_ERROR":
+      case ErrorCategory.SYSTEM_ERROR:
         return "bg-purple-100 text-purple-800 border-purple-200"
-      case "CONNECTION_ERROR":
+      case ErrorCategory.CONNECTION_ERROR:
         return "bg-blue-100 text-blue-800 border-blue-200"
       default:
         return "bg-gray-100 text-gray-800 border-gray-200"

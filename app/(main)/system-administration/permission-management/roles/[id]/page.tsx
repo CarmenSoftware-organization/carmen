@@ -12,7 +12,7 @@ import { UserAssignmentTab } from '../components/user-assignment-tab';
 import { PolicyAssignmentTab } from '../components/policy-assignment-tab';
 import { mockRoles } from '@/lib/mock-data/permission-index';
 import { useRoleStore } from '@/lib/stores/role-store';
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 
 export default function RoleDetailPage() {
   const params = useParams();

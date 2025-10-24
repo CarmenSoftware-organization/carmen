@@ -43,7 +43,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 import { allMockPolicies } from '@/lib/mock-data/permission-policies';
 
 interface PolicyAssignmentTabProps {

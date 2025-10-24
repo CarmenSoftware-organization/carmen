@@ -1,3 +1,19 @@
+/**
+ * DISABLED: This component requires the Product interface to be extended with environmental impact properties.
+ *
+ * Required Product interface additions:
+ * - carbonFootprint?: number
+ * - waterUsage?: number
+ * - packagingRecyclability?: number
+ * - biodegradabilityMonths?: number
+ * - energyEfficiencyRating?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+ * - sustainableCertification?: 'NONE' | 'ORGANIC' | 'FAIRTRADE' | 'RAINFOREST' | 'MSC' | 'FSC'
+ *
+ * Once these properties are added to the Product interface in lib/types/product.ts,
+ * uncomment this file to enable the Environmental Impact tab.
+ */
+
+/*
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -174,5 +190,16 @@ export function EnvironmentalImpactTab({ product, onSave }: EnvironmentalImpactT
         </div>
       </form>
     </Form>
+  )
+}
+*/
+
+// Temporary placeholder component until Product interface is extended
+export function EnvironmentalImpactTab() {
+  return (
+    <div className="p-6 text-center text-muted-foreground">
+      <p>Environmental Impact tracking is not yet available.</p>
+      <p className="text-sm mt-2">This feature requires extending the Product interface.</p>
+    </div>
   )
 } 

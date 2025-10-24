@@ -4,7 +4,7 @@ import React from 'react';
 import { Shield, Users, FileText, Layers } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Role } from '@/lib/types/permissions';
+import { Role } from '@/lib/types';
 import { mockUsers } from '@/lib/mock-data/users';
 import { allMockPolicies } from '@/lib/mock-data/permission-policies';
 

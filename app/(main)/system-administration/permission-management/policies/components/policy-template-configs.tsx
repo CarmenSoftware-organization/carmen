@@ -31,8 +31,8 @@ interface TemplateConfigProps {
 // Department Access Configuration
 export function DepartmentAccessConfig({ onChange }: TemplateConfigProps) {
   const [config, setConfig] = useState({
-    departments: [],
-    permissions: [],
+    departments: [] as string[],
+    permissions: [] as string[],
     crossDepartmentAccess: false,
     managerOverride: true,
     restrictToBusinessHours: false
@@ -326,7 +326,7 @@ export function FinancialApprovalConfig({ onChange }: TemplateConfigProps) {
 // Store Location Configuration
 export function StoreLocationConfig({ onChange }: TemplateConfigProps) {
   const [config, setConfig] = useState({
-    locations: [],
+    locations: [] as string[],
     accessType: 'assigned', // 'assigned', 'region', 'all'
     managerAccess: true,
     crossStoreReporting: false,

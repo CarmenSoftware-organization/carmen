@@ -11,7 +11,7 @@ import { Save, RefreshCw, Bell, Mail, MessageSquare, Smartphone } from "lucide-r
 import { mockNotificationPreferences, mockRoleNotificationDefaults } from "@/lib/mock-data/settings";
 import type { NotificationPreference, NotificationEventType } from "@/lib/types/settings";
 
-const eventCategories = {
+const eventCategories: Record<string, NotificationEventType[]> = {
   Procurement: ['purchase-request-submitted', 'purchase-request-approved', 'purchase-request-rejected', 'purchase-order-created', 'purchase-order-approved'],
   Inventory: ['goods-received', 'low-stock-alert', 'stock-count-required'],
   Finance: ['invoice-received', 'payment-due'],
