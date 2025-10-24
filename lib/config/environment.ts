@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 // Database Environment Schema
 const databaseEnvSchema = z.object({
-  DATABASE_URL: z.string().url('DATABASE_URL must be a valid database connection URL'),
+  DATABASE_URL: z.string().url('DATABASE_URL must be a valid database connection URL').optional(),
   
   // Connection Pool Configuration
   DB_CONNECTION_LIMIT: z.coerce.number().min(1).max(100).default(10),
