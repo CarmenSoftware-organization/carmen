@@ -142,6 +142,22 @@ export function AccountCodeMapping() {
     setSelectedMapping(null)
   }
 
+  const handleCloseView = () => {
+    setIsViewDialogOpen(false)
+    setSelectedMapping(null)
+  }
+
+  const handleCloseCreate = () => {
+    setIsCreateDialogOpen(false)
+    setFormData({})
+  }
+
+  const handleCloseEdit = () => {
+    setIsEditDialogOpen(false)
+    setFormData({})
+    setSelectedMapping(null)
+  }
+
   const handleScan = () => {
     alert('Scan for new codes - To be implemented\n\nThis will scan for:\n- New Location codes\n- New Item Groups\n- New transaction combinations')
   }
@@ -367,7 +383,7 @@ export function AccountCodeMapping() {
       </div>
 
       {/* View Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+      <Dialog open={isViewDialogOpen} onOpenChange={handleCloseView}>
         <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>View Mapping Details</DialogTitle>
@@ -465,7 +481,7 @@ export function AccountCodeMapping() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+            <Button variant="outline" onClick={handleCloseView}>
               Close
             </Button>
           </DialogFooter>
@@ -473,7 +489,7 @@ export function AccountCodeMapping() {
       </Dialog>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+      <Dialog open={isCreateDialogOpen} onOpenChange={handleCloseCreate}>
         <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>Create New Mapping</DialogTitle>
@@ -633,7 +649,7 @@ export function AccountCodeMapping() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+            <Button variant="outline" onClick={handleCloseCreate}>
               Cancel
             </Button>
             <Button onClick={handleSaveCreate}>Create</Button>
@@ -642,7 +658,7 @@ export function AccountCodeMapping() {
       </Dialog>
 
       {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog open={isEditDialogOpen} onOpenChange={handleCloseEdit}>
         <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>Edit Mapping</DialogTitle>
@@ -802,7 +818,7 @@ export function AccountCodeMapping() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button variant="outline" onClick={handleCloseEdit}>
               Cancel
             </Button>
             <Button onClick={handleSaveEdit}>Save Changes</Button>
