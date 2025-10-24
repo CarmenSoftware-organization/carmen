@@ -67,7 +67,11 @@ export type {
   Product,
   ProductSpecification,
   ProductCategory,
-  ProductStatus
+  ProductStatus,
+  CategoryType,
+  CategoryItem,
+  CategoryDragItem,
+  CategoryTreeOperations
 } from './product'
 
 // Recipe and operational planning types

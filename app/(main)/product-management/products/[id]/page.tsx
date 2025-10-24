@@ -840,26 +840,6 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
                     <Input type="number" placeholder="Enter base price" />
                     </div>
                     <div className="space-y-2">
-                    <Label>Tax Type</Label>
-                    <Select 
-                      defaultValue={product?.taxType}
-                      disabled={!isEditing}
-                      onValueChange={(value) => handleInputChange('taxType', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select tax type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ADDED">Added Tax</SelectItem>
-                        <SelectItem value="INCLUDED">Include Tax</SelectItem>
-                        <SelectItem value="NONE">None</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground">
-                      Select how tax should be applied to this product
-                    </p>
-                    </div>
-                    <div className="space-y-2">
                     <Label>Tax Rate (%)</Label>
                     <Input type="number" placeholder="Enter tax rate" />
                     </div>
@@ -944,32 +924,22 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
                     />
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Shelf Life</Label>
-                    <Input 
-                      type="number" 
+                    <Label>Shelf Life (Days)</Label>
+                    <Input
+                      type="number"
                       placeholder="Enter shelf life in days"
-                      defaultValue={product?.shelfLife || 0}
+                      defaultValue={product?.shelfLifeDays || 0}
                       disabled={!isEditing}
-                      onChange={(e) => handleInputChange('shelfLife', Number(e.target.value))}
+                      onChange={(e) => handleInputChange('shelfLifeDays', Number(e.target.value))}
                     />
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Storage Instructions</Label>
-                    <Textarea 
-                      placeholder="Enter storage instructions"
-                      defaultValue={product?.storageInstructions || ''}
+                    <Label>Storage Conditions</Label>
+                    <Textarea
+                      placeholder="Enter storage conditions"
+                      defaultValue={product?.storageConditions || ''}
                       disabled={!isEditing}
-                      onChange={(e) => handleInputChange('storageInstructions', e.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Barcode</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="Enter barcode"
-                      defaultValue={product?.barcode || ''}
-                      disabled={!isEditing}
-                      onChange={(e) => handleInputChange('barcode', e.target.value)}
+                      onChange={(e) => handleInputChange('storageConditions', e.target.value)}
                     />
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
