@@ -11,79 +11,116 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f5f5f5;
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         }
 
-        .container {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Navigation */
         .sidebar {
             width: 280px;
-            background: #fff;
-            border-right: 1px solid #e1e4e8;
-            position: sticky;
-            top: 0;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
             height: 100vh;
             overflow-y: auto;
             padding: 2rem 0;
         }
 
-        .sidebar h3 {
+        .sidebar-header {
             padding: 0 1.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #666;
-        }
-
-        .sidebar nav ul {
-            list-style: none;
-        }
-
-        .sidebar nav a {
-            display: block;
-            padding: 0.5rem 1.5rem;
-            color: #666;
-            text-decoration: none;
-            transition: all 0.2s;
-            font-size: 0.9375rem;
-        }
-
-        .sidebar nav a:hover {
-            background: #f6f8fa;
-            color: #0366d6;
-        }
-
-        .sidebar nav a.active {
-            color: #0366d6;
-            background: #f1f8ff;
-            border-left: 3px solid #0366d6;
-            padding-left: calc(1.5rem - 3px);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 3rem;
-            max-width: 1200px;
-        }
-
-        .breadcrumb {
-            color: #666;
-            font-size: 0.875rem;
             margin-bottom: 2rem;
         }
 
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
         .breadcrumb a {
-            color: #0366d6;
+            color: var(--primary);
             text-decoration: none;
         }
 
@@ -91,122 +128,180 @@
             text-decoration: underline;
         }
 
-        .breadcrumb span {
-            margin: 0 0.5rem;
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
         }
 
         h1 {
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #24292e;
+            font-size: 2.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
         }
 
         h2 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-top: 3rem;
+            font-size: 1.5rem;
+            margin-top: 2.5rem;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e1e4e8;
-            color: #24292e;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h2:first-of-type {
+            margin-top: 0;
         }
 
         h3 {
             font-size: 1.25rem;
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            color: #24292e;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
         }
 
         h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: #24292e;
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
 
         p {
             margin-bottom: 1rem;
-            color: #586069;
+            color: var(--text-primary);
         }
 
         ul, ol {
-            margin-left: 2rem;
             margin-bottom: 1rem;
+            padding-left: 2rem;
         }
 
         li {
             margin-bottom: 0.5rem;
-            color: #586069;
-        }
-
-        strong {
-            color: #24292e;
-            font-weight: 600;
         }
 
         code {
-            background: #f6f8fa;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            font-size: 85%;
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1.5rem 0;
-            background: #fff;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            margin-top: 1rem;
+            font-size: 0.9375rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            text-align: left;
         }
 
         th {
-            background: #f6f8fa;
-            padding: 0.75rem 1rem;
-            text-align: left;
+            background: var(--bg-light);
             font-weight: 600;
-            color: #24292e;
-            border-bottom: 2px solid #e1e4e8;
+            color: var(--text-primary);
         }
 
         td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #e1e4e8;
-            color: #586069;
+            color: var(--text-primary);
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        a {
+            color: var(--primary);
+            text-decoration: none;
         }
 
-        .content-section {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        a:hover {
+            text-decoration: underline;
         }
 
-        .note {
-            background: #f1f8ff;
-            border-left: 4px solid #0366d6;
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        .highlight-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
             padding: 1rem;
             margin: 1rem 0;
-            border-radius: 3px;
-        }
-
-        .warning {
-            background: #fffbdd;
-            border-left: 4px solid #ffd33d;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 3px;
+            border-radius: 0.375rem;
         }
 
         @media (max-width: 1024px) {
@@ -215,70 +310,74 @@
             }
 
             .main-content {
-                padding: 2rem 1.5rem;
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .toc-sidebar {
+                display: none;
             }
         }
 
         @media print {
-            .sidebar {
-                display: none;
-            }
-
+            .sidebar,
+            .toc-sidebar,
             .breadcrumb {
                 display: none;
             }
 
             .main-content {
-                padding: 0;
+                margin-left: 0;
                 max-width: 100%;
+            }
+
+            .document-content {
+                box-shadow: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <h3>Table of Contents</h3>
-            <nav>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← Documentation Home</a>
+            <h1>Finance Module</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <h3>Navigation</h3>
                 <ul>
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#screen-header">Screen Header</a></li>
-                    <li><a href="#view-options">View Options</a></li>
-                    <li><a href="#posting-ap">Posting to AP</a></li>
-                    <li><a href="#posting-gl">Posting to GL</a></li>
+                    <li><a href="#posting-to-ap">Posting to AP</a></li>
+                    <li><a href="#posting-to-gl">Posting to GL</a></li>
                     <li><a href="#crud-operations">CRUD Operations</a></li>
-                    <li><a href="#search-filter">Search and Filter</a></li>
-                    <li><a href="#implementation">Implementation Notes</a></li>
-                    <li><a href="#notes">Notes and Considerations</a></li>
                 </ul>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="breadcrumb">
-                <a href="/">Carmen ERP</a>
-                <span>›</span>
-                <a href="/finance">Finance</a>
-                <span>›</span>
-                <span>Account Code Mapping</span>
             </div>
+        </nav>
+    </aside>
 
-            <h1>Account Code Mapping</h1>
+    <div class="main-content">
+        <div class="breadcrumb">
+            <a href="../index.html">Documentation</a> /
+            <a href="#finance">Finance</a> /
+            Account Code Mapping
+        </div>
 
-            <div class="content-section" id="overview">
-                <h2>Overview</h2>
+        <div class="content-wrapper">
+            <div class="document-content">
+                <h1 id="heading-0">Account Code Mapping</h1>
+
+                <h2 id="heading-1">Overview</h2>
                 <p>The Account Code Mapping screen is used for setting up and managing mappings between account codes used internally and codes used for external reporting, compliance, or integration with other systems. This module ensures that all financial transactions are correctly categorized and accounted for in financial statements.</p>
-            </div>
 
-            <div class="content-section" id="screen-header">
-                <h2>Screen Header</h2>
+                <h2 id="heading-2">Screen Header</h2>
                 <p><strong>Title</strong>: Account Code Mapping</p>
 
-                <h3>Action Buttons</h3>
+                <h3 id="heading-3">Action Buttons</h3>
 
-                <h4>Scan for New Codes</h4>
+                <h4 id="heading-4">Scan for New Codes</h4>
                 <ul>
                     <li><strong>Purpose</strong>: Scans the system for new account codes that have been added but not yet mapped</li>
                     <li><strong>Functionality</strong>:
@@ -292,7 +391,7 @@
                     <li><strong>Benefit</strong>: Ensures all financial transactions are correctly categorized and accounted for in financial statements</li>
                 </ul>
 
-                <h4>Import/Export</h4>
+                <h4 id="heading-5">Import/Export</h4>
                 <ul>
                     <li><strong>Purpose</strong>: Import/export account mappings</li>
                     <li><strong>Functionality</strong>:
@@ -310,7 +409,7 @@
                     </li>
                 </ul>
 
-                <h4>Print</h4>
+                <h4 id="heading-6">Print</h4>
                 <ul>
                     <li><strong>Purpose</strong>: Print the mapping setup</li>
                     <li><strong>Use Cases</strong>:
@@ -322,26 +421,24 @@
                     </li>
                 </ul>
 
-                <h4>Create</h4>
+                <h4 id="heading-7">Create</h4>
                 <ul>
                     <li><strong>Purpose</strong>: Create new account code mappings</li>
                     <li><strong>Functionality</strong>: Opens dialog to add new mapping configurations</li>
                 </ul>
-            </div>
 
-            <div class="content-section" id="view-options">
-                <h2>View Options</h2>
-                <h3>View Name Dropdown</h3>
+                <h2 id="heading-8">View Options</h2>
+
+                <h3 id="heading-9">View Name Dropdown</h3>
                 <p>Allows users to switch between different preset views to adjust the display according to accounting needs.</p>
-            </div>
 
-            <div class="content-section" id="posting-ap">
-                <h2>Posting to AP (Accounts Payable)</h2>
+                <h2 id="heading-10">Posting to AP (Accounts Payable)</h2>
 
-                <h3>Overview</h3>
+                <h3 id="heading-11">Overview</h3>
                 <p>This view handles postings directly related to Accounts Payable. It manages invoices from suppliers and vendors for inventory purchased, linking inventory procurement transactions directly with payable invoices.</p>
 
-                <h3>Data Table Columns</h3>
+                <h3 id="heading-12">Data Table Columns</h3>
+
                 <table>
                     <thead>
                         <tr>
@@ -394,21 +491,20 @@
                     </tbody>
                 </table>
 
-                <h3>Business Rules</h3>
+                <h3 id="heading-13">Business Rules</h3>
                 <ol>
                     <li><strong>Account Restrictions</strong>: Only Debit Accounts are allowed</li>
                     <li><strong>Tax Accounts</strong>: Default from Vendor Profile in Carmen</li>
                     <li><strong>Mapping</strong>: Links inventory procurement transactions with payable invoices</li>
                 </ol>
-            </div>
 
-            <div class="content-section" id="posting-gl">
-                <h2>Posting to GL (General Ledger)</h2>
+                <h2 id="heading-14">Posting to GL (General Ledger)</h2>
 
-                <h3>Overview</h3>
+                <h3 id="heading-15">Overview</h3>
                 <p>This view focuses on posting transactions into the General Ledger. It ensures that all financial data related to inventory—whether purchases, adjustments, or disposals—are accurately reflected in the company's main accounting records.</p>
 
-                <h3>Data Table Columns</h3>
+                <h3 id="heading-16">Data Table Columns</h3>
+
                 <table>
                     <thead>
                         <tr>
@@ -471,26 +567,24 @@
                     </tbody>
                 </table>
 
-                <h3>Business Rules</h3>
+                <h3 id="heading-17">Business Rules</h3>
                 <ol>
                     <li><strong>Location Usage</strong>: Uses the "To" Location for department assignments</li>
                     <li><strong>Account Assignment</strong>: Uses the "To" Location Account for GL postings</li>
                     <li><strong>Internal Cost Allocation</strong>: Tracks which departments are debited and credited</li>
                     <li><strong>Accuracy</strong>: Crucial for accurate financial accounting</li>
                 </ol>
-            </div>
 
-            <div class="content-section" id="crud-operations">
-                <h2>CRUD Operations</h2>
+                <h2 id="heading-18">CRUD Operations</h2>
 
-                <h3>View Mapping</h3>
+                <h3 id="heading-19">View Mapping</h3>
                 <ul>
                     <li><strong>Action</strong>: Click three-dot menu → View</li>
                     <li><strong>Functionality</strong>: Display read-only details of the selected mapping</li>
                     <li><strong>Information Shown</strong>: All mapped fields for the selected record</li>
                 </ul>
 
-                <h3>Create Mapping</h3>
+                <h3 id="heading-20">Create Mapping</h3>
                 <ul>
                     <li><strong>Action</strong>: Click "Create" button</li>
                     <li><strong>Functionality</strong>: Opens dialog with form fields for new mapping</li>
@@ -498,7 +592,7 @@
                     <li><strong>Validation</strong>: All required fields must be completed</li>
                 </ul>
 
-                <h3>Edit Mapping</h3>
+                <h3 id="heading-21">Edit Mapping</h3>
                 <ul>
                     <li><strong>Action</strong>: Click three-dot menu → Edit</li>
                     <li><strong>Functionality</strong>: Opens dialog with pre-populated form fields</li>
@@ -506,57 +600,48 @@
                     <li><strong>Save</strong>: Updates existing mapping record</li>
                 </ul>
 
-                <h3>Duplicate Mapping</h3>
+                <h3 id="heading-22">Duplicate Mapping</h3>
                 <ul>
                     <li><strong>Action</strong>: Click three-dot menu → Duplicate</li>
                     <li><strong>Functionality</strong>: Creates a copy of the selected mapping</li>
                     <li><strong>Use Case</strong>: Quickly create similar mappings with minor variations</li>
                 </ul>
 
-                <h3>Delete Mapping</h3>
+                <h3 id="heading-23">Delete Mapping</h3>
                 <ul>
                     <li><strong>Action</strong>: Click three-dot menu → Delete</li>
                     <li><strong>Functionality</strong>: Removes mapping from system</li>
                     <li><strong>Confirmation</strong>: Requires user confirmation before deletion</li>
                 </ul>
-            </div>
 
-            <div class="content-section" id="search-filter">
-                <h2>Search and Filter</h2>
+                <h2 id="heading-24">Search and Filter</h2>
 
-                <h3>Search Functionality</h3>
+                <h3 id="heading-25">Search Functionality</h3>
                 <ul>
                     <li><strong>Location</strong>: Top of screen</li>
                     <li><strong>Scope</strong>: Searches across all visible columns</li>
                     <li><strong>Real-time</strong>: Filters results as you type</li>
                 </ul>
-            </div>
 
-            <div class="content-section" id="implementation">
-                <h2>Implementation Notes</h2>
+                <h2 id="heading-26">Implementation Notes</h2>
 
-                <div class="note">
-                    <h3>Dialog Fix</h3>
-                    <p>The component includes a comprehensive fix for the Radix UI Dialog pointer-events issue:</p>
-                    <ul>
-                        <li>Fixed at the shadcn/ui Dialog component level</li>
-                        <li>Dual protection mechanism (useEffect cleanup + onCloseAutoFocus)</li>
-                        <li>Ensures all dialogs work correctly without blocking application interactions</li>
-                        <li>No per-component workarounds needed</li>
-                    </ul>
-                </div>
+                <h3 id="heading-27">Dialog Fix</h3>
+                <p>The component includes a comprehensive fix for the Radix UI Dialog pointer-events issue:</p>
+                <ul>
+                    <li>Fixed at the shadcn/ui Dialog component level</li>
+                    <li>Dual protection mechanism (useEffect cleanup + onCloseAutoFocus)</li>
+                    <li>Ensures all dialogs work correctly without blocking application interactions</li>
+                    <li>No per-component workarounds needed</li>
+                </ul>
 
-                <h3>Component Location</h3>
+                <h3 id="heading-28">Component Location</h3>
                 <ul>
                     <li><strong>File</strong>: <code>components/account-code-mapping.tsx</code></li>
                     <li><strong>Route</strong>: <code>/finance/account-code-mapping</code></li>
                     <li><strong>Framework</strong>: Next.js 14 App Router with React Server Components</li>
                 </ul>
-            </div>
 
-            <div class="content-section" id="notes">
-                <h2>Notes and Considerations</h2>
-
+                <h2 id="heading-29">Notes and Considerations</h2>
                 <ol>
                     <li><strong>Mapping Procedure</strong>: Review the mapping procedure to determine whether to map only used transactions or all transactions</li>
                     <li><strong>Data Integrity</strong>: Ensure mappings are kept up-to-date as operations evolve</li>
@@ -564,46 +649,74 @@
                     <li><strong>Compliance</strong>: Mappings must comply with accounting standards and regulations</li>
                 </ol>
             </div>
-        </main>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list">
+                        <li><a href="#heading-1" class="toc-h2">Overview</a></li>
+                        <li><a href="#heading-2" class="toc-h2">Screen Header</a></li>
+                        <li><a href="#heading-3" class="toc-h3">Action Buttons</a></li>
+                        <li><a href="#heading-8" class="toc-h2">View Options</a></li>
+                        <li><a href="#heading-10" class="toc-h2">Posting to AP</a></li>
+                        <li><a href="#heading-11" class="toc-h3">Overview</a></li>
+                        <li><a href="#heading-12" class="toc-h3">Data Table Columns</a></li>
+                        <li><a href="#heading-13" class="toc-h3">Business Rules</a></li>
+                        <li><a href="#heading-14" class="toc-h2">Posting to GL</a></li>
+                        <li><a href="#heading-15" class="toc-h3">Overview</a></li>
+                        <li><a href="#heading-16" class="toc-h3">Data Table Columns</a></li>
+                        <li><a href="#heading-17" class="toc-h3">Business Rules</a></li>
+                        <li><a href="#heading-18" class="toc-h2">CRUD Operations</a></li>
+                        <li><a href="#heading-19" class="toc-h3">View Mapping</a></li>
+                        <li><a href="#heading-20" class="toc-h3">Create Mapping</a></li>
+                        <li><a href="#heading-21" class="toc-h3">Edit Mapping</a></li>
+                        <li><a href="#heading-22" class="toc-h3">Duplicate Mapping</a></li>
+                        <li><a href="#heading-23" class="toc-h3">Delete Mapping</a></li>
+                        <li><a href="#heading-24" class="toc-h2">Search and Filter</a></li>
+                        <li><a href="#heading-26" class="toc-h2">Implementation Notes</a></li>
+                        <li><a href="#heading-29" class="toc-h2">Notes and Considerations</a></li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
     </div>
 
     <script>
-        // Add active class to current section in navigation
-        const sections = document.querySelectorAll('.content-section');
-        const navLinks = document.querySelectorAll('.sidebar nav a');
+        // Smooth scrolling for TOC links
+        document.querySelectorAll('.toc-list a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
 
-        const observerOptions = {
-            root: null,
-            rootMargin: '-20% 0px -75% 0px',
-            threshold: 0
-        };
-
+        // Highlight active TOC item on scroll
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    navLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === \`#\${id}\`) {
-                            link.classList.add('active');
+                    const id = entry.target.id;
+                    document.querySelectorAll('.toc-list a').forEach(a => {
+                        if (a.getAttribute('href') === '#' + id) {
+                            a.style.color = 'var(--primary)';
+                            a.style.fontWeight = '600';
+                        } else {
+                            a.style.color = 'var(--text-secondary)';
+                            a.style.fontWeight = '400';
                         }
                     });
                 }
             });
-        }, observerOptions);
+        }, { threshold: 1.0, rootMargin: '-100px 0px -80% 0px' });
 
-        sections.forEach(section => observer.observe(section));
-
-        // Smooth scroll for navigation links
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href');
-                const targetSection = document.querySelector(targetId);
-                if (targetSection) {
-                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
+        // Observe all headings
+        document.querySelectorAll('h2, h3, h4').forEach(heading => {
+            observer.observe(heading);
         });
     </script>
 </body>
