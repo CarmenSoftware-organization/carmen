@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Code Mapping - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e1e4e8;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar h3 {
+            padding: 0 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.9375rem;
+        }
+
+        .sidebar nav a:hover {
+            background: #f6f8fa;
+            color: #0366d6;
+        }
+
+        .sidebar nav a.active {
+            color: #0366d6;
+            background: #f1f8ff;
+            border-left: 3px solid #0366d6;
+            padding-left: calc(1.5rem - 3px);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            margin: 0 0.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #24292e;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e1e4e8;
+            color: #24292e;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #24292e;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #24292e;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #586069;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: #586069;
+        }
+
+        strong {
+            color: #24292e;
+            font-weight: 600;
+        }
+
+        code {
+            background: #f6f8fa;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 85%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #f6f8fa;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #24292e;
+            border-bottom: 2px solid #e1e4e8;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e1e4e8;
+            color: #586069;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .content-section {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .note {
+            background: #f1f8ff;
+            border-left: 4px solid #0366d6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 3px;
+        }
+
+        .warning {
+            background: #fffbdd;
+            border-left: 4px solid #ffd33d;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media print {
+            .sidebar {
+                display: none;
+            }
+
+            .breadcrumb {
+                display: none;
+            }
+
+            .main-content {
+                padding: 0;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h3>Table of Contents</h3>
+            <nav>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#screen-header">Screen Header</a></li>
+                    <li><a href="#view-options">View Options</a></li>
+                    <li><a href="#posting-ap">Posting to AP</a></li>
+                    <li><a href="#posting-gl">Posting to GL</a></li>
+                    <li><a href="#crud-operations">CRUD Operations</a></li>
+                    <li><a href="#search-filter">Search and Filter</a></li>
+                    <li><a href="#implementation">Implementation Notes</a></li>
+                    <li><a href="#notes">Notes and Considerations</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="/">Carmen ERP</a>
+                <span>›</span>
+                <a href="/finance">Finance</a>
+                <span>›</span>
+                <span>Account Code Mapping</span>
+            </div>
+
+            <h1>Account Code Mapping</h1>
+
+            <div class="content-section" id="overview">
+                <h2>Overview</h2>
+                <p>The Account Code Mapping screen is used for setting up and managing mappings between account codes used internally and codes used for external reporting, compliance, or integration with other systems. This module ensures that all financial transactions are correctly categorized and accounted for in financial statements.</p>
+            </div>
+
+            <div class="content-section" id="screen-header">
+                <h2>Screen Header</h2>
+                <p><strong>Title</strong>: Account Code Mapping</p>
+
+                <h3>Action Buttons</h3>
+
+                <h4>Scan for New Codes</h4>
+                <ul>
+                    <li><strong>Purpose</strong>: Scans the system for new account codes that have been added but not yet mapped</li>
+                    <li><strong>Functionality</strong>:
+                        <ul>
+                            <li>Search system for new Location codes</li>
+                            <li>Identify new Item Groups</li>
+                            <li>Discover new transaction combinations</li>
+                            <li>Allow options to scan for existing transactions</li>
+                        </ul>
+                    </li>
+                    <li><strong>Benefit</strong>: Ensures all financial transactions are correctly categorized and accounted for in financial statements</li>
+                </ul>
+
+                <h4>Import/Export</h4>
+                <ul>
+                    <li><strong>Purpose</strong>: Import/export account mappings</li>
+                    <li><strong>Functionality</strong>:
+                        <ul>
+                            <li>Import mappings from external sources (CSV format)</li>
+                            <li>Export current mappings for backup or use in other systems</li>
+                        </ul>
+                    </li>
+                    <li><strong>Use Cases</strong>:
+                        <ul>
+                            <li>Maintaining consistency across multiple platforms</li>
+                            <li>System migrations or updates</li>
+                            <li>Backup and disaster recovery</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4>Print</h4>
+                <ul>
+                    <li><strong>Purpose</strong>: Print the mapping setup</li>
+                    <li><strong>Use Cases</strong>:
+                        <ul>
+                            <li>Review purposes</li>
+                            <li>Audit requirements</li>
+                            <li>Manual verification of mappings</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4>Create</h4>
+                <ul>
+                    <li><strong>Purpose</strong>: Create new account code mappings</li>
+                    <li><strong>Functionality</strong>: Opens dialog to add new mapping configurations</li>
+                </ul>
+            </div>
+
+            <div class="content-section" id="view-options">
+                <h2>View Options</h2>
+                <h3>View Name Dropdown</h3>
+                <p>Allows users to switch between different preset views to adjust the display according to accounting needs.</p>
+            </div>
+
+            <div class="content-section" id="posting-ap">
+                <h2>Posting to AP (Accounts Payable)</h2>
+
+                <h3>Overview</h3>
+                <p>This view handles postings directly related to Accounts Payable. It manages invoices from suppliers and vendors for inventory purchased, linking inventory procurement transactions directly with payable invoices.</p>
+
+                <h3>Data Table Columns</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Description</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Business Unit</strong></td>
+                            <td>Division or department within the organization</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Store/Location</strong></td>
+                            <td>Specific store or location where items are used/stored</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Category</strong></td>
+                            <td>Broad classification of inventory items (e.g., Food, Beverage)</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sub-Category</strong></td>
+                            <td>Detailed classification within a category</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Item Group</strong></td>
+                            <td>Exact types of items within a sub-category</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Department</strong></td>
+                            <td>Department responsible for the items</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Account Code</strong></td>
+                            <td>Specific GL account code for accounting purposes</td>
+                            <td><strong>Debit Account Only</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Actions</strong></td>
+                            <td>View, Edit, Duplicate, Delete</td>
+                            <td>CRUD operations</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Business Rules</h3>
+                <ol>
+                    <li><strong>Account Restrictions</strong>: Only Debit Accounts are allowed</li>
+                    <li><strong>Tax Accounts</strong>: Default from Vendor Profile in Carmen</li>
+                    <li><strong>Mapping</strong>: Links inventory procurement transactions with payable invoices</li>
+                </ol>
+            </div>
+
+            <div class="content-section" id="posting-gl">
+                <h2>Posting to GL (General Ledger)</h2>
+
+                <h3>Overview</h3>
+                <p>This view focuses on posting transactions into the General Ledger. It ensures that all financial data related to inventory—whether purchases, adjustments, or disposals—are accurately reflected in the company's main accounting records.</p>
+
+                <h3>Data Table Columns</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Description</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Business Unit</strong></td>
+                            <td>Division or department within the organization</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Store/Location</strong></td>
+                            <td>Specific store or location</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Category</strong></td>
+                            <td>Higher-level classification of inventory or expense</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Item Group</strong></td>
+                            <td>Further breakdown within the category</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Movement Type</strong></td>
+                            <td>Type of transaction (sale, purchase, transfer)</td>
+                            <td>Required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dr. Department</strong></td>
+                            <td>Department to be debited</td>
+                            <td>Using "To" Location</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cr. Department</strong></td>
+                            <td>Department to be credited</td>
+                            <td>Using "To" Location</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dr. Account</strong></td>
+                            <td>GL account to be debited</td>
+                            <td>Using "To" Location Account</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cr. Account</strong></td>
+                            <td>GL account to be credited</td>
+                            <td>Using "To" Location Account</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Actions</strong></td>
+                            <td>View, Edit, Duplicate, Delete</td>
+                            <td>CRUD operations</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Business Rules</h3>
+                <ol>
+                    <li><strong>Location Usage</strong>: Uses the "To" Location for department assignments</li>
+                    <li><strong>Account Assignment</strong>: Uses the "To" Location Account for GL postings</li>
+                    <li><strong>Internal Cost Allocation</strong>: Tracks which departments are debited and credited</li>
+                    <li><strong>Accuracy</strong>: Crucial for accurate financial accounting</li>
+                </ol>
+            </div>
+
+            <div class="content-section" id="crud-operations">
+                <h2>CRUD Operations</h2>
+
+                <h3>View Mapping</h3>
+                <ul>
+                    <li><strong>Action</strong>: Click three-dot menu → View</li>
+                    <li><strong>Functionality</strong>: Display read-only details of the selected mapping</li>
+                    <li><strong>Information Shown</strong>: All mapped fields for the selected record</li>
+                </ul>
+
+                <h3>Create Mapping</h3>
+                <ul>
+                    <li><strong>Action</strong>: Click "Create" button</li>
+                    <li><strong>Functionality</strong>: Opens dialog with form fields for new mapping</li>
+                    <li><strong>Required Fields</strong>: Depends on view (AP or GL)</li>
+                    <li><strong>Validation</strong>: All required fields must be completed</li>
+                </ul>
+
+                <h3>Edit Mapping</h3>
+                <ul>
+                    <li><strong>Action</strong>: Click three-dot menu → Edit</li>
+                    <li><strong>Functionality</strong>: Opens dialog with pre-populated form fields</li>
+                    <li><strong>Validation</strong>: All required fields must be completed</li>
+                    <li><strong>Save</strong>: Updates existing mapping record</li>
+                </ul>
+
+                <h3>Duplicate Mapping</h3>
+                <ul>
+                    <li><strong>Action</strong>: Click three-dot menu → Duplicate</li>
+                    <li><strong>Functionality</strong>: Creates a copy of the selected mapping</li>
+                    <li><strong>Use Case</strong>: Quickly create similar mappings with minor variations</li>
+                </ul>
+
+                <h3>Delete Mapping</h3>
+                <ul>
+                    <li><strong>Action</strong>: Click three-dot menu → Delete</li>
+                    <li><strong>Functionality</strong>: Removes mapping from system</li>
+                    <li><strong>Confirmation</strong>: Requires user confirmation before deletion</li>
+                </ul>
+            </div>
+
+            <div class="content-section" id="search-filter">
+                <h2>Search and Filter</h2>
+
+                <h3>Search Functionality</h3>
+                <ul>
+                    <li><strong>Location</strong>: Top of screen</li>
+                    <li><strong>Scope</strong>: Searches across all visible columns</li>
+                    <li><strong>Real-time</strong>: Filters results as you type</li>
+                </ul>
+            </div>
+
+            <div class="content-section" id="implementation">
+                <h2>Implementation Notes</h2>
+
+                <div class="note">
+                    <h3>Dialog Fix</h3>
+                    <p>The component includes a comprehensive fix for the Radix UI Dialog pointer-events issue:</p>
+                    <ul>
+                        <li>Fixed at the shadcn/ui Dialog component level</li>
+                        <li>Dual protection mechanism (useEffect cleanup + onCloseAutoFocus)</li>
+                        <li>Ensures all dialogs work correctly without blocking application interactions</li>
+                        <li>No per-component workarounds needed</li>
+                    </ul>
+                </div>
+
+                <h3>Component Location</h3>
+                <ul>
+                    <li><strong>File</strong>: <code>components/account-code-mapping.tsx</code></li>
+                    <li><strong>Route</strong>: <code>/finance/account-code-mapping</code></li>
+                    <li><strong>Framework</strong>: Next.js 14 App Router with React Server Components</li>
+                </ul>
+            </div>
+
+            <div class="content-section" id="notes">
+                <h2>Notes and Considerations</h2>
+
+                <ol>
+                    <li><strong>Mapping Procedure</strong>: Review the mapping procedure to determine whether to map only used transactions or all transactions</li>
+                    <li><strong>Data Integrity</strong>: Ensure mappings are kept up-to-date as operations evolve</li>
+                    <li><strong>Audit Trail</strong>: All changes to mappings should be tracked for audit purposes</li>
+                    <li><strong>Compliance</strong>: Mappings must comply with accounting standards and regulations</li>
+                </ol>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Add active class to current section in navigation
+        const sections = document.querySelectorAll('.content-section');
+        const navLinks = document.querySelectorAll('.sidebar nav a');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -75% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === \`#\${id}\`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+
+        // Smooth scroll for navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
