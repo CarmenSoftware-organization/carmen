@@ -85,19 +85,6 @@ export function AccountCodeMapping() {
   // Form state
   const [formData, setFormData] = useState<Partial<APMapping | GLMapping>>({})
 
-  // Force restore pointer-events when all dialogs are closed
-  // Uses setTimeout to ensure this runs AFTER Radix UI's cleanup completes
-  useEffect(() => {
-    if (!isViewDialogOpen && !isCreateDialogOpen && !isEditDialogOpen) {
-      // Use setTimeout to run after Radix UI's cleanup phase
-      const timer = setTimeout(() => {
-        document.body.style.pointerEvents = 'auto'
-      }, 0)
-
-      return () => clearTimeout(timer)
-    }
-  }, [isViewDialogOpen, isCreateDialogOpen, isEditDialogOpen])
-
   // Cleanup when dialogs close
   useEffect(() => {
     if (!isViewDialogOpen) {
