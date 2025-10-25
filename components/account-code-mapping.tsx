@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -85,6 +85,26 @@ export function AccountCodeMapping() {
   // Form state
   const [formData, setFormData] = useState<Partial<APMapping | GLMapping>>({})
 
+  // Cleanup when dialogs close
+  useEffect(() => {
+    if (!isViewDialogOpen) {
+      setSelectedMapping(null)
+    }
+  }, [isViewDialogOpen])
+
+  useEffect(() => {
+    if (!isCreateDialogOpen) {
+      setFormData({})
+    }
+  }, [isCreateDialogOpen])
+
+  useEffect(() => {
+    if (!isEditDialogOpen) {
+      setFormData({})
+      setSelectedMapping(null)
+    }
+  }, [isEditDialogOpen])
+
   // Handlers
   const handleCreate = () => {
     setFormData({})
@@ -143,27 +163,6 @@ export function AccountCodeMapping() {
     setSelectedMapping(null)
   }
 
-  const handleCloseView = (open: boolean) => {
-    setIsViewDialogOpen(open)
-    if (!open) {
-      setSelectedMapping(null)
-    }
-  }
-
-  const handleCloseCreate = (open: boolean) => {
-    setIsCreateDialogOpen(open)
-    if (!open) {
-      setFormData({})
-    }
-  }
-
-  const handleCloseEdit = (open: boolean) => {
-    setIsEditDialogOpen(open)
-    if (!open) {
-      setFormData({})
-      setSelectedMapping(null)
-    }
-  }
 
   const handleScan = () => {
     alert('Scan for new codes - To be implemented\n\nThis will scan for:\n- New Location codes\n- New Item Groups\n- New transaction combinations')
@@ -390,7 +389,7 @@ export function AccountCodeMapping() {
       </div>
 
       {/* View Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={handleCloseView}>
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>View Mapping Details</DialogTitle>
@@ -496,7 +495,7 @@ export function AccountCodeMapping() {
       </Dialog>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={handleCloseCreate}>
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Create New Mapping</DialogTitle>
@@ -665,7 +664,7 @@ export function AccountCodeMapping() {
       </Dialog>
 
       {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={handleCloseEdit}>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Edit Mapping</DialogTitle>
