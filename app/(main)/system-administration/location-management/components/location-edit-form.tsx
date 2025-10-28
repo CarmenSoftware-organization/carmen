@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { UserAssignment } from './user-assignment'
+import { ProductAssignment } from './product-assignment'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Save, X } from 'lucide-react'
 
 const locationSchema = z.object({
@@ -42,6 +44,10 @@ export function LocationEditForm({ location, onSave, onCancel }: LocationEditFor
   const [assignedUserIds, setAssignedUserIds] = useState<string[]>(
     location?.assignedUsers || []
   )
+  const [assignedProductIds, setAssignedProductIds] = useState<string[]>(
+    location?.assignedProducts || []
+  )
+  const [activeTab, setActiveTab] = useState<'users' | 'products'>('users')
 
   const {
     register,
@@ -70,6 +76,7 @@ export function LocationEditForm({ location, onSave, onCancel }: LocationEditFor
       ...data,
       eop: data.eop,
       assignedUsers: assignedUserIds,
+      assignedProducts: assignedProductIds,
     }
 
     if (location?.id) {
@@ -191,15 +198,28 @@ export function LocationEditForm({ location, onSave, onCancel }: LocationEditFor
         </div>
       </div>
 
-      {/* User Assignment Section */}
+      {/* Assignment Section with Tabs */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          User Assignment
-        </h3>
-        <UserAssignment
-          assignedUserIds={assignedUserIds}
-          onAssignedUsersChange={setAssignedUserIds}
-        />
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'users' | 'products')}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="users">User Assignment</TabsTrigger>
+            <TabsTrigger value="products">Product Assignment</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="users">
+            <UserAssignment
+              assignedUserIds={assignedUserIds}
+              onAssignedUsersChange={setAssignedUserIds}
+            />
+          </TabsContent>
+
+          <TabsContent value="products">
+            <ProductAssignment
+              assignedProductIds={assignedProductIds}
+              onAssignedProductsChange={setAssignedProductIds}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Form Actions */}
