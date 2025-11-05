@@ -149,7 +149,9 @@ dev-debug.log
 .DS_Store
 # Task files
 tasks.json
-tasks/ 
+!tasks/
+tasks/*
+!tasks/inventory-progress.md 
 .vercel
 
 # Serena cache files
@@ -157,4 +159,4 @@ tasks/
 .playwright-mcp
 
 # Documentation
-docs/
+# docs/ - Commented out to track documentation files

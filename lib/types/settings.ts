@@ -1,6 +1,8 @@
 // Settings Types for Carmen ERP
 // Comprehensive settings system for user preferences and system configuration
 
+import { CostingMethod } from './inventory'
+
 // ============================================================================
 // Display & Regional Settings
 // ============================================================================
@@ -177,6 +179,34 @@ export interface CompanySettings {
   updatedAt: Date;
   updatedBy: string; // User ID
   createdAt: Date;
+}
+
+// ============================================================================
+// Inventory Settings
+// ============================================================================
+
+/**
+ * Inventory Settings for centralized costing configuration
+ *
+ * This configuration applies company-wide to all locations and inventory items.
+ * The selected costing method affects how inventory is valued across the system:
+ * credit notes, GRN processing, period-end valuation, and financial reporting.
+ *
+ * See: docs/app/shared-methods/inventory-valuation/
+ */
+export interface InventorySettings {
+  id: string;
+  companyId: string;
+
+  // Costing Configuration
+  defaultCostingMethod: CostingMethod; // 'FIFO' or 'PERIODIC_AVERAGE'
+  periodType: 'CALENDAR_MONTH'; // Fixed: periods are calendar months
+
+  // Metadata
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy?: string;
 }
 
 // ============================================================================

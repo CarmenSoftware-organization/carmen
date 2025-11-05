@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Management - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.75;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875em;
+            color: var(--danger);
+        }
+
+        pre {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--success);
+            color: white;
+        }
+
+        .badge.status-warning {
+            background: var(--warning);
+        }
+
+        .badge.status-info {
+            background: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        th {
+            background: var(--bg-light);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .info-box strong {
+            color: var(--primary);
+        }
+
+        .ascii-art {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← Back to Modules</a>
+            <h1>Finance</h1>
+        </div>
+        <nav>
+            <div class="nav-section">
+                <h3>Features</h3>
+                <ul>
+                    <li><a href="account-code-mapping.html">Account Code Mapping</a></li>
+                    <li><a href="department-management.html" class="active">Department Management</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb">
+            <a href="../index.html">Documentation</a> /
+            <a href="#finance">Finance</a> /
+            Department Management
+        </div>
+
+        <div class="content-wrapper">
+            <div class="document-content">
+                <h1 id="heading-0">Department Management</h1>
+
+                <div class="info-box">
+                    <strong>Feature:</strong> Finance &gt; Department Management<br>
+                    <strong>Pages:</strong> 1<br>
+                    <strong>Status:</strong> <span class="badge">✅ Production Ready</span>
+                </div>
+
+                <h2 id="overview">Overview</h2>
+                <p>Department Management provides organizational structure configuration for Carmen ERP, enabling cost center tracking, departmental hierarchy, budget allocation, and expense categorization. This feature integrates with Account Code Mapping to ensure proper GL account assignment by department.</p>
+
+                <h3 id="key-capabilities">Key Capabilities</h3>
+                <ol>
+                    <li><strong>Department CRUD</strong> - Create, edit, and manage departments</li>
+                    <li><strong>Head of Department</strong> - Assign multiple department heads</li>
+                    <li><strong>User Assignment</strong> - Assign users to departments with enhanced visual interface</li>
+                    <li><strong>Account Code Linking</strong> - Link departments to default GL accounts</li>
+                    <li><strong>Active Status Management</strong> - Enable/disable departments</li>
+                    <li><strong>Search & Filter</strong> - Quick department lookup</li>
+                </ol>
+
+                <h2 id="page-structure">Page Structure</h2>
+                <p><strong>Route:</strong> <code>/finance/department-list</code></p>
+
+                <h2 id="data-model">Data Model</h2>
+                <pre><code>interface Department {
+  // Identity
+  code: string; // Department code (2-4 characters)
+  name: string; // Department name/description
+
+  // Leadership
+  heads: string[]; // Array of email addresses for department heads
+
+  // User Assignment
+  assignedUsers?: string[]; // Array of user IDs assigned to this department
+
+  // Financial
+  accountCode: string; // Default GL account code for department expenses
+  costCenter?: string; // Cost center code
+  budget?: Money; // Annual or period budget
+
+  // Configuration
+  active: boolean; // Is department active?
+
+  // Hierarchy
+  parentDepartment?: string; // Parent department code
+  level?: number; // Hierarchy level (1 = top level)
+
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  lastModifiedBy: string;
+}</code></pre>
+
+                <h2 id="features-functionality">Features & Functionality</h2>
+
+                <h3 id="department-list">1. Department List View</h3>
+                <h4>Columns:</h4>
+                <ul>
+                    <li><strong>Code</strong>: Department code (badge display)</li>
+                    <li><strong>Name</strong>: Full department name</li>
+                    <li><strong>Head of Department</strong>: Email(s) of department head(s)</li>
+                    <li><strong>Account Code</strong>: Linked GL account</li>
+                    <li><strong>Active</strong>: Status checkbox (display only)</li>
+                    <li><strong>Actions</strong>: Edit/Delete buttons</li>
+                </ul>
+
+                <h4>Features:</h4>
+                <ul>
+                    <li>Sortable columns</li>
+                    <li>Search by code or name</li>
+                    <li>Real-time filtering</li>
+                    <li>Responsive table design</li>
+                    <li>Badge styling for codes</li>
+                </ul>
+
+                <h3 id="department-form">2. Department Creation/Edit Form</h3>
+
+                <h4>Form Fields:</h4>
+
+                <p><strong>Basic Information:</strong></p>
+                <ul>
+                    <li><strong>Code</strong> (required): 2-4 character unique code</li>
+                    <li><strong>Name</strong> (required): Full department name</li>
+                    <li><strong>Account Code</strong> (optional): Default GL account</li>
+                    <li><strong>Active</strong>: Checkbox for status</li>
+                </ul>
+
+                <p><strong>Department Heads:</strong></p>
+                <ul>
+                    <li>List of assigned heads (email addresses)</li>
+                    <li>Add new head (email input + Add button)</li>
+                    <li>Remove existing head (Remove button per entry)</li>
+                    <li>Multiple heads supported</li>
+                </ul>
+
+                <p><strong>User Assignment:</strong></p>
+                <ul>
+                    <li>Enhanced dual-panel interface for assigning users to department</li>
+                    <li>Visual hierarchy showing user avatar, name, role, and current departments</li>
+                    <li>Three-column layout with chevron buttons for assignment/removal</li>
+                    <li>Search and filter capabilities</li>
+                    <li>Select All functionality for bulk operations</li>
+                </ul>
+
+                <h3 id="user-assignment-interface">2.1. Enhanced User Assignment Interface</h3>
+
+                <p><strong>Overview:</strong><br>
+                The department edit form includes an enhanced user assignment component that provides a visual, intuitive way to manage which users are assigned to each department.</p>
+
+                <p><strong>Interface Layout:</strong></p>
+                <div class="ascii-art">┌────────────────────────────────────────────────────┐
+│  Assigned Users        [&lt;] [&gt;]    Available Users  │
+│  ┌─────────────────┐           ┌─────────────────┐│
+│  │ 🔵 John Smith   │           │ 🟢 Jane Doe     ││
+│  │ 📋 Manager      │           │ 📋 Staff        ││
+│  │ 🏢 Finance      │           │ 🏢 Operations   ││
+│  └─────────────────┘           └─────────────────┘│
+└────────────────────────────────────────────────────┘</div>
+
+                <h4>Key Features:</h4>
+
+                <p><strong>1. Visual Hierarchy:</strong></p>
+                <ul>
+                    <li><strong>Color-coded avatar</strong>: Shows user initials on colored background (7 color variations)</li>
+                    <li><strong>Name</strong>: Prominent display of user's full name</li>
+                    <li><strong>Role/Position</strong>: Secondary display with briefcase icon</li>
+                    <li><strong>Department</strong>: Current department assignment with building icon</li>
+                    <li><strong>Additional departments</strong>: Badge display for users in multiple departments</li>
+                </ul>
+
+                <p><strong>2. Three-Column Layout:</strong></p>
+                <ul>
+                    <li><strong>Left Panel</strong>: "Assigned Users" - Users currently assigned to this department</li>
+                    <li><strong>Center</strong>: Action buttons with chevron icons</li>
+                    <li><strong>Right Panel</strong>: "Available Users" - Users not yet assigned to this department</li>
+                </ul>
+
+                <p><strong>3. Assignment Actions:</strong></p>
+                <ul>
+                    <li><strong>ChevronLeft (←)</strong>: Move selected users from Available to Assigned</li>
+                    <li><strong>ChevronRight (→)</strong>: Remove selected users from Assigned to Available</li>
+                    <li><strong>Buttons disabled</strong> when no users are selected</li>
+                </ul>
+
+                <p><strong>4. Search & Filter:</strong></p>
+                <ul>
+                    <li>Search by user name or email in both panels</li>
+                    <li>Real-time filtering as you type</li>
+                    <li>Independent search for each panel</li>
+                </ul>
+
+                <p><strong>5. Bulk Selection:</strong></p>
+                <ul>
+                    <li><strong>Select All checkbox</strong> in each panel header</li>
+                    <li>Select individual users with checkboxes</li>
+                    <li>Visual feedback for selected users (blue highlight)</li>
+                </ul>
+
+                <p><strong>6. Panel Features:</strong></p>
+                <ul>
+                    <li>Equal height panels (384px) with scrolling</li>
+                    <li>Empty state messages when no data</li>
+                    <li>User count display</li>
+                    <li>Hover states for better UX</li>
+                </ul>
+
+                <p><strong>User Experience:</strong></p>
+                <ol>
+                    <li>Search for users in either panel</li>
+                    <li>Select one or more users using checkboxes</li>
+                    <li>Use Select All to select all visible users</li>
+                    <li>Click chevron button to assign/remove selected users</li>
+                    <li>Changes saved when form is submitted</li>
+                </ol>
+
+                <h2 id="technical-implementation">Technical Implementation</h2>
+
+                <h3 id="components">Components</h3>
+
+                <p><strong>UserAssignment Component</strong> (<code>user-assignment.tsx</code>):</p>
+                <ul>
+                    <li>Reusable component for department-user relationships</li>
+                    <li><strong>Props:</strong>
+                        <ul>
+                            <li><code>assignedUserIds: string[]</code> - Currently assigned user IDs</li>
+                            <li><code>onAssignedUsersChange: (userIds: string[]) => void</code> - Callback for changes</li>
+                        </ul>
+                    </li>
+                    <li><strong>Features:</strong>
+                        <ul>
+                            <li>Dual-panel layout with independent search</li>
+                            <li>Visual user cards with avatar, role, and department</li>
+                            <li>Bulk selection and assignment</li>
+                            <li>Real-time filtering</li>
+                            <li>Dark mode support</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <p><strong>Helper Functions:</strong></p>
+                <pre><code>getUserInitials(name: string): string // Returns user initials for avatar
+getAvatarColor(userId: string): string // Returns consistent color class
+getUserDepartments(userId: string): Department[] // Gets user's departments</code></pre>
+
+                <p><strong>State Management:</strong></p>
+                <ul>
+                    <li>Local state for search queries and selections</li>
+                    <li>useMemo hooks for filtering performance</li>
+                    <li>Optimized re-rendering with proper dependency arrays</li>
+                </ul>
+
+                <h3 id="api-integration">API Integration</h3>
+
+                <p><strong>Department User Assignment:</strong></p>
+                <pre><code>PUT /api/finance/departments/:code
+Body: {
+  code: string
+  name: string
+  assignedUsers: string[]
+  ...
+}</code></pre>
+
+                <p><strong>Response:</strong></p>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "code": "IT",
+    "name": "Information Technology",
+    "assignedUsers": ["user-001", "user-002"],
+    ...
+  }
+}</code></pre>
+
+                <h2 id="changelog">Changelog</h2>
+
+                <h3>Version 1.1.0 (2025-01-28)</h3>
+
+                <p><strong>Added:</strong></p>
+                <ul>
+                    <li>Enhanced user assignment interface with visual hierarchy</li>
+                    <li>Color-coded user avatars with initials</li>
+                    <li>Three-column layout with chevron button navigation</li>
+                    <li>Role and department display for each user</li>
+                    <li>Bulk selection with "Select All" functionality</li>
+                    <li>Independent search for Assigned and Available users panels</li>
+                    <li>Real-time filtering and empty state handling</li>
+                    <li>Dark mode support throughout interface</li>
+                </ul>
+
+                <p><strong>Improved:</strong></p>
+                <ul>
+                    <li>User experience for assigning users to departments</li>
+                    <li>Visual feedback for selected users</li>
+                    <li>Performance optimization with useMemo hooks</li>
+                </ul>
+
+                <p><strong>Technical:</strong></p>
+                <ul>
+                    <li>Added <code>assignedUsers</code> field to Department data model</li>
+                    <li>Created reusable UserAssignment component</li>
+                    <li>Implemented helper functions for avatar colors and user data</li>
+                </ul>
+
+                <h3>Version 1.0.0 (2025-01-17)</h3>
+                <ul>
+                    <li>Initial Department Management implementation</li>
+                    <li>CRUD operations for departments</li>
+                    <li>Department head assignment</li>
+                    <li>Account code linking</li>
+                    <li>Status management</li>
+                </ul>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                    <strong>Last Updated:</strong> 2025-01-28<br>
+                    <strong>Version:</strong> 1.1.0
+                </p>
+            </div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list">
+                        <li class="toc-h2"><a href="#overview">Overview</a></li>
+                        <li class="toc-h3"><a href="#key-capabilities">Key Capabilities</a></li>
+                        <li class="toc-h2"><a href="#page-structure">Page Structure</a></li>
+                        <li class="toc-h2"><a href="#data-model">Data Model</a></li>
+                        <li class="toc-h2"><a href="#features-functionality">Features & Functionality</a></li>
+                        <li class="toc-h3"><a href="#department-list">Department List View</a></li>
+                        <li class="toc-h3"><a href="#department-form">Department Form</a></li>
+                        <li class="toc-h3"><a href="#user-assignment-interface">User Assignment Interface</a></li>
+                        <li class="toc-h2"><a href="#technical-implementation">Technical Implementation</a></li>
+                        <li class="toc-h3"><a href="#components">Components</a></li>
+                        <li class="toc-h3"><a href="#api-integration">API Integration</a></li>
+                        <li class="toc-h2"><a href="#changelog">Changelog</a></li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+</body>
+</html>

@@ -35,13 +35,16 @@ export interface InventoryItem {
 
 /**
  * Costing methods for inventory valuation
+ *
+ * System supports two centralized costing methods applied company-wide:
+ * - FIFO: First-In-First-Out (oldest inventory consumed first)
+ * - PERIODIC_AVERAGE: Monthly average cost applied to all transactions in the period
+ *
+ * See: docs/app/shared-methods/inventory-valuation/SM-costing-methods.md
  */
 export enum CostingMethod {
   FIFO = "FIFO",
-  LIFO = "LIFO",
-  MOVING_AVERAGE = "MOVING_AVERAGE",
-  WEIGHTED_AVERAGE = "WEIGHTED_AVERAGE",
-  STANDARD_COST = "STANDARD_COST"
+  PERIODIC_AVERAGE = "PERIODIC_AVERAGE"
 }
 
 /**

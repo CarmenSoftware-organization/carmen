@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Management - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .sidebar nav {
+            padding: 0 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-section a:hover,
+        .nav-section a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100% - 280px);
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .document-content {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .toc-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .toc-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+        }
+
+        .toc-list .toc-h2 {
+            margin-left: 0;
+            font-weight: 500;
+        }
+
+        .toc-list .toc-h3 {
+            margin-left: 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .toc-list .toc-h4 {
+            margin-left: 2rem;
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.75;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875em;
+            color: var(--danger);
+        }
+
+        pre {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--success);
+            color: white;
+        }
+
+        .badge.status-warning {
+            background: var(--warning);
+        }
+
+        .badge.status-info {
+            background: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        th {
+            background: var(--bg-light);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .info-box strong {
+            color: var(--primary);
+        }
+
+        .ascii-art {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="back-link">← Back to Modules</a>
+            <h1>System Administration</h1>
+        </div>
+        <nav>
+            <div class="nav-section">
+                <h3>Features</h3>
+                <ul>
+                    <li><a href="location-management.html" class="active">Location Management</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="breadcrumb">
+            <a href="../index.html">Documentation</a> /
+            <a href="#system-administration">System Administration</a> /
+            Location Management
+        </div>
+
+        <div class="content-wrapper">
+            <div class="document-content">
+                <h1 id="heading-0">Location Management</h1>
+
+                <div class="info-box">
+                    <strong>Feature:</strong> System Administration &gt; Location Management<br>
+                    <strong>Pages:</strong> 4<br>
+                    <strong>Status:</strong> <span class="badge">✅ Production Ready</span>
+                </div>
+
+                <h2 id="overview">Overview</h2>
+                <p>Location Management provides centralized control over all physical business locations in the Carmen ERP system. This feature enables organizations to define, configure, and maintain locations including warehouses, restaurants, central kitchens, delivery points, and end-of-period (EOP) locations.</p>
+
+                <h3 id="key-features">Key Features</h3>
+                <ol>
+                    <li><strong>Location CRUD</strong> - Create, view, edit, and delete locations</li>
+                    <li><strong>Dual View Modes</strong> - Toggle between table and card views</li>
+                    <li><strong>Advanced Filtering</strong> - Filter by status, type, and search</li>
+                    <li><strong>User Assignment</strong> - Assign users to locations with enhanced interface</li>
+                    <li><strong>Product Assignment</strong> - Define product availability at locations</li>
+                    <li><strong>Hierarchical Organization</strong> - Support for location hierarchies</li>
+                    <li><strong>Configuration Management</strong> - Manage location-specific settings</li>
+                    <li><strong>Status Tracking</strong> - Active/inactive status management</li>
+                </ol>
+
+                <h2 id="data-model">Data Model</h2>
+                <pre><code>interface Location {
+  // Identity
+  id: string;
+  code: string;
+  name: string;
+  type: LocationType;
+
+  // Assignment
+  assignedUsers?: string[]; // Array of user IDs assigned to this location
+  assignedProducts?: string[]; // Array of product IDs available at this location
+
+  // Address
+  address: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+
+  // Configuration
+  isEOP: boolean; // End of Period location
+  isDeliveryPoint: boolean;
+  parentLocationId?: string;
+  defaultDepartment?: string;
+  timezone: string;
+
+  // Contact
+  phone?: string;
+  email?: string;
+  manager?: string;
+  emergencyContact?: string;
+
+  // Permissions
+  allowInventory: boolean;
+  allowTransfers: boolean;
+  allowPurchases: boolean;
+  allowProduction: boolean;
+
+  // Financial
+  costCenter?: string;
+  taxId?: string;
+
+  // Status
+  isActive: boolean;
+
+  // Audit
+  createdBy: string;
+  createdAt: Date;
+  updatedBy: string;
+  updatedAt: Date;
+}</code></pre>
+
+                <h2 id="edit-location">4. Edit Location Page</h2>
+                <p><strong>Route:</strong> <code>/system-administration/location-management/[id]/edit</code></p>
+
+                <p>Same form as Create Location, pre-populated with existing data.</p>
+
+                <p><strong>Additional Features:</strong></p>
+                <ul>
+                    <li><strong>Tab Interface</strong>: Switch between different assignment sections
+                        <ul>
+                            <li><strong>User Assignment Tab</strong>: Assign users to this location</li>
+                            <li><strong>Product Assignment Tab</strong>: Assign products available at this location</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 id="user-assignment-tab">4.1. User Assignment Tab</h3>
+
+                <p>Enhanced dual-panel interface for assigning users to the location, using the same interface as Department user assignment.</p>
+
+                <p><strong>Features:</strong></p>
+                <ul>
+                    <li>Visual hierarchy with user avatars, names, roles, and current locations</li>
+                    <li>Three-column layout (Assigned Users | Actions | Available Users)</li>
+                    <li>Chevron buttons for assignment/removal</li>
+                    <li>Search and Select All functionality</li>
+                    <li>Equal-height scrollable panels</li>
+                </ul>
+
+                <h3 id="product-assignment-tab">4.2. Product Assignment Tab</h3>
+
+                <p>Comprehensive product assignment with two viewing modes to accommodate different workflows.</p>
+
+                <p><strong>Mode Toggle:</strong></p>
+                <ul>
+                    <li><strong>Product Mode</strong> (List icon): Flat list view of all products</li>
+                    <li><strong>Category Mode</strong> (FolderTree icon): Hierarchical tree view grouped by category</li>
+                </ul>
+
+                <p><strong>Product Mode Features:</strong></p>
+                <ul>
+                    <li>Dual-panel interface similar to user assignment</li>
+                    <li>Display: Product code, name, category, and base unit</li>
+                    <li>Search by product code or name</li>
+                    <li>Individual and bulk selection</li>
+                    <li>Assign/remove products between panels</li>
+                </ul>
+
+                <p><strong>Category Mode Features:</strong></p>
+                <ul>
+                    <li>Products grouped by category with expand/collapse</li>
+                    <li>Category headers show folder icon and product count badge</li>
+                    <li>Expandable tree structure</li>
+                    <li>Select products within categories</li>
+                    <li>Same dual-panel layout with category grouping</li>
+                    <li>Maintains selection when switching modes</li>
+                </ul>
+
+                <p><strong>Interface Diagrams:</strong></p>
+
+                <p><em>Product Mode (Flat List):</em></p>
+                <div class="ascii-art">┌──────────────────────────────────────────────────┐
+│ [List Icon] Product Mode  [FolderTree] Category  │
+├──────────────────────────────────────────────────┤
+│  Assigned Products      [&lt;] [&gt;]  Available       │
+│  ┌────────────────┐            ┌───────────────┐│
+│  │ 📦 PRD-001     │            │ 📦 PRD-005    ││
+│  │ Olive Oil      │            │ Tomatoes      ││
+│  │ 🏷️ Oils • bottle│            │ 🏷️ Produce•kg ││
+│  └────────────────┘            └───────────────┘│
+└──────────────────────────────────────────────────┘</div>
+
+                <p><em>Category Mode (Tree View):</em></p>
+                <div class="ascii-art">┌──────────────────────────────────────────────────┐
+│ [List] Product  [FolderTree Icon] Category Mode  │
+├──────────────────────────────────────────────────┤
+│  Assigned Products      [&lt;] [&gt;]  Available       │
+│  ┌────────────────┐            ┌───────────────┐│
+│  │ ▼ 📁 Food (12) │            │ ▶ 📁 Dry (16) ││
+│  │   □ Olive Oil  │            │ ▼ 📁 Meat (6) ││
+│  │   □ Pasta      │            │   □ Chicken   ││
+│  │                │            │   □ Beef      ││
+│  └────────────────┘            └───────────────┘│
+└──────────────────────────────────────────────────┘</div>
+
+                <p><strong>Mode Switching:</strong></p>
+                <ul>
+                    <li>Toggle between modes using buttons at top</li>
+                    <li>Selection preserved when switching</li>
+                    <li>Search applies to both modes</li>
+                    <li>Independent panel searching</li>
+                </ul>
+
+                <h2 id="assignment-features">Assignment Features</h2>
+
+                <h3 id="user-assignment">User Assignment</h3>
+
+                <p><strong>Purpose:</strong> Define which users have access to and can work at specific locations.</p>
+
+                <p><strong>Interface Components:</strong></p>
+
+                <p><strong>1. Assigned Users Panel (Left)</strong></p>
+                <ul>
+                    <li>Shows users currently assigned to this location</li>
+                    <li>Search by name or email</li>
+                    <li>Select All checkbox for bulk operations</li>
+                    <li>Visual display:
+                        <ul>
+                            <li>Color-coded avatar with initials</li>
+                            <li>User's full name (prominent)</li>
+                            <li>Role/Position with briefcase icon</li>
+                            <li>Current location(s) with location icon</li>
+                            <li>Additional locations shown as badges</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <p><strong>2. Action Buttons (Center)</strong></p>
+                <ul>
+                    <li>ChevronLeft (←): Assign selected users from Available to Assigned</li>
+                    <li>ChevronRight (→): Remove selected users from Assigned to Available</li>
+                    <li>Buttons disabled when no selection</li>
+                </ul>
+
+                <p><strong>3. Available Users Panel (Right)</strong></p>
+                <ul>
+                    <li>Shows users not yet assigned to this location</li>
+                    <li>Independent search functionality</li>
+                    <li>Same visual hierarchy as Assigned panel</li>
+                </ul>
+
+                <p><strong>Use Cases:</strong></p>
+                <ul>
+                    <li>Assign staff to specific restaurant/store locations</li>
+                    <li>Control access to warehouse locations</li>
+                    <li>Define kitchen staff for central kitchens</li>
+                    <li>Manage delivery personnel for delivery points</li>
+                </ul>
+
+                <h3 id="product-assignment">Product Assignment</h3>
+
+                <p><strong>Purpose:</strong> Define which products are available at each location for ordering, inventory, and operations.</p>
+
+                <p><strong>Product Assignment Use Cases:</strong></p>
+                <ul>
+                    <li><strong>Restaurant</strong>: Assign menu items and ingredients to specific locations</li>
+                    <li><strong>Warehouse</strong>: Define available inventory items per warehouse</li>
+                    <li><strong>Store</strong>: Set available products for store requisitions</li>
+                    <li><strong>Central Kitchen</strong>: Configure recipe ingredients and supplies</li>
+                    <li><strong>Category-based</strong>: Assign entire product categories to new locations</li>
+                </ul>
+
+                <h2 id="technical-implementation">Technical Implementation</h2>
+
+                <h3 id="components">Components</h3>
+
+                <p><strong>UserAssignment Component</strong> (<code>user-assignment.tsx</code>):</p>
+                <ul>
+                    <li>Manages user-to-location assignments</li>
+                    <li>Reuses same component from Department Management</li>
+                    <li><strong>Props:</strong>
+                        <ul>
+                            <li><code>assignedUserIds: string[]</code></li>
+                            <li><code>onAssignedUsersChange: (userIds: string[]) => void</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Features:</strong> Dual-panel interface, search, bulk operations</li>
+                </ul>
+
+                <p><strong>ProductAssignment Component</strong> (<code>product-assignment.tsx</code>):</p>
+                <ul>
+                    <li>Manages product availability at locations</li>
+                    <li><strong>Props:</strong>
+                        <ul>
+                            <li><code>assignedProductIds: string[]</code></li>
+                            <li><code>onAssignedProductsChange: (productIds: string[]) => void</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Features:</strong>
+                        <ul>
+                            <li>Mode toggle (Product/Category)</li>
+                            <li>Dual-panel interface</li>
+                            <li>Category tree with expand/collapse</li>
+                            <li>Search and bulk selection</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <p><strong>LocationEditForm Component</strong> (<code>location-edit-form.tsx</code>):</p>
+                <ul>
+                    <li>Main form with tab interface</li>
+                    <li><strong>State management:</strong>
+                        <pre><code>const [assignedUserIds, setAssignedUserIds] = useState&lt;string[]&gt;([])
+const [assignedProductIds, setAssignedProductIds] = useState&lt;string[]&gt;([])
+const [activeTab, setActiveTab] = useState&lt;'users' | 'products'&gt;('users')</code></pre>
+                    </li>
+                    <li>Tabs component from shadcn/ui</li>
+                    <li>Form submission includes both assignments</li>
+                </ul>
+
+                <h3 id="helper-functions">Helper Functions</h3>
+
+                <p><strong>Product Assignment:</strong></p>
+                <pre><code>groupProductsByCategory(products: Product[]): CategoryGroup[]
+toggleCategory(categoryId: string): void</code></pre>
+
+                <p><strong>State Management:</strong></p>
+                <ul>
+                    <li>useMemo for filtering performance</li>
+                    <li>Set-based category expansion state</li>
+                    <li>Independent search state per panel</li>
+                    <li>Mode toggle preserves selections</li>
+                </ul>
+
+                <h3 id="api-integration">API Integration</h3>
+
+                <p><strong>Location with Assignments:</strong></p>
+                <pre><code>PUT /api/locations/:id
+Body: {
+  code: string
+  name: string
+  assignedUsers: string[]
+  assignedProducts: string[]
+  ...
+}</code></pre>
+
+                <p><strong>Response:</strong></p>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "id": "loc-001",
+    "code": "NYC001",
+    "name": "New York Central Kitchen",
+    "assignedUsers": ["user-001", "user-002"],
+    "assignedProducts": ["product-001", "product-002", "product-003"],
+    ...
+  }
+}</code></pre>
+
+                <h2 id="changelog">Changelog</h2>
+
+                <h3>Version 1.1.0 (2025-01-28)</h3>
+
+                <p><strong>Added:</strong></p>
+                <ul>
+                    <li><strong>User Assignment Tab</strong>: Enhanced interface for assigning users to locations
+                        <ul>
+                            <li>Visual hierarchy with avatars, names, roles, and locations</li>
+                            <li>Three-column layout with chevron navigation</li>
+                            <li>Search and Select All functionality</li>
+                            <li>Reuses Department user assignment component</li>
+                        </ul>
+                    </li>
+                    <li><strong>Product Assignment Tab</strong>: Comprehensive product availability management
+                        <ul>
+                            <li><strong>Product Mode</strong>: Flat list view for quick product assignment
+                                <ul>
+                                    <li>Search by code or name</li>
+                                    <li>Product card display with code, name, category, unit</li>
+                                </ul>
+                            </li>
+                            <li><strong>Category Mode</strong>: Hierarchical tree view for category-based assignment
+                                <ul>
+                                    <li>Expandable/collapsible categories</li>
+                                    <li>Product count badges</li>
+                                    <li>Nested category support</li>
+                                </ul>
+                            </li>
+                            <li>Mode toggle with icons (List / FolderTree)</li>
+                            <li>Independent search per panel</li>
+                            <li>Bulk selection in both modes</li>
+                        </ul>
+                    </li>
+                    <li><strong>Tab Interface</strong>: Organize user and product assignments
+                        <ul>
+                            <li>Easy switching between assignment types</li>
+                            <li>Independent state management</li>
+                            <li>Consistent UI patterns</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <p><strong>Improved:</strong></p>
+                <ul>
+                    <li>Location edit workflow with organized assignments</li>
+                    <li>User experience for managing location access</li>
+                    <li>Product availability configuration per location</li>
+                    <li>Performance with useMemo optimization</li>
+                </ul>
+
+                <p><strong>Technical:</strong></p>
+                <ul>
+                    <li>Added <code>assignedUsers</code> and <code>assignedProducts</code> fields to Location model</li>
+                    <li>Created ProductAssignment component with dual modes</li>
+                    <li>Implemented category grouping and tree rendering</li>
+                    <li>Added mode toggle state management</li>
+                    <li>Integrated Tabs component for organized UI</li>
+                </ul>
+
+                <h3>Version 1.0.0 (2025-01-17)</h3>
+                <ul>
+                    <li>Initial Location Management implementation</li>
+                    <li>CRUD operations for locations</li>
+                    <li>Dual view modes (table/card)</li>
+                    <li>Advanced filtering and search</li>
+                    <li>Status management</li>
+                </ul>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                    <strong>Last Updated:</strong> 2025-01-28<br>
+                    <strong>Version:</strong> 1.1.0
+                </p>
+            </div>
+
+            <aside class="toc-sidebar">
+                <div class="toc-sticky">
+                    <div class="toc-title">On This Page</div>
+                    <ul class="toc-list">
+                        <li class="toc-h2"><a href="#overview">Overview</a></li>
+                        <li class="toc-h3"><a href="#key-features">Key Features</a></li>
+                        <li class="toc-h2"><a href="#data-model">Data Model</a></li>
+                        <li class="toc-h2"><a href="#edit-location">Edit Location</a></li>
+                        <li class="toc-h3"><a href="#user-assignment-tab">User Assignment Tab</a></li>
+                        <li class="toc-h3"><a href="#product-assignment-tab">Product Assignment Tab</a></li>
+                        <li class="toc-h2"><a href="#assignment-features">Assignment Features</a></li>
+                        <li class="toc-h3"><a href="#user-assignment">User Assignment</a></li>
+                        <li class="toc-h3"><a href="#product-assignment">Product Assignment</a></li>
+                        <li class="toc-h2"><a href="#technical-implementation">Technical Implementation</a></li>
+                        <li class="toc-h3"><a href="#components">Components</a></li>
+                        <li class="toc-h3"><a href="#helper-functions">Helper Functions</a></li>
+                        <li class="toc-h3"><a href="#api-integration">API Integration</a></li>
+                        <li class="toc-h2"><a href="#changelog">Changelog</a></li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+</body>
+</html>

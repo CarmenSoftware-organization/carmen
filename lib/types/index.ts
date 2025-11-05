@@ -32,6 +32,8 @@ export type {
   TransactionType
 } from './inventory'
 
+export { CostingMethod } from './inventory'
+
 // Procurement types
 // NOTE: Exclude CostCenter (from finance), CreditNote/CreditNoteItem (from credit-note)
 export type {
@@ -120,6 +122,7 @@ export type {
   IPAccessControl,
   AuditEventType,
   CompanySettings,
+  InventorySettings,
   EmailConfiguration,
   BackupSettings,
   DataRetentionSettings,

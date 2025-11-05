@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Ledger Reports - Index - Carmen ERP Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .content h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .content h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .content h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .content h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+        }
+
+        .content ul, .content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .content th {
+            background: var(--bg-light);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .content td {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .content tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+
+        .content code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        .content pre {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .content blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        .content strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        @media print {
+            .header, .breadcrumb, .footer {
+                display: none;
+            }
+            .content {
+                border: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">Carmen ERP Documentation</div>
+            <nav class="nav-links">
+                <a href="/04-modules/reporting/">Reporting Module</a>
+                <a href="/04-modules/reporting/README.html">Overview</a>
+                <a href="/">Docs Home</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="breadcrumb"><a href="/04-modules/reporting/">Reporting</a> <span>/</span> <span>Reports Index</span></div>
+        <div class="content">
+            <h1>Blue Ledger Reports - Index</h1><p>This directory contains Product Requirement Documents (PRD) and Template specifications for all 35 Blue Ledger reports, organized by module and report type.</p><h2>Directory Structure</h2><p>Each report has its own subdirectory containing:
+<ul>
+<li><strong>PRD.md</strong> - Product Requirements Document</li>
+<li><strong>TEMPLATE.md</strong> - Template structure and layout specifications</li>
+</ul><h2>Report Categories</h2><h3>Purchase Request (PR) Reports</h3>
+<ul>
+<li><strong>01-pr-001-purchase-request-list</strong> - Summary list of all PRs</li>
+<li><strong>02-pr-002-purchase-request-detail</strong> - Detailed PR line items</li>
+<li><strong>03-pr-003-price-list-by-product</strong> - Vendor price comparison</li>
+</ul><h3>Purchase Order (PO) Reports</h3>
+<ul>
+<li><strong>04-po-001-order-pending</strong> - Pending orders (merged with PO-002)</li>
+<li><strong>05-po-002-purchase-order-detail</strong> - Detailed PO with fulfillment tracking</li>
+<li><strong>06-po-003-purchase-order-list</strong> - Summary list of all POs</li>
+</ul><h3>Receiving (RC) Reports</h3>
+<ul>
+<li><strong>07-rc-001-receiving-list</strong> - Summary of goods received</li>
+<li><strong>08-rc-002-receiving-detail</strong> - Detailed receiving transactions</li>
+<li><strong>09-rc-003-top-purchasing</strong> - Top purchased items ranking</li>
+<li><strong>10-rc-004-purchase-analysis-by-item</strong> - Purchase pattern analysis</li>
+</ul><h3>Credit Note (CN) Reports</h3>
+<ul>
+<li><strong>11-cn-001-credit-note-list</strong> - Summary of credit notes</li>
+<li><strong>12-cn-002-credit-note-detail</strong> - Detailed credit note information</li>
+</ul><h3>Vendor (VD) Reports</h3>
+<ul>
+<li><strong>13-vd-001-vendor-list</strong> - Master vendor list</li>
+<li><strong>14-vd-002-vendor-detailed</strong> - Vendor profile with transaction history</li>
+</ul><h3>Product (PD) Reports</h3>
+<ul>
+<li><strong>15-pd-001-product-list</strong> - Master product catalog</li>
+<li><strong>16-pd-002-product-category</strong> - Product categories and hierarchy</li>
+</ul><h3>Store Requisition (SR) Reports</h3>
+<ul>
+<li><strong>17-sr-001-store-requisition-detail</strong> - Internal transfer details</li>
+<li><strong>18-sr-002-store-requisition-summary</strong> - Requisition summary view</li>
+<li><strong>19-sr-003-store-requisition-list</strong> - List of all requisitions</li>
+<li><strong>20-sr-004-issue-detail</strong> - Inventory issue details</li>
+</ul><h3>Stock Movement Reports</h3>
+<ul>
+<li><strong>21-si-001-stock-in-detail</strong> - All stock receipt transactions</li>
+<li><strong>22-so-001-stock-out-detail</strong> - All stock issuance transactions</li>
+</ul><h3>Period Closing Reports</h3>
+<ul>
+<li><strong>23-cl-001-eop-adjustment</strong> - End-of-period adjustments</li>
+</ul><h3>Inventory (INV) Reports</h3>
+<ul>
+<li><strong>24-inv-001-inventory-balance</strong> - Current inventory balances</li>
+<li><strong>25-inv-002-inventory-movement-detail</strong> - Detailed movement by product</li>
+<li><strong>26-inv-003-inventory-movement-summary</strong> - Movement summary by location</li>
+<li><strong>27-inv-004-slow-moving</strong> - Slow-moving inventory analysis</li>
+<li><strong>28-inv-008-stock-card-detailed</strong> - Detailed stock card transactions</li>
+<li><strong>29-inv-009-stock-card-summary</strong> - Stock card summary</li>
+<li><strong>30-inv-010-deviation-by-item</strong> - Variance analysis</li>
+<li><strong>31-inv-011-inventory-aging</strong> - Inventory aging analysis</li>
+<li><strong>32-inv-012-expired-items</strong> - Expiry tracking and alerts</li>
+</ul><h3>Recipe Management (RM) Reports</h3>
+<ul>
+<li><strong>33-rm-001-recipe-list</strong> - Master recipe list</li>
+<li><strong>34-rm-002-recipe-card</strong> - Detailed recipe specifications</li>
+<li><strong>35-rm-003-material-consumption</strong> - Material usage vs standards</li>
+</ul><h2>Implementation Priority</h2><h3>Phase 1 - Critical (Immediate)</h3>
+<ol>
+<li>PR-002: Purchase Request Detail</li>
+<li>PO-002: Purchase Order Detail</li>
+<li>RC-002: Receiving Detail</li>
+<li>INV-001: Inventory Balance</li>
+<li>INV-008: Stock Card Detailed</li>
+</ol><h3>Phase 2 - High Priority</h3>
+<ol>
+<li>RC-004: Purchase Analysis by Item</li>
+<li>RC-003: Top Purchasing</li>
+<li>CN-002: Credit Note Detail</li>
+<li>VD-002: Vendor Detailed</li>
+<li>PD-001: Product List</li>
+<li>INV-002: Inventory Movement Detail</li>
+<li>INV-004: Slow Moving</li>
+<li>INV-012: Expired Items</li>
+</ol><h3>Phase 3 - Medium Priority</h3>
+<ol>
+<li>SR-001: Store Requisition Detail</li>
+<li>SR-004: Issue Detail</li>
+<li>SI-001: Stock In Detail</li>
+<li>SO-001: Stock Out Detail</li>
+<li>INV-011: Inventory Aging</li>
+<li>RM-002: Recipe Card</li>
+<li>RM-003: Material Consumption</li>
+</ol><h3>Phase 4 - Standard Implementation</h3>
+21-35. All remaining list reports, summaries, and analysis reports</p><h2>Source Documents</h2><p>The content in these directories was extracted and refactored from:
+<ul>
+<li><strong>docs/reports/bl_reports_msd.md</strong> - Master Specification Document (MSD)</li>
+<li><strong>docs/reports/bl_reports_prd_templates.md</strong> - PRD and Template Structures</li>
+</ul><h2>Report Development Status</h2><h3>Detailed PRD Available (Ready for Implementation)</h3>
+Reports with comprehensive PRD and template specifications:
+<ul>
+<li>PR-001, PR-002, PR-003</li>
+<li>PO-002</li>
+<li>(These reports have full filter parameters, data columns, business rules, UI/UX requirements)</li>
+</ul><h3>Basic PRD (Requires Elaboration)</h3>
+Reports with specifications from MSD requiring detailed PRD development:
+<ul>
+<li>Most other reports (6-35)</li>
+<li>These have basic structure but need:</li>
+</ul>
+  - Complete filter parameters
+  - Detailed data column specifications
+  - Comprehensive business rules
+  - UI/UX requirements
+  - Performance requirements</p><h2>Usage</h2><ol>
+<li><strong>For Developers</strong>: Review both PRD.md and TEMPLATE.md in each report directory</li>
+<li><strong>For Designers</strong>: Focus on TEMPLATE.md for layout and visual specifications</li>
+<li><strong>For Business Analysts</strong>: Review PRD.md for functional requirements and business rules</li>
+<li><strong>For Project Managers</strong>: Use implementation priority for planning</li>
+</ol><h2>Next Steps</h2><p>For reports marked as "Specification from MSD":
+<ol>
+<li>Review MSD specifications in docs/reports/bl_reports_msd.md</li>
+<li>Gather detailed business requirements from stakeholders</li>
+<li>Create comprehensive PRD following the pattern in PR-001, PR-002</li>
+<li>Design detailed template structure</li>
+<li>Develop implementation plan</li>
+</ol><h2>Report Module Codes</h2><ul>
+<li><strong>PR</strong> - Purchase Request</li>
+<li><strong>PO</strong> - Purchase Order</li>
+<li><strong>RC</strong> - Receiving</li>
+<li><strong>CN</strong> - Credit Note</li>
+<li><strong>VD</strong> - Vendor</li>
+<li><strong>PD</strong> - Product</li>
+<li><strong>SR</strong> - Store Requisition</li>
+<li><strong>SI</strong> - Stock In</li>
+<li><strong>SO</strong> - Stock Out</li>
+<li><strong>CL</strong> - Closing</li>
+<li><strong>INV</strong> - Inventory</li>
+<li><strong>RM</strong> - Recipe Management</li>
+</ul><p>---</p><p><strong>Document Created:</strong> 2025-10-21
+<strong>Total Reports:</strong> 35
+<strong>Status:</strong> Initial organization complete
+</p>
+        </div>
+        <div class="footer">
+            <p>Carmen ERP Documentation - Generated from Markdown</p>
+        </div>
+    </div>
+</body>
+</html>

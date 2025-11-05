@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-sr-001-store-requisition-detail - Template - Carmen ERP Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .report-header {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .report-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .report-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .content {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .content h1 {
+            font-size: 1.875rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .content h2 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .content h3 {
+            font-size: 1.25rem;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .content h4 {
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+        }
+
+        .content ul, .content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .content th {
+            background: var(--bg-light);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .content td {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .content tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+
+        .content code {
+            background: var(--bg-light);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        .content pre {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .content blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        .content strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        @media print {
+            .header, .breadcrumb, .footer {
+                display: none;
+            }
+            .content {
+                border: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">Carmen ERP - Reports Documentation</div>
+            <nav class="nav-links">
+                <a href="../index.html">All Reports</a>
+                <a href="../../04-modules/reporting/00-REPORTS-INDEX.html">Report Index</a>
+                <a href="../../index.html">Docs Home</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Reports</a>
+            <span>/</span>
+            <span>Report</span>
+            <span>/</span>
+            <span>17-sr-001-store-requisition-detail - Template</span>
+        </div>
+
+        <div class="report-header">
+            <h1 class="report-title">17-sr-001-store-requisition-detail - Template</h1>
+            <div class="report-meta">
+                
+                
+                
+                
+            </div>
+        </div>
+
+        <div class="content">
+            <h1>Store Requisition Detail Report - Template Structure</h1><h2>Status</h2><p>Template structure to be developed based on detailed PRD.</p><h2>Source Reference</h2><p>Refer to Master Specification Document (MSD) for initial template guidance:
+- docs/reports/bl_reports_msd.md</p><h2>Template Development</h2><p>Once the detailed PRD is completed, the template structure will include:
+- Filter section layout
+- Data column specifications
+- Visual design elements
+- Export formats
+- Print layout
+</p>
+        </div>
+
+        <div class="footer">
+            <p>Carmen ERP Documentation - Generated from Markdown</p>
+            <p>Report Documentation System © 2025</p>
+        </div>
+    </div>
+</body>
+</html>
